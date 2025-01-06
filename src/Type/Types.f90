@@ -1,0 +1,252 @@
+module Types
+    use, intrinsic :: iso_fortran_env, only : int32, real64
+    #ifdef _MPI
+        use mpi
+    #endif
+    implicit none
+    public
+    integer(int32), parameter :: Temperature = 1, Pressure = 2, Stress = 3
+    integer(int32), parameter :: Linear = 1, pTransition = 2, NonLinear = 3, nTransition = 4
+    real(real64),   parameter :: GravityAcceleration = 9.80655d0
+    integer(int32), parameter :: undumped = 0, dumped = 1
+
+    type :: VC
+        sequence
+        real(real64) :: x, y
+    end type VC
+
+    type :: Vector2d
+        sequence
+        real(real64) :: x, y
+    end type Vector2d
+
+    type :: DP2d
+        sequence
+        real(real64), allocatable :: x(:), y(:)
+    end type DP2d
+
+    type :: DP3d
+        sequence
+        real(real64), allocatable :: x(:), y(:), z(:)
+    end type DP3d
+
+    type :: INT2d
+        sequence
+        integer(int32), allocatable :: x(:), y(:)
+    end type INT2d
+
+    type :: INT3d
+        sequence
+        integer(int32), allocatable :: x(:), y(:), z(:)
+    end type INT3d
+
+    type :: PH
+        sequence
+        real(real64) :: soil, water, ice
+    end type PH
+
+    type :: Phases
+        sequence
+        real(real64) :: soil, water, ice
+    end type Phases
+
+    type :: Shape
+        sequence
+        real(real64), allocatable :: a(:,:), b(:,:), c(:,:), d(:,:)
+    end type Shape
+
+    type :: BoudaryConditionInfo
+        integer(int32), allocatable :: Node(:)     ! <= BC.in
+        integer(int32), allocatable :: TypeKey(:)  ! <= BC.in
+        integer(int32), allocatable :: Type(:)     ! <= BCtype.in
+        real(real64),   allocatable :: Value(:)    ! <= BCtype.in
+        type(INT2d)                  :: Edges
+        integer(int32), allocatable   :: EdgesDirection(:)
+        real(real64), allocatable   :: EdgesDistance(:)
+    end type BoudaryConditionInfo
+
+    type :: BoudaryCondition
+        type(BoudaryConditionInfo)   :: Heat, Water, Stress
+        integer(int32)               :: numNode, numType, numEdges
+    end type BoudaryCondition
+
+    type :: Boudary_Condition_Dirichlet
+        integer(int32) :: Num_Node, Num_Type
+        integer(int32), allocatable :: Node(:), Node_Type(:), Value_Info(:)
+        real(real64),   allocatable :: Value(:)
+    end type Boudary_Condition_Dirichlet
+
+    type :: Boudary_Condition_Neumann
+        integer(int32) :: Num_Edge, Num_Edge_Type, Num_Type
+        integer(int32), allocatable :: Edge(:,:), Edge_Type(:), Value_Info(:)
+        real(real64),   allocatable :: Value(:), Heat_Transfer(:)
+
+    end type Boudary_Condition_Neumann
+
+    type :: Boudary_Condition
+        type(Boudary_Condition_Dirichlet) :: Dirichlet
+        type(Boudary_Condition_Neumann)   :: Neumann
+    end type Boudary_Condition
+
+    type :: InitialConditionInfo
+        integer(int32) :: Type
+        real(real64)   :: Value
+        logical        :: isSet
+    end type InitialConditionInfo
+
+    type :: InitialCondition
+        type(InitialConditionInfo) :: Heat, Water, Stress
+    end type InitialCondition
+
+    #ifdef _MPI
+        type :: MPIInfo
+            integer(int32) :: size, rank
+        end type MPIInfo
+    #endif
+
+    type :: DF
+        real(real64),allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
+    end type DF
+
+    type :: Flag
+        logical              :: isTRM, isGCC, isPower, isSwitchTRM, isSwitchOnceTRM
+        logical              :: isStdOut, isOutputAll, isOutput, isPrintLisMem
+        logical, allocatable :: outOBS(:)
+    end type Flag
+
+    type :: CRS
+        integer(int32)              :: nnz
+        integer(int32), allocatable :: Ptr(:), Ind(:)
+        real(real64),   allocatable :: Val(:)
+    end type CRS
+
+
+    type :: Lis
+        integer(int32) :: TSolver, TOption, PSolver, POption, Maxiter
+        real(real64)   :: Tol
+        logical        :: isOMP
+    end type Lis
+
+    type :: Observation2d
+        integer(int32)              :: nObs, nObsType
+        ! 1: Nodes
+        integer(int32), allocatable :: obsPoint(:)
+        ! 2: Coordinate
+        type(DP2d)                  :: obsCOO
+        integer(int32), allocatable :: nAreaObs(:)
+        real(real64),   allocatable :: vAreaObs(:,:)
+
+    end type Observation2d
+
+    type :: HeatVariables
+        type(DF)                    :: Cs, Cp, lambda, rho, Ca
+        type(DP2d)                  :: Tgrad, TFlux
+        integer(int32), allocatable :: Phase(:)
+    end type HeatVariables
+
+    type HeatConstants
+        type(Phases)    :: Density, ThermalConductivity, SpecificHeat, HeatCapacity
+        type(Vector2d)  :: dispersity
+        real(real64)    :: Porosity, LatentHeat
+    end	type HeatConstants
+
+    type PowerModel
+        real(real64) :: phi, Tf, a
+        real(real64) :: Ca_max
+    end type PowerModel
+
+    type :: GCCModel
+        real(real64) :: thetaS, thetaR, alpha, n, m
+        real(real64) :: Tf
+        real(real64) :: Ca_max
+    end type GCCModel
+
+    type :: LatentHeatTreatment
+        integer(int32)   :: useModel  ! 20: GCC, 30: Power
+        real(real64)     :: Lf, rhoI
+        real(real64)     :: Cp_unf
+        type(GCCModel)   :: GCC
+        type(PowerModel) :: Power
+    end type LatentHeatTreatment
+
+    type :: HeatFields
+        type(HeatVariables)       :: Variables
+        type(HeatConstants)       :: Constants
+        type(LatentHeatTreatment) :: Latent
+        type(CRS)			      :: LHS_A
+        real(real64), allocatable :: RA(:,:)
+        real(real64), allocatable :: Rhs(:)
+    end type HeatFields
+
+    type WaterVariables
+        type(DF)   :: Klh
+        type(DP2d) :: wFlux, hGrad
+    end type WaterVariables
+
+    type WaterConstants
+        type(Phases)  :: HydraulicConductivity
+        real(real64)  :: zeta
+    end type WaterConstants
+
+    type :: WaterFields
+        type(WaterVariables)      :: Variables
+        type(WaterConstants)      :: Constants
+        type(CRS)			      :: LHS_A
+        real(real64), allocatable :: RA(:,:)
+        real(real64), allocatable :: Rhs(:)
+    end type WaterFields
+
+    type :: Geometry2d
+        integer(int32)              :: element, node, shape, dim, ShCoe
+        integer(int32), allocatable :: pElement(:,:)
+        type(DP2d)                  :: vCood
+        real(real64),   allocatable :: eArea(:)
+        type(Shape)                 :: Basis
+    end type Geometry2d
+
+    type :: Geometry_2D
+        integer(int32)              :: Num_Elements, Num_Nodes, Num_Shape, Num_Dimention, Num_Shape_Type, Num_Region
+        integer(int32), allocatable :: Element(:,:)
+        integer(int32), allocatable :: Element_Region(:), COO_Region(:)
+        type(DP2d)                  :: Nodes_2D
+        real(real64),   allocatable :: Area(:)
+        type(Shape)                 :: Shape_Function
+    end type Geometry_2D
+
+    type :: TimeInfo
+        character(3)          :: tUnit
+        ! tUnit <- nmk 1: Second, 2: Minute, 3: Hour, 4: Day, 5: Month, 6: Year
+        ! n : Calculation time unit, m: dt unit, k: output interval time unit
+        real(real64)          :: cTime, cdt, cinterval
+        real(real64)          :: ts, te, max_dt, min_dt, tconv
+        real(real64), pointer :: tst, dt, odt
+    end type TimeInfo
+
+    type :: Iteration
+        integer(int32)          :: itermax, iNLmax, iNI
+        integer(int32), pointer :: iter, titer, iNL
+        integer(int32)          :: digits_itermax
+    end type Iteration
+
+    type :: SolverInfo
+        type(Geometry2d)       :: N
+        logical                :: isHeat, isWater, isStress
+        integer(int32)         :: nAnalysis, nFrTreat, nTimeDisc, isStdOut, outputFile
+        type(TimeInfo)         :: Time
+        type(Iteration)        :: Iter
+        type(Observation2d)    :: Obs
+        type(HeatFields)       :: Heat
+        type(WaterFields)      :: Water
+        type(BoudaryCondition) :: BC
+        type(InitialCondition) :: IC
+        type(DF)               :: mWater, mIce
+        type(DF)               :: T, P
+        type(DF)               :: Si, Sw
+        type(Lis)              :: Lis
+        type(Flag)             :: Flags
+        character(64)          :: fmt_Stdout, fmt_Fileout
+    #ifdef _MPI
+        type(MPIInfo)          :: MPI
+    #endif
+    end type SolverInfo
+end module Types
