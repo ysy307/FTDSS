@@ -1221,7 +1221,7 @@ module Inout_Input
     function Inout_Input_Get_BC_Edge_Value(self, Calc_Type) result(arr_BC_Edge_Value)
         implicit none
         class(Input) :: self
-        real(real64), allocatable :: arr_BC_Edge_Value(:)
+        real(real64), allocatable :: arr_BC_Edge_Value(:,:)
         integer(int32), intent(in) :: Calc_Type
 
         if (allocated(arr_BC_Edge_Value)) then
