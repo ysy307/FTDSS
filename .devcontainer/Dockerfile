@@ -15,7 +15,10 @@ RUN apt-get update -y && apt-get install -y \
     sudo \
     vim \
     git \
-    gfortran\
+    gfortran \
+    python3 \
+    python3-pip \
+    python3-dev \
     && apt-get clean
 
 # Intel OneAPI のリポジトリを追加
@@ -24,9 +27,16 @@ RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PR
     sudo apt update && \
     sudo apt install -y intel-oneapi-compiler-fortran && \
     sudo apt install -y intel-oneapi-hpc-toolkit && \
-    PATH=/opt/intel/oneapi/compiler/latest/linux/bin/intel64:$PATH && \
-    export PS1='\[\e[32m\]\u@\h:\[\e[34m\]\w\[\e[0m\]\$ '
+    echo 'source /opt/intel/oneapi/setvars.sh' >> /root/.bashrc
 
+# Intel OneAPI のパスを環境変数に追加
+ENV PATH="/opt/intel/oneapi/compiler/latest/linux/bin/intel64:${PATH}"
+
+# Pythonツールをインストール
+RUN pip3 install --upgrade pip && \
+    pip3 install --force-reinstall git+https://github.com/fortran-lang/fortls && \
+    pip3 install --upgrade fprettify && \
+    echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod"] }' > /root/.fortls
 
 # .profile に設定を追加
 RUN echo '\
@@ -46,9 +56,6 @@ RUN echo '\
     if [ -d "$HOME/.local/bin" ] ; then\n\
     PATH="$HOME/.local/bin:$PATH"\n\
     fi\n\
-    \n\
-    # Intel oneAPI のセットアップスクリプトを実行\n\
-    source /opt/intel/oneapi/setvars.sh\n\
     \n\
     # DISPLAY 環境変数を設定\n\
     export DISPLAY=:0\n\

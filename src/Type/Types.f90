@@ -1,13 +1,13 @@
 module Types
-    use, intrinsic :: iso_fortran_env, only : int32, real64
-    #ifdef _MPI
-        use mpi
-    #endif
+    use, intrinsic :: iso_fortran_env, only: int32, real64
+#ifdef _MPI
+    use mpi
+#endif
     implicit none
     public
     integer(int32), parameter :: Temperature = 1, Pressure = 2, Stress = 3
     integer(int32), parameter :: Linear = 1, pTransition = 2, NonLinear = 3, nTransition = 4
-    real(real64),   parameter :: GravityAcceleration = 9.80655d0
+    real(real64), parameter :: GravityAcceleration = 9.80655d0
     integer(int32), parameter :: undumped = 0, dumped = 1
 
     type :: VC
@@ -52,14 +52,14 @@ module Types
 
     type :: Shape
         sequence
-        real(real64), allocatable :: a(:,:), b(:,:), c(:,:), d(:,:)
+        real(real64), allocatable :: a(:, :), b(:, :), c(:, :), d(:, :)
     end type Shape
 
     type :: BoudaryConditionInfo
-        integer(int32), allocatable :: Node(:)     ! <= BC.in
-        integer(int32), allocatable :: TypeKey(:)  ! <= BC.in
-        integer(int32), allocatable :: Type(:)     ! <= BCtype.in
-        real(real64),   allocatable :: Value(:)    ! <= BCtype.in
+        integer(int32), allocatable :: Node(:) ! <= BC.in
+        integer(int32), allocatable :: TypeKey(:) ! <= BC.in
+        integer(int32), allocatable :: type(:) ! <= BCtype.in
+        real(real64), allocatable :: value(:) ! <= BCtype.in
         type(INT2d)                  :: Edges
         integer(int32), allocatable   :: EdgesDirection(:)
         real(real64), allocatable   :: EdgesDistance(:)
@@ -73,13 +73,13 @@ module Types
     type :: Boudary_Condition_Dirichlet
         integer(int32) :: Num_Node, Num_Type
         integer(int32), allocatable :: Node(:), Node_Type(:), Value_Info(:)
-        real(real64),   allocatable :: Value(:)
+        real(real64), allocatable :: value(:)
     end type Boudary_Condition_Dirichlet
 
     type :: Boudary_Condition_Neumann
         integer(int32) :: Num_Edge, Num_Edge_Type, Num_Type
-        integer(int32), allocatable :: Edge(:,:), Edge_Type(:), Value_Info(:)
-        real(real64),   allocatable :: Value(:), Heat_Transfer(:)
+        integer(int32), allocatable :: Edge(:, :), Edge_Type(:), Value_Info(:)
+        real(real64), allocatable :: value(:), Heat_Transfer(:)
 
     end type Boudary_Condition_Neumann
 
@@ -89,8 +89,8 @@ module Types
     end type Boudary_Condition
 
     type :: InitialConditionInfo
-        integer(int32) :: Type
-        real(real64)   :: Value
+        integer(int32) :: type
+        real(real64)   :: value
         logical        :: isSet
     end type InitialConditionInfo
 
@@ -98,14 +98,14 @@ module Types
         type(InitialConditionInfo) :: Heat, Water, Stress
     end type InitialCondition
 
-    #ifdef _MPI
-        type :: MPIInfo
-            integer(int32) :: size, rank
-        end type MPIInfo
-    #endif
+#ifdef _MPI
+    type :: MPIInfo
+        integer(int32) :: size, rank
+    end type MPIInfo
+#endif
 
     type :: DF
-        real(real64),allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
+        real(real64), allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
     end type DF
 
     type :: Flag
@@ -117,9 +117,8 @@ module Types
     type :: CRS
         integer(int32)              :: nnz
         integer(int32), allocatable :: Ptr(:), Ind(:)
-        real(real64),   allocatable :: Val(:)
+        real(real64), allocatable :: Val(:)
     end type CRS
-
 
     type :: Lis
         integer(int32) :: TSolver, TOption, PSolver, POption, Maxiter
@@ -134,7 +133,7 @@ module Types
         ! 2: Coordinate
         type(DP2d)                  :: obsCOO
         integer(int32), allocatable :: nAreaObs(:)
-        real(real64),   allocatable :: vAreaObs(:,:)
+        real(real64), allocatable :: vAreaObs(:, :)
 
     end type Observation2d
 
@@ -148,7 +147,7 @@ module Types
         type(Phases)    :: Density, ThermalConductivity, SpecificHeat, HeatCapacity
         type(Vector2d)  :: dispersity
         real(real64)    :: Porosity, LatentHeat
-    end	type HeatConstants
+    end type HeatConstants
 
     type PowerModel
         real(real64) :: phi, Tf, a
@@ -161,8 +160,20 @@ module Types
         real(real64) :: Ca_max
     end type GCCModel
 
+    type :: WRF_Parameters
+        sequence
+        ! w1, w2は先に計算しておく
+        real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2
+    end type WRF_Parameters
+
+    type :: HCF_Parameters
+        sequence
+        real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2
+        real(real64) :: Ks, l
+    end type HCF_Parameters
+
     type :: LatentHeatTreatment
-        integer(int32)   :: useModel  ! 20: GCC, 30: Power
+        integer(int32)   :: useModel ! 20: GCC, 30: Power
         real(real64)     :: Lf, rhoI
         real(real64)     :: Cp_unf
         type(GCCModel)   :: GCC
@@ -173,8 +184,8 @@ module Types
         type(HeatVariables)       :: Variables
         type(HeatConstants)       :: Constants
         type(LatentHeatTreatment) :: Latent
-        type(CRS)			      :: LHS_A
-        real(real64), allocatable :: RA(:,:)
+        type(CRS)                              :: LHS_A
+        real(real64), allocatable :: RA(:, :)
         real(real64), allocatable :: Rhs(:)
     end type HeatFields
 
@@ -191,25 +202,25 @@ module Types
     type :: WaterFields
         type(WaterVariables)      :: Variables
         type(WaterConstants)      :: Constants
-        type(CRS)			      :: LHS_A
-        real(real64), allocatable :: RA(:,:)
+        type(CRS)                              :: LHS_A
+        real(real64), allocatable :: RA(:, :)
         real(real64), allocatable :: Rhs(:)
     end type WaterFields
 
     type :: Geometry2d
         integer(int32)              :: element, node, shape, dim, ShCoe
-        integer(int32), allocatable :: pElement(:,:)
+        integer(int32), allocatable :: pElement(:, :)
         type(DP2d)                  :: vCood
-        real(real64),   allocatable :: eArea(:)
+        real(real64), allocatable :: eArea(:)
         type(Shape)                 :: Basis
     end type Geometry2d
 
     type :: Geometry_2D
         integer(int32)              :: Num_Elements, Num_Nodes, Num_Shape, Num_Dimention, Num_Shape_Type, Num_Region
-        integer(int32), allocatable :: Element(:,:)
+        integer(int32), allocatable :: Element(:, :)
         integer(int32), allocatable :: Element_Region(:), COO_Region(:)
         type(DP2d)                  :: Nodes_2D
-        real(real64),   allocatable :: Area(:)
+        real(real64), allocatable :: Area(:)
         type(Shape)                 :: Shape_Function
     end type Geometry_2D
 
@@ -245,8 +256,8 @@ module Types
         type(Lis)              :: Lis
         type(Flag)             :: Flags
         character(64)          :: fmt_Stdout, fmt_Fileout
-    #ifdef _MPI
+#ifdef _MPI
         type(MPIInfo)          :: MPI
-    #endif
+#endif
     end type SolverInfo
 end module Types

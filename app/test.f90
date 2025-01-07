@@ -22,12 +22,12 @@ program main
     use :: Inout_Output
     use :: Main_Heat
 
-    #ifdef _OPENMP
-        use omp_lib
-    #endif
-    #ifdef _MPI
-        use mpi
-    #endif
+#ifdef _OPENMP
+    use omp_lib
+#endif
+#ifdef _MPI
+    use mpi
+#endif
     implicit none
 
     type(SolverInfo) :: Solver
@@ -53,20 +53,20 @@ program main
 
     ! character(256) :: Tsolver_name, Psolver_name
 
-    #ifdef _MPI
-        call MPI_Init(ierr)
-        call MPI_Comm_size(MPI_COMM_WORLD, Solver%MPI%size, ierr)
-        call MPI_Comm_rank(MPI_COMM_WORLD, Solver%MPI%rank, ierr)
+#ifdef _MPI
+    call MPI_Init(ierr)
+    call MPI_Comm_size(MPI_COMM_WORLD, Solver%MPI%size, ierr)
+    call MPI_Comm_rank(MPI_COMM_WORLD, Solver%MPI%rank, ierr)
 
-        write (*, *) "MPI size: ", Solver%MPI%size
-        write (*, *) "MPI rank: ", Solver%MPI%rank
-        call MPI_Barrier(MPI_COMM_WORLD, ierr)
-    #endif
+    write (*, *) "MPI size: ", Solver%MPI%size
+    write (*, *) "MPI rank: ", Solver%MPI%rank
+    call MPI_Barrier(MPI_COMM_WORLD, ierr)
+#endif
 
-    #ifdef _OPENMP
-        pts = omp_get_wtime()
-        call init_omp_config(Solver)
-    #endif
+#ifdef _OPENMP
+    pts = omp_get_wtime()
+    call init_omp_config(Solver)
+#endif
 
     Inputs = Input()
     Outputs = Output(Inputs)
@@ -129,13 +129,15 @@ program main
     !* Main loop section
     do while (.true.)
     if (Solver%Flags%isOutput) then
+#ifdef _OPENMP
         its = omp_get_wtime()
         Solver%Flags%isOutput = .false.
+#endif
     end if
     otst = ptst
     podt = pdt
     ptst = ptst + pdt
-    outtst = ptst * Solver%Time%tconv
+    outtst = ptst*Solver%Time%tconv
     ig = 1
     Local_loop: do while (.true.)
         piNL = 1
@@ -221,19 +223,22 @@ program main
         piNL = 1
     end if
 
-    if (ptst >= Solver%Time%cinterval * piter) then
+    if (ptst >= Solver%Time%cinterval*piter) then
+#ifdef _OPENMP
         pte = omp_get_wtime()
+#endif
         if (Solver%Flags%isStdOut) write(*,Solver%fmt_Stdout),"Progress:",piter,"/",Solver%Iter%itermax,"; Elapsed time:",pte-its,"/", pte-pts," sec"
-            if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, piter)
-            piter = piter + 1
-            Solver%Flags%isOutput = .true.
+        if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, piter)
+        piter = piter + 1
+        Solver%Flags%isOutput = .true.
     end if
     if (ptst >= Solver%Time%te) exit
     ptiter = ptiter + 1
 
     end do
-
+#ifdef _OPENMP
     pte = omp_get_wtime()
+#endif
     if (Solver%Flags%isStdOut) write (*, '(a)') ""
     if (Solver%Flags%isStdOut) write (*, '(a,i0)') "Total iteration: ", piter - 1
     if (Solver%Flags%isStdOut) write (*, '(a)') ""

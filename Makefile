@@ -15,8 +15,8 @@ DEBUG    = no
 
 MAIN_DIR := app
 SRC_DIR  := src
-MOD_DIR  := mod
-OBJ_DIR  := obj
+MOD_DIR  := build/mod
+OBJ_DIR  := build/obj
 BIN_DIR  := bin
 
 
@@ -114,6 +114,7 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
             $(SRC_DIR)/RootFinding/BinaryFinding.f90 \
             $(SRC_DIR)/Calculate/Update.f90 \
             $(SRC_DIR)/Calculate/Product.f90 \
+            $(SRC_DIR)/Calculate/WRF.f90 \
             $(SRC_DIR)/Matrix/ConvertCRS.f90 \
             $(SRC_DIR)/Matrix/FindInd.f90 \
             $(SRC_DIR)/Matrix/Assemble.f90 \
@@ -172,14 +173,14 @@ test: $(TEST_FILE) $(OBJ_FILES)
 	@$(FC) -o $(BIN_DIR)/$@ $(OBJ_FILES) $(TEST_FILE) $(OPTIONS_LINK) || (echo $(ERROR_TEXT) && exit 1)
 	@echo $(FINISHED_TEXT)
 
-# Compile source files into object files
+setup_directories:
+	@mkdir -p $(MOD_DIR) $(OBJ_DIR) $(BIN_DIR)
+
 $(OBJ_DIR)/%.obj: $(SRC_DIR)/%.f90
 	@mkdir -p $(dir $@)
 	@echo $(COMPILE_TEXT)
 	@$(FC) $(OPTIONS_COMPILE) -c $< -o $@
 
-setup_directories:
-	@mkdir -p $(MOD_DIR) $(OBJ_DIR) $(BIN_DIR)
 
 .PHONY : info
 info:
@@ -209,10 +210,10 @@ clean:
 .PHONY: allclean
 allclean:
 	@echo
-	@rm -rf $(OBJ_DIR)
+	@rm -rf build
 	@echo -e "\033[1;32m  Deleting objects directory \033[0m"
-	@rm -rf $(MOD_DIR)
 	@echo -e "\033[1;32m  Deleting mods directory    \033[0m"
+	@echo -e "\033[1;32m  Deleting build directory    \033[0m"
 	@find ./ -name "*.pdb" -delete
 	@find ./ -name "*.optrpt" -delete
 	@find ./ -name "*.yaml" -delete
