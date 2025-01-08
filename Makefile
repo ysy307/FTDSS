@@ -115,6 +115,7 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
             $(SRC_DIR)/Calculate/Update.f90 \
             $(SRC_DIR)/Calculate/Product.f90 \
             $(SRC_DIR)/Calculate/WRF.f90 \
+            $(SRC_DIR)/Calculate/HCF.f90 \
             $(SRC_DIR)/Matrix/ConvertCRS.f90 \
             $(SRC_DIR)/Matrix/FindInd.f90 \
             $(SRC_DIR)/Matrix/Assemble.f90 \

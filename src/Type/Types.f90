@@ -161,15 +161,13 @@ module Types
     end type GCCModel
 
     type :: WRF_Parameters
-        sequence
         ! w1, w2は先に計算しておく
         real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2
     end type WRF_Parameters
 
     type :: HCF_Parameters
-        sequence
         real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2
-        real(real64) :: Ks, l
+        real(real64) :: Ks, kzero, l, Omega
     end type HCF_Parameters
 
     type :: LatentHeatTreatment

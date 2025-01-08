@@ -137,7 +137,7 @@ program main
     otst = ptst
     podt = pdt
     ptst = ptst + pdt
-    outtst = ptst*Solver%Time%tconv
+    outtst = ptst * Solver%Time%tconv
     ig = 1
     Local_loop: do while (.true.)
         piNL = 1
@@ -223,11 +223,11 @@ program main
         piNL = 1
     end if
 
-    if (ptst >= Solver%Time%cinterval*piter) then
+    if (ptst >= Solver%Time%cinterval * piter) then
 #ifdef _OPENMP
         pte = omp_get_wtime()
 #endif
-        if (Solver%Flags%isStdOut) write(*,Solver%fmt_Stdout),"Progress:",piter,"/",Solver%Iter%itermax,"; Elapsed time:",pte-its,"/", pte-pts," sec"
+        if (Solver%Flags%isStdOut) write (*, Solver%fmt_Stdout), "Progress:", piter, "/", Solver%Iter%itermax, "; Elapsed time:", pte - its, "/", pte - pts, " sec"
         if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, piter)
         piter = piter + 1
         Solver%Flags%isOutput = .true.

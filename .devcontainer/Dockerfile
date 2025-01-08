@@ -27,45 +27,13 @@ RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PR
     sudo apt update && \
     sudo apt install -y intel-oneapi-compiler-fortran && \
     sudo apt install -y intel-oneapi-hpc-toolkit && \
-    echo 'source /opt/intel/oneapi/setvars.sh' >> /root/.bashrc
-
-# Intel OneAPI のパスを環境変数に追加
-ENV PATH="/opt/intel/oneapi/compiler/latest/linux/bin/intel64:${PATH}"
+    echo 'source /opt/intel/oneapi/setvars.sh' >> /root/.profile
 
 # Pythonツールをインストール
 RUN pip3 install --upgrade pip && \
     pip3 install --force-reinstall git+https://github.com/fortran-lang/fortls && \
     pip3 install --upgrade fprettify && \
     echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod"] }' > /root/.fortls
-
-# .profile に設定を追加
-RUN echo '\
-    # BASH_VERSION が存在する場合、.bashrc を読み込む\n\
-    if [ -n "$BASH_VERSION" ]; then\n\
-    if [ -f "$HOME/.bashrc" ]; then\n\
-    . "$HOME/.bashrc"\n\
-    fi\n\
-    fi\n\
-    \n\
-    # ユーザーの private bin を PATH に追加\n\
-    if [ -d "$HOME/bin" ] ; then\n\
-    PATH="$HOME/bin:$PATH"\n\
-    fi\n\
-    \n\
-    # ユーザーの .local/bin を PATH に追加\n\
-    if [ -d "$HOME/.local/bin" ] ; then\n\
-    PATH="$HOME/.local/bin:$PATH"\n\
-    fi\n\
-    \n\
-    # DISPLAY 環境変数を設定\n\
-    export DISPLAY=:0\n\
-    \n\
-    # スタックサイズ制限を無制限に設定\n\
-    ulimit -s unlimited\n\
-    ' >> /root/.profile
-
-# 作業ディレクトリを設定
-WORKDIR /usr/src/app
 
 # コンパイルや実行に使うデフォルトのコマンド
 CMD ["/bin/bash"]
