@@ -121,10 +121,6 @@ module Inout_Input
         module procedure Input_Constructor
     end interface
 
-    ! interface Inout_Input_Get_Coordinates
-    !     procedure Inout_Input_Get_Coordinates_DP2d
-    ! end interface
-
 contains
 
     type(Input) function Input_Constructor
@@ -193,9 +189,6 @@ contains
             open (newunit=unit_num, file=self%Basic_FileName, status="old", action="read", iostat=status)
             if (status /= 0) call error_message(902, opt_file_name=self%Basic_FileName)
 
-            ! --------------------------------------------------------------------
-            ! Basic
-            ! --------------------------------------------------------------------
             read (unit_num, *)
             read (unit_num, *)
             read (unit_num, *)
@@ -209,9 +202,6 @@ contains
             call Allocate_Matrix(self%Work_Region_Parameters_int32, 10, Self%Region)
             call Allocate_Matrix(self%Work_Region_Paremeters_real64, 50, Self%Region)
             do iRegion = 1, Self%Region
-                ! --------------------------------------------------------------------
-                ! Region_i Calculation_Type  Model_Type
-                ! --------------------------------------------------------------------
                 read (unit_num, *)
                 read (unit_num, *) c_dummy, self%Work_Region_Basic_Infomatin(1, iRegion), self%Work_Region_Basic_Infomatin(2, iRegion)
                 read (unit_num, *)
@@ -238,45 +228,33 @@ contains
                     case (min_model_type:max_model_type)
                         ! Porosity and Latent Heat
                         read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 1, iRegion)
+                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
                         id = id + 2
 
                         ! Density
                         read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 2, iRegion)
+                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
                         id = id + 3
 
                         ! Specific Heat
                         read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 2, iRegion)
+                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
                         id = id + 3
 
                         ! Thermal Conductivity
                         read (unit_num, *)
                         if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 2) == 0) then
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion)
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
                             id = id + 3
                         else
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion)
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
                             id = id + 5
                         end if
 
                         ! bulk modulus
                         if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 4) >= 2) then
                             read (unit_num, *)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion)
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
                             id = id + 2
                         end if
 
@@ -285,14 +263,14 @@ contains
                         read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
                         ii = ii + 1
                         select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
-                            ! TRM
                         case (1)
+                            ! TRM
                             read (unit_num, *)
                             read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
                             id = id + 1
 
-                            ! GCC Model
                         case (2)
+                            ! GCC Model
                             ! SWC type
                             read (unit_num, *)
                             read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
@@ -300,59 +278,34 @@ contains
                             read (unit_num, *)
 
                             select case (self%Work_Region_Parameters_int32(ii, iRegion))
-                                ! BC, VG, KO
                             case (1:3)
-                                read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 4, iRegion)
+                                ! BC, VG, KO
+                                read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
                                 id = id + 5
 
-                                ! MVG
                             case (4)
-                                read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 5, iRegion)
+                                ! MVG
+                                read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 5, iRegion)
                                 id = id + 6
 
-                                ! Durner
                             case (5)
-                                read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 7, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 8, iRegion)
+                                ! Durner
+                                read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
                                 id = id + 9
 
-                                ! Dual-VG-CH
                             case (6)
-                                read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                    self%Work_Region_Paremeters_real64(id + 7, iRegion)
+                                ! Dual-VG-CH
+                                read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
                                 id = id + 8
                             case default
                                 call error_message(903, copt1="SWC type")
                             end select
 
                             ii = ii + 1
-                            ! Power Model
                         case (3)
+                            ! Power Model
                             read (unit_num, *)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion)
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
                             id = id + 2
                         case default
                             call error_message(903, copt1="Qice type")
@@ -380,20 +333,17 @@ contains
 
                         ! Density
                         read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 1, iRegion)
+                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
                         id = id + 2
 
                         ! Specific Heat
                         read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 1, iRegion)
+                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
                         id = id + 2
 
                         ! Thermal Conductivity
                         read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 1, iRegion)
+                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
                         id = id + 2
                     end select
                     self%Work_Region_Parameters_Number(1, iRegion) = id - 1
@@ -412,124 +362,54 @@ contains
                     read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
                     ii = ii + 1
 
-                    !TODO: Tf分の読み込みを減らす
-
                     read (unit_num, *)
                     select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
                     case (10)
                         ! Hydraulic Conductivity
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                            self%Work_Region_Paremeters_real64(id + 1, iRegion)
+                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
                         id = id + 2
                     case (21:26, 31:36)
                         select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
-                            ! BC, VG, KO
                         case (1:3)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion)
+                            ! BC, VG, KO
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
                             id = id + 7
 
-                            ! MVG
                         case (4)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 7, iRegion)
+                            ! MVG
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
                             id = id + 8
 
-                            ! Durner
                         case (5)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 7, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 8, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 9, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 10, iRegion)
+                            ! Durner
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
                             id = id + 11
 
-                            ! Dual-VG-CH
                         case (6)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 7, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 8, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 9, iRegion)
+                            ! Dual-VG-CH
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 9, iRegion)
                             id = id + 10
                         end select
                     case (41:46, 51:56)
                         select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
-                            ! BC, VG, KO
                         case (1:3)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion)
+                            ! BC, VG, KO
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
                             id = id + 7
 
-                            ! MVG
                         case (4)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 7, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 8, iRegion)
+                            ! MVG
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
                             id = id + 9
 
-                            ! Durner
                         case (5)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 7, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 8, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 9, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 10, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 11, iRegion)
+                            ! Durner
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 11, iRegion)
                             id = id + 12
 
-                            ! Dual-VG-CH
                         case (6)
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 1, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 2, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 3, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 4, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 5, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 6, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 7, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 8, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 9, iRegion), &
-                                self%Work_Region_Paremeters_real64(id + 10, iRegion)
+                            ! Dual-VG-CH
+                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
                             id = id + 11
                         case default
                             call error_message(903, copt1="SWC type")
@@ -585,7 +465,6 @@ contains
         end if
             !!! FIXME: Bcastについては後で実装する
 #endif
-        print *, self%Work_Region_Paremeters_real64(:id, 1)
     end subroutine Inout_Input_Parameters
 
     subroutine Inout_Input_Coodinates(self)
@@ -712,11 +591,7 @@ contains
         if (self%myrank == root) then
 #endif
             do iNBC = 1, self%Num_NBC_Type
-                read (unit_num, *) self%Work_NBC_Node_Value_Info(iNBC, 1), &
-                    self%Work_NBC_Node_Value_Info(iNBC, 2), &
-                    self%Work_NBC_Node_Value(iNBC, 1), &
-                    self%Work_NBC_Node_Value(iNBC, 2), &
-                    self%Work_NBC_Node_Value(iNBC, 3)
+                read (unit_num, *) self%Work_NBC_Node_Value_Info(iNBC, 1:2), self%Work_NBC_Node_Value(iNBC, 1:3)
             end do
             read (unit_num, *)
             read (unit_num, *)
@@ -747,11 +622,7 @@ contains
         if (self%myrank == root) then
 #endif
             do iEBC = 1, self%Num_EBC_Edge
-                read (unit_num, *) self%Work_EBC_Edge_Value_Info(iEBC, 1), &
-                    self%Work_EBC_Edge_Value_Info(iEBC, 2), &
-                    self%Work_EBC_Edge_Value_Info(iEBC, 3), &
-                    self%Work_EBC_Edge_Value_Info(iEBC, 4), &
-                    self%Work_EBC_Edge_Value_Info(iEBC, 5)
+                read (unit_num, *) self%Work_EBC_Edge_Value_Info(iEBC, 1:5)
 
                 if (mod(self%Work_EBC_Edge_Value_Info(iEBC, 3), 10) /= 0) then
                     read (unit_num, *) self%Work_EBC_Edge_Value(iEBC, 1), self%Work_EBC_Edge_Value(iEBC, 2)
@@ -766,7 +637,7 @@ contains
             read (unit_num, *)
 
             do iEBC = 1, self%Num_BC_Edge
-                read (unit_num, *) self%Work_EBC_Edge(iEBC, 1), self%Work_EBC_Edge(iEBC, 2), self%Work_EBC_Edge_Type(iEBC)
+                read (unit_num, *) self%Work_EBC_Edge(iEBC, 1:2), self%Work_EBC_Edge_Type(iEBC)
             end do
             close (unit_num)
 
@@ -850,17 +721,20 @@ contains
                 call Allocate_Matrix(self%Work_Observation_Coordinate, self%Num_Observation, 3)
                 if (self%COO_Dimension == 1) then
                     do iObs = 1, self%Num_Observation
-                        read (unit_num, *) self%Work_Observation_Coordinate(iObs, 1), &
+                        read (unit_num, *) &
+                            self%Work_Observation_Coordinate(iObs, 1), &
                             self%Work_Observation_Coordinate(iObs, 2)
                     end do
                 else if (self%COO_Dimension == 2) then
                     do iObs = 1, self%Num_Observation
-                        read (unit_num, *) self%Work_Observation_Coordinate(iObs, 1), &
+                        read (unit_num, *) &
+                            self%Work_Observation_Coordinate(iObs, 1), &
                             self%Work_Observation_Coordinate(iObs, 3)
                     end do
                 else if (self%COO_Dimension == 3) then
                     do iObs = 1, self%Num_Observation
-                        read (unit_num, *) self%Work_Observation_Coordinate(iObs, 1), &
+                        read (unit_num, *) &
+                            self%Work_Observation_Coordinate(iObs, 1), &
                             self%Work_Observation_Coordinate(iObs, 2), &
                             self%Work_Observation_Coordinate(iObs, 3)
                     end do
