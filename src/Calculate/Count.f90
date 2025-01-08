@@ -1,5 +1,5 @@
 module Calculate_Count
-    use, intrinsic :: iso_fortran_env, only : int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     use :: error
 
@@ -10,17 +10,17 @@ module Calculate_Count
         procedure :: Count_if_int32_Array
     end interface
 
-    contains
+contains
 
-    function Count_if_int32(array, condition) result(count)
+    function Count_if_int32(array, Condition) result(count)
         implicit none
         interface
             logical function Condition(x)
                 integer, intent(in) :: x
             end function Condition
         end interface
-        integer, intent(in) :: array(:)       ! 入力配列
-        integer :: count                      ! 条件を満たす要素の個数
+        integer, intent(in) :: array(:) ! 入力配列
+        integer :: count ! 条件を満たす要素の個数
         integer :: i
 
         count = 0
@@ -37,9 +37,9 @@ module Calculate_Count
                 integer, intent(in) :: condition_array(:)
             end function Condition
         end interface
-        integer, intent(in) :: array(:)            ! 入力配列
-        integer, intent(in) :: condition_array(:)  ! 条件配列
-        integer :: count                           ! 条件を満たす要素の個数
+        integer, intent(in) :: array(:) ! 入力配列
+        integer, intent(in) :: condition_array(:) ! 条件配列
+        integer :: count ! 条件を満たす要素の個数
         integer :: i
 
         count = 0
