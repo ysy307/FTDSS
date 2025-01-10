@@ -11,12 +11,25 @@ contains
         real(real64) :: thetaW
 
         if (h < -1.0d0 / structure_WRF%alpha1) then
-            thetaW = structure_WRF%thetaR + (structure_WRF%thetaS - structure_WRF%thetaR) * abs(structure_WRF%alpha1 * h)**(-structure_WRF%n1)
+            thetaW = structure_WRF%thetaR + (structure_WRF%thetaS - structure_WRF%thetaR) * (structure_WRF%alpha1 / h)**structure_WRF%n1
         else
             thetaW = structure_WRF%thetaS
         end if
 
     end function Calculate_WRF_BC
+
+    function Calculate_WRF_Derivative_BC(structure_WRF, h) result(Cw)
+        type(WRF_Parameters), intent(in) :: structure_WRF
+        real(real64), intent(in) :: h
+        real(real64) :: Cw
+
+        if (h < -1.0d0 / structure_WRF%alpha1) then
+            Cw = (structure_WRF%thetaS - structure_WRF%thetaR) * structure_WRF%n1 * (structure_WRF%alpha1 / h)**(structure_WRF%n1 + 1.0d0) / structure_WRF%alpha1
+        else
+            Cw = 0.0d0
+        end if
+
+    end function Calculate_WRF_Derivative_BC
 
     function Calculate_WRF_VG(structure_WRF, h) result(thetaW)
         type(WRF_Parameters), intent(in) :: structure_WRF
@@ -24,7 +37,7 @@ contains
         real(real64) :: thetaW
 
         if (h < 0) then
-            thetaW = structure_WRF%thetaR + (structure_WRF%thetaS - structure_WRF%thetaR) * (1.0d0 + abs(structure_WRF%alpha1 * h)**structure_WRF%n1)**(-structure_WRF%m1)
+            thetaW = structure_WRF%thetaR + (structure_WRF%thetaS - structure_WRF%thetaR) * (1.0d0 + (-structure_WRF%alpha1 * h)**structure_WRF%n1)**(-structure_WRF%m1)
         else
             thetaW = structure_WRF%thetaS
         end if
