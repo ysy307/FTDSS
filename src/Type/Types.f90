@@ -1,10 +1,10 @@
 module Types
     use, intrinsic :: iso_fortran_env, only: int32, real64
-#ifdef _MPI
-    use mpi
-#endif
     implicit none
     public
+#ifdef _MPI
+    include 'mpif.h'
+#endif
     integer(int32), parameter :: Temperature = 1, Pressure = 2, Stress = 3
     integer(int32), parameter :: Linear = 1, pTransition = 2, NonLinear = 3, nTransition = 4
     real(real64), parameter :: GravityAcceleration = 9.80655d0

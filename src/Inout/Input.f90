@@ -3,12 +3,7 @@ module Inout_Input
     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
     use :: error
     use :: allocate
-    use :: Types, only:DP2d
-
-#ifdef _MPI
-    use mpi
-#endif
-
+    use :: Types
     implicit none
     private
 

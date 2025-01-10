@@ -33,7 +33,7 @@ RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PR
 RUN pip3 install --upgrade pip && \
     pip3 install --force-reinstall git+https://github.com/fortran-lang/fortls && \
     pip3 install --upgrade fprettify && \
-    echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod"] }' > /root/.fortls
+    echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod", "/opt/intel/oneapi/mpi/2021.14/include/mpi","/opt/intel/oneapi/2025.0/include/mpi"] }' > /root/.fortls
 
 # コンパイルや実行に使うデフォルトのコマンド
 CMD ["/bin/bash"]

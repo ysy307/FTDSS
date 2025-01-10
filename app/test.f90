@@ -25,9 +25,6 @@ program main
 #ifdef _OPENMP
     use omp_lib
 #endif
-#ifdef _MPI
-    use mpi
-#endif
     implicit none
 
     type(SolverInfo) :: Solver

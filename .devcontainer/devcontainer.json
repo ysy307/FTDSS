@@ -32,14 +32,20 @@
                 "fortran.linter.extraArgs": [
                     "-module",
                     "/workspaces/FTDSS/build/mod",
+                    "-module",
+                    "/opt/intel/oneapi/mpi/2021.14/include/mpi",
+                    "-module",
+                    "/opt/intel/oneapi/2025.0/include/mpi",
                     "-fpp"
                 ],
                 "fortran.linter.compiler": "ifx",
-                "fortran.linter.compilerPath": "/opt/intel/oneapi/compiler/latest/bin/ifx",
+                "fortran.linter.compilerPath": "/opt/intel/oneapi/compiler/latest/bin/ifx", // /opt/intel/oneapi/mpi/2021.14/bin/mpiifx
                 "fortran.linter.includePaths": [
                     "/usr/include/",
                     "/workspaces/FTDSS/build/mod/",
-                    "/opt/intel/oneapi/mkl/latest/include/"
+                    "/opt/intel/oneapi/mkl/latest/include/",
+                    "/opt/intel/oneapi/mpi/2021.14/include/",
+                    "/opt/intel/oneapi/2025.0/include/"
                 ],
                 "fortran.linter.modOutput": "/workspaces/FTDSS/build/mod/",
                 "fortran.formatting.formatter": "fprettify",
