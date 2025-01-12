@@ -1,0 +1,115 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "fpm build bebug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/fpm/first_steps",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": "fpm",
+            "args": [
+                "build",
+                "--compiler",
+                "ifx",
+                "--flag",
+                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "--link-flag",
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit  -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "fpm build optimize",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/fpm/first_steps",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "command": "fpm",
+            "args": [
+                "build",
+                "--compiler",
+                "ifx",
+                "--flag",
+                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "--link-flag",
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "fpm run bebug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/fpm/first_steps",
+            },
+            "group": "none",
+            "command": "fpm",
+            "args": [
+                "run",
+                "--compiler",
+                "ifx",
+                "--flag",
+                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "--link-flag",
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit  -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "fpm run optimize",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/fpm/first_steps",
+            },
+            "group": "none",
+            "command": "fpm",
+            "args": [
+                "run",
+                "--compiler",
+                "ifx",
+                "--flag",
+                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "--link-flag",
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        }
+    ]
+}

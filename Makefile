@@ -49,7 +49,7 @@ MKL_OPTIONS_INTEL_MPI := ${MKLROOT}/lib/libmkl_blas95_lp64.a \
                          -ldl
 
 MKL_INC_DIRS_INTEL := -I${MKLROOT}/include/mkl/intel64/lp64 \
-                      -I"${MKLROOT}/include"
+                      -I${MKLROOT}/include
 
 # Include path and Libraries
 INC_DIRS =
