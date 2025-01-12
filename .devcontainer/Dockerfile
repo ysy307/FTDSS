@@ -19,7 +19,6 @@ RUN apt-get update -y && apt-get install -y \
     python3 \
     python3-pip \
     python3-dev \
-    cmake \
     zsh \
     sed \
     && apt-get clean \
@@ -51,7 +50,10 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"; \
     done && \
     sed -i "/'prompt'/c \\\ 'contrib-prompt' \\\\\n  'prompt'" /root/.zpreztorc && \
-    sed -i "s/theme 'sorin'/theme 'spaceship'/g" /root/.zpreztorc
+    sed -i "s/theme 'sorin'/theme 'bart'/g" /root/.zpreztorc && \
+    echo 'export PS1="%~ %# "' >> /root/.zshrc && \
+    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc
+
 
 # デフォルトのシェルをZshに設定
 RUN chsh -s /usr/bin/zsh
