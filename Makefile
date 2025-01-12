@@ -1,7 +1,7 @@
 #!/usr/bin/make
 #----------------------------------------------------------------------------------------------------------------------------------
 # shell
-SHELL = /bin/bash
+SHELL = /bin/zsh
 # no verbose
 $(VERBOSE).SILENT:
 
@@ -15,8 +15,8 @@ DEBUG    = no
 
 MAIN_DIR := app
 SRC_DIR  := src
-MOD_DIR  := build/mod
-OBJ_DIR  := build/obj
+MOD_DIR  := MakeBuild/.mod
+OBJ_DIR  := MakeBuild/.obj
 BIN_DIR  := bin
 
 

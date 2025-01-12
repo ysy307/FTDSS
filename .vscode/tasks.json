@@ -17,9 +17,9 @@
                 "--compiler",
                 "ifx",
                 "--flag",
-                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
                 "--link-flag",
-                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit  -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
             ],
             "presentation": {
                 "echo": false,
@@ -46,9 +46,9 @@
                 "--compiler",
                 "ifx",
                 "--flag",
-                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
                 "--link-flag",
-                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
             ],
             "presentation": {
                 "echo": false,
@@ -72,10 +72,11 @@
                 "--compiler",
                 "ifx",
                 "--flag",
-                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
                 "--link-flag",
-                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit  -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O0 -C -g  -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit  -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
             ],
+            "problemMatcher": [],
             "presentation": {
                 "echo": false,
                 "reveal": "always",
@@ -98,9 +99,143 @@
                 "--compiler",
                 "ifx",
                 "--flag",
-                "\"-fpp -c -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
+                "\"-fpp -traceback -O3 -xHost -fiopenmp -I${MKLROOT}/include/mkl/intel64/lp64 -I${MKLROOT}/include\"",
                 "--link-flag",
-                "\"-fpp -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3 -O3 -flto -xHost -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+                "\"-fpp -traceback -O3 -fiopenmp ${MKLROOT}/lib/libmkl_blas95_lp64.a ${MKLROOT}/lib/libmkl_lapack95_lp64.a -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_lp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl\""
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "make test",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": "build",
+            "command": "make",
+            "args": [
+                "test"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "make",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": "none",
+            "command": "make",
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "make run",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": "none",
+            "command": "make",
+            "args": [
+                "run"
+            ],
+            "problemMatcher": [],
+            "dependsOn": [
+                "make"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "make testrun1",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": "test",
+            "command": "make",
+            "args": [
+                "testrun1"
+            ],
+            "problemMatcher": [],
+            "dependsOn": [
+                "make test"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "make testrun2",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": "test",
+            "command": "make",
+            "args": [
+                "testrun2"
+            ],
+            "problemMatcher": [],
+            "dependsOn": [
+                "make test"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "make testrun3",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": "test",
+            "command": "make",
+            "args": [
+                "testrun3"
+            ],
+            "problemMatcher": [],
+            "dependsOn": [
+                "make test"
             ],
             "presentation": {
                 "echo": false,

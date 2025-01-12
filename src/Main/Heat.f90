@@ -42,6 +42,7 @@ contains
         block
             real(real64) :: array_HCF(9)
             array_HCF = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            print *, array_HCF
             Heat_Constructor%HCFs = HCF(array_HCF, 5, 2)
         end block
 
