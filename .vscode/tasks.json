@@ -245,6 +245,108 @@
                 "showReuseMessage": true,
                 "clear": false
             }
-        }
+        },
+        {
+            "label": "cmake build & testrun",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/CMakeBuild",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": "cmake",
+            "args": [
+                "-S",
+                "..",
+                "-DBUILD_APP=test",
+                "-B",
+                ".",
+                "&&",
+                "cmake",
+                "--build",
+                ".",
+                "&&",
+                "cmake",
+                "--build",
+                ".",
+                "--target",
+                "run_test"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "cmake build & run",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/CMakeBuild",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": "cmake",
+            "args": [
+                "-S",
+                "..",
+                "-DBUILD_APP=ysy_fc",
+                "-B",
+                ".",
+                "&&",
+                "cmake",
+                "--build",
+                ".",
+                "&&",
+                "cmake",
+                "--build",
+                ".",
+                "--target",
+                "run_ysy_fc"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "rm & mkdir cmake build",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+            },
+            "group": {
+                "kind": "none",
+                "isDefault": false
+            },
+            "command": "rm",
+            "args": [
+                "-rf",
+                "CMakeBuild",
+                "&&",
+                "mkdir",
+                "CMakeBuild"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
     ]
 }

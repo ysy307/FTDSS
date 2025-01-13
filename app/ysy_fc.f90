@@ -1,7 +1,7 @@
 program ysy_fc
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
-    use :: Inout_Inout
+    ! use :: Inout_Inout
     use :: allocate
     use :: Allocate_Structure
     use :: Solver_Initialize
@@ -26,7 +26,7 @@ program ysy_fc
     implicit none
 
     type(SolverInfo)          :: Solver
-    type(IO) :: Inout
+    ! type(IO) :: Inout
     type :: SOLVES
         type(ILS) :: ILEQ
         type(DLS) :: DLEQ
@@ -71,20 +71,20 @@ program ysy_fc
     call init_omp_config(Solver)
 #endif
 
-    Inout = IO()
+    ! Inout = IO()
 
     !* Input basic data
-    call Inout%Input_Parameters(Solver)
-    !* Input initial and boundary condition
-    call Inout%Input_IC(Solver)
-    call Inout%Input_BC(Solver)
-    call Inout%Input_Flags(Solver)
+    ! call Inout%Input_Parameters(Solver)
+    ! !* Input initial and boundary condition
+    ! call Inout%Input_IC(Solver)
+    ! call Inout%Input_BC(Solver)
+    ! call Inout%Input_Flags(Solver)
 
     call Allocate_Solver(Solver)
 
     !* Input coordinate and vertex data
-    call Inout%Input_Vertices(Solver)
-    call Inout%Input_Coodinates(Solver)
+    ! call Inout%Input_Vertices(Solver)
+    ! call Inout%Input_Coodinates(Solver)
 
     call Initialize_Solver(Solver)
 
@@ -96,15 +96,15 @@ program ysy_fc
     if (Solver%isWater) call Duplicate_CRS(CTop, Solver%Water%LHS_A)
     call Init_Assemble(CTop)
 
-    call Inout%Input_Observation(Solver)
+    ! call Inout%Input_Observation(Solver)
     if (Solver%Obs%nObsType == 2) call Set_Obs_Coo(Solver)
 
     call Fix_InitialCondition(Solver)
     call Update_Parameters_Water(Solver)
     call Update_Parameters_Heat(Solver)
 
-    if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, 0)
-    call Inout%Output_Observation(Solver, 0.0d0)
+    ! if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, 0)
+    ! call Inout%Output_Observation(Solver, 0.0d0)
 
     ptst => Solver%Time%tst
     pdt => Solver%Time%dt
@@ -209,14 +209,14 @@ program ysy_fc
 
         if (ptst - otst > epsilon(otst)) then
             call Update_Gradient(Solver, Solver%T%pre(:), Solver%Heat%Variables%Tgrad)
-            call Inout%Output_Observation(Solver, outtst)
+            ! call Inout%Output_Observation(Solver, outtst)
             piNL = 1
         end if
 
         if (ptst >= Solver%Time%cinterval * piter) then
 !$          pte = omp_get_wtime()
             if (Solver%Flags%isStdOut) write (*, Solver%fmt_Stdout), "Progress:", piter, "/", Solver%Iter%itermax, "; Elapsed time:", pte - its, "/", pte - pts, " sec"
-            if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, piter)
+            ! if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, piter)
             piter = piter + 1
             Solver%Flags%isOutput = .true.
         end if

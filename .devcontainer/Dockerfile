@@ -21,12 +21,14 @@ RUN apt-get update -y && apt-get install -y \
     python3-dev \
     zsh \
     sed \
+    cmake \
+    software-properties-common \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Intel OneAPI のリポジトリを追加
-RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null && \
-    echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list && \
+RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null && \
+    echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list && \
     apt-get update && \
     apt-get install -y intel-oneapi-compiler-fortran intel-oneapi-hpc-toolkit && \
     touch /root/.zprofile && \
@@ -52,10 +54,20 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     sed -i "/'prompt'/c \\\ 'contrib-prompt' \\\\\n  'prompt'" /root/.zpreztorc && \
     sed -i "s/theme 'sorin'/theme 'bart'/g" /root/.zpreztorc && \
     echo 'export PS1="%~ %# "' >> /root/.zshrc && \
-    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc
-
+    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
+    echo "export FC=ifx" >> ~/.zshrc && \
+    echo "export F90=ifx" >> ~/.zshrc && \
+    echo "export F77=ifx" >> ~/.zshrc
 
 # デフォルトのシェルをZshに設定
-RUN chsh -s /usr/bin/zsh
+RUN echo "export SHELL=/usr/bin/zsh" >> /root/.bashrc && \
+    ln -sf /usr/bin/zsh /etc/alternatives/shell && \
+    ln -sf /usr/bin/zsh /root/.bashrc
+
+# Kitwareリポジトリの設定とCMakeのインストール
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null && \
+    apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" && \
+    apt update && \
+    apt install -y cmake
 
 CMD ["/usr/bin/zsh"]

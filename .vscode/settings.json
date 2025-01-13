@@ -29,7 +29,7 @@
         "/usr/include/",
         "/workspaces/FTDSS/MakeBuild/.mod/",
         "/opt/intel/oneapi/mkl/latest/include/",
-        "/opt/intel/oneapi/mpi/2021.14/include/",
+        "/opt/intel/oneapi/mpi/latest/include/",
         "/opt/intel/oneapi/2025.0/include/"
     ],
     "fortran.linter.modOutput": "/workspaces/FTDSS/MakeBuild/.mod/",
@@ -76,5 +76,6 @@
     },
     "files.exclude": {
         "**/.git": false
-    }
+    },
+    "docker.commands.attach": "${containerCommand} exec -it ${containerId} zsh"
 }
