@@ -21,7 +21,6 @@ RUN apt-get update -y && apt-get install -y \
     python3-dev \
     zsh \
     sed \
-    cmake \
     software-properties-common \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -38,6 +37,7 @@ RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PR
 RUN pip3 install --upgrade pip && \
     pip3 install --force-reinstall git+https://github.com/fortran-lang/fortls && \
     pip3 install --upgrade fprettify && \
+    pip3 install --upgrade fypp && \
     echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod", "/opt/intel/oneapi/mpi/2021.14/include/mpi","/opt/intel/oneapi/2025.0/include/mpi"] }' > /root/.fortls
 
 # ZshとPreztoの設定
@@ -57,7 +57,14 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
     echo "export FC=ifx" >> ~/.zshrc && \
     echo "export F90=ifx" >> ~/.zshrc && \
-    echo "export F77=ifx" >> ~/.zshrc
+    echo "export F77=ifx" >> ~/.zshrc && \
+    echo "export CC=icc" >> ~/.zshrc && \
+    echo "export CXX=icpc" >> ~/.zshrc && \
+    echo "export MPIFC=mpiifx" >> ~/.zshrc && \
+    echo "export MPIF90=mpiifx" >> ~/.zshrc && \
+    echo "export MPIF77=mpiifx" >> ~/.zshrc && \
+    echo "export MPICC=mpiicc" >> ~/.zshrc && \
+    echo "export MPICXX=mpiicpc" >> ~/.zshrc
 
 # デフォルトのシェルをZshに設定
 RUN echo "export SHELL=/usr/bin/zsh" >> /root/.bashrc && \

@@ -124,7 +124,6 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
             $(SRC_DIR)/Inout/SetProjectPath.f90 \
             $(SRC_DIR)/Inout/Input.f90 \
             $(SRC_DIR)/Inout/Output.f90 \
-            $(SRC_DIR)/Inout/Inout.f90 \
             $(SRC_DIR)/Inout/Stdout.f90 \
             $(SRC_DIR)/Main/Heat.f90 \
             $(SRC_DIR)/Solver/Initialize.f90 \
@@ -141,7 +140,7 @@ WHICHFC = $(shell which $(FC))
 
 COMPILE_TEXT  = -e "\033[1;36m  Compile  \033[0m\033[1m $(patsubst $(SRC_DIR)/%,%,$<)\033[0m"
 ASSEMBLE_TEXT = -e "\033[1;31m  Assemble \033[0m\033[1m $<\033[0m"
-FINISHED_TEXT = -e "\033[1;34m  Compilation completed successfully! Executable: $(BIN_DIR)/$@\033[0m"
+FINISHED_TEXT = -e "\033[1;34m  Compilation completed successfully! Executable: $(BIN_DIR)/MAKE_$@\033[0m"
 ERROR_TEXT    = -e "\033[1;31m  Compilation failed! \033[0m"
 
 COMPIELE_OPTIONS_TEXT = "\
@@ -165,13 +164,13 @@ all: setup_directories ysy
 # Compile and link the program
 ysy: $(MAIN_FILE) $(OBJ_FILES)
 	@echo $(ASSEMBLE_TEXT)
-	@$(FC) -o $(BIN_DIR)/$@ $(OBJ_FILES) $(MAIN_FILE) $(OPTIONS_LINK) || (echo $(ERROR_TEXT) && exit 1)
+	@$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(MAIN_FILE) $(OPTIONS_LINK) || (echo $(ERROR_TEXT) && exit 1)
 	@echo $(FINISHED_TEXT)
 
 # Compile and link the test program
 test: $(TEST_FILE) $(OBJ_FILES)
 	@echo $(ASSEMBLE_TEXT)
-	@$(FC) -o $(BIN_DIR)/$@ $(OBJ_FILES) $(TEST_FILE) $(OPTIONS_LINK) || (echo $(ERROR_TEXT) && exit 1)
+	@$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(TEST_FILE) $(OPTIONS_LINK) || (echo $(ERROR_TEXT) && exit 1)
 	@echo $(FINISHED_TEXT)
 
 setup_directories:
@@ -211,30 +210,30 @@ clean:
 .PHONY: allclean
 allclean:
 	@echo
-	@rm -rf build
+	@rm -rf MakeBuild
 	@echo -e "\033[1;32m  Deleting objects directory \033[0m"
 	@echo -e "\033[1;32m  Deleting mods directory    \033[0m"
 	@echo -e "\033[1;32m  Deleting build directory    \033[0m"
 	@find ./ -name "*.pdb" -delete
 	@find ./ -name "*.optrpt" -delete
 	@find ./ -name "*.yaml" -delete
-	@rm -f $(BIN_DIR)/ysy_fc $(BIN_DIR)/tests
-	@echo -e "\033[1;32m  Deleting binaries directory \033[0m"
+	@rm -f $(BIN_DIR)/MAKE_ysy_fc $(BIN_DIR)/MAKE_tests
+	@echo -e "\033[1;32m  Deleting binaries \033[0m"
 	@echo
 
 
 .PHONY: run
 run:
-	@export OMP_NUM_THREADS=4 && ./$(BIN_DIR)/ysy
+	@export OMP_NUM_THREADS=4 && ./$(BIN_DIR)/MAKE_ysy
 
 .PHONY: testrun1
 testrun1:
-	@export OMP_NUM_THREADS=1 && ./$(BIN_DIR)/test
+	@export OMP_NUM_THREADS=1 && ./$(BIN_DIR)/MAKE_test
 
 .PHONY: testrun2
 testrun2:
-	@export OMP_NUM_THREADS=8 && ./$(BIN_DIR)/test
+	@export OMP_NUM_THREADS=8 && ./$(BIN_DIR)/MAKE_test
 
 .PHONY: testrun3
 testrun3:
-	@export OMP_NUM_THREADS=16 && ./$(BIN_DIR)/test
+	@export OMP_NUM_THREADS=16 && ./$(BIN_DIR)/MAKE_test
