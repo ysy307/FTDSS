@@ -4,6 +4,7 @@ module Inout_Input
     use :: error
     use :: allocate
     use :: Types
+    use :: tomlf
     implicit none
     private
 
@@ -23,10 +24,12 @@ module Inout_Input
 
         ! Basic.in
         ! Basic section
+        type(Basic_params) :: Basic
+        type(Type_Region), allocatable :: Regions(:)
         integer(int32) :: Elements, Nodes, Shape, Dimemsion, Region
         integer(int32) :: StandardOutput, OutputFile
-        real(real64)   :: Calculation_Time, dt, Output_Interval_Time
-        character(3)   :: Time_Unit
+        real(real64) :: Calculation_Time, dt, Output_Interval_Time
+        character(3) :: Time_Unit
         ! Region
         integer(int32), allocatable :: Work_Region_Basic_Infomatin(:, :)
         integer(int32), allocatable :: Work_Region_Parameters_Number(:, :)
@@ -34,12 +37,12 @@ module Inout_Input
         real(real64), allocatable :: Work_Region_Paremeters_real64(:, :)
 
         integer(int32) :: SolverDI(3), Solve_Type(3), Solve_Pre(3), Solve_Maxiter(3)
-        real(real64)   :: Time_Discretization
-        real(real64)   :: Solve_Tol(3)
+        real(real64) :: Time_Discretization
+        real(real64) :: Solve_Tol(3)
 
         ! Coordinate.in
-        integer(int32)              :: COO_Dimension
-        real(real64), allocatable   :: Work_Coordinates(:, :)
+        integer(int32) :: COO_Dimension
+        real(real64), allocatable :: Work_Coordinates(:, :)
         integer(int32), allocatable :: Work_Coordinates_Region(:)
 
         ! Top.in
@@ -48,7 +51,7 @@ module Inout_Input
 
         ! BC.in
         ! Nodes BC information
-        integer(int32)              :: Num_BC_Node, Num_BC_Node_Type, Num_NBC_Type
+        integer(int32) :: Num_BC_Node, Num_BC_Node_Type, Num_NBC_Type
         integer(int32), allocatable :: Work_NBC_Node(:), Work_NBC_Node_Type(:), Work_NBC_Node_Value_Info(:, :)
         real(real64), allocatable :: Work_NBC_Node_Value(:, :)
         ! Edeges BC information
@@ -62,12 +65,12 @@ module Inout_Input
         real(real64), allocatable :: Work_IC_Value(:)
 
         ! Obs.in
-        integer(int32)              :: Observation_Type, Num_Observation
+        integer(int32) :: Observation_Type, Num_Observation
         integer(int32), allocatable :: Work_Observation_Node(:)
-        real(real64), allocatable   :: Work_Observation_Coordinate(:, :)
+        real(real64), allocatable :: Work_Observation_Coordinate(:, :)
 
         ! printobs.in
-        integer(int32)              :: Num_Observation_Flag
+        integer(int32) :: Num_Observation_Flag
         integer(int32), allocatable :: Work_Observation_Flag(:)
 
 #ifdef _MPI
@@ -76,7 +79,7 @@ module Inout_Input
 
     contains
 
-        procedure :: Input_Parameters => Inout_Input_Parameters
+        procedure :: Input_Parameters => Inout_Input_Parameters_TOML
         procedure :: Input_Coodinates => Inout_Input_Coodinates
         procedure :: Input_Vertices => Inout_Input_Vertices
         procedure :: Input_BC => Inout_Input_BC
@@ -169,6 +172,99 @@ contains
         call Input_Constructor%Input_Flags()
 
     end function Input_Constructor
+
+    subroutine Inout_Input_Parameters_TOML(self)
+        implicit none
+        class(Input) :: self
+        type(toml_table), allocatable :: table
+        type(toml_error), allocatable :: parse_error
+        integer(int32) :: status, unit_num
+        integer(int32) :: iRegion
+
+        open (newunit=unit_num, file="/workspaces/FTDSS/Inout/new-toml/Basic.toml", status="old", action="read", iostat=status)
+        if (status /= 0) call error_message(902, opt_file_name="/workspaces/FTDSS/Inout/new-toml/Basic.toml")
+        call toml_parse(table, unit_num, parse_error)
+        close (unit=unit_num)
+        if (allocated(parse_error)) then
+            print *, "Error parsing table:"//parse_error%message
+        end if
+        call Inout_Input_Parameters_TOML_Basic(self, table)
+        if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%Region))
+        do iRegion = 1, self%Basic%Region
+            call Inout_Input_Parameters_TOML_Thermal(self, table, iRegion)
+        end do
+
+        stop
+    end subroutine Inout_Input_Parameters_TOML
+
+    subroutine Inout_Input_Parameters_TOML_Basic(self, table)
+        implicit none
+        class(Input) :: self
+        type(toml_table), intent(inout) :: table
+        type(toml_table), pointer :: child, grandchild
+
+        call get_value(table, "Basic", child)
+        if (associated(child)) then
+            call get_value(child, "Element", self%Basic%Element)
+            call get_value(child, "Node", self%Basic%Node)
+            call get_value(child, "Shape", self%Basic%Shape)
+            call get_value(child, "Dimension", self%Basic%Dim)
+            call get_value(child, "Region", self%Basic%Region)
+
+            call get_value(child, "Calculation", grandchild)
+            if (associated(grandchild)) then
+                call get_value(grandchild, "timeUnit", self%Basic%Calculation_timeUnit)
+                call get_value(grandchild, "step", self%Basic%Calculation_step)
+                deallocate (grandchild)
+            end if
+
+            call get_value(child, "Input", grandchild)
+            if (associated(grandchild)) then
+                call get_value(grandchild, "timeUnit", self%Basic%Input_timeUnit)
+                call get_value(grandchild, "calculationPeriod", self%Basic%CalculationPeriod)
+                deallocate (grandchild)
+            end if
+
+            call get_value(child, "Output", grandchild)
+            if (associated(grandchild)) then
+                call get_value(grandchild, "timeUnit", self%Basic%Output_timeUnit)
+                deallocate (grandchild)
+            end if
+
+            call get_value(child, "Interval", grandchild)
+            if (associated(grandchild)) then
+                call get_value(grandchild, "timeUnit", self%Basic%Interval_timeUnit)
+                call get_value(grandchild, "step", self%Basic%Interval)
+                deallocate (grandchild)
+            end if
+
+            call get_value(child, "isDisplayPrompt", self%Basic%isDisplayPrompt)
+            call get_value(child, "FileOutput", self%Basic%FileOutput)
+
+            deallocate (child)
+        end if
+
+    end subroutine Inout_Input_Parameters_TOML_Basic
+
+    subroutine Inout_Input_Parameters_TOML_Thermal(self, table, iRegion)
+        implicit none
+        class(Input) :: self
+        integer(int32), intent(in) :: iRegion
+        type(toml_table), intent(inout) :: table
+        type(toml_table), pointer :: child, grandchild
+        character(8) :: region_name
+
+        integer(int32) :: tmp
+
+        write (region_name, "(A, I0)") "Region", iRegion
+        call get_value(table, trim(region_name), child)
+        if (associated(child)) then
+            call get_value(child, "CalculationType", self%Regions(iRegion)%CalculationType)
+            call get_value(child, "Modelnumber", self%Regions(iRegion)%Modelnumber)
+
+        end if
+
+    end subroutine Inout_Input_Parameters_TOML_Thermal
 
     subroutine Inout_Input_Parameters(self)
         implicit none
@@ -464,10 +560,10 @@ contains
 
     subroutine Inout_Input_Coodinates(self)
         implicit none
-        class(Input)   :: self
+        class(Input) :: self
         integer(int32) :: status, unit_num, iN, ierr
-        real(real64)   :: d_dummy
-        character(64)  :: c_dummy
+        real(real64) :: d_dummy
+        character(64) :: c_dummy
 
 #ifdef _MPI
         if (self%myrank == root) then
@@ -522,7 +618,7 @@ contains
 
     subroutine Inout_Input_Vertices(self)
         implicit none
-        class(Input)   :: self
+        class(Input) :: self
         integer(int32) :: status, unit_num, iElem
 
         if (self%Shape == 3 .and. self%Dimemsion == 1) call Allocate_Matrix(self%Work_Top, 3, self%Elements)
@@ -551,7 +647,7 @@ contains
 
     subroutine Inout_Input_BC(self)
         implicit none
-        class(Input)   :: self
+        class(Input) :: self
         integer(int32) :: status, unit_num
         integer(int32) :: iNBC, iEBC
         character(256) :: c_dummy
@@ -644,9 +740,9 @@ contains
 
     subroutine Inout_Input_IC(self)
         implicit none
-        class(Input)                        :: self
-        integer(int32)                  :: status, unit_num
-        character(256)                   :: c_dummy
+        class(Input) :: self
+        integer(int32) :: status, unit_num
+        character(256) :: c_dummy
 
 #ifdef _MPI
         if (self%myrank == root) then
@@ -691,8 +787,8 @@ contains
 
     subroutine Inout_Input_Observation(self)
         implicit none
-        class(Input)                        :: self
-        integer(int32)                  :: status, unit_num, iObs
+        class(Input) :: self
+        integer(int32) :: status, unit_num, iObs
 
 #ifdef _MPI
         if (self%myrank == root) then
@@ -746,10 +842,10 @@ contains
 
     subroutine Inout_Input_Flags(self)
         implicit none
-        class(Input)                           :: self
-        integer(int32)                      :: unit_num, status
-        integer(int32)                      :: iFlag
-        character(256)                       :: c_dummy
+        class(Input) :: self
+        integer(int32) :: unit_num, status
+        integer(int32) :: iFlag
+        character(256) :: c_dummy
 
 #ifdef _MPI
         if (self%myrank == root) then

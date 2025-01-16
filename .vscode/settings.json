@@ -15,24 +15,25 @@
     },
     "fortran.fortls.path": "/usr/local/bin/fortls",
     "fortran.linter.extraArgs": [
+        "-fpp",
         "-module",
-        "/workspaces/FTDSS/MakeBuild/.mod",
+        "/workspaces/FTDSS/CMakeBuild/.mod",
         "-module",
         "/opt/intel/oneapi/mpi/2021.14/include/mpi",
         "-module",
         "/opt/intel/oneapi/2025.0/include/mpi",
-        "-fpp"
     ],
     "fortran.linter.compiler": "ifx",
     "fortran.linter.compilerPath": "/opt/intel/oneapi/compiler/latest/bin/ifx",
     "fortran.linter.includePaths": [
-        "/usr/include/",
-        "/workspaces/FTDSS/MakeBuild/.mod/",
+        "/workspaces/FTDSS/CMakeBuild/.mod/",
         "/opt/intel/oneapi/mkl/latest/include/",
         "/opt/intel/oneapi/mpi/latest/include/",
-        "/opt/intel/oneapi/2025.0/include/"
+        "/opt/intel/oneapi/2025.0/include/",
+        "/workspaces/FTDSS/include/toml-f/", // toml-f のモジュールパス
+        "/workspaces/FTDSS/include/VTKFortran" // toml-f のモジュールパス
     ],
-    "fortran.linter.modOutput": "/workspaces/FTDSS/MakeBuild/.mod/",
+    "fortran.linter.modOutput": "/workspaces/FTDSS/CMakeBuild/.mod/",
     "fortran.formatting.formatter": "fprettify",
     "fortran.formatting.fprettifyArgs": [
         "--indent",
@@ -67,7 +68,10 @@
         "1",
         "--line-length",
         "256",
-        "--silent"
+        "--silent",
+        "--enable-decl",
+        "--whitespace-decl",
+        "true"
     ],
     "fortran.preferredCase": "lowercase",
     "[FortranFreeForm]": {
