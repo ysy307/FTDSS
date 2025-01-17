@@ -8,13 +8,13 @@ module Main_Heat
 
     implicit none
     private
-    integer(int32), parameter   :: Calc_Heat = 1
+    integer(int32), parameter :: Calc_Heat = 1
 
     public :: Heat
 
     type Heat
-        type(Geometry_2D)           :: Geometry
-        type(Boudary_Condition)  :: BC
+        type(Geometry_2D) :: Geometry
+        type(Boudary_Condition) :: BC
         type(HCF) :: HCFs
         ! integer(int32)              :: Num_Elements, Num_Nodes, Num_Shape, Num_Dimention, Num_Shape_Type, Num_Region
         ! integer(int32), allocatable :: Element(:,:)
@@ -50,7 +50,7 @@ contains
 
     subroutine Set_Geometory_Infomation(self, Structure_Input)
         type(Heat), intent(inout) :: self
-        type(Input), intent(in)    :: Structure_Input
+        type(Input), intent(in) :: Structure_Input
 
         self%Geometry%Num_Elements = Structure_Input%Input_Get_Elements()
         self%Geometry%Num_Nodes = Structure_Input%Input_Get_Nodes()
@@ -70,13 +70,13 @@ contains
         use :: Calculate_Count, only:Count_if
         implicit none
         type(Heat), intent(inout) :: self
-        type(Input), intent(in)    :: Structure_Input
+        type(Input), intent(in) :: Structure_Input
 
         integer(int32) :: Count_Heat
         integer(int32) :: iBC, Counter
 
         integer(int32), allocatable :: Work_Node(:), Work_Edge(:, :), Work_Type(:), Work_Value_Info(:, :)
-        real(real64), allocatable   :: Work_Value(:)
+        real(real64), allocatable :: Work_Value(:)
 
         Work_Node = Structure_Input%Input_Get_BC_Node()
         Work_Type = Structure_Input%Input_Get_BC_Node_Type()

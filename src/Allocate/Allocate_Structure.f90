@@ -1,8 +1,8 @@
 module Allocate_Structure
     use :: error
     use :: Types
-    use :: Allocate
-    use, intrinsic :: iso_fortran_env, only : int32, real64
+    use :: allocate
+    use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
     private
 
@@ -10,60 +10,64 @@ module Allocate_Structure
     public :: Allocate_DP2d
     public :: Allocate_BCinfo
     public :: Allocate_Solver
+    public :: Allocate_Structure_Thermal_Type
+    public :: Allocate_Structure_Ice_Type
+    public :: Allocate_Structure_WRF_Type
 
-    contains
+contains
 
     subroutine Allocate_DF(ar_DF, n)
-		implicit none
-		type(DF), intent(inout)    :: ar_DF
-		integer(int32), intent(in) :: n
+        implicit none
+        type(DF), intent(inout) :: ar_DF
+        integer(int32), intent(in) :: n
 
-		call Allocate_Vector(ar_DF%old, n)
-		call Allocate_Vector(ar_DF%pre, n)
-		call Allocate_Vector(ar_DF%new, n)
-		call Allocate_Vector(ar_DF%dif, n)
-		call Allocate_Vector(ar_DF%div, n)
-		call Allocate_Vector(ar_DF%tmp, n)
+        call Allocate_Vector(ar_DF%old, n)
+        call Allocate_Vector(ar_DF%pre, n)
+        call Allocate_Vector(ar_DF%new, n)
+        call Allocate_Vector(ar_DF%dif, n)
+        call Allocate_Vector(ar_DF%div, n)
+        call Allocate_Vector(ar_DF%tmp, n)
 
-	end subroutine Allocate_DF
+    end subroutine Allocate_DF
 
-	subroutine Allocate_DP2d(ar_DP2d, n)
-		implicit none
-		type(DP2d), intent(inout)  :: ar_DP2d
-		integer(int32), intent(in) :: n
+    subroutine Allocate_DP2d(ar_DP2d, n)
+        implicit none
+        type(DP2d), intent(inout) :: ar_DP2d
+        integer(int32), intent(in) :: n
 
-		call Allocate_Vector(ar_DP2d%x, n)
-		call Allocate_Vector(ar_DP2d%y, n)
+        call Allocate_Vector(ar_DP2d%x, n)
+        call Allocate_Vector(ar_DP2d%y, n)
 
-	end subroutine Allocate_DP2d
+    end subroutine Allocate_DP2d
+
     subroutine Allocate_INT2d(ar_INT2d, n)
-		implicit none
-		type(INT2d), intent(inout)  :: ar_INT2d
-		integer(int32), intent(in) :: n
+        implicit none
+        type(INT2d), intent(inout) :: ar_INT2d
+        integer(int32), intent(in) :: n
 
-		call Allocate_Vector(ar_INT2d%x, n)
-		call Allocate_Vector(ar_INT2d%y, n)
+        call Allocate_Vector(ar_INT2d%x, n)
+        call Allocate_Vector(ar_INT2d%y, n)
 
-	end subroutine Allocate_INT2d
+    end subroutine Allocate_INT2d
 
-	subroutine Allocate_BCinfo(BCinfo, nNode, nType, nEdge)
-		implicit none
-		type(BoudaryConditionInfo), intent(inout) :: BCinfo
-		integer(int32), intent(in)                :: nNode, nType
-		integer(int32), intent(in), optional      :: nEdge
+    subroutine Allocate_BCinfo(BCinfo, nNode, nType, nEdge)
+        implicit none
+        type(BoudaryConditionInfo), intent(inout) :: BCinfo
+        integer(int32), intent(in) :: nNode, nType
+        integer(int32), intent(in), optional :: nEdge
 
-		call Allocate_Vector(BCinfo%Node,    nNode)
-		call Allocate_Vector(BCinfo%TypeKey, nNode)
-		call Allocate_Vector(BCinfo%Type,    nType)
-		call Allocate_Vector(BCinfo%Value,   nType)
+        call Allocate_Vector(BCinfo%Node, nNode)
+        call Allocate_Vector(BCinfo%TypeKey, nNode)
+        call Allocate_Vector(BCinfo%type, nType)
+        call Allocate_Vector(BCinfo%value, nType)
         if (present(nEdge)) then
             ! print*, nEdge
-		call Allocate_INT2d(BCinfo%Edges,  nEdge)
-		call Allocate_Vector(BCinfo%EdgesDirection,   nEdge)
-		call Allocate_Vector(BCinfo%EdgesDistance,   nEdge)
+            call Allocate_INT2d(BCinfo%Edges, nEdge)
+            call Allocate_Vector(BCinfo%EdgesDirection, nEdge)
+            call Allocate_Vector(BCinfo%EdgesDistance, nEdge)
         end if
 
-	end subroutine Allocate_BCinfo
+    end subroutine Allocate_BCinfo
 
     subroutine Allocate_Solver(Solver)
         implicit none
@@ -71,47 +75,119 @@ module Allocate_Structure
 
         !* Allocate Geometry2d
         call Allocate_Matrix(Solver%N%pElement, Solver%N%shape, Solver%N%element)
-        call Allocate_Vector(Solver%N%vCood%x,  Solver%N%node)
-        call Allocate_Vector(Solver%N%vCood%y,  Solver%N%node)
-        call Allocate_Vector(Solver%N%eArea,    Solver%N%element)
-        call Allocate_Matrix(Solver%N%Basis%a,  Solver%N%ShCoe, Solver%N%element)
-        call Allocate_Matrix(Solver%N%Basis%b,  Solver%N%ShCoe, Solver%N%element)
-        call Allocate_Matrix(Solver%N%Basis%c,  Solver%N%ShCoe, Solver%N%element)
+        call Allocate_Vector(Solver%N%vCood%x, Solver%N%node)
+        call Allocate_Vector(Solver%N%vCood%y, Solver%N%node)
+        call Allocate_Vector(Solver%N%eArea, Solver%N%element)
+        call Allocate_Matrix(Solver%N%Basis%a, Solver%N%ShCoe, Solver%N%element)
+        call Allocate_Matrix(Solver%N%Basis%b, Solver%N%ShCoe, Solver%N%element)
+        call Allocate_Matrix(Solver%N%Basis%c, Solver%N%ShCoe, Solver%N%element)
         if (Solver%N%ShCoe == 4) call Allocate_Matrix(Solver%N%Basis%d, Solver%N%ShCoe, Solver%N%element)
 
         call Allocate_Vector(Solver%mWater%old, Solver%N%node)
         call Allocate_Vector(Solver%mWater%pre, Solver%N%node)
-        call Allocate_Vector(Solver%mIce%old,   Solver%N%node)
-        call Allocate_Vector(Solver%mIce%pre,   Solver%N%node)
-        call Allocate_Vector(Solver%mIce%dif,   Solver%N%node)
+        call Allocate_Vector(Solver%mIce%old, Solver%N%node)
+        call Allocate_Vector(Solver%mIce%pre, Solver%N%node)
+        call Allocate_Vector(Solver%mIce%dif, Solver%N%node)
 
         call Allocate_DF(Solver%Si, Solver%N%node)
 
         if (Solver%isHeat) then
-            call Allocate_DF(Solver%Heat%Variables%Cs,        Solver%N%node)
-            call Allocate_DF(Solver%Heat%Variables%Cp,        Solver%N%node)
-            call Allocate_DF(Solver%Heat%Variables%lambda,    Solver%N%node)
-            call Allocate_DF(Solver%Heat%Variables%rho,       Solver%N%node)
-            call Allocate_DF(Solver%Heat%Variables%Ca,        Solver%N%node)
+            call Allocate_DF(Solver%Heat%Variables%Cs, Solver%N%node)
+            call Allocate_DF(Solver%Heat%Variables%Cp, Solver%N%node)
+            call Allocate_DF(Solver%Heat%Variables%lambda, Solver%N%node)
+            call Allocate_DF(Solver%Heat%Variables%rho, Solver%N%node)
+            call Allocate_DF(Solver%Heat%Variables%Ca, Solver%N%node)
 
-            call Allocate_DF(Solver%T,                        Solver%N%node)
-            call Allocate_Vector(Solver%Heat%Rhs,             Solver%N%node)
+            call Allocate_DF(Solver%T, Solver%N%node)
+            call Allocate_Vector(Solver%Heat%Rhs, Solver%N%node)
             call Allocate_Vector(Solver%Heat%Variables%Phase, Solver%N%node)
-            call Allocate_Matrix(Solver%Heat%RA,              Solver%N%node, Solver%N%node)
-            call Allocate_DP2d(Solver%Heat%Variables%Tgrad,   Solver%N%node)
-            call Allocate_DP2d(Solver%Heat%Variables%TFlux,   Solver%N%node)
+            call Allocate_Matrix(Solver%Heat%RA, Solver%N%node, Solver%N%node)
+            call Allocate_DP2d(Solver%Heat%Variables%Tgrad, Solver%N%node)
+            call Allocate_DP2d(Solver%Heat%Variables%TFlux, Solver%N%node)
         end if
         if (Solver%isWater) then
-            call Allocate_DF  (Solver%Water%Variables%Klh,   Solver%N%node)
+            call Allocate_DF(Solver%Water%Variables%Klh, Solver%N%node)
             call Allocate_DP2d(Solver%Water%Variables%wFlux, Solver%N%node)
             call Allocate_DP2d(Solver%Water%Variables%hGrad, Solver%N%node)
 
-            call Allocate_DF  (Solver%P,                     Solver%N%node)
-            call Allocate_Vector(Solver%Water%Rhs,           Solver%N%node)
-            call Allocate_Matrix(Solver%Water%RA,            Solver%N%node, Solver%N%node)
+            call Allocate_DF(Solver%P, Solver%N%node)
+            call Allocate_Vector(Solver%Water%Rhs, Solver%N%node)
+            call Allocate_Matrix(Solver%Water%RA, Solver%N%node, Solver%N%node)
         end if
 
-
     end subroutine Allocate_Solver
+
+    subroutine Allocate_Structure_Thermal_Type(Structure_Thermal, Flags)
+        implicit none
+        type(Type_Thermal), intent(inout) :: Structure_Thermal
+        type(Type_Region_Flags), intent(in) :: Flags
+
+        if (allocated(Structure_Thermal%Density)) deallocate (Structure_Thermal%Density)
+        if (allocated(Structure_Thermal%SpecificHeat)) deallocate (Structure_Thermal%SpecificHeat)
+        if (allocated(Structure_Thermal%ThermalConductivity)) deallocate (Structure_Thermal%ThermalConductivity)
+
+        if (Flags%is1Phase) then
+            allocate (Type_Density_1Phase :: Structure_Thermal%Density)
+            allocate (Type_SpecificHeat_1Phase :: Structure_Thermal%SpecificHeat)
+            allocate (Type_ThermalConductivity_1Phase :: Structure_Thermal%ThermalConductivity)
+        else if (Flags%is2Phase) then
+            allocate (Type_Density_2Phase :: Structure_Thermal%Density)
+            allocate (Type_SpecificHeat_2Phase :: Structure_Thermal%SpecificHeat)
+            allocate (Type_ThermalConductivity_2Phase :: Structure_Thermal%ThermalConductivity)
+        else if (Flags%is3Phase) then
+            allocate (Type_Density_3Phase :: Structure_Thermal%Density)
+            allocate (Type_SpecificHeat_3Phase :: Structure_Thermal%SpecificHeat)
+            if (Flags%isDispersity) then
+                allocate (Type_ThermalConductivity_3Phase_Dispersity_2D :: Structure_Thermal%ThermalConductivity)
+                ! allocate (Type_ThermalConductivity_3Phase_Dispersity_3D :: Structure_Thermal%ThermalConductivity)
+            else
+                allocate (Type_ThermalConductivity_3Phase :: Structure_Thermal%ThermalConductivity)
+            end if
+        end if
+
+    end subroutine Allocate_Structure_Thermal_Type
+
+    subroutine Allocate_Structure_Ice_Type(Structure_Thermal, QiceModelType)
+        implicit none
+        type(Type_Thermal), intent(inout) :: Structure_Thermal
+        integer(int32), intent(in) :: QiceModelType
+
+        if (allocated(Structure_Thermal%Ice)) deallocate (Structure_Thermal%Ice)
+
+        if (QiceModelType == 1) then
+            allocate (Type_Ice_TRM :: Structure_Thermal%Ice)
+        else if (QiceModelType == 2) then
+            allocate (Type_Ice_GCC :: Structure_Thermal%Ice)
+        else if (QiceModelType == 3) then
+            allocate (Type_Ice_EXP :: Structure_Thermal%Ice)
+        end if
+
+    end subroutine Allocate_Structure_Ice_Type
+
+    subroutine Allocate_Structure_WRF_Type(Structure_Thermal, WRFModelType)
+        implicit none
+        type(Type_Thermal), intent(inout) :: Structure_Thermal
+        integer(int32), intent(in) :: WRFModelType
+
+        ! Iceが割り当て済みかチェック
+        if (.not. allocated(Structure_Thermal%Ice)) then
+            print *, "Error: Ice structure is not allocated."
+            return
+        end if
+        select type (Ice => Structure_Thermal%Ice)
+        type is (Type_Ice_GCC)
+            ! WRFの割り当て
+            if (WRFModelType == 1) then
+                allocate (Type_WRF_BC :: Ice%WRF)
+            else if (WRFModelType == 2) then
+                allocate (Type_WRF_VG :: Ice%WRF)
+            else
+                print *, "Unknown WRF model type for Type_Ice_GCC."
+            end if
+        class default
+            print *, "Error: Ice type is not Type_Ice_GCC."
+        end select
+
+    end subroutine Allocate_Structure_WRF_Type
 
 end module Allocate_Structure

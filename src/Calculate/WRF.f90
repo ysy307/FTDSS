@@ -6,7 +6,7 @@ module Calculate_WRF
 contains
 
     function Calculate_WRF_BC(structure_WRF, h) result(thetaW)
-        type(WRF_Parameters), intent(in) :: structure_WRF
+        type(Type_WRF_BC), intent(in) :: structure_WRF
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
@@ -19,7 +19,7 @@ contains
     end function Calculate_WRF_BC
 
     function Calculate_WRF_Derivative_BC(structure_WRF, h) result(Cw)
-        type(WRF_Parameters), intent(in) :: structure_WRF
+        type(Type_WRF_BC), intent(in) :: structure_WRF
         real(real64), intent(in) :: h
         real(real64) :: Cw
 
@@ -32,7 +32,7 @@ contains
     end function Calculate_WRF_Derivative_BC
 
     function Calculate_WRF_VG(structure_WRF, h) result(thetaW)
-        type(WRF_Parameters), intent(in) :: structure_WRF
+        type(Type_WRF_VG), intent(in) :: structure_WRF
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
@@ -45,7 +45,7 @@ contains
     end function Calculate_WRF_VG
 
     function Calculate_WRF_KO(structure_WRF, h) result(thetaW)
-        type(WRF_Parameters), intent(in) :: structure_WRF
+        type(Type_WRF_KO), intent(in) :: structure_WRF
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
@@ -58,7 +58,7 @@ contains
     end function Calculate_WRF_KO
 
     function Calculate_WRF_MVG(structure_WRF, h) result(thetaW)
-        type(WRF_Parameters), intent(in) :: structure_WRF
+        type(Type_WRF_MVG), intent(in) :: structure_WRF
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
@@ -71,7 +71,7 @@ contains
     end function Calculate_WRF_MVG
 
     function Calculate_WRF_Durner(structure_WRF, h) result(thetaW)
-        type(WRF_Parameters), intent(in) :: structure_WRF
+        type(Type_WRF_Durner), intent(in) :: structure_WRF
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
@@ -86,7 +86,7 @@ contains
     end function Calculate_WRF_Durner
 
     function Calculate_WRF_DVGCH(structure_WRF, h) result(thetaW)
-        type(WRF_Parameters), intent(in) :: structure_WRF
+        type(Type_WRF_DVGCH), intent(in) :: structure_WRF
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 

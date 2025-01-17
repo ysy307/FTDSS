@@ -115,15 +115,15 @@ module Types
         integer(int32) :: Shape
         integer(int32) :: Dim
         integer(int32) :: Region
-        character(len=:), allocatable :: Calculation_timeUnit
-        character(len=:), allocatable :: Input_timeUnit
-        character(len=:), allocatable :: Output_timeUnit
-        character(len=:), allocatable :: Interval_timeUnit
+        character(:), allocatable :: Calculation_timeUnit
+        character(:), allocatable :: Input_timeUnit
+        character(:), allocatable :: Output_timeUnit
+        character(:), allocatable :: Interval_timeUnit
         integer(int32) :: Calculation_step
         integer(int32) :: CalculationPeriod
         integer(int32) :: Interval
         logical :: isDisplayPrompt
-        character(len=:), allocatable :: FileOutput
+        character(:), allocatable :: FileOutput
     end type Basic_params
 
     type :: Base_Density
@@ -179,17 +179,44 @@ module Types
         real(real64) :: Phase1
     end type Type_ThermalConductivity_1Phase
 
+    type :: Base_Ice
+        integer(int32) :: QiceType
+    end type Base_Ice
+
+    type, extends(Base_Ice) :: Type_Ice_TRM
+        real(real64) :: Tf
+    end type Type_Ice_TRM
+
+    type, extends(Base_Ice) :: Type_Ice_GCC
+        real(real64) :: Tf
+        integer(int32) :: ModelType
+        class(Base_WRF), allocatable :: WRF
+    end type Type_Ice_GCC
+
+    type, extends(Base_Ice) :: Type_Ice_EXP
+        real(real64) :: Tf, a
+    end type Type_Ice_EXP
+
     type :: Type_Thermal
         class(Base_Density), allocatable :: Density
         class(Base_SpecificHeat), allocatable :: SpecificHeat
         class(Base_ThermalConductivity), allocatable :: ThermalConductivity
-        real(real64) :: Porosity
+        real(real64) :: Porosity, LatentHeat
+
+        class(Base_Ice), allocatable :: Ice
     end type Type_Thermal
+
+    type :: Type_Region_Flags
+        logical :: isHeat, isWater, isStress
+        logical :: is1Phase, is2Phase, is3Phase
+        logical :: isCompression, isFrostHeavePressure, isDispersity
+    end type Type_Region_Flags
 
     type :: Type_Region
         integer(int32) :: CalculationType
         integer(int32) :: Modelnumber
         type(Type_Thermal) :: Thermal
+        type(Type_Region_Flags) :: Flags
     end type Type_Region
 
     type :: DF
@@ -252,6 +279,34 @@ module Types
         ! w1, w2は先に計算しておく
         real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2
     end type WRF_Parameters
+
+    type :: Base_WRF
+        real(real64) :: thetaS, thetaR
+    end type Base_WRF
+
+    type, extends(Base_WRF) :: Type_WRF_BC
+        real(real64) :: alpha1, n1
+    end type Type_WRF_BC
+
+    type, extends(Base_WRF) :: Type_WRF_VG
+        real(real64) :: alpha1, n1, m1
+    end type Type_WRF_VG
+
+    type, extends(Base_WRF) :: Type_WRF_KO
+        real(real64) :: alpha1, n1
+    end type Type_WRF_KO
+
+    type, extends(Base_WRF) :: Type_WRF_MVG
+        real(real64) :: alpha1, n1, m1, hcrit
+    end type Type_WRF_MVG
+
+    type, extends(Base_WRF) :: Type_WRF_Durner
+        real(real64) :: alpha1, n1, m1, alpha2, n2, m2, w1, w2
+    end type Type_WRF_Durner
+
+    type, extends(Base_WRF) :: Type_WRF_DVGCH
+        real(real64) :: alpha1, n1, m1, n2, m2, w1, w2
+    end type Type_WRF_DVGCH
 
     type :: HCF_Parameters
         real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2

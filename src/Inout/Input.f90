@@ -3,6 +3,7 @@ module Inout_Input
     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
     use :: error
     use :: allocate
+    use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type
     use :: Types
     use :: tomlf
     implicit none
@@ -11,6 +12,51 @@ module Inout_Input
     integer(int32), parameter :: min_calculation_type = 1, max_calculation_type = 7
     integer(int32), parameter :: min_model_type = 11, max_model_type = 18
     integer(int32), parameter :: min_Coordinate_Dimesion_type = 1, max_Coordinate_Dimesion_type = 3
+    character(*), parameter :: BasicName = "Basic"
+    character(*), parameter :: ThemalName = "Thermal"
+    character(*), parameter :: ElementName = "Element"
+    character(*), parameter :: NodeName = "Node"
+    character(*), parameter :: ShapeName = "Shape"
+    character(*), parameter :: DimensionName = "Dimension"
+    character(*), parameter :: RegionName = "Region"
+    character(*), parameter :: CalculationName = "Calculation"
+    character(*), parameter :: InputName = "Input"
+    character(*), parameter :: OutputName = "Output"
+    character(*), parameter :: IntervalName = "Interval"
+    character(*), parameter :: timeUnitName = "timeUnit"
+    character(*), parameter :: stepName = "step"
+    character(*), parameter :: calculationPeriodName = "calculationPeriod"
+    character(*), parameter :: isDisplayPromptName = "isDisplayPrompt"
+    character(*), parameter :: FileOutputName = "FileOutput"
+
+    character(*), parameter :: CalculationTypeName = "CalculationType"
+    character(*), parameter :: ModelnumberName = "Modelnumber"
+    character(*), parameter :: PorosityName = "Porosity"
+    character(*), parameter :: LatentHeatName = "LatentHeat"
+    character(*), parameter :: Phase1Name = "Phase1"
+    character(*), parameter :: Phase2Name = "Phase2"
+    character(*), parameter :: SoilName = "Soil"
+    character(*), parameter :: WaterName = "Water"
+    character(*), parameter :: IceName = "Ice"
+    character(*), parameter :: DensityName = "Density"
+    character(*), parameter :: SpecificHeatName = "SpecificHeat"
+    character(*), parameter :: ThermalConductivityName = "ThermalConductivity"
+    character(*), parameter :: dispersityName = "dispersity"
+    character(*), parameter :: xName = "x"
+    character(*), parameter :: yName = "y"
+    character(*), parameter :: QiceTypeName = "QiceType"
+    character(*), parameter :: TfName = "Tf"
+    character(*), parameter :: ParametersName = "Parameters"
+    character(*), parameter :: ModelName = "Model"
+    character(*), parameter :: thetaSName = "thetaS"
+    character(*), parameter :: thetaRName = "thetaR"
+    character(*), parameter :: alpha1Name = "alpha1"
+    character(*), parameter :: n1Name = "n1"
+    character(*), parameter :: KTDynamicsName = "KTDynamics"
+    character(*), parameter :: ImpedanceName = "Impedance"
+    character(*), parameter :: KsName = "Ks"
+
+    character(*), parameter :: AName = "a"
 
 #ifdef _MPI
     integer(int32), parameter :: root = 0
@@ -191,7 +237,10 @@ contains
         call Inout_Input_Parameters_TOML_Basic(self, table)
         if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%Region))
         do iRegion = 1, self%Basic%Region
-            call Inout_Input_Parameters_TOML_Thermal(self, table, iRegion)
+            call Inout_Input_Parameters_TOML_Reigion_Infomation(self, table, iRegion)
+            if (self%Regions(iRegion)%Flags%isHeat) then
+                call Inout_Input_Parameters_TOML_Thermal(self, table, iRegion)
+            end if
         end do
 
         stop
@@ -201,67 +250,282 @@ contains
         implicit none
         class(Input) :: self
         type(toml_table), intent(inout) :: table
-        type(toml_table), pointer :: child, grandchild
+        type(toml_table), pointer :: child => null(), grandchild => null()
 
-        call get_value(table, "Basic", child)
+        call get_value(table, BasicName, child)
         if (associated(child)) then
-            call get_value(child, "Element", self%Basic%Element)
-            call get_value(child, "Node", self%Basic%Node)
-            call get_value(child, "Shape", self%Basic%Shape)
-            call get_value(child, "Dimension", self%Basic%Dim)
-            call get_value(child, "Region", self%Basic%Region)
+            call get_value(child, ElementName, self%Basic%Element)
+            call get_value(child, NodeName, self%Basic%Node)
+            call get_value(child, ShapeName, self%Basic%Shape)
+            call get_value(child, DimensionName, self%Basic%Dim)
+            call get_value(child, RegionName, self%Basic%Region)
 
-            call get_value(child, "Calculation", grandchild)
+            call get_value(child, CalculationName, grandchild)
             if (associated(grandchild)) then
-                call get_value(grandchild, "timeUnit", self%Basic%Calculation_timeUnit)
-                call get_value(grandchild, "step", self%Basic%Calculation_step)
-                deallocate (grandchild)
+                call get_value(grandchild, timeUnitName, self%Basic%Calculation_timeUnit)
+                call get_value(grandchild, stepName, self%Basic%Calculation_step)
+                nullify (grandchild)
             end if
 
-            call get_value(child, "Input", grandchild)
+            call get_value(child, InputName, grandchild)
             if (associated(grandchild)) then
-                call get_value(grandchild, "timeUnit", self%Basic%Input_timeUnit)
-                call get_value(grandchild, "calculationPeriod", self%Basic%CalculationPeriod)
-                deallocate (grandchild)
+                call get_value(grandchild, timeUnitName, self%Basic%Input_timeUnit)
+                call get_value(grandchild, calculationPeriodName, self%Basic%CalculationPeriod)
+                nullify (grandchild)
             end if
 
-            call get_value(child, "Output", grandchild)
+            call get_value(child, OutputName, grandchild)
             if (associated(grandchild)) then
-                call get_value(grandchild, "timeUnit", self%Basic%Output_timeUnit)
-                deallocate (grandchild)
+                call get_value(grandchild, timeUnitName, self%Basic%Output_timeUnit)
+                nullify (grandchild)
             end if
 
-            call get_value(child, "Interval", grandchild)
+            call get_value(child, IntervalName, grandchild)
             if (associated(grandchild)) then
-                call get_value(grandchild, "timeUnit", self%Basic%Interval_timeUnit)
-                call get_value(grandchild, "step", self%Basic%Interval)
-                deallocate (grandchild)
+                call get_value(grandchild, timeUnitName, self%Basic%Interval_timeUnit)
+                call get_value(grandchild, stepName, self%Basic%Interval)
+                nullify (grandchild)
             end if
 
-            call get_value(child, "isDisplayPrompt", self%Basic%isDisplayPrompt)
-            call get_value(child, "FileOutput", self%Basic%FileOutput)
+            call get_value(child, isDisplayPromptName, self%Basic%isDisplayPrompt)
+            call get_value(child, FileOutputName, self%Basic%FileOutput)
 
-            deallocate (child)
+            nullify (child)
         end if
 
     end subroutine Inout_Input_Parameters_TOML_Basic
+
+    subroutine Inout_Input_Parameters_TOML_Reigion_Infomation(self, table, iRegion)
+        implicit none
+        class(Input) :: self
+        integer(int32), intent(in) :: iRegion
+        type(toml_table), intent(inout) :: table
+        type(toml_table), pointer :: child => null()
+        character(8) :: region_name
+
+        write (region_name, '(a, i0)') RegionName, iRegion
+        call get_value(table, trim(region_name), child)
+        if (associated(child)) then
+            call get_value(child, CalculationTypeName, self%Regions(iRegion)%CalculationType)
+            call get_value(child, ModelnumberName, self%Regions(iRegion)%Modelnumber)
+            nullify (child)
+        end if
+
+        select case (self%Regions(iRegion)%CalculationType)
+        case (1)
+            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .false., .false., .true.)
+        case (2)
+            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .false., .true., .false.)
+        case (3)
+            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .false., .true., .true.)
+        case (4)
+            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .false., .false.)
+        case (5)
+            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .true., .false.)
+        case (6)
+            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .false., .true.)
+        case (7)
+            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .true., .true.)
+        case default
+            call error_message(903, copt1=CalculationTypeName)
+        end select
+
+        select case (self%Regions(iRegion)%Modelnumber)
+        case (10)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .true., .false., .false.)
+        case (20)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .true., .false.)
+        case (31)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false.)
+        case (32)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true.)
+        case (33)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false.)
+        case (34)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true.)
+        case (35)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .false., .false.)
+        case (36)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .false., .true.)
+        case (37)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .true., .false.)
+        case (38)
+            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .true., .true.)
+        case default
+            call error_message(903, copt1=ModelnumberName)
+        end select
+
+    end subroutine Inout_Input_Parameters_TOML_Reigion_Infomation
+
+    subroutine Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
+        implicit none
+        class(Input) :: self
+        integer(int32), intent(in) :: iRegion
+        logical, intent(in) :: isHeat, isWater, isStress
+
+        self%Regions(iRegion)%Flags%isHeat = isHeat
+        self%Regions(iRegion)%Flags%isWater = isWater
+        self%Regions(iRegion)%Flags%isStress = isStress
+
+    end subroutine Inout_Input_Parameters_TOML_SetCalculationTypes
+
+    subroutine Inout_Input_Parameters_TOML_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, isCompression, isFrostHeavePressure, isDispersity)
+        implicit none
+        class(Input) :: self
+        integer(int32), intent(in) :: iRegion
+        logical, intent(in) :: is1Phase, is2Phase, is3Phase
+        logical, intent(in), optional :: isCompression, isFrostHeavePressure, isDispersity
+
+        self%Regions(iRegion)%Flags%is1Phase = is1Phase
+        self%Regions(iRegion)%Flags%is2Phase = is2Phase
+        self%Regions(iRegion)%Flags%is3Phase = is3Phase
+        if (present(isCompression)) self%Regions(iRegion)%Flags%isCompression = isCompression
+        if (present(isFrostHeavePressure)) self%Regions(iRegion)%Flags%isFrostHeavePressure = isFrostHeavePressure
+        if (present(isDispersity)) self%Regions(iRegion)%Flags%isDispersity = isDispersity
+
+    end subroutine Inout_Input_Parameters_TOML_SetFlags
 
     subroutine Inout_Input_Parameters_TOML_Thermal(self, table, iRegion)
         implicit none
         class(Input) :: self
         integer(int32), intent(in) :: iRegion
         type(toml_table), intent(inout) :: table
-        type(toml_table), pointer :: child, grandchild
+        type(toml_table), pointer :: child => null(), grandchild => null(), greatgrandchild => null(), greatgreatgrandchild => null()
+
         character(8) :: region_name
+        integer(int32) :: QiceType
 
-        integer(int32) :: tmp
-
-        write (region_name, "(A, I0)") "Region", iRegion
+        write (region_name, '(a, i0)') RegionName, iRegion
         call get_value(table, trim(region_name), child)
+        call Allocate_Structure_Thermal_Type(self%Regions(iRegion)%Thermal, self%Regions(iRegion)%Flags)
         if (associated(child)) then
-            call get_value(child, "CalculationType", self%Regions(iRegion)%CalculationType)
-            call get_value(child, "Modelnumber", self%Regions(iRegion)%Modelnumber)
+            call get_value(child, ThemalName, grandchild)
 
+            if (associated(grandchild)) then
+                if (self%Regions(iRegion)%Flags%is3Phase) then
+                    call get_value(grandchild, PorosityName, self%Regions(iRegion)%Thermal%Porosity)
+                    call get_value(grandchild, LatentHeatName, self%Regions(iRegion)%Thermal%LatentHeat)
+                end if
+
+                ! Density input
+                select type (Density => self%Regions(iRegion)%Thermal%Density)
+                type is (Type_Density_1Phase)
+                    call get_value(grandchild, DensityName, Density%Phase1)
+                type is (Type_Density_2Phase)
+                    call get_value(grandchild, DensityName, greatgrandchild)
+                    if (associated(greatgrandchild)) then
+                        call get_value(greatgrandchild, Phase1Name, Density%Phase1)
+                        call get_value(greatgrandchild, Phase2Name, Density%Phase2)
+                        nullify (greatgrandchild)
+                    end if
+                type is (Type_Density_3Phase)
+                    call get_value(grandchild, DensityName, greatgrandchild)
+                    if (associated(greatgrandchild)) then
+                        call get_value(greatgrandchild, SoilName, Density%Soil)
+                        call get_value(greatgrandchild, WaterName, Density%Water)
+                        call get_value(greatgrandchild, IceName, Density%Ice)
+                        nullify (greatgrandchild)
+                    end if
+                end select
+
+                ! Specific Heat input
+                select type (SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
+                type is (Type_SpecificHeat_1Phase)
+                    call get_value(grandchild, SpecificHeatName, SpecificHeat%Phase1)
+                type is (Type_SpecificHeat_2Phase)
+                    call get_value(grandchild, SpecificHeatName, greatgrandchild)
+                    if (associated(greatgrandchild)) then
+                        call get_value(greatgrandchild, Phase1Name, SpecificHeat%Phase1)
+                        call get_value(greatgrandchild, Phase2Name, SpecificHeat%Phase2)
+                        nullify (greatgrandchild)
+                    end if
+                type is (Type_SpecificHeat_3Phase)
+                    call get_value(grandchild, SpecificHeatName, greatgrandchild)
+                    if (associated(greatgrandchild)) then
+                        call get_value(greatgrandchild, SoilName, SpecificHeat%Soil)
+                        call get_value(greatgrandchild, WaterName, SpecificHeat%Water)
+                        call get_value(greatgrandchild, IceName, SpecificHeat%Ice)
+                        nullify (greatgrandchild)
+                    end if
+                end select
+
+                ! Thermal Conductivity input
+                select type (ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
+                type is (Type_ThermalConductivity_1Phase)
+                    call get_value(grandchild, ThermalConductivityName, ThermalConductivity%Phase1)
+                type is (Type_ThermalConductivity_2Phase)
+                    call get_value(grandchild, ThermalConductivityName, greatgrandchild)
+                    if (associated(greatgrandchild)) then
+                        call get_value(greatgrandchild, Phase1Name, ThermalConductivity%Phase1)
+                        call get_value(greatgrandchild, Phase2Name, ThermalConductivity%Phase2)
+                        nullify (greatgrandchild)
+                    end if
+                type is (Type_ThermalConductivity_3Phase)
+                    call get_value(grandchild, ThermalConductivityName, greatgrandchild)
+                    if (associated(greatgrandchild)) then
+                        call get_value(greatgrandchild, SoilName, ThermalConductivity%Soil)
+                        call get_value(greatgrandchild, WaterName, ThermalConductivity%Water)
+                        call get_value(greatgrandchild, IceName, ThermalConductivity%Ice)
+                        nullify (greatgrandchild)
+                    end if
+                type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
+                    call get_value(grandchild, ThermalConductivityName, greatgrandchild)
+                    if (associated(greatgrandchild)) then
+                        call get_value(greatgrandchild, SoilName, ThermalConductivity%Soil)
+                        call get_value(greatgrandchild, WaterName, ThermalConductivity%Water)
+                        call get_value(greatgrandchild, IceName, ThermalConductivity%Ice)
+                        if (self%Regions(iRegion)%Flags%isDispersity) then
+                            call get_value(greatgrandchild, dispersityName, greatgreatgrandchild)
+                            if (associated(greatgreatgrandchild)) then
+                                call get_value(greatgreatgrandchild, xName, ThermalConductivity%dispersity%x)
+                                call get_value(greatgreatgrandchild, yName, ThermalConductivity%dispersity%y)
+                                nullify (greatgreatgrandchild)
+                            end if
+                        end if
+                        nullify (greatgrandchild)
+                    end if
+                end select
+
+                ! Ice input
+                call get_value(grandchild, IceName, greatgrandchild)
+                if (associated(greatgrandchild)) then
+                    ! print *, self%Regions(iRegion)%Thermal%Ice%QiceType
+                    call get_value(greatgrandchild, QiceTypeName, QiceType)
+                    call Allocate_Structure_Ice_Type(self%Regions(iRegion)%Thermal, QiceType)
+                    self%Regions(iRegion)%Thermal%Ice%QiceType = QiceType
+
+                    select type (Ice => self%Regions(iRegion)%Thermal%Ice)
+                    type is (Type_Ice_TRM)
+                        call get_value(greatgrandchild, TfName, Ice%Tf)
+                        nullify (greatgrandchild)
+                    type is (Type_Ice_GCC)
+                        call get_value(greatgrandchild, TfName, Ice%Tf)
+                        call get_value(greatgrandchild, ParametersName, greatgreatgrandchild)
+                        if (associated(greatgreatgrandchild)) then
+                            call get_value(greatgreatgrandchild, ModelName, Ice%ModelType)
+                            call Allocate_Structure_WRF_Type(self%Regions(iRegion)%Thermal, Ice%ModelType)
+                            call get_value(greatgreatgrandchild, thetaSName, Ice%WRF%thetaS)
+                            call get_value(greatgreatgrandchild, thetaRName, Ice%WRF%thetaR)
+                            select type (WRF => Ice%WRF)
+                            type is (Type_WRF_BC)
+                                call get_value(greatgreatgrandchild, alpha1Name, WRF%alpha1)
+                                call get_value(greatgreatgrandchild, n1Name, WRF%n1)
+                            type is (Type_WRF_VG)
+                                call get_value(greatgreatgrandchild, alpha1Name, WRF%alpha1)
+                                call get_value(greatgreatgrandchild, n1Name, WRF%n1)
+                                WRF%m1 = 1.0 - 1.0 / WRF%n1
+
+                            end select
+                            nullify (greatgreatgrandchild)
+                        end if
+
+                    type is (Type_Ice_EXP)
+                        call get_value(greatgrandchild, TfName, Ice%Tf)
+                        call get_value(greatgrandchild, AName, Ice%a)
+                        nullify (greatgrandchild)
+                    end select
+                end if
+            end if
         end if
 
     end subroutine Inout_Input_Parameters_TOML_Thermal
