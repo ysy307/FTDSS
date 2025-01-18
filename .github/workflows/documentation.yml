@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   documentation:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
 
     env:
       FC: gfortran
