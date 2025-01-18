@@ -23,6 +23,7 @@ RUN apt-get update -y && apt-get install -y \
     sed \
     software-properties-common \
     ninja-build \
+    graphviz \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

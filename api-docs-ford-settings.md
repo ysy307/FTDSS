@@ -6,3 +6,7 @@ summary:This solver can caluculate freezing/thawing processes in the soil integr
 author:Kikuchi Shun
 email:shungiku1012@gmail.com
 project_github:https://github.com/ysy307/FTDSS.git
+graph:true
+page_dir:./docs
+
+{!api-docs-index.md!}
