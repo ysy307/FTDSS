@@ -394,9 +394,12 @@ contains
 
         character(8) :: region_name
         integer(int32) :: QiceType
+        integer(int32) :: status, origin
+        type(toml_context) :: context
 
         write (region_name, '(a, i0)') RegionName, iRegion
         call get_value(table, trim(region_name), child)
+        print *, trim(region_name)
         call Allocate_Structure_Thermal_Type(self%Regions(iRegion)%Thermal, self%Regions(iRegion)%Flags)
         if (associated(child)) then
             call get_value(child, ThemalName, grandchild)
@@ -487,10 +490,22 @@ contains
                 end select
 
                 ! Ice input
-                call get_value(grandchild, IceName, greatgrandchild)
+                nullify (greatgrandchild)
+                call get_value(grandchild, "Ice", greatgrandchild, stat=status, origin=origin)
+                print *, status, origin
+                if (status /= 0) then
+                    print '(a)', context%report("Cannot read timestep", &
+                        & origin, "expected real value")
+                    stop
+                end if
+                ! print *,
+                ! print *, associated(greatgrandchild)
                 if (associated(greatgrandchild)) then
                     ! print *, self%Regions(iRegion)%Thermal%Ice%QiceType
-                    call get_value(greatgrandchild, QiceTypeName, QiceType)
+                    QiceType = 0
+                    call get_value(greatgrandchild, QiceTypeName, QiceType, stat=status)
+
+                    print *, status, QiceType
                     call Allocate_Structure_Ice_Type(self%Regions(iRegion)%Thermal, QiceType)
                     self%Regions(iRegion)%Thermal%Ice%QiceType = QiceType
 
@@ -518,6 +533,7 @@ contains
                             end select
                             nullify (greatgreatgrandchild)
                         end if
+                        nullify (greatgrandchild)
 
                     type is (Type_Ice_EXP)
                         call get_value(greatgrandchild, TfName, Ice%Tf)
@@ -526,7 +542,9 @@ contains
                     end select
                 end if
             end if
+            nullify (grandchild)
         end if
+        nullify (child)
 
     end subroutine Inout_Input_Parameters_TOML_Thermal
 

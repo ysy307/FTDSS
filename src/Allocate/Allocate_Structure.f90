@@ -151,6 +151,7 @@ contains
         implicit none
         type(Type_Thermal), intent(inout) :: Structure_Thermal
         integer(int32), intent(in) :: QiceModelType
+        print *, QiceModelType
 
         if (allocated(Structure_Thermal%Ice)) deallocate (Structure_Thermal%Ice)
 
