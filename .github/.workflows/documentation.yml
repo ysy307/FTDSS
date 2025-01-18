@@ -1,63 +1,45 @@
-name: Build and Push Docker Image
+name: Build and Deploy Documentation
 
-on:
-  push:
+on: [push, pull_request]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  documentation:
+    runs-on: ubuntu-22.04
+
+    env:
+      FC: gfortran
+      GCC_V: 12
 
     steps:
-      # リポジトリをチェックアウト
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Dockerイメージをビルド
-      - name: Build Docker Image
-        run: |
-          docker build -t my-docker-image:latest .devcontainer
+    - name: Install Dependencies Ubuntu
+      run: |
+        sudo apt-get update
+        sudo apt install -y gfortran-${GCC_V} python3-dev graphviz
+        sudo pip install ford markdown==3.3.4
+    - name: Build Developer Documentation
+      run: |
+        ford doc/ford-front-matter.md
+    - name: Upload Documentation
+      uses: actions/upload-artifact@v2
+      with:
+        name: documentation
+        path: docs/api-docs
+        if-no-files-found: error
 
-      # 必要に応じてGitHub Container Registryにログイン
-      - name: Log in to Container Registry
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Broken Link Check
+      if: ${{ github.ref == 'refs/heads/main'}}
+      uses: technote-space/broken-link-checker-action@v1
+      with:
+        TARGET: file://${{ github.workspace }}/ford_site/index.html
+        RECURSIVE: true
+        ASSIGNEES: ${{ github.actor }}
 
-      # Dockerイメージをプッシュ
-      - name: Push Docker Image
-        run: |
-          docker tag my-docker-image:latest ghcr.io/${{ github.repository_owner }}/my-docker-image:latest
-          docker push ghcr.io/${{ github.repository_owner }}/my-docker-image:latest
-
-                # Dockerコンテナ内でFORDを実行してドキュメントを生成
-      - name: Generate Documentation
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace my-docker-image:latest \
-          zsh -c "cd /workspace && ford docs/api-docs-ford-settings.md"
-
-
-                # 生成されたドキュメントをアーティファクトとしてアップロード
-      - name: Upload Documentation
-        uses: actions/upload-artifact@v2
-        with:
-          name: documentation
-          path: docs/api-docs
-          if-no-files-found: error
-
-      # リンク切れのチェック
-      - name: Broken Link Check
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: technote-space/broken-link-checker-action@v1
-        with:
-          TARGET: file://${{ github.workspace }}/doc/api-docs/index.html
-          RECURSIVE: true
-          ASSIGNEES: ${{ github.actor }}
-
-      # `gh-pages`ブランチにドキュメントをデプロイ
-      - name: Deploy API Documentation
-        uses: JamesIves/github-pages-deploy-action@4.1.0
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        with:
-          branch: gh-pages
-          folder: docs/api-docs
+    - name: Deploy API Documentation
+      uses: JamesIves/github-pages-deploy-action@4.1.0
+      if: ${{ github.event_name == 'push'  &&  github.ref == 'refs/heads/main' }}
+      with:
+        branch: gh-pages
+        folder: docs/api-docs
