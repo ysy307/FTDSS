@@ -1,11 +1,12 @@
 module Inout_Input
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
     use :: error
     use :: allocate
     use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type
     use :: Types
     use :: tomlf
+    use :: json_module
     implicit none
     private
 
@@ -31,6 +32,7 @@ module Inout_Input
 
     character(*), parameter :: CalculationTypeName = "CalculationType"
     character(*), parameter :: ModelnumberName = "Modelnumber"
+    character(*), parameter :: isFrozenName = "isFrozen"
     character(*), parameter :: PorosityName = "Porosity"
     character(*), parameter :: LatentHeatName = "LatentHeat"
     character(*), parameter :: Phase1Name = "Phase1"
@@ -44,6 +46,7 @@ module Inout_Input
     character(*), parameter :: dispersityName = "dispersity"
     character(*), parameter :: xName = "x"
     character(*), parameter :: yName = "y"
+    character(*), parameter :: zName = "z"
     character(*), parameter :: QiceTypeName = "QiceType"
     character(*), parameter :: TfName = "Tf"
     character(*), parameter :: ParametersName = "Parameters"
@@ -51,7 +54,11 @@ module Inout_Input
     character(*), parameter :: thetaSName = "thetaS"
     character(*), parameter :: thetaRName = "thetaR"
     character(*), parameter :: alpha1Name = "alpha1"
+    character(*), parameter :: alpha2Name = "alpha2"
     character(*), parameter :: n1Name = "n1"
+    character(*), parameter :: n2Name = "n2"
+    character(*), parameter :: w1Name = "w1"
+    character(*), parameter :: hcritName = "hcrit"
     character(*), parameter :: KTDynamicsName = "KTDynamics"
     character(*), parameter :: ImpedanceName = "Impedance"
     character(*), parameter :: KsName = "Ks"
@@ -125,7 +132,7 @@ module Inout_Input
 
     contains
 
-        procedure :: Input_Parameters => Inout_Input_Parameters_TOML
+        procedure :: Input_Parameters => Inout_Input_Parameters_JSON
         procedure :: Input_Coodinates => Inout_Input_Coodinates
         procedure :: Input_Vertices => Inout_Input_Vertices
         procedure :: Input_BC => Inout_Input_BC
@@ -219,7 +226,7 @@ contains
 
     end function Input_Constructor
 
-    subroutine Inout_Input_Parameters_TOML(self)
+    subroutine Inout_Input_Parameters_JSON(self)
         implicit none
         class(Input) :: self
         type(toml_table), allocatable :: table
@@ -227,137 +234,177 @@ contains
         integer(int32) :: status, unit_num
         integer(int32) :: iRegion
 
-        open (newunit=unit_num, file="/workspaces/FTDSS/Inout/new-toml/Basic.toml", status="old", action="read", iostat=status)
-        if (status /= 0) call error_message(902, opt_file_name="/workspaces/FTDSS/Inout/new-toml/Basic.toml")
-        call toml_parse(table, unit_num, parse_error)
-        close (unit=unit_num)
-        if (allocated(parse_error)) then
-            print *, "Error parsing table:"//parse_error%message
-        end if
-        call Inout_Input_Parameters_TOML_Basic(self, table)
+        type(json_file) :: json ! JSONパーサ
+        character(kind=json_CK, len=:), allocatable :: s ! 文字列用
+        real(kind=json_RK) :: a ! 実数用
+        real(kind=json_RK), dimension(:), allocatable :: b ! 実数の配列用
+        logical(kind=json_LK) :: fl ! 論理用
+        integer :: i ! do文用
+
+        call json%initialize() ! モジュール初期化
+
+        call json%load(filename='/workspaces/FTDSS/Inout/new-toml/Basic.json') ! JSONファイルを読み込む
+        call json%print_error_message(output_unit) ! パースエラーがあれば表示
+
+        call json%print(output_unit) ! 読み込んだjsonをそのまま表示
+        call json%print_error_message(output_unit)
+
+        ! open (newunit=unit_num, file="/workspaces/FTDSS/Inout/new-toml/Basic.toml", status="old", action="read", iostat=status)
+        ! if (status /= 0) call error_message(902, opt_file_name="/workspaces/FTDSS/Inout/new-toml/Basic.toml")
+        ! call toml_parse(table, unit_num, parse_error)
+        ! close (unit=unit_num)
+        ! if (allocated(parse_error)) then
+        !     print *, "Error parsing table:"//parse_error%message
+        ! end if
+        call Inout_Input_Parameters_JSON_Basic(self, json)
         if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%Region))
         do iRegion = 1, self%Basic%Region
-            call Inout_Input_Parameters_TOML_Reigion_Infomation(self, table, iRegion)
+            call Inout_Input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
             if (self%Regions(iRegion)%Flags%isHeat) then
-                call Inout_Input_Parameters_TOML_Thermal(self, table, iRegion)
+                call Inout_Input_Parameters_JSON_Thermal(self, json, iRegion)
+            end if
+            if (self%Regions(iRegion)%Flags%isWater) then
+                call Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
             end if
         end do
 
         stop
-    end subroutine Inout_Input_Parameters_TOML
+    end subroutine Inout_Input_Parameters_JSON
 
-    subroutine Inout_Input_Parameters_TOML_Basic(self, table)
+    subroutine Inout_Input_Parameters_JSON_Basic(self, json)
         implicit none
         class(Input) :: self
-        type(toml_table), intent(inout) :: table
-        type(toml_table), pointer :: child => null(), grandchild => null()
+        type(json_file), intent(inout) :: json
+        character(256) :: key
 
-        call get_value(table, BasicName, child)
-        if (associated(child)) then
-            call get_value(child, ElementName, self%Basic%Element)
-            call get_value(child, NodeName, self%Basic%Node)
-            call get_value(child, ShapeName, self%Basic%Shape)
-            call get_value(child, DimensionName, self%Basic%Dim)
-            call get_value(child, RegionName, self%Basic%Region)
+        write (key, '(3a)') BasicName, ".", ElementName
+        call json%get(key, self%Basic%Element)
+        call json%print_error_message(output_unit)
 
-            call get_value(child, CalculationName, grandchild)
-            if (associated(grandchild)) then
-                call get_value(grandchild, timeUnitName, self%Basic%Calculation_timeUnit)
-                call get_value(grandchild, stepName, self%Basic%Calculation_step)
-                nullify (grandchild)
-            end if
+        write (key, '(3a)') BasicName, ".", NodeName
+        call json%get(key, self%Basic%Node)
+        call json%print_error_message(output_unit)
 
-            call get_value(child, InputName, grandchild)
-            if (associated(grandchild)) then
-                call get_value(grandchild, timeUnitName, self%Basic%Input_timeUnit)
-                call get_value(grandchild, calculationPeriodName, self%Basic%CalculationPeriod)
-                nullify (grandchild)
-            end if
+        write (key, '(3a)') BasicName, ".", ShapeName
+        call json%get(key, self%Basic%Shape)
+        call json%print_error_message(output_unit)
 
-            call get_value(child, OutputName, grandchild)
-            if (associated(grandchild)) then
-                call get_value(grandchild, timeUnitName, self%Basic%Output_timeUnit)
-                nullify (grandchild)
-            end if
+        write (key, '(3a)') BasicName, ".", DimensionName
+        call json%get(key, self%Basic%Dim)
+        call json%print_error_message(output_unit)
 
-            call get_value(child, IntervalName, grandchild)
-            if (associated(grandchild)) then
-                call get_value(grandchild, timeUnitName, self%Basic%Interval_timeUnit)
-                call get_value(grandchild, stepName, self%Basic%Interval)
-                nullify (grandchild)
-            end if
+        write (key, '(3a)') BasicName, ".", RegionName
+        call json%get(key, self%Basic%Region)
+        call json%print_error_message(output_unit)
 
-            call get_value(child, isDisplayPromptName, self%Basic%isDisplayPrompt)
-            call get_value(child, FileOutputName, self%Basic%FileOutput)
+        write (key, '(5a)') BasicName, ".", CalculationName, ".", timeUnitName
+        call json%get(key, self%Basic%Calculation_timeUnit)
+        call json%print_error_message(output_unit)
 
-            nullify (child)
-        end if
+        write (key, '(5a)') BasicName, ".", CalculationName, ".", stepName
+        call json%get(key, self%Basic%Calculation_step)
+        call json%print_error_message(output_unit)
 
-    end subroutine Inout_Input_Parameters_TOML_Basic
+        write (key, '(5a)') BasicName, ".", InputName, ".", timeUnitName
+        call json%get(key, self%Basic%Input_timeUnit)
+        call json%print_error_message(output_unit)
 
-    subroutine Inout_Input_Parameters_TOML_Reigion_Infomation(self, table, iRegion)
+        write (key, '(5a)') BasicName, ".", InputName, ".", calculationPeriodName
+        call json%get(key, self%Basic%CalculationPeriod)
+        call json%print_error_message(output_unit)
+
+        write (key, '(5a)') BasicName, ".", OutputName, ".", timeUnitName
+        call json%get(key, self%Basic%Output_timeUnit)
+        call json%print_error_message(output_unit)
+
+        write (key, '(5a)') BasicName, ".", IntervalName, ".", timeUnitName
+        call json%get(key, self%Basic%Interval_timeUnit)
+        call json%print_error_message(output_unit)
+
+        write (key, '(5a)') BasicName, ".", IntervalName, ".", stepName
+        call json%get(key, self%Basic%Interval)
+        call json%print_error_message(output_unit)
+
+        write (key, '(3a)') BasicName, ".", isDisplayPromptName
+        call json%get(key, self%Basic%isDisplayPrompt)
+        call json%print_error_message(output_unit)
+
+        write (key, '(3a)') BasicName, ".", FileOutputName
+        call json%get(key, self%Basic%FileOutput)
+        call json%print_error_message(output_unit)
+
+    end subroutine Inout_Input_Parameters_JSON_Basic
+
+    subroutine Inout_Input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
         implicit none
         class(Input) :: self
         integer(int32), intent(in) :: iRegion
-        type(toml_table), intent(inout) :: table
-        type(toml_table), pointer :: child => null()
+        type(json_file), intent(inout) :: json
+
         character(8) :: region_name
+        character(256) :: key
 
         write (region_name, '(a, i0)') RegionName, iRegion
-        call get_value(table, trim(region_name), child)
-        if (associated(child)) then
-            call get_value(child, CalculationTypeName, self%Regions(iRegion)%CalculationType)
-            call get_value(child, ModelnumberName, self%Regions(iRegion)%Modelnumber)
-            nullify (child)
-        end if
+
+        write (key, '(3a)') trim(region_name), ".", CalculationTypeName
+        call json%get(key, self%Regions(iRegion)%CalculationType)
+        call json%print_error_message(output_unit)
+
+        write (key, '(3a)') trim(region_name), ".", ModelnumberName
+        call json%get(key, self%Regions(iRegion)%Modelnumber)
+        call json%print_error_message(output_unit)
 
         select case (self%Regions(iRegion)%CalculationType)
         case (1)
-            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .false., .false., .true.)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .false., .true.)
         case (2)
-            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .false., .true., .false.)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .false.)
         case (3)
-            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .false., .true., .true.)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .true.)
         case (4)
-            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .false., .false.)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .false.)
         case (5)
-            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .true., .false.)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .false.)
         case (6)
-            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .false., .true.)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .true.)
         case (7)
-            call Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, .true., .true., .true.)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .true.)
         case default
             call error_message(903, copt1=CalculationTypeName)
         end select
 
         select case (self%Regions(iRegion)%Modelnumber)
         case (10)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .true., .false., .false.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .true., .false., .false.)
         case (20)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .true., .false.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .true., .false.)
         case (31)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false.)
         case (32)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true.)
         case (33)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false.)
         case (34)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true.)
         case (35)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .false., .false.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .true., .false., .false.)
         case (36)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .false., .true.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .true., .false., .true.)
         case (37)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .true., .false.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .true., .true., .false.)
         case (38)
-            call Inout_Input_Parameters_TOML_SetFlags(self, iRegion, .false., .false., .true., .true., .true., .true.)
+            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .true., .true., .true.)
         case default
             call error_message(903, copt1=ModelnumberName)
         end select
 
-    end subroutine Inout_Input_Parameters_TOML_Reigion_Infomation
+        write (key, '(3a)') trim(region_name), ".", isFrozenName
+        call json%get(key, self%Regions(iRegion)%Flags%isFrozen)
+        call json%print_error_message(output_unit)
 
-    subroutine Inout_Input_Parameters_TOML_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
+    end subroutine Inout_Input_Parameters_JSON_Reigion_Infomation
+
+    subroutine Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
         implicit none
         class(Input) :: self
         integer(int32), intent(in) :: iRegion
@@ -367,9 +414,9 @@ contains
         self%Regions(iRegion)%Flags%isWater = isWater
         self%Regions(iRegion)%Flags%isStress = isStress
 
-    end subroutine Inout_Input_Parameters_TOML_SetCalculationTypes
+    end subroutine Inout_Input_Parameters_JSON_SetCalculationTypes
 
-    subroutine Inout_Input_Parameters_TOML_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, isCompression, isFrostHeavePressure, isDispersity)
+    subroutine Inout_Input_Parameters_JSON_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, isCompression, isFrostHeavePressure, isDispersity)
         implicit none
         class(Input) :: self
         integer(int32), intent(in) :: iRegion
@@ -383,170 +430,340 @@ contains
         if (present(isFrostHeavePressure)) self%Regions(iRegion)%Flags%isFrostHeavePressure = isFrostHeavePressure
         if (present(isDispersity)) self%Regions(iRegion)%Flags%isDispersity = isDispersity
 
-    end subroutine Inout_Input_Parameters_TOML_SetFlags
+    end subroutine Inout_Input_Parameters_JSON_SetFlags
 
-    subroutine Inout_Input_Parameters_TOML_Thermal(self, table, iRegion)
+    subroutine Inout_Input_Parameters_JSON_Thermal(self, json, iRegion)
         implicit none
         class(Input) :: self
         integer(int32), intent(in) :: iRegion
-        type(toml_table), intent(inout) :: table
-        type(toml_table), pointer :: child => null(), grandchild => null(), greatgrandchild => null(), greatgreatgrandchild => null()
+        type(json_file), intent(inout) :: json
 
         character(8) :: region_name
         integer(int32) :: QiceType
-        integer(int32) :: status, origin
-        type(toml_context) :: context
+        character(256) :: key
+
+        call Allocate_Structure_Thermal_Type(self%Regions(iRegion)%Thermal, self%Regions(iRegion)%Flags)
 
         write (region_name, '(a, i0)') RegionName, iRegion
-        call get_value(table, trim(region_name), child)
-        print *, trim(region_name)
-        call Allocate_Structure_Thermal_Type(self%Regions(iRegion)%Thermal, self%Regions(iRegion)%Flags)
-        if (associated(child)) then
-            call get_value(child, ThemalName, grandchild)
-
-            if (associated(grandchild)) then
-                if (self%Regions(iRegion)%Flags%is3Phase) then
-                    call get_value(grandchild, PorosityName, self%Regions(iRegion)%Thermal%Porosity)
-                    call get_value(grandchild, LatentHeatName, self%Regions(iRegion)%Thermal%LatentHeat)
-                end if
-
-                ! Density input
-                select type (Density => self%Regions(iRegion)%Thermal%Density)
-                type is (Type_Density_1Phase)
-                    call get_value(grandchild, DensityName, Density%Phase1)
-                type is (Type_Density_2Phase)
-                    call get_value(grandchild, DensityName, greatgrandchild)
-                    if (associated(greatgrandchild)) then
-                        call get_value(greatgrandchild, Phase1Name, Density%Phase1)
-                        call get_value(greatgrandchild, Phase2Name, Density%Phase2)
-                        nullify (greatgrandchild)
-                    end if
-                type is (Type_Density_3Phase)
-                    call get_value(grandchild, DensityName, greatgrandchild)
-                    if (associated(greatgrandchild)) then
-                        call get_value(greatgrandchild, SoilName, Density%Soil)
-                        call get_value(greatgrandchild, WaterName, Density%Water)
-                        call get_value(greatgrandchild, IceName, Density%Ice)
-                        nullify (greatgrandchild)
-                    end if
-                end select
-
-                ! Specific Heat input
-                select type (SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
-                type is (Type_SpecificHeat_1Phase)
-                    call get_value(grandchild, SpecificHeatName, SpecificHeat%Phase1)
-                type is (Type_SpecificHeat_2Phase)
-                    call get_value(grandchild, SpecificHeatName, greatgrandchild)
-                    if (associated(greatgrandchild)) then
-                        call get_value(greatgrandchild, Phase1Name, SpecificHeat%Phase1)
-                        call get_value(greatgrandchild, Phase2Name, SpecificHeat%Phase2)
-                        nullify (greatgrandchild)
-                    end if
-                type is (Type_SpecificHeat_3Phase)
-                    call get_value(grandchild, SpecificHeatName, greatgrandchild)
-                    if (associated(greatgrandchild)) then
-                        call get_value(greatgrandchild, SoilName, SpecificHeat%Soil)
-                        call get_value(greatgrandchild, WaterName, SpecificHeat%Water)
-                        call get_value(greatgrandchild, IceName, SpecificHeat%Ice)
-                        nullify (greatgrandchild)
-                    end if
-                end select
-
-                ! Thermal Conductivity input
-                select type (ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
-                type is (Type_ThermalConductivity_1Phase)
-                    call get_value(grandchild, ThermalConductivityName, ThermalConductivity%Phase1)
-                type is (Type_ThermalConductivity_2Phase)
-                    call get_value(grandchild, ThermalConductivityName, greatgrandchild)
-                    if (associated(greatgrandchild)) then
-                        call get_value(greatgrandchild, Phase1Name, ThermalConductivity%Phase1)
-                        call get_value(greatgrandchild, Phase2Name, ThermalConductivity%Phase2)
-                        nullify (greatgrandchild)
-                    end if
-                type is (Type_ThermalConductivity_3Phase)
-                    call get_value(grandchild, ThermalConductivityName, greatgrandchild)
-                    if (associated(greatgrandchild)) then
-                        call get_value(greatgrandchild, SoilName, ThermalConductivity%Soil)
-                        call get_value(greatgrandchild, WaterName, ThermalConductivity%Water)
-                        call get_value(greatgrandchild, IceName, ThermalConductivity%Ice)
-                        nullify (greatgrandchild)
-                    end if
-                type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
-                    call get_value(grandchild, ThermalConductivityName, greatgrandchild)
-                    if (associated(greatgrandchild)) then
-                        call get_value(greatgrandchild, SoilName, ThermalConductivity%Soil)
-                        call get_value(greatgrandchild, WaterName, ThermalConductivity%Water)
-                        call get_value(greatgrandchild, IceName, ThermalConductivity%Ice)
-                        if (self%Regions(iRegion)%Flags%isDispersity) then
-                            call get_value(greatgrandchild, dispersityName, greatgreatgrandchild)
-                            if (associated(greatgreatgrandchild)) then
-                                call get_value(greatgreatgrandchild, xName, ThermalConductivity%dispersity%x)
-                                call get_value(greatgreatgrandchild, yName, ThermalConductivity%dispersity%y)
-                                nullify (greatgreatgrandchild)
-                            end if
-                        end if
-                        nullify (greatgrandchild)
-                    end if
-                end select
-
-                ! Ice input
-                nullify (greatgrandchild)
-                call get_value(grandchild, "Ice", greatgrandchild, stat=status, origin=origin)
-                print *, status, origin
-                if (status /= 0) then
-                    print '(a)', context%report("Cannot read timestep", &
-                        & origin, "expected real value")
-                    stop
-                end if
-                ! print *,
-                ! print *, associated(greatgrandchild)
-                if (associated(greatgrandchild)) then
-                    ! print *, self%Regions(iRegion)%Thermal%Ice%QiceType
-                    QiceType = 0
-                    call get_value(greatgrandchild, QiceTypeName, QiceType, stat=status)
-
-                    print *, status, QiceType
-                    call Allocate_Structure_Ice_Type(self%Regions(iRegion)%Thermal, QiceType)
-                    self%Regions(iRegion)%Thermal%Ice%QiceType = QiceType
-
-                    select type (Ice => self%Regions(iRegion)%Thermal%Ice)
-                    type is (Type_Ice_TRM)
-                        call get_value(greatgrandchild, TfName, Ice%Tf)
-                        nullify (greatgrandchild)
-                    type is (Type_Ice_GCC)
-                        call get_value(greatgrandchild, TfName, Ice%Tf)
-                        call get_value(greatgrandchild, ParametersName, greatgreatgrandchild)
-                        if (associated(greatgreatgrandchild)) then
-                            call get_value(greatgreatgrandchild, ModelName, Ice%ModelType)
-                            call Allocate_Structure_WRF_Type(self%Regions(iRegion)%Thermal, Ice%ModelType)
-                            call get_value(greatgreatgrandchild, thetaSName, Ice%WRF%thetaS)
-                            call get_value(greatgreatgrandchild, thetaRName, Ice%WRF%thetaR)
-                            select type (WRF => Ice%WRF)
-                            type is (Type_WRF_BC)
-                                call get_value(greatgreatgrandchild, alpha1Name, WRF%alpha1)
-                                call get_value(greatgreatgrandchild, n1Name, WRF%n1)
-                            type is (Type_WRF_VG)
-                                call get_value(greatgreatgrandchild, alpha1Name, WRF%alpha1)
-                                call get_value(greatgreatgrandchild, n1Name, WRF%n1)
-                                WRF%m1 = 1.0 - 1.0 / WRF%n1
-
-                            end select
-                            nullify (greatgreatgrandchild)
-                        end if
-                        nullify (greatgrandchild)
-
-                    type is (Type_Ice_EXP)
-                        call get_value(greatgrandchild, TfName, Ice%Tf)
-                        call get_value(greatgrandchild, AName, Ice%a)
-                        nullify (greatgrandchild)
-                    end select
-                end if
+        if (self%Regions(iRegion)%Flags%isFrozen) then
+            if (self%Regions(iRegion)%Flags%is3Phase) then
+                write (key, '(5a)') trim(region_name), ".", ThemalName, ".", PorosityName
+                call json%get(key, self%Regions(iRegion)%Thermal%Porosity)
+                call json%print_error_message(output_unit)
             end if
-            nullify (grandchild)
         end if
-        nullify (child)
 
-    end subroutine Inout_Input_Parameters_TOML_Thermal
+        select type (Density => self%Regions(iRegion)%Thermal%Density)
+        type is (Type_Density_1Phase)
+            write (key, '(5a)') trim(region_name), ".", ThemalName, ".", DensityName
+            call json%get(key, Density%Phase1)
+            call json%print_error_message(output_unit)
+        type is (Type_Density_2Phase)
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", Phase1Name
+            call json%get(key, Density%Phase1)
+            call json%print_error_message(output_unit)
+
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", Phase2Name
+            call json%get(key, Density%Phase2)
+            call json%print_error_message(output_unit)
+        type is (Type_Density_3Phase)
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", SoilName
+            call json%get(key, Density%Soil)
+            call json%print_error_message(output_unit)
+
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", WaterName
+            call json%get(key, Density%Water)
+            call json%print_error_message(output_unit)
+
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", IceName
+            call json%get(key, Density%Ice)
+            call json%print_error_message(output_unit)
+        end select
+
+        select type (SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
+        type is (Type_SpecificHeat_1Phase)
+            write (key, '(5a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName
+            call json%get(key, SpecificHeat%Phase1)
+            call json%print_error_message(output_unit)
+        type is (Type_SpecificHeat_2Phase)
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", Phase1Name
+            call json%get(key, SpecificHeat%Phase1)
+            call json%print_error_message(output_unit)
+
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", Phase2Name
+            call json%get(key, SpecificHeat%Phase2)
+            call json%print_error_message(output_unit)
+        type is (Type_SpecificHeat_3Phase)
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", SoilName
+            call json%get(key, SpecificHeat%Soil)
+            call json%print_error_message(output_unit)
+
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", WaterName
+            call json%get(key, SpecificHeat%Water)
+            call json%print_error_message(output_unit)
+
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", IceName
+            call json%get(key, SpecificHeat%Ice)
+            call json%print_error_message(output_unit)
+        end select
+
+        select type (ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
+        type is (Type_ThermalConductivity_1Phase)
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName
+            call json%get(key, ThermalConductivity%Phase1)
+            call json%print_error_message(output_unit)
+        type is (Type_ThermalConductivity_2Phase)
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", Phase1Name
+            call json%get(key, ThermalConductivity%Phase1)
+            call json%print_error_message(output_unit)
+
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", Phase2Name
+            call json%get(key, ThermalConductivity%Phase2)
+            call json%print_error_message(output_unit)
+        type is (Type_ThermalConductivity_3Phase)
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", SoilName
+            call json%get(key, ThermalConductivity%Soil)
+            call json%print_error_message(output_unit)
+
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", WaterName
+            call json%get(key, ThermalConductivity%Water)
+            call json%print_error_message(output_unit)
+
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", IceName
+            call json%get(key, ThermalConductivity%Ice)
+            call json%print_error_message(output_unit)
+        type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", SoilName
+            call json%get(key, ThermalConductivity%Soil)
+            call json%print_error_message(output_unit)
+
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", WaterName
+            call json%get(key, ThermalConductivity%Water)
+            call json%print_error_message(output_unit)
+
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", IceName
+            call json%get(key, ThermalConductivity%Ice)
+            call json%print_error_message(output_unit)
+
+            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", xName
+            call json%get(key, ThermalConductivity%dispersity%x)
+            call json%print_error_message(output_unit)
+
+            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", yName
+            call json%get(key, ThermalConductivity%dispersity%y)
+            call json%print_error_message(output_unit)
+        type is (Type_ThermalConductivity_3Phase_Dispersity_3D)
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", SoilName
+            call json%get(key, ThermalConductivity%Soil)
+            call json%print_error_message(output_unit)
+
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", WaterName
+            call json%get(key, ThermalConductivity%Water)
+            call json%print_error_message(output_unit)
+
+            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", IceName
+            call json%get(key, ThermalConductivity%Ice)
+            call json%print_error_message(output_unit)
+
+            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", xName
+            call json%get(key, ThermalConductivity%dispersity%x)
+            call json%print_error_message(output_unit)
+
+            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", yName
+            call json%get(key, ThermalConductivity%dispersity%y)
+            call json%print_error_message(output_unit)
+
+            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", zName
+            call json%get(key, ThermalConductivity%dispersity%z)
+            call json%print_error_message(output_unit)
+        end select
+
+        if (self%Regions(iRegion)%Flags%isFrozen) then
+            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", QiceTypeName
+            call json%get(key, QiceType)
+            call json%print_error_message(output_unit)
+
+            call Allocate_Structure_Ice_Type(self%Regions(iRegion)%Thermal, QiceType)
+
+            select type (Ice => self%Regions(iRegion)%Thermal%Ice)
+            type is (Type_Ice_TRM)
+                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", TfName
+                call json%get(key, Ice%Tf)
+                call json%print_error_message(output_unit)
+            type is (Type_Ice_GCC)
+                write (key, '(5a)') trim(region_name), ".", ThemalName, ".", LatentHeatName
+                call json%get(key, self%Regions(iRegion)%Thermal%Ice%LatentHeat)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", TfName
+                call json%get(key, Ice%Tf)
+                call json%print_error_message(output_unit)
+
+                write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", ModelName
+                call json%get(key, Ice%ModelType)
+                call json%print_error_message(output_unit)
+
+                call Allocate_Structure_WRF_Type(self%Regions(iRegion)%Thermal, Ice%ModelType)
+
+                select type (WRF => Ice%WRF)
+                type is (Type_WRF_BC)
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    call json%get(key, WRF%thetaS)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    call json%get(key, WRF%thetaR)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    call json%get(key, WRF%alpha1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    call json%get(key, WRF%n1)
+                    call json%print_error_message(output_unit)
+                type is (Type_WRF_VG)
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    call json%get(key, WRF%thetaS)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    call json%get(key, WRF%thetaR)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    call json%get(key, WRF%alpha1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    call json%get(key, WRF%n1)
+                    call json%print_error_message(output_unit)
+
+                    WRF%m1 = 1.0 - 1.0 / WRF%n1
+                type is (Type_WRF_KO)
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    call json%get(key, WRF%thetaS)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    call json%get(key, WRF%thetaR)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    call json%get(key, WRF%alpha1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    call json%get(key, WRF%n1)
+                    call json%print_error_message(output_unit)
+
+                type is (Type_WRF_MVG)
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    call json%get(key, WRF%thetaS)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    call json%get(key, WRF%thetaR)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    call json%get(key, WRF%alpha1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    call json%get(key, WRF%n1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", hcritName
+                    call json%get(key, WRF%hcrit)
+                    call json%print_error_message(output_unit)
+
+                    WRF%m1 = 1.0 - 1.0 / WRF%n1
+
+                type is (Type_WRF_Durner)
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    call json%get(key, WRF%thetaS)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    call json%get(key, WRF%thetaR)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    call json%get(key, WRF%alpha1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    call json%get(key, WRF%n1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha2Name
+                    call json%get(key, WRF%alpha2)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n2Name
+                    call json%get(key, WRF%n2)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", w1Name
+                    call json%get(key, WRF%w1)
+                    call json%print_error_message(output_unit)
+
+                    WRF%m1 = 1.0 - 1.0 / WRF%n1
+                    WRF%m2 = 1.0 - 1.0 / WRF%n2
+                    WRF%w2 = 1.0 - WRF%w1
+                type is (Type_WRF_DVGCH)
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    call json%get(key, WRF%thetaS)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    call json%get(key, WRF%thetaR)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    call json%get(key, WRF%alpha1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    call json%get(key, WRF%n1)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n2Name
+                    call json%get(key, WRF%n2)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", w1Name
+                    call json%get(key, WRF%w1)
+                    call json%print_error_message(output_unit)
+
+                    WRF%m1 = 1.0 - 1.0 / WRF%n1
+                    WRF%m2 = 1.0 - 1.0 / WRF%n2
+                    WRF%w2 = 1.0 - WRF%w1
+                end select
+
+            type is (Type_Ice_EXP)
+                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", TfName
+                call json%get(key, Ice%Tf)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", AName
+                call json%get(key, Ice%a)
+                call json%print_error_message(output_unit)
+            end select
+        end if
+    end subroutine Inout_Input_Parameters_JSON_Thermal
+
+    subroutine Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
+        implicit none
+        class(Input) :: self
+        integer(int32), intent(in) :: iRegion
+        type(json_file), intent(inout) :: json
+
+        character(8) :: region_name
+        character(256) :: key
+
+    end subroutine Inout_Input_Parameters_JSON_Hydraulic
 
     subroutine Inout_Input_Parameters(self)
         implicit none
@@ -1321,7 +1538,7 @@ contains
             call error_message(953)
         else
 #ifdef _MPI
-            ! MPI用の処理，分割して割当てる
+            ! MPI用��処理，分���して割当てる
 #else
             allocate (arr_Coordinates_Region, source=self%Work_Coordinates_Region)
 #endif

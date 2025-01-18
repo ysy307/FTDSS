@@ -61,8 +61,8 @@ contains
     subroutine Fix_DirichletBoundaryCondition_Temperature(Solver, iBC)
         implicit none
         type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in)    :: iBC
-        integer(int32)                  :: iCol, ind, ps, pe
+        integer(int32), intent(in) :: iBC
+        integer(int32) :: iCol, ind, ps, pe
 
         iCol = Solver%BC%Heat%Node(iBC)
         call Find_CRS_Index(Solver%Heat%LHS_A, iCol, iCol, ind)
@@ -78,8 +78,8 @@ contains
     subroutine Fix_DirichletBoundaryCondition_Temperature_F(Solver, iBC)
         implicit none
         type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in)    :: iBC
-        integer(int32)                  :: iCol, ind, ps, pe
+        integer(int32), intent(in) :: iBC
+        integer(int32) :: iCol, ind, ps, pe
 
         iCol = Solver%BC%Heat%Node(iBC)
         ! print*,iCol,iBC
@@ -91,8 +91,8 @@ contains
     subroutine Fix_DirichletBoundaryCondition_Water(Solver, iBC)
         implicit none
         type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in)    :: iBC
-        integer(int32)                  :: iCol, ind, ps, pe
+        integer(int32), intent(in) :: iBC
+        integer(int32) :: iCol, ind, ps, pe
 
         iCol = Solver%BC%Water%Node(iBC)
         call Find_CRS_Index(Solver%Water%LHS_A, iCol, iCol, ind)
@@ -108,8 +108,8 @@ contains
     subroutine Fix_DirichletBoundaryCondition_Water_F(Solver, iBC)
         implicit none
         type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in)    :: iBC
-        integer(int32)                  :: iCol, ind, ps, pe
+        integer(int32), intent(in) :: iBC
+        integer(int32) :: iCol, ind, ps, pe
 
         iCol = Solver%BC%Water%Node(iBC)
         Solver%Water%RA(iCol, :) = 0.0d0

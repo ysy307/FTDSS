@@ -39,7 +39,7 @@ elif(ENABLE_OPTIMIZE)
 endif()
 
 # ライブラリ設定
-set(LINK_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libtoml-f.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libvtkfortran.a)
+set(LINK_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libtomlf.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libvtkfortran.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libjsonfortran-static.a)
 
 if(ENABLE_OPENMP)
     find_package(OpenMP REQUIRED)
@@ -66,7 +66,7 @@ if(ENABLE_MPI)
 endif()
 
 # インクルードパス設定
-set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/toml-f ${CMAKE_INCLUDE_PATH}/VTKFortran)
+set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/tomlf ${CMAKE_INCLUDE_PATH}/VTKFortran ${CMAKE_INCLUDE_PATH}/Json-Fortran)
 
 # ビルドするターゲットを選択
 if(BUILD_APP STREQUAL "ysy_fc")

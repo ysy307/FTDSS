@@ -147,6 +147,7 @@ contains
         ! case (6)
         !     kr = Calculate_HCF_DVGCH(Instance_HCF, h)
         ! end select
+        kr = 1.0d0
 
     end function Calculate_Ks
 

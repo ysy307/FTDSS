@@ -180,7 +180,7 @@ module Types
     end type Type_ThermalConductivity_1Phase
 
     type :: Base_Ice
-        integer(int32) :: QiceType
+        real(real64) :: LatentHeat
     end type Base_Ice
 
     type, extends(Base_Ice) :: Type_Ice_TRM
@@ -201,15 +201,40 @@ module Types
         class(Base_Density), allocatable :: Density
         class(Base_SpecificHeat), allocatable :: SpecificHeat
         class(Base_ThermalConductivity), allocatable :: ThermalConductivity
-        real(real64) :: Porosity, LatentHeat
+        real(real64) :: Porosity
 
         class(Base_Ice), allocatable :: Ice
     end type Type_Thermal
+
+    type :: Base_Hydraulic
+        logical :: useImpedance
+        class(Base_Impedance), allocatable :: Impedance
+        integer(int32) :: useKTDynamics
+        class(Base_KTDynamics), allocatable :: KTDynamics
+        logical :: useHCF
+        class(Base_HCF), allocatable :: HCF
+        real(real64) :: Ks
+    end type Base_Hydraulic
+
+    type Base_Impedance
+    end type Base_Impedance
+
+    type, extends(Base_Impedance) :: Type_Impedance
+        real(real64) :: Omega
+    end type Type_Impedance
+
+    type :: Base_KTDynamics
+    end type Base_KTDynamics
+
+    type, extends(Base_KTDynamics) :: Type_KTDynamics
+        real(real64) :: kzero
+    end type Type_KTDynamics
 
     type :: Type_Region_Flags
         logical :: isHeat, isWater, isStress
         logical :: is1Phase, is2Phase, is3Phase
         logical :: isCompression, isFrostHeavePressure, isDispersity
+        logical :: isFrozen
     end type Type_Region_Flags
 
     type :: Type_Region
@@ -312,6 +337,14 @@ module Types
         real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2
         real(real64) :: Ks, kzero, l, Omega
     end type HCF_Parameters
+
+    type :: Base_HCF
+        real(real64) :: thetaS, thetaR
+    end type Base_HCF
+
+    type, extends(Base_HCF) :: Type_HCF_BC
+        real(real64) :: alpha1, n1
+    end type Type_HCF_BC
 
     type :: LatentHeatTreatment
         integer(int32) :: useModel ! 20: GCC, 30: Power

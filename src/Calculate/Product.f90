@@ -12,12 +12,12 @@ contains
     !* 行列ベクトル積を計算するサブルーチン
     subroutine Matrix_Vector_Product_CRS(A, x, y)
         implicit none
-        type(CRS), intent(in)    :: A
-        real(real64), intent(in)    :: x(:)
+        type(CRS), intent(in) :: A
+        real(real64), intent(in) :: x(:)
         real(real64), intent(inout) :: y(:)
-        real(real64)                :: vtemp
-        integer(int32)              :: i, j, is, ie
-        integer(int32)              :: matrix_size
+        real(real64) :: vtemp
+        integer(int32) :: i, j, is, ie
+        integer(int32) :: matrix_size
 
         matrix_size = size(A%ptr) - 1
         y(:) = 0.0d0

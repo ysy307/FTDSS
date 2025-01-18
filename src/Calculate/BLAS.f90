@@ -12,11 +12,11 @@ contains
 
     function norm_2(N, x) result(norm)
         implicit none
-        integer(int32), intent(in)    :: N
-        real(real64), intent(in)    :: x(:)
-        real(real64)                  :: norm
-        integer(int32)                :: iN, ithread, nthreads
-        real(real64), allocatable     :: partial_sums(:)
+        integer(int32), intent(in) :: N
+        real(real64), intent(in) :: x(:)
+        real(real64) :: norm
+        integer(int32) :: iN, ithread, nthreads
+        real(real64), allocatable :: partial_sums(:)
 
         ! nthreads = omp_get_max_threads()
         ! allocate(partial_sums(nthreads))
@@ -38,11 +38,11 @@ contains
 
     function ddots(N, x, y) result(dot)
         implicit none
-        integer(int32), intent(in)    :: N
-        real(real64), intent(in)    :: x(:), y(:)
-        real(real64)                  :: dot
-        integer(int32)                :: iN, ithread, nthreads
-        real(real64), allocatable     :: partial_sums(:)
+        integer(int32), intent(in) :: N
+        real(real64), intent(in) :: x(:), y(:)
+        real(real64) :: dot
+        integer(int32) :: iN, ithread, nthreads
+        real(real64), allocatable :: partial_sums(:)
 
         ! nthreads = omp_get_max_threads()
         ! allocate(partial_sums(nthreads))

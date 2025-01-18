@@ -6,9 +6,6 @@ module Inout_Output
     use :: Inout_Input
     use :: types
 
-#ifdef _MPI
-    use mpi
-#endif
     implicit none
     private
 
@@ -76,9 +73,9 @@ contains
 
     subroutine Inout_Output_All(self, Solver, num)
         implicit none
-        class(Output)                        :: self
+        class(Output) :: self
         type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in)    :: num
+        integer(int32), intent(in) :: num
 
         if (self%is_Output_Dat) call Inout_Output_All_Dat(self, Solver, num)
         if (self%is_Output_VTK) call Inout_Output_All_vtk(self, Solver, num)
@@ -87,12 +84,12 @@ contains
 
     subroutine Inout_Output_All_Dat(self, Solver, num)
         implicit none
-        class(Output)                        :: self
+        class(Output) :: self
         type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in)    :: num
+        integer(int32), intent(in) :: num
 
-        character(256)                  :: oName, fmt
-        integer(int32)                  :: ios, unit_num, iN
+        character(256) :: oName, fmt
+        integer(int32) :: ios, unit_num, iN
 
         write (oName, Solver%fmt_Fileout) trim(self%dir_Path), "Output/DATFILE/Output_", num, ".dat"
         open (newunit=unit_num, file=oName, status='replace', action='write', iostat=ios)
@@ -125,13 +122,13 @@ contains
 
     subroutine Inout_Output_Observation(self, Solver, time)
         implicit none
-        class(Output)                        :: self
+        class(Output) :: self
         type(SolverInfo), intent(inout) :: Solver
-        real(real64), intent(in)    :: time
+        real(real64), intent(in) :: time
 
         integer(int32) :: unit_num, ios, iObs, nObs, iS, dim
-        real(real64)   :: obsValue(Solver%Obs%nObs), obsValue2d(2 * Solver%Obs%nObs)
-        real(real64)   :: tmpValue
+        real(real64) :: obsValue(Solver%Obs%nObs), obsValue2d(2 * Solver%Obs%nObs)
+        real(real64) :: tmpValue
 
         character(64) :: ofmt
 
@@ -368,13 +365,13 @@ contains
     subroutine Inout_Output_All_vtk(self, Solver, num)
 
         implicit none
-        class(Output)                        :: self
+        class(Output) :: self
         type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in)    :: num
+        integer(int32), intent(in) :: num
 
-        character(256)                  :: oName, fmt
-        integer(int32)                  :: ios, unit_num, iN
-        real(real64)                    :: wFlux_all(3, Solver%N%node)
+        character(256) :: oName, fmt
+        integer(int32) :: ios, unit_num, iN
+        real(real64) :: wFlux_all(3, Solver%N%node)
 
         write (oName, Solver%fmt_Fileout) trim(self%dir_Path), "Output/DATFILE/Output_", num, ".vtk"
         open (newunit=unit_num, file=oName, status='replace', action='write', iostat=ios)
@@ -453,15 +450,15 @@ contains
     !     return
     ! end subroutine Measure_Time
 
-    subroutine Set_Output_Flag(iValue, Flag)
+    subroutine Set_Output_Flag(iValue, inFlag)
         implicit none
         integer(int32), intent(in) :: iValue
-        logical, intent(inout) :: Flag
+        logical, intent(inout) :: inFlag
 
         if (iValue == 1) then
-            Flag = .true.
+            inFlag = .true.
         else
-            Flag = .false.
+            inFlag = .false.
         end if
 
     end subroutine Set_Output_Flag

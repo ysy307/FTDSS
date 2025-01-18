@@ -151,7 +151,6 @@ contains
         implicit none
         type(Type_Thermal), intent(inout) :: Structure_Thermal
         integer(int32), intent(in) :: QiceModelType
-        print *, QiceModelType
 
         if (allocated(Structure_Thermal%Ice)) deallocate (Structure_Thermal%Ice)
 
@@ -177,16 +176,21 @@ contains
         end if
         select type (Ice => Structure_Thermal%Ice)
         type is (Type_Ice_GCC)
-            ! WRFの割り当て
             if (WRFModelType == 1) then
                 allocate (Type_WRF_BC :: Ice%WRF)
             else if (WRFModelType == 2) then
                 allocate (Type_WRF_VG :: Ice%WRF)
+            else if (WRFModelType == 3) then
+                allocate (Type_WRF_KO :: Ice%WRF)
+            else if (WRFModelType == 4) then
+                allocate (Type_WRF_MVG :: Ice%WRF)
+            else if (WRFModelType == 5) then
+                allocate (Type_WRF_Durner :: Ice%WRF)
+            else if (WRFModelType == 6) then
+                allocate (Type_WRF_DVGCH :: Ice%WRF)
             else
-                print *, "Unknown WRF model type for Type_Ice_GCC."
+                print *, "Error: WRFModelType is not defined."
             end if
-        class default
-            print *, "Error: Ice type is not Type_Ice_GCC."
         end select
 
     end subroutine Allocate_Structure_WRF_Type

@@ -25,7 +25,8 @@
     },
     "Region1": {
         "CalculationType": 6,
-        "Modelnumber": 31,
+        "Modelnumber": 32,
+        "isFrozen": true,
         "Thermal": {
             "Porosity": 0.3,
             "LatentHeat": 334560,
@@ -61,11 +62,12 @@
             }
         },
         "Hydraulic": {
-            "Model": 2,
-            "KTDynamics": false,
-            "Impedance": true,
-            "Ks": 1.96e-7,
+            "useHCF": false,
+            "useImpedance": true,
+            "useKTDynamics": 0,
             "Parameters": {
+                "Model": 2,
+                "Ks": 1.96e-7,
                 "thetaS": 0.30,
                 "thetaR": 0.0,
                 "alpha1": 0.2,
@@ -78,6 +80,7 @@
     "Region2": {
         "CalculationType": 4,
         "Modelnumber": 10,
+        "isFrozen": false,
         "Thermal": {
             "Density": 2623.3766,
             "SpecificHeat": 1155,
