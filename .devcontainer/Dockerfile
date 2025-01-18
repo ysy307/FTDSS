@@ -39,6 +39,7 @@ RUN pip3 install --upgrade pip && \
     pip3 install --force-reinstall git+https://github.com/fortran-lang/fortls && \
     pip3 install --upgrade fprettify && \
     pip3 install --upgrade fypp && \
+    pip3 install --upgrade ford && \
     echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod", "/opt/intel/oneapi/mpi/2021.14/include/mpi","/opt/intel/oneapi/2025.0/include/mpi"] }' > /root/.fortls
 
 # ZshとPreztoの設定
