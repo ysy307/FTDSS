@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Condition_FixInitialCondition &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href='../page/index.html'>Read Me</a></li>
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>Condition_FixInitialCondition 
+    <small>Module</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 3.8% of total for modules and submodules.">140 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/FixInitialCondition.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/fixinitialcondition.f90.html'>FixInitialCondition.f90</a></li>
+     <li class="active">Condition_FixInitialCondition</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/condition_fixinitialcondition.html#proc-fix_initialcondition">Fix_InitialCondition</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    
+<br>        <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Uses</h3>
+      </div>
+      <ul class="list-group">
+      <li class="list-group-item">
+  <ul class="list-inline">
+    <li><a href='../module/allocate.html'>Allocate</a></li>
+    <li><a href='../module/condition_fixboundarycondition.html'>Condition_FixBoundaryCondition</a></li>
+    <li><a href='../module/solver_solve.html'>Solver_Solve</a></li>
+    <li><a href='../module/calculate_update.html'>Calculate_Update</a></li>
+    <li><a href="http://fortranwiki.org/fortran/show/iso_fortran_env">iso_fortran_env</a></li>
+    <li><a href='../module/allocate_structure.html'>Allocate_Structure</a></li>
+    <li><a href='../module/error.html'>error</a></li>
+    <li><a href='../module/matrix_assemble.html'>Matrix_Assemble</a></li>
+    <li><a href='../module/types.html'>Types</a></li>
+  </ul>
+      </li>
+      <li class="list-group-item">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~condition_fixinitialcondition~~UsesGraph Pages: 1 -->
+<svg id="modulecondition_fixinitialconditionUsesGraph" width="641pt" height="669pt"
+ viewBox="0.00 0.00 641.00 669.13" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~condition_fixinitialcondition~~UsesGraph" class="graph" transform="scale(0.7 0.7) rotate(0) translate(4 957.41)">
+<title>module~~condition_fixinitialcondition~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-957.41 917,-957.41 917,4 -4,4"/>
+<!-- module~condition_fixinitialcondition -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node1" class="node">
+<title>module~condition_fixinitialcondition</title>
+<polygon fill="none" stroke="black" points="913,-476.41 750,-476.41 750,-452.41 913,-452.41 913,-476.41"/>
+<text text-anchor="middle" x="831.5" y="-462.01" font-family="Helvetica,sans-Serif" font-size="10.50">Condition_FixInitialCondition</text>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node2" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node2"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="95,-404.41 1,-404.41 1,-380.41 95,-380.41 95,-404.41"/>
+<text text-anchor="middle" x="48" y="-390.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge1" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M828.23,-476.5C813.3,-551.8 722.33,-953.41 480,-953.41 480,-953.41 480,-953.41 285.5,-953.41 193.76,-953.41 176.65,-895.55 132,-815.41 88.04,-736.51 113.32,-704.06 96,-615.41 81.58,-541.58 62.65,-454.42 53.87,-414.45"/>
+<polygon fill="#000000" stroke="#000000" points="57.24,-413.49 51.67,-404.47 50.41,-414.99 57.24,-413.49"/>
+</g>
+<!-- module~allocate_structure -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node3" class="node">
+<title>module~allocate_structure</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node3"><a xlink:href=".././module/allocate_structure.html" xlink:title="Allocate_Structure">
+<polygon fill="#337ab7" stroke="#337ab7" points="534,-181.41 424,-181.41 424,-157.41 534,-157.41 534,-181.41"/>
+<text text-anchor="middle" x="479" y="-167.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Structure</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~allocate_structure -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge3" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M660,-208.41C626.29,-184.71 580.9,-174.99 544.13,-171.18"/>
+<polygon fill="#000000" stroke="#000000" points="544.29,-167.68 534.01,-170.25 543.65,-174.65 544.29,-167.68"/>
+</g>
+<!-- module~error -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node4" class="node">
+<title>module~error</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node4"><a xlink:href=".././module/error.html" xlink:title="error">
+<polygon fill="#337ab7" stroke="#337ab7" points="186.5,-219.41 132.5,-219.41 132.5,-195.41 186.5,-195.41 186.5,-219.41"/>
+<text text-anchor="middle" x="159.5" y="-205.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~error -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge4" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~error</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M826.05,-452.41C810.36,-411.68 753.51,-277.5 662,-208.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M660,-208.41C609.2,-170.06 629.19,-123.36 572,-95.41 497.73,-59.12 468.61,-92.38 386,-95.41 313.41,-98.08 285.2,-69.89 223,-107.41 193.83,-125.01 176.18,-161.97 167.39,-185.7"/>
+<polygon fill="#000000" stroke="#000000" points="164.05,-184.66 164.07,-195.25 170.66,-186.96 164.05,-184.66"/>
+</g>
+<!-- module~matrix_assemble -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node5" class="node">
+<title>module~matrix_assemble</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node5"><a xlink:href=".././module/matrix_assemble.html" xlink:title="Matrix_Assemble">
+<polygon fill="#337ab7" stroke="#337ab7" points="712.5,-419.41 609.5,-419.41 609.5,-395.41 712.5,-395.41 712.5,-419.41"/>
+<text text-anchor="middle" x="661" y="-405.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_Assemble</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge5" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M794.77,-452.33C769.3,-443.71 734.86,-432.06 707.44,-422.78"/>
+<polygon fill="#000000" stroke="#000000" points="708.28,-419.37 697.68,-419.48 706.03,-426 708.28,-419.37"/>
+</g>
+<!-- module~condition_fixboundarycondition -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node6" class="node">
+<title>module~condition_fixboundarycondition</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node6"><a xlink:href=".././module/condition_fixboundarycondition.html" xlink:title="Condition_FixBoundaryCondition">
+<polygon fill="#337ab7" stroke="#337ab7" points="572,-573.41 386,-573.41 386,-549.41 572,-549.41 572,-573.41"/>
+<text text-anchor="middle" x="479" y="-559.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_FixBoundaryCondition</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~condition_fixboundarycondition -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge2" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~condition_fixboundarycondition</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M660,-521.41C621.44,-529.88 578.26,-539.47 543.86,-547.14"/>
+<polygon fill="#000000" stroke="#000000" points="542.94,-543.76 533.94,-549.35 544.46,-550.59 542.94,-543.76"/>
+</g>
+<!-- module~allocate -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node7" class="node">
+<title>module~allocate</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node7"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="314.5,-259.41 258.5,-259.41 258.5,-235.41 314.5,-235.41 314.5,-259.41"/>
+<text text-anchor="middle" x="286.5" y="-245.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~allocate -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge6" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M660,-208.41C606.58,-170.85 407.65,-216.25 324.45,-237.54"/>
+<polygon fill="#000000" stroke="#000000" points="323.47,-234.18 314.66,-240.07 325.22,-240.96 323.47,-234.18"/>
+</g>
+<!-- module~calculate_update -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node8" class="node">
+<title>module~calculate_update</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node8"><a xlink:href=".././module/calculate_update.html" xlink:title="Calculate_Update">
+<polygon fill="#337ab7" stroke="#337ab7" points="714,-773.41 608,-773.41 608,-749.41 714,-749.41 714,-773.41"/>
+<text text-anchor="middle" x="661" y="-759.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Update</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~calculate_update -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge7" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~calculate_update</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M823.69,-476.42C798.02,-521.67 706.96,-682.17 674.01,-740.24"/>
+<polygon fill="#000000" stroke="#000000" points="670.79,-738.83 668.9,-749.25 676.88,-742.28 670.79,-738.83"/>
+</g>
+<!-- module~solver_solve -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node9" class="node">
+<title>module~solver_solve</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node9"><a xlink:href=".././module/solver_solve.html" xlink:title="Solver_Solve">
+<polygon fill="#337ab7" stroke="#337ab7" points="701.5,-343.41 620.5,-343.41 620.5,-319.41 701.5,-319.41 701.5,-343.41"/>
+<text text-anchor="middle" x="661" y="-329.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Solver_Solve</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~solver_solve -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge8" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~solver_solve</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M815.25,-452.38C785.82,-429.15 721.02,-378 685.85,-350.24"/>
+<polygon fill="#000000" stroke="#000000" points="687.6,-347.16 677.58,-343.71 683.26,-352.66 687.6,-347.16"/>
+</g>
+<!-- module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node10" class="node">
+<title>module~types</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node10"><a xlink:href=".././module/types.html" xlink:title="Types">
+<polygon fill="#337ab7" stroke="#337ab7" points="186.5,-445.41 132.5,-445.41 132.5,-421.41 186.5,-421.41 186.5,-445.41"/>
+<text text-anchor="middle" x="159.5" y="-431.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge9" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M801.23,-476.52C768.06,-489.72 712.07,-510.42 662,-521.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M660,-521.41C497.7,-557.03 448.82,-529.24 287.5,-489.41"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge12" class="edge">
+<title>module~allocate_structure&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M462.32,-157.25C411.42,-119.33 249.06,-10.53 160.5,-93.41"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~error -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge11" class="edge">
+<title>module~allocate_structure&#45;&gt;module~error</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M423.64,-157.62C384.03,-151.76 330.07,-149.59 287.5,-169.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M285.5,-169.41C256.76,-182.79 222.15,-192.89 196.64,-199.3"/>
+<polygon fill="#000000" stroke="#000000" points="195.54,-195.96 186.66,-201.74 197.2,-202.77 195.54,-195.96"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~allocate -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge10" class="edge">
+<title>module~allocate_structure&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M448.65,-181.43C415.26,-195.1 360.68,-217.45 324.43,-232.29"/>
+<polygon fill="#000000" stroke="#000000" points="322.65,-229.24 314.72,-236.27 325.3,-235.72 322.65,-229.24"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge13" class="edge">
+<title>module~allocate_structure&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M285.5,-169.41C251.42,-185.28 241.4,-193.63 223,-226.41 181.8,-299.85 230.72,-340.45 187,-412.41 186.75,-412.83 186.49,-413.24 186.21,-413.64"/>
+<polygon fill="#000000" stroke="#000000" points="183.37,-411.57 179.3,-421.35 188.58,-416.24 183.37,-411.57"/>
+</g>
+<!-- module~error&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge15" class="edge">
+<title>module~error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M151.32,-219.55C133.07,-250.38 84.75,-332.01 61.65,-371.04"/>
+<polygon fill="#000000" stroke="#000000" points="58.44,-369.6 56.35,-379.99 64.46,-373.16 58.44,-369.6"/>
+</g>
+<!-- ieee_arithmetic -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node16" class="node">
+<title>ieee_arithmetic</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node16"><a xlink:href="http://fortranwiki.org/fortran/show/ieee_arithmetic" xlink:title="ieee_arithmetic">
+<polygon fill="#337ab7" stroke="#337ab7" points="96,-648.41 0,-648.41 0,-624.41 96,-624.41 96,-648.41"/>
+<text text-anchor="middle" x="48" y="-634.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ieee_arithmetic</text>
+</a>
+</g>
+</g>
+<!-- module~error&#45;&gt;ieee_arithmetic -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge14" class="edge">
+<title>module~error&#45;&gt;ieee_arithmetic</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M155.34,-219.79C140.13,-279.37 74.4,-536.92 54.64,-614.33"/>
+<polygon fill="#000000" stroke="#000000" points="51.15,-613.84 52.07,-624.4 57.93,-615.57 51.15,-613.84"/>
+</g>
+<!-- module~matrix_assemble&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge17" class="edge">
+<title>module~matrix_assemble&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M653.47,-419.66C643.49,-438.45 623.92,-475.56 608,-507.41 591.47,-540.49 600.51,-558.87 572,-582.41 506.09,-636.86 458.43,-586.01 386,-631.41 365.17,-644.47 369.21,-658.07 350,-673.41 300.13,-713.23 274.59,-702.85 223,-740.41 191.62,-763.26 195.75,-817.65 160.5,-801.41"/>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~allocate_structure -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge16" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M644.46,-395.05C632.69,-384.84 617.05,-369.33 608,-352.41 574.22,-289.3 621.34,-247.28 572,-195.41 564.38,-187.4 554.5,-181.8 544.04,-177.9"/>
+<polygon fill="#000000" stroke="#000000" points="544.93,-174.5 534.33,-174.77 542.78,-181.16 544.93,-174.5"/>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~error -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge19" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~error</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M648.56,-395.18C626.79,-371.97 580.79,-323.33 572,-317.41 483.56,-257.84 453.46,-252.22 350,-226.41 297.8,-213.39 235.41,-209.25 196.86,-207.96"/>
+<polygon fill="#000000" stroke="#000000" points="196.75,-204.45 186.65,-207.66 196.55,-211.45 196.75,-204.45"/>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~allocate -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge20" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M609.5,-398.47C535.2,-384.94 403.33,-359.37 386,-345.41 356.58,-321.72 378.18,-293.57 350,-268.41 342.79,-261.98 333.53,-257.5 324.37,-254.39"/>
+<polygon fill="#000000" stroke="#000000" points="325.14,-250.97 314.56,-251.53 323.18,-257.69 325.14,-250.97"/>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge22" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-483.41C395.24,-501.49 369.73,-509.77 287.5,-489.41"/>
+</g>
+<!-- module~calculate_product -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node12" class="node">
+<title>module~calculate_product</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node12"><a xlink:href=".././module/calculate_product.html" xlink:title="Calculate_Product">
+<polygon fill="#337ab7" stroke="#337ab7" points="340.5,-423.41 232.5,-423.41 232.5,-399.41 340.5,-399.41 340.5,-423.41"/>
+<text text-anchor="middle" x="286.5" y="-409.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Product</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~calculate_product -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge18" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~calculate_product</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M609.39,-404.37C573.23,-402.93 523.47,-402.47 480,-407.41"/>
+</g>
+<!-- module~matrix_findind -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node17" class="node">
+<title>module~matrix_findind</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node17"><a xlink:href=".././module/matrix_findind.html" xlink:title="Matrix_FindInd">
+<polygon fill="#337ab7" stroke="#337ab7" points="331,-541.41 242,-541.41 242,-517.41 331,-517.41 331,-541.41"/>
+<text text-anchor="middle" x="286.5" y="-527.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_FindInd</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~matrix_findind -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge21" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~matrix_findind</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-483.41C431.62,-493.55 379.21,-506.3 341.11,-515.8"/>
+<polygon fill="#000000" stroke="#000000" points="340.11,-512.45 331.26,-518.27 341.81,-519.24 340.11,-512.45"/>
+</g>
+<!-- omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node18" class="node">
+<title>omp_lib</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node18"><a xlink:href="https://www.openmp.org/spec-html/5.1/openmpch3.html#x156-1890003" xlink:title="omp_lib">
+<polygon fill="#337ab7" stroke="#337ab7" points="187,-403.41 132,-403.41 132,-379.41 187,-379.41 187,-403.41"/>
+<text text-anchor="middle" x="159.5" y="-389.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_lib</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_assemble&#45;&gt;omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge23" class="edge">
+<title>module~matrix_assemble&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M642.89,-419.48C625.69,-431.14 598.05,-448.57 572,-459.41 532.99,-475.65 521.28,-474.39 480,-483.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-483.41C421.54,-495.75 276.47,-454.33 223,-432.41 209.03,-426.69 194.85,-417.7 183.53,-409.59"/>
+<polygon fill="#000000" stroke="#000000" points="185.61,-406.78 175.49,-403.64 181.44,-412.4 185.61,-406.78"/>
+</g>
+<!-- module~condition_fixboundarycondition&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge25" class="edge">
+<title>module~condition_fixboundarycondition&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M435.31,-573.55C419.43,-578.76 401.51,-585.49 386,-593.41 307.28,-633.65 284.77,-644.17 223,-707.41 187.94,-743.3 206.55,-821.33 160.5,-801.41"/>
+</g>
+<!-- module~condition_fixboundarycondition&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge26" class="edge">
+<title>module~condition_fixboundarycondition&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M422.76,-549.37C410.34,-545.69 397.45,-541.08 386,-535.41 368.07,-526.54 367.84,-517.46 350,-508.41 324.11,-495.28 315.68,-496.39 287.5,-489.41"/>
+</g>
+<!-- module~condition_fixboundarycondition&#45;&gt;module~matrix_findind -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge24" class="edge">
+<title>module~condition_fixboundarycondition&#45;&gt;module~matrix_findind</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M406.52,-549.41C384.85,-545.77 361.42,-541.83 341.12,-538.42"/>
+<polygon fill="#000000" stroke="#000000" points="341.57,-534.95 331.13,-536.74 340.41,-541.85 341.57,-534.95"/>
+</g>
+<!-- module~allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge27" class="edge">
+<title>module~allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M258.44,-253.53C246.97,-256.86 233.79,-261.7 223,-268.41 189.52,-289.26 198.23,-319.93 160.5,-331.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.5,-331.41C127.35,-340.89 95.21,-360.13 73.87,-374.48"/>
+<polygon fill="#000000" stroke="#000000" points="71.68,-371.74 65.43,-380.29 75.65,-377.51 71.68,-371.74"/>
+</g>
+<!-- module~allocate&#45;&gt;module~error -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge28" class="edge">
+<title>module~allocate&#45;&gt;module~error</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M258.38,-238.73C240.19,-232.92 216.06,-225.19 196.3,-218.87"/>
+<polygon fill="#000000" stroke="#000000" points="197.3,-215.52 186.71,-215.8 195.17,-222.18 197.3,-215.52"/>
+</g>
+<!-- module~allocate&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge29" class="edge">
+<title>module~allocate&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M258.27,-250.56C245.92,-253.34 232.09,-258.58 223,-268.41 178.23,-316.87 222.76,-356.97 187,-412.41 186.67,-412.92 186.33,-413.42 185.97,-413.92"/>
+<polygon fill="#000000" stroke="#000000" points="183.39,-411.55 179.15,-421.26 188.52,-416.31 183.39,-411.55"/>
+</g>
+<!-- module~calculate_update&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge30" class="edge">
+<title>module~calculate_update&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M651.12,-773.66C636.85,-792.22 606.86,-826.84 572,-841.41 428.8,-901.27 368.95,-906.19 223,-853.41 189.02,-841.13 193.42,-816.31 160.5,-801.41"/>
+</g>
+<!-- module~calculate_update&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge33" class="edge">
+<title>module~calculate_update&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M645.67,-749.39C616.51,-725.57 547.29,-672.38 480,-645.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-645.41C365.74,-600.42 314.05,-630.02 223,-550.41 193.44,-524.57 175.53,-481.25 166.86,-455.2"/>
+<polygon fill="#000000" stroke="#000000" points="170.15,-453.98 163.8,-445.5 163.48,-456.09 170.15,-453.98"/>
+</g>
+<!-- module~rootfinding_binaryfinding -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node11" class="node">
+<title>module~rootfinding_binaryfinding</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node11"><a xlink:href=".././module/rootfinding_binaryfinding.html" xlink:title="RootFinding_BinaryFinding">
+<polygon fill="#337ab7" stroke="#337ab7" points="555.5,-832.41 402.5,-832.41 402.5,-808.41 555.5,-808.41 555.5,-832.41"/>
+<text text-anchor="middle" x="479" y="-818.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RootFinding_BinaryFinding</text>
+</a>
+</g>
+</g>
+<!-- module~calculate_update&#45;&gt;module~rootfinding_binaryfinding -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge31" class="edge">
+<title>module~calculate_update&#45;&gt;module~rootfinding_binaryfinding</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M623.14,-773.5C595.23,-782.64 556.71,-795.27 526.65,-805.12"/>
+<polygon fill="#000000" stroke="#000000" points="525.22,-801.91 516.81,-808.35 527.4,-808.56 525.22,-801.91"/>
+</g>
+<!-- module~rootfinding_secantmethod -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node13" class="node">
+<title>module~rootfinding_secantmethod</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node13"><a xlink:href=".././module/rootfinding_secantmethod.html" xlink:title="RootFinding_SecantMethod">
+<polygon fill="#337ab7" stroke="#337ab7" points="557.5,-773.41 400.5,-773.41 400.5,-749.41 557.5,-749.41 557.5,-773.41"/>
+<text text-anchor="middle" x="479" y="-759.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RootFinding_SecantMethod</text>
+</a>
+</g>
+</g>
+<!-- module~calculate_update&#45;&gt;module~rootfinding_secantmethod -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge32" class="edge">
+<title>module~calculate_update&#45;&gt;module~rootfinding_secantmethod</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M607.94,-761.41C595.44,-761.41 581.76,-761.41 568.13,-761.41"/>
+<polygon fill="#000000" stroke="#000000" points="567.73,-757.91 557.73,-761.41 567.73,-764.91 567.73,-757.91"/>
+</g>
+<!-- module~calculate_update&#45;&gt;omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge34" class="edge">
+<title>module~calculate_update&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-645.41C365.13,-601.98 304.07,-640.16 223,-550.41 180.51,-503.38 221.63,-465.51 187,-412.41 186.67,-411.91 186.32,-411.41 185.96,-410.91"/>
+<polygon fill="#000000" stroke="#000000" points="188.51,-408.51 179.13,-403.58 183.39,-413.28 188.51,-408.51"/>
+</g>
+<!-- module~solver_solve&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge37" class="edge">
+<title>module~solver_solve&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M653.38,-319.29C642.75,-299.47 621.69,-258.71 608,-222.41 587.3,-167.52 615.81,-134.44 572,-95.41 435.43,26.23 289.98,35.75 160.5,-93.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.5,-93.41C78.26,-172.62 56.37,-315.4 50.79,-370.18"/>
+<polygon fill="#000000" stroke="#000000" points="47.3,-369.92 49.85,-380.2 54.27,-370.57 47.3,-369.92"/>
+</g>
+<!-- module~solver_solve&#45;&gt;module~allocate_structure -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge35" class="edge">
+<title>module~solver_solve&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M655.55,-319.13C645.22,-292.4 617.02,-228.65 572,-195.41 563.6,-189.21 553.78,-184.49 543.73,-180.89"/>
+<polygon fill="#000000" stroke="#000000" points="544.67,-177.52 534.07,-177.78 542.52,-184.18 544.67,-177.52"/>
+</g>
+<!-- module~solver_solve&#45;&gt;module~error -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge36" class="edge">
+<title>module~solver_solve&#45;&gt;module~error</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M654.16,-319.17C634.68,-278.29 573,-149.05 572,-148.41 440.66,-65.84 367.73,-99.54 223,-155.41 205.29,-162.25 188.93,-176.26 177.4,-188.02"/>
+<polygon fill="#000000" stroke="#000000" points="174.83,-185.63 170.55,-195.32 179.94,-190.42 174.83,-185.63"/>
+</g>
+<!-- module~solver_solve&#45;&gt;module~allocate -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge41" class="edge">
+<title>module~solver_solve&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M620.28,-332.68C583.79,-333.54 528.21,-334.1 480,-331.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-331.41C414.69,-327.89 408.63,-292.56 350,-268.41 341.78,-265.03 332.8,-261.77 324.28,-258.86"/>
+<polygon fill="#000000" stroke="#000000" points="325.15,-255.46 314.55,-255.63 322.94,-262.11 325.15,-255.46"/>
+</g>
+<!-- module~solver_solve&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge42" class="edge">
+<title>module~solver_solve&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M648.53,-343.49C625.77,-367.42 576.66,-418.77 572,-421.41 564.93,-425.42 295.39,-491.37 287.5,-489.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M285.5,-489.41C251.31,-480.97 214.85,-463.56 190.19,-450.38"/>
+<polygon fill="#000000" stroke="#000000" points="191.8,-447.27 181.34,-445.56 188.45,-453.42 191.8,-447.27"/>
+</g>
+<!-- module~solver_solve&#45;&gt;module~calculate_product -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge38" class="edge">
+<title>module~solver_solve&#45;&gt;module~calculate_product</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M641.56,-343.44C610.02,-362.99 543.03,-400.24 480,-407.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-407.41C435.79,-412.22 387.99,-413.21 350.83,-413"/>
+<polygon fill="#000000" stroke="#000000" points="350.67,-409.5 340.64,-412.91 350.61,-416.5 350.67,-409.5"/>
+</g>
+<!-- module~solver_precon_jacobi -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node14" class="node">
+<title>module~solver_precon_jacobi</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node14"><a xlink:href=".././module/solver_precon_jacobi.html" xlink:title="Solver_Precon_jacobi">
+<polygon fill="#337ab7" stroke="#337ab7" points="349,-343.41 224,-343.41 224,-319.41 349,-319.41 349,-343.41"/>
+<text text-anchor="middle" x="286.5" y="-329.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Solver_Precon_jacobi</text>
+</a>
+</g>
+</g>
+<!-- module~solver_solve&#45;&gt;module~solver_precon_jacobi -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge39" class="edge">
+<title>module~solver_solve&#45;&gt;module~solver_precon_jacobi</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-331.41C438.93,-329.24 395.28,-329.07 359.63,-329.53"/>
+<polygon fill="#000000" stroke="#000000" points="359.27,-326.03 349.32,-329.68 359.37,-333.03 359.27,-326.03"/>
+</g>
+<!-- module~calculate_blas -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node15" class="node">
+<title>module~calculate_blas</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node15"><a xlink:href=".././module/calculate_blas.html" xlink:title="Calculate_BLAS">
+<polygon fill="#337ab7" stroke="#337ab7" points="334.5,-301.41 238.5,-301.41 238.5,-277.41 334.5,-277.41 334.5,-301.41"/>
+<text text-anchor="middle" x="286.5" y="-287.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_BLAS</text>
+</a>
+</g>
+</g>
+<!-- module~solver_solve&#45;&gt;module~calculate_blas -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge40" class="edge">
+<title>module~solver_solve&#45;&gt;module~calculate_blas</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-331.41C428.33,-328.65 372.95,-315.23 334.76,-304.29"/>
+<polygon fill="#000000" stroke="#000000" points="335.53,-300.87 324.95,-301.43 333.57,-307.59 335.53,-300.87"/>
+</g>
+<!-- module~solver_solve&#45;&gt;omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge43" class="edge">
+<title>module~solver_solve&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M478,-331.41C464,-330.63 278.05,-367.7 197.4,-383.95"/>
+<polygon fill="#000000" stroke="#000000" points="196.31,-380.6 187.2,-386.01 197.69,-387.46 196.31,-380.6"/>
+</g>
+<!-- module~types&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge44" class="edge">
+<title>module~types&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M132.27,-423.59C119.83,-418.93 104.66,-413.26 90.7,-408.03"/>
+<polygon fill="#000000" stroke="#000000" points="91.87,-404.73 81.27,-404.5 89.41,-411.28 91.87,-404.73"/>
+</g>
+<!-- module~rootfinding_binaryfinding&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge47" class="edge">
+<title>module~rootfinding_binaryfinding&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M285.5,-839.41C233.9,-812.79 213.24,-825.71 160.5,-801.41"/>
+</g>
+<!-- module~rootfinding_binaryfinding&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge48" class="edge">
+<title>module~rootfinding_binaryfinding&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M449.71,-832.43C410.83,-846.98 339.78,-866.39 287.5,-839.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M285.5,-839.41C259.06,-825.77 241.78,-838.49 223,-815.41 177.5,-759.51 164.37,-529.05 161.31,-455.84"/>
+<polygon fill="#000000" stroke="#000000" points="164.79,-455.35 160.9,-445.5 157.8,-455.63 164.79,-455.35"/>
+</g>
+<!-- module~rootfinding_binaryfinding&#45;&gt;ieee_arithmetic -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge46" class="edge">
+<title>module~rootfinding_binaryfinding&#45;&gt;ieee_arithmetic</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M450.31,-832.52C391.08,-856.37 250.21,-901.91 160.5,-839.41"/>
+</g>
+<!-- module~calculate_latentheat -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_node19" class="node">
+<title>module~calculate_latentheat</title>
+<g id="a_module~~condition_fixinitialcondition~~UsesGraph_node19"><a xlink:href=".././module/calculate_latentheat.html" xlink:title="Calculate_LatentHeat">
+<polygon fill="#337ab7" stroke="#337ab7" points="350,-773.41 223,-773.41 223,-749.41 350,-749.41 350,-773.41"/>
+<text text-anchor="middle" x="286.5" y="-759.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_LatentHeat</text>
+</a>
+</g>
+</g>
+<!-- module~rootfinding_binaryfinding&#45;&gt;module~calculate_latentheat -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge45" class="edge">
+<title>module~rootfinding_binaryfinding&#45;&gt;module~calculate_latentheat</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M438.99,-808.33C409.2,-799.1 367.97,-786.34 336.04,-776.45"/>
+<polygon fill="#000000" stroke="#000000" points="337.05,-773.09 326.46,-773.48 334.97,-779.78 337.05,-773.09"/>
+</g>
+<!-- module~calculate_product&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge49" class="edge">
+<title>module~calculate_product&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M272.1,-399.08C245.1,-374.86 184.66,-324.06 160.5,-331.41"/>
+</g>
+<!-- module~calculate_product&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge50" class="edge">
+<title>module~calculate_product&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M232.49,-420.74C220.36,-422.88 207.75,-425.1 196.53,-427.07"/>
+<polygon fill="#000000" stroke="#000000" points="195.92,-423.63 186.68,-428.81 197.13,-430.52 195.92,-423.63"/>
+</g>
+<!-- module~calculate_product&#45;&gt;omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge51" class="edge">
+<title>module~calculate_product&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M232.49,-402.93C220.59,-401.03 208.22,-399.05 197.16,-397.28"/>
+<polygon fill="#000000" stroke="#000000" points="197.44,-393.78 187.01,-395.66 196.34,-400.69 197.44,-393.78"/>
+</g>
+<!-- module~rootfinding_secantmethod&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge54" class="edge">
+<title>module~rootfinding_secantmethod&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M424.79,-773.49C386.68,-781.91 334.08,-793.1 287.5,-801.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M285.5,-801.41C230.81,-811.18 210.96,-824.66 160.5,-801.41"/>
+</g>
+<!-- module~rootfinding_secantmethod&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge55" class="edge">
+<title>module~rootfinding_secantmethod&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M400.87,-749.37C344.01,-736.54 268.87,-710.66 223,-659.41 170.05,-600.26 161.51,-500.07 160.44,-455.7"/>
+<polygon fill="#000000" stroke="#000000" points="163.93,-455.4 160.3,-445.45 156.93,-455.49 163.93,-455.4"/>
+</g>
+<!-- module~rootfinding_secantmethod&#45;&gt;ieee_arithmetic -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge53" class="edge">
+<title>module~rootfinding_secantmethod&#45;&gt;ieee_arithmetic</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M285.5,-801.41C271.21,-803.96 172.41,-847.71 160.5,-839.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.5,-839.41C94.73,-794.98 64.71,-701.22 53.92,-658.48"/>
+<polygon fill="#000000" stroke="#000000" points="57.28,-657.45 51.53,-648.55 50.47,-659.09 57.28,-657.45"/>
+</g>
+<!-- module~rootfinding_secantmethod&#45;&gt;module~calculate_latentheat -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge52" class="edge">
+<title>module~rootfinding_secantmethod&#45;&gt;module~calculate_latentheat</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M400.24,-761.41C387.09,-761.41 373.48,-761.41 360.46,-761.41"/>
+<polygon fill="#000000" stroke="#000000" points="360.16,-757.91 350.16,-761.41 360.16,-764.91 360.16,-757.91"/>
+</g>
+<!-- module~solver_precon_jacobi&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge56" class="edge">
+<title>module~solver_precon_jacobi&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223.73,-324.31C203.23,-323.81 180.53,-325.32 160.5,-331.41"/>
+</g>
+<!-- module~solver_precon_jacobi&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge57" class="edge">
+<title>module~solver_precon_jacobi&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M270.88,-343.57C251.71,-359.49 216.98,-388.21 187,-412.41 186,-413.22 184.97,-414.05 183.94,-414.88"/>
+<polygon fill="#000000" stroke="#000000" points="181.59,-412.27 175.95,-421.25 185.95,-417.75 181.59,-412.27"/>
+</g>
+<!-- module~solver_precon_jacobi&#45;&gt;omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge58" class="edge">
+<title>module~solver_precon_jacobi&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M254.7,-343.48C244.51,-347.67 233.18,-352.54 223,-357.41 212.17,-362.6 200.54,-368.75 190.3,-374.38"/>
+<polygon fill="#000000" stroke="#000000" points="188.37,-371.45 181.34,-379.37 191.78,-377.57 188.37,-371.45"/>
+</g>
+<!-- module~calculate_blas&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge59" class="edge">
+<title>module~calculate_blas&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M249.56,-301.5C212.83,-313.84 161.06,-331.24 160.5,-331.41"/>
+</g>
+<!-- module~calculate_blas&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge60" class="edge">
+<title>module~calculate_blas&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.4,-299.9C232.73,-302.63 227.4,-306.08 223,-310.41 188.75,-344.15 214.93,-373.29 187,-412.41 186.64,-412.92 186.26,-413.42 185.87,-413.92"/>
+<polygon fill="#000000" stroke="#000000" points="183.11,-411.73 178.63,-421.33 188.12,-416.62 183.11,-411.73"/>
+</g>
+<!-- module~calculate_blas&#45;&gt;omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge61" class="edge">
+<title>module~calculate_blas&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M239.25,-301.45C233.52,-303.93 227.94,-306.89 223,-310.41 200.82,-326.21 182.8,-352.13 171.9,-370.38"/>
+<polygon fill="#000000" stroke="#000000" points="168.82,-368.73 166.87,-379.14 174.89,-372.21 168.82,-368.73"/>
+</g>
+<!-- module~matrix_findind&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge62" class="edge">
+<title>module~matrix_findind&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M269.97,-541.53C255.82,-553.34 235.3,-572.54 223,-593.41 173.98,-676.57 249.09,-839.74 160.5,-801.41"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.5,-801.41C140,-793.41 72.79,-498.76 53.94,-414.63"/>
+<polygon fill="#000000" stroke="#000000" points="57.35,-413.82 51.75,-404.82 50.52,-415.35 57.35,-413.82"/>
+</g>
+<!-- module~matrix_findind&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge63" class="edge">
+<title>module~matrix_findind&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M248.69,-517.31C239.86,-513.56 230.76,-508.93 223,-503.41 203.8,-489.76 186.35,-469.19 174.79,-453.88"/>
+<polygon fill="#000000" stroke="#000000" points="177.44,-451.57 168.71,-445.57 171.79,-455.7 177.44,-451.57"/>
+</g>
+<!-- module~calculate_latentheat&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge64" class="edge">
+<title>module~calculate_latentheat&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M255.06,-773.46C220.98,-786.58 169.34,-805.24 160.5,-801.41"/>
+</g>
+<!-- module~calculate_latentheat&#45;&gt;module~types -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge65" class="edge">
+<title>module~calculate_latentheat&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M269.41,-749.24C255.07,-737.52 234.6,-718.5 223,-697.41 178.12,-615.85 165.29,-502.86 161.77,-455.59"/>
+<polygon fill="#000000" stroke="#000000" points="165.25,-455.28 161.09,-445.54 158.27,-455.75 165.25,-455.28"/>
+</g>
+<!-- module~calculate_latentheat&#45;&gt;omp_lib -->
+<g id="module~~condition_fixinitialcondition~~UsesGraph_edge66" class="edge">
+<title>module~calculate_latentheat&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M275.84,-749.38C261.74,-731.11 235.79,-694.76 223,-659.41 185.25,-555.1 242.38,-508.54 187,-412.41 186.77,-412.01 186.52,-411.6 186.26,-411.21"/>
+<polygon fill="#000000" stroke="#000000" points="188.89,-408.9 179.69,-403.64 183.61,-413.49 188.89,-408.9"/>
+</g>
+</g>
+</svg>
+</div><script>var panmodulecondition_fixinitialconditionUsesGraph = svgPanZoom('#modulecondition_fixinitialconditionUsesGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a submodule to the (sub)module which it is
+    descended from. Dashed arrows point from a module or program unit to 
+    modules which it uses.
+    </p>
+    </div></div></div></div>
+      </li>
+      </ul>
+    </div>
+
+    
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/condition_fixinitialcondition.html#proc-fix_initialcondition">Fix_InitialCondition</a>
+    </div>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    
+    
+
+    
+    
+
+    <section>
+    <h2>Subroutines</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-fix_initialcondition"></span><h3>public subroutine <a href='../proc/fix_initialcondition.html'>Fix_InitialCondition</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+    </section>    
+    <br>
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+          </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>

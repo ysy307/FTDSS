@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Allocate_Structure &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href='../page/index.html'>Read Me</a></li>
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>Allocate_Structure 
+    <small>Module</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 4.4% of total for modules and submodules.">160 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/Allocate_Structure.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/allocate_structure.f90.html'>Allocate_Structure.f90</a></li>
+     <li class="active">Allocate_Structure</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_df">Allocate_DF</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_dp2d">Allocate_DP2d</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_bcinfo">Allocate_BCinfo</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_solver">Allocate_Solver</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_structure_thermal_type">Allocate_Structure_Thermal_Type</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_structure_ice_type">Allocate_Structure_Ice_Type</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_structure_wrf_type">Allocate_Structure_WRF_Type</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    
+<br>        <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Uses</h3>
+      </div>
+      <ul class="list-group">
+      <li class="list-group-item">
+  <ul class="list-inline">
+    <li><a href='../module/allocate.html'>Allocate</a></li>
+    <li><a href="http://fortranwiki.org/fortran/show/iso_fortran_env">iso_fortran_env</a></li>
+    <li><a href='../module/types.html'>Types</a></li>
+    <li><a href='../module/error.html'>error</a></li>
+  </ul>
+      </li>
+      <li class="list-group-item">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~allocate_structure~~UsesGraph Pages: 1 -->
+<svg id="moduleallocate_structureUsesGraph" width="432pt" height="143pt"
+ viewBox="0.00 0.00 432.00 142.71" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~allocate_structure~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 138.71)">
+<title>module~~allocate_structure~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-138.71 428,-138.71 428,4 -4,4"/>
+<!-- module~allocate_structure -->
+<g id="module~~allocate_structure~~UsesGraph_node1" class="node">
+<title>module~allocate_structure</title>
+<polygon fill="none" stroke="black" points="424,-94.71 314,-94.71 314,-70.71 424,-70.71 424,-94.71"/>
+<text text-anchor="middle" x="369" y="-80.31" font-family="Helvetica,sans-Serif" font-size="10.50">Allocate_Structure</text>
+</g>
+<!-- module~allocate -->
+<g id="module~~allocate_structure~~UsesGraph_node2" class="node">
+<title>module~allocate</title>
+<g id="a_module~~allocate_structure~~UsesGraph_node2"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="278,-94.71 222,-94.71 222,-70.71 278,-70.71 278,-94.71"/>
+<text text-anchor="middle" x="250" y="-80.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
+</a>
+</g>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~allocate -->
+<g id="module~~allocate_structure~~UsesGraph_edge1" class="edge">
+<title>module~allocate_structure&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M313.95,-82.71C305.2,-82.71 296.3,-82.71 288.07,-82.71"/>
+<polygon fill="#000000" stroke="#000000" points="288.05,-79.21 278.05,-82.71 288.05,-86.21 288.05,-79.21"/>
+</g>
+<!-- module~error -->
+<g id="module~~allocate_structure~~UsesGraph_node3" class="node">
+<title>module~error</title>
+<g id="a_module~~allocate_structure~~UsesGraph_node3"><a xlink:href=".././module/error.html" xlink:title="error">
+<polygon fill="#337ab7" stroke="#337ab7" points="186,-134.71 132,-134.71 132,-110.71 186,-110.71 186,-134.71"/>
+<text text-anchor="middle" x="159" y="-120.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error</text>
+</a>
+</g>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~error -->
+<g id="module~~allocate_structure~~UsesGraph_edge2" class="edge">
+<title>module~allocate_structure&#45;&gt;module~error</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M319.09,-94.77C305.8,-97.87 291.38,-101.07 278,-103.71 250.81,-109.06 219.88,-114 196.5,-117.5"/>
+<polygon fill="#000000" stroke="#000000" points="195.72,-114.08 186.34,-119 196.74,-121 195.72,-114.08"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~allocate_structure~~UsesGraph_node4" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~allocate_structure~~UsesGraph_node4"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="95,-73.71 1,-73.71 1,-49.71 95,-49.71 95,-73.71"/>
+<text text-anchor="middle" x="48" y="-59.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~allocate_structure&#45;&gt;iso_fortran_env -->
+<g id="module~~allocate_structure~~UsesGraph_edge3" class="edge">
+<title>module~allocate_structure&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M357.24,-70.6C338.24,-50.44 296.45,-11.34 251,-2.71"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M249,-2.71C186.54,9.16 115.66,-23.02 77.3,-44.4"/>
+<polygon fill="#000000" stroke="#000000" points="75.21,-41.56 68.27,-49.57 78.69,-47.64 75.21,-41.56"/>
+</g>
+<!-- module~types -->
+<g id="module~~allocate_structure~~UsesGraph_node5" class="node">
+<title>module~types</title>
+<g id="a_module~~allocate_structure~~UsesGraph_node5"><a xlink:href=".././module/types.html" xlink:title="Types">
+<polygon fill="#337ab7" stroke="#337ab7" points="186,-54.71 132,-54.71 132,-30.71 186,-30.71 186,-54.71"/>
+<text text-anchor="middle" x="159" y="-40.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
+</a>
+</g>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~types -->
+<g id="module~~allocate_structure~~UsesGraph_edge4" class="edge">
+<title>module~allocate_structure&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M249,-2.71C224.77,1.9 199.3,-11.68 181.85,-24.24"/>
+<polygon fill="#000000" stroke="#000000" points="179.33,-21.77 173.51,-30.62 183.58,-27.33 179.33,-21.77"/>
+</g>
+<!-- module~allocate&#45;&gt;module~error -->
+<g id="module~~allocate_structure~~UsesGraph_edge6" class="edge">
+<title>module~allocate&#45;&gt;module~error</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M222.3,-94.71C213.78,-98.53 204.23,-102.83 195.21,-106.88"/>
+<polygon fill="#000000" stroke="#000000" points="193.76,-103.7 186.07,-110.99 196.63,-110.08 193.76,-103.7"/>
+</g>
+<!-- module~allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~allocate_structure~~UsesGraph_edge5" class="edge">
+<title>module~allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.61,-79.83C191.88,-76.71 143.58,-71.64 105.62,-67.65"/>
+<polygon fill="#000000" stroke="#000000" points="105.52,-64.12 95.21,-66.56 104.79,-71.08 105.52,-64.12"/>
+</g>
+<!-- module~allocate&#45;&gt;module~types -->
+<g id="module~~allocate_structure~~UsesGraph_edge7" class="edge">
+<title>module~allocate&#45;&gt;module~types</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M222.3,-70.71C213.78,-66.88 204.23,-62.59 195.21,-58.53"/>
+<polygon fill="#000000" stroke="#000000" points="196.63,-55.33 186.07,-54.42 193.76,-61.72 196.63,-55.33"/>
+</g>
+<!-- module~error&#45;&gt;iso_fortran_env -->
+<g id="module~~allocate_structure~~UsesGraph_edge9" class="edge">
+<title>module~error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M136.47,-110.66C120.19,-101.55 97.64,-88.93 79.51,-78.78"/>
+<polygon fill="#000000" stroke="#000000" points="80.93,-75.56 70.49,-73.73 77.51,-81.67 80.93,-75.56"/>
+</g>
+<!-- ieee_arithmetic -->
+<g id="module~~allocate_structure~~UsesGraph_node6" class="node">
+<title>ieee_arithmetic</title>
+<g id="a_module~~allocate_structure~~UsesGraph_node6"><a xlink:href="http://fortranwiki.org/fortran/show/ieee_arithmetic" xlink:title="ieee_arithmetic">
+<polygon fill="#337ab7" stroke="#337ab7" points="96,-134.71 0,-134.71 0,-110.71 96,-110.71 96,-134.71"/>
+<text text-anchor="middle" x="48" y="-120.31" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ieee_arithmetic</text>
+</a>
+</g>
+</g>
+<!-- module~error&#45;&gt;ieee_arithmetic -->
+<g id="module~~allocate_structure~~UsesGraph_edge8" class="edge">
+<title>module~error&#45;&gt;ieee_arithmetic</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-122.71C124.11,-122.71 115.26,-122.71 106.31,-122.71"/>
+<polygon fill="#000000" stroke="#000000" points="106.21,-119.21 96.21,-122.71 106.21,-126.21 106.21,-119.21"/>
+</g>
+<!-- module~types&#45;&gt;iso_fortran_env -->
+<g id="module~~allocate_structure~~UsesGraph_edge10" class="edge">
+<title>module~types&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-47.26C123.84,-48.66 114.65,-50.26 105.38,-51.88"/>
+<polygon fill="#000000" stroke="#000000" points="104.6,-48.46 95.35,-53.63 105.8,-55.36 104.6,-48.46"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a submodule to the (sub)module which it is
+    descended from. Dashed arrows point from a module or program unit to 
+    modules which it uses.
+    </p>
+    </div></div></div></div>
+      </li>
+      </ul>
+    </div>
+
+        <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Used by</h3>
+      </div>
+      <ul class="list-group">
+  <li class="list-group-item">
+    <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~allocate_structure~~UsedByGraph Pages: 1 -->
+<svg id="moduleallocate_structureUsedByGraph" width="456pt" height="131pt"
+ viewBox="0.00 0.00 456.00 131.33" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~allocate_structure~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 127.33)">
+<title>module~~allocate_structure~~UsedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-127.33 452,-127.33 452,4 -4,4"/>
+<!-- module~allocate_structure -->
+<g id="module~~allocate_structure~~UsedByGraph_node1" class="node">
+<title>module~allocate_structure</title>
+<polygon fill="none" stroke="black" points="110,-87 0,-87 0,-63 110,-63 110,-87"/>
+<text text-anchor="middle" x="55" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">Allocate_Structure</text>
+</g>
+<!-- module~matrix_assemble -->
+<g id="module~~allocate_structure~~UsedByGraph_node2" class="node">
+<title>module~matrix_assemble</title>
+<g id="a_module~~allocate_structure~~UsedByGraph_node2"><a xlink:href=".././module/matrix_assemble.html" xlink:title="Matrix_Assemble">
+<polygon fill="#337ab7" stroke="#337ab7" points="249,-108 146,-108 146,-84 249,-84 249,-108"/>
+<text text-anchor="middle" x="197.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_Assemble</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate_structure~~UsedByGraph_edge1" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M145.78,-88.42C137.53,-87.19 128.89,-85.89 120.37,-84.62"/>
+<polygon fill="#000000" stroke="#000000" points="120.85,-81.15 110.45,-83.14 119.82,-88.08 120.85,-81.15"/>
+</g>
+<!-- module~main_heat -->
+<g id="module~~allocate_structure~~UsedByGraph_node3" class="node">
+<title>module~main_heat</title>
+<g id="a_module~~allocate_structure~~UsedByGraph_node3"><a xlink:href=".././module/main_heat.html" xlink:title="Main_Heat">
+<polygon fill="#337ab7" stroke="#337ab7" points="232,-24 163,-24 163,0 232,0 232,-24"/>
+<text text-anchor="middle" x="197.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Main_Heat</text>
+</a>
+</g>
+</g>
+<!-- module~main_heat&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate_structure~~UsedByGraph_edge2" class="edge">
+<title>module~main_heat&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M167.04,-24C160.11,-26.89 152.78,-30.01 146,-33 127.54,-41.14 107.15,-50.62 90.45,-58.51"/>
+<polygon fill="#000000" stroke="#000000" points="88.62,-55.5 81.09,-62.94 91.62,-61.82 88.62,-55.5"/>
+</g>
+<!-- module~condition_fixinitialcondition -->
+<g id="module~~allocate_structure~~UsedByGraph_node4" class="node">
+<title>module~condition_fixinitialcondition</title>
+<g id="a_module~~allocate_structure~~UsedByGraph_node4"><a xlink:href=".././module/condition_fixinitialcondition.html" xlink:title="Condition_FixInitialCondition">
+<polygon fill="#337ab7" stroke="#337ab7" points="448,-108 285,-108 285,-84 448,-84 448,-108"/>
+<text text-anchor="middle" x="366.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_FixInitialCondition</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate_structure~~UsedByGraph_edge3" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M322.11,-108.04C277.48,-118.6 206.17,-130.35 146,-117 124.27,-112.18 101.57,-101.54 84.4,-92.18"/>
+<polygon fill="#000000" stroke="#000000" points="85.91,-89.01 75.48,-87.15 82.47,-95.11 85.91,-89.01"/>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble -->
+<g id="module~~allocate_structure~~UsedByGraph_edge5" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M284.94,-96C276.28,-96 267.58,-96 259.21,-96"/>
+<polygon fill="#000000" stroke="#000000" points="259.19,-92.5 249.19,-96 259.19,-99.5 259.19,-92.5"/>
+</g>
+<!-- module~solver_solve -->
+<g id="module~~allocate_structure~~UsedByGraph_node5" class="node">
+<title>module~solver_solve</title>
+<g id="a_module~~allocate_structure~~UsedByGraph_node5"><a xlink:href=".././module/solver_solve.html" xlink:title="Solver_Solve">
+<polygon fill="#337ab7" stroke="#337ab7" points="238,-66 157,-66 157,-42 238,-42 238,-66"/>
+<text text-anchor="middle" x="197.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Solver_Solve</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~solver_solve -->
+<g id="module~~allocate_structure~~UsedByGraph_edge6" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~solver_solve</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M317.64,-83.96C295.83,-78.48 270.02,-71.99 248.01,-66.45"/>
+<polygon fill="#000000" stroke="#000000" points="248.74,-63.03 238.19,-63.98 247.03,-69.82 248.74,-63.03"/>
+</g>
+<!-- module~solver_solve&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate_structure~~UsedByGraph_edge4" class="edge">
+<title>module~solver_solve&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M156.99,-59.91C145.53,-61.62 132.7,-63.54 120.14,-65.41"/>
+<polygon fill="#000000" stroke="#000000" points="119.52,-61.97 110.15,-66.91 120.56,-68.89 119.52,-61.97"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a submodule to the (sub)module which it is
+    descended from. Dashed arrows point from a module or program unit to 
+    modules which it uses.
+    </p>
+    </div></div></div></div>
+  </li>
+      </ul>
+    </div>
+
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_df">Allocate_DF</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_dp2d">Allocate_DP2d</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_bcinfo">Allocate_BCinfo</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_solver">Allocate_Solver</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_structure_thermal_type">Allocate_Structure_Thermal_Type</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_structure_ice_type">Allocate_Structure_Ice_Type</a>
+      <a class="list-group-item" href="../module/allocate_structure.html#proc-allocate_structure_wrf_type">Allocate_Structure_WRF_Type</a>
+    </div>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    
+    
+
+    
+    
+
+    <section>
+    <h2>Subroutines</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-allocate_df"></span><h3>public subroutine <a href='../proc/allocate_df.html'>Allocate_DF</a>(ar_DF, n)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_DF</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>n</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-allocate_dp2d"></span><h3>public subroutine <a href='../proc/allocate_dp2d.html'>Allocate_DP2d</a>(ar_DP2d, n)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/dp2d.html'>DP2d</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_DP2d</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>n</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-allocate_bcinfo"></span><h3>public subroutine <a href='../proc/allocate_bcinfo.html'>Allocate_BCinfo</a>(BCinfo, nNode, nType, nEdge)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/boudaryconditioninfo.html'>BoudaryConditionInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>BCinfo</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>nNode</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>nType</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>nEdge</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-allocate_solver"></span><h3>public subroutine <a href='../proc/allocate_solver.html'>Allocate_Solver</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td><p>Allocate Geometry2d</p></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-allocate_structure_thermal_type"></span><h3>public subroutine <a href='../proc/allocate_structure_thermal_type.html'>Allocate_Structure_Thermal_Type</a>(Structure_Thermal, Flags)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/type_thermal.html'>Type_Thermal</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Structure_Thermal</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/type_region_flags.html'>Type_Region_Flags</a>),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Flags</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-allocate_structure_ice_type"></span><h3>public subroutine <a href='../proc/allocate_structure_ice_type.html'>Allocate_Structure_Ice_Type</a>(Structure_Thermal, QiceModelType)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/type_thermal.html'>Type_Thermal</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Structure_Thermal</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>QiceModelType</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-allocate_structure_wrf_type"></span><h3>public subroutine <a href='../proc/allocate_structure_wrf_type.html'>Allocate_Structure_WRF_Type</a>(Structure_Thermal, WRFModelType)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/type_thermal.html'>Type_Thermal</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Structure_Thermal</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>WRFModelType</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+    </section>    
+    <br>
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+          </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>

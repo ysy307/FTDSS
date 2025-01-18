@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>SolverInfo &ndash; Freezing Thawing Dynamics Simulation Solver </title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href='../page/index.html'>Read Me</a></li>
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>SolverInfo
+    <small>Derived Type</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p> 4.8% of total for derived types.</p>Including implementation: 19 statements,  2.7% of total for derived types.">19 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/Types.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/types.f90.html'>Types.f90</a></li>
+     <li><a href='../module/types.html'>Types</a></li>
+     <li class="active">SolverInfo</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
+  <div id="vars-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../type/solverinfo.html#variable-n">N</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-isheat~2">isHeat</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-iswater~2">isWater</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-isstress~2">isStress</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-nanalysis">nAnalysis</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-nfrtreat">nFrTreat</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-ntimedisc">nTimeDisc</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-isstdout~2">isStdOut</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-outputfile">outputFile</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-time">Time</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-iter">Iter</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-obs">Obs</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-heat~3">Heat</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-water~6">Water</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-bc">BC</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-ic">IC</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-mwater">mWater</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-mice">mIce</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-t">T</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-p">P</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-si">Si</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-sw">Sw</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-lis">Lis</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-flags~2">Flags</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-fmt_stdout">fmt_Stdout</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-fmt_fileout">fmt_Fileout</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-mpi">MPI</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: SolverInfo</h2>
+    
+<br>    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Inherits</h3>
+      </div>
+      <div class="panel-body">
+    <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~solverinfo~~InheritsGraph Pages: 1 -->
+<svg id="typesolverinfoInheritsGraph" width="641pt" height="377pt"
+ viewBox="0.00 0.00 641.00 376.78" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~solverinfo~~InheritsGraph" class="graph" transform="scale(0.69 0.69) rotate(0) translate(4 545)">
+<title>type~~solverinfo~~InheritsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-545 930,-545 930,4 -4,4"/>
+<!-- type~solverinfo -->
+<g id="type~~solverinfo~~InheritsGraph_node1" class="node">
+<title>type~solverinfo</title>
+<polygon fill="none" stroke="black" points="926,-259 859,-259 859,-235 926,-235 926,-259"/>
+<text text-anchor="middle" x="892.5" y="-244.6" font-family="Helvetica,sans-Serif" font-size="10.50">SolverInfo</text>
+</g>
+<!-- type~timeinfo -->
+<g id="type~~solverinfo~~InheritsGraph_node2" class="node">
+<title>type~timeinfo</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node2"><a xlink:href=".././type/timeinfo.html" xlink:title="TimeInfo">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="769,-541 710,-541 710,-517 769,-517 769,-541"/>
+<text text-anchor="middle" x="739.5" y="-526.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TimeInfo</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~timeinfo -->
+<g id="type~~solverinfo~~InheritsGraph_edge2" class="edge">
+<title>type~solverinfo&#45;&gt;type~timeinfo</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M890.5,-259.1C886.63,-303.15 871.36,-454.16 841,-490 825.44,-508.37 800.14,-518.13 778.82,-523.29"/>
+<polygon fill="#000000" stroke="#000000" points="778.08,-519.87 769.05,-525.41 779.56,-526.71 778.08,-519.87"/>
+<text text-anchor="middle" x="826.5" y="-512.4" font-family="Helvetica,sans-Serif" font-size="9.50">Time</text>
+</g>
+<!-- type~waterfields -->
+<g id="type~~solverinfo~~InheritsGraph_node3" class="node">
+<title>type~waterfields</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node3"><a xlink:href=".././type/waterfields.html" xlink:title="WaterFields">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="776.5,-318 702.5,-318 702.5,-294 776.5,-294 776.5,-318"/>
+<text text-anchor="middle" x="739.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">WaterFields</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~waterfields -->
+<g id="type~~solverinfo~~InheritsGraph_edge6" class="edge">
+<title>type~solverinfo&#45;&gt;type~waterfields</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M864.63,-259.05C857.03,-262.37 848.72,-265.9 841,-269 822.51,-276.42 801.89,-284.11 784.17,-290.55"/>
+<polygon fill="#000000" stroke="#000000" points="782.86,-287.3 774.65,-293.99 785.24,-293.88 782.86,-287.3"/>
+<text text-anchor="middle" x="826.5" y="-281.4" font-family="Helvetica,sans-Serif" font-size="9.50">Water</text>
+</g>
+<!-- type~boudarycondition -->
+<g id="type~~solverinfo~~InheritsGraph_node4" class="node">
+<title>type~boudarycondition</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node4"><a xlink:href=".././type/boudarycondition.html" xlink:title="BoudaryCondition">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="794,-234 685,-234 685,-210 794,-210 794,-234"/>
+<text text-anchor="middle" x="739.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BoudaryCondition</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~boudarycondition -->
+<g id="type~~solverinfo~~InheritsGraph_edge7" class="edge">
+<title>type~solverinfo&#45;&gt;type~boudarycondition</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M858.92,-241.1C852.96,-240.05 846.8,-238.98 841,-238 829.16,-236 816.52,-233.94 804.34,-231.98"/>
+<polygon fill="#000000" stroke="#000000" points="804.68,-228.49 794.25,-230.37 803.57,-235.4 804.68,-228.49"/>
+<text text-anchor="middle" x="826.5" y="-240.4" font-family="Helvetica,sans-Serif" font-size="9.50">BC</text>
+</g>
+<!-- type~lis -->
+<g id="type~~solverinfo~~InheritsGraph_node5" class="node">
+<title>type~lis</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node5"><a xlink:href=".././type/lis.html" xlink:title="Lis">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="766.5,-192 712.5,-192 712.5,-168 766.5,-168 766.5,-192"/>
+<text text-anchor="middle" x="739.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Lis</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~lis -->
+<g id="type~~solverinfo~~InheritsGraph_edge10" class="edge">
+<title>type~solverinfo&#45;&gt;type~lis</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M871.19,-234.91C862.1,-229.72 851.17,-223.76 841,-219 819.83,-209.08 795.4,-199.56 775.92,-192.4"/>
+<polygon fill="#000000" stroke="#000000" points="777.11,-189.11 766.52,-188.99 774.72,-195.69 777.11,-189.11"/>
+<text text-anchor="middle" x="826.5" y="-221.4" font-family="Helvetica,sans-Serif" font-size="9.50">Lis</text>
+</g>
+<!-- type~flag -->
+<g id="type~~solverinfo~~InheritsGraph_node6" class="node">
+<title>type~flag</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node6"><a xlink:href=".././type/flag.html" xlink:title="Flag">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="766.5,-150 712.5,-150 712.5,-126 766.5,-126 766.5,-150"/>
+<text text-anchor="middle" x="739.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Flag</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~flag -->
+<g id="type~~solverinfo~~InheritsGraph_edge11" class="edge">
+<title>type~solverinfo&#45;&gt;type~flag</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M881.28,-234.78C871.49,-223.4 856.02,-206.24 841,-193 821.66,-175.95 816.62,-171.36 794,-159 788.37,-155.92 782.19,-153.07 776.1,-150.51"/>
+<polygon fill="#000000" stroke="#000000" points="777.26,-147.21 766.68,-146.76 774.67,-153.71 777.26,-147.21"/>
+<text text-anchor="middle" x="826.5" y="-195.4" font-family="Helvetica,sans-Serif" font-size="9.50">Flags</text>
+</g>
+<!-- type~geometry2d -->
+<g id="type~~solverinfo~~InheritsGraph_node7" class="node">
+<title>type~geometry2d</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node7"><a xlink:href=".././type/geometry2d.html" xlink:title="Geometry2d">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="779,-499 700,-499 700,-475 779,-475 779,-499"/>
+<text text-anchor="middle" x="739.5" y="-484.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Geometry2d</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~geometry2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge1" class="edge">
+<title>type~solverinfo&#45;&gt;type~geometry2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M890.23,-259.03C885.73,-299.48 869.28,-429.63 841,-459 827.54,-472.98 807.74,-480.16 789.26,-483.79"/>
+<polygon fill="#000000" stroke="#000000" points="788.48,-480.37 779.19,-485.46 789.62,-487.28 788.48,-480.37"/>
+<text text-anchor="middle" x="826.5" y="-478.4" font-family="Helvetica,sans-Serif" font-size="9.50">N</text>
+</g>
+<!-- type~iteration -->
+<g id="type~~solverinfo~~InheritsGraph_node8" class="node">
+<title>type~iteration</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node8"><a xlink:href=".././type/iteration.html" xlink:title="Iteration">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="768.5,-108 710.5,-108 710.5,-84 768.5,-84 768.5,-108"/>
+<text text-anchor="middle" x="739.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Iteration</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~iteration -->
+<g id="type~~solverinfo~~InheritsGraph_edge3" class="edge">
+<title>type~solverinfo&#45;&gt;type~iteration</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M886.61,-234.76C878.82,-216.21 862.27,-180.44 841,-155 823.77,-134.39 817.22,-130.51 794,-117 789.09,-114.15 783.73,-111.52 778.35,-109.17"/>
+<polygon fill="#000000" stroke="#000000" points="779.33,-105.79 768.74,-105.23 776.67,-112.27 779.33,-105.79"/>
+<text text-anchor="middle" x="826.5" y="-157.4" font-family="Helvetica,sans-Serif" font-size="9.50">Iter</text>
+</g>
+<!-- type~observation2d -->
+<g id="type~~solverinfo~~InheritsGraph_node9" class="node">
+<title>type~observation2d</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node9"><a xlink:href=".././type/observation2d.html" xlink:title="Observation2d">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="649.5,-459 558.5,-459 558.5,-435 649.5,-435 649.5,-459"/>
+<text text-anchor="middle" x="604" y="-444.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Observation2d</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~observation2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge4" class="edge">
+<title>type~solverinfo&#45;&gt;type~observation2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M892,-259.22C892.58,-290.88 889.34,-375.94 841,-417 791.13,-459.37 712.59,-460.78 659.97,-455.71"/>
+<polygon fill="#000000" stroke="#000000" points="660.13,-452.21 649.81,-454.62 659.38,-459.17 660.13,-452.21"/>
+<text text-anchor="middle" x="826.5" y="-436.4" font-family="Helvetica,sans-Serif" font-size="9.50">Obs</text>
+</g>
+<!-- type~heatfields -->
+<g id="type~~solverinfo~~InheritsGraph_node10" class="node">
+<title>type~heatfields</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node10"><a xlink:href=".././type/heatfields.html" xlink:title="HeatFields">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="773.5,-276 705.5,-276 705.5,-252 773.5,-252 773.5,-276"/>
+<text text-anchor="middle" x="739.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HeatFields</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~heatfields -->
+<g id="type~~solverinfo~~InheritsGraph_edge5" class="edge">
+<title>type~solverinfo&#45;&gt;type~heatfields</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M858.74,-250.69C836.82,-253.16 807.75,-256.43 783.92,-259.11"/>
+<polygon fill="#000000" stroke="#000000" points="783.27,-255.66 773.72,-260.26 784.05,-262.62 783.27,-255.66"/>
+<text text-anchor="middle" x="826.5" y="-257.4" font-family="Helvetica,sans-Serif" font-size="9.50">Heat</text>
+</g>
+<!-- type~initialcondition -->
+<g id="type~~solverinfo~~InheritsGraph_node11" class="node">
+<title>type~initialcondition</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node11"><a xlink:href=".././type/initialcondition.html" xlink:title="InitialCondition">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="786,-66 693,-66 693,-42 786,-42 786,-66"/>
+<text text-anchor="middle" x="739.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InitialCondition</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~initialcondition -->
+<g id="type~~solverinfo~~InheritsGraph_edge8" class="edge">
+<title>type~solverinfo&#45;&gt;type~initialcondition</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M889.18,-234.88C883.98,-210.06 869.54,-152.5 841,-113 827.09,-93.75 804.8,-79.74 784.74,-70.22"/>
+<polygon fill="#000000" stroke="#000000" points="785.98,-66.94 775.42,-66.04 783.11,-73.33 785.98,-66.94"/>
+<text text-anchor="middle" x="826.5" y="-115.4" font-family="Helvetica,sans-Serif" font-size="9.50">IC</text>
+</g>
+<!-- type~df -->
+<g id="type~~solverinfo~~InheritsGraph_node12" class="node">
+<title>type~df</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node12"><a xlink:href=".././type/df.html" xlink:title="DF">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="65.5,-375 11.5,-375 11.5,-351 65.5,-351 65.5,-375"/>
+<text text-anchor="middle" x="38.5" y="-360.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">DF</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~df -->
+<g id="type~~solverinfo~~InheritsGraph_edge9" class="edge">
+<title>type~solverinfo&#45;&gt;type~df</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M878.98,-259.13C868.97,-268.65 854.44,-282.08 841,-293 774.95,-346.69 750.21,-355.1 667,-373 418.46,-426.46 346.91,-411.28 95,-377 88.6,-376.13 81.88,-374.8 75.4,-373.3"/>
+<polygon fill="#000000" stroke="#000000" points="76.07,-369.86 65.52,-370.84 74.38,-376.65 76.07,-369.86"/>
+<text text-anchor="middle" x="604" y="-397.4" font-family="Helvetica,sans-Serif" font-size="9.50">mWater, mIce, T, P, Si, Sw</text>
+</g>
+<!-- type~mpiinfo -->
+<g id="type~~solverinfo~~InheritsGraph_node13" class="node">
+<title>type~mpiinfo</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node13"><a xlink:href=".././type/mpiinfo.html" xlink:title="MPIInfo">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="766.5,-24 712.5,-24 712.5,0 766.5,0 766.5,-24"/>
+<text text-anchor="middle" x="739.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">MPIInfo</text>
+</a>
+</g>
+</g>
+<!-- type~solverinfo&#45;&gt;type~mpiinfo -->
+<g id="type~~solverinfo~~InheritsGraph_edge12" class="edge">
+<title>type~solverinfo&#45;&gt;type~mpiinfo</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M890.47,-234.95C887.42,-205.05 876.33,-125.97 841,-72 825.88,-48.89 798.49,-33.41 776.12,-23.97"/>
+<polygon fill="#000000" stroke="#000000" points="777.16,-20.62 766.58,-20.17 774.57,-27.12 777.16,-20.62"/>
+<text text-anchor="middle" x="826.5" y="-74.4" font-family="Helvetica,sans-Serif" font-size="9.50">MPI</text>
+</g>
+<!-- type~watervariables -->
+<g id="type~~solverinfo~~InheritsGraph_node14" class="node">
+<title>type~watervariables</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node14"><a xlink:href=".././type/watervariables.html" xlink:title="WaterVariables">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="505,-375 412,-375 412,-351 505,-351 505,-375"/>
+<text text-anchor="middle" x="458.5" y="-360.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">WaterVariables</text>
+</a>
+</g>
+</g>
+<!-- type~waterfields&#45;&gt;type~watervariables -->
+<g id="type~~solverinfo~~InheritsGraph_edge13" class="edge">
+<title>type~waterfields&#45;&gt;type~watervariables</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M717.95,-318.04C704.04,-325.61 684.98,-334.89 667,-340 616.92,-354.25 557.7,-359.75 515.38,-361.83"/>
+<polygon fill="#000000" stroke="#000000" points="515.1,-358.34 505.27,-362.28 515.41,-365.33 515.1,-358.34"/>
+<text text-anchor="middle" x="604" y="-361.4" font-family="Helvetica,sans-Serif" font-size="9.50">Variables</text>
+</g>
+<!-- type~waterconstants -->
+<g id="type~~solverinfo~~InheritsGraph_node19" class="node">
+<title>type~waterconstants</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node19"><a xlink:href=".././type/waterconstants.html" xlink:title="WaterConstants">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="507,-291 410,-291 410,-267 507,-267 507,-291"/>
+<text text-anchor="middle" x="458.5" y="-276.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">WaterConstants</text>
+</a>
+</g>
+</g>
+<!-- type~waterfields&#45;&gt;type~waterconstants -->
+<g id="type~~solverinfo~~InheritsGraph_edge14" class="edge">
+<title>type~waterfields&#45;&gt;type~waterconstants</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M702.16,-301.15C690.9,-299.72 678.45,-298.22 667,-297 616.62,-291.65 559.22,-286.76 517.58,-283.43"/>
+<polygon fill="#000000" stroke="#000000" points="517.6,-279.92 507.35,-282.62 517.04,-286.9 517.6,-279.92"/>
+<text text-anchor="middle" x="604" y="-299.4" font-family="Helvetica,sans-Serif" font-size="9.50">Constants</text>
+</g>
+<!-- type~crs -->
+<g id="type~~solverinfo~~InheritsGraph_node20" class="node">
+<title>type~crs</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node20"><a xlink:href=".././type/crs.html" xlink:title="CRS">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="485.5,-249 431.5,-249 431.5,-225 485.5,-225 485.5,-249"/>
+<text text-anchor="middle" x="458.5" y="-234.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">CRS</text>
+</a>
+</g>
+</g>
+<!-- type~waterfields&#45;&gt;type~crs -->
+<g id="type~~solverinfo~~InheritsGraph_edge15" class="edge">
+<title>type~waterfields&#45;&gt;type~crs</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M703.58,-293.97C697.24,-291.32 690.81,-288.31 685,-285 676.19,-279.99 676.29,-275.06 667,-271 636.88,-257.85 546.45,-246.37 495.47,-240.73"/>
+<polygon fill="#000000" stroke="#000000" points="495.84,-237.25 485.52,-239.64 495.09,-244.2 495.84,-237.25"/>
+<text text-anchor="middle" x="604" y="-273.4" font-family="Helvetica,sans-Serif" font-size="9.50">LHS_A</text>
+</g>
+<!-- type~boudaryconditioninfo -->
+<g id="type~~solverinfo~~InheritsGraph_node15" class="node">
+<title>type~boudaryconditioninfo</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node15"><a xlink:href=".././type/boudaryconditioninfo.html" xlink:title="BoudaryConditionInfo">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="523,-120 394,-120 394,-96 523,-96 523,-120"/>
+<text text-anchor="middle" x="458.5" y="-105.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BoudaryConditionInfo</text>
+</a>
+</g>
+</g>
+<!-- type~boudarycondition&#45;&gt;type~boudaryconditioninfo -->
+<g id="type~~solverinfo~~InheritsGraph_edge16" class="edge">
+<title>type~boudarycondition&#45;&gt;type~boudaryconditioninfo</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M695.85,-209.98C691.79,-207.52 688.05,-204.56 685,-201 661.27,-173.34 694.73,-144.65 667,-121 626.65,-86.6 564.29,-87.4 518.46,-94.32"/>
+<polygon fill="#000000" stroke="#000000" points="517.66,-90.91 508.36,-95.99 518.8,-97.82 517.66,-90.91"/>
+<text text-anchor="middle" x="604" y="-123.4" font-family="Helvetica,sans-Serif" font-size="9.50">Heat, Water, Stress</text>
+</g>
+<!-- type~dp2d -->
+<g id="type~~solverinfo~~InheritsGraph_node18" class="node">
+<title>type~dp2d</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node18"><a xlink:href=".././type/dp2d.html" xlink:title="DP2d">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="65.5,-481 11.5,-481 11.5,-457 65.5,-457 65.5,-481"/>
+<text text-anchor="middle" x="38.5" y="-466.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">DP2d</text>
+</a>
+</g>
+</g>
+<!-- type~geometry2d&#45;&gt;type~dp2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge17" class="edge">
+<title>type~geometry2d&#45;&gt;type~dp2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M699.72,-496.25C689.16,-498.46 677.69,-500.59 667,-502 477.22,-527.03 427.37,-529.45 236.5,-515"/>
+<text text-anchor="middle" x="458.5" y="-525.4" font-family="Helvetica,sans-Serif" font-size="9.50">vCood</text>
+</g>
+<!-- type~shape -->
+<g id="type~~solverinfo~~InheritsGraph_node21" class="node">
+<title>type~shape</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node21"><a xlink:href=".././type/shape.html" xlink:title="Shape">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="485.5,-501 431.5,-501 431.5,-477 485.5,-477 485.5,-501"/>
+<text text-anchor="middle" x="458.5" y="-486.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Shape</text>
+</a>
+</g>
+</g>
+<!-- type~geometry2d&#45;&gt;type~shape -->
+<g id="type~~solverinfo~~InheritsGraph_edge18" class="edge">
+<title>type~geometry2d&#45;&gt;type~shape</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M700,-487.28C646.02,-487.66 548.54,-488.36 495.78,-488.74"/>
+<polygon fill="#000000" stroke="#000000" points="495.52,-485.24 485.54,-488.81 495.57,-492.24 495.52,-485.24"/>
+<text text-anchor="middle" x="604" y="-490.4" font-family="Helvetica,sans-Serif" font-size="9.50">Basis</text>
+</g>
+<!-- type~observation2d&#45;&gt;type~dp2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge19" class="edge">
+<title>type~observation2d&#45;&gt;type~dp2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M558.45,-436.93C513.04,-429.32 442.58,-425.09 394,-458 378.2,-468.71 391.39,-485.7 376,-497 325.61,-534 298.88,-519.09 236.5,-515"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M234.5,-515C172.16,-510.28 154.76,-515.34 95,-497 86,-494.24 76.7,-490.11 68.34,-485.87"/>
+<polygon fill="#000000" stroke="#000000" points="69.84,-482.7 59.37,-481.09 66.55,-488.88 69.84,-482.7"/>
+<text text-anchor="middle" x="458.5" y="-460.4" font-family="Helvetica,sans-Serif" font-size="9.50">obsCOO</text>
+</g>
+<!-- type~heatvariables -->
+<g id="type~~solverinfo~~InheritsGraph_node16" class="node">
+<title>type~heatvariables</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node16"><a xlink:href=".././type/heatvariables.html" xlink:title="HeatVariables">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="502,-333 415,-333 415,-309 502,-309 502,-333"/>
+<text text-anchor="middle" x="458.5" y="-318.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HeatVariables</text>
+</a>
+</g>
+</g>
+<!-- type~heatfields&#45;&gt;type~heatvariables -->
+<g id="type~~solverinfo~~InheritsGraph_edge20" class="edge">
+<title>type~heatfields&#45;&gt;type~heatvariables</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M705.44,-273.92C698.33,-276.87 691.13,-280.54 685,-285 674.79,-292.44 678.23,-301.21 667,-307 640.98,-320.42 564.64,-322.46 512.19,-322.15"/>
+<polygon fill="#000000" stroke="#000000" points="512.07,-318.64 502.04,-322.05 512.01,-325.64 512.07,-318.64"/>
+<text text-anchor="middle" x="604" y="-324.4" font-family="Helvetica,sans-Serif" font-size="9.50">Variables</text>
+</g>
+<!-- type~latentheattreatment -->
+<g id="type~~solverinfo~~InheritsGraph_node17" class="node">
+<title>type~latentheattreatment</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node17"><a xlink:href=".././type/latentheattreatment.html" xlink:title="LatentHeatTreatment">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="521,-207 396,-207 396,-183 521,-183 521,-207"/>
+<text text-anchor="middle" x="458.5" y="-192.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LatentHeatTreatment</text>
+</a>
+</g>
+</g>
+<!-- type~heatfields&#45;&gt;type~latentheattreatment -->
+<g id="type~~solverinfo~~InheritsGraph_edge22" class="edge">
+<title>type~heatfields&#45;&gt;type~latentheattreatment</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M705.44,-255.44C698.1,-252.4 690.79,-248.35 685,-243 671.57,-230.59 682.24,-216.11 667,-206 626.92,-179.42 572.31,-177.54 529.18,-181.85"/>
+<polygon fill="#000000" stroke="#000000" points="528.58,-178.39 519.04,-182.99 529.37,-185.35 528.58,-178.39"/>
+<text text-anchor="middle" x="604" y="-208.4" font-family="Helvetica,sans-Serif" font-size="9.50">Latent</text>
+</g>
+<!-- type~heatfields&#45;&gt;type~crs -->
+<g id="type~~solverinfo~~InheritsGraph_edge23" class="edge">
+<title>type~heatfields&#45;&gt;type~crs</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M705.47,-252.32C698.58,-249.53 691.46,-246.37 685,-243 676.48,-238.55 676.2,-233.79 667,-231 609.13,-213.48 537.98,-221.5 495.82,-229.11"/>
+<polygon fill="#000000" stroke="#000000" points="494.93,-225.72 485.75,-231.02 496.23,-232.6 494.93,-225.72"/>
+<text text-anchor="middle" x="604" y="-233.4" font-family="Helvetica,sans-Serif" font-size="9.50">LHS_A</text>
+</g>
+<!-- type~heatconstants -->
+<g id="type~~solverinfo~~InheritsGraph_node22" class="node">
+<title>type~heatconstants</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node22"><a xlink:href=".././type/heatconstants.html" xlink:title="HeatConstants">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="504,-165 413,-165 413,-141 504,-141 504,-165"/>
+<text text-anchor="middle" x="458.5" y="-150.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HeatConstants</text>
+</a>
+</g>
+</g>
+<!-- type~heatfields&#45;&gt;type~heatconstants -->
+<g id="type~~solverinfo~~InheritsGraph_edge21" class="edge">
+<title>type~heatfields&#45;&gt;type~heatconstants</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M705.37,-256.66C697.77,-253.57 690.35,-249.19 685,-243 662.01,-216.42 693.84,-188.69 667,-166 625.36,-130.79 560.6,-132.61 514.51,-140.02"/>
+<polygon fill="#000000" stroke="#000000" points="513.65,-136.62 504.4,-141.78 514.85,-143.51 513.65,-136.62"/>
+<text text-anchor="middle" x="604" y="-168.4" font-family="Helvetica,sans-Serif" font-size="9.50">Constants</text>
+</g>
+<!-- type~initialconditioninfo -->
+<g id="type~~solverinfo~~InheritsGraph_node23" class="node">
+<title>type~initialconditioninfo</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node23"><a xlink:href=".././type/initialconditioninfo.html" xlink:title="InitialConditionInfo">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="515,-66 402,-66 402,-42 515,-42 515,-66"/>
+<text text-anchor="middle" x="458.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InitialConditionInfo</text>
+</a>
+</g>
+</g>
+<!-- type~initialcondition&#45;&gt;type~initialconditioninfo -->
+<g id="type~~solverinfo~~InheritsGraph_edge24" class="edge">
+<title>type~initialcondition&#45;&gt;type~initialconditioninfo</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M692.74,-54C647.23,-54 576.95,-54 525.43,-54"/>
+<polygon fill="#000000" stroke="#000000" points="525.39,-50.5 515.39,-54 525.39,-57.5 525.39,-50.5"/>
+<text text-anchor="middle" x="604" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">Heat, Water, Stress</text>
+</g>
+<!-- type~watervariables&#45;&gt;type~df -->
+<g id="type~~solverinfo~~InheritsGraph_edge25" class="edge">
+<title>type~watervariables&#45;&gt;type~df</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M411.97,-363C328.31,-363 151.72,-363 75.64,-363"/>
+<polygon fill="#000000" stroke="#000000" points="75.59,-359.5 65.59,-363 75.59,-366.5 75.59,-359.5"/>
+<text text-anchor="middle" x="235.5" y="-365.4" font-family="Helvetica,sans-Serif" font-size="9.50">Klh</text>
+</g>
+<!-- type~watervariables&#45;&gt;type~dp2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge26" class="edge">
+<title>type~watervariables&#45;&gt;type~dp2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M445.15,-375.1C432.22,-387.84 411.42,-408.57 394,-427 385.79,-435.69 386.76,-441.78 376,-447 276.21,-495.41 139.82,-484.22 75.66,-475.13"/>
+<polygon fill="#000000" stroke="#000000" points="76.04,-471.64 65.64,-473.64 75.02,-478.57 76.04,-471.64"/>
+<text text-anchor="middle" x="235.5" y="-485.4" font-family="Helvetica,sans-Serif" font-size="9.50">wFlux, hGrad</text>
+</g>
+<!-- type~int2d -->
+<g id="type~~solverinfo~~InheritsGraph_node24" class="node">
+<title>type~int2d</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node24"><a xlink:href=".././type/int2d.html" xlink:title="INT2d">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="65.5,-118 11.5,-118 11.5,-94 65.5,-94 65.5,-118"/>
+<text text-anchor="middle" x="38.5" y="-103.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">INT2d</text>
+</a>
+</g>
+</g>
+<!-- type~boudaryconditioninfo&#45;&gt;type~int2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge27" class="edge">
+<title>type~boudaryconditioninfo&#45;&gt;type~int2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M393.56,-107.69C304.81,-107.27 147.19,-106.52 76.09,-106.18"/>
+<polygon fill="#000000" stroke="#000000" points="75.86,-102.67 65.84,-106.13 75.82,-109.67 75.86,-102.67"/>
+<text text-anchor="middle" x="235.5" y="-109.4" font-family="Helvetica,sans-Serif" font-size="9.50">Edges</text>
+</g>
+<!-- type~heatvariables&#45;&gt;type~df -->
+<g id="type~~solverinfo~~InheritsGraph_edge28" class="edge">
+<title>type~heatvariables&#45;&gt;type~df</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M414.81,-321.95C346.74,-323.99 209.62,-330.26 95,-349 88.63,-350.04 81.92,-351.46 75.45,-352.99"/>
+<polygon fill="#000000" stroke="#000000" points="74.42,-349.64 65.56,-355.45 76.11,-356.43 74.42,-349.64"/>
+<text text-anchor="middle" x="235.5" y="-351.4" font-family="Helvetica,sans-Serif" font-size="9.50">Cs, Cp, lambda, rho, Ca</text>
+</g>
+<!-- type~heatvariables&#45;&gt;type~dp2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge29" class="edge">
+<title>type~heatvariables&#45;&gt;type~dp2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M414.77,-330.04C407.29,-332.98 400,-336.87 394,-342 380.71,-353.37 389.91,-366.39 376,-377 274.52,-454.37 213.9,-389.65 95,-436 84.82,-439.97 74.34,-445.7 65.27,-451.28"/>
+<polygon fill="#000000" stroke="#000000" points="63.28,-448.4 56.73,-456.73 67.04,-454.3 63.28,-448.4"/>
+<text text-anchor="middle" x="235.5" y="-438.4" font-family="Helvetica,sans-Serif" font-size="9.50">Tgrad, TFlux</text>
+</g>
+<!-- type~powermodel -->
+<g id="type~~solverinfo~~InheritsGraph_node26" class="node">
+<title>type~powermodel</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node26"><a xlink:href=".././type/powermodel.html" xlink:title="PowerModel">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="77,-265 0,-265 0,-241 77,-241 77,-265"/>
+<text text-anchor="middle" x="38.5" y="-250.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">PowerModel</text>
+</a>
+</g>
+</g>
+<!-- type~latentheattreatment&#45;&gt;type~powermodel -->
+<g id="type~~solverinfo~~InheritsGraph_edge31" class="edge">
+<title>type~latentheattreatment&#45;&gt;type~powermodel</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M413.11,-207.09C406.51,-209.62 399.93,-212.58 394,-216 384.73,-221.35 385.88,-227.89 376,-232 279.82,-272.04 154.73,-266.56 87.42,-259.49"/>
+<polygon fill="#000000" stroke="#000000" points="87.45,-255.98 77.12,-258.35 86.68,-262.93 87.45,-255.98"/>
+<text text-anchor="middle" x="235.5" y="-266.4" font-family="Helvetica,sans-Serif" font-size="9.50">Power</text>
+</g>
+<!-- type~gccmodel -->
+<g id="type~~solverinfo~~InheritsGraph_node27" class="node">
+<title>type~gccmodel</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node27"><a xlink:href=".././type/gccmodel.html" xlink:title="GCCModel">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="72.5,-202 4.5,-202 4.5,-178 72.5,-178 72.5,-202"/>
+<text text-anchor="middle" x="38.5" y="-187.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">GCCModel</text>
+</a>
+</g>
+</g>
+<!-- type~latentheattreatment&#45;&gt;type~gccmodel -->
+<g id="type~~solverinfo~~InheritsGraph_edge30" class="edge">
+<title>type~latentheattreatment&#45;&gt;type~gccmodel</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M395.67,-189.97C389.04,-189.57 382.38,-189.23 376,-189 270.93,-185.14 147.27,-187.2 83.1,-188.77"/>
+<polygon fill="#000000" stroke="#000000" points="82.86,-185.27 72.95,-189.02 83.03,-192.27 82.86,-185.27"/>
+<text text-anchor="middle" x="235.5" y="-191.4" font-family="Helvetica,sans-Serif" font-size="9.50">GCC</text>
+</g>
+<!-- type~phases -->
+<g id="type~~solverinfo~~InheritsGraph_node25" class="node">
+<title>type~phases</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node25"><a xlink:href=".././type/phases.html" xlink:title="Phases">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="65.5,-307 11.5,-307 11.5,-283 65.5,-283 65.5,-307"/>
+<text text-anchor="middle" x="38.5" y="-292.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Phases</text>
+</a>
+</g>
+</g>
+<!-- type~waterconstants&#45;&gt;type~phases -->
+<g id="type~~solverinfo~~InheritsGraph_edge32" class="edge">
+<title>type~waterconstants&#45;&gt;type~phases</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M409.96,-280.82C325.73,-284.04 152.04,-290.69 76.23,-293.59"/>
+<polygon fill="#000000" stroke="#000000" points="75.64,-290.11 65.78,-293.99 75.91,-297.11 75.64,-290.11"/>
+<text text-anchor="middle" x="235.5" y="-294.4" font-family="Helvetica,sans-Serif" font-size="9.50">HydraulicConductivity</text>
+</g>
+<!-- type~heatconstants&#45;&gt;type~phases -->
+<g id="type~~solverinfo~~InheritsGraph_edge33" class="edge">
+<title>type~heatconstants&#45;&gt;type~phases</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M412.71,-163.83C406.09,-166.53 399.62,-169.88 394,-174 382.96,-182.1 387.93,-192.29 376,-199 321.41,-229.71 144.45,-182.56 95,-221 75.36,-236.27 92.91,-254.87 77,-274 76.02,-275.18 74.95,-276.31 73.81,-277.39"/>
+<polygon fill="#000000" stroke="#000000" points="71.38,-274.84 65.6,-283.72 75.66,-280.38 71.38,-274.84"/>
+<text text-anchor="middle" x="235.5" y="-223.4" font-family="Helvetica,sans-Serif" font-size="9.50">Density, ThermalConductivity, SpecificHeat, HeatCapacity</text>
+</g>
+<!-- type~vector2d -->
+<g id="type~~solverinfo~~InheritsGraph_node28" class="node">
+<title>type~vector2d</title>
+<g id="a_type~~solverinfo~~InheritsGraph_node28"><a xlink:href=".././type/vector2d.html" xlink:title="Vector2D">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="69,-160 8,-160 8,-136 69,-136 69,-160"/>
+<text text-anchor="middle" x="38.5" y="-145.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Vector2D</text>
+</a>
+</g>
+</g>
+<!-- type~heatconstants&#45;&gt;type~vector2d -->
+<g id="type~~solverinfo~~InheritsGraph_edge34" class="edge">
+<title>type~heatconstants&#45;&gt;type~vector2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M412.77,-152.46C330.8,-151.48 157.76,-149.41 79.47,-148.48"/>
+<polygon fill="#000000" stroke="#000000" points="79.12,-144.97 69.08,-148.35 79.03,-151.97 79.12,-144.97"/>
+<text text-anchor="middle" x="235.5" y="-153.4" font-family="Helvetica,sans-Serif" font-size="9.50">dispersity</text>
+</g>
+</g>
+</svg>
+</div><script>var pantypesolverinfoInheritsGraph = svgPanZoom('#typesolverinfoInheritsGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a derived type to the parent type which it
+    extends. Dashed arrows point from a derived type to the other
+    types it contains as a components, with a label listing the name(s) of
+    said component(s).
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
+  <div id="vars-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../type/solverinfo.html#variable-n">N</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-isheat~2">isHeat</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-iswater~2">isWater</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-isstress~2">isStress</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-nanalysis">nAnalysis</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-nfrtreat">nFrTreat</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-ntimedisc">nTimeDisc</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-isstdout~2">isStdOut</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-outputfile">outputFile</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-time">Time</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-iter">Iter</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-obs">Obs</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-heat~3">Heat</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-water~6">Water</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-bc">BC</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-ic">IC</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-mwater">mWater</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-mice">mIce</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-t">T</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-p">P</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-si">Si</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-sw">Sw</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-lis">Lis</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-flags~2">Flags</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-fmt_stdout">fmt_Stdout</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-fmt_fileout">fmt_Fileout</a>
+      <a class="list-group-item" href="../type/solverinfo.html#variable-mpi">MPI</a>
+    </div>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+    <h2>Components</h2>
+    <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-n"></span>type(<a href='../type/geometry2d.html'>Geometry2d</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>N</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-isheat~2"></span>logical,</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>isHeat</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-iswater~2"></span>logical,</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>isWater</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-isstress~2"></span>logical,</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>isStress</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-nanalysis"></span>integer(kind=int32),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>nAnalysis</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-nfrtreat"></span>integer(kind=int32),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>nFrTreat</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-ntimedisc"></span>integer(kind=int32),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>nTimeDisc</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-isstdout~2"></span>integer(kind=int32),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>isStdOut</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-outputfile"></span>integer(kind=int32),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>outputFile</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-time"></span>type(<a href='../type/timeinfo.html'>TimeInfo</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Time</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-iter"></span>type(<a href='../type/iteration.html'>Iteration</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Iter</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-obs"></span>type(<a href='../type/observation2d.html'>Observation2d</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Obs</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-heat~3"></span>type(<a href='../type/heatfields.html'>HeatFields</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Heat</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-water~6"></span>type(<a href='../type/waterfields.html'>WaterFields</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Water</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-bc"></span>type(<a href='../type/boudarycondition.html'>BoudaryCondition</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>BC</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-ic"></span>type(<a href='../type/initialcondition.html'>InitialCondition</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>IC</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-mwater"></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>mWater</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-mice"></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>mIce</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-t"></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>T</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-p"></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>P</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-si"></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Si</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-sw"></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Sw</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-lis"></span>type(<a href='../type/lis.html'>Lis</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Lis</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-flags~2"></span>type(<a href='../type/flag.html'>Flag</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>Flags</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-fmt_stdout"></span>character(len=64),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>fmt_Stdout</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-fmt_fileout"></span>character(len=64),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>fmt_Fileout</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-mpi"></span>type(<a href='../type/mpiinfo.html'>MPIInfo</a>),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>MPI</strong></td><td></td><td></td><td></td>
+</tr>
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    
+    
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+          </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>
