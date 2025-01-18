@@ -1,0 +1,93 @@
+[Basic]
+Element = 10646
+Node = 5425
+Shape = 3
+Dimension = 1
+Region = 2
+Calculation.timeUnit = "Second"
+Input.timeUnit = "Day"
+Output.timeUnit = "Day"
+Interval.timeUnit = "Second"
+Calculation.step = 300
+Input.calculationPeriod = 60
+Interval.step = 3600
+isDisplayPrompt = false
+FileOutput = "vtk"
+
+[Region1]
+CalculationType = 6
+Modelnumber = 31
+
+[Region1.Thermal]
+Porosity = 0.3
+LatentHeat = 334560
+
+[Region1.Thermal.Density]
+Soil = 2800
+Water = 1000
+Ice = 917
+
+[Region1.Thermal.SpecificHeat]
+Soil = 921
+Water = 4180
+Ice = 2100
+
+[Region1.Thermal.ThermalConductivity]
+Soil = 3.78
+Water = 0.6
+Ice = 2.2
+dispersity.x = 1.0
+dispersity.y = 0.1
+
+[Region1.Thermal.Ice]
+QiceType = 2
+Tf = 0.0
+[Region1.Thermal.Ice.Parameters]
+Model = 2
+thetaS = 0.30
+thetaR = 0.0
+alpha1 = 0.2
+n1 = 1.8
+
+[Region1.Hydraulic]
+Model = 2
+KTDynamics = false
+Impedance = true
+Ks = 1.96e-7
+
+[Region1.Hydraulic.Parameters]
+thetaS = 0.30
+thetaR = 0.0
+alpha1 = 0.2
+n1 = 1.8
+l = 0.5
+Omega = 10
+
+[Region2]
+CalculationType = 4
+Modelnumber = 10
+
+[Region2.Thermal]
+Density = 2623.3766
+SpecificHeat = 1155
+ThermalConductivity = 2.7
+
+# [Region2.Thermal.Ice]
+# QiceType = 1
+# Tf = 0.0
+
+
+[Solve]
+TimeDiscretization = 1.0
+
+[Solve.Thermal]
+DI = 1
+
+[Solve.Thermal.Infomation]
+Soler = 4
+Preconditioner = 1
+maxiter = 50000
+tolerance = 1.0e-20
+
+[Solve.Hydraulic]
+DI = 2

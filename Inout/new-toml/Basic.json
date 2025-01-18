@@ -1,0 +1,105 @@
+{
+    "Basic": {
+        "Element": 10646,
+        "Node": 5425,
+        "Shape": 3,
+        "Dimension": 1,
+        "Region": 2,
+        "Calculation": {
+            "timeUnit": "Second",
+            "step": 300
+        },
+        "Input": {
+            "timeUnit": "Day",
+            "calculationPeriod": 60
+        },
+        "Output": {
+            "timeUnit": "Day"
+        },
+        "Interval": {
+            "timeUnit": "Second",
+            "step": 3600
+        },
+        "isDisplayPrompt": false,
+        "FileOutput": "vtk"
+    },
+    "Region1": {
+        "CalculationType": 6,
+        "Modelnumber": 32,
+        "isFrozen": true,
+        "Thermal": {
+            "Porosity": 0.3,
+            "LatentHeat": 334560,
+            "Density": {
+                "Soil": 2800,
+                "Water": 1000,
+                "Ice": 917
+            },
+            "SpecificHeat": {
+                "Soil": 921,
+                "Water": 4180,
+                "Ice": 2100
+            },
+            "ThermalConductivity": {
+                "Soil": 3.78,
+                "Water": 0.6,
+                "Ice": 2.2,
+                "dispersity": {
+                    "x": 1.0,
+                    "y": 0.1
+                }
+            },
+            "Ice": {
+                "QiceType": 2,
+                "Tf": 0.0,
+                "Parameters": {
+                    "Model": 2,
+                    "thetaS": 0.30,
+                    "thetaR": 0.0,
+                    "alpha1": 0.2,
+                    "n1": 1.8
+                }
+            }
+        },
+        "Hydraulic": {
+            "useHCF": false,
+            "useImpedance": true,
+            "useKTDynamics": 0,
+            "Parameters": {
+                "Model": 2,
+                "Ks": 1.96e-7,
+                "thetaS": 0.30,
+                "thetaR": 0.0,
+                "alpha1": 0.2,
+                "n1": 1.8,
+                "l": 0.5,
+                "Omega": 10
+            }
+        }
+    },
+    "Region2": {
+        "CalculationType": 4,
+        "Modelnumber": 10,
+        "isFrozen": false,
+        "Thermal": {
+            "Density": 2623.3766,
+            "SpecificHeat": 1155,
+            "ThermalConductivity": 2.7
+        }
+    },
+    "Solve": {
+        "TimeDiscretization": 1.0,
+        "Thermal": {
+            "DI": 1,
+            "Infomation": {
+                "Soler": 4,
+                "Preconditioner": 1,
+                "maxiter": 50000,
+                "tolerance": 1.0e-20
+            }
+        },
+        "Hydraulic": {
+            "DI": 2
+        }
+    }
+}

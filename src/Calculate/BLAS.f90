@@ -1,6 +1,6 @@
 module Calculate_BLAS
     use omp_lib
-    use, intrinsic :: iso_fortran_env, only : int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     implicit none
     private
@@ -8,15 +8,15 @@ module Calculate_BLAS
     public :: norm_2
     public :: ddots
 
-    contains
+contains
 
     function norm_2(N, x) result(norm)
         implicit none
-        integer(int32), intent(in)    :: N
-        real(real64),   intent(in)    :: x(:)
-        real(real64)                  :: norm
-        integer(int32)                :: iN, ithread, nthreads
-        real(real64), allocatable     :: partial_sums(:)
+        integer(int32), intent(in) :: N
+        real(real64), intent(in) :: x(:)
+        real(real64) :: norm
+        integer(int32) :: iN, ithread, nthreads
+        real(real64), allocatable :: partial_sums(:)
 
         ! nthreads = omp_get_max_threads()
         ! allocate(partial_sums(nthreads))
@@ -27,21 +27,22 @@ module Calculate_BLAS
         ! ithread = omp_get_thread_num() + 1
         ! $omp do
         do iN = 1, N
-            norm = norm + x(iN) ** 2
+            norm = norm + x(iN)**2
         end do
         ! $omp end do
         ! $omp end parallel
 
-        norm = sqrt(norm)
+        ! メモリ解放
+        deallocate (partial_sums)
     end function norm_2
 
     function ddots(N, x, y) result(dot)
         implicit none
-        integer(int32), intent(in)    :: N
-        real(real64),   intent(in)    :: x(:), y(:)
-        real(real64)                  :: dot
-        integer(int32)                :: iN, ithread, nthreads
-        real(real64), allocatable     :: partial_sums(:)
+        integer(int32), intent(in) :: N
+        real(real64), intent(in) :: x(:), y(:)
+        real(real64) :: dot
+        integer(int32) :: iN, ithread, nthreads
+        real(real64), allocatable :: partial_sums(:)
 
         ! nthreads = omp_get_max_threads()
         ! allocate(partial_sums(nthreads))
@@ -59,6 +60,5 @@ module Calculate_BLAS
 
         ! dot = sum(partial_sums)
     end function ddots
-
 
 end module Calculate_BLAS
