@@ -31,7 +31,6 @@ jobs:
 
     - name: Deploy API Documentation
       uses: JamesIves/github-pages-deploy-action@4.1.0
-      if: ${{ github.event_name == 'push'  &&  github.ref == 'refs/heads/main' }}
       with:
         branch: gh-pages
         folder: ./docs/api-docs
