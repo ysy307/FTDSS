@@ -5,9 +5,6 @@ on: [push, pull_request]
 jobs:
   documentation:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-
 
     env:
       FC: gfortran
@@ -25,10 +22,10 @@ jobs:
 
     - name: Build Developer Documentation
       run: |
-        ford api-docs-ford-settings.md
+        ford api-docs-ford-settings.md --output ./docs/api-docs
 
     - name: Upload Documentation
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v2
       with:
         name: documentation
         path: ./docs/api-docs
