@@ -71,6 +71,13 @@ module Inout_Input
     character(*), parameter :: useKTDynamicsName = "useKTDynamics"
     character(*), parameter :: lName = "l"
     character(*), parameter :: OmegaName = "Omega"
+    character(*), parameter :: TimeDiscretizationName = "TimeDiscretization"
+    character(*), parameter :: SolveName = "Solve"
+    character(*), parameter :: SolverName = "Solver"
+    character(*), parameter :: PreconditionerName = "Preconditioner"
+    character(*), parameter :: MaxIterationName = "MaxIteration"
+    character(*), parameter :: ToleranceName = "Tolerance"
+    character(*), parameter :: useSolverName = "useSolver"
 
 #ifdef _MPI
     integer(int32), parameter :: root = 0
@@ -86,6 +93,7 @@ module Inout_Input
         ! Basic section
         type(Basic_params) :: Basic
         type(Type_Region), allocatable :: Regions(:)
+        type(Type_Solver) :: Solver
         integer(int32) :: Elements, Nodes, Shape, Dimemsion, Region
         integer(int32) :: StandardOutput, OutputFile
         real(real64) :: Calculation_Time, dt, Output_Interval_Time
@@ -261,6 +269,12 @@ contains
                 call Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
             end if
         end do
+        ! if (self%Regions(iRegion)%Flags%isHeat) then
+        call Inout_Input_Parameters_JSON_Solver(self, json)
+        ! end if
+        ! if (self%Regions(iRegion)%Flags%isWater) then
+        !     call Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
+        ! end if
 
         stop
     end subroutine Inout_Input_Parameters_JSON
@@ -760,6 +774,7 @@ contains
     end subroutine Inout_Input_Parameters_JSON_Thermal
 
     subroutine Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
+        !> Load the hydraulic parameters from the JSON file
         implicit none
         class(Input) :: self
         type(json_file), intent(inout) :: json ! JSON parser
@@ -773,26 +788,302 @@ contains
         write (key, '(5a)') trim(region_name), ".", HydraulicName, ".", useHCFName
         call json%get(key, self%Regions(iRegion)%Hydraulic%useHCF)
         call json%print_error_message(output_unit)
-        print *, self%Regions(iRegion)%Hydraulic%useHCF
 
         write (key, '(5a)') trim(region_name), ".", HydraulicName, ".", useImpedanceName
         call json%get(key, self%Regions(iRegion)%Hydraulic%useImpedance)
         call json%print_error_message(output_unit)
-        print *, self%Regions(iRegion)%Hydraulic%useImpedance
 
         write (key, '(5a)') trim(region_name), ".", HydraulicName, ".", useKTDynamicsName
         call json%get(key, self%Regions(iRegion)%Hydraulic%useKTDynamics)
         call json%print_error_message(output_unit)
-        print *, self%Regions(iRegion)%Hydraulic%useKTDynamics
 
         call Allocate_Structure_Hydraulic_Type(self%Regions(iRegion)%Hydraulic)
 
         write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", KsName
         call json%get(key, self%Regions(iRegion)%Hydraulic%Ks)
         call json%print_error_message(output_unit)
-        print *, self%Regions(iRegion)%Hydraulic%Ks
+
+        if (allocated(self%Regions(iRegion)%Hydraulic%HCF)) then
+            select type (HCF => self%Regions(iRegion)%Hydraulic%HCF)
+            type is (Type_HCF_BC)
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaSName
+                call json%get(key, HCF%thetaS)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaRName
+                call json%get(key, HCF%thetaR)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", alpha1Name
+                call json%get(key, HCF%alpha1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n1Name
+                call json%get(key, HCF%n1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", lName
+                call json%get(key, HCF%l)
+                call json%print_error_message(output_unit)
+
+            type is (Type_HCF_VG)
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaSName
+                call json%get(key, HCF%thetaS)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaRName
+                call json%get(key, HCF%thetaR)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", alpha1Name
+                call json%get(key, HCF%alpha1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n1Name
+                call json%get(key, HCF%n1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", lName
+                call json%get(key, HCF%l)
+                call json%print_error_message(output_unit)
+
+                HCF%m1 = 1.0 - 1.0 / HCF%n1
+
+            type is (Type_HCF_KO)
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaSName
+                call json%get(key, HCF%thetaS)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaRName
+                call json%get(key, HCF%thetaR)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", alpha1Name
+                call json%get(key, HCF%alpha1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n1Name
+                call json%get(key, HCF%n1)
+                call json%print_error_message(output_unit)
+
+            type is (Type_HCF_MVG)
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaSName
+                call json%get(key, HCF%thetaS)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaRName
+                call json%get(key, HCF%thetaR)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", alpha1Name
+                call json%get(key, HCF%alpha1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n1Name
+                call json%get(key, HCF%n1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", hcritName
+                call json%get(key, HCF%hcrit)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", lName
+                call json%get(key, HCF%l)
+                call json%print_error_message(output_unit)
+
+                HCF%m1 = 1.0 - 1.0 / HCF%n1
+
+            type is (Type_HCF_Durner)
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaSName
+                call json%get(key, HCF%thetaS)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaRName
+                call json%get(key, HCF%thetaR)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", alpha1Name
+                call json%get(key, HCF%alpha1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n1Name
+                call json%get(key, HCF%n1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", alpha2Name
+                call json%get(key, HCF%alpha2)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n2Name
+                call json%get(key, HCF%n2)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", w1Name
+                call json%get(key, HCF%w1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", lName
+                call json%get(key, HCF%l)
+                call json%print_error_message(output_unit)
+
+                HCF%m1 = 1.0 - 1.0 / HCF%n1
+                HCF%m2 = 1.0 - 1.0 / HCF%n2
+                HCF%w2 = 1.0 - HCF%w1
+
+            type is (Type_HCF_DVGCH)
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaSName
+                call json%get(key, HCF%thetaS)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", thetaRName
+                call json%get(key, HCF%thetaR)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", alpha1Name
+                call json%get(key, HCF%alpha1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n1Name
+                call json%get(key, HCF%n1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", n2Name
+                call json%get(key, HCF%n2)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", w1Name
+                call json%get(key, HCF%w1)
+                call json%print_error_message(output_unit)
+
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", lName
+                call json%get(key, HCF%l)
+                call json%print_error_message(output_unit)
+
+                HCF%m1 = 1.0 - 1.0 / HCF%n1
+                HCF%m2 = 1.0 - 1.0 / HCF%n2
+                HCF%w2 = 1.0 - HCF%w1
+            end select
+        end if
+
+        if (allocated(self%Regions(iRegion)%Hydraulic%Impedance)) then
+            select type (Impedance => self%Regions(iRegion)%Hydraulic%Impedance)
+            type is (Type_Impedance)
+                write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", OmegaName
+                call json%get(key, Impedance%Omega)
+                call json%print_error_message(output_unit)
+            end select
+        end if
 
     end subroutine Inout_Input_Parameters_JSON_Hydraulic
+
+    subroutine Inout_Input_Parameters_JSON_Solver(self, json)
+        !> load Solver settings from the JSON file
+        implicit none
+        class(Input) :: self
+        type(json_file), intent(inout) :: json ! JSON parser
+
+        character(256) :: key
+        integer(int32) :: useSolver
+
+        write (key, '(3a)') SolveName, ".", TimeDiscretizationName
+        call json%get(key, self%Basic%TimeDiscretization)
+        call json%print_error_message(output_unit)
+        print *, self%Basic%TimeDiscretization
+        if (any(self%Regions(:)%Flags%isHeat)) then
+            write (key, '(5a)') SolveName, ".", ThermalName, ".", useSolverName
+            call json%get(key, useSolver)
+            call json%print_error_message(output_unit)
+
+            call Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, ThermalName)
+        end if
+        if (any(self%Regions(:)%Flags%isWater)) then
+            write (key, '(5a)') SolveName, ".", HydraulicName, ".", useSolverName
+            call json%get(key, useSolver)
+            call json%print_error_message(output_unit)
+
+            call Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, HydraulicName)
+        end if
+
+    end subroutine Inout_Input_Parameters_JSON_Solver
+
+    subroutine Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, c_target)
+        !> Load the solver detail settings from the JSON file
+        implicit none
+        class(Input) :: self
+        type(json_file), intent(inout) :: json ! JSON parser
+        integer(int32), intent(in) :: useSolver ! Solver type
+        character(*), intent(in) :: c_target ! Target name
+
+        character(256) :: key
+        select case (c_target)
+        case (ThermalName)
+            select case (useSolver)
+            case (1)
+                allocate (Base_Solver :: self%Solver%Thermal)
+                self%Solver%Thermal%useSolver = useSolver
+            case (2)
+                allocate (Type_Solver_Iterative :: self%Solver%Thermal)
+                self%Solver%Thermal%useSolver = useSolver
+
+                select type (Thermal => self%Solver%Thermal)
+                type is (Type_Solver_Iterative)
+                    write (key, '(7a)') SolveName, ".", ThermalName, ".", ParametersName, ".", SolverName
+                    call json%get(key, Thermal%SolverType)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(7a)') SolveName, ".", ThermalName, ".", ParametersName, ".", PreconditionerName
+                    call json%get(key, Thermal%PreconditionerType)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(7a)') SolveName, ".", ThermalName, ".", ParametersName, ".", MaxIterationName
+                    call json%get(key, Thermal%MaxIter)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(7a)') SolveName, ".", ThermalName, ".", ParametersName, ".", ToleranceName
+                    call json%get(key, Thermal%Tol)
+                    call json%print_error_message(output_unit)
+                class default
+                    ! エラー処理
+                    write (*, '(A)') "Error: Unexpected type assigned to self%Solver%Thermal"
+                    stop
+                end select
+            end select
+        case (HydraulicName)
+            select case (useSolver)
+            case (1)
+                allocate (Base_Solver :: self%Solver%Hydraulic)
+                self%Solver%Hydraulic%useSolver = useSolver
+            case (2)
+                allocate (Type_Solver_Iterative :: self%Solver%Hydraulic)
+                self%Solver%Hydraulic%useSolver = useSolver
+
+                select type (Hydraulic => self%Solver%Hydraulic)
+                type is (Type_Solver_Iterative)
+                    write (key, '(7a)') SolveName, ".", HydraulicName, ".", ParametersName, ".", SolverName
+                    call json%get(key, Hydraulic%SolverType)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(7a)') SolveName, ".", HydraulicName, ".", ParametersName, ".", PreconditionerName
+                    call json%get(key, Hydraulic%PreconditionerType)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(7a)') SolveName, ".", HydraulicName, ".", ParametersName, ".", MaxIterationName
+                    call json%get(key, Hydraulic%MaxIter)
+                    call json%print_error_message(output_unit)
+
+                    write (key, '(7a)') SolveName, ".", HydraulicName, ".", ParametersName, ".", ToleranceName
+                    call json%get(key, Hydraulic%Tol)
+                    call json%print_error_message(output_unit)
+                    print *, Hydraulic%SolverType, Hydraulic%PreconditionerType, Hydraulic%MaxIter, Hydraulic%Tol
+                class default
+                    ! エラー処理
+                    write (*, '(A)') "Error: Unexpected type assigned to self%Solver%Hydraulic"
+                    stop
+                end select
+            end select
+        end select
+
+    end subroutine Inout_Input_Parameters_JSON_Solver_Settings
 
     subroutine Inout_Input_Parameters(self)
         implicit none

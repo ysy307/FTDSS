@@ -124,7 +124,24 @@ module Types
         integer(int32) :: Interval
         logical :: isDisplayPrompt
         character(:), allocatable :: FileOutput
+        real(real64) :: TimeDiscretization
     end type Basic_params
+
+    type :: Type_Solver
+        class(Base_Solver), allocatable :: Thermal ! Solver for heat transfer
+        class(Base_Solver), allocatable :: Hydraulic ! Solver for water flow
+    end type Type_Solver
+
+    type :: Base_Solver
+        integer(int32) :: useSolver ! Solver fpr execute solution 1: Direct, 2: 22Iterative
+    end type Base_Solver
+
+    type, extends(Base_Solver) :: Type_Solver_Iterative
+        integer(int32) :: SolverType ! Solver type
+        integer(int32) :: PreconditionerType ! Preconditioner type
+        integer(int32) :: MaxIter ! Maximum number of iterations
+        real(real64) :: Tol ! Convergence criterion
+    end type Type_Solver_Iterative
 
     type :: Base_Density
     end type Base_Density
