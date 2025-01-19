@@ -145,7 +145,9 @@ module Types
     end type Base_SpecificHeat
 
     type, extends(Base_SpecificHeat) :: Type_SpecificHeat_3Phase
-        real(real64) :: Soil, Water, Ice
+        real(real64) :: Soil ! Soil specific heat
+        real(real64) :: Water ! Water specific heat
+        real(real64) :: Ice ! Ice specific heat
     end type Type_SpecificHeat_3Phase
 
     type, extends(Base_SpecificHeat) :: Type_SpecificHeat_2Phase
@@ -206,15 +208,15 @@ module Types
         class(Base_Ice), allocatable :: Ice
     end type Type_Thermal
 
-    type :: Base_Hydraulic
+    type :: Type_Hydraulic
+        integer(int32) :: useHCF
+        class(Base_HCF), allocatable :: HCF
         logical :: useImpedance
         class(Base_Impedance), allocatable :: Impedance
         integer(int32) :: useKTDynamics
         class(Base_KTDynamics), allocatable :: KTDynamics
-        logical :: useHCF
-        class(Base_HCF), allocatable :: HCF
         real(real64) :: Ks
-    end type Base_Hydraulic
+    end type Type_Hydraulic
 
     type Base_Impedance
     end type Base_Impedance
@@ -241,6 +243,7 @@ module Types
         integer(int32) :: CalculationType
         integer(int32) :: Modelnumber
         type(Type_Thermal) :: Thermal
+        type(Type_Hydraulic) :: Hydraulic
         type(Type_Region_Flags) :: Flags
     end type Type_Region
 
@@ -343,8 +346,28 @@ module Types
     end type Base_HCF
 
     type, extends(Base_HCF) :: Type_HCF_BC
-        real(real64) :: alpha1, n1
+        real(real64) :: alpha1, n1, l
     end type Type_HCF_BC
+
+    type, extends(Base_HCF) :: Type_HCF_VG
+        real(real64) :: alpha1, n1, m1, l
+    end type Type_HCF_VG
+
+    type, extends(Base_HCF) :: Type_HCF_KO
+        real(real64) :: alpha1, n1
+    end type Type_HCF_KO
+
+    type, extends(Base_HCF) :: Type_HCF_MVG
+        real(real64) :: alpha1, n1, m1, hcrit, l
+    end type Type_HCF_MVG
+
+    type, extends(Base_HCF) :: Type_HCF_Durner
+        real(real64) :: alpha1, n1, m1, alpha2, n2, m2, w1, w2, l
+    end type Type_HCF_Durner
+
+    type, extends(Base_HCF) :: Type_HCF_DVGCH
+        real(real64) :: alpha1, n1, m1, n2, m2, w1, w2, l
+    end type Type_HCF_DVGCH
 
     type :: LatentHeatTreatment
         integer(int32) :: useModel ! 20: GCC, 30: Power

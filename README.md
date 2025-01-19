@@ -1,5 +1,14 @@
 # Freezing Thawing Dynamics Simulation Solver
 
+### Compiler Support
+<!-- <img src=""> -->
+<!-- [![Compiler](https://img.shields.io/badge/GNU-pass%20(v6.0.1+)-brightgreen.svg)]()https://img.shields.io/badge/ifx-2025.0.4-0071C5.svg?logo=intel&style=popout -->
+[![Compiler](https://img.shields.io/badge/ifx-2025.0.4-0071C5.svg?logo=intel&style=popout)]()
+<!-- [![Compiler](https://img.shields.io/badge/IBM%20XL-not%20tested-yellow.svg)]() -->
+<!-- [![Compiler](https://img.shields.io/badge/g95-not%20tested-yellow.svg)]() -->
+<!-- [![Compiler](https://img.shields.io/badge/NAG-not%20tested-yellow.svg)]() -->
+<!-- [![Compiler](https://img.shields.io/badge/PGI-not%20tested-yellow.svg)]() -->
+
 ## Goals and Motivations
 
 ## Scope

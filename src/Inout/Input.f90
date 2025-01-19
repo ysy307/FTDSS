@@ -3,7 +3,7 @@ module Inout_Input
     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
     use :: error
     use :: allocate
-    use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type
+    use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type, Allocate_Structure_Hydraulic_Type
     use :: Types
     use :: tomlf
     use :: json_module
@@ -14,7 +14,8 @@ module Inout_Input
     integer(int32), parameter :: min_model_type = 11, max_model_type = 18
     integer(int32), parameter :: min_Coordinate_Dimesion_type = 1, max_Coordinate_Dimesion_type = 3
     character(*), parameter :: BasicName = "Basic"
-    character(*), parameter :: ThemalName = "Thermal"
+    character(*), parameter :: ThermalName = "Thermal"
+    character(*), parameter :: HydraulicName = "Hydraulic"
     character(*), parameter :: ElementName = "Element"
     character(*), parameter :: NodeName = "Node"
     character(*), parameter :: ShapeName = "Shape"
@@ -64,6 +65,12 @@ module Inout_Input
     character(*), parameter :: KsName = "Ks"
 
     character(*), parameter :: AName = "a"
+
+    character(*), parameter :: useHCFName = "useHCF"
+    character(*), parameter :: useImpedanceName = "useImpedance"
+    character(*), parameter :: useKTDynamicsName = "useKTDynamics"
+    character(*), parameter :: lName = "l"
+    character(*), parameter :: OmegaName = "Omega"
 
 #ifdef _MPI
     integer(int32), parameter :: root = 0
@@ -176,8 +183,9 @@ contains
 
     type(Input) function Input_Constructor
         implicit none
-        character(256) :: dir_Path
-        integer(int32) :: access, status
+        character(256) :: dir_Path ! Path to the project directory
+        integer(int32) :: access ! File access status
+        integer(int32) :: status ! File access status
 
         ! Path settings
         dir_Path = GetProjectPath()
@@ -227,35 +235,21 @@ contains
     end function Input_Constructor
 
     subroutine Inout_Input_Parameters_JSON(self)
+        !< Load the input parameters from the JSON file
         implicit none
         class(Input) :: self
-        type(toml_table), allocatable :: table
-        type(toml_error), allocatable :: parse_error
+        type(json_file) :: json ! JSON parser
         integer(int32) :: status, unit_num
         integer(int32) :: iRegion
 
-        type(json_file) :: json ! JSONパーサ
-        character(kind=json_CK, len=:), allocatable :: s ! 文字列用
-        real(kind=json_RK) :: a ! 実数用
-        real(kind=json_RK), dimension(:), allocatable :: b ! 実数の配列用
-        logical(kind=json_LK) :: fl ! 論理用
-        integer :: i ! do文用
+        call json%initialize()
 
-        call json%initialize() ! モジュール初期化
-
-        call json%load(filename='/workspaces/FTDSS/Inout/new-toml/Basic.json') ! JSONファイルを読み込む
-        call json%print_error_message(output_unit) ! パースエラーがあれば表示
-
-        call json%print(output_unit) ! 読み込んだjsonをそのまま表示
+        call json%load(filename='/workspaces/FTDSS/Inout/new-toml/Basic.json')
         call json%print_error_message(output_unit)
 
-        ! open (newunit=unit_num, file="/workspaces/FTDSS/Inout/new-toml/Basic.toml", status="old", action="read", iostat=status)
-        ! if (status /= 0) call error_message(902, opt_file_name="/workspaces/FTDSS/Inout/new-toml/Basic.toml")
-        ! call toml_parse(table, unit_num, parse_error)
-        ! close (unit=unit_num)
-        ! if (allocated(parse_error)) then
-        !     print *, "Error parsing table:"//parse_error%message
-        ! end if
+        call json%print(output_unit)
+        call json%print_error_message(output_unit)
+
         call Inout_Input_Parameters_JSON_Basic(self, json)
         if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%Region))
         do iRegion = 1, self%Basic%Region
@@ -272,9 +266,10 @@ contains
     end subroutine Inout_Input_Parameters_JSON
 
     subroutine Inout_Input_Parameters_JSON_Basic(self, json)
+        !> Load the basic input parameters from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: json ! JSON parser
         character(256) :: key
 
         write (key, '(3a)') BasicName, ".", ElementName
@@ -336,10 +331,11 @@ contains
     end subroutine Inout_Input_Parameters_JSON_Basic
 
     subroutine Inout_Input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
+        !> load the region information from the JSON file
         implicit none
         class(Input) :: self
-        integer(int32), intent(in) :: iRegion
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: json ! JSON parser
+        integer(int32), intent(in) :: iRegion ! Region number
 
         character(8) :: region_name
         character(256) :: key
@@ -364,9 +360,9 @@ contains
         case (4)
             call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .false.)
         case (5)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .false.)
-        case (6)
             call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .true.)
+        case (6)
+            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .false.)
         case (7)
             call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .true.)
         case default
@@ -405,10 +401,13 @@ contains
     end subroutine Inout_Input_Parameters_JSON_Reigion_Infomation
 
     subroutine Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
+        !> Set the calculation types
         implicit none
         class(Input) :: self
-        integer(int32), intent(in) :: iRegion
-        logical, intent(in) :: isHeat, isWater, isStress
+        integer(int32), intent(in) :: iRegion ! Region number
+        logical, intent(in) :: isHeat ! Heat calculation
+        logical, intent(in) :: isWater ! Water calculation
+        logical, intent(in) :: isStress ! Stress calculation
 
         self%Regions(iRegion)%Flags%isHeat = isHeat
         self%Regions(iRegion)%Flags%isWater = isWater
@@ -417,11 +416,16 @@ contains
     end subroutine Inout_Input_Parameters_JSON_SetCalculationTypes
 
     subroutine Inout_Input_Parameters_JSON_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, isCompression, isFrostHeavePressure, isDispersity)
+        !> Set the calculation flags
         implicit none
         class(Input) :: self
-        integer(int32), intent(in) :: iRegion
-        logical, intent(in) :: is1Phase, is2Phase, is3Phase
-        logical, intent(in), optional :: isCompression, isFrostHeavePressure, isDispersity
+        integer(int32), intent(in) :: iRegion ! Region number
+        logical, intent(in) :: is1Phase ! 1 Phase calculation
+        logical, intent(in) :: is2Phase ! 2 Phase calculation
+        logical, intent(in) :: is3Phase ! 3 Phase calculation
+        logical, intent(in), optional :: isCompression ! consideer the water/ice compression
+        logical, intent(in), optional :: isFrostHeavePressure ! Frost heave pressure calculation
+        logical, intent(in), optional :: isDispersity ! Thermalc onductivity dispersity calculation
 
         self%Regions(iRegion)%Flags%is1Phase = is1Phase
         self%Regions(iRegion)%Flags%is2Phase = is2Phase
@@ -433,10 +437,11 @@ contains
     end subroutine Inout_Input_Parameters_JSON_SetFlags
 
     subroutine Inout_Input_Parameters_JSON_Thermal(self, json, iRegion)
+        !> Load the thermal parameters from the JSON file
         implicit none
         class(Input) :: self
-        integer(int32), intent(in) :: iRegion
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: json ! JSON parser
+        integer(int32), intent(in) :: iRegion ! Region number
 
         character(8) :: region_name
         integer(int32) :: QiceType
@@ -447,7 +452,7 @@ contains
         write (region_name, '(a, i0)') RegionName, iRegion
         if (self%Regions(iRegion)%Flags%isFrozen) then
             if (self%Regions(iRegion)%Flags%is3Phase) then
-                write (key, '(5a)') trim(region_name), ".", ThemalName, ".", PorosityName
+                write (key, '(5a)') trim(region_name), ".", ThermalName, ".", PorosityName
                 call json%get(key, self%Regions(iRegion)%Thermal%Porosity)
                 call json%print_error_message(output_unit)
             end if
@@ -455,131 +460,131 @@ contains
 
         select type (Density => self%Regions(iRegion)%Thermal%Density)
         type is (Type_Density_1Phase)
-            write (key, '(5a)') trim(region_name), ".", ThemalName, ".", DensityName
+            write (key, '(5a)') trim(region_name), ".", ThermalName, ".", DensityName
             call json%get(key, Density%Phase1)
             call json%print_error_message(output_unit)
         type is (Type_Density_2Phase)
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", Phase1Name
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", DensityName, ".", Phase1Name
             call json%get(key, Density%Phase1)
             call json%print_error_message(output_unit)
 
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", Phase2Name
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", DensityName, ".", Phase2Name
             call json%get(key, Density%Phase2)
             call json%print_error_message(output_unit)
         type is (Type_Density_3Phase)
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", SoilName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", DensityName, ".", SoilName
             call json%get(key, Density%Soil)
             call json%print_error_message(output_unit)
 
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", WaterName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", DensityName, ".", WaterName
             call json%get(key, Density%Water)
             call json%print_error_message(output_unit)
 
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", DensityName, ".", IceName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", DensityName, ".", IceName
             call json%get(key, Density%Ice)
             call json%print_error_message(output_unit)
         end select
 
         select type (SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
         type is (Type_SpecificHeat_1Phase)
-            write (key, '(5a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName
+            write (key, '(5a)') trim(region_name), ".", ThermalName, ".", SpecificHeatName
             call json%get(key, SpecificHeat%Phase1)
             call json%print_error_message(output_unit)
         type is (Type_SpecificHeat_2Phase)
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", Phase1Name
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", SpecificHeatName, ".", Phase1Name
             call json%get(key, SpecificHeat%Phase1)
             call json%print_error_message(output_unit)
 
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", Phase2Name
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", SpecificHeatName, ".", Phase2Name
             call json%get(key, SpecificHeat%Phase2)
             call json%print_error_message(output_unit)
         type is (Type_SpecificHeat_3Phase)
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", SoilName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", SpecificHeatName, ".", SoilName
             call json%get(key, SpecificHeat%Soil)
             call json%print_error_message(output_unit)
 
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", WaterName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", SpecificHeatName, ".", WaterName
             call json%get(key, SpecificHeat%Water)
             call json%print_error_message(output_unit)
 
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", SpecificHeatName, ".", IceName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", SpecificHeatName, ".", IceName
             call json%get(key, SpecificHeat%Ice)
             call json%print_error_message(output_unit)
         end select
 
         select type (ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
         type is (Type_ThermalConductivity_1Phase)
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName
             call json%get(key, ThermalConductivity%Phase1)
             call json%print_error_message(output_unit)
         type is (Type_ThermalConductivity_2Phase)
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", Phase1Name
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", Phase1Name
             call json%get(key, ThermalConductivity%Phase1)
             call json%print_error_message(output_unit)
 
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", Phase2Name
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", Phase2Name
             call json%get(key, ThermalConductivity%Phase2)
             call json%print_error_message(output_unit)
         type is (Type_ThermalConductivity_3Phase)
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", SoilName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", SoilName
             call json%get(key, ThermalConductivity%Soil)
             call json%print_error_message(output_unit)
 
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", WaterName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", WaterName
             call json%get(key, ThermalConductivity%Water)
             call json%print_error_message(output_unit)
 
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", IceName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", IceName
             call json%get(key, ThermalConductivity%Ice)
             call json%print_error_message(output_unit)
         type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", SoilName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", SoilName
             call json%get(key, ThermalConductivity%Soil)
             call json%print_error_message(output_unit)
 
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", WaterName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", WaterName
             call json%get(key, ThermalConductivity%Water)
             call json%print_error_message(output_unit)
 
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", IceName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", IceName
             call json%get(key, ThermalConductivity%Ice)
             call json%print_error_message(output_unit)
 
-            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", xName
+            write (key, '(11a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", dispersityName, ".", xName
             call json%get(key, ThermalConductivity%dispersity%x)
             call json%print_error_message(output_unit)
 
-            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", yName
+            write (key, '(11a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", dispersityName, ".", yName
             call json%get(key, ThermalConductivity%dispersity%y)
             call json%print_error_message(output_unit)
         type is (Type_ThermalConductivity_3Phase_Dispersity_3D)
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", SoilName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", SoilName
             call json%get(key, ThermalConductivity%Soil)
             call json%print_error_message(output_unit)
 
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", WaterName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", WaterName
             call json%get(key, ThermalConductivity%Water)
             call json%print_error_message(output_unit)
 
-            write (key, '(9a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", IceName
+            write (key, '(9a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", IceName
             call json%get(key, ThermalConductivity%Ice)
             call json%print_error_message(output_unit)
 
-            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", xName
+            write (key, '(11a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", dispersityName, ".", xName
             call json%get(key, ThermalConductivity%dispersity%x)
             call json%print_error_message(output_unit)
 
-            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", yName
+            write (key, '(11a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", dispersityName, ".", yName
             call json%get(key, ThermalConductivity%dispersity%y)
             call json%print_error_message(output_unit)
 
-            write (key, '(11a)') trim(region_name), ".", ThemalName, ".", ThermalConductivityName, ".", dispersityName, ".", zName
+            write (key, '(11a)') trim(region_name), ".", ThermalName, ".", ThermalConductivityName, ".", dispersityName, ".", zName
             call json%get(key, ThermalConductivity%dispersity%z)
             call json%print_error_message(output_unit)
         end select
 
         if (self%Regions(iRegion)%Flags%isFrozen) then
-            write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", QiceTypeName
+            write (key, '(7a)') trim(region_name), ".", ThermalName, ".", IceName, ".", QiceTypeName
             call json%get(key, QiceType)
             call json%print_error_message(output_unit)
 
@@ -587,19 +592,19 @@ contains
 
             select type (Ice => self%Regions(iRegion)%Thermal%Ice)
             type is (Type_Ice_TRM)
-                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", TfName
+                write (key, '(7a)') trim(region_name), ".", ThermalName, ".", IceName, ".", TfName
                 call json%get(key, Ice%Tf)
                 call json%print_error_message(output_unit)
             type is (Type_Ice_GCC)
-                write (key, '(5a)') trim(region_name), ".", ThemalName, ".", LatentHeatName
+                write (key, '(5a)') trim(region_name), ".", ThermalName, ".", LatentHeatName
                 call json%get(key, self%Regions(iRegion)%Thermal%Ice%LatentHeat)
                 call json%print_error_message(output_unit)
 
-                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", TfName
+                write (key, '(7a)') trim(region_name), ".", ThermalName, ".", IceName, ".", TfName
                 call json%get(key, Ice%Tf)
                 call json%print_error_message(output_unit)
 
-                write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", ModelName
+                write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", ModelName
                 call json%get(key, Ice%ModelType)
                 call json%print_error_message(output_unit)
 
@@ -607,105 +612,105 @@ contains
 
                 select type (WRF => Ice%WRF)
                 type is (Type_WRF_BC)
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaSName
                     call json%get(key, WRF%thetaS)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaRName
                     call json%get(key, WRF%thetaR)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", alpha1Name
                     call json%get(key, WRF%alpha1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n1Name
                     call json%get(key, WRF%n1)
                     call json%print_error_message(output_unit)
                 type is (Type_WRF_VG)
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaSName
                     call json%get(key, WRF%thetaS)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaRName
                     call json%get(key, WRF%thetaR)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", alpha1Name
                     call json%get(key, WRF%alpha1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n1Name
                     call json%get(key, WRF%n1)
                     call json%print_error_message(output_unit)
 
                     WRF%m1 = 1.0 - 1.0 / WRF%n1
                 type is (Type_WRF_KO)
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaSName
                     call json%get(key, WRF%thetaS)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaRName
                     call json%get(key, WRF%thetaR)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", alpha1Name
                     call json%get(key, WRF%alpha1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n1Name
                     call json%get(key, WRF%n1)
                     call json%print_error_message(output_unit)
 
                 type is (Type_WRF_MVG)
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaSName
                     call json%get(key, WRF%thetaS)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaRName
                     call json%get(key, WRF%thetaR)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", alpha1Name
                     call json%get(key, WRF%alpha1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n1Name
                     call json%get(key, WRF%n1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", hcritName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", hcritName
                     call json%get(key, WRF%hcrit)
                     call json%print_error_message(output_unit)
 
                     WRF%m1 = 1.0 - 1.0 / WRF%n1
 
                 type is (Type_WRF_Durner)
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaSName
                     call json%get(key, WRF%thetaS)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaRName
                     call json%get(key, WRF%thetaR)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", alpha1Name
                     call json%get(key, WRF%alpha1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n1Name
                     call json%get(key, WRF%n1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha2Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", alpha2Name
                     call json%get(key, WRF%alpha2)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n2Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n2Name
                     call json%get(key, WRF%n2)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", w1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", w1Name
                     call json%get(key, WRF%w1)
                     call json%print_error_message(output_unit)
 
@@ -713,27 +718,27 @@ contains
                     WRF%m2 = 1.0 - 1.0 / WRF%n2
                     WRF%w2 = 1.0 - WRF%w1
                 type is (Type_WRF_DVGCH)
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaSName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaSName
                     call json%get(key, WRF%thetaS)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", thetaRName
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", thetaRName
                     call json%get(key, WRF%thetaR)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", alpha1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", alpha1Name
                     call json%get(key, WRF%alpha1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n1Name
                     call json%get(key, WRF%n1)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", n2Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", n2Name
                     call json%get(key, WRF%n2)
                     call json%print_error_message(output_unit)
 
-                    write (key, '(9a)') trim(region_name), ".", ThemalName, ".", IceName, ".", ParametersName, ".", w1Name
+                    write (key, '(9a)') trim(region_name), ".", ThermalName, ".", IceName, ".", ParametersName, ".", w1Name
                     call json%get(key, WRF%w1)
                     call json%print_error_message(output_unit)
 
@@ -743,11 +748,11 @@ contains
                 end select
 
             type is (Type_Ice_EXP)
-                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", TfName
+                write (key, '(7a)') trim(region_name), ".", ThermalName, ".", IceName, ".", TfName
                 call json%get(key, Ice%Tf)
                 call json%print_error_message(output_unit)
 
-                write (key, '(7a)') trim(region_name), ".", ThemalName, ".", IceName, ".", AName
+                write (key, '(7a)') trim(region_name), ".", ThermalName, ".", IceName, ".", AName
                 call json%get(key, Ice%a)
                 call json%print_error_message(output_unit)
             end select
@@ -757,11 +762,35 @@ contains
     subroutine Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
         implicit none
         class(Input) :: self
-        integer(int32), intent(in) :: iRegion
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: json ! JSON parser
+        integer(int32), intent(in) :: iRegion ! Region number
 
         character(8) :: region_name
         character(256) :: key
+
+        write (region_name, '(a, i0)') RegionName, iRegion
+
+        write (key, '(5a)') trim(region_name), ".", HydraulicName, ".", useHCFName
+        call json%get(key, self%Regions(iRegion)%Hydraulic%useHCF)
+        call json%print_error_message(output_unit)
+        print *, self%Regions(iRegion)%Hydraulic%useHCF
+
+        write (key, '(5a)') trim(region_name), ".", HydraulicName, ".", useImpedanceName
+        call json%get(key, self%Regions(iRegion)%Hydraulic%useImpedance)
+        call json%print_error_message(output_unit)
+        print *, self%Regions(iRegion)%Hydraulic%useImpedance
+
+        write (key, '(5a)') trim(region_name), ".", HydraulicName, ".", useKTDynamicsName
+        call json%get(key, self%Regions(iRegion)%Hydraulic%useKTDynamics)
+        call json%print_error_message(output_unit)
+        print *, self%Regions(iRegion)%Hydraulic%useKTDynamics
+
+        call Allocate_Structure_Hydraulic_Type(self%Regions(iRegion)%Hydraulic)
+
+        write (key, '(7a)') trim(region_name), ".", HydraulicName, ".", ParametersName, ".", KsName
+        call json%get(key, self%Regions(iRegion)%Hydraulic%Ks)
+        call json%print_error_message(output_unit)
+        print *, self%Regions(iRegion)%Hydraulic%Ks
 
     end subroutine Inout_Input_Parameters_JSON_Hydraulic
 
@@ -1669,7 +1698,7 @@ contains
             call error_message(953)
         else
 #ifdef _MPI
-            ! MPI用の処理，分割して割当てる
+            ! MPI用の処理，分割して割���てる
 #else
             allocate (arr_BC_Edge_Value, source=self%Work_EBC_Edge_Value(:, :))
 #endif
