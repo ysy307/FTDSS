@@ -276,6 +276,7 @@ module Types
 
         type(Type_VTK_CELLS), allocatable :: CELLS(:) !! Cell information
         integer(int32), allocatable :: Invalid_CELLS_LIST(:) !! Cell information in the list
+        integer(int32), allocatable :: CellEntityIds(:) !! Cell entity IDs
 
     end type Type_VTK
 

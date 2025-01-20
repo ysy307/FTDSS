@@ -19,6 +19,8 @@ module Inout_VTK
     character(*), parameter :: c_POINTS = "POINTS"
     character(*), parameter :: c_CELLS = "CELLS"
     character(*), parameter :: c_CELL_TYPES = "CELL_TYPES"
+    character(*), parameter :: c_CELL_DATA = "CELL_DATA"
+    character(*), parameter :: c_CellEntityIds = "CellEntityIds"
 
     character(*), parameter :: c_unsigned_char = "unsigned_char"
     character(*), parameter :: c_char = "char"
@@ -165,6 +167,18 @@ contains
             call Inout_VTK_Read_Data_Cells_Types(unit, vtk, line, lines)
         end if
 
+        read (unit, '(a)', iostat=iostat) line
+        if (iostat /= 0) stop
+        line = trim(adjustl(line))
+
+        pos1 = index(line, space)
+        if (pos1 == 0) stop
+        keyword = line(1:pos1 - 1)
+
+        if (keyword == c_CELL_DATA) then
+            call Inout_VTK_Read_Data_CellEntityIds(unit, vtk, line)
+        end if
+
     end subroutine Inout_VTK_Read_Data
 
     subroutine Inout_VTK_Read_Data_Points(unit, vtk, headline)
@@ -219,7 +233,7 @@ contains
             if (iostat /= 0) stop
         end do
 
-        read (unit, '(A)', iostat=iostat) ! Skip
+        read (unit, '(a)', iostat=iostat) ! Skip
 
     end subroutine Inout_VTK_Read_Data_Points
 
@@ -258,7 +272,7 @@ contains
             pos1 = index(lines(iCell), space)
             lines(iCell) = lines(iCell) (pos1 + 1:)
         end do
-        read (unit, '(A)', iostat=iostat) ! Skip
+        read (unit, '(a)', iostat=iostat) ! Skip
 
     end subroutine Inout_VTK_Read_Data_Cells
 
@@ -420,8 +434,6 @@ contains
 
         do iCell = 1, 25
             if (allocated(vtk%CELLS(iCell)%Nodes_Array) .or. allocated(vtk%CELLS(iCell)%Nodes)) then
-                print *, "iCell = ", iCell
-                print *, vtk%CELLS(iCell)%nCells
                 if (allocated(vtk%CELLS(iCell)%Nodes_Array)) then
                     vtk%CELLS(iCell)%Nodes_Array(:) = vtk%CELLS(iCell)%Nodes_Array(:) + 1
                 else if (allocated(vtk%CELLS(iCell)%Nodes)) then
@@ -430,8 +442,39 @@ contains
             end if
         end do
 
-        read (unit, '(A)', iostat=iostat) ! Skip
+        read (unit, '(a)', iostat=iostat) ! Skip
 
     end subroutine Inout_VTK_Read_Data_Cells_Types
+
+    subroutine Inout_VTK_Read_Data_CellEntityIds(unit, vtk, headline)
+        !> Read VTK data cell entity ids
+        implicit none
+        integer(int32), intent(in) :: unit !! Unit number
+        type(Type_VTK), intent(inout) :: vtk !! VTK data
+        character(*), intent(in) :: headline !! Headline
+
+        character(256) :: line, CellEntity
+        integer(int32) :: pos1, pos2
+        integer(int32) :: numCellEntityIds
+        integer(int32) :: iCellEntityId
+
+        pos1 = index(headline, space)
+        pos2 = index(headline(pos1 + 1:), space) + pos1
+        if (pos2 == pos1) stop
+        read (headline(pos1 + 1:pos2 - 1), '(i)') numCellEntityIds
+        call Allocate_Vector(vtk%CellEntityIds, numCellEntityIds)
+
+        read (unit, '(A)') line
+        pos1 = index(line, space)
+        pos2 = index(line(pos1 + 1:), space) + pos1
+        read (line(pos1 + 1:pos2 - 1), '(a)') CellEntity
+        if (CellEntity == c_CellEntityIds) then
+            read (unit, *) ! Skip
+            do iCellEntityId = 1, numCellEntityIds
+                read (unit, '(i)') vtk%CellEntityIds(iCellEntityId)
+            end do
+        end if
+
+    end subroutine Inout_VTK_Read_Data_CellEntityIds
 
 end module Inout_VTK
