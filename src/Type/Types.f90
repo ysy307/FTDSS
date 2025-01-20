@@ -264,6 +264,22 @@ module Types
         type(Type_Region_Flags) :: Flags
     end type Type_Region
 
+    type :: Type_VTK
+        character(:), allocatable :: format !! ASCII or BINARY
+        character(:), allocatable :: dataset !! STRUCTURED_POINTS, STRUCTURED_GRID, RECTILINEAR_GRID, POLYDATA, UNSTRUCTURED_GRID
+        character(:), allocatable :: POINTS_DATATYPE !! dataType is one of the types bit, unsigned_char, char, unsigned_short, short, unsigned_int, int,  unsigned_long, long, float, or double.
+        integer(int32) :: numPoints !! Number of points
+        type(DP3d) :: POINTS !! VTK 3D geometry coordinates
+        integer(int32) :: numCells !! Number of cells
+        integer(int32) :: numCellsList !! Number of cells in the list
+
+    end type Type_VTK
+
+    type :: Type_VTK_CELLS
+        integer(int32) :: nCells !! Number of cells beloging to the region
+        integer(int32), allocatable :: Nodes(:, :) !! Node numbers of the cells
+    end type Type_VTK_CELLS
+
     type :: DF
         real(real64), allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
     end type DF

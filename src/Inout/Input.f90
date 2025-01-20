@@ -7,6 +7,7 @@ module Inout_Input
     use :: Types
     use :: tomlf
     use :: json_module
+    use :: Inout_VTK
     implicit none
     private
 
@@ -94,6 +95,8 @@ module Inout_Input
         type(Basic_params) :: Basic
         type(Type_Region), allocatable :: Regions(:)
         type(Type_Solver) :: Solver
+        type(Type_VTK) :: VTK
+
         integer(int32) :: Elements, Nodes, Shape, Dimemsion, Region
         integer(int32) :: StandardOutput, OutputFile
         real(real64) :: Calculation_Time, dt, Output_Interval_Time
@@ -148,7 +151,7 @@ module Inout_Input
     contains
 
         procedure :: Input_Parameters => Inout_Input_Parameters_JSON
-        procedure :: Input_Coodinates => Inout_Input_Coodinates
+        procedure :: Input_Coodinates => Inout_Input_Geometry_VTK
         procedure :: Input_Vertices => Inout_Input_Vertices
         procedure :: Input_BC => Inout_Input_BC
         procedure :: Input_IC => Inout_Input_IC
@@ -263,8 +266,8 @@ contains
         call json%load(filename='/workspaces/FTDSS/Inout/new-toml/Basic.json')
         call json%print_error_message(output_unit)
 
-        call json%print(output_unit)
-        call json%print_error_message(output_unit)
+        ! call json%print(output_unit)
+        ! call json%print_error_message(output_unit)
 
         call Inout_Input_Parameters_JSON_Basic(self, json)
         if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%Region))
@@ -286,7 +289,6 @@ contains
 
         call json%destroy()
         call json%print_error_message(output_unit)
-        stop
     end subroutine Inout_Input_Parameters_JSON
 
     subroutine Inout_Input_Parameters_JSON_Basic(self, json)
@@ -1013,8 +1015,6 @@ contains
             call Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, HydraulicName)
         end if
 
-        print *, self%Solver%Thermal%useSolver
-
     end subroutine Inout_Input_Parameters_JSON_Solver
 
     subroutine Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, c_target)
@@ -1085,7 +1085,6 @@ contains
                     key = Inout_Input_Connect_dot(SolveName, HydraulicName, ParametersName, ToleranceName)
                     call json%get(key, Hydraulic%Tol)
                     call json%print_error_message(output_unit)
-                    print *, Hydraulic%SolverType, Hydraulic%PreconditionerType, Hydraulic%MaxIter, Hydraulic%Tol
                 class default
                     ! エラー処理
                     write (*, '(A)') "Error: Unexpected type assigned to self%Solver%Hydraulic"
@@ -1380,6 +1379,15 @@ contains
 
         close (unit_num)
     end subroutine Inout_Input_Parameters
+
+    subroutine Inout_Input_Geometry_VTK(self)
+        !> Load the geometry from the VTK file
+        implicit none
+        class(Input) :: self
+
+        call Inout_VTK_Read('/workspaces/FTDSS/Inout/new-toml/Geometry.vtk', self%VTK)
+        stop
+    end subroutine Inout_Input_Geometry_VTK
 
     subroutine Inout_Input_Coodinates(self)
         implicit none
@@ -1793,8 +1801,6 @@ contains
         class(Input) :: self
         integer(int32), allocatable :: arr_Top(:, :)
 
-        ! print *, self%Work_Region_Basic_Infomatin(1, :)
-
         if (allocated(arr_Top)) then
             call error_message(953)
         else
@@ -1820,7 +1826,6 @@ contains
             allocate (arr_Top_Regions, source=self%Work_Top_Regions)
 #endif
         end if
-        ! print *, self%Work_Top_Regions
     end function Inout_Input_Get_Top_Region
 
     function Inout_Input_Get_Coordinates_DP2d(self) result(arr_Coordinates)
