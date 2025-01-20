@@ -5,6 +5,10 @@ module Allocate_Structure
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
     private
+    interface Allocate_DP
+        module procedure Allocate_DP2d
+        module procedure Allocate_DP3d
+    end interface Allocate_DP
 
     public :: Allocate_DF
     public :: Allocate_DP2d
@@ -14,6 +18,8 @@ module Allocate_Structure
     public :: Allocate_Structure_Ice_Type
     public :: Allocate_Structure_WRF_Type
     public :: Allocate_Structure_Hydraulic_Type
+
+    public :: Allocate_DP
 
 contains
 
@@ -40,6 +46,17 @@ contains
         call Allocate_Vector(ar_DP2d%y, n)
 
     end subroutine Allocate_DP2d
+
+    subroutine Allocate_DP3d(ar_DP3d, n)
+        implicit none
+        type(DP3d), intent(inout) :: ar_DP3d
+        integer(int32), intent(in) :: n
+
+        call Allocate_Vector(ar_DP3d%x, n)
+        call Allocate_Vector(ar_DP3d%y, n)
+        call Allocate_Vector(ar_DP3d%z, n)
+
+    end subroutine Allocate_DP3d
 
     subroutine Allocate_INT2d(ar_INT2d, n)
         implicit none

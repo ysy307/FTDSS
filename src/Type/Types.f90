@@ -272,12 +272,17 @@ module Types
         type(DP3d) :: POINTS !! VTK 3D geometry coordinates
         integer(int32) :: numCells !! Number of cells
         integer(int32) :: numCellsList !! Number of cells in the list
+        integer(int32) :: numCellTypes !! Number of cell types
+
+        type(Type_VTK_CELLS), allocatable :: CELLS(:) !! Cell information
+        integer(int32), allocatable :: Invalid_CELLS_LIST(:) !! Cell information in the list
 
     end type Type_VTK
 
     type :: Type_VTK_CELLS
         integer(int32) :: nCells !! Number of cells beloging to the region
         integer(int32), allocatable :: Nodes(:, :) !! Node numbers of the cells
+        integer(int32), allocatable :: Nodes_Array(:) !! Node numbers of the cells in the array
     end type Type_VTK_CELLS
 
     type :: DF

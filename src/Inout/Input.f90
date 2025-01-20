@@ -239,10 +239,6 @@ contains
         status = access(Input_Constructor%COO_FileName, "r")
         if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%COO_FileName)
 
-#ifdef _MPI
-        call MPI_Comm_rank(MPI_COMM_WORLD, Input_Constructor%myrank, Input_Constructor%ierr)
-#endif
-
         call Input_Constructor%Input_Parameters()
         call Input_Constructor%Input_Coodinates()
         call Input_Constructor%Input_Vertices()
@@ -280,12 +276,7 @@ contains
                 call Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
             end if
         end do
-        ! if (self%Regions(iRegion)%Flags%isHeat) then
         call Inout_Input_Parameters_JSON_Solver(self, json)
-        ! end if
-        ! if (self%Regions(iRegion)%Flags%isWater) then
-        !     call Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
-        ! end if
 
         call json%destroy()
         call json%print_error_message(output_unit)
