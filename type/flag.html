@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Flag &ndash; Freezing Thawing Dynamics Simulation Solver </title>
+    <title>Flag &ndash; FTDSS </title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 1.3% of total for derived types.</p>Including implementation: 5 statements,  0.7% of total for derived types.">5 statements</a>
+    title="<p> 1.2% of total for derived types.</p>Including implementation: 5 statements,  0.7% of total for derived types.">5 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Types.f90"> Source File</a></li>
   </ul>
@@ -129,6 +129,12 @@
       <a class="list-group-item" href="../type/flag.html#variable-isprintlismem">isPrintLisMem</a>
       <a class="list-group-item" href="../type/flag.html#variable-outobs">outOBS</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/flag.html#src">Flag</a>
   </div>
 </div>
 
@@ -173,8 +179,8 @@
 <!-- type~solverinfo&#45;&gt;type~flag -->
 <g id="type~~flag~~InheritedByGraph_edge1" class="edge">
 <title>type~solverinfo&#45;&gt;type~flag</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M115.89,-12C100,-12 80.82,-12 64.45,-12"/>
-<polygon fill="#000000" stroke="#000000" points="64.15,-8.5 54.15,-12 64.15,-15.5 64.15,-8.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M115.89,-12C100,-12 80.82,-12 64.45,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="64.15,-8.5 54.15,-12 64.15,-15.5 64.15,-8.5"/>
 <text text-anchor="middle" x="85" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">Flags</text>
 </g>
 </g>
@@ -211,7 +217,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -236,6 +242,12 @@
       <a class="list-group-item" href="../type/flag.html#variable-isprintlismem">isPrintLisMem</a>
       <a class="list-group-item" href="../type/flag.html#variable-outobs">outOBS</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/flag.html#src">Flag</a>
   </div>
 </div>
 
@@ -306,6 +318,16 @@
     
     
     
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Flag</span><span class="w"></span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">isTRM</span><span class="p">,</span><span class="w"> </span><span class="n">isGCC</span><span class="p">,</span><span class="w"> </span><span class="n">isPower</span><span class="p">,</span><span class="w"> </span><span class="n">isSwitchTRM</span><span class="p">,</span><span class="w"> </span><span class="n">isSwitchOnceTRM</span><span class="w"></span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">isStdOut</span><span class="p">,</span><span class="w"> </span><span class="n">isOutputAll</span><span class="p">,</span><span class="w"> </span><span class="n">isOutput</span><span class="p">,</span><span class="w"> </span><span class="n">isPrintLisMem</span><span class="w"></span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">outOBS</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">    </span><span class="k">end type </span><span class="n">Flag</span><span class="w"></span>
+</pre></div>
+
+    </section>
     
     </div>
   </div>
@@ -315,14 +337,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

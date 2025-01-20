@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Allocate &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Allocate &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -127,6 +127,15 @@
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
   <div class="list-group">
     <div id="subs-0" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_int32">Check_Allocate_rank1_int32</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_real64">Check_Allocate_rank1_real64</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_logical">Check_Allocate_rank1_logical</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_int32_specify">Check_Allocate_rank1_int32_specify</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_real64_specify">Check_Allocate_rank1_real64_specify</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank2_int32">Check_Allocate_rank2_int32</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank2_real64">Check_Allocate_rank2_real64</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_pointer_int32">Check_Allocate_Pointer_int32</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_pointer_real64">Check_Allocate_Pointer_real64</a>
       <a class="list-group-item" href="../module/allocate.html#proc-duplicate_crs">Duplicate_CRS</a>
     </div>
   </div>
@@ -145,9 +154,9 @@
       <ul class="list-group">
       <li class="list-group-item">
   <ul class="list-inline">
+    <li><a href='../module/error.html'>error</a></li>
     <li><a href="http://fortranwiki.org/fortran/show/iso_fortran_env">iso_fortran_env</a></li>
     <li><a href='../module/types.html'>Types</a></li>
-    <li><a href='../module/error.html'>error</a></li>
   </ul>
       </li>
       <li class="list-group-item">
@@ -168,62 +177,56 @@
 <polygon fill="none" stroke="black" points="278,-66 222,-66 222,-42 278,-42 278,-66"/>
 <text text-anchor="middle" x="250" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">Allocate</text>
 </g>
-<!-- iso_fortran_env -->
-<g id="module~~allocate~~UsesGraph_node2" class="node">
-<title>iso_fortran_env</title>
-<g id="a_module~~allocate~~UsesGraph_node2"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
-<polygon fill="#337ab7" stroke="#337ab7" points="95,-66 1,-66 1,-42 95,-42 95,-66"/>
-<text text-anchor="middle" x="48" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
-</a>
-</g>
-</g>
-<!-- module~allocate&#45;&gt;iso_fortran_env -->
-<g id="module~~allocate~~UsesGraph_edge1" class="edge">
-<title>module~allocate&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.88,-65.16C210.94,-69.11 198.06,-73.04 186,-75 156.09,-79.85 122.46,-74.85 96.01,-68.52"/>
-<polygon fill="#000000" stroke="#000000" points="96.8,-65.11 86.24,-66.04 95.07,-71.89 96.8,-65.11"/>
-</g>
-<!-- module~types -->
-<g id="module~~allocate~~UsesGraph_node3" class="node">
-<title>module~types</title>
-<g id="a_module~~allocate~~UsesGraph_node3"><a xlink:href=".././module/types.html" xlink:title="Types">
-<polygon fill="#337ab7" stroke="#337ab7" points="186,-66 132,-66 132,-42 186,-42 186,-66"/>
-<text text-anchor="middle" x="159" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
-</a>
-</g>
-</g>
-<!-- module~allocate&#45;&gt;module~types -->
-<g id="module~~allocate~~UsesGraph_edge2" class="edge">
-<title>module~allocate&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.81,-54C213.75,-54 204.78,-54 196.23,-54"/>
-<polygon fill="#000000" stroke="#000000" points="196.11,-50.5 186.11,-54 196.11,-57.5 196.11,-50.5"/>
-</g>
 <!-- module~error -->
-<g id="module~~allocate~~UsesGraph_node4" class="node">
+<g id="module~~allocate~~UsesGraph_node2" class="node">
 <title>module~error</title>
-<g id="a_module~~allocate~~UsesGraph_node4"><a xlink:href=".././module/error.html" xlink:title="error">
+<g id="a_module~~allocate~~UsesGraph_node2"><a xlink:href=".././module/error.html" xlink:title="error">
 <polygon fill="#337ab7" stroke="#337ab7" points="186,-24 132,-24 132,0 186,0 186,-24"/>
 <text text-anchor="middle" x="159" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error</text>
 </a>
 </g>
 </g>
 <!-- module~allocate&#45;&gt;module~error -->
-<g id="module~~allocate~~UsesGraph_edge3" class="edge">
+<g id="module~~allocate~~UsesGraph_edge1" class="edge">
 <title>module~allocate&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223.26,-41.85C214.4,-37.67 204.33,-32.92 194.87,-28.46"/>
-<polygon fill="#000000" stroke="#000000" points="196.22,-25.22 185.68,-24.12 193.23,-31.55 196.22,-25.22"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M223.26,-41.85C214.4,-37.67 204.33,-32.92 194.87,-28.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="196.22,-25.22 185.68,-24.12 193.23,-31.55 196.22,-25.22"/>
 </g>
-<!-- module~types&#45;&gt;iso_fortran_env -->
-<g id="module~~allocate~~UsesGraph_edge4" class="edge">
-<title>module~types&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-54C123.84,-54 114.65,-54 105.38,-54"/>
-<polygon fill="#000000" stroke="#000000" points="105.35,-50.5 95.35,-54 105.35,-57.5 105.35,-50.5"/>
+<!-- iso_fortran_env -->
+<g id="module~~allocate~~UsesGraph_node3" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~allocate~~UsesGraph_node3"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="95,-66 1,-66 1,-42 95,-42 95,-66"/>
+<text text-anchor="middle" x="48" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~allocate~~UsesGraph_edge2" class="edge">
+<title>module~allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M221.88,-65.16C210.94,-69.11 198.06,-73.04 186,-75 156.09,-79.85 122.46,-74.85 96.01,-68.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="96.8,-65.11 86.24,-66.04 95.07,-71.89 96.8,-65.11"/>
+</g>
+<!-- module~types -->
+<g id="module~~allocate~~UsesGraph_node4" class="node">
+<title>module~types</title>
+<g id="a_module~~allocate~~UsesGraph_node4"><a xlink:href=".././module/types.html" xlink:title="Types">
+<polygon fill="#337ab7" stroke="#337ab7" points="186,-66 132,-66 132,-42 186,-42 186,-66"/>
+<text text-anchor="middle" x="159" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
+</a>
+</g>
+</g>
+<!-- module~allocate&#45;&gt;module~types -->
+<g id="module~~allocate~~UsesGraph_edge3" class="edge">
+<title>module~allocate&#45;&gt;module~types</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M221.81,-54C213.75,-54 204.78,-54 196.23,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="196.11,-50.5 186.11,-54 196.11,-57.5 196.11,-50.5"/>
 </g>
 <!-- module~error&#45;&gt;iso_fortran_env -->
 <g id="module~~allocate~~UsesGraph_edge5" class="edge">
 <title>module~error&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-22.06C119.3,-26.91 103.91,-32.84 89.82,-38.27"/>
-<polygon fill="#000000" stroke="#000000" points="88.4,-35.07 80.33,-41.93 90.92,-41.6 88.4,-35.07"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M131.89,-22.06C119.3,-26.91 103.91,-32.84 89.82,-38.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="88.4,-35.07 80.33,-41.93 90.92,-41.6 88.4,-35.07"/>
 </g>
 <!-- ieee_arithmetic -->
 <g id="module~~allocate~~UsesGraph_node5" class="node">
@@ -235,10 +238,16 @@
 </g>
 </g>
 <!-- module~error&#45;&gt;ieee_arithmetic -->
-<g id="module~~allocate~~UsesGraph_edge6" class="edge">
+<g id="module~~allocate~~UsesGraph_edge4" class="edge">
 <title>module~error&#45;&gt;ieee_arithmetic</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-12C124.11,-12 115.26,-12 106.31,-12"/>
-<polygon fill="#000000" stroke="#000000" points="106.21,-8.5 96.21,-12 106.21,-15.5 106.21,-8.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M131.89,-12C124.11,-12 115.26,-12 106.31,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="106.21,-8.5 96.21,-12 106.21,-15.5 106.21,-8.5"/>
+</g>
+<!-- module~types&#45;&gt;iso_fortran_env -->
+<g id="module~~allocate~~UsesGraph_edge6" class="edge">
+<title>module~types&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M131.89,-54C123.84,-54 114.65,-54 105.38,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="105.35,-50.5 95.35,-54 105.35,-57.5 105.35,-50.5"/>
 </g>
 </g>
 </svg>
@@ -297,7 +306,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </li>
@@ -316,187 +325,187 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: module~~allocate~~UsedByGraph Pages: 1 -->
-<svg id="moduleallocateUsedByGraph" width="571pt" height="314pt"
- viewBox="0.00 0.00 571.00 314.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="module~~allocate~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 310)">
+<svg id="moduleallocateUsedByGraph" width="571pt" height="338pt"
+ viewBox="0.00 0.00 571.00 337.74" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~allocate~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 333.74)">
 <title>module~~allocate~~UsedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-310 567,-310 567,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-333.74 567,-333.74 567,4 -4,4"/>
 <!-- module~allocate -->
 <g id="module~~allocate~~UsedByGraph_node1" class="node">
 <title>module~allocate</title>
-<polygon fill="none" stroke="black" points="56,-164 0,-164 0,-140 56,-140 56,-164"/>
-<text text-anchor="middle" x="28" y="-149.6" font-family="Helvetica,sans-Serif" font-size="10.50">Allocate</text>
-</g>
-<!-- module~matrix_convertcrs -->
-<g id="module~~allocate~~UsedByGraph_node2" class="node">
-<title>module~matrix_convertcrs</title>
-<g id="a_module~~allocate~~UsedByGraph_node2"><a xlink:href=".././module/matrix_convertcrs.html" xlink:title="Matrix_ConvertCRS">
-<polygon fill="#337ab7" stroke="#337ab7" points="216,-306 101,-306 101,-282 216,-282 216,-306"/>
-<text text-anchor="middle" x="158.5" y="-291.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_ConvertCRS</text>
-</a>
-</g>
-</g>
-<!-- module~matrix_convertcrs&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge1" class="edge">
-<title>module~matrix_convertcrs&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M114.5,-281.92C106.43,-278.33 98.5,-273.76 92,-268 62.92,-242.2 44.72,-199.66 35.74,-173.89"/>
-<polygon fill="#000000" stroke="#000000" points="39.03,-172.68 32.56,-164.29 32.38,-174.88 39.03,-172.68"/>
-</g>
-<!-- module~condition_fixinitialcondition -->
-<g id="module~~allocate~~UsedByGraph_node3" class="node">
-<title>module~condition_fixinitialcondition</title>
-<g id="a_module~~allocate~~UsedByGraph_node3"><a xlink:href=".././module/condition_fixinitialcondition.html" xlink:title="Condition_FixInitialCondition">
-<polygon fill="#337ab7" stroke="#337ab7" points="563,-205 400,-205 400,-181 563,-181 563,-205"/>
-<text text-anchor="middle" x="481.5" y="-190.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_FixInitialCondition</text>
-</a>
-</g>
-</g>
-<!-- module~condition_fixinitialcondition&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge4" class="edge">
-<title>module~condition_fixinitialcondition&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M456.05,-205.13C401.98,-230.33 268.43,-283.63 159.5,-254"/>
-</g>
-<!-- module~solver_solve -->
-<g id="module~~allocate~~UsedByGraph_node4" class="node">
-<title>module~solver_solve</title>
-<g id="a_module~~allocate~~UsedByGraph_node4"><a xlink:href=".././module/solver_solve.html" xlink:title="Solver_Solve">
-<polygon fill="#337ab7" stroke="#337ab7" points="353,-145 272,-145 272,-121 353,-121 353,-145"/>
-<text text-anchor="middle" x="312.5" y="-130.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Solver_Solve</text>
-</a>
-</g>
-</g>
-<!-- module~condition_fixinitialcondition&#45;&gt;module~solver_solve -->
-<g id="module~~allocate~~UsedByGraph_edge10" class="edge">
-<title>module~condition_fixinitialcondition&#45;&gt;module~solver_solve</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M446.71,-180.86C420.7,-171.52 384.59,-158.54 356.52,-148.46"/>
-<polygon fill="#000000" stroke="#000000" points="357.55,-145.11 346.96,-145.02 355.19,-151.7 357.55,-145.11"/>
-</g>
-<!-- module~matrix_assemble -->
-<g id="module~~allocate~~UsedByGraph_node6" class="node">
-<title>module~matrix_assemble</title>
-<g id="a_module~~allocate~~UsedByGraph_node6"><a xlink:href=".././module/matrix_assemble.html" xlink:title="Matrix_Assemble">
-<polygon fill="#337ab7" stroke="#337ab7" points="364,-225 261,-225 261,-201 364,-201 364,-225"/>
-<text text-anchor="middle" x="312.5" y="-210.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_Assemble</text>
-</a>
-</g>
-</g>
-<!-- module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble -->
-<g id="module~~allocate~~UsedByGraph_edge11" class="edge">
-<title>module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M399.94,-202.65C391.28,-203.69 382.58,-204.73 374.21,-205.73"/>
-<polygon fill="#000000" stroke="#000000" points="373.7,-202.26 364.19,-206.93 374.54,-209.22 373.7,-202.26"/>
+<polygon fill="none" stroke="black" points="56,-178.47 0,-178.47 0,-154.47 56,-154.47 56,-178.47"/>
+<text text-anchor="middle" x="28" y="-164.07" font-family="Helvetica,sans-Serif" font-size="10.50">Allocate</text>
 </g>
 <!-- module~allocate_structure -->
-<g id="module~~allocate~~UsedByGraph_node7" class="node">
+<g id="module~~allocate~~UsedByGraph_node2" class="node">
 <title>module~allocate_structure</title>
-<g id="a_module~~allocate~~UsedByGraph_node7"><a xlink:href=".././module/allocate_structure.html" xlink:title="Allocate_Structure">
-<polygon fill="#337ab7" stroke="#337ab7" points="213.5,-184 103.5,-184 103.5,-160 213.5,-160 213.5,-184"/>
-<text text-anchor="middle" x="158.5" y="-169.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Structure</text>
+<g id="a_module~~allocate~~UsedByGraph_node2"><a xlink:href=".././module/allocate_structure.html" xlink:title="Allocate_Structure">
+<polygon fill="#337ab7" stroke="#337ab7" points="213.5,-56.47 103.5,-56.47 103.5,-32.47 213.5,-32.47 213.5,-56.47"/>
+<text text-anchor="middle" x="158.5" y="-42.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Structure</text>
 </a>
 </g>
-</g>
-<!-- module~condition_fixinitialcondition&#45;&gt;module~allocate_structure -->
-<g id="module~~allocate~~UsedByGraph_edge13" class="edge">
-<title>module~condition_fixinitialcondition&#45;&gt;module~allocate_structure</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M399.91,-187.73C345.53,-184.17 274.71,-179.54 224.05,-176.22"/>
-<polygon fill="#000000" stroke="#000000" points="224.09,-172.72 213.88,-175.56 223.63,-179.7 224.09,-172.72"/>
-</g>
-<!-- module~solver_solve&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge3" class="edge">
-<title>module~solver_solve&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M271.92,-135.66C217.26,-139.34 119.37,-145.92 66.06,-149.51"/>
-<polygon fill="#000000" stroke="#000000" points="65.77,-146.02 56.02,-150.18 66.24,-153 65.77,-146.02"/>
-</g>
-<!-- module~solver_solve&#45;&gt;module~allocate_structure -->
-<g id="module~~allocate~~UsedByGraph_edge14" class="edge">
-<title>module~solver_solve&#45;&gt;module~allocate_structure</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M271.96,-143.14C254.96,-147.51 234.77,-152.69 216.22,-157.45"/>
-<polygon fill="#000000" stroke="#000000" points="215.22,-154.09 206.41,-159.96 216.96,-160.87 215.22,-154.09"/>
-</g>
-<!-- module~calculate_observation -->
-<g id="module~~allocate~~UsedByGraph_node5" class="node">
-<title>module~calculate_observation</title>
-<g id="a_module~~allocate~~UsedByGraph_node5"><a xlink:href=".././module/calculate_observation.html" xlink:title="Calculate_Observation">
-<polygon fill="#337ab7" stroke="#337ab7" points="225,-226 92,-226 92,-202 225,-202 225,-226"/>
-<text text-anchor="middle" x="158.5" y="-211.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Observation</text>
-</a>
-</g>
-</g>
-<!-- module~calculate_observation&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge2" class="edge">
-<title>module~calculate_observation&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M114.23,-201.94C106.68,-199.32 99.01,-196.33 92,-193 78.61,-186.64 64.69,-177.84 53.36,-170.03"/>
-<polygon fill="#000000" stroke="#000000" points="55.07,-166.96 44.88,-164.05 51.03,-172.67 55.07,-166.96"/>
-</g>
-<!-- module~matrix_assemble&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge5" class="edge">
-<title>module~matrix_assemble&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281.12,-225.09C243.71,-239.3 182.31,-260.2 159.5,-254"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M157.5,-254C128.25,-246.05 116.98,-252.16 92,-235 68.89,-219.12 50.67,-192.05 39.89,-173.16"/>
-<polygon fill="#000000" stroke="#000000" points="42.82,-171.21 34.95,-164.12 36.68,-174.58 42.82,-171.21"/>
-</g>
-<!-- module~matrix_assemble&#45;&gt;module~allocate_structure -->
-<g id="module~~allocate~~UsedByGraph_edge12" class="edge">
-<title>module~matrix_assemble&#45;&gt;module~allocate_structure</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M266.72,-200.92C250.25,-196.48 231.41,-191.4 214.16,-186.74"/>
-<polygon fill="#000000" stroke="#000000" points="214.79,-183.29 204.23,-184.06 212.97,-190.05 214.79,-183.29"/>
 </g>
 <!-- module~allocate_structure&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge6" class="edge">
+<g id="module~~allocate~~UsedByGraph_edge1" class="edge">
 <title>module~allocate_structure&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M103.38,-163.58C90.88,-161.63 77.86,-159.6 66.26,-157.8"/>
-<polygon fill="#000000" stroke="#000000" points="66.5,-154.29 56.08,-156.21 65.42,-161.21 66.5,-154.29"/>
-</g>
-<!-- module~inout_output -->
-<g id="module~~allocate~~UsedByGraph_node8" class="node">
-<title>module~inout_output</title>
-<g id="a_module~~allocate~~UsedByGraph_node8"><a xlink:href=".././module/inout_output.html" xlink:title="Inout_Output">
-<polygon fill="#337ab7" stroke="#337ab7" points="199,-104 118,-104 118,-80 199,-80 199,-104"/>
-<text text-anchor="middle" x="158.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Output</text>
-</a>
-</g>
-</g>
-<!-- module~inout_output&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge7" class="edge">
-<title>module~inout_output&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M124.86,-104.09C114.27,-108.24 102.53,-113.09 92,-118 81.05,-123.11 69.33,-129.24 59,-134.88"/>
-<polygon fill="#000000" stroke="#000000" points="57.02,-131.98 49.97,-139.88 60.42,-138.1 57.02,-131.98"/>
-</g>
-<!-- module~main_heat -->
-<g id="module~~allocate~~UsedByGraph_node9" class="node">
-<title>module~main_heat</title>
-<g id="a_module~~allocate~~UsedByGraph_node9"><a xlink:href=".././module/main_heat.html" xlink:title="Main_Heat">
-<polygon fill="#337ab7" stroke="#337ab7" points="347,-83 278,-83 278,-59 347,-59 347,-83"/>
-<text text-anchor="middle" x="312.5" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Main_Heat</text>
-</a>
-</g>
-</g>
-<!-- module~main_heat&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge8" class="edge">
-<title>module~main_heat&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M277.86,-62.28C232.94,-52.52 152.08,-41.62 92,-71 66.81,-83.32 48.78,-111.11 38.63,-130.69"/>
-<polygon fill="#000000" stroke="#000000" points="35.42,-129.28 34.16,-139.8 41.71,-132.36 35.42,-129.28"/>
-</g>
-<!-- module~main_heat&#45;&gt;module~allocate_structure -->
-<g id="module~~allocate~~UsedByGraph_edge15" class="edge">
-<title>module~main_heat&#45;&gt;module~allocate_structure</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M293.17,-83.18C266.57,-100.85 217.14,-133.7 186.41,-154.12"/>
-<polygon fill="#000000" stroke="#000000" points="184.29,-151.32 177.9,-159.77 188.17,-157.15 184.29,-151.32"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M107,-56.56C101.65,-59.01 96.52,-61.95 92,-65.47 65.28,-86.28 46.95,-121.84 37.22,-144.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="33.87,-143.68 33.35,-154.27 40.36,-146.32 33.87,-143.68"/>
 </g>
 <!-- module~solver_initialize -->
-<g id="module~~allocate~~UsedByGraph_node10" class="node">
+<g id="module~~allocate~~UsedByGraph_node3" class="node">
 <title>module~solver_initialize</title>
-<g id="a_module~~allocate~~UsedByGraph_node10"><a xlink:href=".././module/solver_initialize.html" xlink:title="Solver_Initialize">
-<polygon fill="#337ab7" stroke="#337ab7" points="206.5,-24 110.5,-24 110.5,0 206.5,0 206.5,-24"/>
-<text text-anchor="middle" x="158.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Solver_Initialize</text>
+<g id="a_module~~allocate~~UsedByGraph_node3"><a xlink:href=".././module/solver_initialize.html" xlink:title="Solver_Initialize">
+<polygon fill="#337ab7" stroke="#337ab7" points="206.5,-300.47 110.5,-300.47 110.5,-276.47 206.5,-276.47 206.5,-300.47"/>
+<text text-anchor="middle" x="158.5" y="-286.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Solver_Initialize</text>
 </a>
 </g>
 </g>
 <!-- module~solver_initialize&#45;&gt;module~allocate -->
-<g id="module~~allocate~~UsedByGraph_edge9" class="edge">
+<g id="module~~allocate~~UsedByGraph_edge3" class="edge">
 <title>module~solver_initialize&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M114.53,-24.12C106.46,-27.7 98.52,-32.26 92,-38 63.34,-63.23 45.08,-104.78 35.97,-130.14"/>
-<polygon fill="#000000" stroke="#000000" points="32.54,-129.33 32.62,-139.93 39.17,-131.6 32.54,-129.33"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M110.37,-277.85C103.82,-275.13 97.46,-271.72 92,-267.47 65.28,-246.66 46.95,-211.09 37.22,-188.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="40.36,-186.62 33.35,-178.67 33.87,-189.25 40.36,-186.62"/>
+</g>
+<!-- module~matrix_convertcrs -->
+<g id="module~~allocate~~UsedByGraph_node4" class="node">
+<title>module~matrix_convertcrs</title>
+<g id="a_module~~allocate~~UsedByGraph_node4"><a xlink:href=".././module/matrix_convertcrs.html" xlink:title="Matrix_ConvertCRS">
+<polygon fill="#337ab7" stroke="#337ab7" points="216,-258.47 101,-258.47 101,-234.47 216,-234.47 216,-258.47"/>
+<text text-anchor="middle" x="158.5" y="-244.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_ConvertCRS</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_convertcrs&#45;&gt;module~allocate -->
+<g id="module~~allocate~~UsedByGraph_edge2" class="edge">
+<title>module~matrix_convertcrs&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M120.78,-234.36C111.11,-230.52 100.9,-225.84 92,-220.47 75.97,-210.79 59.97,-197.01 48.11,-185.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="50.23,-182.98 40.61,-178.53 45.35,-188 50.23,-182.98"/>
+</g>
+<!-- module~main_heat -->
+<g id="module~~allocate~~UsedByGraph_node5" class="node">
+<title>module~main_heat</title>
+<g id="a_module~~allocate~~UsedByGraph_node5"><a xlink:href=".././module/main_heat.html" xlink:title="Main_Heat">
+<polygon fill="#337ab7" stroke="#337ab7" points="347,-188.47 278,-188.47 278,-164.47 347,-164.47 347,-188.47"/>
+<text text-anchor="middle" x="312.5" y="-174.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Main_Heat</text>
+</a>
+</g>
+</g>
+<!-- module~main_heat&#45;&gt;module~allocate -->
+<g id="module~~allocate~~UsedByGraph_edge4" class="edge">
+<title>module~main_heat&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M277.79,-182.52C234.49,-189.3 157.16,-198.04 92,-187.47 83.33,-186.06 74.24,-183.63 65.75,-180.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="66.71,-177.54 56.12,-177.63 64.45,-184.17 66.71,-177.54"/>
+</g>
+<!-- module~main_heat&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate~~UsedByGraph_edge12" class="edge">
+<title>module~main_heat&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M297.72,-164.27C287.02,-154.4 272.16,-139.84 261,-125.47 241.92,-100.91 249.37,-84.79 225,-65.47 223.18,-64.02 221.25,-62.67 219.25,-61.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.52,-58.13 210.06,-56.48 217.21,-64.3 220.52,-58.13"/>
+</g>
+<!-- module~inout_output -->
+<g id="module~~allocate~~UsedByGraph_node6" class="node">
+<title>module~inout_output</title>
+<g id="a_module~~allocate~~UsedByGraph_node6"><a xlink:href=".././module/inout_output.html" xlink:title="Inout_Output">
+<polygon fill="#337ab7" stroke="#337ab7" points="199,-178.47 118,-178.47 118,-154.47 199,-154.47 199,-178.47"/>
+<text text-anchor="middle" x="158.5" y="-164.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Output</text>
+</a>
+</g>
+</g>
+<!-- module~inout_output&#45;&gt;module~allocate -->
+<g id="module~~allocate~~UsedByGraph_edge5" class="edge">
+<title>module~inout_output&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M117.9,-166.47C101.44,-166.47 82.45,-166.47 66.25,-166.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="66.07,-162.97 56.07,-166.47 66.07,-169.97 66.07,-162.97"/>
+</g>
+<!-- module~matrix_assemble -->
+<g id="module~~allocate~~UsedByGraph_node7" class="node">
+<title>module~matrix_assemble</title>
+<g id="a_module~~allocate~~UsedByGraph_node7"><a xlink:href=".././module/matrix_assemble.html" xlink:title="Matrix_Assemble">
+<polygon fill="#337ab7" stroke="#337ab7" points="364,-36.47 261,-36.47 261,-12.47 364,-12.47 364,-36.47"/>
+<text text-anchor="middle" x="312.5" y="-22.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_Assemble</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~allocate -->
+<g id="module~~allocate~~UsedByGraph_edge6" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M273.03,-12.44C226.18,-0.28 146.58,12.13 92,-23.47 50.76,-50.36 36.33,-110.99 31.42,-144.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="27.94,-143.69 30.1,-154.06 34.88,-144.6 27.94,-143.69"/>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate~~UsedByGraph_edge10" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M260.89,-31.13C249.01,-32.69 236.2,-34.38 223.82,-36.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="223,-32.58 213.54,-37.36 223.92,-39.52 223,-32.58"/>
+</g>
+<!-- module~calculate_observation -->
+<g id="module~~allocate~~UsedByGraph_node8" class="node">
+<title>module~calculate_observation</title>
+<g id="a_module~~allocate~~UsedByGraph_node8"><a xlink:href=".././module/calculate_observation.html" xlink:title="Calculate_Observation">
+<polygon fill="#337ab7" stroke="#337ab7" points="225,-98.47 92,-98.47 92,-74.47 225,-74.47 225,-98.47"/>
+<text text-anchor="middle" x="158.5" y="-84.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Observation</text>
+</a>
+</g>
+</g>
+<!-- module~calculate_observation&#45;&gt;module~allocate -->
+<g id="module~~allocate~~UsedByGraph_edge7" class="edge">
+<title>module~calculate_observation&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M120.78,-98.58C111.11,-102.42 100.9,-107.09 92,-112.47 75.97,-122.15 59.97,-135.92 48.11,-147.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="45.35,-144.94 40.61,-154.41 50.23,-149.96 45.35,-144.94"/>
+</g>
+<!-- module~solver_solve -->
+<g id="module~~allocate~~UsedByGraph_node9" class="node">
+<title>module~solver_solve</title>
+<g id="a_module~~allocate~~UsedByGraph_node9"><a xlink:href=".././module/solver_solve.html" xlink:title="Solver_Solve">
+<polygon fill="#337ab7" stroke="#337ab7" points="353,-116.47 272,-116.47 272,-92.47 353,-92.47 353,-116.47"/>
+<text text-anchor="middle" x="312.5" y="-102.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Solver_Solve</text>
+</a>
+</g>
+</g>
+<!-- module~solver_solve&#45;&gt;module~allocate -->
+<g id="module~~allocate~~UsedByGraph_edge8" class="edge">
+<title>module~solver_solve&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M271.89,-110.19C227.65,-116.97 154.11,-129.4 92,-145.47 83.42,-147.69 74.3,-150.47 65.76,-153.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="64.4,-150.04 56.05,-156.55 66.64,-156.67 64.4,-150.04"/>
+</g>
+<!-- module~solver_solve&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate~~UsedByGraph_edge13" class="edge">
+<title>module~solver_solve&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M286.83,-92.45C269.7,-84.32 246.22,-73.62 225,-65.47 219.91,-63.51 214.56,-61.59 209.2,-59.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="210.18,-56.38 199.58,-56.53 207.96,-63.02 210.18,-56.38"/>
+</g>
+<!-- module~condition_fixinitialcondition -->
+<g id="module~~allocate~~UsedByGraph_node10" class="node">
+<title>module~condition_fixinitialcondition</title>
+<g id="a_module~~allocate~~UsedByGraph_node10"><a xlink:href=".././module/condition_fixinitialcondition.html" xlink:title="Condition_FixInitialCondition">
+<polygon fill="#337ab7" stroke="#337ab7" points="563,-96.47 400,-96.47 400,-72.47 563,-72.47 563,-96.47"/>
+<text text-anchor="middle" x="481.5" y="-82.07" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_FixInitialCondition</text>
+</a>
+</g>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~allocate -->
+<g id="module~~allocate~~UsedByGraph_edge9" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M472.16,-96.68C443.6,-137.23 344.84,-267.2 225,-309.47 169.26,-329.13 141.51,-341.76 92,-309.47 50.76,-282.57 36.33,-221.94 31.42,-188.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="34.88,-188.33 30.1,-178.88 27.94,-189.25 34.88,-188.33"/>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~allocate_structure -->
+<g id="module~~allocate~~UsedByGraph_edge11" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M399.91,-74.43C345.53,-67.65 274.71,-58.83 224.05,-52.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="224.23,-49.01 213.88,-51.24 223.37,-55.95 224.23,-49.01"/>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble -->
+<g id="module~~allocate~~UsedByGraph_edge14" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M446.71,-72.33C420.7,-62.98 384.59,-50.01 356.52,-39.93"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="357.55,-36.58 346.96,-36.49 355.19,-43.16 357.55,-36.58"/>
+</g>
+<!-- module~condition_fixinitialcondition&#45;&gt;module~solver_solve -->
+<g id="module~~allocate~~UsedByGraph_edge15" class="edge">
+<title>module~condition_fixinitialcondition&#45;&gt;module~solver_solve</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M399.94,-94.12C387.55,-95.6 375.07,-97.09 363.6,-98.47"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="362.9,-95.03 353.38,-99.69 363.73,-101.98 362.9,-95.03"/>
 </g>
 </g>
 </svg>
@@ -555,7 +564,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
   </li>
@@ -581,6 +590,15 @@
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
   <div class="list-group">
     <div id="subs-1" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_int32">Check_Allocate_rank1_int32</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_real64">Check_Allocate_rank1_real64</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_logical">Check_Allocate_rank1_logical</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_int32_specify">Check_Allocate_rank1_int32_specify</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank1_real64_specify">Check_Allocate_rank1_real64_specify</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank2_int32">Check_Allocate_rank2_int32</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_rank2_real64">Check_Allocate_rank2_real64</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_pointer_int32">Check_Allocate_Pointer_int32</a>
+      <a class="list-group-item" href="../module/allocate.html#proc-check_allocate_pointer_real64">Check_Allocate_Pointer_real64</a>
       <a class="list-group-item" href="../module/allocate.html#proc-duplicate_crs">Duplicate_CRS</a>
     </div>
   </div>
@@ -598,7 +616,7 @@
   <div class="panel-heading codesum"><span class="anchor" id="interface-allocate_vector"></span><h3>public interface <a href='../interface/allocate_vector.html'>Allocate_Vector</a>  </h3></div>
   <ul class="list-group">
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_rank1_int32(iar, ar_size)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_rank1_int32.html'>Check_Allocate_rank1_int32</a>(iar, ar_size)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -620,7 +638,7 @@
 
     </li>
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_rank1_real64(dar, ar_size)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_rank1_real64.html'>Check_Allocate_rank1_real64</a>(dar, ar_size)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -642,7 +660,7 @@
 
     </li>
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_rank1_logical(lar, ar_size)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_rank1_logical.html'>Check_Allocate_rank1_logical</a>(lar, ar_size)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -664,7 +682,7 @@
 
     </li>
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_rank1_int32_specify(iar, ar_first, ar_last)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_rank1_int32_specify.html'>Check_Allocate_rank1_int32_specify</a>(iar, ar_first, ar_last)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -692,7 +710,7 @@
 
     </li>
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_rank1_real64_specify(dar, ar_first, ar_last)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_rank1_real64_specify.html'>Check_Allocate_rank1_real64_specify</a>(dar, ar_first, ar_last)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -726,7 +744,7 @@
   <div class="panel-heading codesum"><span class="anchor" id="interface-allocate_matrix"></span><h3>public interface <a href='../interface/allocate_matrix.html'>Allocate_Matrix</a>  </h3></div>
   <ul class="list-group">
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_rank2_int32(imt, mt_size_1, mt_size_2)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_rank2_int32.html'>Check_Allocate_rank2_int32</a>(imt, mt_size_1, mt_size_2)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -754,7 +772,7 @@
 
     </li>
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_rank2_real64(dmt, mt_size_1, mt_size_2)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_rank2_real64.html'>Check_Allocate_rank2_real64</a>(dmt, mt_size_1, mt_size_2)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -788,7 +806,7 @@
   <div class="panel-heading codesum"><span class="anchor" id="interface-allocate_pointer"></span><h3>public interface <a href='../interface/allocate_pointer.html'>Allocate_Pointer</a>  </h3></div>
   <ul class="list-group">
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_Pointer_real64(dptr)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_pointer_real64.html'>Check_Allocate_Pointer_real64</a>(dptr)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -804,7 +822,7 @@
 
     </li>
     <li class="list-group-item">
-    <h3>private subroutine Check_Allocate_Pointer_int32(iptr)</h3>    
+    <h3>private subroutine <a href='../proc/check_allocate_pointer_int32.html'>Check_Allocate_Pointer_int32</a>(iptr)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -830,6 +848,252 @@
 
     <section>
     <h2>Subroutines</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_rank1_int32"></span><h3>private subroutine <a href='../proc/check_allocate_rank1_int32.html'>Check_Allocate_rank1_int32</a>(iar, ar_size)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>allocatable</td><td>::</td>
+  <td><strong>iar</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_size</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_rank1_real64"></span><h3>private subroutine <a href='../proc/check_allocate_rank1_real64.html'>Check_Allocate_rank1_real64</a>(dar, ar_size)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>real(kind=real64),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>allocatable</td><td>::</td>
+  <td><strong>dar</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_size</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_rank1_logical"></span><h3>private subroutine <a href='../proc/check_allocate_rank1_logical.html'>Check_Allocate_rank1_logical</a>(lar, ar_size)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>logical,</td>
+<td>intent(inout),</td>
+  <td></td>  <td>allocatable</td><td>::</td>
+  <td><strong>lar</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_size</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_rank1_int32_specify"></span><h3>private subroutine <a href='../proc/check_allocate_rank1_int32_specify.html'>Check_Allocate_rank1_int32_specify</a>(iar, ar_first, ar_last)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>allocatable</td><td>::</td>
+  <td><strong>iar</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_first</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_last</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_rank1_real64_specify"></span><h3>private subroutine <a href='../proc/check_allocate_rank1_real64_specify.html'>Check_Allocate_rank1_real64_specify</a>(dar, ar_first, ar_last)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>real(kind=real64),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>allocatable</td><td>::</td>
+  <td><strong>dar</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_first</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>ar_last</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_rank2_int32"></span><h3>private subroutine <a href='../proc/check_allocate_rank2_int32.html'>Check_Allocate_rank2_int32</a>(imt, mt_size_1, mt_size_2)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>allocatable</td><td>::</td>
+  <td><strong>imt</strong>(:,:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>mt_size_1</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>mt_size_2</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_rank2_real64"></span><h3>private subroutine <a href='../proc/check_allocate_rank2_real64.html'>Check_Allocate_rank2_real64</a>(dmt, mt_size_1, mt_size_2)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>real(kind=real64),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>allocatable</td><td>::</td>
+  <td><strong>dmt</strong>(:,:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>mt_size_1</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>mt_size_2</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_pointer_int32"></span><h3>private subroutine <a href='../proc/check_allocate_pointer_int32.html'>Check_Allocate_Pointer_int32</a>(iptr)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td></td>
+  <td></td>  <td>pointer</td><td>::</td>
+  <td><strong>iptr</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-check_allocate_pointer_real64"></span><h3>private subroutine <a href='../proc/check_allocate_pointer_real64.html'>Check_Allocate_Pointer_real64</a>(dptr)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>real(kind=real64),</td>
+<td></td>
+  <td></td>  <td>pointer</td><td>::</td>
+  <td><strong>dptr</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
       <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-duplicate_crs"></span><h3>public subroutine <a href='../proc/duplicate_crs.html'>Duplicate_CRS</a>(A, B)</h3></div>
   <div class="panel-body">
@@ -867,14 +1131,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

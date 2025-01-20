@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Solver_BiCGStab &ndash; FTDSS</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href='../page/index.html'>Read Me</a></li>
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>Solver_BiCGStab
+      <small>Subroutine</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 2.7% of total for procedures.">80 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/Solve.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/solve.f90.html'>Solve.f90</a></li>
+     <li><a href='../module/solver_solve.html'>Solver_Solve</a></li>
+     <li class="active">Solver_BiCGStab</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/solver_bicgstab.html#src">Solver_BiCGStab</a>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private subroutine Solver_BiCGStab(self, Solver, BiCG_A, BiCG_b, BiCG_x, status)</h2>
+    
+
+
+    <h3>Arguments</h3>
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-self~7"></span>class(<a href='../type/ils.html'>ILS</a>)</td>
+<td></td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>self</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-solver~36"></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-bicg_a"></span>type(<a href='../type/crs.html'>CRS</a>),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>BiCG_A</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-bicg_b"></span>real(kind=real64),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>BiCG_b</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-bicg_x"></span>real(kind=real64),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>BiCG_x</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-status"></span>integer(kind=int32),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>status</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+    <br>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~solver_bicgstab~~CallsGraph Pages: 1 -->
+<svg id="procsolver_bicgstabCallsGraph" width="303pt" height="200pt"
+ viewBox="0.00 0.00 303.00 200.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~solver_bicgstab~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 196)">
+<title>proc~~solver_bicgstab~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-196 299,-196 299,4 -4,4"/>
+<!-- proc~solver_bicgstab -->
+<g id="proc~~solver_bicgstab~~CallsGraph_node1" class="node">
+<title>proc~solver_bicgstab</title>
+<polygon fill="none" stroke="black" points="102,-108 0,-108 0,-84 102,-84 102,-108"/>
+<text text-anchor="middle" x="51" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">Solver_BiCGStab</text>
+</g>
+<!-- proc~matrix_vector_product_crs -->
+<g id="proc~~solver_bicgstab~~CallsGraph_node2" class="node">
+<title>proc~matrix_vector_product_crs</title>
+<g id="a_proc~~solver_bicgstab~~CallsGraph_node2"><a xlink:href=".././proc/matrix_vector_product_crs.html" xlink:title="Matrix_Vector_Product_CRS">
+<polygon fill="#d9534f" stroke="#d9534f" points="295,-192 138,-192 138,-168 295,-168 295,-192"/>
+<text text-anchor="middle" x="216.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_Vector_Product_CRS</text>
+</a>
+</g>
+</g>
+<!-- proc~solver_bicgstab&#45;&gt;proc~matrix_vector_product_crs -->
+<g id="proc~~solver_bicgstab~~CallsGraph_edge1" class="edge">
+<title>proc~solver_bicgstab&#45;&gt;proc~matrix_vector_product_crs</title>
+<path fill="none" stroke="#ff0000" d="M65.28,-108.18C81.36,-122.33 109.81,-145.44 138,-159 142.25,-161.05 146.73,-162.92 151.31,-164.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="150.2,-167.94 160.8,-167.9 152.49,-161.33 150.2,-167.94"/>
+</g>
+<!-- proc~norm_2 -->
+<g id="proc~~solver_bicgstab~~CallsGraph_node3" class="node">
+<title>proc~norm_2</title>
+<g id="a_proc~~solver_bicgstab~~CallsGraph_node3"><a xlink:href=".././proc/norm_2.html" xlink:title="norm_2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="243.5,-150 189.5,-150 189.5,-126 243.5,-126 243.5,-150"/>
+<text text-anchor="middle" x="216.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2</text>
+</a>
+</g>
+</g>
+<!-- proc~solver_bicgstab&#45;&gt;proc~norm_2 -->
+<g id="proc~~solver_bicgstab~~CallsGraph_edge2" class="edge">
+<title>proc~solver_bicgstab&#45;&gt;proc~norm_2</title>
+<path fill="none" stroke="#ff0000" d="M98.85,-108.04C124.5,-114.62 155.79,-122.66 179.5,-128.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="178.93,-132.22 189.49,-131.32 180.67,-125.44 178.93,-132.22"/>
+</g>
+<!-- proc~create_precond_jacobi -->
+<g id="proc~~solver_bicgstab~~CallsGraph_node4" class="node">
+<title>proc~create_precond_jacobi</title>
+<g id="a_proc~~solver_bicgstab~~CallsGraph_node4"><a xlink:href=".././proc/create_precond_jacobi.html" xlink:title="Create_Precond_Jacobi">
+<polygon fill="#d9534f" stroke="#d9534f" points="283,-108 150,-108 150,-84 283,-84 283,-108"/>
+<text text-anchor="middle" x="216.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Create_Precond_Jacobi</text>
+</a>
+</g>
+</g>
+<!-- proc~solver_bicgstab&#45;&gt;proc~create_precond_jacobi -->
+<g id="proc~~solver_bicgstab~~CallsGraph_edge3" class="edge">
+<title>proc~solver_bicgstab&#45;&gt;proc~create_precond_jacobi</title>
+<path fill="none" stroke="#ff0000" d="M102.39,-96C114.24,-96 127.12,-96 139.8,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="139.91,-99.5 149.91,-96 139.91,-92.5 139.91,-99.5"/>
+</g>
+<!-- proc~ddots -->
+<g id="proc~~solver_bicgstab~~CallsGraph_node5" class="node">
+<title>proc~ddots</title>
+<g id="a_proc~~solver_bicgstab~~CallsGraph_node5"><a xlink:href=".././proc/ddots.html" xlink:title="ddots">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="243.5,-66 189.5,-66 189.5,-42 243.5,-42 243.5,-66"/>
+<text text-anchor="middle" x="216.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ddots</text>
+</a>
+</g>
+</g>
+<!-- proc~solver_bicgstab&#45;&gt;proc~ddots -->
+<g id="proc~~solver_bicgstab~~CallsGraph_edge4" class="edge">
+<title>proc~solver_bicgstab&#45;&gt;proc~ddots</title>
+<path fill="none" stroke="#ff0000" d="M98.85,-83.96C124.5,-77.38 155.79,-69.34 179.5,-63.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="180.67,-66.56 189.49,-60.68 178.93,-59.78 180.67,-66.56"/>
+</g>
+<!-- proc~apply_precond_jacobi -->
+<g id="proc~~solver_bicgstab~~CallsGraph_node6" class="node">
+<title>proc~apply_precond_jacobi</title>
+<g id="a_proc~~solver_bicgstab~~CallsGraph_node6"><a xlink:href=".././proc/apply_precond_jacobi.html" xlink:title="Apply_Precond_Jacobi">
+<polygon fill="#d9534f" stroke="#d9534f" points="280.5,-24 152.5,-24 152.5,0 280.5,0 280.5,-24"/>
+<text text-anchor="middle" x="216.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Apply_Precond_Jacobi</text>
+</a>
+</g>
+</g>
+<!-- proc~solver_bicgstab&#45;&gt;proc~apply_precond_jacobi -->
+<g id="proc~~solver_bicgstab~~CallsGraph_edge5" class="edge">
+<title>proc~solver_bicgstab&#45;&gt;proc~apply_precond_jacobi</title>
+<path fill="none" stroke="#ff0000" d="M65.28,-83.82C81.36,-69.67 109.81,-46.56 138,-33 142.25,-30.95 146.73,-29.08 151.31,-27.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="152.49,-30.67 160.8,-24.1 150.2,-24.06 152.49,-30.67"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="597pt" height="32pt"
+ viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
+<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
+<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/solver_bicgstab.html#src">Solver_BiCGStab</a>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    
+    
+
+    
+    
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">Solver_BiCGStab</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">Solver</span><span class="p">,</span><span class="w"> </span><span class="n">BiCG_A</span><span class="p">,</span><span class="w"> </span><span class="n">BiCG_b</span><span class="p">,</span><span class="w"> </span><span class="n">BiCG_x</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">ILS</span><span class="p">)</span><span class="w">                      </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">SolverInfo</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Solver</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">CRS</span><span class="p">),</span><span class="w">        </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">    </span><span class="kd">::</span><span class="w"> </span><span class="n">BiCG_A</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w">     </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">    </span><span class="kd">::</span><span class="w"> </span><span class="n">BiCG_b</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w">     </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">BiCG_x</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w">   </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">status</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">                    </span><span class="kd">::</span><span class="w"> </span><span class="n">rho</span><span class="p">,</span><span class="w"> </span><span class="n">rho_old</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="p">,</span><span class="w"> </span><span class="n">beta</span><span class="p">,</span><span class="w"> </span><span class="n">omega</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">                    </span><span class="kd">::</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span><span class="w"> </span><span class="n">resid</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">                    </span><span class="kd">::</span><span class="w"> </span><span class="n">ddot</span><span class="p">,</span><span class="w"> </span><span class="n">dnrm2</span><span class="w"></span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w">                  </span><span class="kd">::</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="n">iter</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">iN</span><span class="w"></span>
+
+<span class="w">        </span><span class="c">! 1:Initialize</span>
+<span class="w">        </span><span class="n">N</span><span class="w">                 </span><span class="o">=</span><span class="w"> </span><span class="n">Solver</span><span class="p">%</span><span class="n">N</span><span class="p">%</span><span class="n">node</span><span class="w"></span>
+<span class="w">        </span><span class="n">tol</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-12</span><span class="w"></span>
+<span class="w">        </span><span class="n">maxiter</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">        </span><span class="n">maxiter</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="mi">50000</span><span class="w"></span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">CRS_A</span><span class="p">%</span><span class="n">Val</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BiCG_A</span><span class="p">%</span><span class="n">Val</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">b</span><span class="p">(:)</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">BiCG_b</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">        </span><span class="n">rho</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"></span>
+<span class="w">        </span><span class="n">rho_old</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"></span>
+<span class="w">        </span><span class="n">alpha</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"></span>
+<span class="w">        </span><span class="n">beta</span><span class="w">              </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"></span>
+<span class="w">        </span><span class="n">omega</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">do </span><span class="n">iN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">p</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"></span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">s</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"></span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">phat</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"></span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">shat</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"></span>
+<span class="w">        </span><span class="k">end do</span><span class="w"></span>
+
+<span class="w">        </span><span class="c">! 2: Set an initial value x0</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"></span>
+
+<span class="w">        </span><span class="c">! 3: r0 = b-Ax0</span>
+<span class="w">        </span><span class="k">call </span><span class="n">SpMV</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">CRS_A</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">do </span><span class="n">iN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">b</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">end do</span><span class="w"> </span>
+
+<span class="w">        </span><span class="c">! 4: Create preconditioned matrix</span>
+<span class="w">        </span><span class="k">call </span><span class="n">Create_Precond_Jacobi</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">CRS_A</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">M</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="c">! 5: ^r0 = r0, (r*0, r0)!=0</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">r0</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(:)</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">do </span><span class="n">iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="c">! 7: (^r0, rk)</span>
+<span class="w">            </span><span class="n">rho</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">! rho = ddot(N, self%r, 1, self%r0, 1)</span>
+<span class="w">            </span><span class="c">! 8: rho check</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rho</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">                </span><span class="n">BiCG_x</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">iter</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">                </span><span class="c">! 10: p0 = r0</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">p</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">                </span><span class="c">! 12: beta = (rho / rho_old) * (alpha_k / omega_k)</span>
+<span class="w">                </span><span class="n">beta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">rho</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">rho_old</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">omega</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="c">! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)</span>
+<span class="w">                </span><span class="k">do </span><span class="n">iN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">p</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">beta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">p</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">omega</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">iN</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">end do</span>
+<span class="k">            end if</span><span class="w"></span>
+<span class="w">            </span><span class="c">! 15: phat = M^-1 * p</span>
+<span class="w">            </span><span class="k">call </span><span class="n">Apply_Precond_Jacobi</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">phat</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">! 16: v = A * phat</span>
+<span class="w">            </span><span class="k">call </span><span class="n">SpMV</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">CRS_A</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">phat</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">! 17: alpha_k = rho / (^r0, v)</span>
+<span class="w">            </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r0</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">! alpha = rho / ddot(N, self%r0, 1, self%v, 1)</span>
+<span class="w">            </span><span class="c">! 18: s = r_k - alpha_k * v            </span>
+<span class="w">            </span><span class="k">do </span><span class="n">iN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">s</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">end do</span><span class="w"></span>
+
+<span class="w">            </span><span class="c">! 19: shat = M^-1 * s</span>
+<span class="w">            </span><span class="k">call </span><span class="n">Apply_Precond_Jacobi</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">shat</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">! 20: t = A * shat</span>
+<span class="w">            </span><span class="k">call </span><span class="n">SpMV</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">CRS_A</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">shat</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">            </span><span class="c">! 21: omega_k = (t,s)/(t,t)</span>
+<span class="w">            </span><span class="n">omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">! omega = ddot(N, self%t, 1, self%s, 1) / ddot(N, self%t, 1, self%t, 1)</span>
+
+<span class="w">            </span><span class="c">! 22: omega breakdown check</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">omega</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+
+<span class="k">            do </span><span class="n">iN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+<span class="w">                </span><span class="c">! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i) </span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">phat</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">omega</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">shat</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            do </span><span class="n">iN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+<span class="w">                </span><span class="c">! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">s</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">omega</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">t</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">end do</span><span class="w"></span>
+
+
+<span class="w">            </span><span class="c">! 25: ||r_k+1||_2</span>
+<span class="w">            </span><span class="c">! resid = dnrm2(N, self%r(:), 1)</span>
+<span class="w">            </span><span class="n">resid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">(:))</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">resid</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">tol</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">                </span><span class="n">BiCG_x</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+
+<span class="k">            </span><span class="n">rho_old</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho</span><span class="w"></span>
+<span class="w">        </span><span class="k">end do</span>
+<span class="k">        </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="w"></span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">Solver_BiCGStab</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-01-20 00:23            </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>

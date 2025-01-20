@@ -13,6 +13,7 @@ module Allocate_Structure
     public :: Allocate_Structure_Thermal_Type
     public :: Allocate_Structure_Ice_Type
     public :: Allocate_Structure_WRF_Type
+    public :: Allocate_Structure_Hydraulic_Type
 
 contains
 
@@ -118,9 +119,10 @@ contains
     end subroutine Allocate_Solver
 
     subroutine Allocate_Structure_Thermal_Type(Structure_Thermal, Flags)
+        ! Allocate thermal structure type
         implicit none
-        type(Type_Thermal), intent(inout) :: Structure_Thermal
-        type(Type_Region_Flags), intent(in) :: Flags
+        type(Type_Thermal), intent(inout) :: Structure_Thermal ! Thermal structure
+        type(Type_Region_Flags), intent(in) :: Flags ! Region flags
 
         if (allocated(Structure_Thermal%Density)) deallocate (Structure_Thermal%Density)
         if (allocated(Structure_Thermal%SpecificHeat)) deallocate (Structure_Thermal%SpecificHeat)
@@ -148,9 +150,10 @@ contains
     end subroutine Allocate_Structure_Thermal_Type
 
     subroutine Allocate_Structure_Ice_Type(Structure_Thermal, QiceModelType)
+        ! Allocate ice model type
         implicit none
-        type(Type_Thermal), intent(inout) :: Structure_Thermal
-        integer(int32), intent(in) :: QiceModelType
+        type(Type_Thermal), intent(inout) :: Structure_Thermal ! Thermal structure
+        integer(int32), intent(in) :: QiceModelType ! Ice model type
 
         if (allocated(Structure_Thermal%Ice)) deallocate (Structure_Thermal%Ice)
 
@@ -165,34 +168,78 @@ contains
     end subroutine Allocate_Structure_Ice_Type
 
     subroutine Allocate_Structure_WRF_Type(Structure_Thermal, WRFModelType)
+        ! Allocate WRF model type
         implicit none
-        type(Type_Thermal), intent(inout) :: Structure_Thermal
-        integer(int32), intent(in) :: WRFModelType
+        type(Type_Thermal), intent(inout) :: Structure_Thermal ! Thermal structure
+        integer(int32), intent(in) :: WRFModelType ! WRF model type
 
-        ! Iceが割り当て済みかチェック
         if (.not. allocated(Structure_Thermal%Ice)) then
             print *, "Error: Ice structure is not allocated."
             return
         end if
         select type (Ice => Structure_Thermal%Ice)
         type is (Type_Ice_GCC)
-            if (WRFModelType == 1) then
+            select case (WRFModelType)
+            case (1)
                 allocate (Type_WRF_BC :: Ice%WRF)
-            else if (WRFModelType == 2) then
+            case (2)
                 allocate (Type_WRF_VG :: Ice%WRF)
-            else if (WRFModelType == 3) then
+            case (3)
                 allocate (Type_WRF_KO :: Ice%WRF)
-            else if (WRFModelType == 4) then
+            case (4)
                 allocate (Type_WRF_MVG :: Ice%WRF)
-            else if (WRFModelType == 5) then
+            case (5)
                 allocate (Type_WRF_Durner :: Ice%WRF)
-            else if (WRFModelType == 6) then
+            case (6)
                 allocate (Type_WRF_DVGCH :: Ice%WRF)
-            else
+            case default
                 print *, "Error: WRFModelType is not defined."
-            end if
+            end select
         end select
 
     end subroutine Allocate_Structure_WRF_Type
+
+    subroutine Allocate_Structure_Hydraulic_Type(Structure_Hydraulic)
+        ! Allocate hydraulic structure type
+        implicit none
+        type(Type_Hydraulic), intent(inout) :: Structure_Hydraulic ! Hydraulic structure
+
+        if (Structure_Hydraulic%useHCF > 0) then
+            call Allocate_Structure_HCF_Type(Structure_Hydraulic)
+        end if
+        if (Structure_Hydraulic%useImpedance) then
+            allocate (Type_Impedance :: Structure_Hydraulic%Impedance)
+        end if
+
+        select case (Structure_Hydraulic%useKTDynamics)
+        case (1:2)
+            allocate (Type_KTDynamics :: Structure_Hydraulic%KTDynamics)
+        end select
+
+    end subroutine Allocate_Structure_Hydraulic_Type
+
+    subroutine Allocate_Structure_HCF_Type(Structure_Hydraulic)
+        ! Allocate WRF model type
+        implicit none
+        type(Type_Hydraulic), intent(inout) :: Structure_Hydraulic ! Hydraulic structure
+
+        select case (Structure_Hydraulic%useHCF)
+        case (1)
+            allocate (Type_HCF_BC :: Structure_Hydraulic%HCF)
+        case (2)
+            allocate (Type_HCF_VG :: Structure_Hydraulic%HCF)
+        case (3)
+            allocate (Type_HCF_KO :: Structure_Hydraulic%HCF)
+        case (4)
+            allocate (Type_HCF_MVG :: Structure_Hydraulic%HCF)
+        case (5)
+            allocate (Type_HCF_Durner :: Structure_Hydraulic%HCF)
+        case (6)
+            allocate (Type_HCF_DVGCH :: Structure_Hydraulic%HCF)
+        case default
+            print *, "Error: HCFModelType is not defined."
+        end select
+
+    end subroutine Allocate_Structure_HCF_Type
 
 end module Allocate_Structure

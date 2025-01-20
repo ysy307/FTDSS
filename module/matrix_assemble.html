@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Matrix_Assemble &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Matrix_Assemble &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="13.1% of total for modules and submodules.">476 statements</a>
+    title="12.8% of total for modules and submodules.">476 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Assemble.f90"> Source File</a></li>
   </ul>
@@ -114,10 +114,36 @@
   <h3>Contents</h3>
  
 <div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
+  <div id="vars-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d3">D3</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d4">D4</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d12">D12</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d24">D24</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-tmpcrs1">tmpCRS1</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-tmpcrs2">tmpCRS2</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-tmpa">tmpA</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
   <div class="list-group">
     <div id="subs-0" class="panel-collapse collapse">
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-init_assemble">Init_Assemble</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-set_c">Set_C</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_trm">Calc_GM_Time_TRM</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_trm_f">Calc_GM_Time_TRM_F</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_divide">Calc_GM_Time_Divide</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_richards">Calc_GM_Time_Richards</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_trm">Calc_GM_Diffusion_TRM</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion">Calc_GM_Diffusion</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_richards">Calc_GM_Diffusion_Richards</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_richards_f">Calc_GM_Diffusion_Richards_F</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_advection_trm">Calc_GM_Diffusion_Advection_TRM</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_advection_trm_f">Calc_GM_Diffusion_Advection_TRM_F</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_advection">Calc_GM_Diffusion_Advection</a>
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-assemble_gm_heat">Assemble_GM_Heat</a>
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-assemble_gm_heat_ic">Assemble_GM_Heat_IC</a>
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-assemble_gm_water">Assemble_GM_Water</a>
@@ -131,9 +157,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <p>時間項の要素行列を全体CRS行列に組み込むサブルーチン
-拡散項の要素行列を全体CRS行列に組み込むサブルーチン
-拡散・移流項の要素行列を全体CRS行列に組み込むサブルーチン</p>
+    
 <br>        <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Uses</h3>
@@ -141,14 +165,14 @@
       <ul class="list-group">
       <li class="list-group-item">
   <ul class="list-inline">
-    <li><a href='../module/allocate.html'>Allocate</a></li>
+    <li><a href='../module/types.html'>Types</a></li>
     <li><a href='../module/allocate_structure.html'>Allocate_Structure</a></li>
-    <li><a href='../module/matrix_findind.html'>Matrix_FindInd</a></li>
+    <li><a href='../module/allocate.html'>Allocate</a></li>
     <li><a href="http://fortranwiki.org/fortran/show/iso_fortran_env">iso_fortran_env</a></li>
+    <li><a href='../module/matrix_findind.html'>Matrix_FindInd</a></li>
+    <li><a href='../module/error.html'>error</a></li>
     <li><a href="https://www.openmp.org/spec-html/5.1/openmpch3.html#x156-1890003">omp_lib</a></li>
     <li><a href='../module/calculate_product.html'>Calculate_Product</a></li>
-    <li><a href='../module/types.html'>Types</a></li>
-    <li><a href='../module/error.html'>error</a></li>
   </ul>
       </li>
       <li class="list-group-item">
@@ -158,238 +182,239 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: module~~matrix_assemble~~UsesGraph Pages: 1 -->
-<svg id="modulematrix_assembleUsesGraph" width="604pt" height="294pt"
- viewBox="0.00 0.00 604.00 294.02" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="module~~matrix_assemble~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 290.02)">
+<svg id="modulematrix_assembleUsesGraph" width="604pt" height="312pt"
+ viewBox="0.00 0.00 604.00 311.70" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~matrix_assemble~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 307.7)">
 <title>module~~matrix_assemble~~UsesGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-290.02 600,-290.02 600,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-307.7 600,-307.7 600,4 -4,4"/>
 <!-- module~matrix_assemble -->
 <g id="module~~matrix_assemble~~UsesGraph_node1" class="node">
 <title>module~matrix_assemble</title>
-<polygon fill="none" stroke="black" points="596,-123 493,-123 493,-99 596,-99 596,-123"/>
-<text text-anchor="middle" x="544.5" y="-108.6" font-family="Helvetica,sans-Serif" font-size="10.50">Matrix_Assemble</text>
-</g>
-<!-- module~allocate -->
-<g id="module~~matrix_assemble~~UsesGraph_node2" class="node">
-<title>module~allocate</title>
-<g id="a_module~~matrix_assemble~~UsesGraph_node2"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
-<polygon fill="#337ab7" stroke="#337ab7" points="294.5,-83 238.5,-83 238.5,-59 294.5,-59 294.5,-83"/>
-<text text-anchor="middle" x="266.5" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
-</a>
-</g>
-</g>
-<!-- module~matrix_assemble&#45;&gt;module~allocate -->
-<g id="module~~matrix_assemble~~UsesGraph_edge1" class="edge">
-<title>module~matrix_assemble&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M492.77,-111C466.06,-111 432.76,-111 403,-111"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M401,-111C365.88,-111 327.66,-98.14 301.15,-87"/>
-<polygon fill="#000000" stroke="#000000" points="302.51,-83.77 291.94,-83 299.72,-90.19 302.51,-83.77"/>
+<polygon fill="none" stroke="black" points="596,-138.93 493,-138.93 493,-114.93 596,-114.93 596,-138.93"/>
+<text text-anchor="middle" x="544.5" y="-124.53" font-family="Helvetica,sans-Serif" font-size="10.50">Matrix_Assemble</text>
 </g>
 <!-- module~types -->
-<g id="module~~matrix_assemble~~UsesGraph_node3" class="node">
+<g id="module~~matrix_assemble~~UsesGraph_node2" class="node">
 <title>module~types</title>
-<g id="a_module~~matrix_assemble~~UsesGraph_node3"><a xlink:href=".././module/types.html" xlink:title="Types">
-<polygon fill="#337ab7" stroke="#337ab7" points="186,-123 132,-123 132,-99 186,-99 186,-123"/>
-<text text-anchor="middle" x="159" y="-108.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
+<g id="a_module~~matrix_assemble~~UsesGraph_node2"><a xlink:href=".././module/types.html" xlink:title="Types">
+<polygon fill="#337ab7" stroke="#337ab7" points="186,-140.93 132,-140.93 132,-116.93 186,-116.93 186,-140.93"/>
+<text text-anchor="middle" x="159" y="-126.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
 </a>
 </g>
 </g>
 <!-- module~matrix_assemble&#45;&gt;module~types -->
-<g id="module~~matrix_assemble~~UsesGraph_edge4" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge1" class="edge">
 <title>module~matrix_assemble&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M401,-111C341.67,-111 326.67,-106.66 267.5,-111"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M492.71,-125.14C465.98,-124.65 432.68,-124.75 403,-126.93"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401,-126.93C328.45,-132.25 243.29,-131.27 196.11,-130.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="196.17,-126.59 186.08,-129.82 195.98,-133.59 196.17,-126.59"/>
+</g>
+<!-- module~allocate_structure -->
+<g id="module~~matrix_assemble~~UsesGraph_node3" class="node">
+<title>module~allocate_structure</title>
+<g id="a_module~~matrix_assemble~~UsesGraph_node3"><a xlink:href=".././module/allocate_structure.html" xlink:title="Allocate_Structure">
+<polygon fill="#337ab7" stroke="#337ab7" points="457,-60.93 347,-60.93 347,-36.93 457,-36.93 457,-60.93"/>
+<text text-anchor="middle" x="402" y="-46.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Structure</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~allocate_structure -->
+<g id="module~~matrix_assemble~~UsesGraph_edge2" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~allocate_structure</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M521.85,-114.91C498.31,-101.84 460.46,-80.83 433.82,-66.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="435.34,-62.88 424.9,-61.09 431.95,-69 435.34,-62.88"/>
 </g>
 <!-- omp_lib -->
 <g id="module~~matrix_assemble~~UsesGraph_node4" class="node">
 <title>omp_lib</title>
 <g id="a_module~~matrix_assemble~~UsesGraph_node4"><a xlink:href="https://www.openmp.org/spec-html/5.1/openmpch3.html#x156-1890003" xlink:title="omp_lib">
-<polygon fill="#337ab7" stroke="#337ab7" points="294,-243 239,-243 239,-219 294,-219 294,-243"/>
-<text text-anchor="middle" x="266.5" y="-228.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_lib</text>
+<polygon fill="#337ab7" stroke="#337ab7" points="294,-178.93 239,-178.93 239,-154.93 294,-154.93 294,-178.93"/>
+<text text-anchor="middle" x="266.5" y="-164.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_lib</text>
 </a>
 </g>
 </g>
 <!-- module~matrix_assemble&#45;&gt;omp_lib -->
-<g id="module~~matrix_assemble~~UsesGraph_edge2" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge4" class="edge">
 <title>module~matrix_assemble&#45;&gt;omp_lib</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M537.93,-123.47C522.4,-156.39 474.93,-244.88 403,-271"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M401,-271C383.04,-277.52 336.44,-260.78 303.37,-246.99"/>
-<polygon fill="#000000" stroke="#000000" points="304.58,-243.7 294.01,-243.02 301.85,-250.15 304.58,-243.7"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401,-126.93C367.09,-129.42 330.17,-141.23 303.77,-151.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="302.21,-148.23 294.2,-155.16 304.79,-154.74 302.21,-148.23"/>
 </g>
 <!-- module~matrix_findind -->
 <g id="module~~matrix_assemble~~UsesGraph_node5" class="node">
 <title>module~matrix_findind</title>
 <g id="a_module~~matrix_assemble~~UsesGraph_node5"><a xlink:href=".././module/matrix_findind.html" xlink:title="Matrix_FindInd">
-<polygon fill="#337ab7" stroke="#337ab7" points="311,-163 222,-163 222,-139 311,-139 311,-163"/>
-<text text-anchor="middle" x="266.5" y="-148.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_FindInd</text>
+<polygon fill="#337ab7" stroke="#337ab7" points="311,-258.93 222,-258.93 222,-234.93 311,-234.93 311,-258.93"/>
+<text text-anchor="middle" x="266.5" y="-244.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_FindInd</text>
 </a>
 </g>
 </g>
 <!-- module~matrix_assemble&#45;&gt;module~matrix_findind -->
 <g id="module~~matrix_assemble~~UsesGraph_edge3" class="edge">
 <title>module~matrix_assemble&#45;&gt;module~matrix_findind</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M401,-111C365.88,-111 327.66,-123.86 301.15,-135"/>
-<polygon fill="#000000" stroke="#000000" points="299.72,-131.81 291.94,-139 302.51,-138.23 299.72,-131.81"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M537.93,-139.4C522.4,-172.32 474.93,-260.81 403,-286.93"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401,-286.93C383.04,-293.45 336.44,-276.7 303.37,-262.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="304.58,-259.63 294.01,-258.94 301.85,-266.07 304.58,-259.63"/>
+</g>
+<!-- module~allocate -->
+<g id="module~~matrix_assemble~~UsesGraph_node6" class="node">
+<title>module~allocate</title>
+<g id="a_module~~matrix_assemble~~UsesGraph_node6"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="294.5,-60.93 238.5,-60.93 238.5,-36.93 294.5,-36.93 294.5,-60.93"/>
+<text text-anchor="middle" x="266.5" y="-46.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_assemble&#45;&gt;module~allocate -->
+<g id="module~~matrix_assemble~~UsesGraph_edge5" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401,-8.93C363.9,1.44 321.3,-16.56 294.4,-31.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="292.44,-28.75 285.58,-36.82 295.97,-34.79 292.44,-28.75"/>
 </g>
 <!-- iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_node6" class="node">
+<g id="module~~matrix_assemble~~UsesGraph_node7" class="node">
 <title>iso_fortran_env</title>
-<g id="a_module~~matrix_assemble~~UsesGraph_node6"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
-<polygon fill="#337ab7" stroke="#337ab7" points="95,-85 1,-85 1,-61 95,-61 95,-85"/>
-<text text-anchor="middle" x="48" y="-70.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+<g id="a_module~~matrix_assemble~~UsesGraph_node7"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="95,-121.93 1,-121.93 1,-97.93 95,-97.93 95,-121.93"/>
+<text text-anchor="middle" x="48" y="-107.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
 </a>
 </g>
 </g>
 <!-- module~matrix_assemble&#45;&gt;iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_edge5" class="edge">
-<title>module~matrix_assemble&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M401,-271C325.8,-298.31 294.33,-286.19 222,-252 187.05,-235.48 194.47,-208.5 160,-191"/>
-</g>
-<!-- module~allocate_structure -->
-<g id="module~~matrix_assemble~~UsesGraph_node7" class="node">
-<title>module~allocate_structure</title>
-<g id="a_module~~matrix_assemble~~UsesGraph_node7"><a xlink:href=".././module/allocate_structure.html" xlink:title="Allocate_Structure">
-<polygon fill="#337ab7" stroke="#337ab7" points="457,-83 347,-83 347,-59 457,-59 457,-83"/>
-<text text-anchor="middle" x="402" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Structure</text>
-</a>
-</g>
-</g>
-<!-- module~matrix_assemble&#45;&gt;module~allocate_structure -->
 <g id="module~~matrix_assemble~~UsesGraph_edge6" class="edge">
-<title>module~matrix_assemble&#45;&gt;module~allocate_structure</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M501.35,-99C486.89,-94.88 470.54,-90.23 455.37,-85.91"/>
-<polygon fill="#000000" stroke="#000000" points="456.19,-82.5 445.61,-83.13 454.27,-89.24 456.19,-82.5"/>
-</g>
-<!-- module~calculate_product -->
-<g id="module~~matrix_assemble~~UsesGraph_node8" class="node">
-<title>module~calculate_product</title>
-<g id="a_module~~matrix_assemble~~UsesGraph_node8"><a xlink:href=".././module/calculate_product.html" xlink:title="Calculate_Product">
-<polygon fill="#337ab7" stroke="#337ab7" points="456,-203 348,-203 348,-179 456,-179 456,-203"/>
-<text text-anchor="middle" x="402" y="-188.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Product</text>
-</a>
-</g>
-</g>
-<!-- module~matrix_assemble&#45;&gt;module~calculate_product -->
-<g id="module~~matrix_assemble~~UsesGraph_edge7" class="edge">
-<title>module~matrix_assemble&#45;&gt;module~calculate_product</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M522.16,-123.15C498.4,-136.68 459.82,-158.65 433.02,-173.9"/>
-<polygon fill="#000000" stroke="#000000" points="431.04,-171.01 424.08,-179 434.5,-177.09 431.04,-171.01"/>
+<title>module~matrix_assemble&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401,-286.93C298.94,-323.99 258.01,-293.66 160,-246.93"/>
 </g>
 <!-- module~error -->
-<g id="module~~matrix_assemble~~UsesGraph_node9" class="node">
+<g id="module~~matrix_assemble~~UsesGraph_node8" class="node">
 <title>module~error</title>
-<g id="a_module~~matrix_assemble~~UsesGraph_node9"><a xlink:href=".././module/error.html" xlink:title="error">
-<polygon fill="#337ab7" stroke="#337ab7" points="186,-24 132,-24 132,0 186,0 186,-24"/>
-<text text-anchor="middle" x="159" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error</text>
+<g id="a_module~~matrix_assemble~~UsesGraph_node8"><a xlink:href=".././module/error.html" xlink:title="error">
+<polygon fill="#337ab7" stroke="#337ab7" points="186,-60.93 132,-60.93 132,-36.93 186,-36.93 186,-60.93"/>
+<text text-anchor="middle" x="159" y="-46.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error</text>
 </a>
 </g>
 </g>
 <!-- module~matrix_assemble&#45;&gt;module~error -->
-<g id="module~~matrix_assemble~~UsesGraph_edge8" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge7" class="edge">
 <title>module~matrix_assemble&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M529.86,-98.78C513.65,-84.89 485.21,-62.54 457,-50 369.58,-11.14 254.35,-8.52 196.48,-10.11"/>
-<polygon fill="#000000" stroke="#000000" points="196.24,-6.61 186.36,-10.45 196.47,-13.61 196.24,-6.61"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M535.95,-114.78C522.52,-94.11 492.52,-52 457,-27.93 435.94,-13.66 427.5,-15.78 403,-8.93"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401,-8.93C343.86,7.04 326.51,-2.72 267.5,-8.93"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M265.5,-8.93C239.26,-11.69 211.44,-22.61 190.95,-32.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="189.23,-29.29 181.81,-36.85 192.32,-35.58 189.23,-29.29"/>
 </g>
-<!-- module~allocate&#45;&gt;module~types -->
-<g id="module~~matrix_assemble~~UsesGraph_edge10" class="edge">
-<title>module~allocate&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.33,-81.3C225.46,-86.18 209.91,-92.08 196.06,-97.33"/>
-<polygon fill="#000000" stroke="#000000" points="194.46,-94.19 186.35,-101.01 196.94,-100.74 194.46,-94.19"/>
+<!-- module~calculate_product -->
+<g id="module~~matrix_assemble~~UsesGraph_node9" class="node">
+<title>module~calculate_product</title>
+<g id="a_module~~matrix_assemble~~UsesGraph_node9"><a xlink:href=".././module/calculate_product.html" xlink:title="Calculate_Product">
+<polygon fill="#337ab7" stroke="#337ab7" points="456,-178.93 348,-178.93 348,-154.93 456,-154.93 456,-178.93"/>
+<text text-anchor="middle" x="402" y="-164.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Product</text>
+</a>
 </g>
-<!-- module~allocate&#45;&gt;iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_edge9" class="edge">
-<title>module~allocate&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.34,-61.89C217.13,-55.8 186.86,-49.36 160,-52"/>
 </g>
-<!-- module~allocate&#45;&gt;module~error -->
-<g id="module~~matrix_assemble~~UsesGraph_edge11" class="edge">
-<title>module~allocate&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M243.9,-58.92C228.53,-50.33 207.68,-38.67 190.61,-29.12"/>
-<polygon fill="#000000" stroke="#000000" points="192.01,-25.89 181.58,-24.07 188.59,-32 192.01,-25.89"/>
+<!-- module~matrix_assemble&#45;&gt;module~calculate_product -->
+<g id="module~~matrix_assemble~~UsesGraph_edge8" class="edge">
+<title>module~matrix_assemble&#45;&gt;module~calculate_product</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M501.35,-138.93C486.89,-143.04 470.54,-147.7 455.37,-152.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="454.27,-148.69 445.61,-154.8 456.19,-155.42 454.27,-148.69"/>
 </g>
 <!-- module~types&#45;&gt;iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_edge12" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge9" class="edge">
 <title>module~types&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-101.9C120.35,-97.87 106.45,-93.03 93.36,-88.46"/>
-<polygon fill="#000000" stroke="#000000" points="94.15,-85.03 83.55,-85.05 91.85,-91.64 94.15,-85.03"/>
-</g>
-<!-- module~matrix_findind&#45;&gt;module~types -->
-<g id="module~~matrix_assemble~~UsesGraph_edge14" class="edge">
-<title>module~matrix_findind&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M233.85,-139C221.87,-134.46 208.16,-129.26 195.83,-124.59"/>
-<polygon fill="#000000" stroke="#000000" points="196.89,-121.24 186.3,-120.97 194.41,-127.79 196.89,-121.24"/>
-</g>
-<!-- module~matrix_findind&#45;&gt;iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_edge13" class="edge">
-<title>module~matrix_findind&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M244.64,-163.06C218.47,-177.46 175.2,-198.71 160,-191"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158,-191C114.21,-168.77 79.09,-121.29 61.43,-93.82"/>
-<polygon fill="#000000" stroke="#000000" points="64.39,-91.95 56.12,-85.33 58.46,-95.66 64.39,-91.95"/>
-</g>
-<!-- module~allocate_structure&#45;&gt;module~allocate -->
-<g id="module~~matrix_assemble~~UsesGraph_edge15" class="edge">
-<title>module~allocate_structure&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M346.7,-71C332.71,-71 317.97,-71 305.05,-71"/>
-<polygon fill="#000000" stroke="#000000" points="304.68,-67.5 294.68,-71 304.68,-74.5 304.68,-67.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M131.89,-124.38C123.84,-122.97 114.65,-121.37 105.38,-119.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="105.8,-116.28 95.35,-118.01 104.6,-123.17 105.8,-116.28"/>
 </g>
 <!-- module~allocate_structure&#45;&gt;module~types -->
-<g id="module~~matrix_assemble~~UsesGraph_edge17" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge13" class="edge">
 <title>module~allocate_structure&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M373.54,-83.07C347.01,-93.8 305.38,-108.22 267.5,-111"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M265.5,-111C242.48,-112.69 216.55,-112.72 196.17,-112.31"/>
-<polygon fill="#000000" stroke="#000000" points="196.13,-108.81 186.05,-112.06 195.96,-115.8 196.13,-108.81"/>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M265.5,-88.93C241.6,-94.66 215.79,-104.38 195.67,-112.81"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="194.11,-109.67 186.29,-116.81 196.86,-116.11 194.11,-109.67"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~allocate -->
+<g id="module~~matrix_assemble~~UsesGraph_edge11" class="edge">
+<title>module~allocate_structure&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M346.7,-48.93C332.71,-48.93 317.97,-48.93 305.05,-48.93"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="304.68,-45.43 294.68,-48.93 304.68,-52.43 304.68,-45.43"/>
 </g>
 <!-- module~allocate_structure&#45;&gt;iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_edge16" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge12" class="edge">
 <title>module~allocate_structure&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M265.5,-31C218.15,-24.38 207.58,-47.32 160,-52"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158,-52C140.77,-53.7 122.2,-56.79 105.37,-60.09"/>
-<polygon fill="#000000" stroke="#000000" points="104.24,-56.75 95.13,-62.16 105.63,-63.61 104.24,-56.75"/>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M364.75,-60.98C338.07,-69.56 300.79,-80.94 267.5,-88.93"/>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M265.5,-88.93C219.91,-99.87 206.08,-80.28 160,-88.93"/>
 </g>
 <!-- module~allocate_structure&#45;&gt;module~error -->
-<g id="module~~matrix_assemble~~UsesGraph_edge18" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge10" class="edge">
 <title>module~allocate_structure&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M370.57,-58.98C343.89,-49.15 303.8,-36.07 267.5,-31"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M265.5,-31C242.43,-27.78 216.69,-23.16 196.42,-19.29"/>
-<polygon fill="#000000" stroke="#000000" points="196.84,-15.8 186.36,-17.34 195.51,-22.68 196.84,-15.8"/>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M370.8,-36.91C337.98,-24.37 287.53,-6.82 267.5,-8.93"/>
 </g>
-<!-- module~calculate_product&#45;&gt;module~types -->
-<g id="module~~matrix_assemble~~UsesGraph_edge19" class="edge">
-<title>module~calculate_product&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M347.99,-195.3C323.34,-196.2 293.73,-195.72 267.5,-191"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M265.5,-191C227.95,-184.24 194.75,-152.62 176.04,-131.22"/>
-<polygon fill="#000000" stroke="#000000" points="178.5,-128.7 169.37,-123.31 173.14,-133.22 178.5,-128.7"/>
+<!-- module~matrix_findind&#45;&gt;module~types -->
+<g id="module~~matrix_assemble~~UsesGraph_edge15" class="edge">
+<title>module~matrix_findind&#45;&gt;module~types</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M241.15,-234.91C234.52,-230.99 227.62,-226.25 222,-220.93 200.01,-200.1 181.64,-170.14 170.74,-150.13"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="173.78,-148.39 166.01,-141.19 167.59,-151.67 173.78,-148.39"/>
 </g>
-<!-- module~calculate_product&#45;&gt;omp_lib -->
-<g id="module~~matrix_assemble~~UsesGraph_edge21" class="edge">
-<title>module~calculate_product&#45;&gt;omp_lib</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M360.95,-203C342.84,-208.43 321.6,-214.79 303.95,-220.08"/>
-<polygon fill="#000000" stroke="#000000" points="302.59,-216.83 294.02,-223.05 304.6,-223.54 302.59,-216.83"/>
+<!-- module~matrix_findind&#45;&gt;iso_fortran_env -->
+<g id="module~~matrix_assemble~~UsesGraph_edge14" class="edge">
+<title>module~matrix_findind&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M221.79,-255.2C202.03,-256.91 178.93,-255.95 160,-246.93"/>
 </g>
-<!-- module~calculate_product&#45;&gt;iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_edge20" class="edge">
-<title>module~calculate_product&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M265.5,-191C219.35,-182.69 201.81,-212.22 160,-191"/>
+<!-- module~allocate&#45;&gt;module~types -->
+<g id="module~~matrix_assemble~~UsesGraph_edge18" class="edge">
+<title>module~allocate&#45;&gt;module~types</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M243.33,-61.15C236.34,-65.28 228.69,-70.07 222,-74.93 207.36,-85.55 192.01,-98.89 180.26,-109.66"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="177.69,-107.26 172.74,-116.63 182.45,-112.39 177.69,-107.26"/>
+</g>
+<!-- module~allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~matrix_assemble~~UsesGraph_edge17" class="edge">
+<title>module~allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M241.07,-61.04C220.14,-70.71 188.88,-83.51 160,-88.93"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M158,-88.93C140.9,-92.14 122.31,-95.69 105.4,-98.95"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="104.28,-95.61 95.12,-100.94 105.61,-102.48 104.28,-95.61"/>
+</g>
+<!-- module~allocate&#45;&gt;module~error -->
+<g id="module~~matrix_assemble~~UsesGraph_edge16" class="edge">
+<title>module~allocate&#45;&gt;module~error</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M238.33,-48.93C225.58,-48.93 210.21,-48.93 196.47,-48.93"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="196.35,-45.43 186.35,-48.93 196.35,-52.43 196.35,-45.43"/>
 </g>
 <!-- module~error&#45;&gt;iso_fortran_env -->
-<g id="module~~matrix_assemble~~UsesGraph_edge22" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge20" class="edge">
 <title>module~error&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M136.47,-24.05C120.19,-33.16 97.64,-45.78 79.51,-55.93"/>
-<polygon fill="#000000" stroke="#000000" points="77.51,-53.04 70.49,-60.97 80.93,-59.14 77.51,-53.04"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M136.47,-60.98C120.19,-70.09 97.64,-82.71 79.51,-92.85"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="77.51,-89.96 70.49,-97.9 80.93,-96.07 77.51,-89.96"/>
 </g>
 <!-- ieee_arithmetic -->
 <g id="module~~matrix_assemble~~UsesGraph_node10" class="node">
 <title>ieee_arithmetic</title>
 <g id="a_module~~matrix_assemble~~UsesGraph_node10"><a xlink:href="http://fortranwiki.org/fortran/show/ieee_arithmetic" xlink:title="ieee_arithmetic">
-<polygon fill="#337ab7" stroke="#337ab7" points="96,-24 0,-24 0,0 96,0 96,-24"/>
-<text text-anchor="middle" x="48" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ieee_arithmetic</text>
+<polygon fill="#337ab7" stroke="#337ab7" points="96,-60.93 0,-60.93 0,-36.93 96,-36.93 96,-60.93"/>
+<text text-anchor="middle" x="48" y="-46.53" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ieee_arithmetic</text>
 </a>
 </g>
 </g>
 <!-- module~error&#45;&gt;ieee_arithmetic -->
-<g id="module~~matrix_assemble~~UsesGraph_edge23" class="edge">
+<g id="module~~matrix_assemble~~UsesGraph_edge19" class="edge">
 <title>module~error&#45;&gt;ieee_arithmetic</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-12C124.11,-12 115.26,-12 106.31,-12"/>
-<polygon fill="#000000" stroke="#000000" points="106.21,-8.5 96.21,-12 106.21,-15.5 106.21,-8.5"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M131.89,-48.93C124.11,-48.93 115.26,-48.93 106.31,-48.93"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="106.21,-45.43 96.21,-48.93 106.21,-52.43 106.21,-45.43"/>
+</g>
+<!-- module~calculate_product&#45;&gt;module~types -->
+<g id="module~~matrix_assemble~~UsesGraph_edge21" class="edge">
+<title>module~calculate_product&#45;&gt;module~types</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M374.32,-178.98C347.84,-189.96 305.79,-204.78 267.5,-206.93"/>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M265.5,-206.93C226.41,-209.12 192.25,-173.2 174.02,-149.36"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="176.79,-147.21 168.05,-141.22 171.14,-151.36 176.79,-147.21"/>
+</g>
+<!-- module~calculate_product&#45;&gt;omp_lib -->
+<g id="module~~matrix_assemble~~UsesGraph_edge22" class="edge">
+<title>module~calculate_product&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M347.85,-166.93C333.28,-166.93 317.8,-166.93 304.36,-166.93"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="304.08,-163.43 294.08,-166.93 304.08,-170.43 304.08,-163.43"/>
+</g>
+<!-- module~calculate_product&#45;&gt;iso_fortran_env -->
+<g id="module~~matrix_assemble~~UsesGraph_edge23" class="edge">
+<title>module~calculate_product&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M265.5,-206.93C240.47,-208.33 182.63,-257.72 160,-246.93"/>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M158,-246.93C107.99,-223.08 73.94,-163.74 58.47,-131.54"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="61.49,-129.72 54.11,-122.12 55.13,-132.66 61.49,-129.72"/>
 </g>
 </g>
 </svg>
@@ -448,7 +473,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </li>
@@ -490,8 +515,8 @@
 <!-- module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble -->
 <g id="module~~matrix_assemble~~UsedByGraph_edge1" class="edge">
 <title>module~condition_fixinitialcondition&#45;&gt;module~matrix_assemble</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M138.94,-12C130.28,-12 121.58,-12 113.21,-12"/>
-<polygon fill="#000000" stroke="#000000" points="113.19,-8.5 103.19,-12 113.19,-15.5 113.19,-8.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M138.94,-12C130.28,-12 121.58,-12 113.21,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="113.19,-8.5 103.19,-12 113.19,-15.5 113.19,-8.5"/>
 </g>
 </g>
 </svg>
@@ -550,7 +575,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
   </li>
@@ -563,10 +588,36 @@
       <h3>Contents</h3>
  
 <div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
+  <div id="vars-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d3">D3</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d4">D4</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d12">D12</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-d24">D24</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-tmpcrs1">tmpCRS1</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-tmpcrs2">tmpCRS2</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#variable-tmpa">tmpA</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
   <div class="list-group">
     <div id="subs-1" class="panel-collapse collapse">
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-init_assemble">Init_Assemble</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-set_c">Set_C</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_trm">Calc_GM_Time_TRM</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_trm_f">Calc_GM_Time_TRM_F</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_divide">Calc_GM_Time_Divide</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_time_richards">Calc_GM_Time_Richards</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_trm">Calc_GM_Diffusion_TRM</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion">Calc_GM_Diffusion</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_richards">Calc_GM_Diffusion_Richards</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_richards_f">Calc_GM_Diffusion_Richards_F</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_advection_trm">Calc_GM_Diffusion_Advection_TRM</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_advection_trm_f">Calc_GM_Diffusion_Advection_TRM_F</a>
+      <a class="list-group-item" href="../module/matrix_assemble.html#proc-calc_gm_diffusion_advection">Calc_GM_Diffusion_Advection</a>
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-assemble_gm_heat">Assemble_GM_Heat</a>
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-assemble_gm_heat_ic">Assemble_GM_Heat_IC</a>
       <a class="list-group-item" href="../module/matrix_assemble.html#proc-assemble_gm_water">Assemble_GM_Water</a>
@@ -579,6 +630,51 @@
     <br class="visible-xs visible-sm hidden-md">
 
 
+    <section>
+    <h2>Variables</h2>
+    <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-d3"></span>real(kind=real64),</td>
+<td>private,</td>  <td>parameter</td><td>::</td>
+  <td><strong>D3</strong></td><td> =</td><td>0.33333333333333333333333333333d0</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-d4"></span>real(kind=real64),</td>
+<td>private,</td>  <td>parameter</td><td>::</td>
+  <td><strong>D4</strong></td><td> =</td><td>0.25000000000000000000000000000d0</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-d12"></span>real(kind=real64),</td>
+<td>private,</td>  <td>parameter</td><td>::</td>
+  <td><strong>D12</strong></td><td> =</td><td>0.08333333333333333333333333333d0</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-d24"></span>real(kind=real64),</td>
+<td>private,</td>  <td>parameter</td><td>::</td>
+  <td><strong>D24</strong></td><td> =</td><td>0.04166666666666666666666666666d0</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-tmpcrs1"></span>type(<a href='../type/crs.html'>CRS</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>tmpCRS1</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-tmpcrs2"></span>type(<a href='../type/crs.html'>CRS</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>tmpCRS2</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-tmpa"></span>real(kind=real64),</td>
+<td>private,</td>  <td>allocatable</td><td>::</td>
+  <td><strong>tmpA</strong>(:,:)</td><td></td><td></td><td></td>
+</tr>
+</tbody>
+</table>
+
+    </section>
+    <br>
     
     
 
@@ -599,6 +695,270 @@
 <td>intent(in)</td>
   <td></td>  <td></td><td>::</td>
   <td><strong>A</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_c"></span><h3>private subroutine <a href='../proc/set_c.html'>Set_C</a>(C, case, p, C1, C2)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/df.html'>DF</a>),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>C</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>case</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>p</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>real(kind=real64),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>C1</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>real(kind=real64),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>C2</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_time_trm"></span><h3>private subroutine <a href='../proc/calc_gm_time_trm.html'>Calc_GM_Time_TRM</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_time_trm_f"></span><h3>private subroutine <a href='../proc/calc_gm_time_trm_f.html'>Calc_GM_Time_TRM_F</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_time_divide"></span><h3>private subroutine <a href='../proc/calc_gm_time_divide.html'>Calc_GM_Time_Divide</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_time_richards"></span><h3>private subroutine <a href='../proc/calc_gm_time_richards.html'>Calc_GM_Time_Richards</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_diffusion_trm"></span><h3>private subroutine <a href='../proc/calc_gm_diffusion_trm.html'>Calc_GM_Diffusion_TRM</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_diffusion"></span><h3>private subroutine <a href='../proc/calc_gm_diffusion.html'>Calc_GM_Diffusion</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_diffusion_richards"></span><h3>private subroutine <a href='../proc/calc_gm_diffusion_richards.html'>Calc_GM_Diffusion_Richards</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_diffusion_richards_f"></span><h3>private subroutine <a href='../proc/calc_gm_diffusion_richards_f.html'>Calc_GM_Diffusion_Richards_F</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_diffusion_advection_trm"></span><h3>private subroutine <a href='../proc/calc_gm_diffusion_advection_trm.html'>Calc_GM_Diffusion_Advection_TRM</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_diffusion_advection_trm_f"></span><h3>private subroutine <a href='../proc/calc_gm_diffusion_advection_trm_f.html'>Calc_GM_Diffusion_Advection_TRM_F</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_gm_diffusion_advection"></span><h3>private subroutine <a href='../proc/calc_gm_diffusion_advection.html'>Calc_GM_Diffusion_Advection</a>(Solver)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
 </tr>
 </tbody>
 </table>
@@ -698,14 +1058,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

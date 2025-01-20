@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>HeatFields &ndash; Freezing Thawing Dynamics Simulation Solver </title>
+    <title>HeatFields &ndash; FTDSS </title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 2.0% of total for derived types.</p>Including implementation: 8 statements,  1.1% of total for derived types.">8 statements</a>
+    title="<p> 1.9% of total for derived types.</p>Including implementation: 8 statements,  1.1% of total for derived types.">8 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Types.f90"> Source File</a></li>
   </ul>
@@ -125,6 +125,12 @@
       <a class="list-group-item" href="../type/heatfields.html#variable-ra">RA</a>
       <a class="list-group-item" href="../type/heatfields.html#variable-rhs">Rhs</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/heatfields.html#src">HeatFields</a>
   </div>
 </div>
 
@@ -169,8 +175,8 @@
 <!-- type~heatfields&#45;&gt;type~heatvariables -->
 <g id="type~~heatfields~~InheritsGraph_edge1" class="edge">
 <title>type~heatfields&#45;&gt;type~heatvariables</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M616.07,-124.16C607,-129.14 596.16,-134.73 586,-139 561.54,-149.28 533.56,-158.49 509.96,-165.57"/>
-<polygon fill="#000000" stroke="#000000" points="508.74,-162.28 500.14,-168.47 510.72,-168.99 508.74,-162.28"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M616.07,-124.16C607,-129.14 596.16,-134.73 586,-139 561.54,-149.28 533.56,-158.49 509.96,-165.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="508.74,-162.28 500.14,-168.47 510.72,-168.99 508.74,-162.28"/>
 <text text-anchor="middle" x="561.5" y="-158.4" font-family="Helvetica,sans-Serif" font-size="9.50">Variables</text>
 </g>
 <!-- type~heatconstants -->
@@ -185,8 +191,8 @@
 <!-- type~heatfields&#45;&gt;type~heatconstants -->
 <g id="type~~heatfields~~InheritsGraph_edge2" class="edge">
 <title>type~heatfields&#45;&gt;type~heatconstants</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M603.66,-116.83C578.08,-120.53 542.23,-125.73 512.43,-130.04"/>
-<polygon fill="#000000" stroke="#000000" points="511.57,-126.63 502.18,-131.53 512.57,-133.56 511.57,-126.63"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M603.66,-116.83C578.08,-120.53 542.23,-125.73 512.43,-130.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="511.57,-126.63 502.18,-131.53 512.57,-133.56 511.57,-126.63"/>
 <text text-anchor="middle" x="561.5" y="-127.4" font-family="Helvetica,sans-Serif" font-size="9.50">Constants</text>
 </g>
 <!-- type~crs -->
@@ -201,8 +207,8 @@
 <!-- type~heatfields&#45;&gt;type~crs -->
 <g id="type~~heatfields~~InheritsGraph_edge4" class="edge">
 <title>type~heatfields&#45;&gt;type~crs</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M603.95,-104C598,-102.81 591.84,-101.74 586,-101 555.05,-97.09 519.6,-95.96 493.78,-95.74"/>
-<polygon fill="#000000" stroke="#000000" points="493.71,-92.24 483.7,-95.69 493.68,-99.24 493.71,-92.24"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M603.95,-104C598,-102.81 591.84,-101.74 586,-101 555.05,-97.09 519.6,-95.96 493.78,-95.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.71,-92.24 483.7,-95.69 493.68,-99.24 493.71,-92.24"/>
 <text text-anchor="middle" x="561.5" y="-103.4" font-family="Helvetica,sans-Serif" font-size="9.50">LHS_A</text>
 </g>
 <!-- type~latentheattreatment -->
@@ -217,8 +223,8 @@
 <!-- type~heatfields&#45;&gt;type~latentheattreatment -->
 <g id="type~~heatfields~~InheritsGraph_edge3" class="edge">
 <title>type~heatfields&#45;&gt;type~latentheattreatment</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M618.76,-99.88C609.32,-94.06 597.4,-87.41 586,-83 568.01,-76.03 547.93,-70.51 529.08,-66.23"/>
-<polygon fill="#000000" stroke="#000000" points="529.58,-62.76 519.06,-64.05 528.09,-69.6 529.58,-62.76"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M618.76,-99.88C609.32,-94.06 597.4,-87.41 586,-83 568.01,-76.03 547.93,-70.51 529.08,-66.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="529.58,-62.76 519.06,-64.05 528.09,-69.6 529.58,-62.76"/>
 <text text-anchor="middle" x="561.5" y="-85.4" font-family="Helvetica,sans-Serif" font-size="9.50">Latent</text>
 </g>
 <!-- type~df -->
@@ -233,14 +239,14 @@
 <!-- type~heatvariables&#45;&gt;type~df -->
 <g id="type~~heatfields~~InheritsGraph_edge5" class="edge">
 <title>type~heatvariables&#45;&gt;type~df</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M412.7,-188.28C400.85,-190.37 387.95,-192.45 376,-194 267.18,-208.08 137.61,-216.54 75.8,-220.07"/>
-<polygon fill="#000000" stroke="#000000" points="75.55,-216.58 65.77,-220.63 75.95,-223.57 75.55,-216.58"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M412.7,-188.28C400.85,-190.37 387.95,-192.45 376,-194 267.18,-208.08 137.61,-216.54 75.8,-220.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="75.55,-216.58 65.77,-220.63 75.95,-223.57 75.55,-216.58"/>
 <text text-anchor="middle" x="235.5" y="-220.4" font-family="Helvetica,sans-Serif" font-size="9.50">Cs, Cp, lambda, rho, Ca</text>
 </g>
 <!-- type~dp2d -->
-<g id="type~~heatfields~~InheritsGraph_node7" class="node">
+<g id="type~~heatfields~~InheritsGraph_node10" class="node">
 <title>type~dp2d</title>
-<g id="a_type~~heatfields~~InheritsGraph_node7"><a xlink:href=".././type/dp2d.html" xlink:title="DP2d">
+<g id="a_type~~heatfields~~InheritsGraph_node10"><a xlink:href=".././type/dp2d.html" xlink:title="DP2d">
 <polygon fill="#5cb85c" stroke="#5cb85c" points="65.5,-192 11.5,-192 11.5,-168 65.5,-168 65.5,-192"/>
 <text text-anchor="middle" x="38.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">DP2d</text>
 </a>
@@ -249,8 +255,8 @@
 <!-- type~heatvariables&#45;&gt;type~dp2d -->
 <g id="type~~heatfields~~InheritsGraph_edge6" class="edge">
 <title>type~heatvariables&#45;&gt;type~dp2d</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M412.94,-180C330.96,-180 152.49,-180 75.76,-180"/>
-<polygon fill="#000000" stroke="#000000" points="75.63,-176.5 65.63,-180 75.63,-183.5 75.63,-176.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M412.94,-180C330.96,-180 152.49,-180 75.76,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="75.63,-176.5 65.63,-180 75.63,-183.5 75.63,-176.5"/>
 <text text-anchor="middle" x="235.5" y="-182.4" font-family="Helvetica,sans-Serif" font-size="9.50">Tgrad, TFlux</text>
 </g>
 <!-- type~vector2d -->
@@ -265,14 +271,14 @@
 <!-- type~heatconstants&#45;&gt;type~vector2d -->
 <g id="type~~heatfields~~InheritsGraph_edge8" class="edge">
 <title>type~heatconstants&#45;&gt;type~vector2d</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M410.98,-138C329.5,-138 157.62,-138 79.57,-138"/>
-<polygon fill="#000000" stroke="#000000" points="79.2,-134.5 69.2,-138 79.2,-141.5 79.2,-134.5"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M410.98,-138C329.5,-138 157.62,-138 79.57,-138"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="79.2,-134.5 69.2,-138 79.2,-141.5 79.2,-134.5"/>
 <text text-anchor="middle" x="235.5" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">dispersity</text>
 </g>
 <!-- type~phases -->
-<g id="type~~heatfields~~InheritsGraph_node10" class="node">
+<g id="type~~heatfields~~InheritsGraph_node9" class="node">
 <title>type~phases</title>
-<g id="a_type~~heatfields~~InheritsGraph_node10"><a xlink:href=".././type/phases.html" xlink:title="Phases">
+<g id="a_type~~heatfields~~InheritsGraph_node9"><a xlink:href=".././type/phases.html" xlink:title="Phases">
 <polygon fill="#5cb85c" stroke="#5cb85c" points="65.5,-108 11.5,-108 11.5,-84 65.5,-84 65.5,-108"/>
 <text text-anchor="middle" x="38.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Phases</text>
 </a>
@@ -281,14 +287,14 @@
 <!-- type~heatconstants&#45;&gt;type~phases -->
 <g id="type~~heatfields~~InheritsGraph_edge7" class="edge">
 <title>type~heatconstants&#45;&gt;type~phases</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M410.62,-129.36C399.35,-127.39 387.26,-125.46 376,-124 267.18,-109.92 137.61,-101.46 75.8,-97.93"/>
-<polygon fill="#000000" stroke="#000000" points="75.95,-94.43 65.77,-97.37 75.55,-101.42 75.95,-94.43"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M410.62,-129.36C399.35,-127.39 387.26,-125.46 376,-124 267.18,-109.92 137.61,-101.46 75.8,-97.93"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="75.95,-94.43 65.77,-97.37 75.55,-101.42 75.95,-94.43"/>
 <text text-anchor="middle" x="235.5" y="-126.4" font-family="Helvetica,sans-Serif" font-size="9.50">Density, ThermalConductivity, SpecificHeat, HeatCapacity</text>
 </g>
 <!-- type~gccmodel -->
-<g id="type~~heatfields~~InheritsGraph_node9" class="node">
+<g id="type~~heatfields~~InheritsGraph_node7" class="node">
 <title>type~gccmodel</title>
-<g id="a_type~~heatfields~~InheritsGraph_node9"><a xlink:href=".././type/gccmodel.html" xlink:title="GCCModel">
+<g id="a_type~~heatfields~~InheritsGraph_node7"><a xlink:href=".././type/gccmodel.html" xlink:title="GCCModel">
 <polygon fill="#5cb85c" stroke="#5cb85c" points="72.5,-66 4.5,-66 4.5,-42 72.5,-42 72.5,-66"/>
 <text text-anchor="middle" x="38.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">GCCModel</text>
 </a>
@@ -297,8 +303,8 @@
 <!-- type~latentheattreatment&#45;&gt;type~gccmodel -->
 <g id="type~~heatfields~~InheritsGraph_edge9" class="edge">
 <title>type~latentheattreatment&#45;&gt;type~gccmodel</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M393.67,-54C308.46,-54 157.06,-54 82.89,-54"/>
-<polygon fill="#000000" stroke="#000000" points="82.53,-50.5 72.53,-54 82.53,-57.5 82.53,-50.5"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M393.67,-54C308.46,-54 157.06,-54 82.89,-54"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="82.53,-50.5 72.53,-54 82.53,-57.5 82.53,-50.5"/>
 <text text-anchor="middle" x="235.5" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">GCC</text>
 </g>
 <!-- type~powermodel -->
@@ -313,8 +319,8 @@
 <!-- type~latentheattreatment&#45;&gt;type~powermodel -->
 <g id="type~~heatfields~~InheritsGraph_edge10" class="edge">
 <title>type~latentheattreatment&#45;&gt;type~powermodel</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M393.95,-42.59C387.9,-41.64 381.84,-40.76 376,-40 273.49,-26.74 152.56,-18.46 87.22,-14.59"/>
-<polygon fill="#000000" stroke="#000000" points="87.4,-11.1 77.22,-14.01 86.99,-18.09 87.4,-11.1"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M393.95,-42.59C387.9,-41.64 381.84,-40.76 376,-40 273.49,-26.74 152.56,-18.46 87.22,-14.59"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="87.4,-11.1 77.22,-14.01 86.99,-18.09 87.4,-11.1"/>
 <text text-anchor="middle" x="235.5" y="-42.4" font-family="Helvetica,sans-Serif" font-size="9.50">Power</text>
 </g>
 </g>
@@ -351,7 +357,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -390,8 +396,8 @@
 <!-- type~solverinfo&#45;&gt;type~heatfields -->
 <g id="type~~heatfields~~InheritedByGraph_edge1" class="edge">
 <title>type~solverinfo&#45;&gt;type~heatfields</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M127.85,-12C112.84,-12 94.81,-12 78.65,-12"/>
-<polygon fill="#000000" stroke="#000000" points="78.36,-8.5 68.36,-12 78.36,-15.5 78.36,-8.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M127.85,-12C112.84,-12 94.81,-12 78.65,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="78.36,-8.5 68.36,-12 78.36,-15.5 78.36,-8.5"/>
 <text text-anchor="middle" x="98" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">Heat</text>
 </g>
 </g>
@@ -428,7 +434,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -449,6 +455,12 @@
       <a class="list-group-item" href="../type/heatfields.html#variable-ra">RA</a>
       <a class="list-group-item" href="../type/heatfields.html#variable-rhs">Rhs</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/heatfields.html#src">HeatFields</a>
   </div>
 </div>
 
@@ -499,6 +511,19 @@
     
     
     
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">HeatFields</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">HeatVariables</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Variables</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">HeatConstants</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Constants</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">LatentHeatTreatment</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Latent</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">CRS</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">LHS_A</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">RA</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Rhs</span><span class="p">(:)</span><span class="w"></span>
+<span class="w">    </span><span class="k">end type </span><span class="n">HeatFields</span><span class="w"></span>
+</pre></div>
+
+    </section>
     
     </div>
   </div>
@@ -508,14 +533,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

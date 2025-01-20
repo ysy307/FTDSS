@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Update_Phase_Revise &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Update_Phase_Revise &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.6% of total for procedures.">20 statements</a>
+    title=" 0.7% of total for procedures.">20 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Update.f90"> Source File</a></li>
   </ul>
@@ -114,7 +114,12 @@
     <div id="sidebar">
   <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/update_phase_revise.html#src">Update_Phase_Revise</a>
+  </div>
+</div>
 
 </div>
 
@@ -130,7 +135,7 @@
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
 <tr>
-  <td><span class="anchor" id="variable-solver~10"></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+  <td><span class="anchor" id="variable-solver~28"></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
 <td>intent(inout)</td>
   <td></td>  <td></td><td>::</td>
   <td><strong>Solver</strong></td><td></td>
@@ -173,8 +178,8 @@
 <!-- proc~update_phase_revise&#45;&gt;proc~binary_finding -->
 <g id="proc~~update_phase_revise~~CallsGraph_edge1" class="edge">
 <title>proc~update_phase_revise&#45;&gt;proc~binary_finding</title>
-<path fill="none" stroke="#000000" d="M127.2,-12C135.75,-12 144.47,-12 152.85,-12"/>
-<polygon fill="#000000" stroke="#000000" points="152.86,-15.5 162.86,-12 152.86,-8.5 152.86,-15.5"/>
+<path fill="none" stroke="#ff0000" d="M127.2,-12C135.75,-12 144.47,-12 152.85,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="152.86,-15.5 162.86,-12 152.86,-8.5 152.86,-15.5"/>
 </g>
 <!-- proc~calc_latentheatterm -->
 <g id="proc~~update_phase_revise~~CallsGraph_node3" class="node">
@@ -188,8 +193,8 @@
 <!-- proc~binary_finding&#45;&gt;proc~calc_latentheatterm -->
 <g id="proc~~update_phase_revise~~CallsGraph_edge2" class="edge">
 <title>proc~binary_finding&#45;&gt;proc~calc_latentheatterm</title>
-<path fill="none" stroke="#000000" d="M252.26,-12C260.35,-12 268.98,-12 277.66,-12"/>
-<polygon fill="#000000" stroke="#000000" points="277.83,-15.5 287.83,-12 277.83,-8.5 277.83,-15.5"/>
+<path fill="none" stroke="#ff0000" d="M252.26,-12C260.35,-12 268.98,-12 277.66,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="277.83,-15.5 287.83,-12 277.83,-8.5 277.83,-15.5"/>
 </g>
 </g>
 </svg>
@@ -249,7 +254,7 @@
     <p>Solid arrows point from a procedure to one which it calls. Dashed 
     arrows point from an interface to procedures which implement that interface.
     This could include the module procedures in a generic interface or the
-    implementation in a submodule of an interface in a parent module.
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -259,7 +264,12 @@
     <section class="visible-xs visible-sm hidden-md">
       <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/update_phase_revise.html#src">Update_Phase_Revise</a>
+  </div>
+</div>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
@@ -273,6 +283,35 @@
 
 
     
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="w">	</span><span class="k">subroutine </span><span class="n">Update_Phase_Revise</span><span class="p">(</span><span class="n">Solver</span><span class="p">)</span><span class="w"></span>
+<span class="w">		</span><span class="k">implicit none</span>
+<span class="k">		type</span><span class="p">(</span><span class="n">SolverInfo</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Solver</span><span class="w"></span>
+
+<span class="w">		</span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w">                  </span><span class="kd">::</span><span class="w"> </span><span class="n">iN</span><span class="w"></span>
+<span class="w">		</span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">                    </span><span class="kd">::</span><span class="w"> </span><span class="n">Tp</span><span class="p">,</span><span class="w"> </span><span class="n">To</span><span class="w"></span>
+
+<span class="w">		</span><span class="k">do </span><span class="n">iN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Solver</span><span class="p">%</span><span class="n">N</span><span class="p">%</span><span class="n">node</span><span class="w"></span>
+<span class="w">			</span><span class="n">Tp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Solver</span><span class="p">%</span><span class="n">T</span><span class="p">%</span><span class="n">pre</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"></span>
+<span class="w">			</span><span class="n">To</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Solver</span><span class="p">%</span><span class="n">T</span><span class="p">%</span><span class="n">old</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"></span>
+<span class="w">			</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Tp</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">				</span><span class="n">Solver</span><span class="p">%</span><span class="n">Heat</span><span class="p">%</span><span class="n">Variables</span><span class="p">%</span><span class="n">Phase</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Linear</span><span class="w"></span>
+<span class="w">			</span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">Tp</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">				</span><span class="n">Solver</span><span class="p">%</span><span class="n">Heat</span><span class="p">%</span><span class="n">Variables</span><span class="p">%</span><span class="n">Phase</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NonLinear</span><span class="w"></span>
+<span class="w">			</span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">Tp</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">				</span><span class="n">Solver</span><span class="p">%</span><span class="n">Heat</span><span class="p">%</span><span class="n">Variables</span><span class="p">%</span><span class="n">Phase</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pTransition</span><span class="w"></span>
+<span class="w">				</span><span class="c">! call Secant_method(Solver, iN)</span>
+<span class="w">				</span><span class="k">call </span><span class="n">Binary_finding</span><span class="p">(</span><span class="n">Solver</span><span class="p">,</span><span class="w"> </span><span class="n">iN</span><span class="p">)</span><span class="w"></span>
+<span class="w">			</span><span class="k">else</span>
+<span class="k">				</span><span class="n">Solver</span><span class="p">%</span><span class="n">Heat</span><span class="p">%</span><span class="n">Variables</span><span class="p">%</span><span class="n">Phase</span><span class="p">(</span><span class="n">iN</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nTransition</span><span class="w"></span>
+<span class="w">			</span><span class="k">end if</span>
+<span class="k">		end do</span>
+<span class="k">	end subroutine </span><span class="n">Update_Phase_Revise</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
     
     </div>
   </div>
@@ -282,14 +321,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

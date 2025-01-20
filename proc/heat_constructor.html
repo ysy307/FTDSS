@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Heat_Constructor &ndash; FTDSS</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href='../page/index.html'>Read Me</a></li>
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>Heat_Constructor
+      <small>Function</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.4% of total for procedures.">11 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/Heat.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/heat.f90.html'>Heat.f90</a></li>
+     <li><a href='../module/main_heat.html'>Main_Heat</a></li>
+     <li class="active">Heat_Constructor</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/heat_constructor.html#src">Heat_Constructor</a>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private function Heat_Constructor(Structure_Input)</h2>
+    
+
+
+    <h3>Arguments</h3>
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-structure_input"></span>type(Input),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Structure_Input</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+   <h3>Return Value <small><span class="anchor" id="variable-heat_constructor"></span>type(<a href='../type/heat.html'>Heat</a>)</small></h3>
+    
+    <br>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~heat_constructor~~CallsGraph Pages: 1 -->
+<svg id="procheat_constructorCallsGraph" width="641pt" height="195pt"
+ viewBox="0.00 0.00 641.00 194.93" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~heat_constructor~~CallsGraph" class="graph" transform="scale(0.6 0.6) rotate(0) translate(4 322)">
+<title>proc~~heat_constructor~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-322 1068,-322 1068,4 -4,4"/>
+<!-- proc~heat_constructor -->
+<g id="proc~~heat_constructor~~CallsGraph_node1" class="node">
+<title>proc~heat_constructor</title>
+<polygon fill="none" stroke="black" points="106,-255 0,-255 0,-231 106,-231 106,-255"/>
+<text text-anchor="middle" x="53" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50">Heat_Constructor</text>
+</g>
+<!-- proc~set_geometory_infomation -->
+<g id="proc~~heat_constructor~~CallsGraph_node2" class="node">
+<title>proc~set_geometory_infomation</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node2"><a xlink:href=".././proc/set_geometory_infomation.html" xlink:title="Set_Geometory_Infomation">
+<polygon fill="#d9534f" stroke="#d9534f" points="326.5,-318 168.5,-318 168.5,-294 326.5,-294 326.5,-318"/>
+<text text-anchor="middle" x="247.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Set_Geometory_Infomation</text>
+</a>
+</g>
+</g>
+<!-- proc~heat_constructor&#45;&gt;proc~set_geometory_infomation -->
+<g id="proc~~heat_constructor~~CallsGraph_edge1" class="edge">
+<title>proc~heat_constructor&#45;&gt;proc~set_geometory_infomation</title>
+<path fill="none" stroke="#ff0000" d="M75.44,-255.08C92.88,-264.45 118.39,-277.13 142,-285 149.28,-287.43 156.95,-289.62 164.68,-291.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="163.95,-295.01 174.49,-293.97 165.6,-288.21 163.95,-295.01"/>
+</g>
+<!-- interface~hcf -->
+<g id="proc~~heat_constructor~~CallsGraph_node3" class="node">
+<title>interface~hcf</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node3"><a xlink:href=".././interface/hcf.html" xlink:title="HCF">
+<polygon fill="#a7506f" stroke="#a7506f" points="274.5,-276 220.5,-276 220.5,-252 274.5,-252 274.5,-276"/>
+<text text-anchor="middle" x="247.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HCF</text>
+</a>
+</g>
+</g>
+<!-- proc~heat_constructor&#45;&gt;interface~hcf -->
+<g id="proc~~heat_constructor~~CallsGraph_edge2" class="edge">
+<title>proc~heat_constructor&#45;&gt;interface~hcf</title>
+<path fill="none" stroke="#ff0000" d="M106.09,-248.68C139.02,-252.27 180.74,-256.83 210.12,-260.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="210.03,-263.54 220.35,-261.15 210.79,-256.58 210.03,-263.54"/>
+</g>
+<!-- array_hcf -->
+<g id="proc~~heat_constructor~~CallsGraph_node4" class="node">
+<title>array_hcf</title>
+<polygon fill="#777777" stroke="#777777" points="279,-234 216,-234 216,-210 279,-210 279,-234"/>
+<text text-anchor="middle" x="247.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">array_hcf</text>
+</g>
+<!-- proc~heat_constructor&#45;&gt;array_hcf -->
+<g id="proc~~heat_constructor~~CallsGraph_edge3" class="edge">
+<title>proc~heat_constructor&#45;&gt;array_hcf</title>
+<path fill="none" stroke="#ff0000" d="M106.09,-237.32C137.43,-233.9 176.74,-229.61 205.79,-226.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="206.43,-229.89 215.99,-225.33 205.67,-222.93 206.43,-229.89"/>
+</g>
+<!-- proc~set_boundary_condition_infomations -->
+<g id="proc~~heat_constructor~~CallsGraph_node5" class="node">
+<title>proc~set_boundary_condition_infomations</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node5"><a xlink:href=".././proc/set_boundary_condition_infomations.html" xlink:title="Set_Boundary_Condition_Infomations">
+<polygon fill="#d9534f" stroke="#d9534f" points="353,-192 142,-192 142,-168 353,-168 353,-192"/>
+<text text-anchor="middle" x="247.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Set_Boundary_Condition_Infomations</text>
+</a>
+</g>
+</g>
+<!-- proc~heat_constructor&#45;&gt;proc~set_boundary_condition_infomations -->
+<g id="proc~~heat_constructor~~CallsGraph_edge4" class="edge">
+<title>proc~heat_constructor&#45;&gt;proc~set_boundary_condition_infomations</title>
+<path fill="none" stroke="#ff0000" d="M75.44,-230.92C92.88,-221.55 118.39,-208.87 142,-201 149.28,-198.57 156.95,-196.38 164.68,-194.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="165.6,-197.79 174.49,-192.03 163.95,-190.99 165.6,-197.79"/>
+</g>
+<!-- proc~hcf_constructor -->
+<g id="proc~~heat_constructor~~CallsGraph_node8" class="node">
+<title>proc~hcf_constructor</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node8"><a xlink:href=".././proc/hcf_constructor.html" xlink:title="HCF_Constructor">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="533.5,-276 431.5,-276 431.5,-252 533.5,-252 533.5,-276"/>
+<text text-anchor="middle" x="482.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HCF_Constructor</text>
+</a>
+</g>
+</g>
+<!-- interface~hcf&#45;&gt;proc~hcf_constructor -->
+<g id="proc~~heat_constructor~~CallsGraph_edge5" class="edge">
+<title>interface~hcf&#45;&gt;proc~hcf_constructor</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M274.78,-264C310.03,-264 373.7,-264 421.1,-264"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="421.25,-267.5 431.25,-264 421.25,-260.5 421.25,-267.5"/>
+</g>
+<!-- interface~count_if -->
+<g id="proc~~heat_constructor~~CallsGraph_node6" class="node">
+<title>interface~count_if</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node6"><a xlink:href=".././interface/count_if.html" xlink:title="Count_if">
+<polygon fill="#a7506f" stroke="#a7506f" points="510.5,-234 454.5,-234 454.5,-210 510.5,-210 510.5,-234"/>
+<text text-anchor="middle" x="482.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Count_if</text>
+</a>
+</g>
+</g>
+<!-- proc~set_boundary_condition_infomations&#45;&gt;interface~count_if -->
+<g id="proc~~heat_constructor~~CallsGraph_edge6" class="edge">
+<title>proc~set_boundary_condition_infomations&#45;&gt;interface~count_if</title>
+<path fill="none" stroke="#7f00ff" d="M315.27,-192.04C357.19,-199.59 409.69,-209.06 444.34,-215.3"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="444.03,-218.8 454.49,-217.13 445.27,-211.91 444.03,-218.8"/>
+</g>
+<!-- proc~condition_in_boundarycondition -->
+<g id="proc~~heat_constructor~~CallsGraph_node7" class="node">
+<title>proc~condition_in_boundarycondition</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node7"><a xlink:href=".././proc/condition_in_boundarycondition.html" xlink:title="Condition_In_BoundaryCondition">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="576,-192 389,-192 389,-168 576,-168 576,-192"/>
+<text text-anchor="middle" x="482.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_In_BoundaryCondition</text>
+</a>
+</g>
+</g>
+<!-- proc~set_boundary_condition_infomations&#45;&gt;proc~condition_in_boundarycondition -->
+<g id="proc~~heat_constructor~~CallsGraph_edge9" class="edge">
+<title>proc~set_boundary_condition_infomations&#45;&gt;proc~condition_in_boundarycondition</title>
+<path fill="none" stroke="#7f00ff" d="M353.07,-180C361.68,-180 370.38,-180 378.97,-180"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="379,-183.5 389,-180 379,-176.5 379,-183.5"/>
+</g>
+<!-- proc~condition_heat -->
+<g id="proc~~heat_constructor~~CallsGraph_node9" class="node">
+<title>proc~condition_heat</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node9"><a xlink:href=".././proc/condition_heat.html" xlink:title="Condition_Heat">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="529.5,-150 435.5,-150 435.5,-126 529.5,-126 529.5,-150"/>
+<text text-anchor="middle" x="482.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_Heat</text>
+</a>
+</g>
+</g>
+<!-- proc~set_boundary_condition_infomations&#45;&gt;proc~condition_heat -->
+<g id="proc~~heat_constructor~~CallsGraph_edge7" class="edge">
+<title>proc~set_boundary_condition_infomations&#45;&gt;proc~condition_heat</title>
+<path fill="none" stroke="#7f00ff" d="M315.27,-167.96C350.12,-161.68 392.29,-154.08 425.43,-148.11"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="426.19,-151.53 435.41,-146.31 424.95,-144.64 426.19,-151.53"/>
+</g>
+<!-- interface~allocate_vector -->
+<g id="proc~~heat_constructor~~CallsGraph_node10" class="node">
+<title>interface~allocate_vector</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node10"><a xlink:href=".././interface/allocate_vector.html" xlink:title="Allocate_Vector">
+<polygon fill="#a7506f" stroke="#a7506f" points="530,-108 435,-108 435,-84 530,-84 530,-108"/>
+<text text-anchor="middle" x="482.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Vector</text>
+</a>
+</g>
+</g>
+<!-- proc~set_boundary_condition_infomations&#45;&gt;interface~allocate_vector -->
+<g id="proc~~heat_constructor~~CallsGraph_edge8" class="edge">
+<title>proc~set_boundary_condition_infomations&#45;&gt;interface~allocate_vector</title>
+<path fill="none" stroke="#7f00ff" d="M271.79,-167.83C299.21,-153.91 346.4,-131.23 389,-117 400.47,-113.17 412.97,-109.81 424.97,-106.96"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="425.93,-110.33 434.89,-104.69 424.37,-103.51 425.93,-110.33"/>
+</g>
+<!-- proc~count_if_int32 -->
+<g id="proc~~heat_constructor~~CallsGraph_node11" class="node">
+<title>proc~count_if_int32</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node11"><a xlink:href=".././proc/count_if_int32.html" xlink:title="Count_if_int32">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="762,-276 674,-276 674,-252 762,-252 762,-276"/>
+<text text-anchor="middle" x="718" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Count_if_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~count_if&#45;&gt;proc~count_if_int32 -->
+<g id="proc~~heat_constructor~~CallsGraph_edge10" class="edge">
+<title>interface~count_if&#45;&gt;proc~count_if_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M510.74,-226.9C548.14,-233.63 616.17,-245.86 663.84,-254.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="663.22,-257.88 673.69,-256.21 664.46,-250.99 663.22,-257.88"/>
+</g>
+<!-- proc~count_if_int32_array -->
+<g id="proc~~heat_constructor~~CallsGraph_node15" class="node">
+<title>proc~count_if_int32_array</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node15"><a xlink:href=".././proc/count_if_int32_array.html" xlink:title="Count_if_int32_Array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="779.5,-234 656.5,-234 656.5,-210 779.5,-210 779.5,-234"/>
+<text text-anchor="middle" x="718" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Count_if_int32_Array</text>
+</a>
+</g>
+</g>
+<!-- interface~count_if&#45;&gt;proc~count_if_int32_array -->
+<g id="proc~~heat_constructor~~CallsGraph_edge11" class="edge">
+<title>interface~count_if&#45;&gt;proc~count_if_int32_array</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M510.74,-222C543.74,-222 600.56,-222 646.23,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="646.38,-225.5 656.38,-222 646.38,-218.5 646.38,-225.5"/>
+</g>
+<!-- proc~check_allocate_rank1_real64 -->
+<g id="proc~~heat_constructor~~CallsGraph_node12" class="node">
+<title>proc~check_allocate_rank1_real64</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node12"><a xlink:href=".././proc/check_allocate_rank1_real64.html" xlink:title="Check_Allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="802.5,-192 633.5,-192 633.5,-168 802.5,-168 802.5,-192"/>
+<text text-anchor="middle" x="718" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Check_Allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_real64 -->
+<g id="proc~~heat_constructor~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_real64</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M530.39,-100.69C545.73,-103.74 562.32,-108.75 576,-117 597.05,-129.7 590.78,-146.58 612,-159 615.85,-161.25 619.9,-163.27 624.08,-165.07"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="622.82,-168.34 633.4,-168.69 625.35,-161.81 622.82,-168.34"/>
+</g>
+<!-- proc~check_allocate_rank1_int32_specify -->
+<g id="proc~~heat_constructor~~CallsGraph_node13" class="node">
+<title>proc~check_allocate_rank1_int32_specify</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node13"><a xlink:href=".././proc/check_allocate_rank1_int32_specify.html" xlink:title="Check_Allocate_rank1_int32_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="820.5,-150 615.5,-150 615.5,-126 820.5,-126 820.5,-150"/>
+<text text-anchor="middle" x="718" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Check_Allocate_rank1_int32_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_int32_specify -->
+<g id="proc~~heat_constructor~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_int32_specify</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M530.19,-104.4C561.58,-110.04 603.68,-117.62 639.97,-124.15"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="639.58,-127.63 650.04,-125.96 640.82,-120.74 639.58,-127.63"/>
+</g>
+<!-- proc~check_allocate_rank1_int32 -->
+<g id="proc~~heat_constructor~~CallsGraph_node14" class="node">
+<title>proc~check_allocate_rank1_int32</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node14"><a xlink:href=".././proc/check_allocate_rank1_int32.html" xlink:title="Check_Allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="799.5,-108 636.5,-108 636.5,-84 799.5,-84 799.5,-108"/>
+<text text-anchor="middle" x="718" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Check_Allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_int32 -->
+<g id="proc~~heat_constructor~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_int32</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M530.19,-96C557.69,-96 593.42,-96 626.26,-96"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="626.34,-99.5 636.34,-96 626.34,-92.5 626.34,-99.5"/>
+</g>
+<!-- proc~check_allocate_rank1_logical -->
+<g id="proc~~heat_constructor~~CallsGraph_node16" class="node">
+<title>proc~check_allocate_rank1_logical</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node16"><a xlink:href=".././proc/check_allocate_rank1_logical.html" xlink:title="Check_Allocate_rank1_logical">
+<polygon fill="#d9534f" stroke="#d9534f" points="803.5,-66 632.5,-66 632.5,-42 803.5,-42 803.5,-66"/>
+<text text-anchor="middle" x="718" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Check_Allocate_rank1_logical</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_logical -->
+<g id="proc~~heat_constructor~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_logical</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M530.19,-87.6C561.58,-81.96 603.68,-74.38 639.97,-67.85"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="640.82,-71.26 650.04,-66.04 639.58,-64.37 640.82,-71.26"/>
+</g>
+<!-- proc~check_allocate_rank1_real64_specify -->
+<g id="proc~~heat_constructor~~CallsGraph_node17" class="node">
+<title>proc~check_allocate_rank1_real64_specify</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node17"><a xlink:href=".././proc/check_allocate_rank1_real64_specify.html" xlink:title="Check_Allocate_rank1_real64_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="824,-24 612,-24 612,0 824,0 824,-24"/>
+<text text-anchor="middle" x="718" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Check_Allocate_rank1_real64_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_real64_specify -->
+<g id="proc~~heat_constructor~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_vector&#45;&gt;proc~check_allocate_rank1_real64_specify</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M504.16,-83.78C528.97,-69.61 572.23,-46.47 612,-33 619.1,-30.59 626.57,-28.43 634.12,-26.48"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="635.17,-29.82 644.05,-24.05 633.51,-23.02 635.17,-29.82"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~heat_constructor~~CallsGraph_node18" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~heat_constructor~~CallsGraph_node18"><a xlink:href=".././proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="952,-108 860,-108 860,-84 952,-84 952,-108"/>
+<text text-anchor="middle" x="906" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~check_allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~heat_constructor~~CallsGraph_edge17" class="edge">
+<title>proc~check_allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffda00" d="M799.35,-167.97C807.85,-165.52 816.22,-162.56 824,-159 847.59,-148.2 870.55,-129.31 885.97,-115.02"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="888.47,-117.46 893.3,-108.03 883.65,-112.39 888.47,-117.46"/>
+</g>
+<!-- proc~check_allocate_rank1_int32_specify&#45;&gt;proc~error_message -->
+<g id="proc~~heat_constructor~~CallsGraph_edge18" class="edge">
+<title>proc~check_allocate_rank1_int32_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#48ff00" d="M782.14,-125.97C795.97,-123.17 810.5,-120.1 824,-117 832.64,-115.02 841.77,-112.79 850.65,-110.54"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="851.73,-113.88 860.55,-108.01 849.99,-107.09 851.73,-113.88"/>
+</g>
+<!-- proc~check_allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~heat_constructor~~CallsGraph_edge19" class="edge">
+<title>proc~check_allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff91" d="M799.5,-96C816.49,-96 834.06,-96 849.86,-96"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="849.96,-99.5 859.96,-96 849.96,-92.5 849.96,-99.5"/>
+</g>
+<!-- proc~check_allocate_rank1_logical&#45;&gt;proc~error_message -->
+<g id="proc~~heat_constructor~~CallsGraph_edge20" class="edge">
+<title>proc~check_allocate_rank1_logical&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#4800ff" d="M782.14,-66.03C795.97,-68.83 810.5,-71.9 824,-75 832.64,-76.98 841.77,-79.21 850.65,-81.46"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="849.99,-84.91 860.55,-83.99 851.73,-78.12 849.99,-84.91"/>
+</g>
+<!-- proc~check_allocate_rank1_real64_specify&#45;&gt;proc~error_message -->
+<g id="proc~~heat_constructor~~CallsGraph_edge21" class="edge">
+<title>proc~check_allocate_rank1_real64_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00da" d="M799.35,-24.03C807.85,-26.48 816.22,-29.44 824,-33 847.59,-43.8 870.55,-62.69 885.97,-76.98"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="883.65,-79.61 893.3,-83.97 888.47,-74.54 883.65,-79.61"/>
+</g>
+<!-- mpi_finalize -->
+<g id="proc~~heat_constructor~~CallsGraph_node19" class="node">
+<title>mpi_finalize</title>
+<polygon fill="#777777" stroke="#777777" points="1064,-108 988,-108 988,-84 1064,-84 1064,-108"/>
+<text text-anchor="middle" x="1026" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_finalize</text>
+</g>
+<!-- proc~error_message&#45;&gt;mpi_finalize -->
+<g id="proc~~heat_constructor~~CallsGraph_edge22" class="edge">
+<title>proc~error_message&#45;&gt;mpi_finalize</title>
+<path fill="none" stroke="#ff0000" d="M952.28,-96C960.6,-96 969.3,-96 977.68,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="977.68,-99.5 987.68,-96 977.68,-92.5 977.68,-99.5"/>
+</g>
+</g>
+</svg>
+</div><script>var panprocheat_constructorCallsGraph = svgPanZoom('#procheat_constructorCallsGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="597pt" height="32pt"
+ viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
+<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
+<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~heat_constructor~~CalledByGraph Pages: 1 -->
+<svg id="procheat_constructorCalledByGraph" width="204pt" height="32pt"
+ viewBox="0.00 0.00 204.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~heat_constructor~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~heat_constructor~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 200,-28 200,4 -4,4"/>
+<!-- proc~heat_constructor -->
+<g id="proc~~heat_constructor~~CalledByGraph_node1" class="node">
+<title>proc~heat_constructor</title>
+<polygon fill="none" stroke="black" points="196,-24 90,-24 90,0 196,0 196,-24"/>
+<text text-anchor="middle" x="143" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Heat_Constructor</text>
+</g>
+<!-- interface~heat -->
+<g id="proc~~heat_constructor~~CalledByGraph_node2" class="node">
+<title>interface~heat</title>
+<g id="a_proc~~heat_constructor~~CalledByGraph_node2"><a xlink:href=".././interface/heat.html" xlink:title="Heat">
+<polygon fill="#a7506f" stroke="#a7506f" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Heat</text>
+</a>
+</g>
+</g>
+<!-- interface~heat&#45;&gt;proc~heat_constructor -->
+<g id="proc~~heat_constructor~~CalledByGraph_edge1" class="edge">
+<title>interface~heat&#45;&gt;proc~heat_constructor</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M54.15,-12C61.89,-12 70.71,-12 79.71,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="79.9,-15.5 89.9,-12 79.9,-8.5 79.9,-15.5"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="597pt" height="32pt"
+ viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
+<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
+<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/heat_constructor.html#src">Heat_Constructor</a>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    
+    
+
+    
+    
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">Heat</span><span class="p">)</span><span class="w"> </span><span class="k">function </span><span class="n">Heat_Constructor</span><span class="p">(</span><span class="n">Structure_Input</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Input</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Input</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">Set_Geometory_Infomation</span><span class="p">(</span><span class="n">Heat_Constructor</span><span class="p">,</span><span class="w"> </span><span class="n">Structure_Input</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">call </span><span class="n">Set_Boundary_Condition_Infomations</span><span class="p">(</span><span class="n">Heat_Constructor</span><span class="p">,</span><span class="w"> </span><span class="n">Structure_Input</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">block</span>
+<span class="k">            </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">array_HCF</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">array_HCF</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">]</span><span class="w"></span>
+<span class="w">            </span><span class="k">print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">array_HCF</span><span class="w"></span>
+<span class="w">            </span><span class="n">Heat_Constructor</span><span class="p">%</span><span class="n">HCFs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HCF</span><span class="p">(</span><span class="n">array_HCF</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">end block</span>
+
+<span class="k">    end function </span><span class="n">Heat_Constructor</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-01-20 00:23            </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>

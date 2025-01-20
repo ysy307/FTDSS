@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Condition_FixBoundaryCondition &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Condition_FixBoundaryCondition &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -118,6 +118,10 @@
   <div class="list-group">
     <div id="subs-0" class="panel-collapse collapse">
       <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_boundaryconditions">Fix_BoundaryConditions</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_temperature">Fix_DirichletBoundaryCondition_Temperature</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_temperature_f">Fix_DirichletBoundaryCondition_Temperature_F</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_water">Fix_DirichletBoundaryCondition_Water</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_water_f">Fix_DirichletBoundaryCondition_Water_F</a>
     </div>
   </div>
 </div>
@@ -170,8 +174,8 @@
 <!-- module~condition_fixboundarycondition&#45;&gt;module~matrix_findind -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_edge1" class="edge">
 <title>module~condition_fixboundarycondition&#45;&gt;module~matrix_findind</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M344.97,-31.35C336.26,-32.37 327.63,-33.37 319.45,-34.33"/>
-<polygon fill="#000000" stroke="#000000" points="318.88,-30.87 309.36,-35.5 319.7,-37.82 318.88,-30.87"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M344.97,-31.35C336.26,-32.37 327.63,-33.37 319.45,-34.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="318.88,-30.87 309.36,-35.5 319.7,-37.82 318.88,-30.87"/>
 </g>
 <!-- iso_fortran_env -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_node3" class="node">
@@ -185,9 +189,9 @@
 <!-- module~condition_fixboundarycondition&#45;&gt;iso_fortran_env -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_edge2" class="edge">
 <title>module~condition_fixboundarycondition&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M373.26,-8.57C341.05,-3.66 301.3,0.62 265.5,-0.62"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M263.5,-0.62C207.58,-2.55 144.8,-15.46 101.49,-26.1"/>
-<polygon fill="#000000" stroke="#000000" points="100.59,-22.72 91.74,-28.54 102.29,-29.51 100.59,-22.72"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M373.26,-8.57C341.05,-3.66 301.3,0.62 265.5,-0.62"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M263.5,-0.62C207.58,-2.55 144.8,-15.46 101.49,-26.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="100.59,-22.72 91.74,-28.54 102.29,-29.51 100.59,-22.72"/>
 </g>
 <!-- module~types -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_node4" class="node">
@@ -201,26 +205,26 @@
 <!-- module~condition_fixboundarycondition&#45;&gt;module~types -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_edge3" class="edge">
 <title>module~condition_fixboundarycondition&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M263.5,-0.62C236.34,-1.56 207.63,-13.23 187.03,-23.72"/>
-<polygon fill="#000000" stroke="#000000" points="185.36,-20.64 178.17,-28.42 188.64,-26.83 185.36,-20.64"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M263.5,-0.62C236.34,-1.56 207.63,-13.23 187.03,-23.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="185.36,-20.64 178.17,-28.42 188.64,-26.83 185.36,-20.64"/>
 </g>
 <!-- module~matrix_findind&#45;&gt;iso_fortran_env -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_edge4" class="edge">
 <title>module~matrix_findind&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M225.89,-52.68C212.78,-56.32 197.87,-59.82 184,-61.62 160.2,-64.71 153.81,-64.62 130,-61.62 119.06,-60.24 107.49,-57.87 96.6,-55.2"/>
-<polygon fill="#000000" stroke="#000000" points="97.38,-51.79 86.82,-52.69 95.64,-58.57 97.38,-51.79"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M225.89,-52.68C212.78,-56.32 197.87,-59.82 184,-61.62 160.2,-64.71 153.81,-64.62 130,-61.62 119.06,-60.24 107.49,-57.87 96.6,-55.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="97.38,-51.79 86.82,-52.69 95.64,-58.57 97.38,-51.79"/>
 </g>
 <!-- module~matrix_findind&#45;&gt;module~types -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_edge5" class="edge">
 <title>module~matrix_findind&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M219.98,-40.62C211.44,-40.62 202.57,-40.62 194.29,-40.62"/>
-<polygon fill="#000000" stroke="#000000" points="194.2,-37.12 184.2,-40.62 194.2,-44.12 194.2,-37.12"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M219.98,-40.62C211.44,-40.62 202.57,-40.62 194.29,-40.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="194.2,-37.12 184.2,-40.62 194.2,-44.12 194.2,-37.12"/>
 </g>
 <!-- module~types&#45;&gt;iso_fortran_env -->
 <g id="module~~condition_fixboundarycondition~~UsesGraph_edge6" class="edge">
 <title>module~types&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M129.86,-40.62C122.05,-40.62 113.19,-40.62 104.23,-40.62"/>
-<polygon fill="#000000" stroke="#000000" points="104.14,-37.12 94.14,-40.62 104.14,-44.12 104.14,-37.12"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M129.86,-40.62C122.05,-40.62 113.19,-40.62 104.23,-40.62"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="104.14,-37.12 94.14,-40.62 104.14,-44.12 104.14,-37.12"/>
 </g>
 </g>
 </svg>
@@ -279,7 +283,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </li>
@@ -321,8 +325,8 @@
 <!-- module~condition_fixinitialcondition&#45;&gt;module~condition_fixboundarycondition -->
 <g id="module~~condition_fixboundarycondition~~UsedByGraph_edge1" class="edge">
 <title>module~condition_fixinitialcondition&#45;&gt;module~condition_fixboundarycondition</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.89,-12C213.49,-12 204.87,-12 196.27,-12"/>
-<polygon fill="#000000" stroke="#000000" points="196.2,-8.5 186.2,-12 196.2,-15.5 196.2,-8.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M221.89,-12C213.49,-12 204.87,-12 196.27,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="196.2,-8.5 186.2,-12 196.2,-15.5 196.2,-8.5"/>
 </g>
 </g>
 </svg>
@@ -381,7 +385,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
   </li>
@@ -398,6 +402,10 @@
   <div class="list-group">
     <div id="subs-1" class="panel-collapse collapse">
       <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_boundaryconditions">Fix_BoundaryConditions</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_temperature">Fix_DirichletBoundaryCondition_Temperature</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_temperature_f">Fix_DirichletBoundaryCondition_Temperature_F</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_water">Fix_DirichletBoundaryCondition_Water</a>
+      <a class="list-group-item" href="../module/condition_fixboundarycondition.html#proc-fix_dirichletboundarycondition_water_f">Fix_DirichletBoundaryCondition_Water_F</a>
     </div>
   </div>
 </div>
@@ -440,6 +448,110 @@
   </div>
   </div>
 
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-fix_dirichletboundarycondition_temperature"></span><h3>private subroutine <a href='../proc/fix_dirichletboundarycondition_temperature.html'>Fix_DirichletBoundaryCondition_Temperature</a>(Solver, iBC)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>iBC</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-fix_dirichletboundarycondition_temperature_f"></span><h3>private subroutine <a href='../proc/fix_dirichletboundarycondition_temperature_f.html'>Fix_DirichletBoundaryCondition_Temperature_F</a>(Solver, iBC)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>iBC</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-fix_dirichletboundarycondition_water"></span><h3>private subroutine <a href='../proc/fix_dirichletboundarycondition_water.html'>Fix_DirichletBoundaryCondition_Water</a>(Solver, iBC)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>iBC</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-fix_dirichletboundarycondition_water_f"></span><h3>private subroutine <a href='../proc/fix_dirichletboundarycondition_water_f.html'>Fix_DirichletBoundaryCondition_Water_F</a>(Solver, iBC)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>iBC</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
     </section>    
     <br>
     
@@ -451,14 +563,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

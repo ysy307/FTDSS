@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Allocate_Structure_Thermal_Type &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Allocate_Structure_Thermal_Type &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.0% of total for procedures.">25 statements</a>
+    title=" 0.9% of total for procedures.">25 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Allocate_Structure.f90"> Source File</a></li>
   </ul>
@@ -114,7 +114,12 @@
     <div id="sidebar">
   <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/allocate_structure_thermal_type.html#src">Allocate_Structure_Thermal_Type</a>
+  </div>
+</div>
 
 </div>
 
@@ -136,7 +141,7 @@
   <td><strong>Structure_Thermal</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-flags~3"></span>type(<a href='../type/type_region_flags.html'>Type_Region_Flags</a>),</td>
+  <td><span class="anchor" id="variable-flags~6"></span>type(<a href='../type/type_region_flags.html'>Type_Region_Flags</a>),</td>
 <td>intent(in)</td>
   <td></td>  <td></td><td>::</td>
   <td><strong>Flags</strong></td><td></td>
@@ -149,7 +154,12 @@
     <section class="visible-xs visible-sm hidden-md">
       <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/allocate_structure_thermal_type.html#src">Allocate_Structure_Thermal_Type</a>
+  </div>
+</div>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
@@ -163,6 +173,42 @@
 
 
     
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">Allocate_Structure_Thermal_Type</span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">,</span><span class="w"> </span><span class="n">Flags</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="c">! Allocate thermal structure type</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        type</span><span class="p">(</span><span class="n">Type_Thermal</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="w"> </span><span class="c">! Thermal structure</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_Region_Flags</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Flags</span><span class="w"> </span><span class="c">! Region flags</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">Density</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">Density</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">SpecificHeat</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">SpecificHeat</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">ThermalConductivity</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">ThermalConductivity</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Flags</span><span class="p">%</span><span class="n">is1Phase</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_Density_1Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">Density</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_SpecificHeat_1Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">SpecificHeat</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_ThermalConductivity_1Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">ThermalConductivity</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">Flags</span><span class="p">%</span><span class="n">is2Phase</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_Density_2Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">Density</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_SpecificHeat_2Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">SpecificHeat</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_ThermalConductivity_2Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">ThermalConductivity</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">Flags</span><span class="p">%</span><span class="n">is3Phase</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_Density_3Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">Density</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_SpecificHeat_3Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">SpecificHeat</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Flags</span><span class="p">%</span><span class="n">isDispersity</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_ThermalConductivity_3Phase_Dispersity_2D</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">ThermalConductivity</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="c">! allocate (Type_ThermalConductivity_3Phase_Dispersity_3D :: Structure_Thermal%ThermalConductivity)</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_ThermalConductivity_3Phase</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">ThermalConductivity</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">    end subroutine </span><span class="n">Allocate_Structure_Thermal_Type</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
     
     </div>
   </div>
@@ -172,14 +218,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

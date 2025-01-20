@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Base_Ice &ndash; Freezing Thawing Dynamics Simulation Solver </title>
+    <title>Base_Ice &ndash; FTDSS </title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 0.8% of total for derived types.</p>Including implementation: 3 statements,  0.4% of total for derived types.">3 statements</a>
+    title="<p> 0.7% of total for derived types.</p>Including implementation: 3 statements,  0.4% of total for derived types.">3 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Types.f90"> Source File</a></li>
   </ul>
@@ -120,6 +120,12 @@
     <div class="list-group">
       <a class="list-group-item" href="../type/base_ice.html#variable-latentheat">LatentHeat</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/base_ice.html#src">Base_Ice</a>
   </div>
 </div>
 
@@ -164,53 +170,53 @@
 <!-- type~type_thermal&#45;&gt;type~base_ice -->
 <g id="type~~base_ice~~InheritedByGraph_edge1" class="edge">
 <title>type~type_thermal&#45;&gt;type~base_ice</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M128.18,-125.86C122.49,-123.03 116.5,-119.97 111,-117 93.74,-107.68 74.81,-96.6 59.7,-87.54"/>
-<polygon fill="#000000" stroke="#000000" points="61.2,-84.36 50.83,-82.19 57.58,-90.35 61.2,-84.36"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M128.18,-125.86C122.49,-123.03 116.5,-119.97 111,-117 93.74,-107.68 74.81,-96.6 59.7,-87.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="61.2,-84.36 50.83,-82.19 57.58,-90.35 61.2,-84.36"/>
 <text text-anchor="middle" x="85.5" y="-108.4" font-family="Helvetica,sans-Serif" font-size="9.50">Ice</text>
 </g>
-<!-- type~type_ice_trm -->
+<!-- type~type_ice_gcc -->
 <g id="type~~base_ice~~InheritedByGraph_node3" class="node">
-<title>type~type_ice_trm</title>
-<g id="a_type~~base_ice~~InheritedByGraph_node3"><a xlink:href=".././type/type_ice_trm.html" xlink:title="Type_Ice_TRM">
+<title>type~type_ice_gcc</title>
+<g id="a_type~~base_ice~~InheritedByGraph_node3"><a xlink:href=".././type/type_ice_gcc.html" xlink:title="Type_Ice_GCC">
 <polygon fill="#5cb85c" stroke="#5cb85c" points="197.5,-108 111.5,-108 111.5,-84 197.5,-84 197.5,-108"/>
-<text text-anchor="middle" x="154.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_TRM</text>
+<text text-anchor="middle" x="154.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_GCC</text>
+</a>
+</g>
+</g>
+<!-- type~type_ice_gcc&#45;&gt;type~base_ice -->
+<g id="type~~base_ice~~InheritedByGraph_edge3" class="edge">
+<title>type~type_ice_gcc&#45;&gt;type~base_ice</title>
+<path fill="none" stroke="#ff0000" d="M126.41,-83.88C121.16,-81.18 115.81,-78.18 111,-75 99.03,-67.1 100.7,-51.99 86.5,-54"/>
+</g>
+<!-- type~type_ice_trm -->
+<g id="type~~base_ice~~InheritedByGraph_node4" class="node">
+<title>type~type_ice_trm</title>
+<g id="a_type~~base_ice~~InheritedByGraph_node4"><a xlink:href=".././type/type_ice_trm.html" xlink:title="Type_Ice_TRM">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="197.5,-66 111.5,-66 111.5,-42 197.5,-42 197.5,-66"/>
+<text text-anchor="middle" x="154.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_TRM</text>
 </a>
 </g>
 </g>
 <!-- type~type_ice_trm&#45;&gt;type~base_ice -->
 <g id="type~~base_ice~~InheritedByGraph_edge2" class="edge">
 <title>type~type_ice_trm&#45;&gt;type~base_ice</title>
-<path fill="none" stroke="#000000" d="M126.41,-83.88C121.16,-81.18 115.81,-78.18 111,-75 99.03,-67.1 100.7,-51.99 86.5,-54"/>
+<path fill="none" stroke="#ff0000" d="M111.2,-52.2C102.98,-52.36 94.45,-52.88 86.5,-54"/>
 </g>
 <!-- type~type_ice_exp -->
-<g id="type~~base_ice~~InheritedByGraph_node4" class="node">
+<g id="type~~base_ice~~InheritedByGraph_node5" class="node">
 <title>type~type_ice_exp</title>
-<g id="a_type~~base_ice~~InheritedByGraph_node4"><a xlink:href=".././type/type_ice_exp.html" xlink:title="Type_Ice_EXP">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="196,-66 113,-66 113,-42 196,-42 196,-66"/>
-<text text-anchor="middle" x="154.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_EXP</text>
+<g id="a_type~~base_ice~~InheritedByGraph_node5"><a xlink:href=".././type/type_ice_exp.html" xlink:title="Type_Ice_EXP">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="196,-24 113,-24 113,0 196,0 196,-24"/>
+<text text-anchor="middle" x="154.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_EXP</text>
 </a>
 </g>
 </g>
 <!-- type~type_ice_exp&#45;&gt;type~base_ice -->
-<g id="type~~base_ice~~InheritedByGraph_edge3" class="edge">
-<title>type~type_ice_exp&#45;&gt;type~base_ice</title>
-<path fill="none" stroke="#000000" d="M112.98,-52.17C104.22,-52.29 95.02,-52.8 86.5,-54"/>
-</g>
-<!-- type~type_ice_gcc -->
-<g id="type~~base_ice~~InheritedByGraph_node5" class="node">
-<title>type~type_ice_gcc</title>
-<g id="a_type~~base_ice~~InheritedByGraph_node5"><a xlink:href=".././type/type_ice_gcc.html" xlink:title="Type_Ice_GCC">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="197.5,-24 111.5,-24 111.5,0 197.5,0 197.5,-24"/>
-<text text-anchor="middle" x="154.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_GCC</text>
-</a>
-</g>
-</g>
-<!-- type~type_ice_gcc&#45;&gt;type~base_ice -->
 <g id="type~~base_ice~~InheritedByGraph_edge4" class="edge">
-<title>type~type_ice_gcc&#45;&gt;type~base_ice</title>
-<path fill="none" stroke="#000000" d="M126.41,-24.12C121.16,-26.82 115.81,-29.82 111,-33 99.03,-40.9 100.7,-51.99 86.5,-54"/>
-<path fill="none" stroke="#000000" d="M84.5,-54C79.71,-54.68 74.76,-55.7 69.89,-56.9"/>
-<polygon fill="#000000" stroke="#000000" points="68.8,-53.57 60.08,-59.58 70.65,-60.32 68.8,-53.57"/>
+<title>type~type_ice_exp&#45;&gt;type~base_ice</title>
+<path fill="none" stroke="#ff0000" d="M126.41,-24.12C121.16,-26.82 115.81,-29.82 111,-33 99.03,-40.9 100.7,-51.99 86.5,-54"/>
+<path fill="none" stroke="#ff0000" d="M84.5,-54C79.71,-54.68 74.76,-55.7 69.89,-56.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="68.8,-53.57 60.08,-59.58 70.65,-60.32 68.8,-53.57"/>
 </g>
 <!-- type~type_region -->
 <g id="type~~base_ice~~InheritedByGraph_node6" class="node">
@@ -224,8 +230,8 @@
 <!-- type~type_region&#45;&gt;type~type_thermal -->
 <g id="type~~base_ice~~InheritedByGraph_edge5" class="edge">
 <title>type~type_region&#45;&gt;type~type_thermal</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M273.69,-138C254.03,-138 229.85,-138 208.5,-138"/>
-<polygon fill="#000000" stroke="#000000" points="208.28,-134.5 198.28,-138 208.28,-141.5 208.28,-134.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M273.69,-138C254.03,-138 229.85,-138 208.5,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="208.28,-134.5 198.28,-138 208.28,-141.5 208.28,-134.5"/>
 <text text-anchor="middle" x="236" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">Thermal</text>
 </g>
 </g>
@@ -262,7 +268,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -278,6 +284,12 @@
     <div class="list-group">
       <a class="list-group-item" href="../type/base_ice.html#variable-latentheat">LatentHeat</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/base_ice.html#src">Base_Ice</a>
   </div>
 </div>
 
@@ -303,6 +315,14 @@
     
     
     
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Base_Ice</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">LatentHeat</span><span class="w"></span>
+<span class="w">    </span><span class="k">end type </span><span class="n">Base_Ice</span><span class="w"></span>
+</pre></div>
+
+    </section>
     
     </div>
   </div>
@@ -312,14 +332,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

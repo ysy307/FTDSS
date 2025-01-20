@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Base_WRF &ndash; Freezing Thawing Dynamics Simulation Solver </title>
+    <title>Base_WRF &ndash; FTDSS </title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 0.8% of total for derived types.</p>Including implementation: 3 statements,  0.4% of total for derived types.">3 statements</a>
+    title="<p> 0.7% of total for derived types.</p>Including implementation: 3 statements,  0.4% of total for derived types.">3 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Types.f90"> Source File</a></li>
   </ul>
@@ -123,6 +123,12 @@
     </div>
   </div>
 </div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/base_wrf.html#src">Base_WRF</a>
+  </div>
+</div>
 
 </div>
 
@@ -150,94 +156,96 @@
 <!-- type~base_wrf -->
 <g id="type~~base_wrf~~InheritedByGraph_node1" class="node">
 <title>type~base_wrf</title>
-<polygon fill="none" stroke="black" points="68,-213 0,-213 0,-189 68,-189 68,-213"/>
-<text text-anchor="middle" x="34" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50">Base_WRF</text>
+<polygon fill="none" stroke="black" points="68,-150 0,-150 0,-126 68,-126 68,-150"/>
+<text text-anchor="middle" x="34" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">Base_WRF</text>
 </g>
-<!-- type~type_ice_gcc -->
+<!-- type~type_wrf_ko -->
 <g id="type~~base_wrf~~InheritedByGraph_node2" class="node">
-<title>type~type_ice_gcc</title>
-<g id="a_type~~base_wrf~~InheritedByGraph_node2"><a xlink:href=".././type/type_ice_gcc.html" xlink:title="Type_Ice_GCC">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="224.5,-276 138.5,-276 138.5,-252 224.5,-252 224.5,-276"/>
-<text text-anchor="middle" x="181.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_GCC</text>
+<title>type~type_wrf_ko</title>
+<g id="a_type~~base_wrf~~InheritedByGraph_node2"><a xlink:href=".././type/type_wrf_ko.html" xlink:title="Type_WRF_KO">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="224,-276 139,-276 139,-252 224,-252 224,-276"/>
+<text text-anchor="middle" x="181.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_KO</text>
 </a>
 </g>
 </g>
-<!-- type~type_ice_gcc&#45;&gt;type~base_wrf -->
-<g id="type~~base_wrf~~InheritedByGraph_edge1" class="edge">
-<title>type~type_ice_gcc&#45;&gt;type~base_wrf</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M148.09,-251.91C140.78,-249.07 133.1,-246 126,-243 107.11,-235.01 86.32,-225.48 69.39,-217.51"/>
-<polygon fill="#000000" stroke="#000000" points="70.45,-214.14 59.91,-213.03 67.46,-220.47 70.45,-214.14"/>
-<text text-anchor="middle" x="97" y="-236.4" font-family="Helvetica,sans-Serif" font-size="9.50">WRF</text>
+<!-- type~type_wrf_ko&#45;&gt;type~base_wrf -->
+<g id="type~~base_wrf~~InheritedByGraph_edge3" class="edge">
+<title>type~type_wrf_ko&#45;&gt;type~base_wrf</title>
+<path fill="none" stroke="#ff0000" d="M144.96,-251.94C138.51,-249.3 131.94,-246.29 126,-243 112.39,-235.47 111.91,-228.96 98,-222"/>
+</g>
+<!-- type~type_wrf_durner -->
+<g id="type~~base_wrf~~InheritedByGraph_node3" class="node">
+<title>type~type_wrf_durner</title>
+<g id="a_type~~base_wrf~~InheritedByGraph_node3"><a xlink:href=".././type/type_wrf_durner.html" xlink:title="Type_WRF_Durner">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="236,-234 127,-234 127,-210 236,-210 236,-234"/>
+<text text-anchor="middle" x="181.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_Durner</text>
+</a>
+</g>
+</g>
+<!-- type~type_wrf_durner&#45;&gt;type~base_wrf -->
+<g id="type~~base_wrf~~InheritedByGraph_edge4" class="edge">
+<title>type~type_wrf_durner&#45;&gt;type~base_wrf</title>
+<path fill="none" stroke="#ff0000" d="M126.9,-229.07C116.91,-228.46 106.84,-226.42 98,-222"/>
 </g>
 <!-- type~type_wrf_bc -->
-<g id="type~~base_wrf~~InheritedByGraph_node3" class="node">
+<g id="type~~base_wrf~~InheritedByGraph_node4" class="node">
 <title>type~type_wrf_bc</title>
-<g id="a_type~~base_wrf~~InheritedByGraph_node3"><a xlink:href=".././type/type_wrf_bc.html" xlink:title="Type_WRF_BC">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="224,-234 139,-234 139,-210 224,-210 224,-234"/>
-<text text-anchor="middle" x="181.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_BC</text>
+<g id="a_type~~base_wrf~~InheritedByGraph_node4"><a xlink:href=".././type/type_wrf_bc.html" xlink:title="Type_WRF_BC">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="224,-192 139,-192 139,-168 224,-168 224,-192"/>
+<text text-anchor="middle" x="181.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_BC</text>
 </a>
 </g>
 </g>
 <!-- type~type_wrf_bc&#45;&gt;type~base_wrf -->
 <g id="type~~base_wrf~~InheritedByGraph_edge2" class="edge">
 <title>type~type_wrf_bc&#45;&gt;type~base_wrf</title>
-<path fill="none" stroke="#000000" d="M138.84,-210.02C134.17,-207.54 129.75,-204.56 126,-201 103.79,-179.89 124.67,-122.92 98,-138"/>
+<path fill="none" stroke="#ff0000" d="M144.96,-192.06C138.51,-194.7 131.94,-197.71 126,-201 112.39,-208.53 111.91,-228.96 98,-222"/>
+<path fill="none" stroke="#ff0000" d="M96,-222C70.35,-209.17 53.02,-179.84 43.58,-159.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="46.67,-157.81 39.46,-150.04 40.25,-160.61 46.67,-157.81"/>
 </g>
-<!-- type~type_wrf_ko -->
-<g id="type~~base_wrf~~InheritedByGraph_node4" class="node">
-<title>type~type_wrf_ko</title>
-<g id="a_type~~base_wrf~~InheritedByGraph_node4"><a xlink:href=".././type/type_wrf_ko.html" xlink:title="Type_WRF_KO">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="224,-192 139,-192 139,-168 224,-168 224,-192"/>
-<text text-anchor="middle" x="181.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_KO</text>
-</a>
-</g>
-</g>
-<!-- type~type_wrf_ko&#45;&gt;type~base_wrf -->
-<g id="type~~base_wrf~~InheritedByGraph_edge4" class="edge">
-<title>type~type_wrf_ko&#45;&gt;type~base_wrf</title>
-<path fill="none" stroke="#000000" d="M144.96,-167.94C138.51,-165.3 131.94,-162.29 126,-159 112.39,-151.47 111.54,-130.35 98,-138"/>
-</g>
-<!-- type~type_wrf_durner -->
+<!-- type~type_ice_gcc -->
 <g id="type~~base_wrf~~InheritedByGraph_node5" class="node">
-<title>type~type_wrf_durner</title>
-<g id="a_type~~base_wrf~~InheritedByGraph_node5"><a xlink:href=".././type/type_wrf_durner.html" xlink:title="Type_WRF_Durner">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="236,-150 127,-150 127,-126 236,-126 236,-150"/>
-<text text-anchor="middle" x="181.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_Durner</text>
+<title>type~type_ice_gcc</title>
+<g id="a_type~~base_wrf~~InheritedByGraph_node5"><a xlink:href=".././type/type_ice_gcc.html" xlink:title="Type_Ice_GCC">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="224.5,-150 138.5,-150 138.5,-126 224.5,-126 224.5,-150"/>
+<text text-anchor="middle" x="181.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Ice_GCC</text>
 </a>
 </g>
 </g>
-<!-- type~type_wrf_durner&#45;&gt;type~base_wrf -->
-<g id="type~~base_wrf~~InheritedByGraph_edge3" class="edge">
-<title>type~type_wrf_durner&#45;&gt;type~base_wrf</title>
-<path fill="none" stroke="#000000" d="M126.95,-130.19C116.85,-130.83 106.73,-133.07 98,-138"/>
-</g>
-<!-- type~type_wrf_vg -->
-<g id="type~~base_wrf~~InheritedByGraph_node6" class="node">
-<title>type~type_wrf_vg</title>
-<g id="a_type~~base_wrf~~InheritedByGraph_node6"><a xlink:href=".././type/type_wrf_vg.html" xlink:title="Type_WRF_VG">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="225,-108 138,-108 138,-84 225,-84 225,-108"/>
-<text text-anchor="middle" x="181.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_VG</text>
-</a>
-</g>
-</g>
-<!-- type~type_wrf_vg&#45;&gt;type~base_wrf -->
-<g id="type~~base_wrf~~InheritedByGraph_edge5" class="edge">
-<title>type~type_wrf_vg&#45;&gt;type~base_wrf</title>
-<path fill="none" stroke="#000000" d="M144.96,-108.06C138.51,-110.7 131.94,-113.71 126,-117 112.39,-124.53 111.54,-130.35 98,-138"/>
+<!-- type~type_ice_gcc&#45;&gt;type~base_wrf -->
+<g id="type~~base_wrf~~InheritedByGraph_edge1" class="edge">
+<title>type~type_ice_gcc&#45;&gt;type~base_wrf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M138.42,-138C119.58,-138 97.38,-138 78.4,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="78.22,-134.5 68.22,-138 78.22,-141.5 78.22,-134.5"/>
+<text text-anchor="middle" x="97" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">WRF</text>
 </g>
 <!-- type~type_wrf_mvg -->
-<g id="type~~base_wrf~~InheritedByGraph_node7" class="node">
+<g id="type~~base_wrf~~InheritedByGraph_node6" class="node">
 <title>type~type_wrf_mvg</title>
-<g id="a_type~~base_wrf~~InheritedByGraph_node7"><a xlink:href=".././type/type_wrf_mvg.html" xlink:title="Type_WRF_MVG">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="229.5,-66 133.5,-66 133.5,-42 229.5,-42 229.5,-66"/>
-<text text-anchor="middle" x="181.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_MVG</text>
+<g id="a_type~~base_wrf~~InheritedByGraph_node6"><a xlink:href=".././type/type_wrf_mvg.html" xlink:title="Type_WRF_MVG">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="229.5,-108 133.5,-108 133.5,-84 229.5,-84 229.5,-108"/>
+<text text-anchor="middle" x="181.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_MVG</text>
 </a>
 </g>
 </g>
 <!-- type~type_wrf_mvg&#45;&gt;type~base_wrf -->
-<g id="type~~base_wrf~~InheritedByGraph_edge6" class="edge">
+<g id="type~~base_wrf~~InheritedByGraph_edge5" class="edge">
 <title>type~type_wrf_mvg&#45;&gt;type~base_wrf</title>
-<path fill="none" stroke="#000000" d="M138.56,-66.12C133.99,-68.58 129.67,-71.51 126,-75 103.79,-96.11 124.67,-122.92 98,-138"/>
+<path fill="none" stroke="#ff0000" d="M144.96,-83.94C138.51,-81.3 131.94,-78.29 126,-75 112.39,-67.47 111.91,-47.04 98,-54"/>
+</g>
+<!-- type~type_wrf_vg -->
+<g id="type~~base_wrf~~InheritedByGraph_node7" class="node">
+<title>type~type_wrf_vg</title>
+<g id="a_type~~base_wrf~~InheritedByGraph_node7"><a xlink:href=".././type/type_wrf_vg.html" xlink:title="Type_WRF_VG">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="225,-66 138,-66 138,-42 225,-42 225,-66"/>
+<text text-anchor="middle" x="181.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_WRF_VG</text>
+</a>
+</g>
+</g>
+<!-- type~type_wrf_vg&#45;&gt;type~base_wrf -->
+<g id="type~~base_wrf~~InheritedByGraph_edge6" class="edge">
+<title>type~type_wrf_vg&#45;&gt;type~base_wrf</title>
+<path fill="none" stroke="#ff0000" d="M137.67,-46.77C124.36,-46.38 110.04,-47.98 98,-54"/>
 </g>
 <!-- type~type_wrf_dvgch -->
 <g id="type~~base_wrf~~InheritedByGraph_node8" class="node">
@@ -251,9 +259,9 @@
 <!-- type~type_wrf_dvgch&#45;&gt;type~base_wrf -->
 <g id="type~~base_wrf~~InheritedByGraph_edge7" class="edge">
 <title>type~type_wrf_dvgch&#45;&gt;type~base_wrf</title>
-<path fill="none" stroke="#000000" d="M137.2,-24.05C133.04,-26.5 129.18,-29.45 126,-33 93.73,-68.93 140.04,-114.23 98,-138"/>
-<path fill="none" stroke="#000000" d="M96,-138C77.34,-148.55 60.76,-166.55 49.61,-180.61"/>
-<polygon fill="#000000" stroke="#000000" points="46.68,-178.68 43.4,-188.76 52.24,-182.93 46.68,-178.68"/>
+<path fill="none" stroke="#ff0000" d="M144.96,-24.06C138.51,-26.7 131.94,-29.71 126,-33 112.39,-40.53 111.91,-47.04 98,-54"/>
+<path fill="none" stroke="#ff0000" d="M96,-54C70.35,-66.83 53.02,-96.16 43.58,-116.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="40.25,-115.39 39.46,-125.96 46.67,-118.19 40.25,-115.39"/>
 </g>
 </g>
 </svg>
@@ -289,7 +297,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -306,6 +314,12 @@
       <a class="list-group-item" href="../type/base_wrf.html#variable-thetas~4">thetaS</a>
       <a class="list-group-item" href="../type/base_wrf.html#variable-thetar~4">thetaR</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/base_wrf.html#src">Base_WRF</a>
   </div>
 </div>
 
@@ -336,6 +350,14 @@
     
     
     
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Base_WRF</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">thetaS</span><span class="p">,</span><span class="w"> </span><span class="n">thetaR</span><span class="w"></span>
+<span class="w">    </span><span class="k">end type </span><span class="n">Base_WRF</span><span class="w"></span>
+</pre></div>
+
+    </section>
     
     </div>
   </div>
@@ -345,14 +367,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

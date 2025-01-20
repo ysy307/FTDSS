@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Allocate_Structure_WRF_Type &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Allocate_Structure_WRF_Type &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.1% of total for procedures.">27 statements</a>
+    title=" 1.0% of total for procedures.">28 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Allocate_Structure.f90"> Source File</a></li>
   </ul>
@@ -114,7 +114,12 @@
     <div id="sidebar">
   <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/allocate_structure_wrf_type.html#src">Allocate_Structure_WRF_Type</a>
+  </div>
+</div>
 
 </div>
 
@@ -149,7 +154,12 @@
     <section class="visible-xs visible-sm hidden-md">
       <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/allocate_structure_wrf_type.html#src">Allocate_Structure_WRF_Type</a>
+  </div>
+</div>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
@@ -163,6 +173,43 @@
 
 
     
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">Allocate_Structure_WRF_Type</span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">,</span><span class="w"> </span><span class="n">WRFModelType</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="c">! Allocate WRF model type</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        type</span><span class="p">(</span><span class="n">Type_Thermal</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="w"> </span><span class="c">! Thermal structure</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">WRFModelType</span><span class="w"> </span><span class="c">! WRF model type</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">Ice</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Error: Ice structure is not allocated.&quot;</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+<span class="k">        select type</span><span class="w"> </span><span class="p">(</span><span class="n">Ice</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Structure_Thermal</span><span class="p">%</span><span class="n">Ice</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">Type_Ice_GCC</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">WRFModelType</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_WRF_BC</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">WRF</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_WRF_VG</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">WRF</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_WRF_KO</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">WRF</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_WRF_MVG</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">WRF</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_WRF_Durner</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">WRF</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_WRF_DVGCH</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">WRF</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">case </span><span class="n">default</span><span class="w"></span>
+<span class="w">                </span><span class="k">print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Error: WRFModelType is not defined.&quot;</span><span class="w"></span>
+<span class="w">            </span><span class="k">end select</span>
+<span class="k">        end select</span>
+
+<span class="k">    end subroutine </span><span class="n">Allocate_Structure_WRF_Type</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
     
     </div>
   </div>
@@ -172,14 +219,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

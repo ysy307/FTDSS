@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Type_Thermal &ndash; Freezing Thawing Dynamics Simulation Solver </title>
+    <title>Type_Thermal &ndash; FTDSS </title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 1.8% of total for derived types.</p>Including implementation: 7 statements,  1.0% of total for derived types.">7 statements</a>
+    title="<p> 1.7% of total for derived types.</p>Including implementation: 7 statements,  1.0% of total for derived types.">7 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Types.f90"> Source File</a></li>
   </ul>
@@ -124,6 +124,12 @@
       <a class="list-group-item" href="../type/type_thermal.html#variable-porosity">Porosity</a>
       <a class="list-group-item" href="../type/type_thermal.html#variable-ice~4">Ice</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/type_thermal.html#src">Type_Thermal</a>
   </div>
 </div>
 
@@ -168,57 +174,57 @@
 <!-- type~type_thermal&#45;&gt;type~base_density -->
 <g id="type~~type_thermal~~InheritsGraph_edge1" class="edge">
 <title>type~type_thermal&#45;&gt;type~base_density</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M308.94,-87C298.12,-91.91 285.13,-97.29 273,-101 225.38,-115.57 169.36,-125.5 129.7,-131.38"/>
-<polygon fill="#000000" stroke="#000000" points="129.13,-127.92 119.73,-132.82 130.13,-134.85 129.13,-127.92"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M308.94,-87C298.12,-91.91 285.13,-97.29 273,-101 225.38,-115.57 169.36,-125.5 129.7,-131.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="129.13,-127.92 119.73,-132.82 130.13,-134.85 129.13,-127.92"/>
 <text text-anchor="middle" x="223" y="-126.4" font-family="Helvetica,sans-Serif" font-size="9.50">Density</text>
 </g>
-<!-- type~base_ice -->
-<g id="type~~type_thermal~~InheritsGraph_node3" class="node">
-<title>type~base_ice</title>
-<g id="a_type~~type_thermal~~InheritsGraph_node3"><a xlink:href=".././type/base_ice.html" xlink:title="Base_Ice">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="107.5,-108 47.5,-108 47.5,-84 107.5,-84 107.5,-108"/>
-<text text-anchor="middle" x="77.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Base_Ice</text>
-</a>
-</g>
-</g>
-<!-- type~type_thermal&#45;&gt;type~base_ice -->
-<g id="type~~type_thermal~~InheritsGraph_edge4" class="edge">
-<title>type~type_thermal&#45;&gt;type~base_ice</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M290.82,-78.51C242.58,-82.49 164.68,-88.9 117.85,-92.76"/>
-<polygon fill="#000000" stroke="#000000" points="117.47,-89.28 107.79,-93.59 118.04,-96.26 117.47,-89.28"/>
-<text text-anchor="middle" x="223" y="-89.4" font-family="Helvetica,sans-Serif" font-size="9.50">Ice</text>
-</g>
-<!-- type~base_thermalconductivity -->
-<g id="type~~type_thermal~~InheritsGraph_node4" class="node">
-<title>type~base_thermalconductivity</title>
-<g id="a_type~~type_thermal~~InheritsGraph_node4"><a xlink:href=".././type/base_thermalconductivity.html" xlink:title="Base_ThermalConductivity">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="155,-66 0,-66 0,-42 155,-42 155,-66"/>
-<text text-anchor="middle" x="77.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Base_ThermalConductivity</text>
-</a>
-</g>
-</g>
-<!-- type~type_thermal&#45;&gt;type~base_thermalconductivity -->
-<g id="type~~type_thermal~~InheritsGraph_edge3" class="edge">
-<title>type~type_thermal&#45;&gt;type~base_thermalconductivity</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M290.96,-66.56C284.95,-65.57 278.83,-64.68 273,-64 238,-59.94 199.26,-57.52 165.63,-56.09"/>
-<polygon fill="#000000" stroke="#000000" points="165.5,-52.58 155.36,-55.68 165.21,-59.58 165.5,-52.58"/>
-<text text-anchor="middle" x="223" y="-66.4" font-family="Helvetica,sans-Serif" font-size="9.50">ThermalConductivity</text>
-</g>
 <!-- type~base_specificheat -->
-<g id="type~~type_thermal~~InheritsGraph_node5" class="node">
+<g id="type~~type_thermal~~InheritsGraph_node3" class="node">
 <title>type~base_specificheat</title>
-<g id="a_type~~type_thermal~~InheritsGraph_node5"><a xlink:href=".././type/base_specificheat.html" xlink:title="Base_SpecificHeat">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="133.5,-24 21.5,-24 21.5,0 133.5,0 133.5,-24"/>
-<text text-anchor="middle" x="77.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Base_SpecificHeat</text>
+<g id="a_type~~type_thermal~~InheritsGraph_node3"><a xlink:href=".././type/base_specificheat.html" xlink:title="Base_SpecificHeat">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="133.5,-108 21.5,-108 21.5,-84 133.5,-84 133.5,-108"/>
+<text text-anchor="middle" x="77.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Base_SpecificHeat</text>
 </a>
 </g>
 </g>
 <!-- type~type_thermal&#45;&gt;type~base_specificheat -->
 <g id="type~~type_thermal~~InheritsGraph_edge2" class="edge">
 <title>type~type_thermal&#45;&gt;type~base_specificheat</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M315.46,-63C303.81,-55.81 288.07,-47.1 273,-42 231.26,-27.88 182.21,-20.37 143.81,-16.4"/>
-<polygon fill="#000000" stroke="#000000" points="144.07,-12.91 133.78,-15.42 143.39,-19.88 144.07,-12.91"/>
-<text text-anchor="middle" x="223" y="-44.4" font-family="Helvetica,sans-Serif" font-size="9.50">SpecificHeat</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M290.82,-78.51C250.75,-81.81 190.22,-86.8 144.03,-90.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="143.49,-87.14 133.81,-91.44 144.07,-94.11 143.49,-87.14"/>
+<text text-anchor="middle" x="223" y="-89.4" font-family="Helvetica,sans-Serif" font-size="9.50">SpecificHeat</text>
+</g>
+<!-- type~base_ice -->
+<g id="type~~type_thermal~~InheritsGraph_node4" class="node">
+<title>type~base_ice</title>
+<g id="a_type~~type_thermal~~InheritsGraph_node4"><a xlink:href=".././type/base_ice.html" xlink:title="Base_Ice">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="107.5,-66 47.5,-66 47.5,-42 107.5,-42 107.5,-66"/>
+<text text-anchor="middle" x="77.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Base_Ice</text>
+</a>
+</g>
+</g>
+<!-- type~type_thermal&#45;&gt;type~base_ice -->
+<g id="type~~type_thermal~~InheritsGraph_edge4" class="edge">
+<title>type~type_thermal&#45;&gt;type~base_ice</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M290.92,-68.2C284.91,-67.37 278.81,-66.61 273,-66 219.37,-60.37 157.13,-57.1 117.78,-55.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="117.7,-51.92 107.56,-55.01 117.41,-58.92 117.7,-51.92"/>
+<text text-anchor="middle" x="223" y="-68.4" font-family="Helvetica,sans-Serif" font-size="9.50">Ice</text>
+</g>
+<!-- type~base_thermalconductivity -->
+<g id="type~~type_thermal~~InheritsGraph_node5" class="node">
+<title>type~base_thermalconductivity</title>
+<g id="a_type~~type_thermal~~InheritsGraph_node5"><a xlink:href=".././type/base_thermalconductivity.html" xlink:title="Base_ThermalConductivity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="155,-24 0,-24 0,0 155,0 155,-24"/>
+<text text-anchor="middle" x="77.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Base_ThermalConductivity</text>
+</a>
+</g>
+</g>
+<!-- type~type_thermal&#45;&gt;type~base_thermalconductivity -->
+<g id="type~~type_thermal~~InheritsGraph_edge3" class="edge">
+<title>type~type_thermal&#45;&gt;type~base_thermalconductivity</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M313.74,-62.89C302.24,-56.36 287.24,-48.69 273,-44 238.54,-32.64 199.25,-25.21 165.06,-20.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="165.47,-16.91 155.09,-19.04 164.53,-23.85 165.47,-16.91"/>
+<text text-anchor="middle" x="223" y="-46.4" font-family="Helvetica,sans-Serif" font-size="9.50">ThermalConductivity</text>
 </g>
 </g>
 </svg>
@@ -254,7 +260,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -293,8 +299,8 @@
 <!-- type~type_region&#45;&gt;type~type_thermal -->
 <g id="type~~type_thermal~~InheritedByGraph_edge1" class="edge">
 <title>type~type_region&#45;&gt;type~type_thermal</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M162.69,-12C143.03,-12 118.85,-12 97.5,-12"/>
-<polygon fill="#000000" stroke="#000000" points="97.28,-8.5 87.28,-12 97.28,-15.5 97.28,-8.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M162.69,-12C143.03,-12 118.85,-12 97.5,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="97.28,-8.5 87.28,-12 97.28,-15.5 97.28,-8.5"/>
 <text text-anchor="middle" x="125" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">Thermal</text>
 </g>
 </g>
@@ -331,7 +337,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -351,6 +357,12 @@
       <a class="list-group-item" href="../type/type_thermal.html#variable-porosity">Porosity</a>
       <a class="list-group-item" href="../type/type_thermal.html#variable-ice~4">Ice</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/type_thermal.html#src">Type_Thermal</a>
   </div>
 </div>
 
@@ -396,6 +408,19 @@
     
     
     
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Type_Thermal</span><span class="w"></span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Base_Density</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Density</span><span class="w"></span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Base_SpecificHeat</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">SpecificHeat</span><span class="w"></span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Base_ThermalConductivity</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ThermalConductivity</span><span class="w"></span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Porosity</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Base_Ice</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="w"></span>
+<span class="w">    </span><span class="k">end type </span><span class="n">Type_Thermal</span><span class="w"></span>
+</pre></div>
+
+    </section>
     
     </div>
   </div>
@@ -405,14 +430,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

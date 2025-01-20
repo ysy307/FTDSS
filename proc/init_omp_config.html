@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>init_omp_config &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>init_omp_config &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.9% of total for procedures.">11 statements</a>
+    title=" 0.4% of total for procedures.">11 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Stdout.f90"> Source File</a></li>
   </ul>
@@ -114,7 +114,12 @@
     <div id="sidebar">
   <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/init_omp_config.html#src">init_omp_config</a>
+  </div>
+</div>
 
 </div>
 
@@ -130,7 +135,7 @@
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
 <tr>
-  <td><span class="anchor" id="variable-solver~6"></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+  <td><span class="anchor" id="variable-solver~17"></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
 <td>intent(inout)</td>
   <td></td>  <td></td><td>::</td>
   <td><strong>Solver</strong></td><td></td>
@@ -170,8 +175,8 @@
 <!-- proc~init_omp_config&#45;&gt;omp_set_max_active_levels -->
 <g id="proc~~init_omp_config~~CallsGraph_edge1" class="edge">
 <title>proc~init_omp_config&#45;&gt;omp_set_max_active_levels</title>
-<path fill="none" stroke="#000000" d="M96.07,-66.04C114.59,-70.82 136.09,-76.38 155.49,-81.4"/>
-<polygon fill="#000000" stroke="#000000" points="154.87,-84.85 165.43,-83.96 156.62,-78.07 154.87,-84.85"/>
+<path fill="none" stroke="#ff0000" d="M96.07,-66.04C114.59,-70.82 136.09,-76.38 155.49,-81.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="154.87,-84.85 165.43,-83.96 156.62,-78.07 154.87,-84.85"/>
 </g>
 <!-- omp_get_max_threads -->
 <g id="proc~~init_omp_config~~CallsGraph_node3" class="node">
@@ -182,8 +187,8 @@
 <!-- proc~init_omp_config&#45;&gt;omp_get_max_threads -->
 <g id="proc~~init_omp_config~~CallsGraph_edge2" class="edge">
 <title>proc~init_omp_config&#45;&gt;omp_get_max_threads</title>
-<path fill="none" stroke="#000000" d="M97.38,-54C109.61,-54 123.07,-54 136.33,-54"/>
-<polygon fill="#000000" stroke="#000000" points="136.4,-57.5 146.4,-54 136.4,-50.5 136.4,-57.5"/>
+<path fill="none" stroke="#ff0000" d="M97.38,-54C109.61,-54 123.07,-54 136.33,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="136.4,-57.5 146.4,-54 136.4,-50.5 136.4,-57.5"/>
 </g>
 <!-- omp_get_num_procs -->
 <g id="proc~~init_omp_config~~CallsGraph_node4" class="node">
@@ -194,8 +199,8 @@
 <!-- proc~init_omp_config&#45;&gt;omp_get_num_procs -->
 <g id="proc~~init_omp_config~~CallsGraph_edge3" class="edge">
 <title>proc~init_omp_config&#45;&gt;omp_get_num_procs</title>
-<path fill="none" stroke="#000000" d="M96.07,-41.96C114.59,-37.18 136.09,-31.62 155.49,-26.6"/>
-<polygon fill="#000000" stroke="#000000" points="156.62,-29.93 165.43,-24.04 154.87,-23.15 156.62,-29.93"/>
+<path fill="none" stroke="#ff0000" d="M96.07,-41.96C114.59,-37.18 136.09,-31.62 155.49,-26.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="156.62,-29.93 165.43,-24.04 154.87,-23.15 156.62,-29.93"/>
 </g>
 </g>
 </svg>
@@ -255,7 +260,7 @@
     <p>Solid arrows point from a procedure to one which it calls. Dashed 
     arrows point from an interface to procedures which implement that interface.
     This could include the module procedures in a generic interface or the
-    implementation in a submodule of an interface in a parent module.
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -265,7 +270,12 @@
     <section class="visible-xs visible-sm hidden-md">
       <h3>Contents</h3>
  
-<em>None</em>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/init_omp_config.html#src">init_omp_config</a>
+  </div>
+</div>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
@@ -279,6 +289,26 @@
 
 
     
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">init_omp_config</span><span class="p">(</span><span class="n">Solver</span><span class="p">)</span><span class="w"></span>
+<span class="w">		</span><span class="k">type</span><span class="p">(</span><span class="n">SolverInfo</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Solver</span><span class="w"></span>
+<span class="w">		</span><span class="c">! OpenMPの設定</span>
+<span class="w">		</span><span class="c">! call omp_set_dynamic(TRUE)</span>
+<span class="w">		</span><span class="k">call </span><span class="n">omp_set_max_active_levels</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Solver</span><span class="p">%</span><span class="n">Flags</span><span class="p">%</span><span class="n">isStdOut</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w">    </span><span class="s1">&#39;&#39;</span><span class="w"></span>
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Solver</span><span class="p">%</span><span class="n">Flags</span><span class="p">%</span><span class="n">isStdOut</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w">    </span><span class="s1">&#39;OpenMP Properties&#39;</span><span class="w"></span>
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Solver</span><span class="p">%</span><span class="n">Flags</span><span class="p">%</span><span class="n">isStdOut</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w">    </span><span class="s1">&#39;-------------------------------------&#39;</span><span class="w"></span>
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Solver</span><span class="p">%</span><span class="n">Flags</span><span class="p">%</span><span class="n">isStdOut</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,i0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Max number of threads           = &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">omp_get_max_threads</span><span class="p">()</span><span class="w"></span>
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Solver</span><span class="p">%</span><span class="n">Flags</span><span class="p">%</span><span class="n">isStdOut</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,i0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Number of processors availables = &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">omp_get_num_procs</span><span class="p">()</span><span class="w"></span>
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Solver</span><span class="p">%</span><span class="n">Flags</span><span class="p">%</span><span class="n">isStdOut</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w">    </span><span class="s1">&#39;-------------------------------------&#39;</span><span class="w"></span>
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Solver</span><span class="p">%</span><span class="n">Flags</span><span class="p">%</span><span class="n">isStdOut</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w">    </span><span class="s1">&#39;&#39;</span><span class="w"></span>
+<span class="w">	</span><span class="k">end subroutine </span><span class="n">init_omp_config</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
     
     </div>
   </div>
@@ -288,14 +318,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

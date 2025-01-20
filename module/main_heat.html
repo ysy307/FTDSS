@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Main_Heat &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Main_Heat &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 3.1% of total for modules and submodules.">113 statements</a>
+    title=" 3.0% of total for modules and submodules.">113 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Heat.f90"> Source File</a></li>
   </ul>
@@ -114,6 +114,14 @@
   <h3>Contents</h3>
  
 <div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
+  <div id="vars-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/main_heat.html#variable-calc_heat">Calc_Heat</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#inters-0">Interfaces</a></h3></div>
   <div id="inters-0" class="panel-collapse collapse">
     <div class="list-group">
@@ -126,6 +134,25 @@
   <div id="types-0" class="panel-collapse collapse">
     <div class="list-group">
       <a class="list-group-item" href="../module/main_heat.html#type-heat">Heat</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-0">Functions</a></h3></div>
+  <div id="funcs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/main_heat.html#proc-heat_constructor">Heat_Constructor</a>
+      <a class="list-group-item" href="../module/main_heat.html#proc-condition_heat">Condition_Heat</a>
+      <a class="list-group-item" href="../module/main_heat.html#proc-condition_in_boundarycondition">Condition_In_BoundaryCondition</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/main_heat.html#proc-set_geometory_infomation">Set_Geometory_Infomation</a>
+      <a class="list-group-item" href="../module/main_heat.html#proc-set_boundary_condition_infomations">Set_Boundary_Condition_Infomations</a>
     </div>
   </div>
 </div>
@@ -143,12 +170,12 @@
       <ul class="list-group">
       <li class="list-group-item">
   <ul class="list-inline">
-    <li><a href='../module/allocate.html'>Allocate</a></li>
+    <li><a href='../module/types.html'>Types</a></li>
     <li><a href='../module/allocate_structure.html'>Allocate_Structure</a></li>
     <li>Inout_Input</li>
+    <li><a href='../module/allocate.html'>Allocate</a></li>
     <li><a href="http://fortranwiki.org/fortran/show/iso_fortran_env">iso_fortran_env</a></li>
     <li><a href='../module/calculate_hcf.html'>Calculate_HCF</a></li>
-    <li><a href='../module/types.html'>Types</a></li>
   </ul>
       </li>
       <li class="list-group-item">
@@ -169,102 +196,117 @@
 <polygon fill="none" stroke="black" points="563,-66 494,-66 494,-42 563,-42 563,-66"/>
 <text text-anchor="middle" x="528.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">Main_Heat</text>
 </g>
-<!-- module~allocate -->
-<g id="module~~main_heat~~UsesGraph_node2" class="node">
-<title>module~allocate</title>
-<g id="a_module~~main_heat~~UsesGraph_node2"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
-<polygon fill="#337ab7" stroke="#337ab7" points="295,-66 239,-66 239,-42 295,-42 295,-66"/>
-<text text-anchor="middle" x="267" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
-</a>
-</g>
-</g>
-<!-- module~main_heat&#45;&gt;module~allocate -->
-<g id="module~~main_heat~~UsesGraph_edge1" class="edge">
-<title>module~main_heat&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M495.42,-66.07C470.74,-74.95 435.62,-86.69 404,-94"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M402,-94C364.76,-102.61 322.64,-85.5 295.73,-71.05"/>
-<polygon fill="#000000" stroke="#000000" points="297.32,-67.93 286.88,-66.1 293.9,-74.04 297.32,-67.93"/>
-</g>
-<!-- Inout_Input -->
-<g id="module~~main_heat~~UsesGraph_node3" class="node">
-<title>Inout_Input</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="439,-24 367,-24 367,0 439,0 439,-24"/>
-<text text-anchor="middle" x="403" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Input</text>
-</g>
-<!-- module~main_heat&#45;&gt;Inout_Input -->
-<g id="module~~main_heat~~UsesGraph_edge2" class="edge">
-<title>module~main_heat&#45;&gt;Inout_Input</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M493.75,-42.52C479.93,-37.82 463.72,-32.31 448.92,-27.28"/>
-<polygon fill="#000000" stroke="#000000" points="450.03,-23.96 439.43,-24.05 447.77,-30.58 450.03,-23.96"/>
-</g>
 <!-- module~types -->
-<g id="module~~main_heat~~UsesGraph_node4" class="node">
+<g id="module~~main_heat~~UsesGraph_node2" class="node">
 <title>module~types</title>
-<g id="a_module~~main_heat~~UsesGraph_node4"><a xlink:href=".././module/types.html" xlink:title="Types">
+<g id="a_module~~main_heat~~UsesGraph_node2"><a xlink:href=".././module/types.html" xlink:title="Types">
 <polygon fill="#337ab7" stroke="#337ab7" points="186,-106 132,-106 132,-82 186,-82 186,-106"/>
 <text text-anchor="middle" x="159" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
 </a>
 </g>
 </g>
 <!-- module~main_heat&#45;&gt;module~types -->
-<g id="module~~main_heat~~UsesGraph_edge3" class="edge">
+<g id="module~~main_heat~~UsesGraph_edge1" class="edge">
 <title>module~main_heat&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M402,-94C343.98,-107.42 327.4,-89.66 268,-94"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402,-94C343.98,-107.42 327.4,-89.66 268,-94"/>
 </g>
 <!-- module~allocate_structure -->
-<g id="module~~main_heat~~UsesGraph_node5" class="node">
+<g id="module~~main_heat~~UsesGraph_node3" class="node">
 <title>module~allocate_structure</title>
-<g id="a_module~~main_heat~~UsesGraph_node5"><a xlink:href=".././module/allocate_structure.html" xlink:title="Allocate_Structure">
+<g id="a_module~~main_heat~~UsesGraph_node3"><a xlink:href=".././module/allocate_structure.html" xlink:title="Allocate_Structure">
 <polygon fill="#337ab7" stroke="#337ab7" points="458,-66 348,-66 348,-42 458,-42 458,-66"/>
 <text text-anchor="middle" x="403" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Structure</text>
 </a>
 </g>
 </g>
 <!-- module~main_heat&#45;&gt;module~allocate_structure -->
-<g id="module~~main_heat~~UsesGraph_edge4" class="edge">
+<g id="module~~main_heat~~UsesGraph_edge2" class="edge">
 <title>module~main_heat&#45;&gt;module~allocate_structure</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M493.75,-54C485.85,-54 477.17,-54 468.41,-54"/>
-<polygon fill="#000000" stroke="#000000" points="468.15,-50.5 458.15,-54 468.15,-57.5 468.15,-50.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M493.75,-54C485.85,-54 477.17,-54 468.41,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="468.15,-50.5 458.15,-54 468.15,-57.5 468.15,-50.5"/>
 </g>
-<!-- module~calculate_hcf -->
-<g id="module~~main_heat~~UsesGraph_node6" class="node">
-<title>module~calculate_hcf</title>
-<g id="a_module~~main_heat~~UsesGraph_node6"><a xlink:href=".././module/calculate_hcf.html" xlink:title="Calculate_HCF">
-<polygon fill="#337ab7" stroke="#337ab7" points="312,-146 222,-146 222,-122 312,-122 312,-146"/>
-<text text-anchor="middle" x="267" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_HCF</text>
+<!-- Inout_Input -->
+<g id="module~~main_heat~~UsesGraph_node4" class="node">
+<title>Inout_Input</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="439,-24 367,-24 367,0 439,0 439,-24"/>
+<text text-anchor="middle" x="403" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Input</text>
+</g>
+<!-- module~main_heat&#45;&gt;Inout_Input -->
+<g id="module~~main_heat~~UsesGraph_edge3" class="edge">
+<title>module~main_heat&#45;&gt;Inout_Input</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M493.75,-42.52C479.93,-37.82 463.72,-32.31 448.92,-27.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="450.03,-23.96 439.43,-24.05 447.77,-30.58 450.03,-23.96"/>
+</g>
+<!-- module~allocate -->
+<g id="module~~main_heat~~UsesGraph_node5" class="node">
+<title>module~allocate</title>
+<g id="a_module~~main_heat~~UsesGraph_node5"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="295,-66 239,-66 239,-42 295,-42 295,-66"/>
+<text text-anchor="middle" x="267" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
 </a>
 </g>
 </g>
-<!-- module~main_heat&#45;&gt;module~calculate_hcf -->
-<g id="module~~main_heat~~UsesGraph_edge5" class="edge">
-<title>module~main_heat&#45;&gt;module~calculate_hcf</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M402,-94C372.24,-100.88 339.37,-110.66 313.64,-118.83"/>
-<polygon fill="#000000" stroke="#000000" points="312.24,-115.6 303.79,-121.98 314.38,-122.26 312.24,-115.6"/>
+<!-- module~main_heat&#45;&gt;module~allocate -->
+<g id="module~~main_heat~~UsesGraph_edge4" class="edge">
+<title>module~main_heat&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M495.42,-66.07C470.74,-74.95 435.62,-86.69 404,-94"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402,-94C364.76,-102.61 322.64,-85.5 295.73,-71.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="297.32,-67.93 286.88,-66.1 293.9,-74.04 297.32,-67.93"/>
 </g>
 <!-- iso_fortran_env -->
-<g id="module~~main_heat~~UsesGraph_node7" class="node">
+<g id="module~~main_heat~~UsesGraph_node6" class="node">
 <title>iso_fortran_env</title>
-<g id="a_module~~main_heat~~UsesGraph_node7"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<g id="a_module~~main_heat~~UsesGraph_node6"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
 <polygon fill="#337ab7" stroke="#337ab7" points="95,-87 1,-87 1,-63 95,-63 95,-87"/>
 <text text-anchor="middle" x="48" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
 </a>
 </g>
 </g>
 <!-- module~main_heat&#45;&gt;iso_fortran_env -->
-<g id="module~~main_heat~~UsesGraph_edge6" class="edge">
+<g id="module~~main_heat~~UsesGraph_edge5" class="edge">
 <title>module~main_heat&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M402,-94C354.92,-104.89 357.22,-137.98 312,-155 248.28,-178.98 225.57,-192.33 160,-174"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402,-94C354.92,-104.89 357.22,-137.98 312,-155 248.28,-178.98 225.57,-192.33 160,-174"/>
 </g>
-<!-- module~allocate&#45;&gt;module~types -->
-<g id="module~~main_heat~~UsesGraph_edge8" class="edge">
-<title>module~allocate&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.98,-64.2C225.82,-69.16 209.83,-75.2 195.68,-80.54"/>
-<polygon fill="#000000" stroke="#000000" points="194.36,-77.29 186.24,-84.1 196.83,-83.84 194.36,-77.29"/>
+<!-- module~calculate_hcf -->
+<g id="module~~main_heat~~UsesGraph_node7" class="node">
+<title>module~calculate_hcf</title>
+<g id="a_module~~main_heat~~UsesGraph_node7"><a xlink:href=".././module/calculate_hcf.html" xlink:title="Calculate_HCF">
+<polygon fill="#337ab7" stroke="#337ab7" points="312,-146 222,-146 222,-122 312,-122 312,-146"/>
+<text text-anchor="middle" x="267" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_HCF</text>
+</a>
 </g>
-<!-- module~allocate&#45;&gt;iso_fortran_env -->
+</g>
+<!-- module~main_heat&#45;&gt;module~calculate_hcf -->
+<g id="module~~main_heat~~UsesGraph_edge6" class="edge">
+<title>module~main_heat&#45;&gt;module~calculate_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402,-94C372.24,-100.88 339.37,-110.66 313.64,-118.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="312.24,-115.6 303.79,-121.98 314.38,-122.26 312.24,-115.6"/>
+</g>
+<!-- module~types&#45;&gt;iso_fortran_env -->
 <g id="module~~main_heat~~UsesGraph_edge7" class="edge">
-<title>module~allocate&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.73,-51.26C217.17,-49.75 186.41,-49.06 160,-54"/>
+<title>module~types&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M131.89,-89.45C123.84,-88.05 114.65,-86.44 105.38,-84.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="105.8,-81.35 95.35,-83.08 104.6,-88.24 105.8,-81.35"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~types -->
+<g id="module~~main_heat~~UsesGraph_edge11" class="edge">
+<title>module~allocate_structure&#45;&gt;module~types</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M374.44,-66.07C347.8,-76.81 306.02,-91.22 268,-94"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M266,-94C242.87,-95.69 216.82,-95.72 196.34,-95.31"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="196.26,-91.81 186.18,-95.06 196.09,-98.8 196.26,-91.81"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;module~allocate -->
+<g id="module~~main_heat~~UsesGraph_edge9" class="edge">
+<title>module~allocate_structure&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M347.88,-54C333.55,-54 318.41,-54 305.2,-54"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="305.08,-50.5 295.08,-54 305.08,-57.5 305.08,-50.5"/>
+</g>
+<!-- module~allocate_structure&#45;&gt;iso_fortran_env -->
+<g id="module~~main_heat~~UsesGraph_edge10" class="edge">
+<title>module~allocate_structure&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M266,-14C215.71,-11.41 209.49,-44.74 160,-54"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M158,-54C140.9,-57.2 122.31,-60.76 105.4,-64.02"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="104.28,-60.67 95.12,-66 105.6,-67.54 104.28,-60.67"/>
 </g>
 <!-- module~error -->
 <g id="module~~main_heat~~UsesGraph_node8" class="node">
@@ -275,63 +317,48 @@
 </a>
 </g>
 </g>
-<!-- module~allocate&#45;&gt;module~error -->
-<g id="module~~main_heat~~UsesGraph_edge9" class="edge">
-<title>module~allocate&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M238.98,-43.8C225.82,-38.84 209.83,-32.8 195.68,-27.46"/>
-<polygon fill="#000000" stroke="#000000" points="196.83,-24.16 186.24,-23.9 194.36,-30.71 196.83,-24.16"/>
-</g>
-<!-- module~types&#45;&gt;iso_fortran_env -->
-<g id="module~~main_heat~~UsesGraph_edge10" class="edge">
-<title>module~types&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-89.45C123.84,-88.05 114.65,-86.44 105.38,-84.83"/>
-<polygon fill="#000000" stroke="#000000" points="105.8,-81.35 95.35,-83.08 104.6,-88.24 105.8,-81.35"/>
-</g>
-<!-- module~allocate_structure&#45;&gt;module~allocate -->
-<g id="module~~main_heat~~UsesGraph_edge11" class="edge">
-<title>module~allocate_structure&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M347.88,-54C333.55,-54 318.41,-54 305.2,-54"/>
-<polygon fill="#000000" stroke="#000000" points="305.08,-50.5 295.08,-54 305.08,-57.5 305.08,-50.5"/>
-</g>
-<!-- module~allocate_structure&#45;&gt;module~types -->
-<g id="module~~main_heat~~UsesGraph_edge13" class="edge">
-<title>module~allocate_structure&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M374.44,-66.07C347.8,-76.81 306.02,-91.22 268,-94"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M266,-94C242.87,-95.69 216.82,-95.72 196.34,-95.31"/>
-<polygon fill="#000000" stroke="#000000" points="196.26,-91.81 186.18,-95.06 196.09,-98.8 196.26,-91.81"/>
-</g>
-<!-- module~allocate_structure&#45;&gt;iso_fortran_env -->
-<g id="module~~main_heat~~UsesGraph_edge12" class="edge">
-<title>module~allocate_structure&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M266,-14C215.71,-11.41 209.49,-44.74 160,-54"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158,-54C140.9,-57.2 122.31,-60.76 105.4,-64.02"/>
-<polygon fill="#000000" stroke="#000000" points="104.28,-60.67 95.12,-66 105.6,-67.54 104.28,-60.67"/>
-</g>
 <!-- module~allocate_structure&#45;&gt;module~error -->
-<g id="module~~main_heat~~UsesGraph_edge14" class="edge">
+<g id="module~~main_heat~~UsesGraph_edge8" class="edge">
 <title>module~allocate_structure&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M368.4,-41.98C335.49,-30.57 287.52,-15.01 268,-14"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M266,-14C242.84,-12.81 216.79,-12.79 196.31,-13.08"/>
-<polygon fill="#000000" stroke="#000000" points="196.09,-9.58 186.16,-13.25 196.21,-16.58 196.09,-9.58"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M368.4,-41.98C335.49,-30.57 287.52,-15.01 268,-14"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M266,-14C242.84,-12.81 216.79,-12.79 196.31,-13.08"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="196.09,-9.58 186.16,-13.25 196.21,-16.58 196.09,-9.58"/>
+</g>
+<!-- module~allocate&#45;&gt;module~types -->
+<g id="module~~main_heat~~UsesGraph_edge14" class="edge">
+<title>module~allocate&#45;&gt;module~types</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M238.98,-64.2C225.82,-69.16 209.83,-75.2 195.68,-80.54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="194.36,-77.29 186.24,-84.1 196.83,-83.84 194.36,-77.29"/>
+</g>
+<!-- module~allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~main_heat~~UsesGraph_edge13" class="edge">
+<title>module~allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M238.73,-51.26C217.17,-49.75 186.41,-49.06 160,-54"/>
+</g>
+<!-- module~allocate&#45;&gt;module~error -->
+<g id="module~~main_heat~~UsesGraph_edge12" class="edge">
+<title>module~allocate&#45;&gt;module~error</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M238.98,-43.8C225.82,-38.84 209.83,-32.8 195.68,-27.46"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="196.83,-24.16 186.24,-23.9 194.36,-30.71 196.83,-24.16"/>
 </g>
 <!-- module~calculate_hcf&#45;&gt;module~types -->
 <g id="module~~main_heat~~UsesGraph_edge16" class="edge">
 <title>module~calculate_hcf&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M234.2,-122C222.07,-117.42 208.17,-112.18 195.71,-107.47"/>
-<polygon fill="#000000" stroke="#000000" points="196.67,-104.1 186.08,-103.84 194.2,-110.65 196.67,-104.1"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M234.2,-122C222.07,-117.42 208.17,-112.18 195.71,-107.47"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="196.67,-104.1 186.08,-103.84 194.2,-110.65 196.67,-104.1"/>
 </g>
 <!-- module~calculate_hcf&#45;&gt;iso_fortran_env -->
 <g id="module~~main_heat~~UsesGraph_edge15" class="edge">
 <title>module~calculate_hcf&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M243.6,-146.03C217.56,-159.39 176.1,-178.5 160,-174"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158,-174C115.46,-162.11 80.69,-121.17 62.58,-95.81"/>
-<polygon fill="#000000" stroke="#000000" points="65.24,-93.5 56.68,-87.26 59.48,-97.48 65.24,-93.5"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M243.6,-146.03C217.56,-159.39 176.1,-178.5 160,-174"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M158,-174C115.46,-162.11 80.69,-121.17 62.58,-95.81"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="65.24,-93.5 56.68,-87.26 59.48,-97.48 65.24,-93.5"/>
 </g>
 <!-- module~error&#45;&gt;iso_fortran_env -->
-<g id="module~~main_heat~~UsesGraph_edge17" class="edge">
+<g id="module~~main_heat~~UsesGraph_edge18" class="edge">
 <title>module~error&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M136.47,-26.05C120.19,-35.16 97.64,-47.78 79.51,-57.93"/>
-<polygon fill="#000000" stroke="#000000" points="77.51,-55.04 70.49,-62.97 80.93,-61.14 77.51,-55.04"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M136.47,-26.05C120.19,-35.16 97.64,-47.78 79.51,-57.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="77.51,-55.04 70.49,-62.97 80.93,-61.14 77.51,-55.04"/>
 </g>
 <!-- ieee_arithmetic -->
 <g id="module~~main_heat~~UsesGraph_node9" class="node">
@@ -343,10 +370,10 @@
 </g>
 </g>
 <!-- module~error&#45;&gt;ieee_arithmetic -->
-<g id="module~~main_heat~~UsesGraph_edge18" class="edge">
+<g id="module~~main_heat~~UsesGraph_edge17" class="edge">
 <title>module~error&#45;&gt;ieee_arithmetic</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-14C124.11,-14 115.26,-14 106.31,-14"/>
-<polygon fill="#000000" stroke="#000000" points="106.21,-10.5 96.21,-14 106.21,-17.5 106.21,-10.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M131.89,-14C124.11,-14 115.26,-14 106.31,-14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="106.21,-10.5 96.21,-14 106.21,-17.5 106.21,-10.5"/>
 </g>
 </g>
 </svg>
@@ -405,7 +432,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </li>
@@ -418,6 +445,14 @@
     <section class="visible-xs visible-sm hidden-md">
       <h3>Contents</h3>
  
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
+  <div id="vars-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/main_heat.html#variable-calc_heat">Calc_Heat</a>
+    </div>
+  </div>
+</div>
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#inters-1">Interfaces</a></h3></div>
   <div id="inters-1" class="panel-collapse collapse">
@@ -434,11 +469,45 @@
     </div>
   </div>
 </div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-1">Functions</a></h3></div>
+  <div id="funcs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/main_heat.html#proc-heat_constructor">Heat_Constructor</a>
+      <a class="list-group-item" href="../module/main_heat.html#proc-condition_heat">Condition_Heat</a>
+      <a class="list-group-item" href="../module/main_heat.html#proc-condition_in_boundarycondition">Condition_In_BoundaryCondition</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/main_heat.html#proc-set_geometory_infomation">Set_Geometory_Infomation</a>
+      <a class="list-group-item" href="../module/main_heat.html#proc-set_boundary_condition_infomations">Set_Boundary_Condition_Infomations</a>
+    </div>
+  </div>
+</div>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
 
+    <section>
+    <h2>Variables</h2>
+    <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-calc_heat"></span>integer(kind=int32),</td>
+<td>private,</td>  <td>parameter</td><td>::</td>
+  <td><strong>Calc_Heat</strong></td><td> =</td><td>1</td><td></td>
+</tr>
+</tbody>
+</table>
+
+    </section>
+    <br>
     
     
     <section>
@@ -447,7 +516,7 @@
   <div class="panel-heading codesum"><span class="anchor" id="interface-heat"></span><h3>public interface <a href='../interface/heat.html'>Heat</a>  </h3></div>
   <ul class="list-group">
     <li class="list-group-item">
-    <h3>private function Heat_Constructor(Structure_Input)</h3>    
+    <h3>private function <a href='../proc/heat_constructor.html'>Heat_Constructor</a>(Structure_Input)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -475,11 +544,33 @@
      <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="type-heat"></span><h3>type, public :: <a href='../type/heat.html'>Heat</a>  </h3></div>
   <div class="panel-body">
+     <h4>Components</h4>
+    <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-geometry"></span>type(<a href='../type/geometry_2d.html'>Geometry_2D</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>Geometry</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-bc"></span>type(<a href='../type/boudary_condition.html'>Boudary_Condition</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>BC</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-hcfs"></span>type(<a href='../type/hcf.html'>HCF</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>HCFs</strong></td><td></td><td></td><td></td>
+</tr>
+</tbody>
+</table>
+
      <h4>Constructor</h4>
          
        <table class="table table-striped varlist">
       <tbody>
-             <tr><td>private  function <strong>Heat_Constructor</strong>(Structure_Input)</td><td></td></tr>
+             <tr><td>private  function <strong><a href='../proc/heat_constructor.html'>Heat_Constructor</a></strong>(Structure_Input)</td><td></td></tr>
        </tbody>
        </table>
      
@@ -489,7 +580,137 @@
     </section>
   <br>
     
+ 
+    <section>
+    <h2>Functions</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-heat_constructor"></span><h3>private function <a href='../proc/heat_constructor.html'>Heat_Constructor</a>(Structure_Input)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(Input),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Structure_Input</strong></td><td></td>
+</tr>
+</tbody>
+</table>
 
+<h4>Return Value <small>type(<a href='../type/heat.html'>Heat</a>)</small></h4>  
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-condition_heat"></span><h3>private function <a href='../proc/condition_heat.html'>Condition_Heat</a>(num)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>num</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+<h4>Return Value <small>logical</small></h4>  
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-condition_in_boundarycondition"></span><h3>private function <a href='../proc/condition_in_boundarycondition.html'>Condition_In_BoundaryCondition</a>(num, Value_Info)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>num</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Value_Info</strong>(:)</td><td></td>
+</tr>
+</tbody>
+</table>
+
+<h4>Return Value <small>logical</small></h4>  
+
+  </div>
+  </div>
+
+    </section>
+    <br>
+
+    <section>
+    <h2>Subroutines</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_geometory_infomation"></span><h3>private subroutine <a href='../proc/set_geometory_infomation.html'>Set_Geometory_Infomation</a>(self, Structure_Input)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/heat.html'>Heat</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>self</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(Input),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Structure_Input</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_boundary_condition_infomations"></span><h3>private subroutine <a href='../proc/set_boundary_condition_infomations.html'>Set_Boundary_Condition_Infomations</a>(self, Structure_Input)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/heat.html'>Heat</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>self</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(Input),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Structure_Input</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+    </section>    
+    <br>
     
     </div>
   </div>
@@ -499,14 +720,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

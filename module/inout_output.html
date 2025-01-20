@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Inout_Output &ndash; Freezing Thawing Dynamics Simulation Solver</title>
+    <title>Inout_Output &ndash; FTDSS</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 9.6% of total for modules and submodules.">351 statements</a>
+    title=" 9.5% of total for modules and submodules.">351 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Output.f90"> Source File</a></li>
   </ul>
@@ -129,6 +129,26 @@
     </div>
   </div>
 </div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-0">Functions</a></h3></div>
+  <div id="funcs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/inout_output.html#proc-output_constructor">Output_Constructor</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_all">Inout_Output_All</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_all_dat">Inout_Output_All_Dat</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_observation">Inout_Output_Observation</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_all_vtk">Inout_Output_All_vtk</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-set_output_flag">Set_Output_Flag</a>
+    </div>
+  </div>
+</div>
 
 </div>
 
@@ -143,11 +163,11 @@
       <ul class="list-group">
       <li class="list-group-item">
   <ul class="list-inline">
-    <li><a href='../module/allocate.html'>Allocate</a></li>
-    <li>Inout_Input</li>
-    <li><a href="http://fortranwiki.org/fortran/show/iso_fortran_env">iso_fortran_env</a></li>
-    <li><a href='../module/inout_setprojectpath.html'>Inout_SetProjectPath</a></li>
     <li><a href='../module/types.html'>Types</a></li>
+    <li>Inout_Input</li>
+    <li><a href='../module/inout_setprojectpath.html'>Inout_SetProjectPath</a></li>
+    <li><a href='../module/allocate.html'>Allocate</a></li>
+    <li><a href="http://fortranwiki.org/fortran/show/iso_fortran_env">iso_fortran_env</a></li>
     <li><a href='../module/error.html'>error</a></li>
   </ul>
       </li>
@@ -169,63 +189,63 @@
 <polygon fill="none" stroke="black" points="460,-104 379,-104 379,-80 460,-80 460,-104"/>
 <text text-anchor="middle" x="419.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50">Inout_Output</text>
 </g>
-<!-- module~allocate -->
-<g id="module~~inout_output~~UsesGraph_node2" class="node">
-<title>module~allocate</title>
-<g id="a_module~~inout_output~~UsesGraph_node2"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
-<polygon fill="#337ab7" stroke="#337ab7" points="310.5,-146 254.5,-146 254.5,-122 310.5,-122 310.5,-146"/>
-<text text-anchor="middle" x="282.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
-</a>
-</g>
-</g>
-<!-- module~inout_output&#45;&gt;module~allocate -->
-<g id="module~~inout_output~~UsesGraph_edge1" class="edge">
-<title>module~inout_output&#45;&gt;module~allocate</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M379.81,-104.04C361.14,-109.84 338.85,-116.78 320.42,-122.51"/>
-<polygon fill="#000000" stroke="#000000" points="319.13,-119.25 310.62,-125.56 321.21,-125.93 319.13,-119.25"/>
-</g>
-<!-- Inout_Input -->
-<g id="module~~inout_output~~UsesGraph_node3" class="node">
-<title>Inout_Input</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="318.5,-24 246.5,-24 246.5,0 318.5,0 318.5,-24"/>
-<text text-anchor="middle" x="282.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Input</text>
-</g>
-<!-- module~inout_output&#45;&gt;Inout_Input -->
-<g id="module~~inout_output~~UsesGraph_edge2" class="edge">
-<title>module~inout_output&#45;&gt;Inout_Input</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M403.51,-79.85C388.71,-68.2 365.14,-50.57 343,-38 336.94,-34.56 330.34,-31.26 323.81,-28.25"/>
-<polygon fill="#000000" stroke="#000000" points="324.92,-24.91 314.37,-24.03 322.07,-31.3 324.92,-24.91"/>
-</g>
 <!-- module~types -->
-<g id="module~~inout_output~~UsesGraph_node4" class="node">
+<g id="module~~inout_output~~UsesGraph_node2" class="node">
 <title>module~types</title>
-<g id="a_module~~inout_output~~UsesGraph_node4"><a xlink:href=".././module/types.html" xlink:title="Types">
+<g id="a_module~~inout_output~~UsesGraph_node2"><a xlink:href=".././module/types.html" xlink:title="Types">
 <polygon fill="#337ab7" stroke="#337ab7" points="186,-165 132,-165 132,-141 186,-141 186,-165"/>
 <text text-anchor="middle" x="159" y="-150.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Types</text>
 </a>
 </g>
 </g>
 <!-- module~inout_output&#45;&gt;module~types -->
-<g id="module~~inout_output~~UsesGraph_edge3" class="edge">
+<g id="module~~inout_output~~UsesGraph_edge1" class="edge">
 <title>module~inout_output&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M408.61,-104.18C388.27,-128 338.98,-179.58 283.5,-193"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281.5,-193C248.01,-201.1 210.47,-184.69 186.11,-170.5"/>
-<polygon fill="#000000" stroke="#000000" points="187.81,-167.44 177.45,-165.22 184.17,-173.41 187.81,-167.44"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M408.61,-104.18C388.27,-128 338.98,-179.58 283.5,-193"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M281.5,-193C248.01,-201.1 210.47,-184.69 186.11,-170.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="187.81,-167.44 177.45,-165.22 184.17,-173.41 187.81,-167.44"/>
 </g>
 <!-- module~inout_setprojectpath -->
-<g id="module~~inout_output~~UsesGraph_node5" class="node">
+<g id="module~~inout_output~~UsesGraph_node3" class="node">
 <title>module~inout_setprojectpath</title>
-<g id="a_module~~inout_output~~UsesGraph_node5"><a xlink:href=".././module/inout_setprojectpath.html" xlink:title="Inout_SetProjectPath">
+<g id="a_module~~inout_output~~UsesGraph_node3"><a xlink:href=".././module/inout_setprojectpath.html" xlink:title="Inout_SetProjectPath">
 <polygon fill="#337ab7" stroke="#337ab7" points="343,-104 222,-104 222,-80 343,-80 343,-104"/>
 <text text-anchor="middle" x="282.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_SetProjectPath</text>
 </a>
 </g>
 </g>
 <!-- module~inout_output&#45;&gt;module~inout_setprojectpath -->
-<g id="module~~inout_output~~UsesGraph_edge4" class="edge">
+<g id="module~~inout_output~~UsesGraph_edge2" class="edge">
 <title>module~inout_output&#45;&gt;module~inout_setprojectpath</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M378.73,-92C370.68,-92 361.99,-92 353.25,-92"/>
-<polygon fill="#000000" stroke="#000000" points="353.01,-88.5 343.01,-92 353.01,-95.5 353.01,-88.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M378.73,-92C370.68,-92 361.99,-92 353.25,-92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="353.01,-88.5 343.01,-92 353.01,-95.5 353.01,-88.5"/>
+</g>
+<!-- Inout_Input -->
+<g id="module~~inout_output~~UsesGraph_node4" class="node">
+<title>Inout_Input</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="318.5,-24 246.5,-24 246.5,0 318.5,0 318.5,-24"/>
+<text text-anchor="middle" x="282.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Input</text>
+</g>
+<!-- module~inout_output&#45;&gt;Inout_Input -->
+<g id="module~~inout_output~~UsesGraph_edge3" class="edge">
+<title>module~inout_output&#45;&gt;Inout_Input</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M403.51,-79.85C388.71,-68.2 365.14,-50.57 343,-38 336.94,-34.56 330.34,-31.26 323.81,-28.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="324.92,-24.91 314.37,-24.03 322.07,-31.3 324.92,-24.91"/>
+</g>
+<!-- module~allocate -->
+<g id="module~~inout_output~~UsesGraph_node5" class="node">
+<title>module~allocate</title>
+<g id="a_module~~inout_output~~UsesGraph_node5"><a xlink:href=".././module/allocate.html" xlink:title="Allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="310.5,-146 254.5,-146 254.5,-122 310.5,-122 310.5,-146"/>
+<text text-anchor="middle" x="282.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate</text>
+</a>
+</g>
+</g>
+<!-- module~inout_output&#45;&gt;module~allocate -->
+<g id="module~~inout_output~~UsesGraph_edge4" class="edge">
+<title>module~inout_output&#45;&gt;module~allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M379.81,-104.04C361.14,-109.84 338.85,-116.78 320.42,-122.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="319.13,-119.25 310.62,-125.56 321.21,-125.93 319.13,-119.25"/>
 </g>
 <!-- iso_fortran_env -->
 <g id="module~~inout_output~~UsesGraph_node6" class="node">
@@ -239,8 +259,8 @@
 <!-- module~inout_output&#45;&gt;iso_fortran_env -->
 <g id="module~~inout_output~~UsesGraph_edge5" class="edge">
 <title>module~inout_output&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281.5,-193C208.34,-210.7 122.6,-174 78.5,-150.89"/>
-<polygon fill="#000000" stroke="#000000" points="79.95,-147.7 69.49,-146.05 76.64,-153.86 79.95,-147.7"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M281.5,-193C208.34,-210.7 122.6,-174 78.5,-150.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="79.95,-147.7 69.49,-146.05 76.64,-153.86 79.95,-147.7"/>
 </g>
 <!-- module~error -->
 <g id="module~~inout_output~~UsesGraph_node7" class="node">
@@ -254,50 +274,50 @@
 <!-- module~inout_output&#45;&gt;module~error -->
 <g id="module~~inout_output~~UsesGraph_edge6" class="edge">
 <title>module~inout_output&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M382.82,-79.94C370.37,-76.3 356.21,-72.8 343,-71 292.57,-64.12 233.6,-66.63 196.52,-69.48"/>
-<polygon fill="#000000" stroke="#000000" points="195.89,-66.02 186.21,-70.32 196.46,-72.99 195.89,-66.02"/>
-</g>
-<!-- module~allocate&#45;&gt;module~types -->
-<g id="module~~inout_output~~UsesGraph_edge8" class="edge">
-<title>module~allocate&#45;&gt;module~types</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M254.23,-138.26C237.11,-140.94 214.83,-144.43 196.24,-147.33"/>
-<polygon fill="#000000" stroke="#000000" points="195.68,-143.88 186.34,-148.88 196.76,-150.79 195.68,-143.88"/>
-</g>
-<!-- module~allocate&#45;&gt;iso_fortran_env -->
-<g id="module~~inout_output~~UsesGraph_edge7" class="edge">
-<title>module~allocate&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M254.16,-125.05C229.64,-118.04 192.61,-109.94 160,-113"/>
-</g>
-<!-- module~allocate&#45;&gt;module~error -->
-<g id="module~~inout_output~~UsesGraph_edge9" class="edge">
-<title>module~allocate&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M254.3,-125.89C243.97,-122.42 232.23,-118.02 222,-113 209.21,-106.72 195.82,-98.35 184.78,-90.88"/>
-<polygon fill="#000000" stroke="#000000" points="186.69,-87.95 176.48,-85.15 182.72,-93.71 186.69,-87.95"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M382.82,-79.94C370.37,-76.3 356.21,-72.8 343,-71 292.57,-64.12 233.6,-66.63 196.52,-69.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="195.89,-66.02 186.21,-70.32 196.46,-72.99 195.89,-66.02"/>
 </g>
 <!-- module~types&#45;&gt;iso_fortran_env -->
-<g id="module~~inout_output~~UsesGraph_edge10" class="edge">
+<g id="module~~inout_output~~UsesGraph_edge7" class="edge">
 <title>module~types&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-148.45C123.84,-147.05 114.65,-145.44 105.38,-143.83"/>
-<polygon fill="#000000" stroke="#000000" points="105.8,-140.35 95.35,-142.08 104.6,-147.24 105.8,-140.35"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M131.89,-148.45C123.84,-147.05 114.65,-145.44 105.38,-143.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="105.8,-140.35 95.35,-142.08 104.6,-147.24 105.8,-140.35"/>
 </g>
 <!-- module~inout_setprojectpath&#45;&gt;iso_fortran_env -->
-<g id="module~~inout_output~~UsesGraph_edge11" class="edge">
+<g id="module~~inout_output~~UsesGraph_edge9" class="edge">
 <title>module~inout_setprojectpath&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M222.73,-104.05C202.89,-107.61 180.57,-111.07 160,-113"/>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158,-113C140.76,-114.62 122.19,-117.69 105.36,-120.99"/>
-<polygon fill="#000000" stroke="#000000" points="104.23,-117.65 95.12,-123.06 105.62,-124.51 104.23,-117.65"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M222.73,-104.05C202.89,-107.61 180.57,-111.07 160,-113"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M158,-113C140.76,-114.62 122.19,-117.69 105.36,-120.99"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="104.23,-117.65 95.12,-123.06 105.62,-124.51 104.23,-117.65"/>
 </g>
 <!-- module~inout_setprojectpath&#45;&gt;module~error -->
-<g id="module~~inout_output~~UsesGraph_edge12" class="edge">
+<g id="module~~inout_output~~UsesGraph_edge8" class="edge">
 <title>module~inout_setprojectpath&#45;&gt;module~error</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.82,-82.67C213.14,-81.31 204.43,-79.95 196.4,-78.69"/>
-<polygon fill="#000000" stroke="#000000" points="196.72,-75.2 186.3,-77.11 195.64,-82.12 196.72,-75.2"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M221.82,-82.67C213.14,-81.31 204.43,-79.95 196.4,-78.69"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="196.72,-75.2 186.3,-77.11 195.64,-82.12 196.72,-75.2"/>
+</g>
+<!-- module~allocate&#45;&gt;module~types -->
+<g id="module~~inout_output~~UsesGraph_edge12" class="edge">
+<title>module~allocate&#45;&gt;module~types</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M254.23,-138.26C237.11,-140.94 214.83,-144.43 196.24,-147.33"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="195.68,-143.88 186.34,-148.88 196.76,-150.79 195.68,-143.88"/>
+</g>
+<!-- module~allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~inout_output~~UsesGraph_edge11" class="edge">
+<title>module~allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M254.16,-125.05C229.64,-118.04 192.61,-109.94 160,-113"/>
+</g>
+<!-- module~allocate&#45;&gt;module~error -->
+<g id="module~~inout_output~~UsesGraph_edge10" class="edge">
+<title>module~allocate&#45;&gt;module~error</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M254.3,-125.89C243.97,-122.42 232.23,-118.02 222,-113 209.21,-106.72 195.82,-98.35 184.78,-90.88"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="186.69,-87.95 176.48,-85.15 182.72,-93.71 186.69,-87.95"/>
 </g>
 <!-- module~error&#45;&gt;iso_fortran_env -->
-<g id="module~~inout_output~~UsesGraph_edge13" class="edge">
+<g id="module~~inout_output~~UsesGraph_edge14" class="edge">
 <title>module~error&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M136.47,-85.05C120.19,-94.16 97.64,-106.78 79.51,-116.93"/>
-<polygon fill="#000000" stroke="#000000" points="77.51,-114.04 70.49,-121.97 80.93,-120.14 77.51,-114.04"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M136.47,-85.05C120.19,-94.16 97.64,-106.78 79.51,-116.93"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="77.51,-114.04 70.49,-121.97 80.93,-120.14 77.51,-114.04"/>
 </g>
 <!-- ieee_arithmetic -->
 <g id="module~~inout_output~~UsesGraph_node8" class="node">
@@ -309,10 +329,10 @@
 </g>
 </g>
 <!-- module~error&#45;&gt;ieee_arithmetic -->
-<g id="module~~inout_output~~UsesGraph_edge14" class="edge">
+<g id="module~~inout_output~~UsesGraph_edge13" class="edge">
 <title>module~error&#45;&gt;ieee_arithmetic</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M131.89,-73C124.11,-73 115.26,-73 106.31,-73"/>
-<polygon fill="#000000" stroke="#000000" points="106.21,-69.5 96.21,-73 106.21,-76.5 106.21,-69.5"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M131.89,-73C124.11,-73 115.26,-73 106.31,-73"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="106.21,-69.5 96.21,-73 106.21,-76.5 106.21,-69.5"/>
 </g>
 </g>
 </svg>
@@ -371,7 +391,7 @@
     
     <p>Solid arrows point from a submodule to the (sub)module which it is
     descended from. Dashed arrows point from a module or program unit to 
-    modules which it uses.
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </li>
@@ -400,6 +420,26 @@
     </div>
   </div>
 </div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-1">Functions</a></h3></div>
+  <div id="funcs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/inout_output.html#proc-output_constructor">Output_Constructor</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_all">Inout_Output_All</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_all_dat">Inout_Output_All_Dat</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_observation">Inout_Output_Observation</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-inout_output_all_vtk">Inout_Output_All_vtk</a>
+      <a class="list-group-item" href="../module/inout_output.html#proc-set_output_flag">Set_Output_Flag</a>
+    </div>
+  </div>
+</div>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
@@ -413,7 +453,7 @@
   <div class="panel-heading codesum"><span class="anchor" id="interface-output"></span><h3>public interface <a href='../interface/output.html'>Output</a>  </h3></div>
   <ul class="list-group">
     <li class="list-group-item">
-    <h3>private function Output_Constructor(Inputs)</h3>    
+    <h3>private function <a href='../proc/output_constructor.html'>Output_Constructor</a>(Inputs)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -441,11 +481,78 @@
      <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="type-output"></span><h3>type, public :: <a href='../type/output.html'>Output</a>  </h3></div>
   <div class="panel-body">
+     <h4>Components</h4>
+    <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-output_observation_flag"></span>integer(kind=int32),</td>
+<td>private,</td>  <td>allocatable</td><td>::</td>
+  <td><strong>Output_Observation_Flag</strong>(:)</td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-t_filename"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>T_FileName</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-fr_filename"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>Fr_FileName</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-tc_filename"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>TC_FileName</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-c_filename"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>C_FileName</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-p_filename"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>P_FileName</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-flux_filename"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>Flux_FileName</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-k_filename"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>K_FileName</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-dir_path"></span>character(len=256),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>dir_Path</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-is_output"></span>logical,</td>
+<td>private,</td>  <td>allocatable</td><td>::</td>
+  <td><strong>is_Output</strong>(:)</td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-is_output_dat"></span>logical,</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>is_Output_Dat</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-is_output_vtk"></span>logical,</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>is_Output_VTK</strong></td><td></td><td></td><td></td>
+</tr>
+</tbody>
+</table>
+
      <h4>Constructor</h4>
          
        <table class="table table-striped varlist">
       <tbody>
-             <tr><td>private  function <strong>Output_Constructor</strong>(Inputs)</td><td></td></tr>
+             <tr><td>private  function <strong><a href='../proc/output_constructor.html'>Output_Constructor</a></strong>(Inputs)</td><td></td></tr>
        </tbody>
        </table>
      
@@ -464,7 +571,191 @@
     </section>
   <br>
     
+ 
+    <section>
+    <h2>Functions</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-output_constructor"></span><h3>private function <a href='../proc/output_constructor.html'>Output_Constructor</a>(Inputs)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(Input),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Inputs</strong></td><td></td>
+</tr>
+</tbody>
+</table>
 
+<h4>Return Value <small>type(<a href='../type/output.html'>Output</a>)</small></h4>  
+
+  </div>
+  </div>
+
+    </section>
+    <br>
+
+    <section>
+    <h2>Subroutines</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-inout_output_all"></span><h3>private subroutine <a href='../proc/inout_output_all.html'>Inout_Output_All</a>(self, Solver, num)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>class(<a href='../type/output.html'>Output</a>)</td>
+<td></td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>self</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>num</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-inout_output_all_dat"></span><h3>private subroutine <a href='../proc/inout_output_all_dat.html'>Inout_Output_All_Dat</a>(self, Solver, num)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>class(<a href='../type/output.html'>Output</a>)</td>
+<td></td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>self</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>num</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-inout_output_observation"></span><h3>private subroutine <a href='../proc/inout_output_observation.html'>Inout_Output_Observation</a>(self, Solver, time)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>class(<a href='../type/output.html'>Output</a>)</td>
+<td></td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>self</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>real(kind=real64),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>time</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-inout_output_all_vtk"></span><h3>private subroutine <a href='../proc/inout_output_all_vtk.html'>Inout_Output_All_vtk</a>(self, Solver, num)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>class(<a href='../type/output.html'>Output</a>)</td>
+<td></td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>self</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/solverinfo.html'>SolverInfo</a>),</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>Solver</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>num</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_output_flag"></span><h3>private subroutine <a href='../proc/set_output_flag.html'>Set_Output_Flag</a>(iValue, inFlag)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=int32),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>logical,</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>inFlag</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+    </section>    
+    <br>
     
     </div>
   </div>
@@ -474,14 +765,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>

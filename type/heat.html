@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   <meta name="description" content="This solver can caluculate freezing/thawing processes in the soil integrated heat and water transport.">
+   <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Heat &ndash; Freezing Thawing Dynamics Simulation Solver </title>
+    <title>Heat &ndash; FTDSS </title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Freezing Thawing Dynamics Simulation Solver </a>
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 2.3% of total for derived types.</p>Including implementation: 6 statements,  0.9% of total for derived types.">6 statements</a>
+    title="<p> 2.1% of total for derived types.</p>Including implementation: 6 statements,  0.8% of total for derived types.">6 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/Heat.f90"> Source File</a></li>
   </ul>
@@ -115,11 +115,27 @@
   <h3>Contents</h3>
  
 <div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
+  <div id="vars-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../type/heat.html#variable-geometry">Geometry</a>
+      <a class="list-group-item" href="../type/heat.html#variable-bc">BC</a>
+      <a class="list-group-item" href="../type/heat.html#variable-hcfs">HCFs</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#cons-0">Constructor</a></h3></div>
   <div id="cons-0" class="panel-collapse collapse">
     <div class="list-group">
       <a class="list-group-item" href="../type/heat.html#interface-heat">Heat</a>
     </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/heat.html#src">Heat</a>
   </div>
 </div>
 
@@ -164,8 +180,8 @@
 <!-- type~heat&#45;&gt;type~geometry_2d -->
 <g id="type~~heat~~InheritsGraph_edge1" class="edge">
 <title>type~heat&#45;&gt;type~geometry_2d</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M480.58,-104.8C474.81,-106.61 468.72,-108.44 463,-110 440.29,-116.21 414.95,-122.18 393.28,-127"/>
-<polygon fill="#000000" stroke="#000000" points="392.29,-123.63 383.28,-129.2 393.8,-130.47 392.29,-123.63"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M480.58,-104.8C474.81,-106.61 468.72,-108.44 463,-110 440.29,-116.21 414.95,-122.18 393.28,-127"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="392.29,-123.63 383.28,-129.2 393.8,-130.47 392.29,-123.63"/>
 <text text-anchor="middle" x="439" y="-123.4" font-family="Helvetica,sans-Serif" font-size="9.50">Geometry</text>
 </g>
 <!-- type~hcf -->
@@ -180,8 +196,8 @@
 <!-- type~heat&#45;&gt;type~hcf -->
 <g id="type~~heat~~InheritsGraph_edge3" class="edge">
 <title>type~heat&#45;&gt;type~hcf</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M480.7,-96C452.77,-96 408.44,-96 377.22,-96"/>
-<polygon fill="#000000" stroke="#000000" points="377.18,-92.5 367.18,-96 377.18,-99.5 377.18,-92.5"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M480.7,-96C452.77,-96 408.44,-96 377.22,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="377.18,-92.5 367.18,-96 377.18,-99.5 377.18,-92.5"/>
 <text text-anchor="middle" x="439" y="-98.4" font-family="Helvetica,sans-Serif" font-size="9.50">HCFs</text>
 </g>
 <!-- type~boudary_condition -->
@@ -196,46 +212,46 @@
 <!-- type~heat&#45;&gt;type~boudary_condition -->
 <g id="type~~heat~~InheritsGraph_edge2" class="edge">
 <title>type~heat&#45;&gt;type~boudary_condition</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M480.58,-87.2C474.81,-85.39 468.72,-83.56 463,-82 444.96,-77.07 425.26,-72.29 407.06,-68.12"/>
-<polygon fill="#000000" stroke="#000000" points="407.64,-64.66 397.12,-65.86 406.1,-71.49 407.64,-64.66"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M480.58,-87.2C474.81,-85.39 468.72,-83.56 463,-82 444.96,-77.07 425.26,-72.29 407.06,-68.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="407.64,-64.66 397.12,-65.86 406.1,-71.49 407.64,-64.66"/>
 <text text-anchor="middle" x="439" y="-84.4" font-family="Helvetica,sans-Serif" font-size="9.50">BC</text>
 </g>
-<!-- type~dp2d -->
-<g id="type~~heat~~InheritsGraph_node5" class="node">
-<title>type~dp2d</title>
-<g id="a_type~~heat~~InheritsGraph_node5"><a xlink:href=".././type/dp2d.html" xlink:title="DP2d">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="112.5,-192 58.5,-192 58.5,-168 112.5,-168 112.5,-192"/>
-<text text-anchor="middle" x="85.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">DP2d</text>
-</a>
-</g>
-</g>
-<!-- type~geometry_2d&#45;&gt;type~dp2d -->
-<g id="type~~heat~~InheritsGraph_edge4" class="edge">
-<title>type~geometry_2d&#45;&gt;type~dp2d</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M296.78,-146.22C286.4,-148.18 275.31,-150.22 265,-152 215.77,-160.52 158.7,-169.27 122.6,-174.68"/>
-<polygon fill="#000000" stroke="#000000" points="121.93,-171.24 112.56,-176.17 122.96,-178.16 121.93,-171.24"/>
-<text text-anchor="middle" x="227" y="-166.4" font-family="Helvetica,sans-Serif" font-size="9.50">Nodes_2D</text>
-</g>
 <!-- type~shape -->
-<g id="type~~heat~~InheritsGraph_node9" class="node">
+<g id="type~~heat~~InheritsGraph_node6" class="node">
 <title>type~shape</title>
-<g id="a_type~~heat~~InheritsGraph_node9"><a xlink:href=".././type/shape.html" xlink:title="Shape">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="112.5,-150 58.5,-150 58.5,-126 112.5,-126 112.5,-150"/>
-<text text-anchor="middle" x="85.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Shape</text>
+<g id="a_type~~heat~~InheritsGraph_node6"><a xlink:href=".././type/shape.html" xlink:title="Shape">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="112.5,-192 58.5,-192 58.5,-168 112.5,-168 112.5,-192"/>
+<text text-anchor="middle" x="85.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Shape</text>
 </a>
 </g>
 </g>
 <!-- type~geometry_2d&#45;&gt;type~shape -->
 <g id="type~~heat~~InheritsGraph_edge5" class="edge">
 <title>type~geometry_2d&#45;&gt;type~shape</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M296.74,-138C248.03,-138 168.78,-138 122.76,-138"/>
-<polygon fill="#000000" stroke="#000000" points="122.64,-134.5 112.64,-138 122.64,-141.5 122.64,-134.5"/>
-<text text-anchor="middle" x="227" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">Shape_Function</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M296.78,-146.22C286.4,-148.18 275.31,-150.22 265,-152 215.77,-160.52 158.7,-169.27 122.6,-174.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="121.93,-171.24 112.56,-176.17 122.96,-178.16 121.93,-171.24"/>
+<text text-anchor="middle" x="227" y="-166.4" font-family="Helvetica,sans-Serif" font-size="9.50">Shape_Function</text>
+</g>
+<!-- type~dp2d -->
+<g id="type~~heat~~InheritsGraph_node9" class="node">
+<title>type~dp2d</title>
+<g id="a_type~~heat~~InheritsGraph_node9"><a xlink:href=".././type/dp2d.html" xlink:title="DP2d">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="112.5,-150 58.5,-150 58.5,-126 112.5,-126 112.5,-150"/>
+<text text-anchor="middle" x="85.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">DP2d</text>
+</a>
+</g>
+</g>
+<!-- type~geometry_2d&#45;&gt;type~dp2d -->
+<g id="type~~heat~~InheritsGraph_edge4" class="edge">
+<title>type~geometry_2d&#45;&gt;type~dp2d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M296.74,-138C248.03,-138 168.78,-138 122.76,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="122.64,-134.5 112.64,-138 122.64,-141.5 122.64,-134.5"/>
+<text text-anchor="middle" x="227" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">Nodes_2D</text>
 </g>
 <!-- type~hcf_parameters -->
-<g id="type~~heat~~InheritsGraph_node8" class="node">
+<g id="type~~heat~~InheritsGraph_node7" class="node">
 <title>type~hcf_parameters</title>
-<g id="a_type~~heat~~InheritsGraph_node8"><a xlink:href=".././type/hcf_parameters.html" xlink:title="HCF_Parameters">
+<g id="a_type~~heat~~InheritsGraph_node7"><a xlink:href=".././type/hcf_parameters.html" xlink:title="HCF_Parameters">
 <polygon fill="#5cb85c" stroke="#5cb85c" points="136,-108 35,-108 35,-84 136,-84 136,-108"/>
 <text text-anchor="middle" x="85.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HCF_Parameters</text>
 </a>
@@ -244,40 +260,40 @@
 <!-- type~hcf&#45;&gt;type~hcf_parameters -->
 <g id="type~~heat~~InheritsGraph_edge6" class="edge">
 <title>type~hcf&#45;&gt;type~hcf_parameters</title>
-<path fill="none" stroke="#000000" d="M312.93,-96C273.95,-96 199.4,-96 146.5,-96"/>
-<polygon fill="#000000" stroke="#000000" points="146.23,-92.5 136.23,-96 146.23,-99.5 146.23,-92.5"/>
-</g>
-<!-- type~boudary_condition_neumann -->
-<g id="type~~heat~~InheritsGraph_node6" class="node">
-<title>type~boudary_condition_neumann</title>
-<g id="a_type~~heat~~InheritsGraph_node6"><a xlink:href=".././type/boudary_condition_neumann.html" xlink:title="Boudary_Condition_Neumann">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="171,-66 0,-66 0,-42 171,-42 171,-66"/>
-<text text-anchor="middle" x="85.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Boudary_Condition_Neumann</text>
-</a>
-</g>
-</g>
-<!-- type~boudary_condition&#45;&gt;type~boudary_condition_neumann -->
-<g id="type~~heat~~InheritsGraph_edge8" class="edge">
-<title>type~boudary_condition&#45;&gt;type~boudary_condition_neumann</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M282.96,-54C253.08,-54 215.49,-54 181.22,-54"/>
-<polygon fill="#000000" stroke="#000000" points="181.18,-50.5 171.18,-54 181.18,-57.5 181.18,-50.5"/>
-<text text-anchor="middle" x="227" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">Neumann</text>
+<path fill="none" stroke="#00ff00" d="M312.93,-96C273.95,-96 199.4,-96 146.5,-96"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="146.23,-92.5 136.23,-96 146.23,-99.5 146.23,-92.5"/>
 </g>
 <!-- type~boudary_condition_dirichlet -->
-<g id="type~~heat~~InheritsGraph_node7" class="node">
+<g id="type~~heat~~InheritsGraph_node5" class="node">
 <title>type~boudary_condition_dirichlet</title>
-<g id="a_type~~heat~~InheritsGraph_node7"><a xlink:href=".././type/boudary_condition_dirichlet.html" xlink:title="Boudary_Condition_Dirichlet">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="167.5,-24 3.5,-24 3.5,0 167.5,0 167.5,-24"/>
-<text text-anchor="middle" x="85.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Boudary_Condition_Dirichlet</text>
+<g id="a_type~~heat~~InheritsGraph_node5"><a xlink:href=".././type/boudary_condition_dirichlet.html" xlink:title="Boudary_Condition_Dirichlet">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="167.5,-66 3.5,-66 3.5,-42 167.5,-42 167.5,-66"/>
+<text text-anchor="middle" x="85.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Boudary_Condition_Dirichlet</text>
 </a>
 </g>
 </g>
 <!-- type~boudary_condition&#45;&gt;type~boudary_condition_dirichlet -->
 <g id="type~~heat~~InheritsGraph_edge7" class="edge">
 <title>type~boudary_condition&#45;&gt;type~boudary_condition_dirichlet</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M282.87,-43.19C276.84,-42.09 270.8,-41 265,-40 236.24,-35.03 204.82,-29.97 176.45,-25.55"/>
-<polygon fill="#000000" stroke="#000000" points="176.98,-22.09 166.56,-24.01 175.9,-29 176.98,-22.09"/>
-<text text-anchor="middle" x="227" y="-42.4" font-family="Helvetica,sans-Serif" font-size="9.50">Dirichlet</text>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M282.96,-54C252.15,-54 213.16,-54 178.05,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="177.78,-50.5 167.78,-54 177.78,-57.5 177.78,-50.5"/>
+<text text-anchor="middle" x="227" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">Dirichlet</text>
+</g>
+<!-- type~boudary_condition_neumann -->
+<g id="type~~heat~~InheritsGraph_node8" class="node">
+<title>type~boudary_condition_neumann</title>
+<g id="a_type~~heat~~InheritsGraph_node8"><a xlink:href=".././type/boudary_condition_neumann.html" xlink:title="Boudary_Condition_Neumann">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="171,-24 0,-24 0,0 171,0 171,-24"/>
+<text text-anchor="middle" x="85.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Boudary_Condition_Neumann</text>
+</a>
+</g>
+</g>
+<!-- type~boudary_condition&#45;&gt;type~boudary_condition_neumann -->
+<g id="type~~heat~~InheritsGraph_edge8" class="edge">
+<title>type~boudary_condition&#45;&gt;type~boudary_condition_neumann</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M282.87,-43.19C276.84,-42.09 270.8,-41 265,-40 236.24,-35.03 204.82,-29.97 176.45,-25.55"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="176.98,-22.09 166.56,-24.01 175.9,-29 176.98,-22.09"/>
+<text text-anchor="middle" x="227" y="-42.4" font-family="Helvetica,sans-Serif" font-size="9.50">Neumann</text>
 </g>
 </g>
 </svg>
@@ -313,7 +329,7 @@
     <p>Solid arrows point from a derived type to the parent type which it
     extends. Dashed arrows point from a derived type to the other
     types it contains as a components, with a label listing the name(s) of
-    said component(s).
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
     </p>
     </div></div></div></div>
       </div>
@@ -324,6 +340,16 @@
       <h3>Contents</h3>
  
 <div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
+  <div id="vars-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../type/heat.html#variable-geometry">Geometry</a>
+      <a class="list-group-item" href="../type/heat.html#variable-bc">BC</a>
+      <a class="list-group-item" href="../type/heat.html#variable-hcfs">HCFs</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#cons-1">Constructor</a></h3></div>
   <div id="cons-1" class="panel-collapse collapse">
     <div class="list-group">
@@ -331,10 +357,41 @@
     </div>
   </div>
 </div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/heat.html#src">Heat</a>
+  </div>
+</div>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
+    <section>
+    <h2>Components</h2>
+    <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-geometry"></span>type(<a href='../type/geometry_2d.html'>Geometry_2D</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>Geometry</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-bc"></span>type(<a href='../type/boudary_condition.html'>Boudary_Condition</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>BC</strong></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-hcfs"></span>type(<a href='../type/hcf.html'>HCF</a>),</td>
+<td>private</td>  <td></td><td>::</td>
+  <td><strong>HCFs</strong></td><td></td><td></td><td></td>
+</tr>
+</tbody>
+</table>
+
+    </section>
+    <br>
     
    <section>
    <h2>Constructor</h2>
@@ -342,7 +399,7 @@
   <div class="panel-heading codesum"><span class="anchor" id="interface-heat"></span><h3>public interface <a href='../interface/heat.html'>Heat</a>  </h3></div>
   <ul class="list-group">
     <li class="list-group-item">
-    <h3>private function Heat_Constructor(Structure_Input)</h3>    
+    <h3>private function <a href='../proc/heat_constructor.html'>Heat_Constructor</a>(Structure_Input)</h3>    
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
@@ -366,6 +423,25 @@
     
     
     
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">type </span><span class="n">Heat</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Geometry_2D</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Geometry</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Boudary_Condition</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">BC</span><span class="w"></span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">HCF</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">HCFs</span><span class="w"></span>
+<span class="w">        </span><span class="c">! integer(int32)              :: Num_Elements, Num_Nodes, Num_Shape, Num_Dimention, Num_Shape_Type, Num_Region</span>
+<span class="w">        </span><span class="c">! integer(int32), allocatable :: Element(:,:)</span>
+<span class="w">        </span><span class="c">! integer(int32), allocatable :: Element_Region(:), COO_Region(:)</span>
+<span class="w">        </span><span class="c">! type(DP2d)                  :: Nodes_2D</span>
+<span class="w">        </span><span class="c">! real(real64),   allocatable :: Area(:)</span>
+<span class="w">        </span><span class="c">! type(Shape)                 :: Shape_Function</span>
+
+<span class="w">    </span><span class="k">contains</span>
+
+<span class="k">    end type </span><span class="n">Heat</span><span class="w"></span>
+</pre></div>
+
+    </section>
     
     </div>
   </div>
@@ -375,14 +451,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Freezing Thawing Dynamics Simulation Solver was developed by Kikuchi Shun<br>&copy; 2025 
+        <div class="col-xs-6 col-md-6"><p>FTDSS was developed by Kikuchi Shun<br>&copy; 2025 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-          </p>
+ on 2025-01-20 00:23            </p>
         </div>
       </div>
       <br>
