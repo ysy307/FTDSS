@@ -246,7 +246,7 @@ contains
         !< Load the input parameters from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file) :: json ! JSON parser
+        type(json_file) :: json
         integer(int32) :: status, unit_num
         integer(int32) :: iRegion
 
@@ -283,7 +283,7 @@ contains
         !> Load the basic input parameters from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file), intent(inout) :: json ! JSON parser
+        type(json_file), intent(inout) :: json !! JSON parser
         character(256) :: key
 
         write (key, '(3a)') BasicName, ".", ElementName
@@ -348,8 +348,8 @@ contains
         !> load the region information from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file), intent(inout) :: json ! JSON parser
-        integer(int32), intent(in) :: iRegion ! Region number
+        type(json_file), intent(inout) :: json !! JSON parser
+        integer(int32), intent(in) :: iRegion !! Region number
 
         character(8) :: region_name
         character(256) :: key
@@ -418,10 +418,10 @@ contains
         !> Set the calculation types
         implicit none
         class(Input) :: self
-        integer(int32), intent(in) :: iRegion ! Region number
-        logical, intent(in) :: isHeat ! Heat calculation
-        logical, intent(in) :: isWater ! Water calculation
-        logical, intent(in) :: isStress ! Stress calculation
+        integer(int32), intent(in) :: iRegion !! Region number
+        logical, intent(in) :: isHeat !! Heat calculation
+        logical, intent(in) :: isWater !! Water calculation
+        logical, intent(in) :: isStress !! Stress calculation
 
         self%Regions(iRegion)%Flags%isHeat = isHeat
         self%Regions(iRegion)%Flags%isWater = isWater
@@ -433,13 +433,13 @@ contains
         !> Set the calculation flags
         implicit none
         class(Input) :: self
-        integer(int32), intent(in) :: iRegion ! Region number
-        logical, intent(in) :: is1Phase ! 1 Phase calculation
-        logical, intent(in) :: is2Phase ! 2 Phase calculation
-        logical, intent(in) :: is3Phase ! 3 Phase calculation
-        logical, intent(in), optional :: isCompression ! consideer the water/ice compression
-        logical, intent(in), optional :: isFrostHeavePressure ! Frost heave pressure calculation
-        logical, intent(in), optional :: isDispersity ! Thermalc onductivity dispersity calculation
+        integer(int32), intent(in) :: iRegion !! Region number
+        logical, intent(in) :: is1Phase !! 1 Phase calculation
+        logical, intent(in) :: is2Phase !! 2 Phase calculation
+        logical, intent(in) :: is3Phase !! 3 Phase calculation
+        logical, intent(in), optional :: isCompression !! consideer the water/ice compression
+        logical, intent(in), optional :: isFrostHeavePressure !! Frost heave pressure calculation
+        logical, intent(in), optional :: isDispersity !! Thermalc onductivity dispersity calculation
 
         self%Regions(iRegion)%Flags%is1Phase = is1Phase
         self%Regions(iRegion)%Flags%is2Phase = is2Phase
@@ -454,8 +454,8 @@ contains
         !> Load the thermal parameters from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file), intent(inout) :: json ! JSON parser
-        integer(int32), intent(in) :: iRegion ! Region number
+        type(json_file), intent(inout) :: json !! JSON parser
+        integer(int32), intent(in) :: iRegion !! Region number
 
         character(8) :: region_name
         integer(int32) :: QiceType
@@ -777,8 +777,8 @@ contains
         !> Load the hydraulic parameters from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file), intent(inout) :: json ! JSON parser
-        integer(int32), intent(in) :: iRegion ! Region number
+        type(json_file), intent(inout) :: json !! JSON parser
+        integer(int32), intent(in) :: iRegion !! Region number
 
         character(8) :: region_name
         character(256) :: key
@@ -980,7 +980,7 @@ contains
         !> load Solver settings from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file), intent(inout) :: json ! JSON parser
+        type(json_file), intent(inout) :: json !! JSON parser
 
         character(256) :: key
         integer(int32) :: useSolver
@@ -1010,9 +1010,9 @@ contains
         !> Load the solver detail settings from the JSON file
         implicit none
         class(Input) :: self
-        type(json_file), intent(inout) :: json ! JSON parser
-        integer(int32), intent(in) :: useSolver ! Solver type
-        character(*), intent(in) :: c_target ! Target name
+        type(json_file), intent(inout) :: json !! JSON parser
+        integer(int32), intent(in) :: useSolver !! Solver type
+        character(*), intent(in) :: c_target !! Target name
 
         character(256) :: key
         select case (c_target)
