@@ -62,11 +62,10 @@
             }
         },
         "Hydraulic": {
-            "useHCF": false,
+            "useHCF": 0,
             "useImpedance": true,
             "useKTDynamics": 0,
             "Parameters": {
-                "Model": 2,
                 "Ks": 1.96e-7,
                 "thetaS": 0.30,
                 "thetaR": 0.0,
@@ -90,16 +89,16 @@
     "Solve": {
         "TimeDiscretization": 1.0,
         "Thermal": {
-            "DI": 1,
-            "Infomation": {
-                "Soler": 4,
+            "useSolver": 2,
+            "Parameters": {
+                "Solver": 4,
                 "Preconditioner": 1,
-                "maxiter": 50000,
-                "tolerance": 1.0e-20
+                "MaxIteration": 50000,
+                "Tolerance": 1.0e-10
             }
         },
         "Hydraulic": {
-            "DI": 2
+            "useSolver": 1
         }
     }
 }
