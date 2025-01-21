@@ -112,8 +112,8 @@ module Types
     type :: Basic_params
         integer(int32) :: Element
         integer(int32) :: Node
-        integer(int32) :: Shape
-        integer(int32) :: Dim
+        integer(int32) :: ShapeType
+        integer(int32) :: DimensionType !! 1 is 2D horizontal, 2 is 2D vertical, 3 is 3D
         integer(int32) :: Region
         character(:), allocatable :: Calculation_timeUnit
         character(:), allocatable :: Input_timeUnit
@@ -137,10 +137,10 @@ module Types
     end type Base_Solver
 
     type, extends(Base_Solver) :: Type_Solver_Iterative
-        integer(int32) :: SolverType ! Solver type
-        integer(int32) :: PreconditionerType ! Preconditioner type
-        integer(int32) :: MaxIter ! Maximum number of iterations
-        real(real64) :: Tol ! Convergence criterion
+        integer(int32) :: SolverType !! Solver type
+        integer(int32) :: PreconditionerType !! Preconditioner type
+        integer(int32) :: MaxIter !! Maximum number of iterations
+        real(real64) :: Tol !! Convergence criterion
     end type Type_Solver_Iterative
 
     type :: Base_Density
@@ -199,30 +199,30 @@ module Types
     end type Type_ThermalConductivity_1Phase
 
     type :: Base_Ice
-        real(real64) :: LatentHeat
+        real(real64) :: LatentHeat !! Latent heat of fusion
     end type Base_Ice
 
     type, extends(Base_Ice) :: Type_Ice_TRM
-        real(real64) :: Tf
+        real(real64) :: Tf !! Freezing point
     end type Type_Ice_TRM
 
     type, extends(Base_Ice) :: Type_Ice_GCC
-        real(real64) :: Tf
+        real(real64) :: Tf !! Freezing point
         integer(int32) :: ModelType
         class(Base_WRF), allocatable :: WRF
     end type Type_Ice_GCC
 
     type, extends(Base_Ice) :: Type_Ice_EXP
-        real(real64) :: Tf, a
+        real(real64) :: Tf !! Freezing point
+        real(real64) :: a !! power model parameter
     end type Type_Ice_EXP
 
     type :: Type_Thermal
-        class(Base_Density), allocatable :: Density
-        class(Base_SpecificHeat), allocatable :: SpecificHeat
-        class(Base_ThermalConductivity), allocatable :: ThermalConductivity
-        real(real64) :: Porosity
-
-        class(Base_Ice), allocatable :: Ice
+        class(Base_Density), allocatable :: Density !! Density
+        class(Base_SpecificHeat), allocatable :: SpecificHeat !! Specific heat
+        class(Base_ThermalConductivity), allocatable :: ThermalConductivity !! Thermal conductivity
+        real(real64) :: Porosity !! Porosity
+        class(Base_Ice), allocatable :: Ice !! Ice
     end type Type_Thermal
 
     type :: Type_Hydraulic
@@ -257,7 +257,8 @@ module Types
     end type Type_Region_Flags
 
     type :: Type_Region
-        integer(int32), allocatable :: BelongingGroup(:)
+        integer(int32) :: BelongingSurface
+        integer(int32), allocatable :: BelongingEdge(:)
         integer(int32) :: CalculationType
         integer(int32) :: Modelnumber
         type(Type_Thermal) :: Thermal
@@ -452,14 +453,14 @@ module Types
         type(Shape) :: Basis
     end type Geometry2d
 
-    type :: Geometry_2D
-        integer(int32) :: Num_Elements, Num_Nodes, Num_Shape, Num_Dimention, Num_Shape_Type, Num_Region
+    type :: Type_Geometry
+        type(Basic_params) :: Basic !! Basic parameters
         integer(int32), allocatable :: Element(:, :)
         integer(int32), allocatable :: Element_Region(:), COO_Region(:)
-        type(DP2d) :: Nodes_2D
+        type(DP3d) :: Nodes
         real(real64), allocatable :: Area(:)
         type(Shape) :: Shape_Function
-    end type Geometry_2D
+    end type Type_Geometry
 
     type :: TimeInfo
         character(3) :: tUnit

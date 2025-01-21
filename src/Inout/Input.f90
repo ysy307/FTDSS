@@ -19,10 +19,12 @@ module Inout_Input
     character(*), parameter :: HydraulicName = "Hydraulic"
     character(*), parameter :: ElementName = "Element"
     character(*), parameter :: NodeName = "Node"
-    character(*), parameter :: ShapeName = "Shape"
-    character(*), parameter :: DimensionName = "Dimension"
+    character(*), parameter :: ShapeName = "ShapeType"
+    character(*), parameter :: DimensionName = "DimensionType"
     character(*), parameter :: RegionName = "Region"
     character(*), parameter :: BelongName = "Belong"
+    character(*), parameter :: SurfaceName = "Surface"
+    character(*), parameter :: EdgeName = "Edge"
     character(*), parameter :: CalculationName = "Calculation"
     character(*), parameter :: InputName = "Input"
     character(*), parameter :: OutputName = "Output"
@@ -159,6 +161,9 @@ module Inout_Input
         procedure :: Input_Observation => Inout_Input_Observation
         procedure :: Input_Flags => Inout_Input_Flags
 
+        procedure :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
+        generic :: Input_Get => Input_Get_Basic_Params
+
         procedure :: Input_Get_Elements => Inout_Input_Get_Elements
         procedure :: Input_Get_Nodes => Inout_Input_Get_Nodes
         procedure :: Input_Get_Shape => Inout_Input_Get_Shape
@@ -197,6 +202,14 @@ module Inout_Input
         procedure :: Inout_Input_Connect_dot_4
         procedure :: Inout_Input_Connect_dot_5
         procedure :: Inout_Input_Connect_dot_6
+    end interface
+
+    abstract interface
+        function Inout_Input_Get_Interface(self) result(ptr)
+            import :: Basic_params, Type_Solver, Type_VTK, Input
+            class(Input), intent(in) :: self
+            class(*), pointer :: ptr
+        end function Inout_Input_Get_Interface
     end interface
 
 contains
@@ -241,12 +254,12 @@ contains
         if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%COO_FileName)
 
         call Input_Constructor%Input_Parameters()
-        call Input_Constructor%Input_Coodinates()
-        call Input_Constructor%Input_Vertices()
-        call Input_Constructor%Input_BC()
-        call Input_Constructor%Input_IC()
-        call Input_Constructor%Input_Observation()
-        call Input_Constructor%Input_Flags()
+        ! call Input_Constructor%Input_Coodinates()
+        ! call Input_Constructor%Input_Vertices()
+        ! call Input_Constructor%Input_BC()
+        ! call Input_Constructor%Input_IC()
+        ! call Input_Constructor%Input_Observation()
+        ! call Input_Constructor%Input_Flags()
 
     end function Input_Constructor
 
@@ -299,11 +312,11 @@ contains
         call json%print_error_message(output_unit)
 
         key = Inout_Input_Connect_dot(BasicName, ShapeName)
-        call json%get(key, self%Basic%Shape)
+        call json%get(key, self%Basic%ShapeType)
         call json%print_error_message(output_unit)
 
         key = Inout_Input_Connect_dot(BasicName, DimensionName)
-        call json%get(key, self%Basic%Dim)
+        call json%get(key, self%Basic%DimensionType)
         call json%print_error_message(output_unit)
 
         key = Inout_Input_Connect_dot(BasicName, RegionName)
@@ -360,8 +373,12 @@ contains
 
         write (region_name, '(a, i0)') RegionName, iRegion
 
-        key = Inout_Input_Connect_dot(region_name, BelongName)
-        call json%get(key, self%Regions(iRegion)%BelongingGroup)
+        key = Inout_Input_Connect_dot(region_name, BelongName, SurfaceName)
+        call json%get(key, self%Regions(iRegion)%BelongingSurface)
+        call json%print_error_message(output_unit)
+
+        key = Inout_Input_Connect_dot(region_name, BelongName, EdgeName)
+        call json%get(key, self%Regions(iRegion)%BelongingEdge)
         call json%print_error_message(output_unit)
 
         key = Inout_Input_Connect_dot(region_name, CalculationTypeName)
@@ -1382,7 +1399,7 @@ contains
         class(Input) :: self
 
         call Inout_VTK_Read('/workspaces/FTDSS/Inout/new-toml/Geometry.vtk', self%VTK)
-        stop
+        ! stop
     end subroutine Inout_Input_Geometry_VTK
 
     subroutine Inout_Input_Coodinates(self)
@@ -2000,6 +2017,30 @@ contains
 #endif
         end if
     end function Inout_Input_Get_BC_Edge_Value
+
+    function Inout_Input_Get_Basic_Params(self) result(Structure)
+        !> Get the Basic_Params of the input data
+        implicit none
+        class(Input) :: self
+        type(Basic_params) :: Structure
+
+        Structure%Element = self%Basic%Element
+        Structure%Node = self%Basic%Node
+        Structure%ShapeType = self%Basic%ShapeType
+        Structure%DimensionType = self%Basic%DimensionType
+        Structure%Region = self%Basic%Region
+        Structure%Calculation_timeUnit = self%Basic%Calculation_timeUnit
+        Structure%Input_timeUnit = self%Basic%Input_timeUnit
+        Structure%Output_timeUnit = self%Basic%Output_timeUnit
+        Structure%Interval_timeUnit = self%Basic%Interval_timeUnit
+        Structure%Calculation_step = self%Basic%Calculation_step
+        Structure%CalculationPeriod = self%Basic%CalculationPeriod
+        Structure%Interval = self%Basic%Interval
+        Structure%isDisplayPrompt = self%Basic%isDisplayPrompt
+        Structure%FileOutput = self%Basic%FileOutput
+        Structure%TimeDiscretization = self%Basic%TimeDiscretization
+
+    end function Inout_Input_Get_Basic_Params
 
     function Inout_Input_Connect_dot_2(c1, c2) result(key)
         !> connect two strings with dot

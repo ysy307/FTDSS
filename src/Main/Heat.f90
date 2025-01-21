@@ -13,7 +13,7 @@ module Main_Heat
     public :: Heat
 
     type Heat
-        type(Geometry_2D) :: Geometry
+        type(Type_Geometry) :: Geometry
         type(Boudary_Condition) :: BC
         type(HCF) :: HCFs
         ! integer(int32)              :: Num_Elements, Num_Nodes, Num_Shape, Num_Dimention, Num_Shape_Type, Num_Region
@@ -39,12 +39,12 @@ contains
         call Set_Geometory_Infomation(Heat_Constructor, Structure_Input)
         call Set_Boundary_Condition_Infomations(Heat_Constructor, Structure_Input)
 
-        block
-            real(real64) :: array_HCF(9)
-            array_HCF = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            print *, array_HCF
-            Heat_Constructor%HCFs = HCF(array_HCF, 5, 2)
-        end block
+        ! block
+        !     real(real64) :: array_HCF(9)
+        !     array_HCF = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        !     print *, array_HCF
+        !     Heat_Constructor%HCFs = HCF(array_HCF, 5, 2)
+        ! end block
 
     end function Heat_Constructor
 
@@ -52,18 +52,23 @@ contains
         type(Heat), intent(inout) :: self
         type(Input), intent(in) :: Structure_Input
 
-        self%Geometry%Num_Elements = Structure_Input%Input_Get_Elements()
-        self%Geometry%Num_Nodes = Structure_Input%Input_Get_Nodes()
-        self%Geometry%Num_Shape = Structure_Input%Input_Get_Shape()
-        self%Geometry%Num_Dimention = Structure_Input%Input_Get_Dimemsion()
-        self%Geometry%Num_Region = Structure_Input%Input_Get_Region()
+        self%Geometry%Basic = Structure_Input%Input_Get()
+        print *, self%Geometry%Basic%Element
 
-        self%Geometry%Num_Shape_Type = self%Geometry%Num_Shape * self%Geometry%Num_Dimention
+        ! self%Geometry%Num_Elements = Structure_Input%Input_Get_Elements()
+        ! self%Geometry%Num_Nodes = Structure_Input%Input_Get_Nodes()
+        ! self%Geometry%Num_Shape = Structure_Input%Input_Get_Shape()
+        ! self%Geometry%Num_Dimention = Structure_Input%Input_Get_Dimemsion()
+        ! self%Geometry%Num_Region = Structure_Input%Input_Get_Region()
 
-        self%Geometry%Element = Structure_Input%Input_Get_Top()
-        self%Geometry%Element_Region = Structure_Input%Input_Get_Top_Region()
-        self%Geometry%Nodes_2D = Structure_Input%Input_Get_Coordinates()
-        self%Geometry%COO_Region = Structure_Input%Input_Get_Coordinates_Region()
+        ! self%Geometry%Num_Shape_Type = self%Geometry%Num_Shape * self%Geometry%Num_Dimention
+
+        ! self%Geometry%Element = Structure_Input%Input_Get_Top()
+        ! self%Geometry%Element_Region = Structure_Input%Input_Get_Top_Region()
+        ! self%Geometry%Nodes_2D = Structure_Input%Input_Get_Coordinates()
+        ! self%Geometry%COO_Region = Structure_Input%Input_Get_Coordinates_Region()
+
+        stop
     end subroutine Set_Geometory_Infomation
 
     subroutine Set_Boundary_Condition_Infomations(self, Structure_Input)
