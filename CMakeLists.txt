@@ -27,14 +27,11 @@ endif()
 # ソースファイルとオブジェクトファイル
 file(GLOB_RECURSE ALL_SRC_FILES ${PROJECT_SOURCE_DIR}/src/**/*.f90)
 
-# 除外フォルダのファイルを除外
-list(FILTER ALL_SRC_FILES EXCLUDE REGEX ".*/archive/.*")
-
 # 共通のコンパイルフラグ
 set(COMPILE_Fortran_FLAGS "-fpp -traceback -standard-semantics")
 if(ENABLE_DEBUG)
     set(COMPILE_Fortran_FLAGS "${COMPILE_Fortran_FLAGS} -O0 -g -check all")
-elif(ENABLE_OPTIMIZE)
+elseif(ENABLE_OPTIMIZE)
     set(COMPILE_Fortran_FLAGS "${COMPILE_Fortran_FLAGS} -O3 -flto -xHost")
 endif()
 
@@ -69,9 +66,6 @@ if(ENABLE_MPI)
 endif()
 
 # Include path settings
-# file(GLOB_RECURSE MY_ALL_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/**/*)
-# set(My_INCLUDE_PATH ${MY_ALL_INCLUDE_PATH})
-# set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/Json-Fortran)
 set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/tomlf ${CMAKE_INCLUDE_PATH}/VTKFortran ${CMAKE_INCLUDE_PATH}/Json-Fortran)
 
 # Select build target
@@ -95,6 +89,4 @@ elseif(BUILD_APP STREQUAL "test")
         DEPENDS test
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
-else()
-    message(FATAL_ERROR "Please specify a valid application to build with -DBUILD_APP=ysy_fc or -DBUILD_APP=test")
 endif()

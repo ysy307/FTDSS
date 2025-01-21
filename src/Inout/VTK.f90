@@ -295,6 +295,7 @@ contains
         integer(int32) :: iCell, iiCell
         integer(int32), allocatable :: CellType(:)
         integer(int32) :: counts
+        integer(int32) :: Counters(25)
 
         pos1 = index(headline, space)
         pos2 = index(headline(pos1 + 1:), space) + pos1
@@ -391,48 +392,71 @@ contains
             end if
         end do
 
+        print *, vtk%numCells
+        Counters(:) = 0
+        ! stop
         do iCell = 1, vtk%numCells
             select case (CellType(iCell))
             case (VTK_VERTEX)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VERTEX)%Nodes_Array(iCell)
+                Counters(VTK_VERTEX) = Counters(VTK_VERTEX) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VERTEX)%Nodes_Array(Counters(VTK_VERTEX))
             case (VTK_POLY_VERTEX)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_VERTEX)%Nodes_Array(iCell)
+                Counters(VTK_POLY_VERTEX) = Counters(VTK_POLY_VERTEX) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_VERTEX)%Nodes_Array(Counters(VTK_POLY_VERTEX))
             case (VTK_LINE)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_LINE)%Nodes(1:2, iCell)
+                Counters(VTK_LINE) = Counters(VTK_LINE) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_LINE)%Nodes(1:2, Counters(VTK_LINE))
             case (VTK_POLY_LINE)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_LINE)%Nodes_Array(iCell)
+                Counters(VTK_POLY_LINE) = Counters(VTK_POLY_LINE) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_LINE)%Nodes_Array(Counters(VTK_POLY_LINE))
             case (VTK_TRIANGLE)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE)%Nodes(1:3, iCell)
+                Counters(VTK_TRIANGLE) = Counters(VTK_TRIANGLE) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE)%Nodes(1:3, Counters(VTK_TRIANGLE))
             case (VTK_TRIANGLE_STRIP)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE_STRIP)%Nodes_Array(iCell)
+                Counters(VTK_TRIANGLE_STRIP) = Counters(VTK_TRIANGLE_STRIP) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE_STRIP)%Nodes_Array(Counters(VTK_TRIANGLE_STRIP))
             case (VTK_POLYGON)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLYGON)%Nodes_Array(iCell)
+                Counters(VTK_POLYGON) = Counters(VTK_POLYGON) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLYGON)%Nodes_Array(Counters(VTK_POLYGON))
             case (VTK_PIXEL)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_PIXEL)%Nodes(1:4, iCell)
+                Counters(VTK_PIXEL) = Counters(VTK_PIXEL) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_PIXEL)%Nodes(1:4, Counters(VTK_PIXEL))
             case (VTK_QUAD)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUAD)%Nodes(1:4, iCell)
+                Counters(VTK_QUAD) = Counters(VTK_QUAD) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUAD)%Nodes(1:4, Counters(VTK_QUAD))
             case (VTK_TETRA)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TETRA)%Nodes(1:4, iCell)
+                Counters(VTK_TETRA) = Counters(VTK_TETRA) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TETRA)%Nodes(1:4, Counters(VTK_TETRA))
             case (VTK_VOXEL)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VOXEL)%Nodes(1:8, iCell)
+                Counters(VTK_VOXEL) = Counters(VTK_VOXEL) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VOXEL)%Nodes(1:8, Counters(VTK_VOXEL))
             case (VTK_HEXAHEDRON)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_HEXAHEDRON)%Nodes(1:8, iCell)
+                Counters(VTK_HEXAHEDRON) = Counters(VTK_HEXAHEDRON) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_HEXAHEDRON)%Nodes(1:8, Counters(VTK_HEXAHEDRON))
             case (VTK_WEDGE)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_WEDGE)%Nodes(1:6, iCell)
+                Counters(VTK_WEDGE) = Counters(VTK_WEDGE) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_WEDGE)%Nodes(1:6, Counters(VTK_WEDGE))
             case (VTK_PYRAMID)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_PYRAMID)%Nodes(1:5, iCell)
+                Counters(VTK_PYRAMID) = Counters(VTK_PYRAMID) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_PYRAMID)%Nodes(1:5, Counters(VTK_PYRAMID))
             case (VTK_QUADRATIC_EDGE)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_EDGE)%Nodes(1:3, iCell)
+                Counters(VTK_QUADRATIC_EDGE) = Counters(VTK_QUADRATIC_EDGE) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_EDGE)%Nodes(1:3, Counters(VTK_QUADRATIC_EDGE))
             case (VTK_QUADRATIC_TRIANGLE)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%Nodes(1:6, iCell)
+                Counters(VTK_QUADRATIC_TRIANGLE) = Counters(VTK_QUADRATIC_TRIANGLE) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%Nodes(1:6, Counters(VTK_QUADRATIC_TRIANGLE))
             case (VTK_QUADRATIC_QUAD)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_QUAD)%Nodes(1:8, iCell)
+                Counters(VTK_QUADRATIC_QUAD) = Counters(VTK_QUADRATIC_QUAD) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_QUAD)%Nodes(1:8, Counters(VTK_QUADRATIC_QUAD))
             case (VTK_QUADRATIC_TETRA)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_TETRA)%Nodes(1:10, iCell)
+                Counters(VTK_QUADRATIC_TETRA) = Counters(VTK_QUADRATIC_TETRA) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_TETRA)%Nodes(1:10, Counters(VTK_QUADRATIC_TETRA))
             case (VTK_QUADRATIC_HEXAHEDRON)
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%Nodes(1:20, iCell)
+                Counters(VTK_QUADRATIC_HEXAHEDRON) = Counters(VTK_QUADRATIC_HEXAHEDRON) + 1
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%Nodes(1:20, Counters(VTK_QUADRATIC_HEXAHEDRON))
             end select
         end do
+        ! return
 
         do iCell = 1, 25
             if (allocated(vtk%CELLS(iCell)%Nodes_Array) .or. allocated(vtk%CELLS(iCell)%Nodes)) then
@@ -478,6 +502,7 @@ contains
                 read (unit, '(i)') vtk%CellEntityIds(iCellEntityId)
             end do
         end if
+        ! print *, vtk%CellEntityIds
 
     end subroutine Inout_VTK_Read_Data_CellEntityIds
 

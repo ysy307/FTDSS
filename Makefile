@@ -52,9 +52,11 @@ MKL_INC_DIRS_INTEL := -I${MKLROOT}/include/mkl/intel64/lp64 \
                       -I${MKLROOT}/include
 
 # Include path and Libraries
-INC_DIRS =
-LIBS = 
+INC_DIRS = -I/workspaces/FTDSS/include/Json-Fortran/
+LIBS =  -L/workspaces/FTDSS/lib/ -llibjsonfortran-static.a
 
+OPTIONS_COMPILE := $(OPTIONS_COMPILE) $(INC_DIRS)
+OPTIONS_LINK:= $(OPTIONS_LINK)  $(LIBS)
 OMP_INTEL := -fiopenmp
 OPT_INTEL := -O3 -flto -xHost
 CHK_INTEL := -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit
@@ -63,8 +65,8 @@ DEB_IMTEL := -g -debug all -fpe-all=0 -fp-stack-check -fstack-protector-all -ftr
 # Compiler
 ifeq "$(COMPILER)" "intel"
     FC              := ifx
-    OPTIONS_COMPILE := -fpp -c -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
-    OPTIONS_LINK    := -fpp -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
+    OPTIONS_COMPILE := $(OPTIONS_COMPILE) -fpp -c -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
+    OPTIONS_LINK    :=  $(OPTIONS_LINK) -fpp -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
     WRN             := $(WRN_INTEL)
     CHK             := $(CHK_INTEL)
     DEB             := $(DEB_INTEL)
@@ -122,6 +124,7 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
             $(SRC_DIR)/Calculate/TRM.f90 \
             $(SRC_DIR)/Conditions/FixBoundaryCondition.f90 \
             $(SRC_DIR)/Inout/SetProjectPath.f90 \
+            $(SRC_DIR)/Inout/VTK.f90 \
             $(SRC_DIR)/Inout/Input.f90 \
             $(SRC_DIR)/Inout/Output.f90 \
             $(SRC_DIR)/Inout/Stdout.f90 \
@@ -170,7 +173,7 @@ ysy: $(MAIN_FILE) $(OBJ_FILES)
 # Compile and link the test program
 test: $(TEST_FILE) $(OBJ_FILES)
 	@echo $(ASSEMBLE_TEXT)
-	@$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(TEST_FILE) $(OPTIONS_LINK) || (echo $(ERROR_TEXT) && exit 1)
+	@$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(TEST_FILE) $(OPTIONS_LINK) $(INC_DIRS) $(LIBS) || (echo $(ERROR_TEXT) && exit 1)
 	@echo $(FINISHED_TEXT)
 
 setup_directories:
@@ -179,7 +182,7 @@ setup_directories:
 $(OBJ_DIR)/%.obj: $(SRC_DIR)/%.f90
 	@mkdir -p $(dir $@)
 	@echo $(COMPILE_TEXT)
-	@$(FC) $(OPTIONS_COMPILE) -c $< -o $@
+	@$(FC) $(OPTIONS_COMPILE) -c $< -o $@ $(INC_DIRS) $(LIBS)
 
 
 .PHONY : info

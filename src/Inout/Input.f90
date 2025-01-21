@@ -5,8 +5,8 @@ module Inout_Input
     use :: allocate
     use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type, Allocate_Structure_Hydraulic_Type
     use :: Types
-    use :: tomlf
-    use :: json_module
+    ! use :: tomlf
+    use :: json_module, only:json_file
     use :: Inout_VTK
     implicit none
     private
@@ -162,7 +162,8 @@ module Inout_Input
         procedure :: Input_Flags => Inout_Input_Flags
 
         procedure :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
-        generic :: Input_Get => Input_Get_Basic_Params
+        procedure :: Input_Get_int32_rank1 => Inout_Input_Get_int32_rank1
+        generic :: Input_Get => Input_Get_Basic_Params, Input_Get_int32_rank1
 
         procedure :: Input_Get_Elements => Inout_Input_Get_Elements
         procedure :: Input_Get_Nodes => Inout_Input_Get_Nodes
@@ -202,14 +203,6 @@ module Inout_Input
         procedure :: Inout_Input_Connect_dot_4
         procedure :: Inout_Input_Connect_dot_5
         procedure :: Inout_Input_Connect_dot_6
-    end interface
-
-    abstract interface
-        function Inout_Input_Get_Interface(self) result(ptr)
-            import :: Basic_params, Type_Solver, Type_VTK, Input
-            class(Input), intent(in) :: self
-            class(*), pointer :: ptr
-        end function Inout_Input_Get_Interface
     end interface
 
 contains
@@ -254,7 +247,8 @@ contains
         if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%COO_FileName)
 
         call Input_Constructor%Input_Parameters()
-        ! call Input_Constructor%Input_Coodinates()
+        call Input_Constructor%Input_Coodinates()
+
         ! call Input_Constructor%Input_Vertices()
         ! call Input_Constructor%Input_BC()
         ! call Input_Constructor%Input_IC()
@@ -2041,6 +2035,22 @@ contains
         Structure%TimeDiscretization = self%Basic%TimeDiscretization
 
     end function Inout_Input_Get_Basic_Params
+
+    function Inout_Input_Get_int32_rank1(self, key) result(array_int32)
+        !> Get the int32 rank1 array of the input data
+        implicit none
+        class(Input) :: self
+        character(*), intent(in) :: key !! Key of the array
+        integer(int32), allocatable :: array_int32(:)
+
+        select case (key)
+        case ("CellEntityIds")
+            print *, self%VTK%CellEntityIds(:10)
+            allocate (array_int32, source=self%VTK%CellEntityIds)
+            print *, "CellEntityIds"
+
+        end select
+    end function Inout_Input_Get_int32_rank1
 
     function Inout_Input_Connect_dot_2(c1, c2) result(key)
         !> connect two strings with dot
