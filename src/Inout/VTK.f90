@@ -1,9 +1,10 @@
 module Inout_VTK
-    use, intrinsic :: iso_fortran_env
-    use :: Types
-    use :: allocate
-    use :: Allocate_Structure
+    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: Types, only:Type_VTK
+    use :: allocate, only:Allocate_Vector, Allocate_Matrix
+    use :: Allocate_Structure, only:Allocate_DP
     implicit none
+    private
 
     character(*), parameter :: c_ASCII = "ASCII"
     character(*), parameter :: c_BINARY = "BINARY"
@@ -54,6 +55,8 @@ module Inout_VTK
     integer(int32), parameter :: VTK_QUADRATIC_HEXAHEDRON = 25
 
     character(*), parameter :: space = " "
+
+    public :: Inout_VTK_Read
 
 contains
 
@@ -178,6 +181,8 @@ contains
         if (keyword == c_CELL_DATA) then
             call Inout_VTK_Read_Data_CellEntityIds(unit, vtk, line)
         end if
+
+        deallocate (lines)
 
     end subroutine Inout_VTK_Read_Data
 
@@ -387,9 +392,6 @@ contains
         end do
 
         do iCell = 1, vtk%numCells
-            ! pos1 = index(lines(iCell), space)
-            ! lines(iCell) = lines(iCell) (pos1 + 1:)
-
             select case (CellType(iCell))
             case (VTK_VERTEX)
                 read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VERTEX)%Nodes_Array(iCell)
@@ -443,6 +445,8 @@ contains
         end do
 
         read (unit, '(a)', iostat=iostat) ! Skip
+
+        deallocate (CellType)
 
     end subroutine Inout_VTK_Read_Data_Cells_Types
 

@@ -22,6 +22,7 @@ module Inout_Input
     character(*), parameter :: ShapeName = "Shape"
     character(*), parameter :: DimensionName = "Dimension"
     character(*), parameter :: RegionName = "Region"
+    character(*), parameter :: BelongName = "Belong"
     character(*), parameter :: CalculationName = "Calculation"
     character(*), parameter :: InputName = "Input"
     character(*), parameter :: OutputName = "Output"
@@ -358,6 +359,10 @@ contains
         character(:), allocatable :: key
 
         write (region_name, '(a, i0)') RegionName, iRegion
+
+        key = Inout_Input_Connect_dot(region_name, BelongName)
+        call json%get(key, self%Regions(iRegion)%BelongingGroup)
+        call json%print_error_message(output_unit)
 
         key = Inout_Input_Connect_dot(region_name, CalculationTypeName)
         call json%get(key, self%Regions(iRegion)%CalculationType)

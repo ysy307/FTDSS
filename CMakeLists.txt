@@ -38,8 +38,11 @@ elif(ENABLE_OPTIMIZE)
     set(COMPILE_Fortran_FLAGS "${COMPILE_Fortran_FLAGS} -O3 -flto -xHost")
 endif()
 
-# ライブラリ設定
-set(LINK_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libtomlf.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libvtkfortran.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libjsonfortran-static.a)
+# libraries settings
+file(GLOB_RECURSE MY_ALL_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.a)
+set(LINK_LIBRARIES ${MY_ALL_LIBRARIES})
+# set(LINK_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libjsonfortran-static.a)
+# set(LINK_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libtomlf.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libvtkfortran.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libjsonfortran-static.a)
 
 if(ENABLE_OPENMP)
     find_package(OpenMP REQUIRED)
@@ -65,10 +68,13 @@ if(ENABLE_MPI)
     list(APPEND LINK_LIBRARIES MPI::MPI_Fortran)
 endif()
 
-# インクルードパス設定
+# Include path settings
+# file(GLOB_RECURSE MY_ALL_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/**/*)
+# set(My_INCLUDE_PATH ${MY_ALL_INCLUDE_PATH})
+# set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/Json-Fortran)
 set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/tomlf ${CMAKE_INCLUDE_PATH}/VTKFortran ${CMAKE_INCLUDE_PATH}/Json-Fortran)
 
-# ビルドするターゲットを選択
+# Select build target
 if(BUILD_APP STREQUAL "ysy_fc")
     add_executable(ysy_fc ${PROJECT_SOURCE_DIR}/app/ysy_fc.f90 ${ALL_SRC_FILES})
     target_compile_options(ysy_fc PRIVATE ${COMPILE_Fortran_FLAGS})

@@ -257,6 +257,7 @@ module Types
     end type Type_Region_Flags
 
     type :: Type_Region
+        integer(int32), allocatable :: BelongingGroup(:)
         integer(int32) :: CalculationType
         integer(int32) :: Modelnumber
         type(Type_Thermal) :: Thermal
