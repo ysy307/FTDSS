@@ -1,4 +1,4 @@
-module Main_Heat
+module Main_Water
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     use :: Inout_Input
@@ -11,36 +11,33 @@ module Main_Heat
 
     implicit none
     private
-    integer(int32), parameter :: Calc_Heat = 1
+    integer(int32), parameter :: Calc_Water = 1
 
-    public :: Heat
+    public :: Water
 
-    type Heat
+    type Water
         type(Type_Geometry) :: Geometry
         type(Boudary_Condition) :: BC
-        type(CRS) :: Heat_CRS
-
+        type(CRS) :: Water_CRS
     contains
 
-    end type Heat
+    end type Water
 
-    interface Heat
-        module procedure Heat_Constructor
+    interface Water
+        module procedure Water_Constructor
     end interface
 
 contains
 
-    type(Heat) function Heat_Constructor(Structure_Input)
+    type(Water) function Water_Constructor(Structure_Input)
         type(Input), intent(in) :: Structure_Input
 
-        call Set_Geometory_Infomation(Heat_Constructor, Structure_Input)
-        ! call Set_Boundary_Condition_Infomations(Heat_Constructor, Structure_Input)
-
-    end function Heat_Constructor
+        call Set_Geometory_Infomation(Water_Constructor, Structure_Input)
+    end function Water_Constructor
 
     subroutine Set_Geometory_Infomation(self, Structure_Input)
         implicit none
-        type(Heat), intent(inout) :: self
+        type(Water), intent(inout) :: self
         type(Input), intent(in) :: Structure_Input
         procedure(condition_function), pointer :: condition_ptr => null()
 
@@ -67,8 +64,8 @@ contains
 
         numElements = 0
         do i = 1, self%Geometry%Basic%Region
-            call Structure_Input%Get(Work_Regions(i), i, "Thermal")
-            if (Work_Regions(i)%Flags%isHeat) then
+            call Structure_Input%Get(Work_Regions(i), i, "Hydraulic")
+            if (Work_Regions(i)%Flags%isWater) then
                 numElements = numElements + Work_CellCounts(Work_Regions(i)%BelongingSurface)
             end if
         end do
@@ -82,11 +79,12 @@ contains
             sums = sums + tmp
         end do
 
+        ! print *, sums, Work_CellEntityIds(sums:sums + 1)
         count = 0
         call Structure_Input%Get("CellNodes", Work_Elements, 5)
         elem: do i = 1, size(Work_Elements(:, :), 2)
             reg: do j = 1, self%Geometry%Basic%Region
-            if (Work_Regions(j)%Flags%isHeat) then
+            if (Work_Regions(j)%Flags%isWater) then
                 if (Work_Regions(j)%BelongingSurface == Work_CellEntityIds(sums + i)) then
                     count = count + 1
                     self%Geometry%Element(:, count) = Work_Elements(:, i)
@@ -104,7 +102,7 @@ contains
 
         call Calc_Area(self%Geometry)
 
-        call Convert_CRS(self%Geometry, self%Heat_CRS)
+        call Convert_CRS(self%Geometry, self%Water_CRS)
 
         if (allocated(Work_Regions)) deallocate (Work_Regions)
         if (allocated(Work_CellEntityIds)) deallocate (Work_CellEntityIds)
@@ -126,4 +124,4 @@ contains
         end if
     end function Condition_BelongingGroup
 
-end module Main_Heat
+end module Main_Water

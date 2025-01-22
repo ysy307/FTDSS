@@ -463,10 +463,10 @@ module Types
     type :: Type_Geometry
         type(Basic_params) :: Basic !! Basic parameters
         integer(int32), allocatable :: Element(:, :)
-        integer(int32), allocatable :: Element_Region(:), COO_Region(:)
+        integer(int32), allocatable :: Element_Region(:)
         type(DP3d) :: Nodes
         real(real64), allocatable :: Area(:)
-        type(Shape) :: Shape_Function
+        type(Shape) :: Basis
     end type Type_Geometry
 
     type :: TimeInfo

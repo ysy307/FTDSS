@@ -100,68 +100,20 @@ module Inout_Input
         type(Type_Solver) :: Solver
         type(Type_VTK) :: VTK
 
-        integer(int32) :: Elements, Nodes, Shape, Dimemsion, Region
-        integer(int32) :: StandardOutput, OutputFile
-        real(real64) :: Calculation_Time, dt, Output_Interval_Time
-        character(3) :: Time_Unit
-        ! Region
-        integer(int32), allocatable :: Work_Region_Basic_Infomatin(:, :)
-        integer(int32), allocatable :: Work_Region_Parameters_Number(:, :)
-        integer(int32), allocatable :: Work_Region_Parameters_int32(:, :)
-        real(real64), allocatable :: Work_Region_Paremeters_real64(:, :)
-
-        integer(int32) :: SolverDI(3), Solve_Type(3), Solve_Pre(3), Solve_Maxiter(3)
-        real(real64) :: Time_Discretization
-        real(real64) :: Solve_Tol(3)
-
-        ! Coordinate.in
-        integer(int32) :: COO_Dimension
-        real(real64), allocatable :: Work_Coordinates(:, :)
-        integer(int32), allocatable :: Work_Coordinates_Region(:)
-
-        ! Top.in
-        integer(int32), allocatable :: Work_Top(:, :)
-        integer(int32), allocatable :: Work_Top_Regions(:)
-
-        ! BC.in
-        ! Nodes BC information
-        integer(int32) :: Num_BC_Node, Num_BC_Node_Type, Num_NBC_Type
-        integer(int32), allocatable :: Work_NBC_Node(:), Work_NBC_Node_Type(:), Work_NBC_Node_Value_Info(:, :)
-        real(real64), allocatable :: Work_NBC_Node_Value(:, :)
-        ! Edeges BC information
-        integer(int32) :: Num_BC_Edge, Num_BC_Edge_Type, Num_EBC_Edge
-        integer(int32), allocatable :: Work_EBC_Edge(:, :), Work_EBC_Edge_Type(:), Work_EBC_Edge_Value_Info(:, :)
-        real(real64), allocatable :: Work_EBC_Edge_Value(:, :)
-
-        ! IC.in
-        integer(int32) :: IC_Type
-        integer(int32), allocatable :: Work_IC_Type(:)
-        real(real64), allocatable :: Work_IC_Value(:)
-
-        ! Obs.in
-        integer(int32) :: Observation_Type, Num_Observation
-        integer(int32), allocatable :: Work_Observation_Node(:)
-        real(real64), allocatable :: Work_Observation_Coordinate(:, :)
-
-        ! printobs.in
-        integer(int32) :: Num_Observation_Flag
-        integer(int32), allocatable :: Work_Observation_Flag(:)
-
-#ifdef _MPI
-        integer(int32) :: myrank, ierr
-#endif
-
     contains
 
         procedure :: Input_Parameters => Inout_Input_Parameters_JSON
         procedure :: Input_Geometry => Inout_Input_Geometry_VTK
 
         procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
+        procedure, pass :: Input_Get_Regional_Params => Inout_Input_Get_Regional_Params
+        procedure, pass :: Input_Get_DP3d => Inout_Input_Get_DP3d
         procedure, pass :: Input_Get_int32 => Inout_Input_Get_int32
         procedure, pass :: Input_Get_int32_rank1 => Inout_Input_Get_int32_rank1
-        generic :: Get => Input_Get_Basic_Params, Input_Get_int32, Input_Get_int32_rank1
+        procedure, pass :: Input_Get_int32_rank2 => Inout_Input_Get_int32_rank2
+        generic :: Get => Input_Get_Basic_Params, Input_Get_Regional_Params, Input_Get_int32, Input_Get_int32_rank1, Input_Get_int32_rank2, Input_Get_DP3d
 
-        final :: Inout_Input_Finalize
+        ! final :: Inout_Input_Finalize
 
     end type Input
 
@@ -1074,290 +1026,290 @@ contains
 
     end subroutine Inout_Input_Parameters_JSON_Solver_Settings
 
-    subroutine Inout_Input_Parameters(self)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: status, unit_num
-        integer(int32) :: iRegion
-        integer(int32) :: id, ii
-        character(256) :: c_dummy
+    ! subroutine Inout_Input_Parameters(self)
+    !     implicit none
+    !     class(Input) :: self
+    !     integer(int32) :: status, unit_num
+    !     integer(int32) :: iRegion
+    !     integer(int32) :: id, ii
+    !     character(256) :: c_dummy
 
-        open (newunit=unit_num, file=self%Basic_FileName, status="old", action="read", iostat=status)
-        if (status /= 0) call error_message(902, opt_file_name=self%Basic_FileName)
+    !     open (newunit=unit_num, file=self%Basic_FileName, status="old", action="read", iostat=status)
+    !     if (status /= 0) call error_message(902, opt_file_name=self%Basic_FileName)
 
-        read (unit_num, *)
-        read (unit_num, *)
-        read (unit_num, *)
-        read (unit_num, *)
-        read (unit_num, *) Self%Elements, Self%Nodes, Self%Shape, Self%Dimemsion, Self%Region
-        read (unit_num, *)
-        read (unit_num, *) self%Time_Unit, self%Calculation_Time, self%dt, self%Output_Interval_Time, self%StandardOutput, self%OutputFile
+    !     read (unit_num, *)
+    !     read (unit_num, *)
+    !     read (unit_num, *)
+    !     read (unit_num, *)
+    !     read (unit_num, *) Self%Elements, Self%Nodes, Self%Shape, Self%Dimemsion, Self%Region
+    !     read (unit_num, *)
+    !     read (unit_num, *) self%Time_Unit, self%Calculation_Time, self%dt, self%Output_Interval_Time, self%StandardOutput, self%OutputFile
 
-        call Allocate_Matrix(self%Work_Region_Basic_Infomatin, 2, Self%Region)
-        call Allocate_Matrix(self%Work_Region_Parameters_Number, 10, Self%Region)
-        call Allocate_Matrix(self%Work_Region_Parameters_int32, 10, Self%Region)
-        call Allocate_Matrix(self%Work_Region_Paremeters_real64, 50, Self%Region)
-        do iRegion = 1, Self%Region
-            read (unit_num, *)
-            read (unit_num, *) c_dummy, self%Work_Region_Basic_Infomatin(1, iRegion), self%Work_Region_Basic_Infomatin(2, iRegion)
-            read (unit_num, *)
-            if (.not. value_in_range(self%Work_Region_Basic_Infomatin(1, iRegion), min_calculation_type, max_calculation_type)) then
-                call error_message(903, copt1="calculation type")
-            end if
-            if (.not. value_in_range(self%Work_Region_Basic_Infomatin(2, iRegion), min_model_type, max_model_type)) then
-                if (self%Work_Region_Basic_Infomatin(2, iRegion) /= 20 .and. self%Work_Region_Basic_Infomatin(2, iRegion) /= 30) then
-                    call error_message(903, copt1="model type")
-                end if
-            end if
-            ! end do
-            ! end do
+    !     call Allocate_Matrix(self%Work_Region_Basic_Infomatin, 2, Self%Region)
+    !     call Allocate_Matrix(self%Work_Region_Parameters_Number, 10, Self%Region)
+    !     call Allocate_Matrix(self%Work_Region_Parameters_int32, 10, Self%Region)
+    !     call Allocate_Matrix(self%Work_Region_Paremeters_real64, 50, Self%Region)
+    !     do iRegion = 1, Self%Region
+    !         read (unit_num, *)
+    !         read (unit_num, *) c_dummy, self%Work_Region_Basic_Infomatin(1, iRegion), self%Work_Region_Basic_Infomatin(2, iRegion)
+    !         read (unit_num, *)
+    !         if (.not. value_in_range(self%Work_Region_Basic_Infomatin(1, iRegion), min_calculation_type, max_calculation_type)) then
+    !             call error_message(903, copt1="calculation type")
+    !         end if
+    !         if (.not. value_in_range(self%Work_Region_Basic_Infomatin(2, iRegion), min_model_type, max_model_type)) then
+    !             if (self%Work_Region_Basic_Infomatin(2, iRegion) /= 20 .and. self%Work_Region_Basic_Infomatin(2, iRegion) /= 30) then
+    !                 call error_message(903, copt1="model type")
+    !             end if
+    !         end if
+    !         ! end do
+    !         ! end do
 
-            ! Heat parameters input
-            if (mod(self%Work_Region_Basic_Infomatin(1, iRegion), 8) >= 4) then
-                id = 1
-                ii = 1
+    !         ! Heat parameters input
+    !         if (mod(self%Work_Region_Basic_Infomatin(1, iRegion), 8) >= 4) then
+    !             id = 1
+    !             ii = 1
 
-                read (unit_num, *)
-                read (unit_num, *)
-                read (unit_num, *)
-                select case (self%Work_Region_Basic_Infomatin(2, iRegion))
-                case (min_model_type:max_model_type)
-                    ! Porosity and Latent Heat
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-                    id = id + 2
+    !             read (unit_num, *)
+    !             read (unit_num, *)
+    !             read (unit_num, *)
+    !             select case (self%Work_Region_Basic_Infomatin(2, iRegion))
+    !             case (min_model_type:max_model_type)
+    !                 ! Porosity and Latent Heat
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
+    !                 id = id + 2
 
-                    ! Density
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
-                    id = id + 3
+    !                 ! Density
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
+    !                 id = id + 3
 
-                    ! Specific Heat
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
-                    id = id + 3
+    !                 ! Specific Heat
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
+    !                 id = id + 3
 
-                    ! Thermal Conductivity
-                    read (unit_num, *)
-                    if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 2) == 0) then
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
-                        id = id + 3
-                    else
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
-                        id = id + 5
-                    end if
+    !                 ! Thermal Conductivity
+    !                 read (unit_num, *)
+    !                 if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 2) == 0) then
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
+    !                     id = id + 3
+    !                 else
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
+    !                     id = id + 5
+    !                 end if
 
-                    ! bulk modulus
-                    if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 4) >= 2) then
-                        read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-                        id = id + 2
-                    end if
+    !                 ! bulk modulus
+    !                 if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 4) >= 2) then
+    !                     read (unit_num, *)
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
+    !                     id = id + 2
+    !                 end if
 
-                    ! Qice type
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
-                    ii = ii + 1
-                    select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
-                    case (1)
-                        ! TRM
-                        read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-                        id = id + 1
+    !                 ! Qice type
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
+    !                 ii = ii + 1
+    !                 select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
+    !                 case (1)
+    !                     ! TRM
+    !                     read (unit_num, *)
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
+    !                     id = id + 1
 
-                    case (2)
-                        ! GCC Model
-                        ! SWC type
-                        read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
+    !                 case (2)
+    !                     ! GCC Model
+    !                     ! SWC type
+    !                     read (unit_num, *)
+    !                     read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
 
-                        read (unit_num, *)
+    !                     read (unit_num, *)
 
-                        select case (self%Work_Region_Parameters_int32(ii, iRegion))
-                        case (1:3)
-                            ! BC, VG, KO
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
-                            id = id + 5
+    !                     select case (self%Work_Region_Parameters_int32(ii, iRegion))
+    !                     case (1:3)
+    !                         ! BC, VG, KO
+    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
+    !                         id = id + 5
 
-                        case (4)
-                            ! MVG
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 5, iRegion)
-                            id = id + 6
+    !                     case (4)
+    !                         ! MVG
+    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 5, iRegion)
+    !                         id = id + 6
 
-                        case (5)
-                            ! Durner
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
-                            id = id + 9
+    !                     case (5)
+    !                         ! Durner
+    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
+    !                         id = id + 9
 
-                        case (6)
-                            ! Dual-VG-CH
-                            read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
-                            id = id + 8
-                        case default
-                            call error_message(903, copt1="SWC type")
-                        end select
+    !                     case (6)
+    !                         ! Dual-VG-CH
+    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
+    !                         id = id + 8
+    !                     case default
+    !                         call error_message(903, copt1="SWC type")
+    !                     end select
 
-                        ii = ii + 1
-                    case (3)
-                        ! Power Model
-                        read (unit_num, *)
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-                        id = id + 2
-                    case default
-                        call error_message(903, copt1="Qice type")
-                    end select
-                case (20)
-                    ! Density
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-                    id = id + 1
+    !                     ii = ii + 1
+    !                 case (3)
+    !                     ! Power Model
+    !                     read (unit_num, *)
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
+    !                     id = id + 2
+    !                 case default
+    !                     call error_message(903, copt1="Qice type")
+    !                 end select
+    !             case (20)
+    !                 ! Density
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
+    !                 id = id + 1
 
-                    ! Specific Heat
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-                    id = id + 1
+    !                 ! Specific Heat
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
+    !                 id = id + 1
 
-                    ! Thermal Conductivity
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-                    id = id + 1
-                case (30)
-                    ! Porosity
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-                    id = id + 1
+    !                 ! Thermal Conductivity
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
+    !                 id = id + 1
+    !             case (30)
+    !                 ! Porosity
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
+    !                 id = id + 1
 
-                    ! Density
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-                    id = id + 2
+    !                 ! Density
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
+    !                 id = id + 2
 
-                    ! Specific Heat
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-                    id = id + 2
+    !                 ! Specific Heat
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
+    !                 id = id + 2
 
-                    ! Thermal Conductivity
-                    read (unit_num, *)
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-                    id = id + 2
-                end select
-                self%Work_Region_Parameters_Number(1, iRegion) = id - 1
-                self%Work_Region_Parameters_Number(2, iRegion) = ii - 1
-            end if
+    !                 ! Thermal Conductivity
+    !                 read (unit_num, *)
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
+    !                 id = id + 2
+    !             end select
+    !             self%Work_Region_Parameters_Number(1, iRegion) = id - 1
+    !             self%Work_Region_Parameters_Number(2, iRegion) = ii - 1
+    !         end if
 
-            ! Water parameters input
-            if (mod(self%Work_Region_Basic_Infomatin(1, iRegion), 4) >= 2) then
+    !         ! Water parameters input
+    !         if (mod(self%Work_Region_Basic_Infomatin(1, iRegion), 4) >= 2) then
 
-                read (unit_num, *)
-                read (unit_num, *)
-                read (unit_num, *)
+    !             read (unit_num, *)
+    !             read (unit_num, *)
+    !             read (unit_num, *)
 
-                ! krType
-                read (unit_num, *)
-                read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
-                ii = ii + 1
+    !             ! krType
+    !             read (unit_num, *)
+    !             read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
+    !             ii = ii + 1
 
-                read (unit_num, *)
-                select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
-                case (10)
-                    ! Hydraulic Conductivity
-                    read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-                    id = id + 2
-                case (21:26, 31:36)
-                    select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
-                    case (1:3)
-                        ! BC, VG, KO
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
-                        id = id + 7
+    !             read (unit_num, *)
+    !             select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
+    !             case (10)
+    !                 ! Hydraulic Conductivity
+    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
+    !                 id = id + 2
+    !             case (21:26, 31:36)
+    !                 select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
+    !                 case (1:3)
+    !                     ! BC, VG, KO
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
+    !                     id = id + 7
 
-                    case (4)
-                        ! MVG
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
-                        id = id + 8
+    !                 case (4)
+    !                     ! MVG
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
+    !                     id = id + 8
 
-                    case (5)
-                        ! Durner
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
-                        id = id + 11
+    !                 case (5)
+    !                     ! Durner
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
+    !                     id = id + 11
 
-                    case (6)
-                        ! Dual-VG-CH
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 9, iRegion)
-                        id = id + 10
-                    end select
-                case (41:46, 51:56)
-                    select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
-                    case (1:3)
-                        ! BC, VG, KO
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
-                        id = id + 7
+    !                 case (6)
+    !                     ! Dual-VG-CH
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 9, iRegion)
+    !                     id = id + 10
+    !                 end select
+    !             case (41:46, 51:56)
+    !                 select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
+    !                 case (1:3)
+    !                     ! BC, VG, KO
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
+    !                     id = id + 7
 
-                    case (4)
-                        ! MVG
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
-                        id = id + 9
+    !                 case (4)
+    !                     ! MVG
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
+    !                     id = id + 9
 
-                    case (5)
-                        ! Durner
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 11, iRegion)
-                        id = id + 12
+    !                 case (5)
+    !                     ! Durner
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 11, iRegion)
+    !                     id = id + 12
 
-                    case (6)
-                        ! Dual-VG-CH
-                        read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
-                        id = id + 11
-                    case default
-                        call error_message(903, copt1="SWC type")
-                    end select
+    !                 case (6)
+    !                     ! Dual-VG-CH
+    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
+    !                     id = id + 11
+    !                 case default
+    !                     call error_message(903, copt1="SWC type")
+    !                 end select
 
-                end select
+    !             end select
 
-                self%Work_Region_Parameters_Number(3, iRegion) = id - self%Work_Region_Parameters_Number(1, iRegion) - 1
-                self%Work_Region_Parameters_Number(4, iRegion) = ii - self%Work_Region_Parameters_Number(2, iRegion) - 1
-            end if
-        end do
+    !             self%Work_Region_Parameters_Number(3, iRegion) = id - self%Work_Region_Parameters_Number(1, iRegion) - 1
+    !             self%Work_Region_Parameters_Number(4, iRegion) = ii - self%Work_Region_Parameters_Number(2, iRegion) - 1
+    !         end if
+    !     end do
 
-        read (unit_num, *)
-        read (unit_num, *)
-        read (unit_num, *)
+    !     read (unit_num, *)
+    !     read (unit_num, *)
+    !     read (unit_num, *)
 
-        ! Time Discretization
-        read (unit_num, *)
-        read (unit_num, *) self%Time_Discretization
+    !     ! Time Discretization
+    !     read (unit_num, *)
+    !     read (unit_num, *) self%Time_Discretization
 
-        ! Heat Solver
-        if (any(mod(self%Work_Region_Basic_Infomatin(1, :), 8) >= 4)) then
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *) self%SolverDI(1)
+    !     ! Heat Solver
+    !     if (any(mod(self%Work_Region_Basic_Infomatin(1, :), 8) >= 4)) then
+    !         read (unit_num, *)
+    !         read (unit_num, *)
+    !         read (unit_num, *)
+    !         read (unit_num, *)
+    !         read (unit_num, *) self%SolverDI(1)
 
-            select case (self%SolverDI(1))
-            case (1)
-                read (unit_num, *)
-                read (unit_num, *) self%Solve_Type(1), self%Solve_Pre(1), self%Solve_Maxiter(1), self%Solve_Tol(1)
-            end select
-        end if
+    !         select case (self%SolverDI(1))
+    !         case (1)
+    !             read (unit_num, *)
+    !             read (unit_num, *) self%Solve_Type(1), self%Solve_Pre(1), self%Solve_Maxiter(1), self%Solve_Tol(1)
+    !         end select
+    !     end if
 
-        ! Water Solver
-        if (any(mod(self%Work_Region_Basic_Infomatin(1, :), 4) >= 2)) then
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *) self%SolverDI(2)
+    !     ! Water Solver
+    !     if (any(mod(self%Work_Region_Basic_Infomatin(1, :), 4) >= 2)) then
+    !         read (unit_num, *)
+    !         read (unit_num, *)
+    !         read (unit_num, *)
+    !         read (unit_num, *)
+    !         read (unit_num, *) self%SolverDI(2)
 
-            select case (self%SolverDI(2))
-            case (1)
-                read (unit_num, *)
-                read (unit_num, *) self%Solve_Type(2), self%Solve_Pre(2), self%Solve_Maxiter(2), self%Solve_Tol(2)
-            end select
-        end if
+    !         select case (self%SolverDI(2))
+    !         case (1)
+    !             read (unit_num, *)
+    !             read (unit_num, *) self%Solve_Type(2), self%Solve_Pre(2), self%Solve_Maxiter(2), self%Solve_Tol(2)
+    !         end select
+    !     end if
 
-        close (unit_num)
-    end subroutine Inout_Input_Parameters
+    !     close (unit_num)
+    ! end subroutine Inout_Input_Parameters
 
     subroutine Inout_Input_Geometry_VTK(self)
         !> Load the geometry from the VTK file
@@ -1368,32 +1320,32 @@ contains
         ! stop
     end subroutine Inout_Input_Geometry_VTK
 
-    subroutine Inout_Input_Finalize(self)
-        implicit none
-        type(Input) :: self
+    ! subroutine Inout_Input_Finalize(self)
+    !     implicit none
+    !     type(Input) :: self
 
-        if (allocated(self%Work_Region_Basic_Infomatin)) deallocate (self%Work_Region_Basic_Infomatin)
-        if (allocated(self%Work_Region_Paremeters_real64)) deallocate (self%Work_Region_Paremeters_real64)
-        if (allocated(self%Work_Region_Parameters_int32)) deallocate (self%Work_Region_Parameters_int32)
-        if (allocated(self%Work_Region_Parameters_Number)) deallocate (self%Work_Region_Parameters_Number)
-        if (allocated(self%Work_Coordinates)) deallocate (self%Work_Coordinates)
-        if (allocated(self%Work_Coordinates_Region)) deallocate (self%Work_Coordinates_Region)
-        if (allocated(self%Work_Top)) deallocate (self%Work_Top)
-        if (allocated(self%Work_NBC_Node)) deallocate (self%Work_NBC_Node)
-        if (allocated(self%Work_NBC_Node_Type)) deallocate (self%Work_NBC_Node_Type)
-        if (allocated(self%Work_NBC_Node_Value_Info)) deallocate (self%Work_NBC_Node_Value_Info)
-        if (allocated(self%Work_NBC_Node_Value)) deallocate (self%Work_NBC_Node_Value)
-        if (allocated(self%Work_EBC_Edge)) deallocate (self%Work_EBC_Edge)
-        if (allocated(self%Work_EBC_Edge_Type)) deallocate (self%Work_EBC_Edge_Type)
-        if (allocated(self%Work_EBC_Edge_Value_Info)) deallocate (self%Work_EBC_Edge_Value_Info)
-        if (allocated(self%Work_EBC_Edge_Value)) deallocate (self%Work_EBC_Edge_Value)
-        if (allocated(self%Work_IC_Type)) deallocate (self%Work_IC_Type)
-        if (allocated(self%Work_IC_Value)) deallocate (self%Work_IC_Value)
-        if (allocated(self%Work_Observation_Node)) deallocate (self%Work_Observation_Node)
-        if (allocated(self%Work_Observation_Coordinate)) deallocate (self%Work_Observation_Coordinate)
-        if (allocated(self%Work_Observation_Flag)) deallocate (self%Work_Observation_Flag)
+    !     if (allocated(self%Work_Region_Basic_Infomatin)) deallocate (self%Work_Region_Basic_Infomatin)
+    !     if (allocated(self%Work_Region_Paremeters_real64)) deallocate (self%Work_Region_Paremeters_real64)
+    !     if (allocated(self%Work_Region_Parameters_int32)) deallocate (self%Work_Region_Parameters_int32)
+    !     if (allocated(self%Work_Region_Parameters_Number)) deallocate (self%Work_Region_Parameters_Number)
+    !     if (allocated(self%Work_Coordinates)) deallocate (self%Work_Coordinates)
+    !     if (allocated(self%Work_Coordinates_Region)) deallocate (self%Work_Coordinates_Region)
+    !     if (allocated(self%Work_Top)) deallocate (self%Work_Top)
+    !     if (allocated(self%Work_NBC_Node)) deallocate (self%Work_NBC_Node)
+    !     if (allocated(self%Work_NBC_Node_Type)) deallocate (self%Work_NBC_Node_Type)
+    !     if (allocated(self%Work_NBC_Node_Value_Info)) deallocate (self%Work_NBC_Node_Value_Info)
+    !     if (allocated(self%Work_NBC_Node_Value)) deallocate (self%Work_NBC_Node_Value)
+    !     if (allocated(self%Work_EBC_Edge)) deallocate (self%Work_EBC_Edge)
+    !     if (allocated(self%Work_EBC_Edge_Type)) deallocate (self%Work_EBC_Edge_Type)
+    !     if (allocated(self%Work_EBC_Edge_Value_Info)) deallocate (self%Work_EBC_Edge_Value_Info)
+    !     if (allocated(self%Work_EBC_Edge_Value)) deallocate (self%Work_EBC_Edge_Value)
+    !     if (allocated(self%Work_IC_Type)) deallocate (self%Work_IC_Type)
+    !     if (allocated(self%Work_IC_Value)) deallocate (self%Work_IC_Value)
+    !     if (allocated(self%Work_Observation_Node)) deallocate (self%Work_Observation_Node)
+    !     if (allocated(self%Work_Observation_Coordinate)) deallocate (self%Work_Observation_Coordinate)
+    !     if (allocated(self%Work_Observation_Flag)) deallocate (self%Work_Observation_Flag)
 
-    end subroutine Inout_Input_Finalize
+    ! end subroutine Inout_Input_Finalize
 
     subroutine Inout_Input_Get_Basic_Params(self, Structure)
         !> Get the Basic_Params of the input data
@@ -1419,33 +1371,116 @@ contains
 
     end subroutine Inout_Input_Get_Basic_Params
 
-    subroutine Inout_Input_Get_int32(self, key, idata)
+    subroutine Inout_Input_Get_Regional_Params(self, Structure, iRegion, cType)
+        !> Get the Basic_Params of the input data
+        implicit none
+        class(Input) :: self
+        type(Type_Region), intent(inout) :: Structure
+        integer(int32), intent(in) :: iRegion
+        character(*), intent(in) :: cType
+
+        select case (cType)
+        case ("Thermal")
+            Structure%BelongingSurface = self%Regions(iRegion)%BelongingSurface
+            allocate (Structure%BelongingEdge, source=self%Regions(iRegion)%BelongingEdge)
+            Structure%CalculationType = self%Regions(iRegion)%CalculationType
+            Structure%Modelnumber = self%Regions(iRegion)%Modelnumber
+            Structure%Flags%is1Phase = self%Regions(iRegion)%Flags%is1Phase
+            Structure%Flags%is2Phase = self%Regions(iRegion)%Flags%is2Phase
+            Structure%Flags%isHeat = self%Regions(iRegion)%Flags%isHeat
+            Structure%Flags%isWater = self%Regions(iRegion)%Flags%isWater
+            Structure%Flags%isStress = self%Regions(iRegion)%Flags%isStress
+            Structure%Flags%isCompression = self%Regions(iRegion)%Flags%isCompression
+            Structure%Flags%isFrostHeavePressure = self%Regions(iRegion)%Flags%isFrostHeavePressure
+            Structure%Flags%isDispersity = self%Regions(iRegion)%Flags%isDispersity
+            Structure%Flags%isFrozen = self%Regions(iRegion)%Flags%isFrozen
+            call Allocate_Structure_Thermal_Type(Structure%Thermal, Structure%Flags)
+        case ("Hydraulic")
+            Structure%BelongingSurface = self%Regions(iRegion)%BelongingSurface
+            allocate (Structure%BelongingEdge, source=self%Regions(iRegion)%BelongingEdge)
+            Structure%CalculationType = self%Regions(iRegion)%CalculationType
+            Structure%Modelnumber = self%Regions(iRegion)%Modelnumber
+            Structure%Flags%is1Phase = self%Regions(iRegion)%Flags%is1Phase
+            Structure%Flags%is2Phase = self%Regions(iRegion)%Flags%is2Phase
+            Structure%Flags%isHeat = self%Regions(iRegion)%Flags%isHeat
+            Structure%Flags%isWater = self%Regions(iRegion)%Flags%isWater
+            Structure%Flags%isStress = self%Regions(iRegion)%Flags%isStress
+            Structure%Flags%isCompression = self%Regions(iRegion)%Flags%isCompression
+            Structure%Flags%isFrostHeavePressure = self%Regions(iRegion)%Flags%isFrostHeavePressure
+            Structure%Flags%isDispersity = self%Regions(iRegion)%Flags%isDispersity
+            Structure%Flags%isFrozen = self%Regions(iRegion)%Flags%isFrozen
+            call Allocate_Structure_Hydraulic_Type(Structure%Hydraulic)
+        end select
+
+    end subroutine Inout_Input_Get_Regional_Params
+
+    subroutine Inout_Input_Get_DP3d(self, key, Structure_DP)
+        !> Get the DP2d/3d of the input data
+        implicit none
+        class(Input) :: self
+        character(*), intent(in) :: key !! Key of the array
+        type(DP3d), intent(inout) :: Structure_DP
+
+        select case (key)
+        case ("POINTS")
+            allocate (Structure_DP%x, source=self%VTK%POINTS%x)
+            allocate (Structure_DP%y, source=self%VTK%POINTS%y)
+            allocate (Structure_DP%z, source=self%VTK%POINTS%z)
+        end select
+
+    end subroutine Inout_Input_Get_DP3d
+
+    subroutine Inout_Input_Get_int32(self, key, idata, optnum)
         !> Get the int32 of the input data
         implicit none
         class(Input) :: self
         character(*), intent(in) :: key !! Key of the array
         integer(int32), intent(inout) :: idata !! Array to store the data
+        integer(int32), intent(in), optional :: optnum !! Number of the array
 
         select case (key)
         case ("numCellTypes")
             idata = self%VTK%numCellTypes
+        case ("nCell")
+            if (present(optnum)) then
+                idata = self%VTK%CELLS(optnum)%nCells
+            end if
         end select
 
     end subroutine Inout_Input_Get_int32
 
-    subroutine Inout_Input_Get_int32_rank1(self, key, array_int32)
+    subroutine Inout_Input_Get_int32_rank1(self, key, array_int32, optnum)
         !> Get the int32 rank1 array of the input data
         implicit none
         class(Input) :: self
         character(*), intent(in) :: key !! Key of the array
         integer(int32), intent(inout), allocatable :: array_int32(:) !! Array to store the data
+        integer(int32), intent(in), optional :: optnum !! Number of the array
 
         select case (key)
         case ("CellEntityIds")
             allocate (array_int32, source=self%VTK%CellEntityIds)
+
         end select
 
     end subroutine Inout_Input_Get_int32_rank1
+
+    subroutine Inout_Input_Get_int32_rank2(self, key, array_int32, optnum)
+        !> Get the int32 rank1 array of the input data
+        implicit none
+        class(Input) :: self
+        character(*), intent(in) :: key !! Key of the array
+        integer(int32), intent(inout), allocatable :: array_int32(:, :) !! Array to store the data
+        integer(int32), intent(in), optional :: optnum !! Number of the array
+
+        select case (key)
+        case ("CellNodes")
+            if (present(optnum)) then
+                allocate (array_int32, source=self%VTK%Cells(optnum)%Nodes)
+            end if
+        end select
+
+    end subroutine Inout_Input_Get_int32_rank2
 
     function Inout_Input_Connect_dot_2(c1, c2) result(key)
         !> connect two strings with dot
