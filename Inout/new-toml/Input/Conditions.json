@@ -18,11 +18,11 @@
         "3": {
             "Thermal": {
                 "Type": "Dirichlet",
-                "Value": 0.0
+                "Value": 18.0
             },
             "Hydraulic": {
                 "Type": "Dirichlet",
-                "Value": 0.0
+                "Value": 10.0
             }
         },
         "4": {
@@ -97,7 +97,7 @@
         },
         "12": {
             "Thermal": {
-                "Type": "HeatTra",
+                "Type": "Dirichlet",
                 "Value": -30.0
             },
             "Hydraulic": {
@@ -134,13 +134,19 @@
     "InitialConditions": {
         "Thermal": {
             "Type": "Constant",
-            "Value": 0.0
+            "Value": 18.0
         },
         "Hydraulic": {
             "Type": "Laplace",
             "Value": {
-                "3": 0.1,
-                "5": 0.0
+                "3": {
+                    "Type": "Dirichlet",
+                    "Value": 0.1
+                },
+                "5": {
+                    "Type": "Dirichlet",
+                    "Value": 0.0
+                }
             }
         }
     }

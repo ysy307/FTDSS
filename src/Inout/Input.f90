@@ -83,6 +83,24 @@ module Inout_Input
     character(*), parameter :: ToleranceName = "Tolerance"
     character(*), parameter :: useSolverName = "useSolver"
 
+    character(*), parameter :: BCName = "BoundaryConditions"
+    character(*), parameter :: ICName = "InitialConditions"
+    character(*), parameter :: ConstantName = "Constant"
+    character(*), parameter :: LaplaceName = "Laplace"
+
+    character(*), parameter :: GroupName = "Groups"
+    character(*), parameter :: TypeName = "Type"
+    character(*), parameter :: ValueName = "Value"
+    character(*), parameter :: DirichletName = "Dirichlet"
+    character(*), parameter :: AdiabaticName = "Adiabatic"
+    character(*), parameter :: ImpermeableName = "Impermeable"
+    character(*), parameter :: FreeHeatTransferName = "FreeHeatTransfer"
+    character(*), parameter :: NoneName = "None"
+    character(*), parameter :: HeatTransferName = "HeatTransfer"
+
+    !! Positive NaN
+    real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
+
 #ifdef _MPI
     integer(int32), parameter :: root = 0
 #endif
@@ -91,7 +109,8 @@ module Inout_Input
 
     type :: Input
         private
-        character(256) :: Basic_FileName, COO_FileName, BC_FileName, Obs_FileName, ObsFlag_FileName, Top_FileName, IC_FileName
+        character(256) :: Basic_FileName, Conditions_FileName, Geometry_FileName
+        ! character(256) :: Basic_FileName, COO_FileName, BC_FileName, Obs_FileName, ObsFlag_FileName, Top_FileName, IC_FileName
 
         ! Basic.in
         ! Basic section
@@ -99,11 +118,13 @@ module Inout_Input
         type(Type_Region), allocatable :: Regions(:)
         type(Type_Solver) :: Solver
         type(Type_VTK) :: VTK
+        type(Type_Conditions) :: Conditions
 
     contains
 
         procedure :: Input_Parameters => Inout_Input_Parameters_JSON
         procedure :: Input_Geometry => Inout_Input_Geometry_VTK
+        procedure :: Input_Conditions => Inout_Input_Conditions_JSON
 
         procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
         procedure, pass :: Input_Get_Regional_Params => Inout_Input_Get_Regional_Params
@@ -136,45 +157,36 @@ contains
         character(256) :: dir_Path ! Path to the project directory
         integer(int32) :: access ! File access status
         integer(int32) :: status ! File access status
+        logical :: exists ! File existence status
+        character(256) :: access_mode
 
         ! Path settings
         dir_Path = GetProjectPath()
 
-        Input_Constructor%Basic_FileName = trim(adjustl(dir_Path))//"Input/Basic.in"
-        Input_Constructor%BC_FileName = trim(adjustl(dir_Path))//"Input/BC.in"
-        Input_Constructor%IC_FileName = trim(adjustl(dir_Path))//"Input/IC.in"
-        Input_Constructor%Obs_FileName = trim(adjustl(dir_Path))//"Input/Obs.in"
-        Input_Constructor%ObsFlag_FileName = trim(adjustl(dir_Path))//"Input/printobs.in"
-        Input_Constructor%Top_FileName = trim(adjustl(dir_Path))//"Input/top.in"
-        Input_Constructor%COO_FileName = trim(adjustl(dir_Path))//"Input/coordinate.in"
+        inquire (DIRECTORY=trim(adjustl(dir_Path))//"Input/", exist=exists)
+
+        Input_Constructor%Basic_FileName = trim(adjustl(dir_Path))//"Input/Basic.json"
+        Input_Constructor%Conditions_FileName = trim(adjustl(dir_Path))//"Input/Conditions.json"
+        Input_Constructor%Geometry_FileName = trim(adjustl(dir_Path))//"Input/Geometry.vtk"
+        ! Input_Constructor%IC_FileName = trim(adjustl(dir_Path))//"Input/IC.in"
+        ! Input_Constructor%Obs_FileName = trim(adjustl(dir_Path))//"Input/Obs.in"
+        ! Input_Constructor%ObsFlag_FileName = trim(adjustl(dir_Path))//"Input/printobs.in"
+        ! Input_Constructor%Top_FileName = trim(adjustl(dir_Path))//"Input/top.in"
+        ! Input_Constructor%COO_FileName = trim(adjustl(dir_Path))//"Input/coordinate.in"
 
         ! Check the existence of the file
-        status = access(Input_Constructor%Basic_FileName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%Basic_FileName)
+        inquire (file=Input_Constructor%Basic_FileName, exist=exists)
+        if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Basic_FileName)
 
-        status = access(Input_Constructor%BC_FileName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%BC_FileName)
+        inquire (file=Input_Constructor%Conditions_FileName, exist=exists)
+        if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Conditions_FileName)
 
-        status = access(Input_Constructor%IC_FileName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%IC_FileName)
-
-        status = access(Input_Constructor%Obs_FileName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%Obs_FileName)
-
-        status = access(Input_Constructor%ObsFlag_FileName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%ObsFlag_FileName)
-
-        status = access(Input_Constructor%Top_FileName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%Top_FileName)
-
-        status = access(Input_Constructor%COO_FileName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%COO_FileName)
+        inquire (file=Input_Constructor%Geometry_FileName, exist=exists)
+        if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Geometry_FileName)
 
         call Input_Constructor%Input_Parameters()
         call Input_Constructor%Input_Geometry()
-
-        ! call Input_Constructor%Input_Vertices()
-        ! call Input_Constructor%Input_BC()
+        call Input_Constructor%Input_Conditions()
         ! call Input_Constructor%Input_IC()
         ! call Input_Constructor%Input_Observation()
         ! call Input_Constructor%Input_Flags()
@@ -191,11 +203,8 @@ contains
 
         call json%initialize()
 
-        call json%load(filename='/workspaces/FTDSS/Inout/new-toml/Basic.json')
+        call json%load(filename=self%Basic_FileName)
         call json%print_error_message(output_unit)
-
-        ! call json%print(output_unit)
-        ! call json%print_error_message(output_unit)
 
         call Inout_Input_Parameters_JSON_Basic(self, json)
         if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%Region))
@@ -1026,298 +1035,165 @@ contains
 
     end subroutine Inout_Input_Parameters_JSON_Solver_Settings
 
-    ! subroutine Inout_Input_Parameters(self)
-    !     implicit none
-    !     class(Input) :: self
-    !     integer(int32) :: status, unit_num
-    !     integer(int32) :: iRegion
-    !     integer(int32) :: id, ii
-    !     character(256) :: c_dummy
+    subroutine Inout_Input_Conditions_JSON(self)
+        !> Load the boundary/initial conditions from the JSON file
+        implicit none
+        class(Input) :: self
 
-    !     open (newunit=unit_num, file=self%Basic_FileName, status="old", action="read", iostat=status)
-    !     if (status /= 0) call error_message(902, opt_file_name=self%Basic_FileName)
+        type(json_file) :: json
+        character(:), allocatable :: key
+        integer(int32) :: iRegion
 
-    !     read (unit_num, *)
-    !     read (unit_num, *)
-    !     read (unit_num, *)
-    !     read (unit_num, *)
-    !     read (unit_num, *) Self%Elements, Self%Nodes, Self%Shape, Self%Dimemsion, Self%Region
-    !     read (unit_num, *)
-    !     read (unit_num, *) self%Time_Unit, self%Calculation_Time, self%dt, self%Output_Interval_Time, self%StandardOutput, self%OutputFile
+        call json%initialize()
+        call json%load(filename=self%Conditions_FileName)
+        call json%print_error_message(output_unit)
 
-    !     call Allocate_Matrix(self%Work_Region_Basic_Infomatin, 2, Self%Region)
-    !     call Allocate_Matrix(self%Work_Region_Parameters_Number, 10, Self%Region)
-    !     call Allocate_Matrix(self%Work_Region_Parameters_int32, 10, Self%Region)
-    !     call Allocate_Matrix(self%Work_Region_Paremeters_real64, 50, Self%Region)
-    !     do iRegion = 1, Self%Region
-    !         read (unit_num, *)
-    !         read (unit_num, *) c_dummy, self%Work_Region_Basic_Infomatin(1, iRegion), self%Work_Region_Basic_Infomatin(2, iRegion)
-    !         read (unit_num, *)
-    !         if (.not. value_in_range(self%Work_Region_Basic_Infomatin(1, iRegion), min_calculation_type, max_calculation_type)) then
-    !             call error_message(903, copt1="calculation type")
-    !         end if
-    !         if (.not. value_in_range(self%Work_Region_Basic_Infomatin(2, iRegion), min_model_type, max_model_type)) then
-    !             if (self%Work_Region_Basic_Infomatin(2, iRegion) /= 20 .and. self%Work_Region_Basic_Infomatin(2, iRegion) /= 30) then
-    !                 call error_message(903, copt1="model type")
-    !             end if
-    !         end if
-    !         ! end do
-    !         ! end do
+        call Inout_Input_Conditions_JSON_BC(self, json)
+        call Inout_Input_Conditions_JSON_IC(self, json)
 
-    !         ! Heat parameters input
-    !         if (mod(self%Work_Region_Basic_Infomatin(1, iRegion), 8) >= 4) then
-    !             id = 1
-    !             ii = 1
+        call json%destroy()
+        call json%print_error_message(output_unit)
 
-    !             read (unit_num, *)
-    !             read (unit_num, *)
-    !             read (unit_num, *)
-    !             select case (self%Work_Region_Basic_Infomatin(2, iRegion))
-    !             case (min_model_type:max_model_type)
-    !                 ! Porosity and Latent Heat
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-    !                 id = id + 2
+    end subroutine Inout_Input_Conditions_JSON
 
-    !                 ! Density
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
-    !                 id = id + 3
+    subroutine Inout_Input_Conditions_JSON_BC(self, json)
+        !> Load the boundary conditions from the JSON file
+        implicit none
+        class(Input) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
 
-    !                 ! Specific Heat
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
-    !                 id = id + 3
+        character(:), allocatable :: key
+        character(2) :: cBCGroup
+        integer(int32) :: iBC
 
-    !                 ! Thermal Conductivity
-    !                 read (unit_num, *)
-    !                 if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 2) == 0) then
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 2, iRegion)
-    !                     id = id + 3
-    !                 else
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
-    !                     id = id + 5
-    !                 end if
+        key = Inout_Input_Connect_dot(BCName, GroupName)
+        call json%get(key, self%Conditions%BCGroup)
+        call json%print_error_message(output_unit)
+        allocate (self%Conditions%BC_Thermal(size(self%Conditions%BCGroup)))
+        allocate (self%Conditions%BC_Hydraulic(size(self%Conditions%BCGroup)))
 
-    !                 ! bulk modulus
-    !                 if (mod(self%Work_Region_Basic_Infomatin(2, iRegion) - min_model_type, 4) >= 2) then
-    !                     read (unit_num, *)
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-    !                     id = id + 2
-    !                 end if
+        do iBC = 1, size(self%Conditions%BCGroup)
+            write (cBCGroup, '(i0)') self%Conditions%BCGroup(iBC)
+            key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, TypeName)
+            call json%get(key, self%Conditions%BC_Thermal(iBC)%type)
+            call json%print_error_message(output_unit)
 
-    !                 ! Qice type
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
-    !                 ii = ii + 1
-    !                 select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
-    !                 case (1)
-    !                     ! TRM
-    !                     read (unit_num, *)
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-    !                     id = id + 1
+            select case (self%Conditions%BC_Thermal(iBC)%type)
+            case (DirichletName, HeatTransferName)
+                key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, ValueName)
+                call json%get(key, self%Conditions%BC_Thermal(iBC)%value)
+                call json%print_error_message(output_unit)
+            case default
+                self%Conditions%BC_Thermal(iBC)%value = NaNValue
+            end select
 
-    !                 case (2)
-    !                     ! GCC Model
-    !                     ! SWC type
-    !                     read (unit_num, *)
-    !                     read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
+            key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, TypeName)
+            call json%get(key, self%Conditions%BC_Hydraulic(iBC)%type)
+            call json%print_error_message(output_unit)
 
-    !                     read (unit_num, *)
+            select case (self%Conditions%BC_Hydraulic(iBC)%type)
+            case (DirichletName, HeatTransferName)
+                key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, ValueName)
+                call json%get(key, self%Conditions%BC_Hydraulic(iBC)%value)
+                call json%print_error_message(output_unit)
+            case default
+                self%Conditions%BC_Hydraulic(iBC)%value = NaNValue
+            end select
+        end do
 
-    !                     select case (self%Work_Region_Parameters_int32(ii, iRegion))
-    !                     case (1:3)
-    !                         ! BC, VG, KO
-    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 4, iRegion)
-    !                         id = id + 5
+    end subroutine Inout_Input_Conditions_JSON_BC
 
-    !                     case (4)
-    !                         ! MVG
-    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 5, iRegion)
-    !                         id = id + 6
+    subroutine Inout_Input_Conditions_JSON_IC(self, json)
+        !> Load the initialy conditions from the JSON file
+        implicit none
+        class(Input) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
 
-    !                     case (5)
-    !                         ! Durner
-    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
-    !                         id = id + 9
+        character(:), allocatable :: key
+        character(:), allocatable :: tmp
 
-    !                     case (6)
-    !                         ! Dual-VG-CH
-    !                         read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
-    !                         id = id + 8
-    !                     case default
-    !                         call error_message(903, copt1="SWC type")
-    !                     end select
+        character(2) :: cICGroup
+        integer(int32) :: i, count
+        logical :: isFind
 
-    !                     ii = ii + 1
-    !                 case (3)
-    !                     ! Power Model
-    !                     read (unit_num, *)
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-    !                     id = id + 2
-    !                 case default
-    !                     call error_message(903, copt1="Qice type")
-    !                 end select
-    !             case (20)
-    !                 ! Density
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-    !                 id = id + 1
+        key = Inout_Input_Connect_dot(ICName, ThermalName, TypeName)
+        call json%get(key, self%Conditions%IC_Thermal%type)
+        call json%print_error_message(output_unit)
 
-    !                 ! Specific Heat
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-    !                 id = id + 1
+        select case (self%Conditions%IC_Thermal%type)
+        case (ConstantName)
+            key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName)
+            call json%get(key, self%Conditions%IC_Thermal%value)
+            call json%print_error_message(output_unit)
+        case (LaplaceName)
+            count = 0
+            do i = 1, size(self%Conditions%BCGroup)
+                write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+                key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
+                call json%get(key, tmp, found=isFind)
+                if (isFind) count = count + 1
+            end do
+            allocate (self%Conditions%IC_Thermal%IC_BC(count))
+            do i = 1, size(self%Conditions%BCGroup)
+                write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+                key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
+                call json%get(key, tmp, found=isFind)
+                if (.not. isFind) cycle
 
-    !                 ! Thermal Conductivity
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-    !                 id = id + 1
-    !             case (30)
-    !                 ! Porosity
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id, iRegion)
-    !                 id = id + 1
+                key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
+                call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%type)
+                call json%print_error_message(output_unit)
 
-    !                 ! Density
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-    !                 id = id + 2
+                key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, ValueName)
+                call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%value)
+                call json%print_error_message(output_unit)
+            end do
 
-    !                 ! Specific Heat
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-    !                 id = id + 2
+        end select
 
-    !                 ! Thermal Conductivity
-    !                 read (unit_num, *)
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-    !                 id = id + 2
-    !             end select
-    !             self%Work_Region_Parameters_Number(1, iRegion) = id - 1
-    !             self%Work_Region_Parameters_Number(2, iRegion) = ii - 1
-    !         end if
+        key = Inout_Input_Connect_dot(ICName, HydraulicName, TypeName)
+        call json%get(key, self%Conditions%IC_Hydraulic%type)
+        call json%print_error_message(output_unit)
 
-    !         ! Water parameters input
-    !         if (mod(self%Work_Region_Basic_Infomatin(1, iRegion), 4) >= 2) then
+        select case (self%Conditions%IC_Hydraulic%type)
+        case (ConstantName)
+            key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName)
+            call json%get(key, self%Conditions%IC_Hydraulic%value)
+            call json%print_error_message(output_unit)
+        case (LaplaceName)
+            count = 0
+            do i = 1, size(self%Conditions%BCGroup)
+                write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+                key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+                call json%get(key, tmp, found=isFind)
+                if (isFind) count = count + 1
+            end do
+            allocate (self%Conditions%IC_Hydraulic%IC_BC(count))
+            do i = 1, size(self%Conditions%BCGroup)
+                write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+                key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+                call json%get(key, tmp, found=isFind)
 
-    !             read (unit_num, *)
-    !             read (unit_num, *)
-    !             read (unit_num, *)
+                if (.not. isFind) cycle
 
-    !             ! krType
-    !             read (unit_num, *)
-    !             read (unit_num, *) self%Work_Region_Parameters_int32(ii, iRegion)
-    !             ii = ii + 1
+                key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+                call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(i)%type)
+                call json%print_error_message(output_unit)
 
-    !             read (unit_num, *)
-    !             select case (self%Work_Region_Parameters_int32(ii - 1, iRegion))
-    !             case (10)
-    !                 ! Hydraulic Conductivity
-    !                 read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 1, iRegion)
-    !                 id = id + 2
-    !             case (21:26, 31:36)
-    !                 select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
-    !                 case (1:3)
-    !                     ! BC, VG, KO
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
-    !                     id = id + 7
+                key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
+                call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(i)%value)
+                call json%print_error_message(output_unit)
+            end do
+        end select
 
-    !                 case (4)
-    !                     ! MVG
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 7, iRegion)
-    !                     id = id + 8
-
-    !                 case (5)
-    !                     ! Durner
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
-    !                     id = id + 11
-
-    !                 case (6)
-    !                     ! Dual-VG-CH
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 9, iRegion)
-    !                     id = id + 10
-    !                 end select
-    !             case (41:46, 51:56)
-    !                 select case (mod(self%Work_Region_Parameters_int32(ii - 1, iRegion), 10))
-    !                 case (1:3)
-    !                     ! BC, VG, KO
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 6, iRegion)
-    !                     id = id + 7
-
-    !                 case (4)
-    !                     ! MVG
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 8, iRegion)
-    !                     id = id + 9
-
-    !                 case (5)
-    !                     ! Durner
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 11, iRegion)
-    !                     id = id + 12
-
-    !                 case (6)
-    !                     ! Dual-VG-CH
-    !                     read (unit_num, *) self%Work_Region_Paremeters_real64(id:id + 10, iRegion)
-    !                     id = id + 11
-    !                 case default
-    !                     call error_message(903, copt1="SWC type")
-    !                 end select
-
-    !             end select
-
-    !             self%Work_Region_Parameters_Number(3, iRegion) = id - self%Work_Region_Parameters_Number(1, iRegion) - 1
-    !             self%Work_Region_Parameters_Number(4, iRegion) = ii - self%Work_Region_Parameters_Number(2, iRegion) - 1
-    !         end if
-    !     end do
-
-    !     read (unit_num, *)
-    !     read (unit_num, *)
-    !     read (unit_num, *)
-
-    !     ! Time Discretization
-    !     read (unit_num, *)
-    !     read (unit_num, *) self%Time_Discretization
-
-    !     ! Heat Solver
-    !     if (any(mod(self%Work_Region_Basic_Infomatin(1, :), 8) >= 4)) then
-    !         read (unit_num, *)
-    !         read (unit_num, *)
-    !         read (unit_num, *)
-    !         read (unit_num, *)
-    !         read (unit_num, *) self%SolverDI(1)
-
-    !         select case (self%SolverDI(1))
-    !         case (1)
-    !             read (unit_num, *)
-    !             read (unit_num, *) self%Solve_Type(1), self%Solve_Pre(1), self%Solve_Maxiter(1), self%Solve_Tol(1)
-    !         end select
-    !     end if
-
-    !     ! Water Solver
-    !     if (any(mod(self%Work_Region_Basic_Infomatin(1, :), 4) >= 2)) then
-    !         read (unit_num, *)
-    !         read (unit_num, *)
-    !         read (unit_num, *)
-    !         read (unit_num, *)
-    !         read (unit_num, *) self%SolverDI(2)
-
-    !         select case (self%SolverDI(2))
-    !         case (1)
-    !             read (unit_num, *)
-    !             read (unit_num, *) self%Solve_Type(2), self%Solve_Pre(2), self%Solve_Maxiter(2), self%Solve_Tol(2)
-    !         end select
-    !     end if
-
-    !     close (unit_num)
-    ! end subroutine Inout_Input_Parameters
+    end subroutine Inout_Input_Conditions_JSON_IC
 
     subroutine Inout_Input_Geometry_VTK(self)
         !> Load the geometry from the VTK file
         implicit none
         class(Input) :: self
 
-        call Inout_VTK_Read('/workspaces/FTDSS/Inout/new-toml/Geometry.vtk', self%VTK)
-        ! stop
+        call Inout_VTK_Read(self%Geometry_FileName, self%VTK)
     end subroutine Inout_Input_Geometry_VTK
 
     ! subroutine Inout_Input_Finalize(self)

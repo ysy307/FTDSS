@@ -150,6 +150,27 @@ module Types
         real(real64) :: Tol !! Convergence criterion
     end type Type_Solver_Iterative
 
+    type :: BC_Condition
+        character(:), allocatable :: type
+        real(real64) :: value
+    end type BC_Condition
+
+    type :: IC_Condition
+        character(:), allocatable :: type
+        !! Constant initial condition
+        real(real64) :: value
+        !! Following the laplace equation
+        type(BC_Condition), allocatable :: IC_BC(:)
+    end type IC_Condition
+
+    type :: Type_Conditions
+        integer(int32), allocatable :: BCGroup(:)
+        type(BC_Condition), allocatable :: BC_Thermal(:)
+        type(BC_Condition), allocatable :: BC_Hydraulic(:)
+        type(IC_Condition) :: IC_Thermal
+        type(IC_Condition) :: IC_Hydraulic
+    end type Type_Conditions
+
     type :: Base_Density
     end type Base_Density
 
