@@ -10,6 +10,13 @@ module Types
     real(real64), parameter :: GravityAcceleration = 9.80655d0
     integer(int32), parameter :: undumped = 0, dumped = 1
 
+    abstract interface
+        logical function condition_function(num, group)
+            integer, intent(in) :: num
+            integer, intent(in) :: group
+        end function condition_function
+    end interface
+
     type :: VC
         sequence
         real(real64) :: x, y

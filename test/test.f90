@@ -72,8 +72,6 @@ program test
 #endif
 
     Inputs = Input()
-    print *, "TEst"
-    print *, "TEst"
     ! Outputs = Output(Inputs)
     tHeat = Heat(Inputs)
     ! tHeat = Heat(Inputs)

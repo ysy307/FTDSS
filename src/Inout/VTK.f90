@@ -53,6 +53,7 @@ module Inout_VTK
     integer(int32), parameter :: VTK_QUADRATIC_QUAD = 23
     integer(int32), parameter :: VTK_QUADRATIC_TETRA = 24
     integer(int32), parameter :: VTK_QUADRATIC_HEXAHEDRON = 25
+    integer(int32), parameter :: MAX_VTK_SHAPE = 25
 
     character(*), parameter :: space = " "
 
@@ -260,13 +261,10 @@ contains
         read (headline(pos1 + 1:pos2 - 1), '(i)') numCells
         read (headline(pos2 + 1:), '(i)') numCellsList
 
-        ! allocate (vtk%CELLS(25))
-
         vtk%numCells = numCells
         vtk%numCellsList = numCellsList
 
         allocate (lines(vtk%numCells))
-        ! call Allocate_Vector(CellType, vtk%numCells)
 
         do iCell = 1, vtk%numCells
             read (unit, '(a)', iostat=iostat) lines(iCell)
@@ -293,16 +291,15 @@ contains
         integer(int32) :: iostat, numCellTypes
         integer(int32) :: pos1, pos2
         integer(int32) :: iCell, iiCell
-        integer(int32), allocatable :: CellType(:)
+        integer(int32), allocatable :: CellType(:), Counters(:)
         integer(int32) :: counts
-        integer(int32) :: Counters(25)
 
         pos1 = index(headline, space)
         pos2 = index(headline(pos1 + 1:), space) + pos1
         if (pos2 == pos1) stop
 
         read (headline(pos1 + 1:pos2 - 1), '(i)') numCellTypes
-        allocate (vtk%CELLS(25))
+        allocate (vtk%CELLS(MAX_VTK_SHAPE))
 
         vtk%numCellTypes = numCellTypes
         call Allocate_Vector(CellType, vtk%numCellTypes)
@@ -357,7 +354,7 @@ contains
         end do
 
         counts = 0
-        do iCell = 1, 25
+        do iCell = 1, MAX_VTK_SHAPE
             if (vtk%CELLS(iCell)%nCells > 0) then
                 counts = counts + 1
                 select case (iCell)
@@ -385,16 +382,15 @@ contains
 
         call Allocate_Vector(vtk%Invalid_CELLS_LIST, counts)
         iiCell = 0
-        do iCell = 1, 25
+        do iCell = 1, MAX_VTK_SHAPE
             if (vtk%CELLS(iCell)%nCells > 0) then
                 iiCell = iiCell + 1
                 vtk%Invalid_CELLS_LIST(iiCell) = iCell
             end if
         end do
 
-        print *, vtk%numCells
+        call Allocate_Vector(Counters, MAX_VTK_SHAPE)
         Counters(:) = 0
-        ! stop
         do iCell = 1, vtk%numCells
             select case (CellType(iCell))
             case (VTK_VERTEX)
@@ -456,9 +452,8 @@ contains
                 read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%Nodes(1:20, Counters(VTK_QUADRATIC_HEXAHEDRON))
             end select
         end do
-        ! return
 
-        do iCell = 1, 25
+        do iCell = 1, MAX_VTK_SHAPE
             if (allocated(vtk%CELLS(iCell)%Nodes_Array) .or. allocated(vtk%CELLS(iCell)%Nodes)) then
                 if (allocated(vtk%CELLS(iCell)%Nodes_Array)) then
                     vtk%CELLS(iCell)%Nodes_Array(:) = vtk%CELLS(iCell)%Nodes_Array(:) + 1
@@ -471,6 +466,7 @@ contains
         read (unit, '(a)', iostat=iostat) ! Skip
 
         deallocate (CellType)
+        deallocate (Counters)
 
     end subroutine Inout_VTK_Read_Data_Cells_Types
 
@@ -502,7 +498,6 @@ contains
                 read (unit, '(i)') vtk%CellEntityIds(iCellEntityId)
             end do
         end if
-        ! print *, vtk%CellEntityIds
 
     end subroutine Inout_VTK_Read_Data_CellEntityIds
 

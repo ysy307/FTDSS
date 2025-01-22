@@ -7,38 +7,39 @@ module Calculate_Count
 
     interface Count_if
         procedure :: Count_if_int32
-        procedure :: Count_if_int32_Array
+        ! procedure :: Count_if_int32_Array
     end interface
 
 contains
 
-    function Count_if_int32(array, condition) result(count)
+    function Count_if_int32(array, condition, group) result(count)
         !> 条件を満たす整数の個数をカウントする関数
         implicit none
-        integer, intent(in) :: array(:) !! 入力配列
-        logical, pointer :: condition !! 条件を満たすか判定する関数ポインタ
-        integer :: count !! 条件を満たす要素の個数
-        integer :: i
+        integer(int32), intent(in) :: array(:) !! 入力配列
+        integer(int32), intent(in) :: group !! 条件となる整数
+        procedure(condition_function), pointer :: condition !! 条件を満たすか判定する関数ポインタ
+        integer(int32) :: count !! 条件を満たす要素の個数
+        integer(int32) :: i
 
         count = 0
         do i = 1, size(array)
-            if (condition(array(i))) count = count + 1
+            if (condition(array(i), group)) count = count + 1
         end do
     end function Count_if_int32
 
-    ! 2. 条件配列とともに整数の個数をカウントする関数
-    function Count_if_int32_Array(array, condition, condition_array) result(count)
-        implicit none
-        integer, intent(in) :: array(:) ! 入力配列
-        logical, pointer :: condition ! 条件を満たすか判定する関数ポインタ
-        integer, intent(in) :: condition_array(:) ! 条件配列
-        integer :: count ! 条件を満たす要素の個数
-        integer :: i
+    ! ! 2. 条件配列とともに整数の個数をカウントする関数
+    ! function Count_if_int32_Array(array, condition, condition_array) result(count)
+    !     implicit none
+    !     integer, intent(in) :: array(:) !! 入力配列
+    !     logical, pointer :: condition !! 条件を満たすか判定する関数ポインタ
+    !     integer, intent(in) :: condition_array(:) !! 条件配列
+    !     integer :: count !! 条件を満たす要素の個数
+    !     integer :: i
 
-        count = 0
-        do i = 1, size(array)
-            if (condition(array(i), condition_array)) count = count + 1
-        end do
-    end function Count_if_int32_Array
+    !     count = 0
+    !     do i = 1, size(array)
+    !         if (condition(array(i), condition_array)) count = count + 1
+    !     end do
+    ! end function Count_if_int32_Array
 
 end module Calculate_Count

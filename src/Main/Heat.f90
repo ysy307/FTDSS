@@ -2,8 +2,10 @@ module Main_Heat
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     use :: Inout_Input
-    ! use :: allocate
-    ! use :: Allocate_Structure, only:Allocate_DP2d
+    use :: calculate_count, only:Count_if
+    use :: allocate, only:Allocate_Vector
+    use :: Calculate_Unique, only:Unique
+    ! use :: Allocate_Structure, only:
     ! use :: Calculate_HCF
 
     implicit none
@@ -49,30 +51,27 @@ contains
     end function Heat_Constructor
 
     subroutine Set_Geometory_Infomation(self, Structure_Input)
+        implicit none
         type(Heat), intent(inout) :: self
         type(Input), intent(in) :: Structure_Input
+        procedure(condition_function), pointer :: condition_ptr => null()
 
-        integer(int32), allocatable :: Work_CellEntityIds(:)
+        integer(int32), allocatable :: Work_CellEntityIds(:), Work_CellEntityIdUnique(:)
+        integer(int32), allocatable :: Work_CellCounts(:)
+        integer(int32) :: numCellTypes
 
-        print *, "test"
-        self%Geometry%Basic = Structure_Input%Input_Get()
-        Work_CellEntityIds(:) = Structure_Input%Input_Get("CellEntityIds")
-        print *, Work_CellEntityIds
+        call Structure_Input%Get(self%Geometry%Basic)
+        call Structure_Input%Get("CellEntityIds", Work_CellEntityIds)
+        call Structure_Input%Get("numCellTypes", numCellTypes)
+        ! print *, numCellTypes
+        ! allocate (Work_CellEntityIdss, source=Work_CellEntityIds)
 
-        ! print *, self%Geometry%Basic%Element
-
-        ! self%Geometry%Num_Elements = Structure_Input%Input_Get_Elements()
-        ! self%Geometry%Num_Nodes = Structure_Input%Input_Get_Nodes()
-        ! self%Geometry%Num_Shape = Structure_Input%Input_Get_Shape()
-        ! self%Geometry%Num_Dimention = Structure_Input%Input_Get_Dimemsion()
-        ! self%Geometry%Num_Region = Structure_Input%Input_Get_Region()
-
-        ! self%Geometry%Num_Shape_Type = self%Geometry%Num_Shape * self%Geometry%Num_Dimention
-
-        ! self%Geometry%Element = Structure_Input%Input_Get_Top()
-        ! self%Geometry%Element_Region = Structure_Input%Input_Get_Top_Region()
-        ! self%Geometry%Nodes_2D = Structure_Input%Input_Get_Coordinates()
-        ! self%Geometry%COO_Region = Structure_Input%Input_Get_Coordinates_Region()
+        ! print *, Work_CellEntityIds(:)
+        call Unique(Work_CellEntityIds, Work_CellEntityIdUnique)
+        print *, Work_CellEntityIdUnique(:)
+        condition_ptr => Condition_BelongingGroup
+        call Allocate_Vector(Work_CellCounts, numCellTypes)
+        write (*, *) Count_if(Work_CellEntityIds, condition_ptr, 2)
 
         stop
     end subroutine Set_Geometory_Infomation
@@ -158,5 +157,17 @@ contains
 
     !     Condition_In_BoundaryCondition = found
     ! end function Condition_In_BoundaryCondition
+
+    logical function Condition_BelongingGroup(num, Group)
+        implicit none
+        integer(int32), intent(in) :: num
+        integer(int32), intent(in) :: Group
+
+        if (num == Group) then
+            Condition_BelongingGroup = .true.
+        else
+            Condition_BelongingGroup = .false.
+        end if
+    end function Condition_BelongingGroup
 
 end module Main_Heat

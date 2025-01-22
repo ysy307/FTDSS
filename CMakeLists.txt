@@ -68,9 +68,13 @@ endif()
 # Include path settings
 set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/tomlf ${CMAKE_INCLUDE_PATH}/VTKFortran ${CMAKE_INCLUDE_PATH}/Json-Fortran)
 
+set(fortran_stdlib_DIR "/workspaces/FTDSS/EXTERNAL/fortran_stdlib/lib/cmake/fortran_stdlib")
+find_package(fortran_stdlib REQUIRED)
+
+
 # Select build target
 if(BUILD_APP STREQUAL "ysy_fc")
-    add_executable(ysy_fc ${PROJECT_SOURCE_DIR}/app/ysy_fc.f90 ${ALL_SRC_FILES})
+    add_executable(ysy_fc ${PROJECT_SOURCE_DIR}/app/ysy_fc.f90 stdlib.f90 ${ALL_SRC_FILES})
     target_compile_options(ysy_fc PRIVATE ${COMPILE_Fortran_FLAGS})
     target_link_libraries(ysy_fc PRIVATE ${LINK_LIBRARIES})
     target_include_directories(ysy_fc PUBLIC ${My_INCLUDE_PATH})
@@ -80,9 +84,9 @@ if(BUILD_APP STREQUAL "ysy_fc")
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 elseif(BUILD_APP STREQUAL "test")
-    add_executable(test ${PROJECT_SOURCE_DIR}/test/test.f90 ${ALL_SRC_FILES})
+    add_executable(test ${PROJECT_SOURCE_DIR}/test/test.f90 ${ALL_SRC_FILES} )
     target_compile_options(test PRIVATE ${COMPILE_Fortran_FLAGS})
-    target_link_libraries(test PRIVATE ${LINK_LIBRARIES})
+    target_link_libraries(test PRIVATE ${LINK_LIBRARIES}  fortran_stdlib::fortran_stdlib)
     target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
     add_custom_target(run_test
         COMMAND OMP_NUM_THREADS=4 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test

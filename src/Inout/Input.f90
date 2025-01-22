@@ -154,40 +154,12 @@ module Inout_Input
     contains
 
         procedure :: Input_Parameters => Inout_Input_Parameters_JSON
-        procedure :: Input_Coodinates => Inout_Input_Geometry_VTK
-        procedure :: Input_Vertices => Inout_Input_Vertices
-        procedure :: Input_BC => Inout_Input_BC
-        procedure :: Input_IC => Inout_Input_IC
-        procedure :: Input_Observation => Inout_Input_Observation
-        procedure :: Input_Flags => Inout_Input_Flags
+        procedure :: Input_Geometry => Inout_Input_Geometry_VTK
 
-        procedure :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
-        procedure :: Input_Get_int32_rank1 => Inout_Input_Get_int32_rank1
-        generic :: Input_Get => Input_Get_Basic_Params, Input_Get_int32_rank1
-
-        procedure :: Input_Get_Elements => Inout_Input_Get_Elements
-        procedure :: Input_Get_Nodes => Inout_Input_Get_Nodes
-        procedure :: Input_Get_Shape => Inout_Input_Get_Shape
-        procedure :: Input_Get_Dimemsion => Inout_Input_Get_Dimension
-        procedure :: Input_Get_Region => Inout_Input_Get_Regions
-        procedure :: Input_Get_Standard_Output => Inout_Input_Get_Standard_Output
-        procedure :: Input_Get_Output_File => Inout_Input_Get_Output_File
-        procedure :: Input_Get_Observation_Flag => Inout_Input_Get_Observation_Flag
-        procedure :: Input_Get_Top => Inout_Input_Get_Top
-        procedure :: Input_Get_Top_Region => Inout_Input_Get_Top_Region
-
-        procedure :: Input_Get_Coordinates => Inout_Input_Get_Coordinates
-
-        ! procedure :: Input_Get_BC_Node   => Inout_Input_Get_BC_Node
-        procedure :: Input_Get_Coordinates_Region => Inout_Input_Get_Coordinates_Region
-
-        procedure :: Input_Get_BC_Node => Inout_Input_Get_BC_Node
-        procedure :: Input_Get_BC_Node_Type => Inout_Input_Get_BC_Node_Type
-        procedure :: Input_Get_BC_Node_Value_Info => Inout_Input_Get_BC_Node_Value_Info
-        procedure :: Input_Get_BC_Node_Value => Inout_Input_Get_BC_Node_Value
-
-        procedure :: Input_Get_BC_Edge => Inout_Input_Get_BC_Edge
-        procedure :: Input_Get_BC_Edge_Type => Inout_Input_Get_BC_Edge_Type
+        procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
+        procedure, pass :: Input_Get_int32 => Inout_Input_Get_int32
+        procedure, pass :: Input_Get_int32_rank1 => Inout_Input_Get_int32_rank1
+        generic :: Get => Input_Get_Basic_Params, Input_Get_int32, Input_Get_int32_rank1
 
         final :: Inout_Input_Finalize
 
@@ -247,7 +219,7 @@ contains
         if (status /= 0) call error_message(901, opt_file_name=Input_Constructor%COO_FileName)
 
         call Input_Constructor%Input_Parameters()
-        call Input_Constructor%Input_Coodinates()
+        call Input_Constructor%Input_Geometry()
 
         ! call Input_Constructor%Input_Vertices()
         ! call Input_Constructor%Input_BC()
@@ -1396,321 +1368,6 @@ contains
         ! stop
     end subroutine Inout_Input_Geometry_VTK
 
-    subroutine Inout_Input_Coodinates(self)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: status, unit_num, iN, ierr
-        real(real64) :: d_dummy
-        character(64) :: c_dummy
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            open (newunit=unit_num, file=self%COO_FileName, status="old", action="read", iostat=status)
-            if (status /= 0) call error_message(902, opt_file_name=self%COO_FileName)
-            read (unit_num, *)
-            read (unit_num, *) c_dummy, self%COO_Dimension
-            read (unit_num, *)
-            if (.not. value_in_range(self%COO_Dimension, min_Coordinate_Dimesion_type, max_Coordinate_Dimesion_type)) then
-                call error_message(903, copt1="Coordinate Dimension type")
-            end if
-
-#ifdef _MPI
-        end if
-        call MPI_Bcast(self%COO_Dimension, 1, MPI_INTEGER, root, MPI_COMM_WORLD, ierr)
-#endif
-
-        if (self%COO_Dimension == 3) then
-            call Allocate_Matrix(self%Work_Coordinates, self%Nodes, 3)
-        else
-            call Allocate_Matrix(self%Work_Coordinates, self%Nodes, 2)
-        end if
-        call Allocate_Vector(self%Work_Coordinates_Region, self%Nodes)
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            read (unit_num, *)
-            if (self%COO_Dimension == 1) then
-                do iN = 1, self%Nodes
-                    read (unit_num, *) self%Work_Coordinates(iN, 1), self%Work_Coordinates(iN, 2), d_dummy, self%Work_Coordinates_Region(iN)
-                end do
-            else if (self%COO_Dimension == 2) then
-                do iN = 1, self%Nodes
-                    read (unit_num, *) self%Work_Coordinates(iN, 1), d_dummy, self%Work_Coordinates(iN, 2), self%Work_Coordinates_Region(iN)
-                end do
-            else if (self%COO_Dimension == 3) then
-                do iN = 1, self%Nodes
-                    read (unit_num, *) self%Work_Coordinates(iN, 1), self%Work_Coordinates(iN, 2), self%Work_Coordinates(iN, 3), self%Work_Coordinates_Region(iN)
-                end do
-            end if
-
-            close (unit_num)
-#ifdef _MPI
-        end if
-            !!! FIXME: Bcastについては後で実装する
-#endif
-    end subroutine Inout_Input_Coodinates
-
-    subroutine Inout_Input_Vertices(self)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: status, unit_num, iElem
-
-        if (self%Shape == 3 .and. self%Dimemsion == 1) call Allocate_Matrix(self%Work_Top, 3, self%Elements)
-        call Allocate_Vector(self%Work_Top_Regions, self%Elements)
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            open (newunit=unit_num, file=self%Top_FileName, status="old", action="read", iostat=status)
-            if (status /= 0) call error_message(902, opt_file_name=self%Top_FileName)
-
-            read (unit_num, *)
-            if (self%Shape == 3 .and. self%Dimemsion == 1) then
-                do iElem = 1, self%Elements
-                    read (unit_num, *) self%Work_Top(1, iElem), self%Work_Top(2, iElem), self%Work_Top(3, iElem), self%Work_Top_Regions(iElem)
-                end do
-            end if
-            close (unit_num)
-
-#ifdef _MPI
-        end if
-            !!! FIXME: Bcastについては後で実装するx
-#endif
-    end subroutine Inout_Input_Vertices
-
-    subroutine Inout_Input_BC(self)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: status, unit_num
-        integer(int32) :: iNBC, iEBC
-        character(256) :: c_dummy
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            open (newunit=unit_num, file=self%BC_FileName, status="old", action="read", iostat=status)
-            if (status /= 0) call error_message(902, opt_file_name=self%BC_FileName)
-
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *) self%Num_BC_Node, self%Num_BC_Node_Type
-            read (unit_num, *)
-            read (unit_num, *) c_dummy, self%Num_NBC_Type
-
-#ifdef _MPI
-        end if
-
-        call MPI_Bcast(self%Num_BC_Node, 1, MPI_INTEGER, root, MPI_COMM_WORLD, ierr)
-        call MPI_Bcast(self%Num_NBC_Type, 1, MPI_INTEGER, root, MPI_COMM_WORLD, ierr)
-#endif
-
-        call Allocate_Vector(self%Work_NBC_Node, self%Num_BC_Node)
-        call Allocate_Vector(self%Work_NBC_Node_Type, self%Num_BC_Node)
-
-        call Allocate_Matrix(self%Work_NBC_Node_Value_Info, self%Num_NBC_Type, 2)
-        call Allocate_Matrix(self%Work_NBC_Node_Value, self%Num_NBC_Type, 3)
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-            do iNBC = 1, self%Num_NBC_Type
-                read (unit_num, *) self%Work_NBC_Node_Value_Info(iNBC, 1:2), self%Work_NBC_Node_Value(iNBC, 1:3)
-            end do
-            read (unit_num, *)
-            read (unit_num, *)
-            do iNBC = 1, self%Num_BC_Node
-                read (unit_num, *) self%Work_NBC_Node(iNBC), self%Work_NBC_Node_Type(iNBC)
-            end do
-
-            read (unit_num, *)
-            read (unit_num, *)
-            read (unit_num, *) self%Num_BC_Edge, self%Num_BC_Edge_Type
-            read (unit_num, *)
-            read (unit_num, *) c_dummy, self%Num_EBC_Edge
-
-#ifdef _MPI
-        end if
-
-        call MPI_Bcast(self%Num_BC_Edge, 1, MPI_INTEGER, root, MPI_COMM_WORLD, ierr)
-        call MPI_Bcast(self%Num_EBC_Edge, 1, MPI_INTEGER, root, MPI_COMM_WORLD, ierr)
-#endif
-
-        call Allocate_Matrix(self%Work_EBC_Edge, self%Num_BC_Edge, 2)
-        call Allocate_Vector(self%Work_EBC_Edge_Type, self%Num_BC_Edge)
-
-        call Allocate_Matrix(self%Work_EBC_Edge_Value_Info, self%Num_EBC_Edge, 5)
-        call Allocate_Matrix(self%Work_EBC_Edge_Value, self%Num_EBC_Edge, 6)
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-            do iEBC = 1, self%Num_EBC_Edge
-                read (unit_num, *) self%Work_EBC_Edge_Value_Info(iEBC, 1:5)
-
-                if (mod(self%Work_EBC_Edge_Value_Info(iEBC, 3), 10) /= 0) then
-                    read (unit_num, *) self%Work_EBC_Edge_Value(iEBC, 1), self%Work_EBC_Edge_Value(iEBC, 2)
-                end if
-                if (mod(self%Work_EBC_Edge_Value_Info(iEBC, 4), 10) /= 0) then
-                    read (unit_num, *) self%Work_EBC_Edge_Value(iEBC, 3), self%Work_EBC_Edge_Value(iEBC, 4)
-                end if
-                if (mod(self%Work_EBC_Edge_Value_Info(iEBC, 5), 10) /= 0) then
-                    read (unit_num, *) self%Work_EBC_Edge_Value(iEBC, 5), self%Work_EBC_Edge_Value(iEBC, 6)
-                end if
-            end do
-            read (unit_num, *)
-
-            do iEBC = 1, self%Num_BC_Edge
-                read (unit_num, *) self%Work_EBC_Edge(iEBC, 1:2), self%Work_EBC_Edge_Type(iEBC)
-            end do
-            close (unit_num)
-
-#ifdef _MPI
-        end if
-            !!! FIXME: Bcastについては後で実装する
-#endif
-    end subroutine Inout_Input_BC
-
-    subroutine Inout_Input_IC(self)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: status, unit_num
-        character(256) :: c_dummy
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            open (newunit=unit_num, file=self%IC_FileName, status="old", action="read", iostat=status)
-            if (status /= 0) call error_message(902, opt_file_name=self%IC_FileName)
-
-            read (unit_num, *)
-            read (unit_num, *) c_dummy, self%IC_Type
-            read (unit_num, *)
-            read (unit_num, *)
-
-#ifdef _MPI
-        end if
-        call MPI_Bcast(self%IC_Type, 1, MPI_INTEGER, root, MPI_COMM_WORLD, ierr)
-#endif
-
-        if (self%IC_Type == 1) then
-            call Allocate_Vector(self%Work_IC_Type, 3)
-            call Allocate_Vector(self%Work_IC_Value, 3)
-        end if
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            if (self%IC_Type == 1) then
-                read (unit_num, *) self%Work_IC_Type(1), self%Work_IC_Value(1)
-                read (unit_num, *) self%Work_IC_Type(2), self%Work_IC_Value(2)
-                read (unit_num, *) self%Work_IC_Type(3), self%Work_IC_Value(3)
-            end if
-
-            close (unit_num)
-
-#ifdef _MPI
-        end if
-            !!! FIXME: Bcastについては後で実装する
-#endif
-
-    end subroutine Inout_Input_IC
-
-    subroutine Inout_Input_Observation(self)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: status, unit_num, iObs
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            open (newunit=unit_num, file=self%Obs_FileName, status="old", action="read", iostat=status)
-            if (status /= 0) call error_message(902, opt_file_name=self%Obs_FileName)
-
-            read (unit_num, *)
-            read (unit_num, *) self%Observation_Type
-            read (unit_num, *)
-            read (unit_num, *) self%Num_Observation
-            read (unit_num, *)
-
-            if (self%Observation_Type == 1) then
-                call Allocate_Vector(self%Work_Observation_Node, self%Num_Observation)
-                do iObs = 1, self%Num_Observation
-                    read (unit_num, *) self%Work_Observation_Node(iObs)
-                end do
-            else if (self%Observation_Type == 2) then
-                call Allocate_Matrix(self%Work_Observation_Coordinate, self%Num_Observation, 3)
-                if (self%COO_Dimension == 1) then
-                    do iObs = 1, self%Num_Observation
-                        read (unit_num, *) &
-                            self%Work_Observation_Coordinate(iObs, 1), &
-                            self%Work_Observation_Coordinate(iObs, 2)
-                    end do
-                else if (self%COO_Dimension == 2) then
-                    do iObs = 1, self%Num_Observation
-                        read (unit_num, *) &
-                            self%Work_Observation_Coordinate(iObs, 1), &
-                            self%Work_Observation_Coordinate(iObs, 3)
-                    end do
-                else if (self%COO_Dimension == 3) then
-                    do iObs = 1, self%Num_Observation
-                        read (unit_num, *) &
-                            self%Work_Observation_Coordinate(iObs, 1), &
-                            self%Work_Observation_Coordinate(iObs, 2), &
-                            self%Work_Observation_Coordinate(iObs, 3)
-                    end do
-                end if
-            end if
-            close (unit_num)
-
-#ifdef _MPI
-        end if
-            !!! FIXME: Bcastについては後で実装する
-#endif
-
-    end subroutine Inout_Input_Observation
-
-    subroutine Inout_Input_Flags(self)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: unit_num, status
-        integer(int32) :: iFlag
-        character(256) :: c_dummy
-
-#ifdef _MPI
-        if (self%myrank == root) then
-#endif
-
-            open (newunit=unit_num, file=self%ObsFlag_FileName, status="old", action="read", iostat=status)
-            if (status /= 0) call error_message(902, opt_file_name=self%ObsFlag_FileName)
-
-            read (unit_num, *)
-            read (unit_num, *) self%Num_Observation_Flag
-            read (unit_num, *)
-
-            call Allocate_Vector(self%Work_Observation_Flag, self%Num_Observation_Flag)
-
-            do iFlag = 1, self%Num_Observation_Flag
-                read (unit_num, *) c_dummy, self%Work_Observation_Flag(iFlag)
-            end do
-
-            close (unit_num)
-
-#ifdef _MPI
-        end if
-            !!! FIXME: Bcastについては後で実装する
-#endif
-
-    end subroutine Inout_Input_Flags
-
     subroutine Inout_Input_Finalize(self)
         implicit none
         type(Input) :: self
@@ -1738,285 +1395,11 @@ contains
 
     end subroutine Inout_Input_Finalize
 
-    function Inout_Input_Get_Nodes(self) result(iNodes)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: iNodes
-
-        iNodes = self%Nodes
-    end function Inout_Input_Get_Nodes
-
-    function Inout_Input_Get_Elements(self) result(iElements)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: iElements
-
-        iElements = self%Elements
-    end function Inout_Input_Get_Elements
-
-    function Inout_Input_Get_Shape(self) result(iShape)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: iShape
-
-        iShape = self%Shape
-    end function Inout_Input_Get_Shape
-
-    function Inout_Input_Get_Dimension(self) result(iDimension)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: iDimension
-
-        iDimension = self%Dimemsion
-    end function Inout_Input_Get_Dimension
-
-    function Inout_Input_Get_Regions(self) result(iRegions)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: iRegions
-
-        iRegions = self%Region
-    end function Inout_Input_Get_Regions
-
-    function Inout_Input_Get_Standard_Output(self) result(iStandard_Output)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: iStandard_Output
-
-        iStandard_Output = self%StandardOutput
-    end function Inout_Input_Get_Standard_Output
-
-    function Inout_Input_Get_Output_File(self) result(iOutputFile)
-        implicit none
-        class(Input) :: self
-        integer(int32) :: iOutputFile
-
-        iOutputFile = self%OutputFile
-    end function Inout_Input_Get_Output_File
-
-    function Inout_Input_Get_Observation_Flag(self) result(arr_Observation_Flag)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_Observation_Flag(:)
-
-        allocate (arr_Observation_Flag(self%Num_Observation_Flag))
-        arr_Observation_Flag = self%Work_Observation_Flag
-    end function Inout_Input_Get_Observation_Flag
-
-    function Inout_Input_Get_Top(self) result(arr_Top)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_Top(:, :)
-
-        if (allocated(arr_Top)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_Top, source=self%Work_Top)
-#endif
-        end if
-    end function Inout_Input_Get_Top
-
-    function Inout_Input_Get_Top_Region(self) result(arr_Top_Regions)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_Top_Regions(:)
-
-        if (allocated(arr_Top_Regions)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_Top_Regions, source=self%Work_Top_Regions)
-#endif
-        end if
-    end function Inout_Input_Get_Top_Region
-
-    function Inout_Input_Get_Coordinates_DP2d(self) result(arr_Coordinates)
-        implicit none
-        class(Input) :: self
-        type(DP2d) :: arr_Coordinates
-
-        if (allocated(arr_Coordinates%x) .or. allocated(arr_Coordinates%y)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_Coordinates%x, source=self%Work_Coordinates(:, 1))
-            allocate (arr_Coordinates%y, source=self%Work_Coordinates(:, 2))
-#endif
-        end if
-    end function Inout_Input_Get_Coordinates_DP2d
-
-    function Inout_Input_Get_Coordinates(self) result(arr_Coordinates)
-        implicit none
-        class(Input) :: self
-        type(DP2d) :: arr_Coordinates
-
-        select case (self%COO_Dimension)
-        case (1:2)
-            arr_Coordinates = Inout_Input_Get_Coordinates_DP2d(self)
-        case (3)
-            ! 3次元の場合の処理
-        end select
-    end function Inout_Input_Get_Coordinates
-
-    function Inout_Input_Get_Coordinates_Region(self) result(arr_Coordinates_Region)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_Coordinates_Region(:)
-
-        if (allocated(arr_Coordinates_Region)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用��処理，分���して割当てる
-#else
-            allocate (arr_Coordinates_Region, source=self%Work_Coordinates_Region)
-#endif
-        end if
-
-    end function Inout_Input_Get_Coordinates_Region
-
-    function Inout_Input_Get_BC_Node(self) result(arr_BC_Node)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_BC_Node(:)
-
-        if (allocated(arr_BC_Node)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_BC_Node, source=self%Work_NBC_Node)
-#endif
-        end if
-    end function Inout_Input_Get_BC_Node
-
-    function Inout_Input_Get_BC_Node_Type(self) result(arr_BC_Node_Type)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_BC_Node_Type(:)
-
-        if (allocated(arr_BC_Node_Type)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_BC_Node_Type, source=self%Work_NBC_Node_Type)
-#endif
-        end if
-    end function Inout_Input_Get_BC_Node_Type
-
-    function Inout_Input_Get_BC_Node_Value_Info(self) result(arr_BC_Node_Value_Info)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_BC_Node_Value_Info(:, :)
-
-        if (allocated(arr_BC_Node_Value_Info)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_BC_Node_Value_Info, source=self%Work_NBC_Node_Value_Info(:, :))
-#endif
-        end if
-    end function Inout_Input_Get_BC_Node_Value_Info
-
-    function Inout_Input_Get_BC_Node_Value(self, Calc_Type) result(arr_BC_Node_Value)
-        implicit none
-        class(Input) :: self
-        real(real64), allocatable :: arr_BC_Node_Value(:)
-        integer(int32), intent(in) :: Calc_Type
-
-        if (allocated(arr_BC_Node_Value)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_BC_Node_Value, source=self%Work_NBC_Node_Value(:, Calc_Type))
-#endif
-        end if
-    end function Inout_Input_Get_BC_Node_Value
-
-    function Inout_Input_Get_BC_Edge(self) result(arr_BC_Edge)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_BC_Edge(:, :)
-
-        if (allocated(arr_BC_Edge)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_BC_Edge, source=self%Work_EBC_Edge(:, :))
-#endif
-        end if
-    end function Inout_Input_Get_BC_Edge
-
-    function Inout_Input_Get_BC_Edge_Type(self) result(arr_BC_Edge_Type)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_BC_Edge_Type(:)
-
-        if (allocated(arr_BC_Edge_Type)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_BC_Edge_Type, source=self%Work_EBC_Edge_Type)
-#endif
-        end if
-    end function Inout_Input_Get_BC_Edge_Type
-
-    function Inout_Input_Get_BC_Edge_Value_Info(self) result(arr_BC_Edge_Value_Info)
-        implicit none
-        class(Input) :: self
-        integer(int32), allocatable :: arr_BC_Edge_Value_Info(:, :)
-
-        if (allocated(arr_BC_Edge_Value_Info)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割当てる
-#else
-            allocate (arr_BC_Edge_Value_Info, source=self%Work_EBC_Edge_Value_Info(:, :))
-#endif
-        end if
-    end function Inout_Input_Get_BC_Edge_Value_Info
-
-    function Inout_Input_Get_BC_Edge_Value(self, Calc_Type) result(arr_BC_Edge_Value)
-        implicit none
-        class(Input) :: self
-        real(real64), allocatable :: arr_BC_Edge_Value(:, :)
-        integer(int32), intent(in) :: Calc_Type
-
-        if (allocated(arr_BC_Edge_Value)) then
-            call error_message(953)
-        else
-#ifdef _MPI
-            ! MPI用の処理，分割して割���てる
-#else
-            allocate (arr_BC_Edge_Value, source=self%Work_EBC_Edge_Value(:, :))
-#endif
-        end if
-    end function Inout_Input_Get_BC_Edge_Value
-
-    function Inout_Input_Get_Basic_Params(self) result(Structure)
+    subroutine Inout_Input_Get_Basic_Params(self, Structure)
         !> Get the Basic_Params of the input data
         implicit none
         class(Input) :: self
-        type(Basic_params) :: Structure
+        type(Basic_params), intent(inout) :: Structure
 
         Structure%Element = self%Basic%Element
         Structure%Node = self%Basic%Node
@@ -2034,23 +1417,35 @@ contains
         Structure%FileOutput = self%Basic%FileOutput
         Structure%TimeDiscretization = self%Basic%TimeDiscretization
 
-    end function Inout_Input_Get_Basic_Params
+    end subroutine Inout_Input_Get_Basic_Params
 
-    function Inout_Input_Get_int32_rank1(self, key) result(array_int32)
+    subroutine Inout_Input_Get_int32(self, key, idata)
+        !> Get the int32 of the input data
+        implicit none
+        class(Input) :: self
+        character(*), intent(in) :: key !! Key of the array
+        integer(int32), intent(inout) :: idata !! Array to store the data
+
+        select case (key)
+        case ("numCellTypes")
+            idata = self%VTK%numCellTypes
+        end select
+
+    end subroutine Inout_Input_Get_int32
+
+    subroutine Inout_Input_Get_int32_rank1(self, key, array_int32)
         !> Get the int32 rank1 array of the input data
         implicit none
         class(Input) :: self
         character(*), intent(in) :: key !! Key of the array
-        integer(int32), allocatable :: array_int32(:)
+        integer(int32), intent(inout), allocatable :: array_int32(:) !! Array to store the data
 
         select case (key)
         case ("CellEntityIds")
-            print *, self%VTK%CellEntityIds(:10)
             allocate (array_int32, source=self%VTK%CellEntityIds)
-            print *, "CellEntityIds"
-
         end select
-    end function Inout_Input_Get_int32_rank1
+
+    end subroutine Inout_Input_Get_int32_rank1
 
     function Inout_Input_Connect_dot_2(c1, c2) result(key)
         !> connect two strings with dot
