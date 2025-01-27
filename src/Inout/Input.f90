@@ -128,11 +128,13 @@ module Inout_Input
 
         procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
         procedure, pass :: Input_Get_Regional_Params => Inout_Input_Get_Regional_Params
+        procedure, pass :: Input_Get_BoundaryConditions => Inout_Input_Get_BoundaryConditions
+        procedure, pass :: Input_Get_InitialConditions => Inout_Input_Get_InitialConditions
         procedure, pass :: Input_Get_DP3d => Inout_Input_Get_DP3d
         procedure, pass :: Input_Get_int32 => Inout_Input_Get_int32
         procedure, pass :: Input_Get_int32_rank1 => Inout_Input_Get_int32_rank1
         procedure, pass :: Input_Get_int32_rank2 => Inout_Input_Get_int32_rank2
-        generic :: Get => Input_Get_Basic_Params, Input_Get_Regional_Params, Input_Get_int32, Input_Get_int32_rank1, Input_Get_int32_rank2, Input_Get_DP3d
+        generic :: Get => Input_Get_Basic_Params, Input_Get_Regional_Params, Input_Get_int32, Input_Get_int32_rank1, Input_Get_int32_rank2, Input_Get_DP3d, Input_Get_BoundaryConditions, Input_Get_InitialConditions
 
         ! final :: Inout_Input_Finalize
 
@@ -1305,6 +1307,69 @@ contains
         end select
 
     end subroutine Inout_Input_Get_DP3d
+
+    subroutine Inout_Input_Get_BoundaryConditions(self, key, group, Structure_BC)
+        !> Get the BoundaryConditions of the input data
+        implicit none
+        class(Input) :: self
+        character(*), intent(in) :: key !! Key of the array
+        integer(int32), allocatable, intent(inout) :: group(:) !! Group of the array
+        type(BC_Condition), allocatable, intent(inout) :: Structure_BC(:) !! Structure to store the data
+
+        integer(int32) :: i
+
+        select case (key)
+        case (ThermalName)
+            allocate (group, source=self%Conditions%BCGroup)
+            allocate (Structure_BC(size(self%Conditions%BCGroup)))
+            do i = 1, size(self%Conditions%BCGroup)
+                Structure_BC(i)%type = self%Conditions%BC_Thermal(i)%type
+                Structure_BC(i)%value = self%Conditions%BC_Thermal(i)%value
+            end do
+        case (HydraulicName)
+            allocate (group, source=self%Conditions%BCGroup)
+            allocate (Structure_BC(size(self%Conditions%BCGroup)))
+            do i = 1, size(self%Conditions%BCGroup)
+                Structure_BC(i)%type = self%Conditions%BC_Hydraulic(i)%type
+                Structure_BC(i)%value = self%Conditions%BC_Hydraulic(i)%value
+            end do
+        end select
+
+    end subroutine Inout_Input_Get_BoundaryConditions
+
+    subroutine Inout_Input_Get_InitialConditions(self, key, Structure_IC)
+        !> Get the InitialConditions of the input data
+        implicit none
+        class(Input) :: self
+        character(*), intent(in) :: key !! Key of the array
+        type(IC_Condition), intent(inout) :: Structure_IC
+        integer(int32) :: i
+
+        select case (key)
+        case (ThermalName)
+            Structure_IC%type = self%Conditions%IC_Thermal%type
+            Structure_IC%value = self%Conditions%IC_Thermal%value
+            if (allocated(self%Conditions%IC_Thermal%IC_BC)) then
+                allocate (Structure_IC%IC_BC(size(self%Conditions%IC_Thermal%IC_BC)))
+                do i = 1, size(self%Conditions%IC_Thermal%IC_BC)
+                    Structure_IC%IC_BC(i)%type = self%Conditions%IC_Thermal%IC_BC(i)%type
+                    Structure_IC%IC_BC(i)%value = self%Conditions%IC_Thermal%IC_BC(i)%value
+                end do
+            end if
+        case (HydraulicName)
+            Structure_IC%type = self%Conditions%IC_Hydraulic%type
+            Structure_IC%value = self%Conditions%IC_Hydraulic%value
+            if (allocated(self%Conditions%IC_Hydraulic%IC_BC)) then
+                allocate (Structure_IC%IC_BC(size(self%Conditions%IC_Hydraulic%IC_BC)))
+                do i = 1, size(self%Conditions%IC_Hydraulic%IC_BC)
+                    Structure_IC%IC_BC(i)%type = self%Conditions%IC_Hydraulic%IC_BC(i)%type
+                    Structure_IC%IC_BC(i)%value = self%Conditions%IC_Hydraulic%IC_BC(i)%value
+                end do
+            end if
+
+        end select
+
+    end subroutine Inout_Input_Get_InitialConditions
 
     subroutine Inout_Input_Get_int32(self, key, idata, optnum)
         !> Get the int32 of the input data

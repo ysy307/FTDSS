@@ -1,4 +1,4 @@
-module Main_Heat
+module Main_Solver
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     use :: Inout_Input
@@ -13,35 +13,46 @@ module Main_Heat
     private
     integer(int32), parameter :: Calc_Heat = 1
 
-    public :: Heat
+    public :: Class_Solver
 
-    type Heat
+    type Class_Solver
         type(Type_Geometry) :: Geometry
-        type(Boudary_Condition) :: BC
-        type(CRS) :: Heat_CRS
+        type(CRS) :: Matrix_CRS
+
+        integer(int32), allocatable :: BCGroup(:)
+        type(BC_Condition), allocatable :: BC(:)
+        type(IC_Condition) :: IC
 
     contains
 
-    end type Heat
+    end type Class_Solver
 
-    interface Heat
-        module procedure Heat_Constructor
+    interface Class_Solver
+        module procedure Constructor
     end interface
 
 contains
 
-    type(Heat) function Heat_Constructor(Structure_Input)
+    type(Class_Solver) function Constructor(Structure_Input, Construct_target)
         type(Input), intent(in) :: Structure_Input
+        character(*), intent(in) :: Construct_target
 
-        call Set_Geometory_Infomation(Heat_Constructor, Structure_Input)
-        ! call Set_Boundary_Condition_Infomations(Heat_Constructor, Structure_Input)
+        select case (Construct_target)
+        case ("Thermal", "Hydraulic")
+            call Set_Geometory_Infomation(Constructor, Structure_Input, Construct_target)
+            call Set_Condition_Infomations(Constructor, Structure_Input, Construct_target)
+        case default
+            print *, "Error: Invalid Construct_target"
+            stop
+        end select
 
-    end function Heat_Constructor
+    end function Constructor
 
-    subroutine Set_Geometory_Infomation(self, Structure_Input)
+    subroutine Set_Geometory_Infomation(self, Structure_Input, Construct_target)
         implicit none
-        type(Heat), intent(inout) :: self
+        type(Class_Solver), intent(inout) :: self
         type(Input), intent(in) :: Structure_Input
+        character(*), intent(in) :: Construct_target
         procedure(condition_function), pointer :: condition_ptr => null()
 
         type(Type_Region), allocatable :: Work_Regions(:)
@@ -53,25 +64,36 @@ contains
         integer(int32) :: i, j, tmp, sums, count
         integer(int32) :: numElements
 
+        character(:), allocatable :: key
+
         call Structure_Input%Get(self%Geometry%Basic)
         allocate (Work_Regions(self%Geometry%Basic%Region))
         call Structure_Input%Get("CellEntityIds", Work_CellEntityIds)
         call Structure_Input%Get("numCellTypes", numCellTypes)
 
         call Unique(Work_CellEntityIds, Work_CellEntityIdUnique)
+        if (associated(condition_ptr)) nullify (condition_ptr)
         condition_ptr => Condition_BelongingGroup
         call Allocate_Vector(Work_CellCounts, size(Work_CellEntityIdUnique))
         do i = 1, size(Work_CellEntityIdUnique)
             Work_CellCounts(i) = Count_if(Work_CellEntityIds, condition_ptr, Work_CellEntityIdUnique(i))
         end do
 
+        select case (Construct_target)
+        case ("Thermal")
+            key = "Thermal"
+        case ("Hydraulic")
+            key = "Hydraulic"
+        end select
+
         numElements = 0
         do i = 1, self%Geometry%Basic%Region
-            call Structure_Input%Get(Work_Regions(i), i, "Thermal")
+            call Structure_Input%Get(Work_Regions(i), i, key)
             if (Work_Regions(i)%Flags%isHeat) then
                 numElements = numElements + Work_CellCounts(Work_Regions(i)%BelongingSurface)
             end if
         end do
+
         !TODO: 三角形要素のみにしか適用していないので，今後修正が必要
         call Allocate_Matrix(self%Geometry%Element, 3, numElements)
         call Allocate_Vector(self%Geometry%Element_Region, numElements)
@@ -104,7 +126,7 @@ contains
 
         call Calc_Area(self%Geometry)
 
-        call Convert_CRS(self%Geometry, self%Heat_CRS)
+        call Convert_CRS(self%Geometry, self%Matrix_CRS)
 
         if (allocated(Work_Regions)) deallocate (Work_Regions)
         if (allocated(Work_CellEntityIds)) deallocate (Work_CellEntityIds)
@@ -113,6 +135,28 @@ contains
         if (allocated(Work_Elements)) deallocate (Work_Elements)
 
     end subroutine Set_Geometory_Infomation
+
+    subroutine Set_Condition_Infomations(self, Structure_Input, Construct_target)
+        implicit none
+        type(Class_Solver), intent(inout) :: self
+        type(Input), intent(in) :: Structure_Input
+        character(*), intent(in) :: Construct_target
+
+        integer(int32) :: i
+        integer(int32) :: numBC, numIC
+        character(:), allocatable :: key
+
+        select case (Construct_target)
+        case ("Thermal")
+            key = "Thermal"
+        case ("Hydraulic")
+            key = "Hydraulic"
+        end select
+
+        call Structure_Input%Get(key, self%BCGroup, self%BC)
+        call Structure_Input%Get(key, self%IC)
+
+    end subroutine Set_Condition_Infomations
 
     logical function Condition_BelongingGroup(num, Group)
         implicit none
@@ -126,4 +170,4 @@ contains
         end if
     end function Condition_BelongingGroup
 
-end module Main_Heat
+end module Main_Solver

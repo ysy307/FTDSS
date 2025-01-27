@@ -20,7 +20,7 @@ program test
     use :: Inout_Stdout
     use :: Inout_Input
     use :: Inout_Output
-    use :: Main_Heat
+    use :: Main_Solver
 
     ! use :: tomlf
 
@@ -37,7 +37,7 @@ program test
     type(DLS) :: DLEQ
     type(Input) :: Inputs
     ! type(Output) :: Outputs
-    type(Heat) :: tHeat
+    type(Class_Solver) :: Heat
 
     real(real64), pointer :: ptst, pdt, podt
     integer(int32), pointer :: piter, ptiter, piNL
@@ -73,7 +73,8 @@ program test
 
     Inputs = Input()
     ! Outputs = Output(Inputs)
-    tHeat = Heat(Inputs)
+    Heat = Class_Solver(Inputs, "Thermal")
+    print *, Heat%BCGroup
     ! tHeat = Heat(Inputs)
     ! call Inputs%Input_Parameters()
     ! call Inputs%Input_Coodinates()
