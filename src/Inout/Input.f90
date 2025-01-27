@@ -128,13 +128,14 @@ module Inout_Input
 
         procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
         procedure, pass :: Input_Get_Regional_Params => Inout_Input_Get_Regional_Params
+        procedure, pass :: Input_Get_Thermal_Params => Inout_Input_Get_Themal_Params
         procedure, pass :: Input_Get_BoundaryConditions => Inout_Input_Get_BoundaryConditions
         procedure, pass :: Input_Get_InitialConditions => Inout_Input_Get_InitialConditions
         procedure, pass :: Input_Get_DP3d => Inout_Input_Get_DP3d
         procedure, pass :: Input_Get_int32 => Inout_Input_Get_int32
         procedure, pass :: Input_Get_int32_rank1 => Inout_Input_Get_int32_rank1
         procedure, pass :: Input_Get_int32_rank2 => Inout_Input_Get_int32_rank2
-        generic :: Get => Input_Get_Basic_Params, Input_Get_Regional_Params, Input_Get_int32, Input_Get_int32_rank1, Input_Get_int32_rank2, Input_Get_DP3d, Input_Get_BoundaryConditions, Input_Get_InitialConditions
+        generic :: Get => Input_Get_Basic_Params, Input_Get_Regional_Params, Input_Get_int32, Input_Get_int32_rank1, Input_Get_int32_rank2, Input_Get_DP3d, Input_Get_BoundaryConditions, Input_Get_InitialConditions, Input_Get_Thermal_Params
 
         ! final :: Inout_Input_Finalize
 
@@ -1265,6 +1266,7 @@ contains
             Structure%Modelnumber = self%Regions(iRegion)%Modelnumber
             Structure%Flags%is1Phase = self%Regions(iRegion)%Flags%is1Phase
             Structure%Flags%is2Phase = self%Regions(iRegion)%Flags%is2Phase
+            Structure%Flags%is3Phase = self%Regions(iRegion)%Flags%is3Phase
             Structure%Flags%isHeat = self%Regions(iRegion)%Flags%isHeat
             Structure%Flags%isWater = self%Regions(iRegion)%Flags%isWater
             Structure%Flags%isStress = self%Regions(iRegion)%Flags%isStress
@@ -1280,6 +1282,7 @@ contains
             Structure%Modelnumber = self%Regions(iRegion)%Modelnumber
             Structure%Flags%is1Phase = self%Regions(iRegion)%Flags%is1Phase
             Structure%Flags%is2Phase = self%Regions(iRegion)%Flags%is2Phase
+            Structure%Flags%is3Phase = self%Regions(iRegion)%Flags%is3Phase
             Structure%Flags%isHeat = self%Regions(iRegion)%Flags%isHeat
             Structure%Flags%isWater = self%Regions(iRegion)%Flags%isWater
             Structure%Flags%isStress = self%Regions(iRegion)%Flags%isStress
@@ -1291,6 +1294,187 @@ contains
         end select
 
     end subroutine Inout_Input_Get_Regional_Params
+
+    subroutine Inout_Input_Get_Themal_Params(self, Structure, iRegion)
+        !> Get the Themal_Params of the input data
+        implicit none
+        class(Input) :: self
+        type(Type_Thermal), intent(inout) :: Structure
+        integer(int32), intent(in) :: iRegion
+
+        select type (Density => Structure%Density)
+        type is (Type_Density_1Phase)
+            select type (self_Density => self%Regions(iRegion)%Thermal%Density)
+            type is (Type_Density_1Phase)
+                Density%Phase1 = self_Density%Phase1
+            end select
+        type is (Type_Density_2Phase)
+            select type (self_Density => self%Regions(iRegion)%Thermal%Density)
+            type is (Type_Density_2Phase)
+                Density%Phase1 = self_Density%Phase1
+                Density%Phase2 = self_Density%Phase2
+            end select
+        type is (Type_Density_3Phase)
+            select type (self_Density => self%Regions(iRegion)%Thermal%Density)
+            type is (Type_Density_3Phase)
+                Density%Soil = self_Density%Soil
+                Density%Water = self_Density%Water
+                Density%Ice = self_Density%Ice
+            end select
+        end select
+
+        select type (SpecificHeat => Structure%SpecificHeat)
+        type is (Type_SpecificHeat_1Phase)
+            select type (self_SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
+            type is (Type_SpecificHeat_1Phase)
+                SpecificHeat%Phase1 = self_SpecificHeat%Phase1
+            end select
+        type is (Type_SpecificHeat_2Phase)
+            select type (self_SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
+            type is (Type_SpecificHeat_2Phase)
+                SpecificHeat%Phase1 = self_SpecificHeat%Phase1
+                SpecificHeat%Phase2 = self_SpecificHeat%Phase2
+            end select
+        type is (Type_SpecificHeat_3Phase)
+            select type (self_SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
+            type is (Type_SpecificHeat_3Phase)
+                SpecificHeat%Soil = self_SpecificHeat%Soil
+                SpecificHeat%Water = self_SpecificHeat%Water
+                SpecificHeat%Ice = self_SpecificHeat%Ice
+            end select
+        end select
+
+        select type (ThermalConductivity => Structure%ThermalConductivity)
+        type is (Type_ThermalConductivity_1Phase)
+            select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
+            type is (Type_ThermalConductivity_1Phase)
+                ThermalConductivity%Phase1 = self_ThermalConductivity%Phase1
+            end select
+        type is (Type_ThermalConductivity_2Phase)
+            select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
+            type is (Type_ThermalConductivity_2Phase)
+                ThermalConductivity%Phase1 = self_ThermalConductivity%Phase1
+                ThermalConductivity%Phase2 = self_ThermalConductivity%Phase2
+            end select
+        type is (Type_ThermalConductivity_3Phase)
+            select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
+            type is (Type_ThermalConductivity_3Phase)
+                ThermalConductivity%Soil = self_ThermalConductivity%Soil
+                ThermalConductivity%Water = self_ThermalConductivity%Water
+                ThermalConductivity%Ice = self_ThermalConductivity%Ice
+            end select
+        type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
+            select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
+            type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
+                ThermalConductivity%Soil = self_ThermalConductivity%Soil
+                ThermalConductivity%Water = self_ThermalConductivity%Water
+                ThermalConductivity%Ice = self_ThermalConductivity%Ice
+                ThermalConductivity%dispersity%x = self_ThermalConductivity%dispersity%x
+                ThermalConductivity%dispersity%y = self_ThermalConductivity%dispersity%y
+            end select
+        type is (Type_ThermalConductivity_3Phase_Dispersity_3D)
+            select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
+            type is (Type_ThermalConductivity_3Phase_Dispersity_3D)
+                ThermalConductivity%Soil = self_ThermalConductivity%Soil
+                ThermalConductivity%Water = self_ThermalConductivity%Water
+                ThermalConductivity%Ice = self_ThermalConductivity%Ice
+                ThermalConductivity%dispersity%x = self_ThermalConductivity%dispersity%x
+                ThermalConductivity%dispersity%y = self_ThermalConductivity%dispersity%y
+                ThermalConductivity%dispersity%z = self_ThermalConductivity%dispersity%z
+            end select
+        end select
+
+        if (self%Regions(iRegion)%Flags%isFrozen) then
+            select type (self_Ice => self%Regions(iRegion)%Thermal%Ice)
+            type is (Type_Ice_TRM)
+                allocate (Type_Ice_TRM :: Structure%Ice)
+                select type (Ice => Structure%Ice)
+                type is (Type_Ice_TRM)
+                    Ice%Tf = self_Ice%Tf
+                end select
+            type is (Type_Ice_GCC)
+                allocate (Type_Ice_GCC :: Structure%Ice)
+                call Allocate_Structure_WRF_Type(Structure, self_Ice%ModelType)
+                select type (Ice => Structure%Ice)
+                type is (Type_Ice_GCC)
+                    Ice%LatentHeat = self_Ice%LatentHeat
+                    Ice%Tf = self_Ice%Tf
+                    Ice%ModelType = self_Ice%ModelType
+
+                    select type (WRF => Ice%WRF)
+                    type is (Type_WRF_BC)
+                        select type (self_WRF => self_Ice%WRF)
+                        type is (Type_WRF_BC)
+                            WRF%thetaS = self_WRF%thetaS
+                            WRF%thetaR = self_WRF%thetaR
+                            WRF%alpha1 = self_WRF%alpha1
+                            WRF%n1 = self_WRF%n1
+                        end select
+                    type is (Type_WRF_VG)
+                        select type (self_WRF => self_Ice%WRF)
+                        type is (Type_WRF_VG)
+                            WRF%thetaS = self_WRF%thetaS
+                            WRF%thetaR = self_WRF%thetaR
+                            WRF%alpha1 = self_WRF%alpha1
+                            WRF%n1 = self_WRF%n1
+                            WRF%m1 = self_WRF%m1
+                        end select
+                    type is (Type_WRF_KO)
+                        select type (self_WRF => self_Ice%WRF)
+                        type is (Type_WRF_KO)
+                            WRF%thetaS = self_WRF%thetaS
+                            WRF%thetaR = self_WRF%thetaR
+                            WRF%alpha1 = self_WRF%alpha1
+                            WRF%n1 = self_WRF%n1
+                        end select
+                    type is (Type_WRF_MVG)
+                        select type (self_WRF => self_Ice%WRF)
+                        type is (Type_WRF_MVG)
+                            WRF%thetaS = self_WRF%thetaS
+                            WRF%thetaR = self_WRF%thetaR
+                            WRF%alpha1 = self_WRF%alpha1
+                            WRF%n1 = self_WRF%n1
+                            WRF%m1 = self_WRF%m1
+                        end select
+                    type is (Type_WRF_Durner)
+                        select type (self_WRF => self_Ice%WRF)
+                        type is (Type_WRF_Durner)
+                            WRF%thetaS = self_WRF%thetaS
+                            WRF%thetaR = self_WRF%thetaR
+                            WRF%alpha1 = self_WRF%alpha1
+                            WRF%n1 = self_WRF%n1
+                            WRF%m1 = self_WRF%m1
+                            WRF%alpha2 = self_WRF%alpha2
+                            WRF%n2 = self_WRF%n2
+                            WRF%m2 = self_WRF%m2
+                            WRF%w1 = self_WRF%w1
+                            WRF%w2 = self_WRF%w2
+                        end select
+                    type is (Type_WRF_DVGCH)
+                        select type (self_WRF => self_Ice%WRF)
+                        type is (Type_WRF_DVGCH)
+                            WRF%thetaS = self_WRF%thetaS
+                            WRF%thetaR = self_WRF%thetaR
+                            WRF%alpha1 = self_WRF%alpha1
+                            WRF%n1 = self_WRF%n1
+                            WRF%m1 = self_WRF%m1
+                            WRF%n2 = self_WRF%n2
+                            WRF%m2 = self_WRF%m2
+                            WRF%w1 = self_WRF%w1
+                            WRF%w2 = self_WRF%w2
+                        end select
+                    end select
+                end select
+            type is (Type_Ice_EXP)
+                allocate (Type_Ice_EXP :: Structure%Ice)
+                select type (Ice => Structure%Ice)
+                type is (Type_Ice_EXP)
+                    Ice%Tf = self_Ice%Tf
+                    Ice%a = self_Ice%a
+                end select
+            end select
+        end if
+    end subroutine Inout_Input_Get_Themal_Params
 
     subroutine Inout_Input_Get_DP3d(self, key, Structure_DP)
         !> Get the DP2d/3d of the input data

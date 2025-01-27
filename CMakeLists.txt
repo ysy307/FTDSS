@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.30)
 
 # プロジェクト名と言語
 project(YSY_FC LANGUAGES Fortran)
+enable_language(Fortran)
 
 # オプション
 option(ENABLE_OPTIMIZE "Enable optimization flags" ON)
@@ -70,6 +71,9 @@ set(My_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}/tomlf ${CMAKE_INCLUDE_PATH}/VTKFortran
 
 set(fortran_stdlib_DIR "/workspaces/FTDSS/EXTERNAL/fortran_stdlib/lib/cmake/fortran_stdlib")
 find_package(fortran_stdlib REQUIRED)
+
+message(STATUS "Fortran Compiler ID: ${CMAKE_Fortran_COMPILER_ID}")
+# set(jsonfortran-${CMAKE_Fortan_COMPILER_ID})
 
 
 # Select build target

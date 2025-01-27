@@ -5,7 +5,7 @@ module Main_Solver
     use :: calculate_count, only:Count_if
     use :: allocate, only:Allocate_Vector, Allocate_Matrix
     use :: Calculate_Unique, only:Unique
-    use :: Allocate_Structure, only:Allocate_DP
+    use :: Allocate_Structure, only:Allocate_DP, Allocate_Structure_Thermal_Type
     use :: Calculate_Area, only:Calc_Area
     use :: Matrix_ConvertCRS, only:Convert_CRS
 
@@ -14,6 +14,7 @@ module Main_Solver
     integer(int32), parameter :: Calc_Heat = 1
 
     public :: Class_Solver
+    ! public :: Class_Solver_Heat
 
     type Class_Solver
         type(Type_Geometry) :: Geometry
@@ -22,6 +23,7 @@ module Main_Solver
         integer(int32), allocatable :: BCGroup(:)
         type(BC_Condition), allocatable :: BC(:)
         type(IC_Condition) :: IC
+        class(Base_Parameters), allocatable :: Variables(:)
 
     contains
 
@@ -38,9 +40,15 @@ contains
         character(*), intent(in) :: Construct_target
 
         select case (Construct_target)
-        case ("Thermal", "Hydraulic")
+        case ("Thermal")
             call Set_Geometory_Infomation(Constructor, Structure_Input, Construct_target)
             call Set_Condition_Infomations(Constructor, Structure_Input, Construct_target)
+            call Set_Heat_Variables(Constructor, Structure_Input)
+            ! allocate (Heat_Variables :: Constructor%Variables)
+        case ("Hydraulic")
+            call Set_Geometory_Infomation(Constructor, Structure_Input, Construct_target)
+            call Set_Condition_Infomations(Constructor, Structure_Input, Construct_target)
+            ! allocate (Water_Variables :: Constructor%Variables)
         case default
             print *, "Error: Invalid Construct_target"
             stop
@@ -157,6 +165,36 @@ contains
         call Structure_Input%Get(key, self%IC)
 
     end subroutine Set_Condition_Infomations
+
+    subroutine Set_Heat_Variables(self, Structure_Input)
+        !> Set the heat variables
+        implicit none
+        type(Class_Solver), intent(inout) :: self
+        type(Input), intent(in) :: Structure_Input
+
+        type(Type_Region), allocatable :: Work_Regions(:)
+
+        integer(int32) :: i
+
+        allocate (Work_Regions(self%Geometry%Basic%Region))
+        allocate (Heat_Parameters :: self%Variables(self%Geometry%Basic%Region))
+
+        do i = 1, self%Geometry%Basic%Region
+            call Structure_Input%Get(Work_Regions(i), i, "Thermal")
+            if (Work_Regions(i)%Flags%isHeat) then
+                select type (Variables => self%Variables(i))
+                type is (Heat_Parameters)
+                    call Allocate_Structure_Thermal_Type(Variables%Constants, Work_Regions(i)%Flags)
+                    call Structure_Input%Get(Variables%Constants, i)
+                end select
+            end if
+        end do
+
+        if (allocated(Work_Regions)) deallocate (Work_Regions)
+
+    end subroutine Set_Heat_Variables
+
+    ! subroutine Set_
 
     logical function Condition_BelongingGroup(num, Group)
         implicit none

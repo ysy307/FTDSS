@@ -37,7 +37,8 @@ program test
     type(DLS) :: DLEQ
     type(Input) :: Inputs
     ! type(Output) :: Outputs
-    type(Class_Solver) :: Heat
+    ! type(Class_Solver) ::
+    type(Class_Solver) :: Heat, Water
 
     real(real64), pointer :: ptst, pdt, podt
     integer(int32), pointer :: piter, ptiter, piNL
@@ -49,12 +50,6 @@ program test
     real(real64) :: pts, pte, ts, te, dt, tst, tst_old, its, otst, conv_time_out, dt_max, dt_min, outtst
     ! real(real64) :: lis_sum_time, lis_sum_itime, lis_sum_ptime
     real(real64) :: sdts, sdte
-
-    ! type(toml_table), allocatable :: table
-    ! character(len=:), allocatable :: title
-    ! real, allocatable :: spectrum(:)
-
-    ! character(256) :: Tsolver_name, Psolver_name
 
 #ifdef _MPI
     call MPI_Init(ierr)
@@ -74,37 +69,8 @@ program test
     Inputs = Input()
     ! Outputs = Output(Inputs)
     Heat = Class_Solver(Inputs, "Thermal")
+    Water = Class_Solver(Inputs, "Hydraulic")
     print *, Heat%BCGroup
-    ! tHeat = Heat(Inputs)
-    ! call Inputs%Input_Parameters()
-    ! call Inputs%Input_Coodinates()
-    ! call Inputs%Input_Vertices()
-
-    ! call Inout%Input_Coodinates()
-
-    ! block
-    !     integer :: io
-    !     type(toml_error), allocatable :: ferror
-
-    !     open (file="/workspaces/FTDSS/Inout/new-toml/Basic.toml", newunit=io, status="old")
-    !     call toml_parse(table, io, ferror)
-    !     close (io)
-    !     if (allocated(ferror)) then
-    !         print '(a)', "fError: "//ferror%message
-    !         stop 1
-    !     end if
-    ! end block
-
-    ! call read_data(table, title, spectrum)
-
-    ! if (allocated(title)) then
-    !     print '(a)', "Title: '"//title//"'"
-    ! end if
-
-    ! print '(*(g0, 1x))', "Entries:", size(spectrum)
-    ! if (size(spectrum) > 0) then
-    !     print '(*(g0, 1x))', "Spectrum:", spectrum
-    ! end if
 
     stop
     ! call init_omp_config(Solver)

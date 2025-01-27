@@ -320,6 +320,26 @@ module Types
         real(real64), allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
     end type DF
 
+    type :: Variables
+        real(real64), allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
+    end type Variables
+
+    type :: Base_Parameters
+    end type Base_Parameters
+
+    type, extends(Base_Parameters) :: Heat_Parameters
+        type(Variables) :: Cs, Cp, lambda, rho, Ca
+        type(DP3d) :: Tgrad, TFlux
+        integer(int32), allocatable :: Phase(:)
+        type(Type_Thermal) :: Constants
+    end type Heat_Parameters
+
+    type, extends(Base_Parameters) :: Water_Parameters
+        type(Variables) :: Klh
+        type(DP3d) :: wFlux, hGrad
+        type(Type_Hydraulic) :: Constants
+    end type Water_Parameters
+
     type :: Flag
         logical :: isTRM, isGCC, isPower, isSwitchTRM, isSwitchOnceTRM
         logical :: isStdOut, isOutputAll, isOutput, isPrintLisMem
