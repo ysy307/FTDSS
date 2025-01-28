@@ -1,7 +1,7 @@
 module Matrix_ConvertCRS
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
-    use :: allocate
+    use :: Allocate_Allocate
 
     implicit none
     private
@@ -23,10 +23,10 @@ contains
         nTop = 3
         nNode = Geometry%Basic%Node
         ! 0オリジンでベクトルを作成
-        call Allocate_Vector(A%Ptr, 0, nNode)
-        call Allocate_Vector(row, 0, nNode - 1)
-        call Allocate_Vector(tmpInd, 0, 8 * nNode)
-        call Allocate_Vector(vertex, nTop)
+        call Allocate_Array(A%Ptr, 0_int32, nNode)
+        call Allocate_Array(row, 0_int32, nNode - 1_int32)
+        call Allocate_Array(tmpInd, 0_int32, 8_int32 * nNode)
+        call Allocate_Array(vertex, nTop)
 
         A%Ptr(0) = 0
         A%nnz = 0
@@ -62,8 +62,8 @@ contains
         end do
 
         ! CRS Matrixのメモリ確保 (0オリジン)
-        call Allocate_Vector(A%Ind, 0, A%nnz - 1)
-        call Allocate_Vector(A%val, 0, A%nnz - 1)
+        call Allocate_Array(A%Ind, 0_int32, A%nnz - 1_int32)
+        call Allocate_Array(A%val, 0_int32, A%nnz - 1_int32)
 
         ! CRSの初期化及び値の格納
         do iNNZ = 0, A%nnz - 1

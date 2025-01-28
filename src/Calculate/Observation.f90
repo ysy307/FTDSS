@@ -1,7 +1,7 @@
 module Calculate_Observation
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
-    use :: allocate
+    use :: Allocate_Allocate
     use :: Calculate_Points, only:Set_Point
     implicit none
     private
@@ -21,8 +21,8 @@ contains
         integer(int32) :: iE, iObs, iS
         real(real64) :: x, y, s
 
-        call Allocate_Vector(Solver%Obs%nAreaObs, Solver%Obs%nObs)
-        call Allocate_Matrix(Solver%Obs%vAreaObs, Solver%N%ShCoe, Solver%Obs%nObs)
+        call Allocate_Array(Solver%Obs%nAreaObs, Solver%Obs%nObs)
+        call Allocate_Array(Solver%Obs%vAreaObs, Solver%N%ShCoe, Solver%Obs%nObs)
 
         ! do iObs = 1, Solver%Obs%nObs
         !         x = Solver%Obs%obsCOO%x(iObs)

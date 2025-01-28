@@ -2,7 +2,7 @@ module Matrix_Assemble
     use, intrinsic :: iso_fortran_env, only : int32, real64
     use omp_lib
     use :: Types, udmp => undumped, dmp => dumped
-	use :: Allocate
+	use :: Allocate_Allocate
 	use :: Allocate_Structure
 	use :: error
     use :: Matrix_FindInd
@@ -98,7 +98,7 @@ module Matrix_Assemble
 		integer(int32)                  :: indexes(Solver%N%Shcoe ** 2)
 		real(real64)                    :: CoeA, C1, C2, C3, C
 
-		if (.not. allocated(tmpA)) call Allocate_Matrix(tmpA, Solver%N%node, Solver%N%node)
+		if (.not. allocated(tmpA)) call Allocate_Array(tmpA, Solver%N%node, Solver%N%node)
 		tmpA(:,:) = 0.0d0
 		do iN = 1, Solver%N%element
 			p1   = Solver%N%pElement(1, iN)

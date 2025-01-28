@@ -1,8 +1,7 @@
 program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
-    ! use :: Inout_Inout
-    use :: allocate
+    use :: Allocate_Allocate
     use :: Allocate_Structure
     use :: Solver_Initialize
     use :: Solver_InitCopy
@@ -21,8 +20,6 @@ program test
     use :: Inout_Input
     use :: Inout_Output
     use :: Main_Solver
-
-    ! use :: tomlf
 
 #ifdef _OPENMP
     use omp_lib
@@ -70,7 +67,6 @@ program test
     ! Outputs = Output(Inputs)
     Heat = Class_Solver(Inputs, "Thermal")
     Water = Class_Solver(Inputs, "Hydraulic")
-    print *, Heat%BCGroup
 
     stop
     ! call init_omp_config(Solver)

@@ -1,7 +1,7 @@
 module Inout_VTK
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types, only:Type_VTK
-    use :: allocate, only:Allocate_Vector, Allocate_Matrix
+    use :: Allocate_Allocate, only:Allocate_Array
     use :: Allocate_Structure, only:Allocate_DP
     implicit none
     private
@@ -302,7 +302,7 @@ contains
         allocate (vtk%CELLS(MAX_VTK_SHAPE))
 
         vtk%numCellTypes = numCellTypes
-        call Allocate_Vector(CellType, vtk%numCellTypes)
+        call Allocate_Array(CellType, vtk%numCellTypes)
 
         do iCell = 1, vtk%numCellTypes
             read (unit, '(i)', iostat=iostat) CellType(iCell)
@@ -359,28 +359,28 @@ contains
                 counts = counts + 1
                 select case (iCell)
                 case (VTK_VERTEX, VTK_POLY_VERTEX, VTK_POLY_LINE, VTK_TRIANGLE_STRIP, VTK_POLYGON)
-                    call Allocate_Vector(vtk%CELLS(iCell)%Nodes_Array, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes_Array, vtk%CELLS(iCell)%nCells)
                 case (VTK_LINE, VTK_QUADRATIC_EDGE)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 2, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 2_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_TRIANGLE)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 3, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 3_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_PIXEL, VTK_QUAD, VTK_TETRA)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 4, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 4_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_PYRAMID)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 5, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 5_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_WEDGE, VTK_QUADRATIC_TRIANGLE)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 6, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 6_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_VOXEL, VTK_HEXAHEDRON, VTK_QUADRATIC_QUAD)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 8, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 8_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_QUADRATIC_TETRA)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 10, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 10_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_QUADRATIC_HEXAHEDRON)
-                    call Allocate_Matrix(vtk%CELLS(iCell)%Nodes, 20, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 20_int32, vtk%CELLS(iCell)%nCells)
                 end select
             end if
         end do
 
-        call Allocate_Vector(vtk%Invalid_CELLS_LIST, counts)
+        call Allocate_Array(vtk%Invalid_CELLS_LIST, counts)
         iiCell = 0
         do iCell = 1, MAX_VTK_SHAPE
             if (vtk%CELLS(iCell)%nCells > 0) then
@@ -389,7 +389,7 @@ contains
             end if
         end do
 
-        call Allocate_Vector(Counters, MAX_VTK_SHAPE)
+        call Allocate_Array(Counters, MAX_VTK_SHAPE)
         Counters(:) = 0
         do iCell = 1, vtk%numCells
             select case (CellType(iCell))
@@ -486,7 +486,7 @@ contains
         pos2 = index(headline(pos1 + 1:), space) + pos1
         if (pos2 == pos1) stop
         read (headline(pos1 + 1:pos2 - 1), '(i)') numCellEntityIds
-        call Allocate_Vector(vtk%CellEntityIds, numCellEntityIds)
+        call Allocate_Array(vtk%CellEntityIds, numCellEntityIds)
 
         read (unit, '(A)') line
         pos1 = index(line, space)

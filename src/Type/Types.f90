@@ -11,9 +11,11 @@ module Types
     integer(int32), parameter :: undumped = 0, dumped = 1
 
     abstract interface
-        logical function condition_function(num, group)
-            integer, intent(in) :: num
-            integer, intent(in) :: group
+        logical(4) function condition_function(num, group)
+            use, intrinsic :: iso_fortran_env, only: int32
+            implicit none
+            integer(int32), intent(in) :: num
+            integer(int32), intent(in) :: group
         end function condition_function
     end interface
 
@@ -103,7 +105,7 @@ module Types
     type :: InitialConditionInfo
         integer(int32) :: type
         real(real64) :: value
-        logical :: isSet
+        logical(4) :: isSet
     end type InitialConditionInfo
 
     type :: InitialCondition
@@ -129,7 +131,7 @@ module Types
         integer(int32) :: Calculation_step
         integer(int32) :: CalculationPeriod
         integer(int32) :: Interval
-        logical :: isDisplayPrompt
+        logical(4) :: isDisplayPrompt
         character(:), allocatable :: FileOutput
         real(real64) :: TimeDiscretization
     end type Basic_params
@@ -256,7 +258,7 @@ module Types
     type :: Type_Hydraulic
         integer(int32) :: useHCF
         class(Base_HCF), allocatable :: HCF
-        logical :: useImpedance
+        logical(4) :: useImpedance
         class(Base_Impedance), allocatable :: Impedance
         integer(int32) :: useKTDynamics
         class(Base_KTDynamics), allocatable :: KTDynamics
@@ -278,10 +280,10 @@ module Types
     end type Type_KTDynamics
 
     type :: Type_Region_Flags
-        logical :: isHeat, isWater, isStress
-        logical :: is1Phase, is2Phase, is3Phase
-        logical :: isCompression, isFrostHeavePressure, isDispersity
-        logical :: isFrozen
+        logical(4) :: isHeat, isWater, isStress
+        logical(4) :: is1Phase, is2Phase, is3Phase
+        logical(4) :: isCompression, isFrostHeavePressure, isDispersity
+        logical(4) :: isFrozen
     end type Type_Region_Flags
 
     type :: Type_Region
@@ -341,9 +343,9 @@ module Types
     end type Water_Parameters
 
     type :: Flag
-        logical :: isTRM, isGCC, isPower, isSwitchTRM, isSwitchOnceTRM
-        logical :: isStdOut, isOutputAll, isOutput, isPrintLisMem
-        logical, allocatable :: outOBS(:)
+        logical(4) :: isTRM, isGCC, isPower, isSwitchTRM, isSwitchOnceTRM
+        logical(4) :: isStdOut, isOutputAll, isOutput, isPrintLisMem
+        logical(4), allocatable :: outOBS(:)
     end type Flag
 
     type :: CRS
@@ -355,7 +357,7 @@ module Types
     type :: Lis
         integer(int32) :: TSolver, TOption, PSolver, POption, Maxiter
         real(real64) :: Tol
-        logical :: isOMP
+        logical(4) :: isOMP
     end type Lis
 
     type :: Observation2d
@@ -527,7 +529,7 @@ module Types
 
     type :: SolverInfo
         type(Geometry2d) :: N
-        logical :: isHeat, isWater, isStress
+        logical(4) :: isHeat, isWater, isStress
         integer(int32) :: nAnalysis, nFrTreat, nTimeDisc, isStdOut, outputFile
         type(TimeInfo) :: Time
         type(Iteration) :: Iter

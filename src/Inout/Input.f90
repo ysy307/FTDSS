@@ -2,7 +2,7 @@ module Inout_Input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
     use :: error
-    use :: allocate
+    use :: Allocate_Allocate
     use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type, Allocate_Structure_Hydraulic_Type
     use :: Types
     ! use :: tomlf
@@ -160,7 +160,7 @@ contains
         character(256) :: dir_Path ! Path to the project directory
         integer(int32) :: access ! File access status
         integer(int32) :: status ! File access status
-        logical :: exists ! File existence status
+        logical(4) :: exists ! File existence status
         character(256) :: access_mode
 
         ! Path settings
@@ -374,9 +374,9 @@ contains
         implicit none
         class(Input) :: self
         integer(int32), intent(in) :: iRegion !! Region number
-        logical, intent(in) :: isHeat !! Heat calculation
-        logical, intent(in) :: isWater !! Water calculation
-        logical, intent(in) :: isStress !! Stress calculation
+        logical(4), intent(in) :: isHeat !! Heat calculation
+        logical(4), intent(in) :: isWater !! Water calculation
+        logical(4), intent(in) :: isStress !! Stress calculation
 
         self%Regions(iRegion)%Flags%isHeat = isHeat
         self%Regions(iRegion)%Flags%isWater = isWater
@@ -389,12 +389,12 @@ contains
         implicit none
         class(Input) :: self
         integer(int32), intent(in) :: iRegion !! Region number
-        logical, intent(in) :: is1Phase !! 1 Phase calculation
-        logical, intent(in) :: is2Phase !! 2 Phase calculation
-        logical, intent(in) :: is3Phase !! 3 Phase calculation
-        logical, intent(in), optional :: isCompression !! consideer the water/ice compression
-        logical, intent(in), optional :: isFrostHeavePressure !! Frost heave pressure calculation
-        logical, intent(in), optional :: isDispersity !! Thermalc onductivity dispersity calculation
+        logical(4), intent(in) :: is1Phase !! 1 Phase calculation
+        logical(4), intent(in) :: is2Phase !! 2 Phase calculation
+        logical(4), intent(in) :: is3Phase !! 3 Phase calculation
+        logical(4), intent(in), optional :: isCompression !! consideer the water/ice compression
+        logical(4), intent(in), optional :: isFrostHeavePressure !! Frost heave pressure calculation
+        logical(4), intent(in), optional :: isDispersity !! Thermalc onductivity dispersity calculation
 
         self%Regions(iRegion)%Flags%is1Phase = is1Phase
         self%Regions(iRegion)%Flags%is2Phase = is2Phase
@@ -1117,7 +1117,7 @@ contains
 
         character(2) :: cICGroup
         integer(int32) :: i, count
-        logical :: isFind
+        logical(4) :: isFind
 
         key = Inout_Input_Connect_dot(ICName, ThermalName, TypeName)
         call json%get(key, self%Conditions%IC_Thermal%type)

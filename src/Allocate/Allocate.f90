@@ -1,179 +1,345 @@
-module Allocate
-    use, intrinsic :: iso_fortran_env, only : int32, real64
+module Allocate_Allocate
+    use, intrinsic :: iso_fortran_env
     use :: error
     use :: Types
     implicit none
-    private
+    ! priva
 
-    interface Allocate_Vector
-        procedure :: Check_Allocate_rank1_int32
-        procedure :: Check_Allocate_rank1_real64
-        procedure :: Check_Allocate_rank1_logical
-        procedure :: Check_Allocate_rank1_int32_specify
-        procedure :: Check_Allocate_rank1_real64_specify
-    end interface
-
-    interface Allocate_Matrix
-        procedure :: Check_Allocate_rank2_int32
-        procedure :: Check_Allocate_rank2_real64
+    interface Allocate_Array
+        procedure Allocate_Rank1_int32
+        procedure Allocate_Rank1_int64
+        procedure Allocate_Rank1_real32
+        procedure Allocate_Rank1_real64
+        procedure Allocate_Rank1_real128
+        procedure Allocate_Rank1_logical
+        procedure Allocate_Rank2_int32
+        procedure Allocate_Rank2_int64
+        procedure Allocate_Rank2_real32
+        procedure Allocate_Rank2_real64
+        procedure Allocate_Rank2_real128
+        procedure :: Allocate_Rank1_int32_specify
+        procedure :: Allocate_Rank1_int64_specify
+        procedure :: Allocate_Rank1_real32_specify
+        procedure :: Allocate_Rank1_real64_specify
+        procedure :: Allocate_Rank1_real128_specify
+        procedure :: Allocate_Rank1_logical_specify
     end interface
 
     interface Allocate_Pointer
-        procedure :: Check_Allocate_Pointer_real64
-        procedure :: Check_Allocate_Pointer_int32
+        procedure Allocate_Pointer_int32
+        procedure Allocate_Pointer_int64
+        procedure Allocate_Pointer_real32
+        module procedure Allocate_Pointer_real64
+        module procedure Allocate_Pointer_real128
     end interface
 
-    public :: Allocate_Vector
-    public :: Allocate_Matrix
+    public :: Allocate_Array
     public :: Allocate_Pointer
     public :: Duplicate_CRS
 
-    contains
+contains
 
-    subroutine Check_Allocate_rank1_int32(iar, ar_size)
+    ! Rank-1 配列の割り当て
+    subroutine Allocate_Rank1_int32(array, size)
         implicit none
-        integer(int32), intent(in)                 :: ar_size
-        integer(int32), intent(inout), allocatable :: iar(:)
+        integer(int32), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: size
 
-        if (ar_size <= 0) call error_message(951)
-
-        if (.not. allocated(iar)) then
-            allocate(iar(ar_size))
+        if (size <= 0) call error_message(951)
+        if (.not. allocated(array)) then
+            allocate (array(size))
         else
             call error_message(953)
         end if
+    end subroutine Allocate_Rank1_int32
 
-    end subroutine Check_Allocate_rank1_int32
-
-    subroutine Check_Allocate_rank1_real64(dar, ar_size)
+    subroutine Allocate_Rank1_int64(array, size)
         implicit none
-        integer(int32), intent(in)                 :: ar_size
-        real(real64),   intent(inout), allocatable :: dar(:)
+        integer(int64), intent(inout), allocatable :: array(:)
+        integer(int64), intent(in) :: size
 
-        if (ar_size <= 0) call error_message(951)
-
-        if (.not. allocated(dar)) then
-            allocate(dar(ar_size))
+        if (size <= 0) call error_message(951)
+        if (.not. allocated(array)) then
+            allocate (array(size))
         else
             call error_message(953)
         end if
+    end subroutine Allocate_Rank1_int64
 
-    end subroutine Check_Allocate_rank1_real64
-
-    subroutine Check_Allocate_rank1_logical(lar, ar_size)
+    subroutine Allocate_Rank1_real32(array, size)
         implicit none
-        integer(int32), intent(in)                 :: ar_size
-        logical,        intent(inout), allocatable :: lar(:)
+        real(real32), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: size
 
-        if (ar_size <= 0) call error_message(951)
-
-        if (.not. allocated(lar)) then
-            allocate(lar(ar_size))
+        if (size <= 0) call error_message(951)
+        if (.not. allocated(array)) then
+            allocate (array(size))
         else
             call error_message(953)
         end if
+    end subroutine Allocate_Rank1_real32
 
-    end subroutine Check_Allocate_rank1_logical
-
-    subroutine Check_Allocate_rank1_int32_specify(iar, ar_first, ar_last)
+    subroutine Allocate_Rank1_real64(array, size)
         implicit none
-        integer(int32), intent(in)                 :: ar_first, ar_last
-        integer(int32), intent(inout), allocatable :: iar(:)
+        real(real64), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: size
 
-        if (.not. allocated(iar)) then
-            allocate(iar(ar_first:ar_last))
+        if (size <= 0) call error_message(951)
+        if (.not. allocated(array)) then
+            allocate (array(size))
         else
             call error_message(953)
         end if
+    end subroutine Allocate_Rank1_real64
 
-    end subroutine Check_Allocate_rank1_int32_specify
-
-    subroutine Check_Allocate_rank1_real64_specify(dar, ar_first, ar_last)
+    subroutine Allocate_Rank1_real128(array, size)
         implicit none
-        integer(int32), intent(in)                 :: ar_first, ar_last
-        real(real64),   intent(inout), allocatable :: dar(:)
+        real(real128), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: size
 
-        if (.not. allocated(dar)) then
-            allocate(dar(ar_first:ar_last))
+        if (size <= 0) call error_message(951)
+        if (.not. allocated(array)) then
+            allocate (array(size))
         else
             call error_message(953)
         end if
+    end subroutine Allocate_Rank1_real128
 
-    end subroutine Check_Allocate_rank1_real64_specify
-
-    subroutine Check_Allocate_rank2_int32(imt, mt_size_1, mt_size_2)
+    subroutine Allocate_Rank1_logical(array, size)
         implicit none
-        integer(int32), intent(in)                 :: mt_size_1, mt_size_2
-        integer(int32), intent(inout), allocatable :: imt(:,:)
+        logical, intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: size
 
-        if (mt_size_1 <= 0 .or. mt_size_2 <= 0) call error_message(952)
+        if (size <= 0) call error_message(951)
+        if (.not. allocated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_logical
 
-        if (.not. allocated(imt)) then
-            allocate(imt(mt_size_1, mt_size_2))
+    subroutine Allocate_Rank1_int32_specify(array, first, last)
+        implicit none
+        integer(int32), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_int32_specify
+
+    subroutine Allocate_Rank1_int64_specify(array, first, last)
+        implicit none
+        integer(int64), intent(inout), allocatable :: array(:)
+        integer(int64), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_int64_specify
+
+    subroutine Allocate_Rank1_real32_specify(array, first, last)
+        implicit none
+        real(real32), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real32_specify
+
+    subroutine Allocate_Rank1_real64_specify(array, first, last)
+        implicit none
+        real(real64), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real64_specify
+
+    subroutine Allocate_Rank1_real128_specify(array, first, last)
+        implicit none
+        real(real128), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real128_specify
+
+    subroutine Allocate_Rank1_logical_specify(array, first, last)
+        implicit none
+        logical, intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_logical_specify
+
+    ! Rank-2 配列の割り当て
+    subroutine Allocate_Rank2_int32(array, size1, size2)
+        implicit none
+        integer(int32), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: size1, size2
+
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
         else
             call error_message(954)
         end if
+    end subroutine Allocate_Rank2_int32
 
-    end subroutine Check_Allocate_rank2_int32
-
-    subroutine Check_Allocate_rank2_real64(dmt, mt_size_1, mt_size_2)
+    subroutine Allocate_Rank2_int64(array, size1, size2)
         implicit none
-        integer(int32), intent(in) :: mt_size_1, mt_size_2
-        real(real64), intent(inout), allocatable :: dmt(:,:)
+        integer(int64), intent(inout), allocatable :: array(:, :)
+        integer(int64), intent(in) :: size1, size2
 
-        if (mt_size_1 <= 0 .or. mt_size_2 <= 0) call error_message(952)
-        if (.not. allocated(dmt)) then
-        allocate(dmt(mt_size_1, mt_size_2))
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
         else
-        call error_message(954)
+            call error_message(954)
         end if
+    end subroutine Allocate_Rank2_int64
 
-    end subroutine Check_Allocate_rank2_real64
+    subroutine Allocate_Rank2_real32(array, size1, size2)
+        implicit none
+        real(real32), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: size1, size2
 
-    subroutine Check_Allocate_Pointer_int32(iptr)
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
+        else
+            call error_message(954)
+        end if
+    end subroutine Allocate_Rank2_real32
+
+    subroutine Allocate_Rank2_real64(array, size1, size2)
+        implicit none
+        real(real64), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: size1, size2
+
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
+        else
+            call error_message(954)
+        end if
+    end subroutine Allocate_Rank2_real64
+
+    subroutine Allocate_Rank2_real128(array, size1, size2)
+        implicit none
+        real(real128), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: size1, size2
+
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
+        else
+            call error_message(954)
+        end if
+    end subroutine Allocate_Rank2_real128
+
+    ! ポインタ用の割り当て
+    subroutine Allocate_Pointer_int32(iptr)
         implicit none
         integer(int32), pointer :: iptr
-        
+
         if (.not. associated(iptr)) then
-            allocate(iptr)
+            allocate (iptr)
         else
             call error_message(955)
         end if
-    end subroutine Check_Allocate_Pointer_int32
+    end subroutine Allocate_Pointer_int32
 
-    subroutine Check_Allocate_Pointer_real64(dptr)
+    subroutine Allocate_Pointer_int64(iptr)
+        implicit none
+        integer(int64), pointer :: iptr
+
+        if (.not. associated(iptr)) then
+            allocate (iptr)
+        else
+            call error_message(955)
+        end if
+    end subroutine Allocate_Pointer_int64
+
+    subroutine Allocate_Pointer_real32(dptr)
+        implicit none
+        real(real32), pointer :: dptr
+
+        if (.not. associated(dptr)) then
+            allocate (dptr)
+        else
+            call error_message(955)
+        end if
+    end subroutine Allocate_Pointer_real32
+
+    subroutine Allocate_Pointer_real64(dptr)
         implicit none
         real(real64), pointer :: dptr
 
         if (.not. associated(dptr)) then
-            allocate(dptr)
+            allocate (dptr)
         else
             call error_message(955)
         end if
-    end subroutine Check_Allocate_Pointer_real64
+    end subroutine Allocate_Pointer_real64
+
+    subroutine Allocate_Pointer_real128(dptr)
+        implicit none
+        real(real128), pointer :: dptr
+
+        if (.not. associated(dptr)) then
+            allocate (dptr)
+        else
+            call error_message(955)
+        end if
+    end subroutine Allocate_Pointer_real128
 
     subroutine Duplicate_CRS(A, B)
         implicit none
-        type(CRS), intent(in)    :: A
+        type(CRS), intent(in) :: A
         type(CRS), intent(inout) :: B
 
         B%nnz = A%nnz
         if (.not. allocated(B%Ptr)) then
-            allocate(B%Ptr, source=A%Ptr)
+            allocate (B%Ptr, source=A%Ptr)
         else
             ! call error_message(951)
         end if
         if (.not. allocated(B%Ind)) then
-            allocate(B%Ind, source=A%Ind)
+            allocate (B%Ind, source=A%Ind)
         else
             ! call error_message(951)
         end if
         if (.not. allocated(B%val)) then
-            allocate(B%val, source=A%Val)
+            allocate (B%val, source=A%Val)
         else
             ! call error_message(951)
         end if
         B%val = 0.0d0
 
     end subroutine Duplicate_CRS
-end module Allocate
+end module Allocate_Allocate

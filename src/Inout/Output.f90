@@ -2,7 +2,7 @@ module Inout_Output
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
     use :: error
-    use :: allocate
+    use :: Allocate_Allocate
     use :: Inout_Input
     use :: types
 

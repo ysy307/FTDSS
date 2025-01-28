@@ -2,8 +2,8 @@ module Main_Solver
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     use :: Inout_Input
-    use :: calculate_count, only:Count_if
-    use :: allocate, only:Allocate_Vector, Allocate_Matrix
+    use :: calculate_count
+    use :: Allocate_Allocate, only:Allocate_Array
     use :: Calculate_Unique, only:Unique
     use :: Allocate_Structure, only:Allocate_DP, Allocate_Structure_Thermal_Type
     use :: Calculate_Area, only:Calc_Area
@@ -67,7 +67,7 @@ contains
         integer(int32), allocatable :: Work_CellEntityIds(:), Work_CellEntityIdUnique(:)
         integer(int32), allocatable :: Work_CellCounts(:)
         integer(int32), allocatable :: Work_Elements(:, :)
-        integer(int32) :: numCellTypes
+        integer(int32) :: numCellTypes, numUniqueCellEntityIds
 
         integer(int32) :: i, j, tmp, sums, count
         integer(int32) :: numElements
@@ -82,8 +82,9 @@ contains
         call Unique(Work_CellEntityIds, Work_CellEntityIdUnique)
         if (associated(condition_ptr)) nullify (condition_ptr)
         condition_ptr => Condition_BelongingGroup
-        call Allocate_Vector(Work_CellCounts, size(Work_CellEntityIdUnique))
-        do i = 1, size(Work_CellEntityIdUnique)
+        numUniqueCellEntityIds = size(Work_CellEntityIdUnique)
+        call Allocate_Array(Work_CellCounts, numUniqueCellEntityIds)
+        do i = 1, numUniqueCellEntityIds
             Work_CellCounts(i) = Count_if(Work_CellEntityIds, condition_ptr, Work_CellEntityIdUnique(i))
         end do
 
@@ -103,8 +104,8 @@ contains
         end do
 
         !TODO: 三角形要素のみにしか適用していないので，今後修正が必要
-        call Allocate_Matrix(self%Geometry%Element, 3, numElements)
-        call Allocate_Vector(self%Geometry%Element_Region, numElements)
+        call Allocate_Array(self%Geometry%Element, 3_int32, numElements)
+        call Allocate_Array(self%Geometry%Element_Region, numElements)
         ! 5 => VTK_TRIANGLE
         sums = 0
         do i = 1, 4
@@ -113,7 +114,7 @@ contains
         end do
 
         count = 0
-        call Structure_Input%Get("CellNodes", Work_Elements, 5)
+        call Structure_Input%Get("CellNodes", Work_Elements, 5_int32)
         elem: do i = 1, size(Work_Elements(:, :), 2)
             reg: do j = 1, self%Geometry%Basic%Region
             if (Work_Regions(j)%Flags%isHeat) then
@@ -128,7 +129,7 @@ contains
         end do elem
 
         call Structure_Input%Get("POINTS", self%Geometry%Nodes)
-        call Allocate_Vector(self%Geometry%Area, numElements)
+        call Allocate_Array(self%Geometry%Area, numElements)
         self%Geometry%Basic%Element = numElements
         self%Geometry%Basic%Node = size(self%Geometry%Nodes%x, 1)
 
@@ -196,7 +197,7 @@ contains
 
     ! subroutine Set_
 
-    logical function Condition_BelongingGroup(num, Group)
+    logical(4) function Condition_BelongingGroup(num, Group)
         implicit none
         integer(int32), intent(in) :: num
         integer(int32), intent(in) :: Group

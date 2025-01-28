@@ -1,7 +1,7 @@
 module Solver_Initialize
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
-    use :: allocate
+    use :: Allocate_Allocate
     use :: Calculate_LatentHeat, only:Find_Ca_max
     implicit none
     private

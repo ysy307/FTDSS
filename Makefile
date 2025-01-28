@@ -5,7 +5,6 @@ SHELL = /bin/zsh
 # no verbose
 $(VERBOSE).SILENT:
 
-
 COMPILER = intel
 OPTIMIZE = yes
 OPENMP   = yes
@@ -19,86 +18,63 @@ MOD_DIR  := MakeBuild/.mod
 OBJ_DIR  := MakeBuild/.obj
 BIN_DIR  := bin
 
+# Intel MKL options
+MKL_OPTIONS := ${MKLROOT}/lib/libmkl_blas95_lp64.a \
+               ${MKLROOT}/lib/libmkl_lapack95_lp64.a \
+               -Wl,--start-group \
+               ${MKLROOT}/lib/libmkl_intel_lp64.a \
+               ${MKLROOT}/lib/libmkl_intel_thread.a \
+               ${MKLROOT}/lib/libmkl_core.a \
+               -Wl,--end-group \
+               -liomp5 \
+               -lpthread \
+               -lm \
+               -ldl
 
+MKL_INC_DIRS := -I${MKLROOT}/include/mkl/intel64/lp64 \
+                -I${MKLROOT}/include
 
-# Compilation flags for Intel Fortran Compiler in windows
-MKL_OPTIONS_INTEL := ${MKLROOT}/lib/libmkl_blas95_lp64.a \
-                     ${MKLROOT}/lib/libmkl_lapack95_lp64.a \
-                     -Wl,--start-group \
-                     ${MKLROOT}/lib/libmkl_intel_lp64.a \
-                     ${MKLROOT}/lib/libmkl_intel_thread.a \
-                     ${MKLROOT}/lib/libmkl_core.a \
-                     -Wl,--end-group \
-                     -liomp5 \
-                     -lpthread \
-                     -lm \
-                     -ldl
+# Json-Fortran Include and Libraries
+INC_DIRS_JSONFORTRAN := -I/workspaces/FTDSS/include/Json-Fortran/
+LIBS_JSONFORTRAN := /workspaces/FTDSS/lib/libjsonfortran-static.a
 
-MKL_OPTIONS_INTEL_MPI := ${MKLROOT}/lib/libmkl_blas95_lp64.a \
-                         ${MKLROOT}/lib/libmkl_lapack95_lp64.a \
-                         ${MKLROOT}/lib/libmkl_scalapack_lp64.a \
-                         -Wl,--start-group \
-                         ${MKLROOT}/lib/libmkl_intel_lp64.a \
-                         ${MKLROOT}/lib/libmkl_intel_thread.a \
-                         ${MKLROOT}/lib/libmkl_core.a \
-                         ${MKLROOT}/lib/libmkl_blacs_intelmpi_lp64.a \
-                         -Wl,--end-group \
-                         -liomp5 \
-                         -lpthread \
-                         -lm \
-                         -ldl
+# stdlib Include and Libraries
+INC_DIRS_STD := -I/workspaces/FTDSS/EXTERNAL/fortran_stdlib/include/fortran_stdlib/IntelLLVM-2025.0.4/
+LIBS_STD := /workspaces/FTDSS/EXTERNAL/fortran_stdlib/lib/libfortran_stdlib.a
 
-MKL_INC_DIRS_INTEL := -I${MKLROOT}/include/mkl/intel64/lp64 \
-                      -I${MKLROOT}/include
+# Compilation and Linking options
+OPTIONS_COMPILE := -fpp -c -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
+OPTIONS_COMPILE += $(INC_DIRS_JSONFORTRAN) $(INC_DIRS_STD) $(MKL_INC_DIRS)
 
-# Include path and Libraries
-INC_DIRS = -I/workspaces/FTDSS/include/Json-Fortran/
-LIBS =  -L/workspaces/FTDSS/lib/ -llibjsonfortran-static.a
+OPTIONS_LINK := $(LIBS_JSONFORTRAN) $(LIBS_STD) $(MKL_OPTIONS)
+OPTIONS_LINK += -fpp -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
 
-OPTIONS_COMPILE := $(OPTIONS_COMPILE) $(INC_DIRS)
-OPTIONS_LINK:= $(OPTIONS_LINK)  $(LIBS)
 OMP_INTEL := -fiopenmp
 OPT_INTEL := -O3 -flto -xHost
+
 CHK_INTEL := -check arg_temp_created -check format -check assume -check format -check output_conversion -check pointers -check stack -check uninit
-DEB_IMTEL := -g -debug all -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -gen-interfaces
+DEB_INTEL := -g -debug all -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -gen-interfaces
 
 # Compiler
 ifeq "$(COMPILER)" "intel"
-    FC              := ifx
-    OPTIONS_COMPILE := $(OPTIONS_COMPILE) -fpp -c -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
-    OPTIONS_LINK    :=  $(OPTIONS_LINK) -fpp -module $(MOD_DIR) -traceback -standard-semantics -qopt-report-file=docs/report.optrpt -qopt-report=3
-    WRN             := $(WRN_INTEL)
-    CHK             := $(CHK_INTEL)
-    DEB             := $(DEB_INTEL)
-    OMP             := $(OMP_INTEL)
-    OPT             := $(OPT_INTEL)
+    FC := ifx
+    OPTIONS_COMPILE += $(OPT_INTEL) $(OMP_INTEL)
+    OPTIONS_LINK += $(OPT_INTEL) $(OMP_INTEL)
+    WRN := $(WRN_INTEL)
+    CHK := $(CHK_INTEL)
+    DEB := $(DEB_INTEL)
 endif
+
 ifeq "$(DEBUG)" "yes"
     OPTIONS_COMPILE := $(OPTIONS_COMPILE) -O0 -C -g $(WRN) $(CHK) $(DEB)
     OPTIONS_LINK    := $(OPTIONS_LINK) -O0 -C -g $(WRN) $(CHK) $(DEB)
 endif
-ifeq "$(OPTIMIZE)" "yes"
-    OPTIONS_COMPILE := $(OPTIONS_COMPILE) $(OPT)
-    OPTIONS_LINK    := $(OPTIONS_LINK) $(OPT)
-endif
-ifeq "$(OPENMP)" "yes"
-    OPTIONS_COMPILE := $(OPTIONS_COMPILE) $(OMP)
-    OPTIONS_LINK    := $(OPTIONS_LINK) $(OMP)
-endif
-ifeq "$(MKL)" "yes"
-    OPTIONS_COMPILE  := $(OPTIONS_COMPILE) $(MKL_INC_DIRS_INTEL)
-    ifeq "$(MPI)" "yes"
-        OPTIONS_LINK := $(OPTIONS_LINK) $(MKL_OPTIONS_INTEL_MPI)
-    else
-        OPTIONS_LINK := $(OPTIONS_LINK) $(MKL_OPTIONS_INTEL)
-    endif
-endif
-ifeq "$(MPI)" "yes"
-    FC = mpiifx
-    OPTIONS_COMPILE := $(OPTIONS_COMPILE) -D_MPI
-    OPTIONS_LINK    := $(OPTIONS_LINK) -D_MPI
-endif
 
+ifeq "$(MPI)" "yes"
+    FC := mpiifx
+    OPTIONS_COMPILE += -D_MPI
+    OPTIONS_LINK    += -D_MPI
+endif
 
 # Source files and object files
 SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
@@ -110,6 +86,7 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
             $(SRC_DIR)/Calculate/Area.f90 \
             $(SRC_DIR)/Calculate/Count.f90 \
             $(SRC_DIR)/Calculate/BLAS.f90 \
+            $(SRC_DIR)/Calculate/Unique.f90 \
             $(SRC_DIR)/Calculate/Shape.f90 \
             $(SRC_DIR)/Calculate/Observation.f90 \
             $(SRC_DIR)/RootFinding/SecantMethod.f90 \
@@ -118,6 +95,7 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
             $(SRC_DIR)/Calculate/Product.f90 \
             $(SRC_DIR)/Calculate/WRF.f90 \
             $(SRC_DIR)/Calculate/HCF.f90 \
+            $(SRC_DIR)/Calculate/GCC.f90 \
             $(SRC_DIR)/Matrix/ConvertCRS.f90 \
             $(SRC_DIR)/Matrix/FindInd.f90 \
             $(SRC_DIR)/Matrix/Assemble.f90 \
@@ -128,7 +106,7 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
             $(SRC_DIR)/Inout/Input.f90 \
             $(SRC_DIR)/Inout/Output.f90 \
             $(SRC_DIR)/Inout/Stdout.f90 \
-            $(SRC_DIR)/Main/Heat.f90 \
+            $(SRC_DIR)/Main/Solver.f90 \
             $(SRC_DIR)/Solver/Initialize.f90 \
             $(SRC_DIR)/Solver/InitCopy.f90 \
             $(SRC_DIR)/Solver/Precon_jacobi.f90 \
@@ -137,106 +115,52 @@ SRC_FILES = $(SRC_DIR)/Type/Types.f90 \
 
 OBJ_FILES = $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%, $(SRC_FILES:.f90=.obj))
 MAIN_FILE = $(MAIN_DIR)/ysy_fc.f90
-TEST_FILE = $(MAIN_DIR)/test.f90
+TEST_FILE = test/test.f90
 
-WHICHFC = $(shell which $(FC))
-
-COMPILE_TEXT  = -e "\033[1;36m  Compile  \033[0m\033[1m $(patsubst $(SRC_DIR)/%,%,$<)\033[0m"
-ASSEMBLE_TEXT = -e "\033[1;31m  Assemble \033[0m\033[1m $<\033[0m"
-FINISHED_TEXT = -e "\033[1;34m  Compilation completed successfully! Executable: $(BIN_DIR)/MAKE_$@\033[0m"
-ERROR_TEXT    = -e "\033[1;31m  Compilation failed! \033[0m"
-
-COMPIELE_OPTIONS_TEXT = "\
-                        \\033[1;31m Compile options \\033[0m \n\
-                        \\033[1m [$(OPTIONS_COMPILE)] \\033[0m"
-
-LINK_OPTIONS_TEXT = "\
-                    \\033[1;31m Link options \\033[0m \n\
-                    \\033[1m [$(OPTIONS_LINK)] \\033[0m"
-
-PRINTCHK =  "\
-            \\033[1;31m Compiler \\033[0m\\033[1m $(FC) => $(WHICHFC) \\033[0m \n\
-            \\033[1;31m Debug    \\033[0m\\033[1m $(DEBUG)            \\033[0m \n\
-            \\033[1;31m Optimize \\033[0m\\033[1m $(OPTIMIZE)         \\033[0m \n\
-            \\033[1;31m OpenMP   \\033[0m\\033[1m $(OPENMP)           \\033[0m \n\
-            \\033[1;31m MPI      \\033[0m\\033[1m $(MPI)              \\033[0m "
-
-# Default target
-all: setup_directories ysy
-
-# Compile and link the program
+# Compile the program
 ysy: $(MAIN_FILE) $(OBJ_FILES)
-	@echo $(ASSEMBLE_TEXT)
-	@$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(MAIN_FILE) $(OPTIONS_LINK) || (echo $(ERROR_TEXT) && exit 1)
-	@echo $(FINISHED_TEXT)
+	@echo "  Assemble"
+	@$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(MAIN_FILE) $(OPTIONS_LINK) || (echo "  Compilation failed!" && exit 1)
+	@echo "  Compilation completed successfully! Executable: $(BIN_DIR)/MAKE_$@"
 
 # Compile and link the test program
 test: $(TEST_FILE) $(OBJ_FILES)
-	@echo $(ASSEMBLE_TEXT)
-	@$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(TEST_FILE) $(OPTIONS_LINK) $(INC_DIRS) $(LIBS) || (echo $(ERROR_TEXT) && exit 1)
-	@echo $(FINISHED_TEXT)
+	@echo "  Assemble"
+	$(FC) -o $(BIN_DIR)/MAKE_$@ $(OBJ_FILES) $(TEST_FILE) $(OPTIONS_LINK)  || (echo "  Compilation failed!" && exit 1)
+	@echo "  Compilation completed successfully!"
 
+# Create directories if they do not exist
 setup_directories:
 	@mkdir -p $(MOD_DIR) $(OBJ_DIR) $(BIN_DIR)
 
+# Compile source files into object files
 $(OBJ_DIR)/%.obj: $(SRC_DIR)/%.f90
 	@mkdir -p $(dir $@)
-	@echo $(COMPILE_TEXT)
-	@$(FC) $(OPTIONS_COMPILE) -c $< -o $@ $(INC_DIRS) $(LIBS)
+	@echo "  Compile  $<"
+	$(FC) $(OPTIONS_COMPILE) -c $< -o $@ || (echo "  Compilation failed!" && exit 1)
 
-
-.PHONY : info
+.PHONY: info
 info:
-	@echo
-	@echo -e $(PRINTCHK)
-	@echo
-	@echo -e $(COMPIELE_OPTIONS_TEXT)
-	@echo
-	@echo -e $(LINK_OPTIONS_TEXT)
-	@echo
+	@echo "Compiler: $(FC)"
+	@echo "Options: $(OPTIONS_COMPILE)"
+	@echo "Link options: $(OPTIONS_LINK)"
 
-# Clean target to remove object and module files
+# Clean object and module files
 .PHONY: clean
 clean:
-	@echo
+	@echo "  Deleting objects"
 	@rm -rf $(OBJ_DIR)/*
-	@echo -e "\033[1;32m  Deleting objects \033[0m"
+	@echo "  Deleting mods"
 	@rm -rf $(MOD_DIR)/*
-	@echo -e "\033[1;32m  Deleting mods    \033[0m"
 	@find ./ -name "*.pdb" -delete
 	@find ./ -name "*.optrpt" -delete
 	@find ./ -name "*.yaml" -delete
 	@rm -f $(BIN_DIR)/ysy_fc $(BIN_DIR)/tests
-	@echo -e "\033[1;32m  Deleting binaries \033[0m"
-	@echo
+	@echo "  Deleting binaries"
 
 .PHONY: allclean
 allclean:
-	@echo
+	@echo "  Deleting objects directory"
 	@rm -rf MakeBuild
-	@echo -e "\033[1;32m  Deleting objects directory \033[0m"
-	@echo -e "\033[1;32m  Deleting mods directory    \033[0m"
-	@echo -e "\033[1;32m  Deleting build directory    \033[0m"
-	@find ./ -name "*.pdb" -delete
-	@find ./ -name "*.optrpt" -delete
-	@find ./ -name "*.yaml" -delete
-	@rm -f $(BIN_DIR)/MAKE_ysy_fc $(BIN_DIR)/MAKE_tests
-	@echo -e "\033[1;32m  Deleting binaries \033[0m"
-	@echo
-
-
-.PHONY: run
-run:
-	@export OMP_NUM_THREADS=4 && ./$(BIN_DIR)/MAKE_ysy
-
-.PHONY: testrun1
-testrun1:
-	@export OMP_NUM_THREADS=1 && ./$(BIN_DIR)/MAKE_test
-
-.PHONY: testrun2
-testrun2:
-	@export OMP_NUM_THREADS=8 && ./$(BIN_DIR)/MAKE_test
-
-.PHONY: testrun3
-testrun3:
-	@export OMP_NUM_THREADS=16 && ./$(BIN_DIR)/MAKE_test
+	@echo "  Deleting binaries"
+	@rm -f $(BIN_DIR)/ysy_fc $(BIN_DIR)/tests
