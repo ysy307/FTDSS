@@ -5,6 +5,14 @@ module Calculate_WRF
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)
 
+    public :: Abstract_WRF
+    public :: Type_WRF_BC
+    public :: Type_WRF_VG
+    public :: Type_WRF_KO
+    public :: Type_WRF_MVG
+    public :: Type_WRF_Durner
+    public :: Type_WRF_DVGCH
+
     type, abstract :: Abstract_WRF
         real(real64) :: thetaR !! Residual water content
         real(real64) :: thetaS !! Saturated water content

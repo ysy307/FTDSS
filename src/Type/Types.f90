@@ -257,7 +257,7 @@ module Types
 
     type :: Type_Hydraulic
         integer(int32) :: useHCF
-        class(Base_HCF), allocatable :: HCF
+        ! class(Base_HCF), allocatable :: HCF
         logical(4) :: useImpedance
         class(Base_Impedance), allocatable :: Impedance
         integer(int32) :: useKTDynamics
@@ -432,33 +432,33 @@ module Types
         real(real64) :: Ks, kzero, l, Omega
     end type HCF_Parameters
 
-    type :: Base_HCF
-        real(real64) :: thetaS, thetaR
-    end type Base_HCF
+    ! type :: Base_HCF
+    !     real(real64) :: thetaS, thetaR
+    ! end type Base_HCF
 
-    type, extends(Base_HCF) :: Type_HCF_BC
-        real(real64) :: alpha1, n1, l
-    end type Type_HCF_BC
+    ! type, extends(Base_HCF) :: Type_HCF_BC
+    !     real(real64) :: alpha1, n1, l
+    ! end type Type_HCF_BC
 
-    type, extends(Base_HCF) :: Type_HCF_VG
-        real(real64) :: alpha1, n1, m1, l
-    end type Type_HCF_VG
+    ! type, extends(Base_HCF) :: Type_HCF_VG
+    !     real(real64) :: alpha1, n1, m1, l
+    ! end type Type_HCF_VG
 
-    type, extends(Base_HCF) :: Type_HCF_KO
-        real(real64) :: alpha1, n1
-    end type Type_HCF_KO
+    ! type, extends(Base_HCF) :: Type_HCF_KO
+    !     real(real64) :: alpha1, n1
+    ! end type Type_HCF_KO
 
-    type, extends(Base_HCF) :: Type_HCF_MVG
-        real(real64) :: alpha1, n1, m1, hcrit, l
-    end type Type_HCF_MVG
+    ! type, extends(Base_HCF) :: Type_HCF_MVG
+    !     real(real64) :: alpha1, n1, m1, hcrit, l
+    ! end type Type_HCF_MVG
 
-    type, extends(Base_HCF) :: Type_HCF_Durner
-        real(real64) :: alpha1, n1, m1, alpha2, n2, m2, w1, w2, l
-    end type Type_HCF_Durner
+    ! type, extends(Base_HCF) :: Type_HCF_Durner
+    !     real(real64) :: alpha1, n1, m1, alpha2, n2, m2, w1, w2, l
+    ! end type Type_HCF_Durner
 
-    type, extends(Base_HCF) :: Type_HCF_DVGCH
-        real(real64) :: alpha1, n1, m1, n2, m2, w1, w2, l
-    end type Type_HCF_DVGCH
+    ! type, extends(Base_HCF) :: Type_HCF_DVGCH
+    !     real(real64) :: alpha1, n1, m1, n2, m2, w1, w2, l
+    ! end type Type_HCF_DVGCH
 
     type :: LatentHeatTreatment
         integer(int32) :: useModel ! 20: GCC, 30: Power
