@@ -27,10 +27,10 @@ if(NOT DEFINED CMAKE_Fortran_COMPILER)
 endif()
 
 # Source Files
-file(GLOB_RECURSE ALL_SRC_FILES ${PROJECT_SOURCE_DIR}/src/**/*.f90)
+file(GLOB_RECURSE ALL_SRC_FILES ${PROJECT_SOURCE_DIR}/src/**/*.F90)
 
 # Compilation Flags
-set(COMPILE_Fortran_FLAGS "-fpp -traceback -standard-semantics")
+set(COMPILE_Fortran_FLAGS "-fpp -traceback")
 # set(COMPILE_Fortran_FLAGS -fpp -traceback -standard-semantics)
 
 if(ENABLE_DEBUG)
@@ -38,7 +38,7 @@ if(ENABLE_DEBUG)
 elseif(ENABLE_OPTIMIZE)
     set(COMPILE_Fortran_FLAGS "${COMPILE_Fortran_FLAGS} -O3 -flto -xHost")
 endif()
-
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp -traceback -O0 -g -check all")
 # target_compile_options(cmake_test PRIVATE -Wall -Wextra)
 # message(STATUS "Fortran Compile Flags: ${COMPILE_Fortran_FLAGS}")
 # Libraries
@@ -77,7 +77,7 @@ message(STATUS "Fortran Compiler ID: ${CMAKE_Fortran_COMPILER_ID}")
 # Build Targets
 if(BUILD_APP STREQUAL "ysy_fc")
     # ysy_fc Target
-    add_executable(ysy_fc ${PROJECT_SOURCE_DIR}/app/ysy_fc.f90 ${ALL_SRC_FILES})
+    add_executable(ysy_fc ${PROJECT_SOURCE_DIR}/app/ysy_fc.F90 ${ALL_SRC_FILES})
     target_compile_options(ysy_fc PRIVATE ${COMPILE_Fortran_FLAGS})
     target_link_libraries(ysy_fc PRIVATE ${LINK_LIBRARIES})
     target_include_directories(ysy_fc PUBLIC ${My_INCLUDE_PATH})
@@ -91,8 +91,8 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     # Test Target
-    add_executable(test ${PROJECT_SOURCE_DIR}/test/test.f90 ${ALL_SRC_FILES})
-    target_compile_options(test PUBLIC ${COMPILE_Fortran_FLAGS})
+    add_executable(test ${PROJECT_SOURCE_DIR}/test/test.F90 ${ALL_SRC_FILES})
+    # target_compile_options(test PUBLIC ${COMPILE_Fortran_FLAGS})
     target_link_libraries(test PUBLIC ${LINK_LIBRARIES} )
     target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")

@@ -403,29 +403,29 @@ module Types
         real(real64) :: thetaS, thetaR
     end type Base_WRF
 
-    type, extends(Base_WRF) :: Type_WRF_BC
-        real(real64) :: alpha1, n1
-    end type Type_WRF_BC
+    ! type, extends(Base_WRF) :: Type_WRF_BC
+    !     real(real64) :: alpha1, n1
+    ! end type Type_WRF_BC
 
-    type, extends(Base_WRF) :: Type_WRF_VG
-        real(real64) :: alpha1, n1, m1
-    end type Type_WRF_VG
+    ! type, extends(Base_WRF) :: Type_WRF_VG
+    !     real(real64) :: alpha1, n1, m1
+    ! end type Type_WRF_VG
 
-    type, extends(Base_WRF) :: Type_WRF_KO
-        real(real64) :: alpha1, n1
-    end type Type_WRF_KO
+    ! type, extends(Base_WRF) :: Type_WRF_KO
+    !     real(real64) :: alpha1, n1
+    ! end type Type_WRF_KO
 
-    type, extends(Base_WRF) :: Type_WRF_MVG
-        real(real64) :: alpha1, n1, m1, hcrit
-    end type Type_WRF_MVG
+    ! type, extends(Base_WRF) :: Type_WRF_MVG
+    !     real(real64) :: alpha1, n1, m1, hcrit
+    ! end type Type_WRF_MVG
 
-    type, extends(Base_WRF) :: Type_WRF_Durner
-        real(real64) :: alpha1, n1, m1, alpha2, n2, m2, w1, w2
-    end type Type_WRF_Durner
+    ! type, extends(Base_WRF) :: Type_WRF_Durner
+    !     real(real64) :: alpha1, n1, m1, alpha2, n2, m2, w1, w2
+    ! end type Type_WRF_Durner
 
-    type, extends(Base_WRF) :: Type_WRF_DVGCH
-        real(real64) :: alpha1, n1, m1, n2, m2, w1, w2
-    end type Type_WRF_DVGCH
+    ! type, extends(Base_WRF) :: Type_WRF_DVGCH
+    !     real(real64) :: alpha1, n1, m1, n2, m2, w1, w2
+    ! end type Type_WRF_DVGCH
 
     type :: HCF_Parameters
         real(real64) :: thetaS, thetaR, alpha1, alpha2, n1, n2, m1, m2, hcrit, w1, w2

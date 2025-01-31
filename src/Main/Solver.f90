@@ -23,7 +23,7 @@ module Main_Solver
         integer(int32), allocatable :: BCGroup(:)
         type(BC_Condition), allocatable :: BC(:)
         type(IC_Condition) :: IC
-        class(Base_Parameters), allocatable :: Variables(:)
+        class(Base_Parameters), allocatable :: Parms(:)
 
     contains
 
@@ -43,8 +43,10 @@ contains
         case ("Thermal")
             call Set_Geometory_Infomation(Constructor, Structure_Input, Construct_target)
             call Set_Condition_Infomations(Constructor, Structure_Input, Construct_target)
+            print *, "Set_Heat_Variables"
             call Set_Heat_Variables(Constructor, Structure_Input)
             ! allocate (Heat_Variables :: Constructor%Variables)
+            ! call Set_Calculate_GCC_Segregation
         case ("Hydraulic")
             call Set_Geometory_Infomation(Constructor, Structure_Input, Construct_target)
             call Set_Condition_Infomations(Constructor, Structure_Input, Construct_target)
@@ -178,15 +180,15 @@ contains
         integer(int32) :: i
 
         allocate (Work_Regions(self%Geometry%Basic%Region))
-        allocate (Heat_Parameters :: self%Variables(self%Geometry%Basic%Region))
+        allocate (Heat_Parameters :: self%Parms(self%Geometry%Basic%Region))
 
         do i = 1, self%Geometry%Basic%Region
             call Structure_Input%Get(Work_Regions(i), i, "Thermal")
             if (Work_Regions(i)%Flags%isHeat) then
-                select type (Variables => self%Variables(i))
+                select type (Parms => self%Parms(i))
                 type is (Heat_Parameters)
-                    call Allocate_Structure_Thermal_Type(Variables%Constants, Work_Regions(i)%Flags)
-                    call Structure_Input%Get(Variables%Constants, i)
+                    call Allocate_Structure_Thermal_Type(Parms%Constants, Work_Regions(i)%Flags)
+                    call Structure_Input%Get(Parms%Constants, i)
                 end select
             end if
         end do

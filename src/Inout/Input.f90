@@ -1172,19 +1172,21 @@ contains
                 if (isFind) count = count + 1
             end do
             allocate (self%Conditions%IC_Hydraulic%IC_BC(count))
+            count = 0
             do i = 1, size(self%Conditions%BCGroup)
                 write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
                 key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
                 call json%get(key, tmp, found=isFind)
 
                 if (.not. isFind) cycle
+                count = count + 1
 
                 key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-                call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(i)%type)
+                call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%type)
                 call json%print_error_message(output_unit)
 
                 key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
-                call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(i)%value)
+                call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%value)
                 call json%print_error_message(output_unit)
             end do
         end select
