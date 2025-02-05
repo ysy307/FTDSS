@@ -3,345 +3,450 @@ module Calculate_HCF
     use :: Types
     implicit none
 
-    type, abstract :: Abstract_Base_HCF
+    type, abstract :: Abstract_HCF
         real(real64) :: Ks !! saturated hydraulic conductivity
-    end type Abstract_Base_HCF
+    contains
+        !! get/set
+    end type Abstract_HCF
 
-    type, abstract, extends(Abstract_Base_HCF) :: Abstract_HCF
+    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Base
         real(real64) :: thetaS !! saturated water content
         real(real64) :: thetaR !! residual water content
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: l
     contains
-        procedure(Abstract_Calculation_kr), deferred :: Calculate_kr
-    end type Abstract_HCF
+        procedure(Abstract_Calculation_kr_HCF_Base), pass, deferred :: Calculate_kr
+    end type Abstract_HCF_Base
 
-    type, abstract, extends(Abstract_Base_HCF) :: Abstract_HCF_Impedance
+    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Impedance
         real(real64) :: Omega
     contains
-        procedure(Abstract_Calculation_Impedance), deferred :: Calculate_Impedance
+        procedure(Abstract_Calculation_Impedance), nopass, deferred :: Calculate_Impedance
     end type Abstract_HCF_Impedance
 
-    type, extends(Abstract_HCF) :: Type_HCF_BC
+    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Viscosity
+        real(real64) :: kzero
+        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
     contains
-        procedure :: Calculate_kr => Calculate_BC_kr
-    end type Type_HCF_BC
+        procedure(Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
+    end type Abstract_HCF_Viscosity
 
-    type, extends(Abstract_Base_HCF) :: Type_HCF_BC_Impedance
+    type, abstract, extends(Abstract_HCF_Base) :: Abstract_HCF_Base_Impedance
         real(real64) :: Omega
     contains
-        procedure :: Calculate_Impedance => Calculate_HCF_BC_Impedance
-    end type Type_HCF_BC_Impedance
+        procedure(Abstract_Calculation_Impedance), nopass, deferred :: Calculate_Impedance
+    end type Abstract_HCF_Base_Impedance
 
-    type, extends(Abstract_Base_HCF) :: Type_HCF_BC_Viscosity
+    type, abstract, extends(Abstract_HCF_Base) :: Abstract_HCF_Base_Viscosity
         real(real64) :: kzero
-        procedure(Abstract_Calculate_Viscosiy), pointer, nopass :: Calculate_Viscosiy => null()
-    end type Type_HCF_BC_Viscosity
-
-    type, extends(Type_HCF_BC) :: Type_HCF_BC_BC_Impedance
-        real(real64) :: Omega
+        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
     contains
-        procedure :: Calculate_Impedance => Calculate_HCF_BC_BC_Impedance
-    end type Type_HCF_BC_BC_Impedance
+        procedure(Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
+    end type Abstract_HCF_Base_Viscosity
 
-    type, extends(Type_HCF_BC) :: Type_HCF_BC_BC_Viscosity
+    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Impedance_Viscosity
+        real(real64) :: Omega
         real(real64) :: kzero
-        procedure(Abstract_Calculate_Viscosiy), pointer, nopass :: Calculate_Viscosiy => null()
-    end type Type_HCF_BC_BC_Viscosity
+        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
+    contains
+        procedure(Abstract_Calculation_Impedance), nopass, deferred :: Calculate_Impedance
+        procedure(Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
+    end type Abstract_HCF_Impedance_Viscosity
 
-    type, extends(Type_HCF_BC_BC_Impedance) :: Type_HCF_BC_BC_Impedance_Viscosity
+    type, abstract, extends(Abstract_HCF_Base) :: Abstract_HCF_Base_Impedance_Viscosity
+        real(real64) :: Omega
         real(real64) :: kzero
-        procedure(Abstract_Calculate_Viscosiy), pointer, nopass :: Calculate_Viscosiy => null()
-    end type Type_HCF_BC_BC_Impedance_Viscosity
+        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
+    contains
+        procedure(Abstract_Calculation_Impedance), nopass, deferred :: Calculate_Impedance
+        procedure(Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
+    end type Abstract_HCF_Base_Impedance_Viscosity
 
-    ! type, extends(HCF_Parameters) :: HCF
-    !     private
-    !     procedure(Calculation_HCF), pointer, nopass :: Calculate_HCF => null()
-    !     procedure(Calculation_HCF_mu), pointer, nopass :: Calculate_HCF_mu => null()
-    ! contains
-    !     procedure :: Calculate_Kflh => Calculate_Ks
-    ! end type HCF
+    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_BC
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_BC
+    end type Type_HCF_Base_BC
 
-    ! interface HCF
-    !     module procedure HCF_Constructor
-    ! end interface
+    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_VG
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_VG
+    end type Type_HCF_Base_VG
+
+    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_KO
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_KO
+    end type Type_HCF_Base_KO
+
+    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_MVG
+        real(real64) :: hcrit
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_MVG
+    end type Type_HCF_Base_MVG
+
+    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_Durner
+        real(real64) :: m1
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Durner
+    end type Type_HCF_Base_Durner
+
+    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_DVGCH
+        real(real64) :: m1
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_DVGCH
+    end type Type_HCF_Base_DVGCH
+
+    type, extends(Abstract_HCF_Impedance) :: Type_HCF_Impedance
+    contains
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+    end type Type_HCF_Impedance
+
+    type, extends(Abstract_HCF_Viscosity) :: Type_HCF_Viscosity
+    contains
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Viscosity
+
+    type, extends(Abstract_HCF_Impedance_Viscosity) :: Type_HCF_Impedance_Viscosity
+    contains
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Impedance_Viscosity
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_BC
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_BC
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+    end type Type_HCF_Base_Impedance_BC
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_VG
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_VG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+    end type Type_HCF_Base_Impedance_VG
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_KO
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_KO
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+    end type Type_HCF_Base_Impedance_KO
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_MVG
+        real(real64) :: m1
+        real(real64) :: hcrit
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_MVG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+    end type Type_HCF_Base_Impedance_MVG
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_Durner
+        real(real64) :: m1
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Durner
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+    end type Type_HCF_Base_Impedance_Durner
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_DVGCH
+        real(real64) :: m1
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_DVGCH
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+    end type Type_HCF_Base_Impedance_DVGCH
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_BC
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_BC
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Viscosity_BC
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_VG
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_VG
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Viscosity_VG
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_KO
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_KO
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Viscosity_KO
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_MVG
+        real(real64) :: m1
+        real(real64) :: hcrit
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_MVG
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Viscosity_MVG
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_Durner
+        real(real64) :: m1
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_Durner
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Viscosity_Durner
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_DVGCH
+        real(real64) :: m1
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_DVGCH
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Viscosity_DVGCH
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_BC
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_BC
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Impedance_Viscosity_BC
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_VG
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_VG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Impedance_Viscosity_VG
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_KO
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_KO
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Impedance_Viscosity_KO
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_MVG
+        real(real64) :: m1
+        real(real64) :: hcrit
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_MVG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Impedance_Viscosity_MVG
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_Durner
+        real(real64) :: m1
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_Durner
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Impedance_Viscosity_Durner
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_DVGCH
+        real(real64) :: m1
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_DVGCH
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+    end type Type_HCF_Base_Impedance_Viscosity_DVGCH
 
     interface
-        function Abstract_Calculation_kr(self, h) result(kr)
+        function Abstract_Calculation_kr_HCF_Base(self, h) result(kr)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF
+            import :: Abstract_HCF_Base
             implicit none
-            class(Abstract_HCF), intent(in) :: self
+            class(Abstract_HCF_Base), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
-        end function Abstract_Calculation_kr
+        end function Abstract_Calculation_kr_HCF_Base
 
-        function Abstract_Calculation_Impedance(self, theta_ice) result(Impedance)
+        function Abstract_Calculation_Impedance(Omega, thetaI) result(Impedance)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Impedance
             implicit none
-            class(Abstract_HCF_Impedance), intent(in) :: self
-            real(real64), intent(in) :: theta_ice
+            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: thetaI
             real(real64) :: Impedance
         end function Abstract_Calculation_Impedance
 
+        function Set_Calculate_HCF_Viscosity(Calculate_Viscosity_Type) result(Calculate_Viscosity)
+            use, intrinsic :: iso_fortran_env, only: int32
+            import :: Abstract_Calculate_Viscosity
+            implicit none
+            integer(int32), intent(in) :: Calculate_Viscosity_Type
+            procedure(Abstract_Calculate_Viscosity), pointer :: Calculate_Viscosity
+        end function Set_Calculate_HCF_Viscosity
     end interface
 
-    ! abstract interface
-    !     function Calculation_HCF(self, h) result(kr)
-    !         use, intrinsic :: iso_fortran_env, only: real64
-    !         import :: HCF
-    !         implicit none
-    !         type(HCF), intent(in) :: self
-    !         real(real64), intent(in) :: h
-    !         real(real64) :: kr
-    !     end function Calculation_HCF
-    ! end interface
-
     abstract interface
-        function Abstract_Calculate_Viscosiy(Temp) result(Viscosity)
+        function Abstract_Calculate_Viscosity(Temp) result(Viscosity)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
             real(real64), intent(in) :: Temp
             real(real64) :: Viscosity
-        end function Abstract_Calculate_Viscosiy
+        end function Abstract_Calculate_Viscosity
     end interface
 
 contains
-    ! type(HCF) function HCF_Constructor(in_HCF_Parameters, HCF_Model_id, Kflh_Model_id)
-    !     implicit none
-    !     real(real64), intent(in) :: in_HCF_Parameters(:)
-    !     integer(int32), intent(in) :: HCF_Model_id, Kflh_Model_id
-    !     real(real64), parameter :: Tcrit = 15.0d0
 
-    !     select case (HCF_Model_id)
-    !     case (1)
-    !         HCF_Constructor%thetaS = in_HCF_Parameters(1)
-    !         HCF_Constructor%thetaR = in_HCF_Parameters(2)
-    !         HCF_Constructor%alpha1 = in_HCF_Parameters(3)
-    !         HCF_Constructor%n1 = in_HCF_Parameters(4)
-    !         HCF_Constructor%Ks = in_HCF_Parameters(5)
-    !         HCF_Constructor%l = in_HCF_Parameters(6)
-
-    !         HCF_Constructor%Calculate_HCF => Calculate_HCF_BC
-    !     case (2)
-    !         HCF_Constructor%thetaS = in_HCF_Parameters(1)
-    !         HCF_Constructor%thetaR = in_HCF_Parameters(2)
-    !         HCF_Constructor%alpha1 = in_HCF_Parameters(3)
-    !         HCF_Constructor%n1 = in_HCF_Parameters(4)
-    !         HCF_Constructor%Ks = in_HCF_Parameters(5)
-    !         HCF_Constructor%l = in_HCF_Parameters(6)
-    !         HCF_Constructor%m1 = 1.0d0 - 1.0d0 / HCF_Constructor%n1
-
-    !         HCF_Constructor%Calculate_HCF => Calculate_HCF_VG
-    !     case (3)
-    !         HCF_Constructor%thetaS = in_HCF_Parameters(1)
-    !         HCF_Constructor%thetaR = in_HCF_Parameters(2)
-    !         HCF_Constructor%alpha1 = in_HCF_Parameters(3)
-    !         HCF_Constructor%n1 = in_HCF_Parameters(4)
-    !         HCF_Constructor%Ks = in_HCF_Parameters(5)
-    !         HCF_Constructor%l = in_HCF_Parameters(6)
-
-    !         HCF_Constructor%Calculate_HCF => Calculate_HCF_KO
-    !     case (4)
-    !         HCF_Constructor%thetaS = in_HCF_Parameters(1)
-    !         HCF_Constructor%thetaR = in_HCF_Parameters(2)
-    !         HCF_Constructor%alpha1 = in_HCF_Parameters(3)
-    !         HCF_Constructor%n1 = in_HCF_Parameters(4)
-    !         HCF_Constructor%hcrit = in_HCF_Parameters(5)
-    !         HCF_Constructor%Ks = in_HCF_Parameters(6)
-    !         HCF_Constructor%l = in_HCF_Parameters(7)
-    !         HCF_Constructor%m1 = 1.0d0 - 1.0d0 / HCF_Constructor%n1
-
-    !         HCF_Constructor%Calculate_HCF => Calculate_HCF_MVG
-    !     case (5)
-    !         HCF_Constructor%thetaS = in_HCF_Parameters(1)
-    !         HCF_Constructor%thetaR = in_HCF_Parameters(2)
-    !         HCF_Constructor%alpha1 = in_HCF_Parameters(3)
-    !         HCF_Constructor%n1 = in_HCF_Parameters(4)
-    !         HCF_Constructor%alpha2 = in_HCF_Parameters(5)
-    !         HCF_Constructor%n2 = in_HCF_Parameters(6)
-    !         HCF_Constructor%w1 = in_HCF_Parameters(7)
-    !         HCF_Constructor%Ks = in_HCF_Parameters(8)
-    !         HCF_Constructor%l = in_HCF_Parameters(9)
-
-    !         HCF_Constructor%m1 = 1.0d0 - 1.0d0 / HCF_Constructor%n1
-    !         HCF_Constructor%m2 = 1.0d0 - 1.0d0 / HCF_Constructor%n2
-    !         HCF_Constructor%w2 = 1.0d0 - HCF_Constructor%w1
-
-    !         HCF_Constructor%Calculate_HCF => Calculate_HCF_Durner
-    !     case (6)
-    !         HCF_Constructor%thetaS = in_HCF_Parameters(1)
-    !         HCF_Constructor%thetaR = in_HCF_Parameters(2)
-    !         HCF_Constructor%alpha1 = in_HCF_Parameters(3)
-    !         HCF_Constructor%n1 = in_HCF_Parameters(4)
-    !         HCF_Constructor%n2 = in_HCF_Parameters(5)
-    !         HCF_Constructor%w1 = in_HCF_Parameters(6)
-    !         HCF_Constructor%Ks = in_HCF_Parameters(7)
-    !         HCF_Constructor%l = in_HCF_Parameters(8)
-
-    !         HCF_Constructor%m1 = 1.0d0 - 1.0d0 / HCF_Constructor%n1
-    !         HCF_Constructor%m2 = 1.0d0 - 1.0d0 / HCF_Constructor%n2
-    !         HCF_Constructor%w2 = 1.0d0 - HCF_Constructor%w1
-
-    !         HCF_Constructor%Calculate_HCF => Calculate_HCF_DVGCH
-    !     end select
-
-    !     select case (Kflh_Model_id)
-    !     case (3, 5)
-    !         HCF_Constructor%Calculate_HCF_mu => Calc_HCF_mu_Exponential
-    !         HCF_Constructor%kzero = HCF_Constructor%Ks / HCF_Constructor%Calculate_HCF_mu(Tcrit)
-    !     case (6, 7)
-    !         HCF_Constructor%Calculate_HCF_mu => Calc_HCF_mu_Exponential_Supercooled
-    !         HCF_Constructor%kzero = HCF_Constructor%Ks / HCF_Constructor%Calculate_HCF_mu(Tcrit)
-    !     end select
-
-    ! end function HCF_Constructor
-
-    ! function Calculate_Ks(self, h) result(kr)
-    !     implicit none
-    !     class(HCF), intent(in) :: self
-    !     real(real64), intent(in) :: h
-    !     real(real64) :: kr
-
-    !     ! select case (self%Ks)
-    !     ! case (1)
-    !     !     kr = Calculate_HCF_BC(self, h)
-    !     ! case (2)
-    !     !     kr = Calculate_HCF_VG(self, h)
-    !     ! case (3)
-    !     !     kr = Calculate_HCF_KO(self, h)
-    !     ! case (4)
-    !     !     kr = Calculate_HCF_MVG(self, h)
-    !     ! case (5)
-    !     !     kr = Calculate_HCF_Durner(self, h)
-    !     ! case (6)
-    !     !     kr = Calculate_HCF_DVGCH(self, h)
-    !     ! end select
-    !     kr = 1.0d0
-
-    ! end function Calculate_Ks
-
-    ! subroutine Set_HCF(self, HCF_Model_id)
-    !     implicit none
-    !     class(Type_HCF_BC), intent(inout) :: self
-    !     integer(int32), intent(in) :: HCF_Model_id
-
-    !     select case (HCF_Model_id)
-
-    !     case (1)
-    !         self%Calculate_kr => Calculate_BC_kr
-    !     end select
-    ! end subroutine Set_HCF
-
-    function Calculate_BC_kr(self, h) result(kr)
+    function Calculate_kr_BC_Base(alpha1, n1, l, h) result(kr)
         implicit none
-        class(Type_HCF_BC), intent(in) :: self
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        real(real64), intent(in) :: l
         real(real64), intent(in) :: h
         real(real64) :: kr
         real(real64) :: Sw
 
-        if (h < -1.0d0 / self%alpha1) then
-            Sw = (self%alpha1 * h)**(-self%n1)
+        if (h < -1.0d0 / alpha1) then
+            Sw = (alpha1 * h)**(-n1)
         else
             Sw = 1.0d0
         end if
 
-        kr = Sw**(2.0d0 / (self%n1 + self%l + 2.0d0))
+        kr = Sw**(2.0d0 / (n1 + l + 2.0d0))
 
-    end function Calculate_BC_kr
+    end function Calculate_kr_BC_Base
 
-    ! function Calculate_HCF_VG(self, h) result(kr)
-    !     implicit none
-    !     type(HCF), intent(in) :: self
-    !     real(real64), intent(in) :: h
-    !     real(real64) :: kr
-    !     real(real64) :: Sw
+    function Calculate_kr_VG_Base(alpha1, n1, m1, l, h) result(kr)
+        implicit none
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        real(real64), intent(in) :: m1
+        real(real64), intent(in) :: l
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+        real(real64) :: Sw
 
-    !     if (h < 0) then
-    !         Sw = (1.0d0 + abs(self%alpha1 * h)**self%n1)**(-self%m1)
-    !     else
-    !         Sw = 1.0d0
-    !     end if
+        if (h < 0.0d0) then
+            Sw = (1.0d0 + (-alpha1 * h)**n1)**(-m1)
+        else
+            Sw = 1.0d0
+        end if
 
-    !     kr = Sw**self%l * (1.0d0 - (1.0d0 - Sw**(1.0d0 / self%m1))**self%m1)**2.0d0
+        kr = Sw**l * (1.0d0 - (1.0d0 - Sw**(1.0d0 / m1))**m1)**2.0d0
 
-    ! end function Calculate_HCF_VG
+    end function Calculate_kr_VG_Base
 
-    ! function Calculate_HCF_KO(self, h) result(kr)
-    !     implicit none
-    !     type(HCF), intent(in) :: self
-    !     real(real64), intent(in) :: h
-    !     real(real64) :: kr
-    !     real(real64) :: Sw
+    function Calculate_kr_KO_Base(alpha1, n1, l, h) result(kr)
+        implicit none
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        real(real64), intent(in) :: l
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+        real(real64) :: Sw
 
-    !     if (h < 0) then
-    !         Sw = 0.5d0 * erfc(log(h / self%alpha1) / (self%n1 * sqrt(2.0d0)))
-    !         kr = Sw**0.5d0 * (0.5d0 * erfc(log(h / self%alpha1) / (self%n1 * sqrt(2.0d0)) + self%n1 / sqrt(2.0d0)))**2.0d0
-    !     else
-    !         kr = 1.0d0
-    !     end if
+        if (h < 0.0d0) then
+            Sw = 0.5d0 * erfc(log(h / alpha1) / (n1 * sqrt(2.0d0)))
+            kr = Sw**0.5d0 * (0.5d0 * erfc(log(h / alpha1) / (n1 * sqrt(2.0d0)) + n1 / sqrt(2.0d0)))**2.0d0
+        else
+            kr = 1.0d0
+        end if
 
-    ! end function Calculate_HCF_KO
+    end function Calculate_kr_KO_Base
 
-    ! function Calculate_HCF_MVG(self, h) result(kr)
-    !     implicit none
-    !     type(HCF), intent(in) :: self
-    !     real(real64), intent(in) :: h
-    !     real(real64) :: kr
-    !     real(real64) :: Sw, thetaM
+    function Calculate_kr_MVG_Base(thetaS, thetaR, alpha1, n1, m1, l, hcrit, h) result(kr)
+        implicit none
+        ! type(HCF), intent(in) :: self
+        real(real64), intent(in) :: thetaS
+        real(real64), intent(in) :: thetaR
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        real(real64), intent(in) :: m1
+        real(real64), intent(in) :: l
+        real(real64), intent(in) :: hcrit
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+        real(real64) :: Sw, thetaM
 
-    !     thetaM = self%thetaR + (self%thetaS - self%thetaR) * (1.0d0 + abs(self%alpha1 * self%hcrit)**self%n1)**(-self%m1)
+        thetaM = thetaR + (thetaS - thetaR) * (1.0d0 + (-alpha1 * hcrit)**n1)**(-m1)
 
-    !     if (h < self%hcrit) then
-    !         Sw = (self%thetaS - self%thetaR) / (thetaM - self%thetaR) * (1.0d0 + abs(self%alpha1 * h)**self%n1)**(-self%m1)
-    !         kr = Sw**self%l * ((1.0d0 - (1.0d0 - Sw**(1.0d0 / self%m1))**self%m1) / (1.0d0 - (1.0d0 - 1.0d0**(1.0d0 / self%m1))**self%m1))**2.0d0
-    !     else
-    !         kr = 1.0d0
-    !     end if
+        if (h < hcrit) then
+            Sw = (thetaS - thetaR) / (thetaM - thetaR) * (1.0d0 + abs(alpha1 * h)**n1)**(-m1)
+            kr = Sw**l * ((1.0d0 - (1.0d0 - Sw**(1.0d0 / m1))**m1) / (1.0d0 - (1.0d0 - 1.0d0**(1.0d0 / m1))**m1))**2.0d0
+        else
+            kr = 1.0d0
+        end if
 
-    ! end function Calculate_HCF_MVG
+    end function Calculate_kr_MVG_Base
 
-    ! function Calculate_HCF_Durner(self, h) result(kr)
-    !     implicit none
-    !     type(HCF), intent(in) :: self
-    !     real(real64), intent(in) :: h
-    !     real(real64) :: kr
-    !     real(real64) :: Sw1, Sw2
+    function Calculate_kr_Durner_Base(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h) result(kr)
+        implicit none
+        ! type(HCF), intent(in) :: self
+        real(real64), intent(in) :: alpha1, alpha2
+        real(real64), intent(in) :: n1, n2
+        real(real64), intent(in) :: m1, m2
+        real(real64), intent(in) :: w1, w2
+        real(real64), intent(in) :: l
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+        real(real64) :: Sw1, Sw2
 
-    !     if (h < 0) then
-    !         Sw1 = self%w1 * (1.0d0 + abs(self%alpha1 * h)**self%n1)**(-self%m1)
-    !         Sw2 = self%w2 * (1.0d0 + abs(self%alpha2 * h)**self%n2)**(-self%m2)
-    !         kr = (self%w1 * Sw1 + self%w2 * Sw2)**self%l &
-    !              * (self%w1 * self%alpha1 * (1.0d0 - (1.0d0 - Sw1**(1.0d0 / self%m1))**self%m1) &
-    !                 + self%w2 * self%alpha2 * (1.0d0 - (1.0d0 - Sw2**(1.0d0 / self%m2))**self%m2))**2.0d0 &
-    !              / (self%w1 * self%alpha1 + self%w2 * self%alpha2)**2.0d0
-    !     else
-    !         kr = 1.0d0
-    !     end if
+        if (h < 0.0d0) then
+            Sw1 = (1.0d0 + (-alpha1 * h)**n1)**(-m1)
+            Sw2 = (1.0d0 + (-alpha2 * h)**n2)**(-m2)
+            kr = (w1 * Sw1 + w2 * Sw2)**l * &
+                 (w1 * alpha1 * (1.0d0 - (1.0d0 - Sw1**(1.0d0 / m1))**m1) &
+                  + w2 * alpha2 * (1.0d0 - (1.0d0 - Sw2**(1.0d0 / m2))**m2))**2.0d0 / &
+                 (w1 * alpha1 + w2 * alpha2)**2.0d0
+        else
+            kr = 1.0d0
+        end if
 
-    ! end function Calculate_HCF_Durner
+    end function Calculate_kr_Durner_Base
 
-    ! function Calculate_HCF_DVGCH(self, h) result(kr)
-    !     implicit none
-    !     type(HCF), intent(in) :: self
-    !     real(real64), intent(in) :: h
-    !     real(real64) :: kr
-    !     real(real64) :: Sw1, Sw2
+    function Calculate_kr_DVGCH_Base(alpha1, n1, m1, w1, n2, m2, w2, l, h) result(kr)
+        implicit none
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1, n2
+        real(real64), intent(in) :: m1, m2
+        real(real64), intent(in) :: w1, w2
+        real(real64), intent(in) :: l
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+        real(real64) :: Sw1, Sw2
 
-    !     if (h < 0) then
-    !         Sw1 = self%w1 * (1.0d0 + abs(self%alpha1 * h)**self%n1)**(-self%m1)
-    !         Sw2 = self%w2 * (1.0d0 + abs(self%alpha1 * h)**self%n2)**(-self%m2)
-    !         kr = (self%w1 * Sw1 + self%w2 * Sw2)**self%l &
-    !              * (self%w1 * self%alpha1 * (1.0d0 - (1.0d0 - Sw1**(1.0d0 / self%m1))**self%m1) &
-    !                 + self%w2 * self%alpha1 * (1.0d0 - (1.0d0 - Sw2**(1.0d0 / self%m2))**self%m2))**2.0d0 &
-    !              / (self%w1 * self%alpha1 + self%w2 * self%alpha2)**2.0d0
-    !     else
-    !         kr = 1.0d0
-    !     end if
+        if (h < 0) then
+            Sw1 = (1.0d0 + (-alpha1 * h)**n1)**(-m1)
+            Sw2 = (1.0d0 + (-alpha1 * h)**n2)**(-m2)
+            kr = (w1 * Sw1 + w2 * Sw2)**l &
+                 * (w1 * alpha1 * (1.0d0 - (1.0d0 - Sw1**(1.0d0 / m1))**m1) &
+                    + w2 * alpha1 * (1.0d0 - (1.0d0 - Sw2**(1.0d0 / m2))**m2))**2.0d0 &
+                 / (w1 * alpha1 + w2 * alpha1)**2.0d0
+        else
+            kr = 1.0d0
+        end if
 
-    ! end function Calculate_HCF_DVGCH
+    end function Calculate_kr_DVGCH_Base
 
     function Calculate_HCF_mu_Exponential(Temp) result(Viscosity)
         implicit none
@@ -357,28 +462,274 @@ contains
         real(real64), intent(in) :: Temp
         real(real64) :: Viscosity
 
-        Viscosity = 1.3788d-4 * ((273.15d0 + Temp) / 225.66d0 - 1.0d0)**(-1.6438)
+        Viscosity = 1.3788d-4 * ((273.15d0 + Temp) / 225.66d0 - 1.0d0)**(-1.6438d0)
 
     end function Calculate_HCF_mu_Exponential_Supercooled
 
-    function Calculate_HCF_BC_Impedance(self, theta_ice) result(Impedance)
+    function Calculate_Impedance_Base(Omega, thetaI) result(Impedance)
         implicit none
-        class(Type_HCF_BC_Impedance), intent(in) :: self
-        real(real64), intent(in) :: theta_ice
+        real(real64), intent(in) :: Omega
+        real(real64), intent(in) :: thetaI
         real(real64) :: Impedance
 
-        Impedance = 10.0d0**(-self%Omega * theta_ice)
+        Impedance = 10.0d0**(-Omega * thetaI)
 
-    end function Calculate_HCF_BC_Impedance
+    end function Calculate_Impedance_Base
 
-    function Calculate_HCF_BC_BC_Impedance(self, theta_ice) result(Impedance)
+    function Set_Calculate_Viscosity_Base(Calculate_Viscosity_Type) result(Calculate_Viscosity)
         implicit none
-        class(Type_HCF_BC_BC_Impedance), intent(in) :: self
-        real(real64), intent(in) :: theta_ice
-        real(real64) :: Impedance
+        integer(int32), intent(in) :: Calculate_Viscosity_Type
+        procedure(Abstract_Calculate_Viscosity), pointer :: Calculate_Viscosity
 
-        Impedance = 10.0d0**(-self%Omega * theta_ice)
+        select case (Calculate_Viscosity_Type)
+        case (1)
+            Calculate_Viscosity => Calculate_HCF_mu_Exponential
+        case (2)
+            Calculate_Viscosity => Calculate_HCF_mu_Exponential_Supercooled
+        case default
+            Calculate_Viscosity => null()
+        end select
 
-    end function Calculate_HCF_BC_BC_Impedance
+    end function Set_Calculate_Viscosity_Base
+
+    function Calculate_kr_Base_BC(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_BC), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_BC_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_BC
+
+    function Calculate_kr_Base_VG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_VG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_VG_Base(self%alpha1, self%n1, self%m1, self%l, h)
+
+    end function Calculate_kr_Base_VG
+
+    function Calculate_kr_Base_KO(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_KO), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_KO_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_KO
+
+    function Calculate_kr_Base_MVG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_MVG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_MVG_Base(self%thetaS, self%thetaR, self%alpha1, self%n1, self%m1, self%l, self%hcrit, h)
+
+    end function Calculate_kr_Base_MVG
+
+    function Calculate_kr_Base_Durner(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Durner), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_Durner_Base(self%alpha1, self%n1, self%m1, self%w1, self%alpha2, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_Durner
+
+    function Calculate_kr_Base_DVGCH(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_DVGCH), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_DVGCH_Base(self%alpha1, self%n1, self%m1, self%w1, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_DVGCH
+
+    function Calculate_kr_Base_Impedance_BC(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_BC), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_BC_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_BC
+
+    function Calculate_kr_Base_Impedance_VG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_VG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_VG_Base(self%alpha1, self%n1, self%m1, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_VG
+
+    function Calculate_kr_Base_Impedance_KO(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_KO), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_KO_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_KO
+
+    function Calculate_kr_Base_Impedance_MVG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_MVG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_MVG_Base(self%thetaS, self%thetaR, self%alpha1, self%n1, self%m1, self%l, self%hcrit, h)
+
+    end function Calculate_kr_Base_Impedance_MVG
+
+    function Calculate_kr_Base_Impedance_Durner(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_Durner), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_Durner_Base(self%alpha1, self%n1, self%m1, self%w1, self%alpha2, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_Durner
+
+    function Calculate_kr_Base_Impedance_DVGCH(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_DVGCH), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_DVGCH_Base(self%alpha1, self%n1, self%m1, self%w1, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_DVGCH
+
+    function Calculate_kr_Base_Viscosity_BC(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Viscosity_BC), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_BC_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_Viscosity_BC
+
+    function Calculate_kr_Base_Viscosity_VG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Viscosity_VG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_VG_Base(self%alpha1, self%n1, self%m1, self%l, h)
+
+    end function Calculate_kr_Base_Viscosity_VG
+
+    function Calculate_kr_Base_Viscosity_KO(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Viscosity_KO), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_KO_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_Viscosity_KO
+
+    function Calculate_kr_Base_Viscosity_MVG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Viscosity_MVG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_MVG_Base(self%thetaS, self%thetaR, self%alpha1, self%n1, self%m1, self%l, self%hcrit, h)
+
+    end function Calculate_kr_Base_Viscosity_MVG
+
+    function Calculate_kr_Base_Viscosity_Durner(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Viscosity_Durner), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_Durner_Base(self%alpha1, self%n1, self%m1, self%w1, self%alpha2, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_Viscosity_Durner
+
+    function Calculate_kr_Base_Viscosity_DVGCH(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Viscosity_DVGCH), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_DVGCH_Base(self%alpha1, self%n1, self%m1, self%w1, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_Viscosity_DVGCH
+
+    function Calculate_kr_Base_Impedance_Viscosity_BC(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_Viscosity_BC), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_BC_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_Viscosity_BC
+
+    function Calculate_kr_Base_Impedance_Viscosity_VG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_Viscosity_VG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_VG_Base(self%alpha1, self%n1, self%m1, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_Viscosity_VG
+
+    function Calculate_kr_Base_Impedance_Viscosity_KO(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_Viscosity_KO), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_KO_Base(self%alpha1, self%n1, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_Viscosity_KO
+
+    function Calculate_kr_Base_Impedance_Viscosity_MVG(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_Viscosity_MVG), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_MVG_Base(self%thetaS, self%thetaR, self%alpha1, self%n1, self%m1, self%l, self%hcrit, h)
+
+    end function Calculate_kr_Base_Impedance_Viscosity_MVG
+
+    function Calculate_kr_Base_Impedance_Viscosity_Durner(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_Viscosity_Durner), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_Durner_Base(self%alpha1, self%n1, self%m1, self%w1, self%alpha2, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_Viscosity_Durner
+
+    function Calculate_kr_Base_Impedance_Viscosity_DVGCH(self, h) result(kr)
+        implicit none
+        class(Type_HCF_Base_Impedance_Viscosity_DVGCH), intent(in) :: self
+        real(real64), intent(in) :: h
+        real(real64) :: kr
+
+        kr = Calculate_kr_DVGCH_Base(self%alpha1, self%n1, self%m1, self%w1, self%n2, self%m2, self%w2, self%l, h)
+
+    end function Calculate_kr_Base_Impedance_Viscosity_DVGCH
 
 end module Calculate_HCF
