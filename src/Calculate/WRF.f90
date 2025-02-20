@@ -1,6 +1,5 @@
 module Calculate_WRF
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Types
     implicit none
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)
@@ -67,7 +66,7 @@ module Calculate_WRF
         real(real64) :: w2 !! Parameter 8
     contains
         procedure :: Calculate_WRF => Calculate_WRF_Durner
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_Durner
+        procedure :: Calculate_WRF_Derivative => Calculate_WRF_Durner_Derivative
     end type Type_WRF_Durner
 
     type, extends(Abstract_WRF) :: Type_WRF_DVGCH
@@ -80,7 +79,7 @@ module Calculate_WRF
         real(real64) :: w2 !! Parameter 7
     contains
         procedure :: Calculate_WRF => Calculate_WRF_DVGCH
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_DVGCH
+        procedure :: Calculate_WRF_Derivative => Calculate_WRF_DVGCH_Derivative
     end type Type_WRF_DVGCH
 
     interface
@@ -109,7 +108,7 @@ contains
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
-        if (h < -1.0d0 / self%alpha1) then
+        if (h < self%alpha1) then
             thetaW = self%thetaR + (self%thetaS - self%thetaR) * (self%alpha1 / h)**self%n1
         else
             thetaW = self%thetaS
@@ -124,8 +123,8 @@ contains
 
         !@note alpha1 must be negative
 
-        if (h < -1.0d0 / self%alpha1) then
-            Cw = (self%thetaS - self%thetaR) * self%n1 * (self%alpha1 / h)**(self%n1 + 1.0d0) / self%alpha1
+        if (h < self%alpha1) then
+            Cw = -(self%thetaS - self%thetaR) * self%n1 * (self%alpha1 / h)**(self%n1 + 1.0d0) / self%alpha1
         else
             Cw = 0.0d0
         end if
@@ -222,7 +221,7 @@ contains
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
-        if (h < 0) then
+        if (h < 0.0d0) then
             thetaW = self%thetaR + (self%thetaS - self%thetaR) * &
                      (self%w1 * (1.0d0 + abs(self%alpha1 * h)**self%n1)**(-self%m1) &
                       + self%w2 * (1.0d0 + abs(self%alpha2 * h)**self%n2)**(-self%m2))
@@ -237,7 +236,7 @@ contains
         real(real64), intent(in) :: h
         real(real64) :: Cw
 
-        if (h < 0) then
+        if (h < 0.0d0) then
             Cw = (self%thetaS - self%thetaR) * &
                  (self%w1 * self%alpha1**self%n1 * self%m1 * self%n1 * (-h)**(self%n1 - 1.0d0) * &
                   (1.0d0 + (-self%alpha1 * h)**self%n1)**(-self%m1 - 1.0d0) &
@@ -254,7 +253,7 @@ contains
         real(real64), intent(in) :: h
         real(real64) :: thetaW
 
-        if (h < 0) then
+        if (h < 0.0d0) then
             thetaW = self%thetaR + (self%thetaS - self%thetaR) * &
                      (self%w1 * (1.0d0 + abs(self%alpha1 * h)**self%n1)**(-self%m1) &
                       + self%w2 * (1.0d0 + abs(self%alpha1 * h)**self%n2)**(-self%m2))
@@ -269,7 +268,7 @@ contains
         real(real64), intent(in) :: h
         real(real64) :: Cw
 
-        if (h < 0) then
+        if (h < 0.0d0) then
             Cw = (self%thetaS - self%thetaR) * &
                  (self%w1 * self%alpha1**self%n1 * self%m1 * self%n1 * (-h)**(self%n1 - 1.0d0) * &
                   (1.0d0 + (-self%alpha1 * h)**self%n1)**(-self%m1 - 1.0d0) &

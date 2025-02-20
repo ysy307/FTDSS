@@ -1,6 +1,6 @@
 module Calculate_HCF
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Types
+    ! use :: Types
     implicit none
 
     type, abstract :: Abstract_HCF
@@ -478,13 +478,13 @@ contains
         real(real64) :: kr
         real(real64) :: Sw
 
-        if (h < -1.0d0 / alpha1) then
-            Sw = (alpha1 * h)**(-n1)
+        if (h < alpha1) then
+            Sw = (h / alpha1)**(-n1)
         else
             Sw = 1.0d0
         end if
 
-        kr = Sw**(2.0d0 / (n1 + l + 2.0d0))
+        kr = Sw**(2.0d0 / n1 + l + 2.0d0)
 
     end function Calculate_kr_BC_Base
 

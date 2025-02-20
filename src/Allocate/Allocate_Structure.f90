@@ -1,6 +1,7 @@
 module Allocate_Structure
     use :: error
     use :: Types
+    use :: Calculate_WRF
     use :: Allocate_Allocate
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
@@ -189,29 +190,29 @@ contains
         type(Type_Thermal), intent(inout) :: Structure_Thermal ! Thermal structure
         integer(int32), intent(in) :: WRFModelType ! WRF model type
 
-        if (.not. allocated(Structure_Thermal%Ice)) then
-            print *, "Error: Ice structure is not allocated."
-            return
-        end if
-        select type (Ice => Structure_Thermal%Ice)
-        type is (Type_Ice_GCC)
-            select case (WRFModelType)
-            case (1)
-                allocate (Type_WRF_BC :: Ice%WRF)
-            case (2)
-                allocate (Type_WRF_VG :: Ice%WRF)
-            case (3)
-                allocate (Type_WRF_KO :: Ice%WRF)
-            case (4)
-                allocate (Type_WRF_MVG :: Ice%WRF)
-            case (5)
-                allocate (Type_WRF_Durner :: Ice%WRF)
-            case (6)
-                allocate (Type_WRF_DVGCH :: Ice%WRF)
-            case default
-                print *, "Error: WRFModelType is not defined."
-            end select
-        end select
+        ! if (.not. allocated(Structure_Thermal%Ice)) then
+        !     print *, "Error: Ice structure is not allocated."
+        !     return
+        ! end if
+        ! select type (Ice => Structure_Thermal%Ice)
+        ! type is (Type_Ice_GCC)
+        !     select case (WRFModelType)
+        !     case (1)
+        !         allocate (Type_WRF_BC :: Ice%WRF)
+        !     case (2)
+        !         allocate (Type_WRF_VG :: Ice%WRF)
+        !     case (3)
+        !         allocate (Type_WRF_KO :: Ice%WRF)
+        !     case (4)
+        !         allocate (Type_WRF_MVG :: Ice%WRF)
+        !     case (5)
+        !         allocate (Type_WRF_Durner :: Ice%WRF)
+        !     case (6)
+        !         allocate (Type_WRF_DVGCH :: Ice%WRF)
+        !     case default
+        !         print *, "Error: WRFModelType is not defined."
+        !     end select
+        ! end select
 
     end subroutine Allocate_Structure_WRF_Type
 
@@ -239,22 +240,22 @@ contains
         implicit none
         type(Type_Hydraulic), intent(inout) :: Structure_Hydraulic ! Hydraulic structure
 
-        select case (Structure_Hydraulic%useHCF)
-        case (1)
-            allocate (Type_HCF_BC :: Structure_Hydraulic%HCF)
-        case (2)
-            allocate (Type_HCF_VG :: Structure_Hydraulic%HCF)
-        case (3)
-            allocate (Type_HCF_KO :: Structure_Hydraulic%HCF)
-        case (4)
-            allocate (Type_HCF_MVG :: Structure_Hydraulic%HCF)
-        case (5)
-            allocate (Type_HCF_Durner :: Structure_Hydraulic%HCF)
-        case (6)
-            allocate (Type_HCF_DVGCH :: Structure_Hydraulic%HCF)
-        case default
-            print *, "Error: HCFModelType is not defined."
-        end select
+        ! select case (Structure_Hydraulic%useHCF)
+        ! case (1)
+        !     allocate (Type_HCF_BC :: Structure_Hydraulic%HCF)
+        ! case (2)
+        !     allocate (Type_HCF_VG :: Structure_Hydraulic%HCF)
+        ! case (3)
+        !     allocate (Type_HCF_KO :: Structure_Hydraulic%HCF)
+        ! case (4)
+        !     allocate (Type_HCF_MVG :: Structure_Hydraulic%HCF)
+        ! case (5)
+        !     allocate (Type_HCF_Durner :: Structure_Hydraulic%HCF)
+        ! case (6)
+        !     allocate (Type_HCF_DVGCH :: Structure_Hydraulic%HCF)
+        ! case default
+        !     print *, "Error: HCFModelType is not defined."
+        ! end select
 
     end subroutine Allocate_Structure_HCF_Type
 
