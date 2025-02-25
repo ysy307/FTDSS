@@ -5,6 +5,19 @@ module Calculate_GCC
     real(real64), parameter :: g = 9.80665d0
     real(real64), parameter :: TtoK = 273.15d0
 
+    type, abstract :: Abstract_GCC
+        real(real64) :: Tf !! Freezing point
+        real(real64) :: Lf !! Latent heat of fusion
+    end type Abstract_GCC
+
+    type, extends(Abstract_GCC) :: GCC_NonSegregation
+    end type GCC_NonSegregation
+
+    type, extends(Abstract_GCC) :: GCC_Segregation
+        real(real64) :: rhoW !! Density of water
+        real(real64) :: rhoI !! Density of ice
+    end type GCC_Segregation
+
     public :: Calculate_GCC_NonSegregation
     public :: Calculate_GCC_Segregation
     public :: Set_Calculate_GCC_Segregation
