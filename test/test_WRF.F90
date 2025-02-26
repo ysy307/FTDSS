@@ -16,29 +16,29 @@ program test_WRF
 
     class(Abstract_WRF), allocatable :: WRF
 
-    ! Loamy sand(BC)
-    thetaS_BC = 0.437d0
-    thetaR_BC = 0.035d0
-    alpha1_BC = -0.115d0
-    n1_BC = 0.474d0
+    ! BC
+    thetaS_BC = 0.3d0
+    thetaR_BC = 0.0d0
+    alpha1_BC = -2.558d0
+    n1_BC = 0.57087d0
 
-    ! Loamy sand(vG)
-    thetaS_vG = 0.41d0
-    thetaR_vG = 0.057d0
-    alpha1_vG = 0.124d0
-    n1_vG = 2.28d0
+    ! vG
+    thetaS_vG = 0.3d0
+    thetaR_vG = 0.0d0
+    alpha1_vG = 0.2d0
+    n1_vG = 1.8d0
 
-    ! Loamy sand(KO)
-    thetaS_KO = 0.41d0
-    thetaR_KO = 0.057d0
-    alpha1_KO = -12.4656d0
-    n1_KO = 0.9497d0
+    ! KO
+    thetaS_KO = 0.3d0
+    thetaR_KO = 0.0d0
+    alpha1_KO = -11.473d0
+    n1_KO = 1.3685d0
 
-    ! Loamy sand(MVG)
-    thetaS_MVG = 0.41d0
-    thetaR_MVG = 0.057d0
-    alpha1_MVG = 0.03d0
-    n1_MVG = 1.5d0
+    ! MVG
+    thetaS_MVG = 0.3d0
+    thetaR_MVG = 0.0d0
+    alpha1_MVG = 0.2d0
+    n1_MVG = 1.8d0
     theatM_MVG = 0.0d0
 
     ! Durner

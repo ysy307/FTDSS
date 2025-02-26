@@ -1,4 +1,4 @@
-program test_WRF
+program test_GCC
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Calculate_GCC
     implicit none
@@ -20,11 +20,11 @@ program test_WRF
     case (1)
         allocate (Type_GCC_NonSegregation_m :: GCC)
     case (2)
-        allocate (Type_GCC_NonSegregation_kPa :: GCC)
+        allocate (Type_GCC_NonSegregation_Pa :: GCC)
     case (3)
         allocate (Type_GCC_Segregation_m :: GCC)
     case (4)
-        allocate (Type_GCC_Segregation_kPa :: GCC)
+        allocate (Type_GCC_Segregation_Pa :: GCC)
     end select
 
     select type (g => GCC)
@@ -35,7 +35,7 @@ program test_WRF
         do i = 1, size(T)
             print *, T(i), g%Calculate_GCC(T(i)), g%Calculate_GCC_Derivative(T(i))
         end do
-    type is (Type_GCC_NonSegregation_kPa)
+    type is (Type_GCC_NonSegregation_Pa)
         g%Lf = 334560d0
         g%Tf = 0.0d0
 
@@ -51,7 +51,7 @@ program test_WRF
         do i = 1, size(T)
             print *, T(i), g%Calculate_GCC(T(i), Pw, rhoW), g%Calculate_GCC_Derivative(T(i), Pw, rhoW)
         end do
-    type is (Type_GCC_Segregation_kPa)
+    type is (Type_GCC_Segregation_Pa)
         g%Lf = 334560d0
         g%Tf = 0.0d0
         g%rhoI = 917.0d0
@@ -62,4 +62,4 @@ program test_WRF
         end do
     end select
 
-end program test_WRF
+end program test_GCC

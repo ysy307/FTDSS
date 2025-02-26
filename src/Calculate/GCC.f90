@@ -15,11 +15,11 @@ module Calculate_GCC
         procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_NonSegregation_Derivative_m
     end type Type_GCC_NonSegregation_m
 
-    type, extends(Abstract_GCC) :: Type_GCC_NonSegregation_kPa
+    type, extends(Abstract_GCC) :: Type_GCC_NonSegregation_Pa
     contains
-        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_NonSegregation_kPa
-        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_NonSegregation_Derivative_kPa
-    end type Type_GCC_NonSegregation_kPa
+        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_NonSegregation_Pa
+        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_NonSegregation_Derivative_Pa
+    end type Type_GCC_NonSegregation_Pa
 
     type, abstract, extends(Abstract_GCC) :: Abstract_GCC_Segregation
         real(real64) :: rhoI !! Density of ice
@@ -34,11 +34,11 @@ module Calculate_GCC
         procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_Segregation_Derivative_m
     end type Type_GCC_Segregation_m
 
-    type, extends(Abstract_GCC_Segregation) :: Type_GCC_Segregation_kPa
+    type, extends(Abstract_GCC_Segregation) :: Type_GCC_Segregation_Pa
     contains
-        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_Segregation_kPa
-        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_Segregation_Derivative_kPa
-    end type Type_GCC_Segregation_kPa
+        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_Segregation_Pa
+        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_Segregation_Derivative_Pa
+    end type Type_GCC_Segregation_Pa
 
     interface
         function Abstract_Calculate_GCC_Segregation(self, T, Pw, rhoW) result(Suction)
@@ -94,9 +94,9 @@ contains
 
     end function Calculate_GCC_NonSegregation_Derivative_m
 
-    function Calculate_GCC_NonSegregation_kPa(self, T, rhoW) result(Suction)
+    function Calculate_GCC_NonSegregation_Pa(self, T, rhoW) result(Suction)
         implicit none
-        class(Type_GCC_NonSegregation_kPa), intent(in) :: self
+        class(Type_GCC_NonSegregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T, rhoW
         real(real64) :: Suction
 
@@ -106,11 +106,11 @@ contains
             Suction = 0.0d0
         end if
 
-    end function Calculate_GCC_NonSegregation_kPa
+    end function Calculate_GCC_NonSegregation_Pa
 
-    function Calculate_GCC_NonSegregation_Derivative_kPa(self, T, rhoW) result(Suction_Derivative)
+    function Calculate_GCC_NonSegregation_Derivative_Pa(self, T, rhoW) result(Suction_Derivative)
         implicit none
-        class(Type_GCC_NonSegregation_kPa), intent(in) :: self
+        class(Type_GCC_NonSegregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T, rhoW
         real(real64) :: Suction_Derivative
 
@@ -120,7 +120,7 @@ contains
             Suction_Derivative = 0.0d0
         end if
 
-    end function Calculate_GCC_NonSegregation_Derivative_kPa
+    end function Calculate_GCC_NonSegregation_Derivative_Pa
 
     function Calculate_GCC_Segregation_m(self, T, Pw, rhoW) result(Suction)
         implicit none
@@ -154,9 +154,9 @@ contains
 
     end function Calculate_GCC_Segregation_Derivative_m
 
-    function Calculate_GCC_Segregation_kPa(self, T, Pw, rhoW) result(Suction)
+    function Calculate_GCC_Segregation_Pa(self, T, Pw, rhoW) result(Suction)
         implicit none
-        class(Type_GCC_Segregation_kPa), intent(in) :: self
+        class(Type_GCC_Segregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in) :: Pw
         real(real64), intent(in) :: rhoW
@@ -168,11 +168,11 @@ contains
             Suction = 0.0d0
         end if
 
-    end function Calculate_GCC_Segregation_kPa
+    end function Calculate_GCC_Segregation_Pa
 
-    function Calculate_GCC_Segregation_Derivative_kPa(self, T, Pw, rhoW) result(Suction_Derivative)
+    function Calculate_GCC_Segregation_Derivative_Pa(self, T, Pw, rhoW) result(Suction_Derivative)
         implicit none
-        class(Type_GCC_Segregation_kPa), intent(in) :: self
+        class(Type_GCC_Segregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in) :: Pw
         real(real64), intent(in) :: rhoW
@@ -184,6 +184,6 @@ contains
             Suction_Derivative = 0.0d0
         end if
 
-    end function Calculate_GCC_Segregation_Derivative_kPa
+    end function Calculate_GCC_Segregation_Derivative_Pa
 
 end module Calculate_GCC
