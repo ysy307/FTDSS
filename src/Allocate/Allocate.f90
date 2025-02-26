@@ -1,22 +1,22 @@
 module Allocate_Allocate
     use, intrinsic :: iso_fortran_env
     use :: error
-    use :: Types
+    ! use :: Types
     implicit none
-    ! priva
+    private
 
     interface Allocate_Array
-        procedure Allocate_Rank1_int32
-        procedure Allocate_Rank1_int64
-        procedure Allocate_Rank1_real32
-        procedure Allocate_Rank1_real64
-        procedure Allocate_Rank1_real128
-        procedure Allocate_Rank1_logical
-        procedure Allocate_Rank2_int32
-        procedure Allocate_Rank2_int64
-        procedure Allocate_Rank2_real32
-        procedure Allocate_Rank2_real64
-        procedure Allocate_Rank2_real128
+        procedure :: Allocate_Rank1_int32
+        procedure :: Allocate_Rank1_int64
+        procedure :: Allocate_Rank1_real32
+        procedure :: Allocate_Rank1_real64
+        procedure :: Allocate_Rank1_real128
+        procedure :: Allocate_Rank1_logical
+        procedure :: Allocate_Rank2_int32
+        procedure :: Allocate_Rank2_int64
+        procedure :: Allocate_Rank2_real32
+        procedure :: Allocate_Rank2_real64
+        procedure :: Allocate_Rank2_real128
         procedure :: Allocate_Rank1_int32_specify
         procedure :: Allocate_Rank1_int64_specify
         procedure :: Allocate_Rank1_real32_specify
@@ -26,16 +26,16 @@ module Allocate_Allocate
     end interface
 
     interface Allocate_Pointer
-        procedure Allocate_Pointer_int32
-        procedure Allocate_Pointer_int64
-        procedure Allocate_Pointer_real32
-        module procedure Allocate_Pointer_real64
-        module procedure Allocate_Pointer_real128
+        procedure :: Allocate_Pointer_int32
+        procedure :: Allocate_Pointer_int64
+        procedure :: Allocate_Pointer_real32
+        procedure :: Allocate_Pointer_real64
+        procedure :: Allocate_Pointer_real128
     end interface
 
     public :: Allocate_Array
     public :: Allocate_Pointer
-    public :: Duplicate_CRS
+    ! public :: Duplicate_CRS
 
 contains
 
@@ -185,7 +185,7 @@ contains
 
     subroutine Allocate_Rank1_logical_specify(array, first, last)
         implicit none
-        logical, intent(inout), allocatable :: array(:)
+        logical(4), intent(inout), allocatable :: array(:)
         integer(int32), intent(in) :: first, last
 
         if (first > last) call error_message(952)
@@ -318,28 +318,28 @@ contains
         end if
     end subroutine Allocate_Pointer_real128
 
-    subroutine Duplicate_CRS(A, B)
-        implicit none
-        type(CRS), intent(in) :: A
-        type(CRS), intent(inout) :: B
+    ! subroutine Duplicate_CRS(A, B)
+    !     implicit none
+    !     type(CRS), intent(in) :: A
+    !     type(CRS), intent(inout) :: B
 
-        B%nnz = A%nnz
-        if (.not. allocated(B%Ptr)) then
-            allocate (B%Ptr, source=A%Ptr)
-        else
-            ! call error_message(951)
-        end if
-        if (.not. allocated(B%Ind)) then
-            allocate (B%Ind, source=A%Ind)
-        else
-            ! call error_message(951)
-        end if
-        if (.not. allocated(B%val)) then
-            allocate (B%val, source=A%Val)
-        else
-            ! call error_message(951)
-        end if
-        B%val = 0.0d0
+    !     B%nnz = A%nnz
+    !     if (.not. allocated(B%Ptr)) then
+    !         allocate (B%Ptr, source=A%Ptr)
+    !     else
+    !         ! call error_message(951)
+    !     end if
+    !     if (.not. allocated(B%Ind)) then
+    !         allocate (B%Ind, source=A%Ind)
+    !     else
+    !         ! call error_message(951)
+    !     end if
+    !     if (.not. allocated(B%val)) then
+    !         allocate (B%val, source=A%Val)
+    !     else
+    !         ! call error_message(951)
+    !     end if
+    !     B%val = 0.0d0
 
-    end subroutine Duplicate_CRS
+    ! end subroutine Duplicate_CRS
 end module Allocate_Allocate

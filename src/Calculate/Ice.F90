@@ -9,12 +9,18 @@ module Calculate_Ice
     implicit none
 
     type, abstract :: Abstract_Ice
+        type(Variables) :: Qw
         type(Variables) :: Qice
+        type(Variables) :: Si
     end type
 
     type, extends(Abstract_Ice) :: Type_Ice_TRM
         real(real64) :: Lf !! Latent heat
         real(real64) :: Tf !! Freezing point
+    contains
+        procedure, pass(self), private :: Calculate_Ice_TRM_scalar
+        procedure, pass(self), private :: Calculate_Ice_TRM_array
+        generic, public :: Calculate_Ice => Calculate_Ice_TRM_scalar, Calculate_Ice_TRM_array
     end type
 
     type, extends(Abstract_Ice) :: Type_Ice_GCC
@@ -50,7 +56,44 @@ module Calculate_Ice
         procedure, pass(self) :: Calculate_Ice_Derivative => Calculate_Ice_EXP_Derivative_Temperature
     end type Type_Ice_EXP
 
+    interface Type_Ice_TRM
+        module procedure Construct_Type_Ice_TRM
+    end interface
+
     interface
+        module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(self)
+            use, intrinsic :: iso_fortran_env, only: real64
+            import :: Type_Ice_TRM
+            implicit none
+            real(real64), intent(in) :: Lf
+            real(real64), intent(in) :: Tf
+            integer(int32), intent(in) :: nsize
+            class(Abstract_Ice), allocatable :: self
+
+        end function Construct_Type_Ice_TRM
+
+        module subroutine Calculate_Ice_TRM_array(self, arr_Temperature, arr_Si, arr_rhoW, arr_Cp)
+            use, intrinsic :: iso_fortran_env, only: real64
+            import :: Type_Ice_TRM
+            implicit none
+            class(Type_Ice_TRM), intent(inout) :: self
+            type(Variables), intent(inout) :: arr_Temperature
+            type(Variables), intent(inout) :: arr_Si
+            real(real64), intent(in) :: arr_rhoW(:)
+            real(real64), intent(in) :: arr_Cp(:)
+        end subroutine Calculate_Ice_TRM_array
+
+        module subroutine Calculate_Ice_TRM_scalar(self, arr_Temperature, arr_Si, rhoW, arr_Cp)
+            use, intrinsic :: iso_fortran_env, only: real64
+            import :: Type_Ice_TRM
+            implicit none
+            class(Type_Ice_TRM), intent(inout) :: self
+            type(Variables), intent(inout) :: arr_Temperature
+            type(Variables), intent(inout) :: arr_Si
+            real(real64), intent(in) :: rhoW
+            real(real64), intent(in) :: arr_Cp(:)
+        end subroutine Calculate_Ice_TRM_scalar
+
         module subroutine Set_Type_Ice_GCC_WRF(self, ModelType)
             use, intrinsic :: iso_fortran_env, only: int32
             import :: Type_Ice_GCC

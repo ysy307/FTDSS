@@ -8,16 +8,16 @@ contains
         class(Type_Ice_EXP), intent(inout) :: self
         real(real64), intent(in) :: arr_Temperature(:)
 
-        integer(int32) :: i, n
+        integer(int32) :: iN, n
 
         n = size(arr_Temperature)
 
-        !$omp parallel do schedule(guided) private(i)
-        do i = 1, n
-            if (arr_Temperature(i) < self%Tf) then
-                self%Qice%pre(i) = self%phi * (1.0d0 - (1.0d0 - arr_Temperature(i) + self%Tf)**self%a)
+        !$omp parallel do schedule(guided) private(iN)
+        do iN = 1, n
+            if (arr_Temperature(iN) < self%Tf) then
+                self%Qice%pre(iN) = self%phi * (1.0d0 - (1.0d0 - arr_Temperature(iN) + self%Tf)**self%a)
             else
-                self%Qice%pre(i) = 0.0d0
+                self%Qice%pre(iN) = 0.0d0
             end if
         end do
 
@@ -28,16 +28,16 @@ contains
         class(Type_Ice_EXP), intent(inout) :: self
         real(real64), intent(in) :: arr_Temperature(:)
 
-        integer(int32) :: i, n
+        integer(int32) :: iN, n
 
         n = size(arr_Temperature)
 
-        !$omp parallel do schedule(guided) private(i)
-        do i = 1, n
-            if (arr_Temperature(i) < self%Tf) then
-                self%D_Qice%pre(i) = self%phi * self%a * (1.0d0 - arr_Temperature(i) + self%Tf)**(self%a - 1.0d0)
+        !$omp parallel do schedule(guided) private(iN)
+        do iN = 1, n
+            if (arr_Temperature(iN) < self%Tf) then
+                self%D_Qice%pre(iN) = self%phi * self%a * (1.0d0 - arr_Temperature(iN) + self%Tf)**(self%a - 1.0d0)
             else
-                self%Qice%pre(i) = 0.0d0
+                self%Qice%pre(iN) = 0.0d0
             end if
         end do
 
