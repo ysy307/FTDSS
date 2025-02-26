@@ -67,6 +67,7 @@ module Calculate_GCC
 contains
 
     function Calculate_GCC_NonSegregation_m(self, T) result(Suction)
+        !$omp declare simd uniform(self, T)
         implicit none
         class(Type_GCC_NonSegregation_m), intent(in) :: self
         real(real64), intent(in) :: T
@@ -81,6 +82,7 @@ contains
     end function Calculate_GCC_NonSegregation_m
 
     function Calculate_GCC_NonSegregation_Derivative_m(self, T) result(Suction)
+        !$omp declare simd uniform(self, T)
         implicit none
         class(Type_GCC_NonSegregation_m), intent(in) :: self
         real(real64), intent(in) :: T
@@ -95,6 +97,7 @@ contains
     end function Calculate_GCC_NonSegregation_Derivative_m
 
     function Calculate_GCC_NonSegregation_Pa(self, T, rhoW) result(Suction)
+        !$omp declare simd uniform(self, T, rhoW)
         implicit none
         class(Type_GCC_NonSegregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T, rhoW
@@ -109,6 +112,7 @@ contains
     end function Calculate_GCC_NonSegregation_Pa
 
     function Calculate_GCC_NonSegregation_Derivative_Pa(self, T, rhoW) result(Suction_Derivative)
+        !$omp declare simd uniform(self, T, rhoW)
         implicit none
         class(Type_GCC_NonSegregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T, rhoW
@@ -123,6 +127,7 @@ contains
     end function Calculate_GCC_NonSegregation_Derivative_Pa
 
     function Calculate_GCC_Segregation_m(self, T, Pw, rhoW) result(Suction)
+        !$omp declare simd uniform(self, T, rhoW)
         implicit none
         class(Type_GCC_Segregation_m), intent(in) :: self
         real(real64), intent(in) :: T
@@ -139,6 +144,7 @@ contains
     end function Calculate_GCC_Segregation_m
 
     function Calculate_GCC_Segregation_Derivative_m(self, T, Pw, rhoW) result(Suction_Derivative)
+        !$omp declare simd uniform(self, T, Pw, rhoW)
         implicit none
         class(Type_GCC_Segregation_m), intent(in) :: self
         real(real64), intent(in) :: T
@@ -155,6 +161,7 @@ contains
     end function Calculate_GCC_Segregation_Derivative_m
 
     function Calculate_GCC_Segregation_Pa(self, T, Pw, rhoW) result(Suction)
+        !$omp declare simd uniform(self, T, Pw, rhoW)
         implicit none
         class(Type_GCC_Segregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T
@@ -171,6 +178,7 @@ contains
     end function Calculate_GCC_Segregation_Pa
 
     function Calculate_GCC_Segregation_Derivative_Pa(self, T, Pw, rhoW) result(Suction_Derivative)
+        !$omp declare simd uniform(self, T, Pw, rhoW)
         implicit none
         class(Type_GCC_Segregation_Pa), intent(in) :: self
         real(real64), intent(in) :: T

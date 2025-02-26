@@ -2,6 +2,9 @@ module Calculate_Ice
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Calculate_WRF
     use :: Calculate_GCC
+#ifdef _OPENMP
+!$  use omp_lib
+#endif
     implicit none
 
     type, abstract :: Abstract_Ice
@@ -88,14 +91,16 @@ contains
         real(real64), intent(in) :: arr_Temperature(:)
         real(real64), intent(inout) :: arr_Qice(:)
 
-        real(real64) :: Qs
-        integer(int32) :: i
+        real(real64) :: Qs, head
+        integer(int32) :: i, n
 
         Qs = self%WRF%thetaS
+        n = size(arr_Temperature)
 
         select type (GCC => self%GCC)
         type is (Type_GCC_NonSegregation_m)
-            do i = 1, size(arr_Qice)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
                 arr_Qice(i) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(i)))
             end do
         end select
@@ -109,23 +114,27 @@ contains
         real(real64), intent(in) :: rhoW
 
         real(real64) :: Qs
-        integer(int32) :: i
+        integer(int32) :: i, n
 
         Qs = self%WRF%thetaS
+        n = size(arr_Temperature)
 
         select type (GCC => self%GCC)
         type is (Type_GCC_NonSegregation_Pa)
-            do i = 1, size(arr_Qice)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
                 arr_Qice(i) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(i), rhoW))
             end do
         type is (Type_GCC_Segregation_m)
             if (.not. present(arr_Pw)) stop 'arr_Pw is required'
-            do i = 1, size(arr_Qice)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
                 arr_Qice(i) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), rhoW))
             end do
         type is (Type_GCC_Segregation_Pa)
             if (.not. present(arr_Pw)) stop 'arr_Pw is required'
-            do i = 1, size(arr_Qice)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
                 arr_Qice(i) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), rhoW))
             end do
 
@@ -141,23 +150,27 @@ contains
         real(real64), intent(in), optional :: arr_Pw(:)
 
         real(real64) :: Qs
-        integer(int32) :: i
+        integer(int32) :: i, n
 
         Qs = self%WRF%thetaS
+        n = size(arr_Temperature)
 
         select type (GCC => self%GCC)
         type is (Type_GCC_NonSegregation_Pa)
-            do i = 1, size(arr_Qice)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
                 arr_Qice(i) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(i), arr_rhoW(i)))
             end do
         type is (Type_GCC_Segregation_m)
             if (.not. present(arr_Pw)) stop 'arr_Pw is required'
-            do i = 1, size(arr_Qice)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
                 arr_Qice(i) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), arr_rhoW(i)))
             end do
         type is (Type_GCC_Segregation_Pa)
             if (.not. present(arr_Pw)) stop 'arr_Pw is required'
-            do i = 1, size(arr_Qice)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
                 arr_Qice(i) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), arr_rhoW(i)))
             end do
         end select

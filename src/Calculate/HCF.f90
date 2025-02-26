@@ -355,12 +355,12 @@ module Calculate_HCF
             real(real64) :: Kflh
         end function Abstract_Calculation_Kflh_Impedance
 
-        function Abstract_Calculation_Kflh_Viscosity(self, Temp) result(Kflh)
+        function Abstract_Calculation_Kflh_Viscosity(self, Temperature) result(Kflh)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Abstract_HCF_Viscosity
             implicit none
             class(Abstract_HCF_Viscosity), intent(in) :: self
-            real(real64), intent(in) :: Temp
+            real(real64), intent(in) :: Temperature
             real(real64) :: Kflh
         end function Abstract_Calculation_Kflh_Viscosity
 
@@ -374,34 +374,34 @@ module Calculate_HCF
             real(real64) :: Kflh
         end function Abstract_Calculation_Kflh_Base_Impedance
 
-        function Abstract_Calculation_Kflh_Base_Viscosity(self, h, Temp) result(Kflh)
+        function Abstract_Calculation_Kflh_Base_Viscosity(self, h, Temperature) result(Kflh)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Abstract_HCF_Base_Viscosity
             implicit none
             class(Abstract_HCF_Base_Viscosity), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: Temp
+            real(real64), intent(in) :: Temperature
             real(real64) :: Kflh
         end function Abstract_Calculation_Kflh_Base_Viscosity
 
-        function Abstract_Calculation_Kflh_Impedance_Viscosity(self, thetaI, Temp) result(Kflh)
+        function Abstract_Calculation_Kflh_Impedance_Viscosity(self, thetaI, Temperature) result(Kflh)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Abstract_HCF_Impedance_Viscosity
             implicit none
             class(Abstract_HCF_Impedance_Viscosity), intent(in) :: self
             real(real64), intent(in) :: thetaI
-            real(real64), intent(in) :: Temp
+            real(real64), intent(in) :: Temperature
             real(real64) :: Kflh
         end function Abstract_Calculation_Kflh_Impedance_Viscosity
 
-        function Abstract_Calculation_Kflh_Base_Impedance_Viscosity(self, h, thetaI, Temp) result(Kflh)
+        function Abstract_Calculation_Kflh_Base_Impedance_Viscosity(self, h, thetaI, Temperature) result(Kflh)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Abstract_HCF_Base_Impedance_Viscosity
             implicit none
             class(Abstract_HCF_Base_Impedance_Viscosity), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: thetaI
-            real(real64), intent(in) :: Temp
+            real(real64), intent(in) :: Temperature
             real(real64) :: Kflh
         end function Abstract_Calculation_Kflh_Base_Impedance_Viscosity
 
@@ -459,10 +459,10 @@ module Calculate_HCF
     end interface
 
     abstract interface
-        function Abstract_Calculate_Viscosity(Temp) result(Viscosity)
+        function Abstract_Calculate_Viscosity(Temperature) result(Viscosity)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
-            real(real64), intent(in) :: Temp
+            real(real64), intent(in) :: Temperature
             real(real64) :: Viscosity
         end function Abstract_Calculate_Viscosity
     end interface
@@ -470,6 +470,7 @@ module Calculate_HCF
 contains
 
     function Calculate_kr_BC_Base(alpha1, n1, l, h) result(kr)
+        !$omp declare simd uniform(alpha1, n1, l, h)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1
@@ -489,6 +490,7 @@ contains
     end function Calculate_kr_BC_Base
 
     function Calculate_kr_VG_Base(alpha1, n1, m1, l, h) result(kr)
+        !$omp declare simd uniform(alpha1, n1, m1, l, h)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1
@@ -509,6 +511,7 @@ contains
     end function Calculate_kr_VG_Base
 
     function Calculate_kr_KO_Base(alpha1, n1, l, h) result(kr)
+        !$omp declare simd uniform(alpha1, n1, l, h)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1
@@ -527,8 +530,8 @@ contains
     end function Calculate_kr_KO_Base
 
     function Calculate_kr_MVG_Base(thetaS, thetaR, alpha1, n1, m1, l, hcrit, h) result(kr)
+        !$omp declare simd uniform(thetaS, thetaR, alpha1, n1, m1, l, hcrit, h)
         implicit none
-        ! type(HCF), intent(in) :: self
         real(real64), intent(in) :: thetaS
         real(real64), intent(in) :: thetaR
         real(real64), intent(in) :: alpha1
@@ -552,8 +555,8 @@ contains
     end function Calculate_kr_MVG_Base
 
     function Calculate_kr_Durner_Base(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h) result(kr)
+        !$omp declare simd uniform(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h)
         implicit none
-        ! type(HCF), intent(in) :: self
         real(real64), intent(in) :: alpha1, alpha2
         real(real64), intent(in) :: n1, n2
         real(real64), intent(in) :: m1, m2
@@ -577,6 +580,7 @@ contains
     end function Calculate_kr_Durner_Base
 
     function Calculate_kr_DVGCH_Base(alpha1, n1, m1, w1, n2, m2, w2, l, h) result(kr)
+        !$omp declare simd uniform(alpha1, n1, m1, w1, n2, m2, w2, l, h)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1, n2
@@ -600,25 +604,28 @@ contains
 
     end function Calculate_kr_DVGCH_Base
 
-    function Calculate_HCF_mu_Exponential(Temp) result(Viscosity)
+    function Calculate_HCF_mu_Exponential(Temperature) result(Viscosity)
+        !$omp declare simd uniform(Temperature)
         implicit none
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Viscosity
 
-        Viscosity = 2.1d-6 * exp(1808.5d0 / (Temp + 273.15d0))
+        Viscosity = 2.1d-6 * exp(1808.5d0 / (Temperature + 273.15d0))
 
     end function Calculate_HCF_mu_Exponential
 
-    function Calculate_HCF_mu_Exponential_Supercooled(Temp) result(Viscosity)
+    function Calculate_HCF_mu_Exponential_Supercooled(Temperature) result(Viscosity)
+        !$omp declare simd uniform(Temperature)
         implicit none
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Viscosity
 
-        Viscosity = 1.3788d-4 * ((273.15d0 + Temp) / 225.66d0 - 1.0d0)**(-1.6438d0)
+        Viscosity = 1.3788d-4 * ((273.15d0 + Temperature) / 225.66d0 - 1.0d0)**(-1.6438d0)
 
     end function Calculate_HCF_mu_Exponential_Supercooled
 
     function Calculate_Impedance_Base(Omega, thetaI) result(Impedance)
+        !$omp declare simd uniform(Omega, thetaI)
         implicit none
         real(real64), intent(in) :: Omega
         real(real64), intent(in) :: thetaI
@@ -954,24 +961,24 @@ contains
 
     end function Calculate_Kflh_Impedance
 
-    function Calculate_Kflh_Viscosity(self, Temp) result(Kflh)
+    function Calculate_Kflh_Viscosity(self, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Viscosity), intent(in) :: self
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%kzero / self%Calculate_Viscosity(Temp)
+        Kflh = self%kzero / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Viscosity
 
-    function Calculate_Kflh_Impedance_Viscosity(self, thetaI, Temp) result(Kflh)
+    function Calculate_Kflh_Impedance_Viscosity(self, thetaI, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Impedance_Viscosity), intent(in) :: self
         real(real64), intent(in) :: thetaI
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Ks * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Ks * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Impedance_Viscosity
 
@@ -1041,141 +1048,141 @@ contains
 
     end function Calculate_Kflh_Base_Impedance_DVGCH
 
-    function Calculate_Kflh_Base_Viscosity_BC(self, h, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Viscosity_BC(self, h, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Viscosity_BC), intent(in) :: self
         real(real64), intent(in) :: h
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Viscosity_BC
 
-    function Calculate_Kflh_Base_Viscosity_VG(self, h, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Viscosity_VG(self, h, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Viscosity_VG), intent(in) :: self
         real(real64), intent(in) :: h
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Viscosity_VG
 
-    function Calculate_Kflh_Base_Viscosity_KO(self, h, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Viscosity_KO(self, h, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Viscosity_KO), intent(in) :: self
         real(real64), intent(in) :: h
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Viscosity_KO
 
-    function Calculate_Kflh_Base_Viscosity_MVG(self, h, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Viscosity_MVG(self, h, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Viscosity_MVG), intent(in) :: self
         real(real64), intent(in) :: h
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Viscosity_MVG
 
-    function Calculate_Kflh_Base_Viscosity_Durner(self, h, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Viscosity_Durner(self, h, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Viscosity_Durner), intent(in) :: self
         real(real64), intent(in) :: h
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Viscosity_Durner
 
-    function Calculate_Kflh_Base_Viscosity_DVGCH(self, h, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Viscosity_DVGCH(self, h, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Viscosity_DVGCH), intent(in) :: self
         real(real64), intent(in) :: h
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Viscosity_DVGCH
 
-    function Calculate_Kflh_Base_Impedance_Viscosity_BC(self, h, thetaI, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Impedance_Viscosity_BC(self, h, thetaI, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Impedance_Viscosity_BC), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64), intent(in) :: thetaI
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) * Calculate_Impedance_Base(self%Omega, thetaI) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) * Calculate_Impedance_Base(self%Omega, thetaI) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Impedance_Viscosity_BC
 
-    function Calculate_Kflh_Base_Impedance_Viscosity_VG(self, h, thetaI, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Impedance_Viscosity_VG(self, h, thetaI, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Impedance_Viscosity_VG), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64), intent(in) :: thetaI
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Impedance_Viscosity_VG
 
-    function Calculate_Kflh_Base_Impedance_Viscosity_KO(self, h, thetaI, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Impedance_Viscosity_KO(self, h, thetaI, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Impedance_Viscosity_KO), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64), intent(in) :: thetaI
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Impedance_Viscosity_KO
 
-    function Calculate_Kflh_Base_Impedance_Viscosity_MVG(self, h, thetaI, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Impedance_Viscosity_MVG(self, h, thetaI, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Impedance_Viscosity_MVG), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64), intent(in) :: thetaI
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Impedance_Viscosity_MVG
 
-    function Calculate_Kflh_Base_Impedance_Viscosity_Durner(self, h, thetaI, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Impedance_Viscosity_Durner(self, h, thetaI, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Impedance_Viscosity_Durner), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64), intent(in) :: thetaI
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Impedance_Viscosity_Durner
 
-    function Calculate_Kflh_Base_Impedance_Viscosity_DVGCH(self, h, thetaI, Temp) result(Kflh)
+    function Calculate_Kflh_Base_Impedance_Viscosity_DVGCH(self, h, thetaI, Temperature) result(Kflh)
         implicit none
         class(Type_HCF_Base_Impedance_Viscosity_DVGCH), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64), intent(in) :: thetaI
-        real(real64), intent(in) :: Temp
+        real(real64), intent(in) :: Temperature
         real(real64) :: Kflh
 
-        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temp)
+        Kflh = self%Kzero * self%Calculate_kr(h) * self%Calculate_Impedance(self%Omega, thetaI) / self%Calculate_Viscosity(Temperature)
 
     end function Calculate_Kflh_Base_Impedance_Viscosity_DVGCH
 

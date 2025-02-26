@@ -146,9 +146,4 @@ program test_Ice
         end select
     end select
 
-    ! print *, "h Q Cw"
-    ! do i = 1, 330
-    !     print *, head(i), WRF%Calculate_WRF(head(i)), WRF%Calculate_WRF_Derivative(head(i))
-    ! end do
-
 end program test_Ice

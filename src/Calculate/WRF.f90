@@ -104,6 +104,8 @@ module Calculate_WRF
 contains
 
     function Calculate_WRF_BC(self, h) result(thetaW)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_BC), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: thetaW
@@ -117,6 +119,8 @@ contains
     end function Calculate_WRF_BC
 
     function Calculate_WRF_BC_Derivative(self, h) result(Cw)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_BC), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: Cw
@@ -131,6 +135,8 @@ contains
     end function Calculate_WRF_BC_Derivative
 
     function Calculate_WRF_VG(self, h) result(thetaW)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_VG), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: thetaW
@@ -145,6 +151,8 @@ contains
     end function Calculate_WRF_VG
 
     function Calculate_WRF_VG_Derivative(self, h) result(Cw)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_VG), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: Cw
@@ -161,6 +169,8 @@ contains
     end function Calculate_WRF_VG_Derivative
 
     function Calculate_WRF_KO(self, h) result(thetaW)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_KO), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: thetaW
@@ -174,6 +184,8 @@ contains
     end function Calculate_WRF_KO
 
     function Calculate_WRF_KO_Derivative(self, h) result(Cw)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_KO), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: Cw
@@ -189,6 +201,8 @@ contains
     end function Calculate_WRF_KO_Derivative
 
     function Calculate_WRF_MVG(self, h) result(thetaW)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_MVG), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: thetaW
@@ -202,6 +216,8 @@ contains
     end function Calculate_WRF_MVG
 
     function Calculate_WRF_MVG_Derivative(self, h) result(Cw)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_MVG), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: Cw
@@ -217,6 +233,8 @@ contains
     end function Calculate_WRF_MVG_Derivative
 
     function Calculate_WRF_Durner(self, h) result(thetaW)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_Durner), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: thetaW
@@ -232,6 +250,8 @@ contains
     end function Calculate_WRF_Durner
 
     function Calculate_WRF_Durner_Derivative(self, h) result(Cw)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_Durner), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: Cw
@@ -249,6 +269,8 @@ contains
     end function Calculate_WRF_Durner_Derivative
 
     function Calculate_WRF_DVGCH(self, h) result(thetaW)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_DVGCH), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: thetaW
@@ -264,6 +286,8 @@ contains
     end function Calculate_WRF_DVGCH
 
     function Calculate_WRF_DVGCH_Derivative(self, h) result(Cw)
+        !$omp declare simd uniform(self, h)
+        implicit none
         class(Type_WRF_DVGCH), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64) :: Cw
