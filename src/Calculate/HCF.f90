@@ -1,6 +1,8 @@
 module Calculate_HCF
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    ! use :: Types
+#ifdef _OPENMP
+!$  use omp_lib
+#endif
     implicit none
 
     type, abstract :: Abstract_HCF

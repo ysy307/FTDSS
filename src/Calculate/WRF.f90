@@ -1,5 +1,8 @@
 module Calculate_WRF
     use, intrinsic :: iso_fortran_env, only: int32, real64
+#ifdef _OPENMP
+!$  use omp_lib
+#endif
     implicit none
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)

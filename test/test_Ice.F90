@@ -12,14 +12,13 @@ program test_Ice
     real(real64) :: thetaS_MVG, thetaR_MVG, alpha1_MVG, n1_MVG, theatM_MVG
     real(real64) :: thetaS_Durner, thetaR_Durner, alpha1_Durner, n1_Durner, w1_Durner, alpha2_Durner, n2_Durner
     real(real64) :: thetaS_DVGCH, thetaR_DVGCH, alpha1_DVGCH, n1_DVGCH, w1_DVGCH, alpha2_DVGCH, n2_DVGCH
+    real(real64) :: EXP_phi, EXP_a
 
     real(real64) :: Tf, Lf, rhoI
 
     integer(int32) :: case_num
 
     class(Abstract_Ice), allocatable :: Ice
-
-    allocate (Type_Ice_GCC :: Ice)
 
     ! BC
     thetaS_BC = 0.3d0
@@ -66,6 +65,12 @@ program test_Ice
     Tf = 0.0d0
     Lf = 334560d0
     rhoI = 917.0d0
+
+    EXP_phi = 0.3d0
+    EXP_a = -6.02d0
+
+    ! allocate (Type_Ice_GCC :: Ice)
+    allocate (Type_Ice_EXP :: Ice)
 
     case_num = 1
 
@@ -127,11 +132,13 @@ program test_Ice
         type is (Type_GCC_NonSegregation_m)
             tGCC%Lf = Lf
             tGCC%Tf = Tf
+            allocate (tI%Qice%pre(size(T)))
+            allocate (tI%D_Qice%pre(size(T)))
 
-            call tI%Calculate_Ice(Qice, T)
-            call tI%Calculate_Ice_Derivative(D_Qice, T)
+            call tI%Calculate_Ice(T)
+            call tI%Calculate_Ice_Derivative(T)
             do i = 1, size(T)
-                print *, T(i), Qice(i), D_Qice(i)
+                print *, T(i), tI%Qice%pre(i), tI%D_Qice%pre(i)
             end do
         type is (Type_GCC_NonSegregation_Pa)
             tGCC%Lf = Lf
@@ -145,6 +152,20 @@ program test_Ice
             tGCC%Tf = Tf
             tGCC%rhoI = rhoI
         end select
+    type is (Type_Ice_EXP)
+        tI%phi = EXP_phi
+        tI%a = EXP_a
+        tI%Tf = Tf
+
+        allocate (tI%Qice%pre(size(T)))
+        allocate (tI%D_Qice%pre(size(T)))
+
+        call tI%Calculate_Ice(T)
+        call tI%Calculate_Ice_Derivative(T)
+
+        do i = 1, size(T)
+            print *, T(i), tI%Qice%pre(i), tI%D_Qice%pre(i)
+        end do
     end select
 
 end program test_Ice

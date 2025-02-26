@@ -322,6 +322,7 @@ module Types
         real(real64), allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
     end type DF
 
+    !!KEEP THIS TYPE
     type :: Variables
         real(real64), allocatable :: new(:), old(:), pre(:), dif(:), div(:), tmp(:)
     end type Variables

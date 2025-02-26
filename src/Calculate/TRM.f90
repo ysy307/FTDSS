@@ -64,22 +64,23 @@ contains
         ! end do
     end subroutine TRMethod
 
-    ! subroutine Calculate_TRM()
-    !     implicit none
+    subroutine Calculate_TRM(arr_Temperature, arr_Si)
+        implicit none
+        type(Variables), intent(inout) :: arr_Temperature, arr_Si
 
-    !     TRM_BTM = Solver%Heat%Constants%Density%water * Solver%Heat%Constants%LatentHeat
-    !     C = Solver%Heat%Variables%rho%pre(iN) * Solver%Heat%Variables%Cs%pre(iN) / (Solver%mWater%pre(iN) * TRM_BTM)
-    !     tmpSi = Solver%Si%old(iN) + C * (vTf - Solver%T%new(iN))
-    !     if (tmpSi <= 0.0d0 .and. Solver%Si%old(iN) == 0.0d0) then
-    !         Solver%Si%new(iN) = 0.0d0
-    !     else if (tmpSi >= 1.0d0 .and. Solver%Si%old(iN) == 1.0d0) then
-    !         Solver%Si%new(iN) = 1.0d0
-    !     else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. Solver%Si%old(iN) <= 1.0d0) then
-    !         Solver%T%new(iN) = vTf
-    !         Solver%Si%new(iN) = tmpSi
-    !     else if (0.0d0 < Solver%Si%old(iN) .and. Solver%Si%old(iN) < 1.0d0 .and. tmpSi >= 1.0d0) then
-    !         Solver%T%new(iN) = vTf + (1.0d0 - tmpSi) / C
-    !         Solver%Si%new(iN) = 1.0d0
-    !     end if
-    ! end subroutine Calculate_TRM
+        !     TRM_BTM = Solver%Heat%Constants%Density%water * Solver%Heat%Constants%LatentHeat
+        !     C = Solver%Heat%Variables%rho%pre(iN) * Solver%Heat%Variables%Cs%pre(iN) / (Solver%mWater%pre(iN) * TRM_BTM)
+        !     tmpSi = Solver%Si%old(iN) + C * (vTf - Solver%T%new(iN))
+        !     if (tmpSi <= 0.0d0 .and. Solver%Si%old(iN) == 0.0d0) then
+        !         Solver%Si%new(iN) = 0.0d0
+        !     else if (tmpSi >= 1.0d0 .and. Solver%Si%old(iN) == 1.0d0) then
+        !         Solver%Si%new(iN) = 1.0d0
+        !     else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. Solver%Si%old(iN) <= 1.0d0) then
+        !         Solver%T%new(iN) = vTf
+        !         Solver%Si%new(iN) = tmpSi
+        !     else if (0.0d0 < Solver%Si%old(iN) .and. Solver%Si%old(iN) < 1.0d0 .and. tmpSi >= 1.0d0) then
+        !         Solver%T%new(iN) = vTf + (1.0d0 - tmpSi) / C
+        !         Solver%Si%new(iN) = 1.0d0
+        !     end if
+    end subroutine Calculate_TRM
 end module Calculate_TRM

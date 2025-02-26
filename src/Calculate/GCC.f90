@@ -1,5 +1,8 @@
 module Calculate_GCC
     use, intrinsic :: iso_fortran_env, only: int32, real64
+#ifdef _OPENMP
+!$  use omp_lib
+#endif
     implicit none
 
     type, abstract :: Abstract_GCC
