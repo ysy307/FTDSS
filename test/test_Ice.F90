@@ -3,7 +3,7 @@ program test_Ice
     use :: Calculate_Ice
     implicit none
     real(real64) :: T(501)
-    real(real64) :: Qice(size(T)), rhoW(size(T)), Pw(size(T))
+    real(real64) :: Qice(size(T)), D_Qice(size(T)), rhoW(size(T)), Pw(size(T))
     integer(int32) :: i
 
     real(real64) :: thetaS_BC, thetaR_BC, alpha1_BC, n1_BC
@@ -67,12 +67,12 @@ program test_Ice
     Lf = 334560d0
     rhoI = 917.0d0
 
-    case_num = 6
+    case_num = 1
 
     do i = 1, 501
         T(i) = -4.0d0 + 0.01d0 * (i - 1)
     end do
-    print *, "T Qice"
+    print *, "T Qice dQice/dT"
     select type (tI => Ice)
     type is (Type_Ice_GCC)
         call tI%Set_WRF(case_num)
@@ -129,8 +129,9 @@ program test_Ice
             tGCC%Tf = Tf
 
             call tI%Calculate_Ice(Qice, T)
+            call tI%Calculate_Ice_Derivative(D_Qice, T)
             do i = 1, size(T)
-                print *, T(i), Qice(i)
+                print *, T(i), Qice(i), D_Qice(i)
             end do
         type is (Type_GCC_NonSegregation_Pa)
             tGCC%Lf = Lf

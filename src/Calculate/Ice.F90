@@ -25,6 +25,10 @@ module Calculate_Ice
         procedure, pass(self), private :: Calculate_Ice_GCC_rhoW_scalar
         procedure, pass(self), private :: Calculate_Ice_GCC_rhoW_array
         generic :: Calculate_Ice => Calculate_Ice_GCC_NonSegregation_m, Calculate_Ice_GCC_rhoW_Scalar, Calculate_Ice_GCC_rhoW_Array
+        procedure, pass(self), private :: Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m
+        procedure, pass(self), private :: Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar
+        procedure, pass(self), private :: Calculate_Ice_GCC_Derivative_Temperature_rhoW_array
+        generic :: Calculate_Ice_Derivative => Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m, Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar, Calculate_Ice_GCC_Derivative_Temperature_rhoW_array
     end type Type_Ice_GCC
 
     type, extends(Abstract_Ice) :: Type_Ice_EXP
@@ -35,6 +39,7 @@ module Calculate_Ice
 contains
 
     subroutine Set_Type_Ice_GCC_WRF(self, ModelType)
+        implicit none
         class(Type_Ice_GCC), intent(inout) :: self
         integer(int32), intent(in) :: ModelType
 
@@ -59,6 +64,7 @@ contains
     end subroutine Set_Type_Ice_GCC_WRF
 
     subroutine Set_Type_Ice_GCC_GCC(self, isSegregation, c_unit)
+        implicit none
         class(Type_Ice_GCC), intent(inout) :: self
         logical(4), intent(in) :: isSegregation
         character(*), intent(in) :: c_unit
@@ -87,11 +93,12 @@ contains
     end subroutine Set_Type_Ice_GCC_GCC
 
     subroutine Calculate_Ice_GCC_NonSegregation_m(self, arr_Qice, arr_Temperature)
+        implicit none
         class(Type_Ice_GCC), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
         real(real64), intent(inout) :: arr_Qice(:)
+        real(real64), intent(in) :: arr_Temperature(:)
 
-        real(real64) :: Qs, head
+        real(real64) :: Qs
         integer(int32) :: i, n
 
         Qs = self%WRF%thetaS
@@ -107,11 +114,12 @@ contains
     end subroutine Calculate_Ice_GCC_NonSegregation_m
 
     subroutine Calculate_Ice_GCC_rhoW_scalar(self, arr_Qice, arr_Temperature, rhoW, arr_Pw)
+        implicit none
         class(Type_Ice_GCC), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
         real(real64), intent(inout) :: arr_Qice(:)
-        real(real64), intent(in), optional :: arr_Pw(:)
+        real(real64), intent(in) :: arr_Temperature(:)
         real(real64), intent(in) :: rhoW
+        real(real64), intent(in), optional :: arr_Pw(:)
 
         real(real64) :: Qs
         integer(int32) :: i, n
@@ -143,9 +151,10 @@ contains
     end subroutine Calculate_Ice_GCC_rhoW_scalar
 
     subroutine Calculate_Ice_GCC_rhoW_array(self, arr_Qice, arr_Temperature, arr_rhoW, arr_Pw)
+        implicit none
         class(Type_Ice_GCC), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
         real(real64), intent(inout) :: arr_Qice(:)
+        real(real64), intent(in) :: arr_Temperature(:)
         real(real64), intent(in) :: arr_rhoW(:)
         real(real64), intent(in), optional :: arr_Pw(:)
 
@@ -176,5 +185,98 @@ contains
         end select
 
     end subroutine Calculate_Ice_GCC_rhoW_array
+
+    subroutine Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m(self, arr_D_Qice, arr_Temperature)
+        implicit none
+        class(Type_Ice_GCC), intent(inout) :: self
+        real(real64), intent(inout) :: arr_D_Qice(:)
+        real(real64), intent(in) :: arr_Temperature(:)
+
+        real(real64) :: Qs
+        integer(int32) :: i, n
+
+        Qs = self%WRF%thetaS
+        n = size(arr_Temperature)
+
+        select type (GCC => self%GCC)
+        type is (Type_GCC_NonSegregation_m)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
+                arr_D_Qice(i) = self%WRF%Calculate_WRF_Derivative(-GCC%Calculate_GCC(arr_Temperature(i))) * GCC%Calculate_GCC_Derivative(arr_Temperature(i))
+            end do
+        end select
+    end subroutine Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m
+
+    subroutine Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar(self, arr_D_Qice, arr_Temperature, rhoW, arr_Pw)
+        implicit none
+        class(Type_Ice_GCC), intent(inout) :: self
+        real(real64), intent(inout) :: arr_D_Qice(:)
+        real(real64), intent(in) :: arr_Temperature(:)
+        real(real64), intent(in) :: rhoW
+        real(real64), intent(in), optional :: arr_Pw(:)
+
+        real(real64) :: Qs
+        integer(int32) :: i, n
+
+        Qs = self%WRF%thetaS
+        n = size(arr_Temperature)
+
+        select type (GCC => self%GCC)
+        type is (Type_GCC_NonSegregation_Pa)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
+                arr_D_Qice(i) = self%WRF%Calculate_WRF_Derivative(-GCC%Calculate_GCC(arr_Temperature(i), rhoW)) * GCC%Calculate_GCC_Derivative(arr_Temperature(i), rhoW)
+            end do
+        type is (Type_GCC_Segregation_m)
+            if (.not. present(arr_Pw)) stop 'arr_Pw is required'
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
+                arr_D_Qice(i) = self%WRF%Calculate_WRF_Derivative(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), rhoW)) * GCC%Calculate_GCC_Derivative(arr_Temperature(i), arr_Pw(i), rhoW)
+            end do
+        type is (Type_GCC_Segregation_Pa)
+            if (.not. present(arr_Pw)) stop 'arr_Pw is required'
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
+                arr_D_Qice(i) = self%WRF%Calculate_WRF_Derivative(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), rhoW)) * GCC%Calculate_GCC_Derivative(arr_Temperature(i), arr_Pw(i), rhoW)
+            end do
+        end select
+
+    end subroutine Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar
+
+    subroutine Calculate_Ice_GCC_Derivative_Temperature_rhoW_array(self, arr_D_Qice, arr_Temperature, arr_rhoW, arr_Pw)
+        implicit none
+        class(Type_Ice_GCC), intent(inout) :: self
+        real(real64), intent(inout) :: arr_D_Qice(:)
+        real(real64), intent(in) :: arr_Temperature(:)
+        real(real64), intent(in) :: arr_rhoW(:)
+        real(real64), intent(in), optional :: arr_Pw(:)
+
+        real(real64) :: Qs
+        integer(int32) :: i, n
+
+        Qs = self%WRF%thetaS
+        n = size(arr_Temperature)
+
+        select type (GCC => self%GCC)
+        type is (Type_GCC_NonSegregation_Pa)
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
+                arr_D_Qice(i) = self%WRF%Calculate_WRF_Derivative(-GCC%Calculate_GCC(arr_Temperature(i), arr_rhoW(i))) * GCC%Calculate_GCC_Derivative(arr_Temperature(i), arr_rhoW(i))
+            end do
+        type is (Type_GCC_Segregation_m)
+            if (.not. present(arr_Pw)) stop 'arr_Pw is required'
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
+                arr_D_Qice(i) = self%WRF%Calculate_WRF_Derivative(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), arr_rhoW(i))) * GCC%Calculate_GCC_Derivative(arr_Temperature(i), arr_Pw(i), arr_rhoW(i))
+            end do
+        type is (Type_GCC_Segregation_Pa)
+            if (.not. present(arr_Pw)) stop 'arr_Pw is required'
+            !$omp parallel do schedule(guided) private(i)
+            do i = 1, n
+                arr_D_Qice(i) = self%WRF%Calculate_WRF_Derivative(-GCC%Calculate_GCC(arr_Temperature(i), arr_Pw(i), arr_rhoW(i))) * GCC%Calculate_GCC_Derivative(arr_Temperature(i), arr_Pw(i), arr_rhoW(i))
+            end do
+        end select
+
+    end subroutine Calculate_Ice_GCC_Derivative_Temperature_rhoW_array
 
 end module Calculate_Ice
