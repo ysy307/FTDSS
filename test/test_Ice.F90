@@ -70,7 +70,8 @@ program test_Ice
     EXP_a = -6.02d0
 
     ! allocate (Type_Ice_GCC :: Ice)
-    allocate (Type_Ice_EXP :: Ice)
+    ! allocate (Type_Ice_EXP :: Ice)
+    Ice = Type_Ice_EXP(EXP_phi, Tf, EXP_a, size(T))
 
     case_num = 1
 
@@ -153,15 +154,9 @@ program test_Ice
             tGCC%rhoI = rhoI
         end select
     type is (Type_Ice_EXP)
-        tI%phi = EXP_phi
-        tI%a = EXP_a
-        tI%Tf = Tf
 
-        allocate (tI%Qice%pre(size(T)))
-        allocate (tI%D_Qice%pre(size(T)))
-
-        call tI%Calculate_Ice(T)
-        call tI%Calculate_Ice_Derivative(T)
+        call tI%Update_Ice(T)
+        call tI%Update_Ice_Derivative(T)
 
         do i = 1, size(T)
             print *, T(i), tI%Qice%pre(i), tI%D_Qice%pre(i)

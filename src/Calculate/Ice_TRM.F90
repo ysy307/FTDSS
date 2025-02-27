@@ -3,18 +3,18 @@ submodule(Calculate_Ice) Calculate_Ice_TRM_Implementation
     implicit none
 
 contains
-    module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(self)
+    module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(structure)
         use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: Tf
         integer(int32), intent(in) :: nsize
-        class(Abstract_Ice), allocatable :: self
+        class(Abstract_Ice), allocatable :: structure
 
-        if (allocated(self)) deallocate (self)
-        allocate (Type_Ice_TRM :: self)
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_Ice_TRM :: structure)
 
-        select type (this => self)
+        select type (this => structure)
         type is (Type_Ice_TRM)
             this%Lf = Lf
             this%Tf = Tf
@@ -44,7 +44,16 @@ contains
 
     end function Construct_Type_Ice_TRM
 
-    module subroutine Calculate_Ice_TRM_scalar(self, arr_Temperature, arr_Si, rhoW, arr_Cp)
+    module function Construct_Type_Ice_TRM_minimum result(structure)
+        implicit none
+        class(Abstract_Ice), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_Ice_TRM :: structure)
+
+    end function Construct_Type_Ice_TRM_minimum
+
+    module subroutine Update_Ice_TRM_scalar(self, arr_Temperature, arr_Si, rhoW, arr_Cp)
         implicit none
         class(Type_Ice_TRM), intent(inout) :: self
         type(Variables), intent(inout) :: arr_Temperature
@@ -75,9 +84,9 @@ contains
             end if
         end do
 
-    end subroutine Calculate_Ice_TRM_scalar
+    end subroutine Update_Ice_TRM_scalar
 
-    module subroutine Calculate_Ice_TRM_array(self, arr_Temperature, arr_Si, arr_rhoW, arr_Cp)
+    module subroutine Update_Ice_TRM_array(self, arr_Temperature, arr_Si, arr_rhoW, arr_Cp)
         implicit none
         class(Type_Ice_TRM), intent(inout) :: self
         type(Variables), intent(inout) :: arr_Temperature
@@ -108,6 +117,6 @@ contains
             end if
         end do
 
-    end subroutine Calculate_Ice_TRM_array
+    end subroutine Update_Ice_TRM_array
 
 end submodule Calculate_Ice_TRM_Implementation
