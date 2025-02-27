@@ -53,7 +53,7 @@ contains
 
     end function Construct_Type_Ice_EXP
 
-    module function Construct_Type_Ice_EXP_minimum result(structure)
+    module function Construct_Type_Ice_EXP_minimum() result(structure)
         implicit none
         class(Abstract_Ice), allocatable :: structure
 

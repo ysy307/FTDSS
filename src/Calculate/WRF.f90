@@ -104,7 +104,68 @@ module Calculate_WRF
             real(real64) :: Cw !! Calculated derivative of water content
         end function Abstract_Calculate_WRF_Derivative
     end interface
+
+    interface Type_WRF_BC
+        module procedure Construct_Type_WRF_BC
+        module procedure Construct_Type_WRF_BC_minimum
+    end interface
+
+    interface Type_WRF_VG
+        module procedure Construct_Type_WRF_VG
+        module procedure Construct_Type_WRF_VG_minimum
+    end interface
+
+    interface Type_WRF_KO
+        module procedure Construct_Type_WRF_KO
+        module procedure Construct_Type_WRF_KO_minimum
+    end interface
+
+    interface Type_WRF_MVG
+        module procedure Construct_Type_WRF_MVG
+        module procedure Construct_Type_WRF_MVG_minimum
+    end interface
+
+    interface Type_WRF_Durner
+        module procedure Construct_Type_WRF_Durner
+        module procedure Construct_Type_WRF_Durner_minimum
+    end interface
+
+    interface Type_WRF_DVGCH
+        module procedure Construct_Type_WRF_DVGCH
+        module procedure Construct_Type_WRF_DVGCH_minimum
+    end interface
+
 contains
+
+    function Construct_Type_WRF_BC(thetaS, thetaR, alpha1, n1) result(structure)
+        implicit none
+        real(real64), intent(in) :: thetaR
+        real(real64), intent(in) :: thetaS
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_BC :: structure)
+
+        select type (this => structure)
+        type is (Type_WRF_BC)
+            this%thetaR = thetaR
+            this%thetaS = thetaS
+            this%alpha1 = alpha1
+            this%n1 = n1
+        end select
+
+    end function Construct_Type_WRF_BC
+
+    function Construct_Type_WRF_BC_minimum() result(structure)
+        implicit none
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_BC :: structure)
+
+    end function Construct_Type_WRF_BC_minimum
 
     function Calculate_WRF_BC(self, h) result(thetaW)
         !$omp declare simd uniform(self, h)
@@ -136,6 +197,37 @@ contains
             Cw = 0.0d0
         end if
     end function Calculate_WRF_BC_Derivative
+
+    function Construct_Type_WRF_VG(thetaS, thetaR, alpha1, n1) result(structure)
+        implicit none
+        real(real64), intent(in) :: thetaS
+        real(real64), intent(in) :: thetaR
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_VG :: structure)
+
+        select type (this => structure)
+        type is (Type_WRF_VG)
+            this%thetaR = thetaR
+            this%thetaS = thetaS
+            this%alpha1 = alpha1
+            this%n1 = n1
+            this%m1 = 1.0d0 - 1.0d0 / n1
+        end select
+
+    end function Construct_Type_WRF_VG
+
+    function Construct_Type_WRF_VG_minimum() result(structure)
+        implicit none
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_VG :: structure)
+
+    end function Construct_Type_WRF_VG_minimum
 
     function Calculate_WRF_VG(self, h) result(thetaW)
         !$omp declare simd uniform(self, h)
@@ -171,6 +263,36 @@ contains
 
     end function Calculate_WRF_VG_Derivative
 
+    function Construct_Type_WRF_KO(thetaS, thetaR, alpha1, n1) result(structure)
+        implicit none
+        real(real64), intent(in) :: thetaS
+        real(real64), intent(in) :: thetaR
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_KO :: structure)
+
+        select type (this => structure)
+        type is (Type_WRF_KO)
+            this%thetaR = thetaR
+            this%thetaS = thetaS
+            this%alpha1 = alpha1
+            this%n1 = n1
+        end select
+
+    end function Construct_Type_WRF_KO
+
+    function Construct_Type_WRF_KO_minimum() result(structure)
+        implicit none
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_KO :: structure)
+
+    end function Construct_Type_WRF_KO_minimum
+
     function Calculate_WRF_KO(self, h) result(thetaW)
         !$omp declare simd uniform(self, h)
         implicit none
@@ -203,6 +325,39 @@ contains
 
     end function Calculate_WRF_KO_Derivative
 
+    function Construct_Type_WRF_MVG(thetaS, thetaR, alpha1, n1, hcrit) result(structure)
+        implicit none
+        real(real64), intent(in) :: thetaS
+        real(real64), intent(in) :: thetaR
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        real(real64), intent(in) :: hcrit
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_MVG :: structure)
+
+        select type (this => structure)
+        type is (Type_WRF_MVG)
+            this%thetaR = thetaR
+            this%thetaS = thetaS
+            this%alpha1 = alpha1
+            this%n1 = n1
+            this%m1 = 1.0d0 - 1.0d0 / n1
+            this%hcrit = hcrit
+        end select
+
+    end function Construct_Type_WRF_MVG
+
+    function Construct_Type_WRF_MVG_minimum() result(structure)
+        implicit none
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_MVG :: structure)
+
+    end function Construct_Type_WRF_MVG_minimum
+
     function Calculate_WRF_MVG(self, h) result(thetaW)
         !$omp declare simd uniform(self, h)
         implicit none
@@ -234,6 +389,45 @@ contains
         end if
 
     end function Calculate_WRF_MVG_Derivative
+
+    function Construct_Type_WRF_Durner(thetaS, thetaR, alpha1, n1, w1, alpha2, n2) result(structure)
+        implicit none
+        real(real64), intent(in) :: thetaS
+        real(real64), intent(in) :: thetaR
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        real(real64), intent(in) :: w1
+        real(real64), intent(in) :: alpha2
+        real(real64), intent(in) :: n2
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_Durner :: structure)
+
+        select type (this => structure)
+        type is (Type_WRF_Durner)
+            this%thetaR = thetaR
+            this%thetaS = thetaS
+            this%alpha1 = alpha1
+            this%n1 = n1
+            this%m1 = 1.0d0 - 1.0d0 / n1
+            this%w1 = w1
+            this%alpha2 = alpha2
+            this%n2 = n2
+            this%m2 = 1.0d0 - 1.0d0 / n2
+            this%w2 = 1.0d0 - w1
+        end select
+
+    end function Construct_Type_WRF_Durner
+
+    function Construct_Type_WRF_Durner_minimum() result(structure)
+        implicit none
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_Durner :: structure)
+
+    end function Construct_Type_WRF_Durner_minimum
 
     function Calculate_WRF_Durner(self, h) result(thetaW)
         !$omp declare simd uniform(self, h)
@@ -270,6 +464,43 @@ contains
         end if
 
     end function Calculate_WRF_Durner_Derivative
+
+    function Construct_Type_WRF_DVGCH(thetaS, thetaR, alpha1, n1, w1, n2) result(structure)
+        implicit none
+        real(real64), intent(in) :: thetaS
+        real(real64), intent(in) :: thetaR
+        real(real64), intent(in) :: alpha1
+        real(real64), intent(in) :: n1
+        real(real64), intent(in) :: w1
+        real(real64), intent(in) :: n2
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_DVGCH :: structure)
+
+        select type (this => structure)
+        type is (Type_WRF_DVGCH)
+            this%thetaR = thetaR
+            this%thetaS = thetaS
+            this%alpha1 = alpha1
+            this%n1 = n1
+            this%m1 = 1.0d0 - 1.0d0 / n1
+            this%w1 = w1
+            this%n2 = n2
+            this%m2 = 1.0d0 - 1.0d0 / n2
+            this%w2 = 1.0d0 - w1
+        end select
+
+    end function Construct_Type_WRF_DVGCH
+
+    function Construct_Type_WRF_DVGCH_minimum() result(structure)
+        implicit none
+        class(Abstract_WRF), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_WRF_DVGCH :: structure)
+
+    end function Construct_Type_WRF_DVGCH_minimum
 
     function Calculate_WRF_DVGCH(self, h) result(thetaW)
         !$omp declare simd uniform(self, h)

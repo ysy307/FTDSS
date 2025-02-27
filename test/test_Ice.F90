@@ -16,7 +16,7 @@ program test_Ice
 
     real(real64) :: Tf, Lf, rhoI
 
-    integer(int32) :: case_num
+    integer(int32) :: case_num, case_type_num, nsize
 
     class(Abstract_Ice), allocatable :: Ice
 
@@ -69,98 +69,116 @@ program test_Ice
     EXP_phi = 0.3d0
     EXP_a = -6.02d0
 
-    ! allocate (Type_Ice_GCC :: Ice)
-    ! allocate (Type_Ice_EXP :: Ice)
-    Ice = Type_Ice_EXP(EXP_phi, Tf, EXP_a, size(T))
-
-    case_num = 1
+    case_type_num = 2
+    case_num = 6
 
     do i = 1, 501
         T(i) = -4.0d0 + 0.01d0 * (i - 1)
     end do
-    print *, "T Qice dQice/dT"
-    select type (tI => Ice)
-    type is (Type_Ice_GCC)
-        call tI%Set_WRF(case_num)
-        select type (w => tI%WRF)
-        type is (Type_WRF_BC)
-            w%thetaS = thetaS_BC
-            w%thetaR = thetaR_BC
-            w%alpha1 = alpha1_BC
-            w%n1 = n1_BC
-        type is (Type_WRF_VG)
-            w%thetaS = thetaS_vG
-            w%thetaR = thetaR_vG
-            w%alpha1 = alpha1_vG
-            w%n1 = n1_vG
-            w%m1 = 1.0d0 - 1.0d0 / n1_vG
-        type is (Type_WRF_KO)
-            w%thetaS = thetaS_KO
-            w%thetaR = thetaR_KO
-            w%alpha1 = alpha1_KO
-            w%n1 = n1_KO
-        type is (Type_WRF_MVG)
-            w%thetaS = thetaS_MVG
-            w%thetaR = thetaR_MVG
-            w%alpha1 = alpha1_MVG
-            w%n1 = n1_MVG
-            w%m1 = 1.0d0 - 1.0d0 / n1_MVG
-            w%hcrit = theatM_MVG
-        type is (Type_WRF_Durner)
-            w%thetaS = thetaS_Durner
-            w%thetaR = thetaR_Durner
-            w%alpha1 = alpha1_Durner
-            w%n1 = n1_Durner
-            w%m1 = 1.0d0 - 1.0d0 / n1_Durner
-            w%w1 = w1_Durner
-            w%alpha2 = alpha2_Durner
-            w%n2 = n2_Durner
-            w%m2 = 1.0d0 - 1.0d0 / n2_Durner
-            w%w2 = 1.0d0 - w1_Durner
-        type is (Type_WRF_DVGCH)
-            w%thetaS = thetaS_DVGCH
-            w%thetaR = thetaR_DVGCH
-            w%alpha1 = alpha1_DVGCH
-            w%n1 = n1_DVGCH
-            w%m1 = 1.0d0 - 1.0d0 / n1_DVGCH
-            w%w1 = w1_DVGCH
-            w%n2 = n2_DVGCH
-            w%m2 = 1.0d0 - 1.0d0 / n2_DVGCH
-            w%w2 = 1.0d0 - w1_DVGCH
-        end select
-        call tI%Set_GCC(.false., 'm')
-        select type (tGCC => tI%GCC)
-        type is (Type_GCC_NonSegregation_m)
-            tGCC%Lf = Lf
-            tGCC%Tf = Tf
-            allocate (tI%Qice%pre(size(T)))
-            allocate (tI%D_Qice%pre(size(T)))
 
-            call tI%Calculate_Ice(T)
-            call tI%Calculate_Ice_Derivative(T)
+    nsize = size(T)
+
+    select case (case_type_num)
+    case (1)
+        Ice = Construct_Type_Ice_TRM(Lf, Tf, nsize)
+    case (2)
+        select case (case_num)
+        case (1)
+            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
+                                         isSegregation=.false., &
+                                         c_unit='m', &
+                                         nsize=nsize, &
+                                         thetaR=thetaR_BC, &
+                                         thetaS=thetaS_BC, &
+                                         alpha1=alpha1_BC, &
+                                         n1=n1_BC, &
+                                         Lf=Lf, &
+                                         Tf=Tf)
+        case (2)
+            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
+                                         isSegregation=.false., &
+                                         c_unit='m', &
+                                         nsize=nsize, &
+                                         thetaS=thetaS_vG, &
+                                         thetaR=thetaR_vG, &
+                                         alpha1=alpha1_vG, &
+                                         n1=n1_vG, &
+                                         Lf=Lf, &
+                                         Tf=Tf)
+        case (3)
+            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
+                                         isSegregation=.false., &
+                                         c_unit='m', &
+                                         nsize=nsize, &
+                                         thetaS=thetaS_KO, &
+                                         thetaR=thetaR_KO, &
+                                         alpha1=alpha1_KO, &
+                                         n1=n1_KO, &
+                                         Lf=Lf, &
+                                         Tf=Tf)
+        case (4)
+            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
+                                         isSegregation=.false., &
+                                         c_unit='m', &
+                                         nsize=nsize, &
+                                         thetaS=thetaS_MVG, &
+                                         thetaR=thetaR_MVG, &
+                                         alpha1=alpha1_MVG, &
+                                         n1=n1_MVG, &
+                                         Lf=Lf, &
+                                         Tf=Tf, &
+                                         hcrit=theatM_MVG)
+        case (5)
+            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
+                                         isSegregation=.false., &
+                                         c_unit='m', &
+                                         nsize=nsize, &
+                                         thetaS=thetaS_Durner, &
+                                         thetaR=thetaR_Durner, &
+                                         alpha1=alpha1_Durner, &
+                                         n1=n1_Durner, &
+                                         w1=w1_Durner, &
+                                         alpha2=alpha2_Durner, &
+                                         n2=n2_Durner, &
+                                         Lf=Lf, &
+                                         Tf=Tf)
+        case (6)
+            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
+                                         isSegregation=.false., &
+                                         c_unit='m', &
+                                         nsize=nsize, &
+                                         thetaS=thetaS_DVGCH, &
+                                         thetaR=thetaR_DVGCH, &
+                                         alpha1=alpha1_DVGCH, &
+                                         n1=n1_DVGCH, &
+                                         w1=w1_DVGCH, &
+                                         alpha2=alpha2_DVGCH, &
+                                         n2=n2_DVGCH, &
+                                         Lf=Lf, &
+                                         Tf=Tf)
+        end select
+
+        select type (tI => Ice)
+        type is (Type_Ice_GCC)
+            call tI%Update_Ice(T)
+            call tI%Update_Ice_Derivative(T)
+            print *, "T Qice dQice/dT"
             do i = 1, size(T)
                 print *, T(i), tI%Qice%pre(i), tI%D_Qice%pre(i)
             end do
-        type is (Type_GCC_NonSegregation_Pa)
-            tGCC%Lf = Lf
-            tGCC%Tf = Tf
-        type is (Type_GCC_Segregation_m)
-            tGCC%Lf = Lf
-            tGCC%Tf = Tf
-            tGCC%rhoI = rhoI
-        type is (Type_GCC_Segregation_Pa)
-            tGCC%Lf = Lf
-            tGCC%Tf = Tf
-            tGCC%rhoI = rhoI
+
         end select
-    type is (Type_Ice_EXP)
-
-        call tI%Update_Ice(T)
-        call tI%Update_Ice_Derivative(T)
-
-        do i = 1, size(T)
-            print *, T(i), tI%Qice%pre(i), tI%D_Qice%pre(i)
-        end do
+    case (3)
+        Ice = Construct_Type_Ice_EXP(EXP_phi, Tf, EXP_a, nsize)
+        select type (tI => Ice)
+        type is (Type_Ice_EXP)
+            call tI%Update_Ice(T)
+            call tI%Update_Ice_Derivative(T)
+            print *, "T Qice dQice/dT"
+            do i = 1, size(T)
+                print *, T(i), tI%Qice%pre(i), tI%D_Qice%pre(i)
+            end do
+        end select
     end select
 
 end program test_Ice

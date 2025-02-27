@@ -4,6 +4,13 @@ module Calculate_GCC
 !$  use omp_lib
 #endif
     implicit none
+    private
+
+    public :: Abstract_GCC
+    public :: Type_GCC_NonSegregation_m
+    public :: Type_GCC_NonSegregation_Pa
+    public :: Type_GCC_Segregation_m
+    public :: Type_GCC_Segregation_Pa
 
     type, abstract :: Abstract_GCC
         real(real64) :: Tf !! Freezing point
@@ -67,7 +74,52 @@ module Calculate_GCC
         end function Abstract_Calculate_GCC_Segregation_Derivative
     end interface
 
+    interface Type_GCC_NonSegregation_m
+        module procedure Construct_Type_GCC_NonSegregation_m
+        module procedure Construct_Type_GCC_NonSegregation_m_minimum
+    end interface
+
+    interface Type_GCC_NonSegregation_Pa
+        module procedure Construct_Type_GCC_NonSegregation_Pa
+        module procedure Construct_Type_GCC_NonSegregation_Pa_minimum
+    end interface
+
+    interface Type_GCC_Segregation_m
+        module procedure Construct_Type_GCC_Segregation_m
+        module procedure Construct_Type_GCC_Segregation_m_minimum
+    end interface
+
+    interface Type_GCC_Segregation_Pa
+        module procedure Construct_Type_GCC_Segregation_Pa
+        module procedure Construct_Type_GCC_Segregation_Pa_minimum
+    end interface
+
 contains
+    function Construct_Type_GCC_NonSegregation_m(Tf, Lf) result(structure)
+        implicit none
+        real(real64), intent(in) :: Tf
+        real(real64), intent(in) :: Lf
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_m :: structure)
+
+        select type (this => structure)
+        type is (Type_GCC_NonSegregation_m)
+            this%Lf = Lf
+            this%Tf = Tf
+        end select
+
+    end function Construct_Type_GCC_NonSegregation_m
+
+    function Construct_Type_GCC_NonSegregation_m_minimum() result(structure)
+        implicit none
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_m :: structure)
+
+    end function Construct_Type_GCC_NonSegregation_m_minimum
 
     function Calculate_GCC_NonSegregation_m(self, T) result(Suction)
         !$omp declare simd uniform(self, T)
@@ -99,6 +151,32 @@ contains
 
     end function Calculate_GCC_NonSegregation_Derivative_m
 
+    function Construct_Type_GCC_NonSegregation_Pa(Tf, Lf) result(structure)
+        implicit none
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: Tf
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_Pa :: structure)
+
+        select type (this => structure)
+        type is (Type_GCC_NonSegregation_Pa)
+            this%Lf = Lf
+            this%Tf = Tf
+        end select
+
+    end function Construct_Type_GCC_NonSegregation_Pa
+
+    function Construct_Type_GCC_NonSegregation_Pa_minimum() result(structure)
+        implicit none
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_Pa :: structure)
+
+    end function Construct_Type_GCC_NonSegregation_Pa_minimum
+
     function Calculate_GCC_NonSegregation_Pa(self, T, rhoW) result(Suction)
         !$omp declare simd uniform(self, T, rhoW)
         implicit none
@@ -128,6 +206,34 @@ contains
         end if
 
     end function Calculate_GCC_NonSegregation_Derivative_Pa
+
+    function Construct_Type_GCC_Segregation_m(Tf, Lf, rhoI) result(structure)
+        implicit none
+        real(real64), intent(in) :: Tf
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: rhoI
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_m :: structure)
+
+        select type (this => structure)
+        type is (Type_GCC_Segregation_m)
+            this%Lf = Lf
+            this%Tf = Tf
+            this%rhoI = rhoI
+        end select
+
+    end function Construct_Type_GCC_Segregation_m
+
+    function Construct_Type_GCC_Segregation_m_minimum() result(structure)
+        implicit none
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_m :: structure)
+
+    end function Construct_Type_GCC_Segregation_m_minimum
 
     function Calculate_GCC_Segregation_m(self, T, Pw, rhoW) result(Suction)
         !$omp declare simd uniform(self, T, rhoW)
@@ -162,6 +268,34 @@ contains
         end if
 
     end function Calculate_GCC_Segregation_Derivative_m
+
+    function Construct_Type_GCC_Segregation_Pa(Tf, Lf, rhoI) result(structure)
+        implicit none
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: Tf
+        real(real64), intent(in) :: rhoI
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_Pa :: structure)
+
+        select type (this => structure)
+        type is (Type_GCC_Segregation_Pa)
+            this%Lf = Lf
+            this%Tf = Tf
+            this%rhoI = rhoI
+        end select
+
+    end function Construct_Type_GCC_Segregation_Pa
+
+    function Construct_Type_GCC_Segregation_Pa_minimum() result(structure)
+        implicit none
+        class(Abstract_GCC_Segregation), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_Pa :: structure)
+
+    end function Construct_Type_GCC_Segregation_Pa_minimum
 
     function Calculate_GCC_Segregation_Pa(self, T, Pw, rhoW) result(Suction)
         !$omp declare simd uniform(self, T, Pw, rhoW)

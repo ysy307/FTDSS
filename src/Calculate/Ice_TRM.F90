@@ -44,7 +44,7 @@ contains
 
     end function Construct_Type_Ice_TRM
 
-    module function Construct_Type_Ice_TRM_minimum result(structure)
+    module function Construct_Type_Ice_TRM_minimum() result(structure)
         implicit none
         class(Abstract_Ice), allocatable :: structure
 
