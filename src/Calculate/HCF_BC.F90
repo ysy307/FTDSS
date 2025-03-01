@@ -2,9 +2,9 @@ submodule(Calculate_HCF) Calculate_HCF_BC_Implementation
     use :: Allocate_Allocate, only:Allocate_Array
     implicit none
 contains
-    !-----------------------------------------------------------------------
-    ! Constructe each types by using BC model
-    !-----------------------------------------------------------------------
+    !----------------------------------------------------------------------------------------------------
+    ! Constructe each types by using Brooks and Corey model
+    !----------------------------------------------------------------------------------------------------
     module function Construct_Type_HCF_Base_BC(Ks, alpha1, n1, l, nsize) result(structure_HCF)
         implicit none
         real(real64), intent(in) :: Ks
@@ -153,9 +153,9 @@ contains
 
     end function Construct_Type_HCF_Base_Impedance_Viscosity_BC_minimal
 
-    !-----------------------------------------------------------------------
-    ! Calculate kr for BC model
-    !-----------------------------------------------------------------------
+    !----------------------------------------------------------------------------------------------------
+    ! Calculate kr for Brooks and Corey model
+    !----------------------------------------------------------------------------------------------------
     module function Calculate_kr_BC_Base(alpha1, n1, l, h) result(kr)
         !$omp declare simd uniform(alpha1, n1, l, h)
         implicit none
@@ -176,9 +176,9 @@ contains
 
     end function Calculate_kr_BC_Base
 
-    !-----------------------------------------------------------------------
-    ! Wrapper of calculating kr for BC model bounding different BC types
-    !-----------------------------------------------------------------------
+    !----------------------------------------------------------------------------------------------------
+    ! Wrapper of calculating kr for Brooks and Corey model bounding different derived types
+    !----------------------------------------------------------------------------------------------------
     module function Calculate_kr_Base_BC(self, h) result(kr)
         implicit none
         class(Type_HCF_Base_BC), intent(in) :: self
@@ -219,9 +219,9 @@ contains
 
     end function Calculate_kr_Base_Impedance_Viscosity_BC
 
-    !-----------------------------------------------------------------------
-    ! Calculate Kflh for BC model bounding different BC type
-    !-----------------------------------------------------------------------
+    !----------------------------------------------------------------------------------------------------
+    ! Calculate Kflh for Brooks and Corey model bounding different derived types
+    !----------------------------------------------------------------------------------------------------
     module function Calculate_Kflh_Base_BC(self, h) result(Kflh)
         implicit none
         class(Type_HCF_Base_BC), intent(in) :: self
@@ -266,73 +266,73 @@ contains
 
     end function Calculate_Kflh_Base_Impedance_Viscosity_BC
 
-    !-----------------------------------------------------------------------
-    ! Calculate Kflh for BC model bounding different BC type
-    !-----------------------------------------------------------------------
+    !----------------------------------------------------------------------------------------------------
+    ! Update Kflh for Brooks and Corey model bounding different derived types
+    !----------------------------------------------------------------------------------------------------
     module subroutine Update_Kflh_Base_BC(self, arr_h)
         implicit none
-        class(Type_HCF_Base_BC), intent(in) :: self
+        class(Type_HCF_Base_BC), intent(inout) :: self
         real(real64), intent(in) :: arr_h(:)
 
         integer(int32) :: iN, n
 
-        n = size(arr_h)
+        n = size(arr_h(:))
 
         !$omp parallel do schedule(guided) private(iN)
         do iN = 1, n
-            self%Kflh(iN) = self%Ks * self%Calculate_kr(arr_h(iN))
+            self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN))
         end do
 
     end subroutine Update_Kflh_Base_BC
 
     module subroutine Update_Kflh_Base_Impedance_BC(self, arr_h, arr_thetaI)
         implicit none
-        class(Type_HCF_Base_Impedance_BC), intent(in) :: self
+        class(Type_HCF_Base_Impedance_BC), intent(inout) :: self
         real(real64), intent(in) :: arr_h(:)
         real(real64), intent(in) :: arr_thetaI(:)
 
         integer(int32) :: iN, n
 
-        n = size(arr_h)
+        n = size(arr_h(:))
 
         !$omp parallel do schedule(guided) private(iN)
         do iN = 1, n
-            self%Kflh(iN) = self%Ks * self%Calculate_kr(arr_h(iN)) * Calculate_Impedance_Base(self%Omega, arr_thetaI(iN))
+            self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN), arr_thetaI(iN))
         end do
 
     end subroutine Update_Kflh_Base_Impedance_BC
 
     module subroutine Update_Kflh_Base_Viscosity_BC(self, arr_h, arr_Temperature)
         implicit none
-        class(Type_HCF_Base_Viscosity_BC), intent(in) :: self
-        real(real64), intent(in) :: arr_h
-        real(real64), intent(in) :: arr_Temperature
+        class(Type_HCF_Base_Viscosity_BC), intent(inout) :: self
+        real(real64), intent(in) :: arr_h(:)
+        real(real64), intent(in) :: arr_Temperature(:)
 
         integer(int32) :: iN, n
 
-        n = size(arr_h)
+        n = size(arr_h(:))
 
         !$omp parallel do schedule(guided) private(iN)
         do iN = 1, n
-            self%Kflh(iN) = self%Kzero * self%Calculate_kr(arr_h(iN)) / self%Calculate_Viscosity(arr_Temperature(iN))
+            self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN), arr_Temperature(iN))
         end do
 
     end subroutine Update_Kflh_Base_Viscosity_BC
 
     module subroutine Update_Kflh_Base_Impedance_Viscosity_BC(self, arr_h, arr_thetaI, arr_Temperature)
         implicit none
-        class(Type_HCF_Base_Impedance_Viscosity_BC), intent(in) :: self
-        real(real64), intent(in) :: arr_h
-        real(real64), intent(in) :: arr_thetaI
-        real(real64), intent(in) :: arr_Temperature
+        class(Type_HCF_Base_Impedance_Viscosity_BC), intent(inout) :: self
+        real(real64), intent(in) :: arr_h(:)
+        real(real64), intent(in) :: arr_thetaI(:)
+        real(real64), intent(in) :: arr_Temperature(:)
 
         integer(int32) :: iN, n
 
-        n = size(arr_h)
+        n = size(arr_h(:))
 
         !$omp parallel do schedule(guided) private(iN)
         do iN = 1, n
-            self%Kflh(iN) = self%Kzero * self%Calculate_kr(arr_h(iN)) * Calculate_Impedance_Base(self%Omega, arr_thetaI(iN)) / self%Calculate_Viscosity(arr_Temperature(iN))
+            self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN), arr_thetaI(iN), arr_Temperature(iN))
         end do
 
     end subroutine Update_Kflh_Base_Impedance_Viscosity_BC
