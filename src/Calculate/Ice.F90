@@ -4,7 +4,7 @@ module Calculate_Ice
     use :: Calculate_GCC
     use :: Types, only:Variables
 #ifdef _OPENMP
-!$  use omp_lib
+    use omp_lib
 #endif
     implicit none
 
@@ -59,8 +59,8 @@ module Calculate_Ice
         procedure, pass(self), private :: Update_Ice_GCC_Derivative_Temperature_rhoW_scalar
         procedure, pass(self), private :: Update_Ice_GCC_Derivative_Temperature_rhoW_array
         generic, public :: Update_Ice_Derivative => Update_Ice_GCC_Derivative_Temperature_NonSegregation_m, & !&
-                                                       Update_Ice_GCC_Derivative_Temperature_rhoW_scalar, & !&
-                                                       Update_Ice_GCC_Derivative_Temperature_rhoW_array !&
+                                                    Update_Ice_GCC_Derivative_Temperature_rhoW_scalar, & !&
+                                                    Update_Ice_GCC_Derivative_Temperature_rhoW_array !&
     end type Type_Ice_GCC
 
     type, extends(Abstract_Ice) :: Type_Ice_EXP
@@ -299,6 +299,23 @@ module Calculate_Ice
             real(real64), intent(in), optional :: arr_Pw(:)
         end subroutine Update_Ice_GCC_Derivative_Temperature_rhoW_array
 
+        module function Construct_Type_Ice_EXP(phi, Tf, a, nsize) result(self)
+            use, intrinsic :: iso_fortran_env, only: real64
+            implicit none
+            real(real64), intent(in) :: phi
+            real(real64), intent(in) :: Tf
+            real(real64), intent(in) :: a
+            integer(int32), intent(in) :: nsize
+            class(Abstract_Ice), allocatable :: self
+
+        end function Construct_Type_Ice_EXP
+
+        module function Construct_Type_Ice_EXP_minimum() result(self)
+            implicit none
+            class(Abstract_Ice), allocatable :: self
+
+        end function Construct_Type_Ice_EXP_minimum
+
         module function Calculate_Ice_EXP(self, Temperature) result(Qice)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Type_Ice_EXP
@@ -316,23 +333,6 @@ module Calculate_Ice
             real(real64), intent(in) :: Temperature
             real(real64) :: D_Qice
         end function Calculate_Ice_EXP_Derivative_Temperature
-
-        module function Construct_Type_Ice_EXP(phi, Tf, a, nsize) result(self)
-            use, intrinsic :: iso_fortran_env, only: real64
-            implicit none
-            real(real64), intent(in) :: phi
-            real(real64), intent(in) :: Tf
-            real(real64), intent(in) :: a
-            integer(int32), intent(in) :: nsize
-            class(Abstract_Ice), allocatable :: self
-
-        end function Construct_Type_Ice_EXP
-
-        module function Construct_Type_Ice_EXP_minimum() result(self)
-            implicit none
-            class(Abstract_Ice), allocatable :: self
-
-        end function Construct_Type_Ice_EXP_minimum
 
         module subroutine Update_Ice_EXP(self, arr_Temperature)
             use, intrinsic :: iso_fortran_env, only: real64

@@ -85,7 +85,7 @@ module Calculate_WRF
         procedure :: Calculate_WRF_Derivative => Calculate_WRF_DVGCH_Derivative
     end type Type_WRF_DVGCH
 
-    interface
+    abstract interface
         function Abstract_Calculate_WRF(self, h) result(thetaW)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Abstract_WRF
