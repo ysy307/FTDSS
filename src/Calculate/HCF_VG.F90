@@ -23,6 +23,7 @@ contains
             this%n1 = n1
             this%m1 = 1.0d0 - 1.0d0 / n1
             this%l = l
+            this%nsize = nsize
 
             call Allocate_Array(this%Kflh, nsize)
             this%Kflh(:) = 0.0d0
@@ -60,6 +61,7 @@ contains
             this%m1 = 1.0d0 - 1.0d0 / n1
             this%l = l
             this%Omega = Omega
+            this%nsize = nsize
 
             call Allocate_Array(this%Kflh, nsize)
             this%Kflh(:) = 0.0d0
@@ -96,6 +98,7 @@ contains
             this%n1 = n1
             this%m1 = 1.0d0 - 1.0d0 / n1
             this%l = l
+            this%nsize = nsize
 
             call this%Set_Calculate_Viscosity(useViscosity, this%Calculate_Viscosity)
             this%Kzero = this%Ks * this%Calculate_Viscosity(15.d0)
@@ -137,6 +140,7 @@ contains
             this%m1 = 1.0d0 - 1.0d0 / n1
             this%l = l
             this%Omega = Omega
+            this%nsize = nsize
 
             call this%Set_Calculate_Viscosity(useViscosity, this%Calculate_Viscosity)
             this%Kzero = this%Ks * this%Calculate_Viscosity(15.d0)
@@ -278,12 +282,10 @@ contains
         class(Type_HCF_Base_VG), intent(inout) :: self
         real(real64), intent(in) :: arr_h(:)
 
-        integer(int32) :: iN, n
-
-        n = size(arr_h(:))
+        integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, n
+        do iN = 1, self%nsize
             self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN))
         end do
 
@@ -295,12 +297,10 @@ contains
         real(real64), intent(in) :: arr_h(:)
         real(real64), intent(in) :: arr_thetaI(:)
 
-        integer(int32) :: iN, n
-
-        n = size(arr_h(:))
+        integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, n
+        do iN = 1, self%nsize
             self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN), arr_thetaI(iN))
         end do
 
@@ -312,12 +312,10 @@ contains
         real(real64), intent(in) :: arr_h(:)
         real(real64), intent(in) :: arr_Temperature(:)
 
-        integer(int32) :: iN, n
-
-        n = size(arr_h(:))
+        integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, n
+        do iN = 1, self%nsize
             self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN), arr_Temperature(iN))
         end do
 
@@ -330,12 +328,9 @@ contains
         real(real64), intent(in) :: arr_thetaI(:)
         real(real64), intent(in) :: arr_Temperature(:)
 
-        integer(int32) :: iN, n
-
-        n = size(arr_h(:))
-
+        integer(int32) :: iN
         !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, n
+        do iN = 1, self%nsize
             self%Kflh(iN) = self%Calculate_Kflh(arr_h(iN), arr_thetaI(iN), arr_Temperature(iN))
         end do
 

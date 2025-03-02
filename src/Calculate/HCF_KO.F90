@@ -22,6 +22,7 @@ contains
             this%alpha1 = alpha1
             this%n1 = n1
             this%l = l
+            this%nsize = nsize
 
             call Allocate_Array(this%Kflh, nsize)
             this%Kflh(:) = 0.0d0
@@ -58,6 +59,7 @@ contains
             this%n1 = n1
             this%l = l
             this%Omega = Omega
+            this%nsize = nsize
 
             call Allocate_Array(this%Kflh, nsize)
             this%Kflh(:) = 0.0d0
@@ -93,6 +95,7 @@ contains
             this%alpha1 = alpha1
             this%n1 = n1
             this%l = l
+            this%nsize = nsize
 
             call this%Set_Calculate_Viscosity(useViscosity, this%Calculate_Viscosity)
             this%Kzero = this%Ks * this%Calculate_Viscosity(15.d0)
@@ -133,6 +136,7 @@ contains
             this%n1 = n1
             this%l = l
             this%Omega = Omega
+            this%nsize = nsize
 
             call this%Set_Calculate_Viscosity(useViscosity, this%Calculate_Viscosity)
             this%Kzero = this%Ks * this%Calculate_Viscosity(15.d0)

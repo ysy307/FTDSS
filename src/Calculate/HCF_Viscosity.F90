@@ -17,6 +17,7 @@ contains
         select type (this => structure_HCF)
         type is (Type_HCF_Viscosity)
             this%Ks = Ks
+            this%nsize = nsize
 
             call this%Set_Calculate_Viscosity(useViscosity, this%Calculate_Viscosity)
             this%Kzero = this%Ks * this%Calculate_Viscosity(15.d0)
@@ -99,12 +100,10 @@ contains
         class(Type_HCF_Viscosity), intent(inout) :: self
         real(real64), intent(in) :: arr_Temperature(:)
 
-        integer(int32) :: iN, n
-
-        n = size(arr_Temperature(:))
+        integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, n
+        do iN = 1, self%nsize
             self%Kflh(iN) = self%Calculate_Kflh(arr_Temperature(iN))
         end do
 

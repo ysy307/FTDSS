@@ -7,6 +7,7 @@ module Calculate_HCF
 
     type, abstract :: Abstract_HCF
         real(real64) :: Ks !! saturated hydraulic conductivity
+        integer(int32) :: nsize
         real(real64), allocatable :: Kflh(:)
     contains
         !! get/set
