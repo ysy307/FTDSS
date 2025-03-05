@@ -170,7 +170,7 @@ contains
 
         if (h < 0.0d0) then
             Sw = 0.5d0 * erfc(log(h / alpha1) / (n1 * sqrt(2.0d0)))
-            kr = Sw**0.5d0 * (0.5d0 * erfc(log(h / alpha1) / (n1 * sqrt(2.0d0)) + n1 / sqrt(2.0d0)))**2.0d0
+            kr = Sw**l * (0.5d0 * erfc(log(h / alpha1) / (n1 * sqrt(2.0d0)) + n1 / sqrt(2.0d0)))**2.0d0
         else
             kr = 1.0d0
         end if

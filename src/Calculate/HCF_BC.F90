@@ -1,5 +1,4 @@
 submodule(Calculate_HCF) Calculate_HCF_BC_Implementation
-    use :: Allocate_Allocate, only:Allocate_Array
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------

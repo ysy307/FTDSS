@@ -80,7 +80,7 @@ program test_Ice
 
     select case (case_type_num)
     case (1)
-        Ice = Construct_Type_Ice_TRM(Lf, Tf, nsize)
+        Ice = Type_Ice_TRM(Lf, Tf, nsize)
     case (2)
         select case (case_num)
         case (1)
