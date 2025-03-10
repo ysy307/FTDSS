@@ -161,6 +161,9 @@ contains
         class(Abstract_Ice), pointer :: construct
 
         allocate (Type_Ice_GCC :: construct)
+        if (.not. associated(construct)) then
+            stop "construct was not properly allocated"
+        end if
 
         select type (this => construct)
         type is (Type_Ice_GCC)

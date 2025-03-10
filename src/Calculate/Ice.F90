@@ -92,8 +92,8 @@ module Calculate_Ice
     end interface
 
     interface Type_Ice_GCC_Pointer
-        module procedure Construct_Type_Ice_GCC_Pointer
-        module procedure Construct_Type_Ice_GCC_minimum_Pointer
+        procedure Construct_Type_Ice_GCC_Pointer
+        procedure Construct_Type_Ice_GCC_minimum_Pointer
     end interface
 
     interface Type_Ice_EXP

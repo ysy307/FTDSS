@@ -94,90 +94,90 @@ program test_VHC
     end do
 
     nsize = size(T)
-    case_type_num = 2
-    case_num = 6
+    case_type_num = 3
+    case_num = 2
 
     select case (case_type_num)
     case (1)
-        Ice => Type_Ice_TRM_Pointer(Lf, Tf, nsize)
+        Ice => Construct_Type_Ice_TRM_Pointer(Lf, Tf, nsize)
     case (2)
         select case (case_num)
         case (1)
-            Ice => Type_Ice_GCC_Pointer(ModelType=case_num, &
-                                        isSegregation=.false., &
-                                        c_unit='m', &
-                                        nsize=nsize, &
-                                        thetaR=thetaR_BC, &
-                                        thetaS=thetaS_BC, &
-                                        alpha1=alpha1_BC, &
-                                        n1=n1_BC, &
-                                        Lf=Lf, &
-                                        Tf=Tf)
+            Ice => Construct_Type_Ice_GCC_Pointer(ModelType=case_num, &
+                                                  isSegregation=.false., &
+                                                  c_unit='m', &
+                                                  nsize=nsize, &
+                                                  thetaR=thetaR_BC, &
+                                                  thetaS=thetaS_BC, &
+                                                  alpha1=alpha1_BC, &
+                                                  n1=n1_BC, &
+                                                  Lf=Lf, &
+                                                  Tf=Tf)
         case (2)
-            Ice => Type_Ice_GCC_Pointer(ModelType=case_num, &
-                                        isSegregation=.false., &
-                                        c_unit='m', &
-                                        nsize=nsize, &
-                                        thetaS=thetaS_vG, &
-                                        thetaR=thetaR_vG, &
-                                        alpha1=alpha1_vG, &
-                                        n1=n1_vG, &
-                                        Lf=Lf, &
-                                        Tf=Tf)
+            Ice => Construct_Type_Ice_GCC_Pointer(ModelType=case_num, &
+                                                  isSegregation=.false., &
+                                                  c_unit='m', &
+                                                  nsize=nsize, &
+                                                  thetaS=thetaS_vG, &
+                                                  thetaR=thetaR_vG, &
+                                                  alpha1=alpha1_vG, &
+                                                  n1=n1_vG, &
+                                                  Lf=Lf, &
+                                                  Tf=Tf)
         case (3)
-            Ice => Type_Ice_GCC_Pointer(ModelType=case_num, &
-                                        isSegregation=.false., &
-                                        c_unit='m', &
-                                        nsize=nsize, &
-                                        thetaS=thetaS_KO, &
-                                        thetaR=thetaR_KO, &
-                                        alpha1=alpha1_KO, &
-                                        n1=n1_KO, &
-                                        Lf=Lf, &
-                                        Tf=Tf)
+            Ice => Construct_Type_Ice_GCC_Pointer(ModelType=case_num, &
+                                                  isSegregation=.false., &
+                                                  c_unit='m', &
+                                                  nsize=nsize, &
+                                                  thetaS=thetaS_KO, &
+                                                  thetaR=thetaR_KO, &
+                                                  alpha1=alpha1_KO, &
+                                                  n1=n1_KO, &
+                                                  Lf=Lf, &
+                                                  Tf=Tf)
         case (4)
-            Ice => Type_Ice_GCC_Pointer(ModelType=case_num, &
-                                        isSegregation=.false., &
-                                        c_unit='m', &
-                                        nsize=nsize, &
-                                        thetaS=thetaS_MVG, &
-                                        thetaR=thetaR_MVG, &
-                                        alpha1=alpha1_MVG, &
-                                        n1=n1_MVG, &
-                                        Lf=Lf, &
-                                        Tf=Tf, &
-                                        hcrit=theatM_MVG)
+            Ice => Construct_Type_Ice_GCC_Pointer(ModelType=case_num, &
+                                                  isSegregation=.false., &
+                                                  c_unit='m', &
+                                                  nsize=nsize, &
+                                                  thetaS=thetaS_MVG, &
+                                                  thetaR=thetaR_MVG, &
+                                                  alpha1=alpha1_MVG, &
+                                                  n1=n1_MVG, &
+                                                  Lf=Lf, &
+                                                  Tf=Tf, &
+                                                  hcrit=theatM_MVG)
         case (5)
-            Ice => Type_Ice_GCC_Pointer(ModelType=case_num, &
-                                        isSegregation=.false., &
-                                        c_unit='m', &
-                                        nsize=nsize, &
-                                        thetaS=thetaS_Durner, &
-                                        thetaR=thetaR_Durner, &
-                                        alpha1=alpha1_Durner, &
-                                        n1=n1_Durner, &
-                                        w1=w1_Durner, &
-                                        alpha2=alpha2_Durner, &
-                                        n2=n2_Durner, &
-                                        Lf=Lf, &
-                                        Tf=Tf)
+            Ice => Construct_Type_Ice_GCC_Pointer(ModelType=case_num, &
+                                                  isSegregation=.false., &
+                                                  c_unit='m', &
+                                                  nsize=nsize, &
+                                                  thetaS=thetaS_Durner, &
+                                                  thetaR=thetaR_Durner, &
+                                                  alpha1=alpha1_Durner, &
+                                                  n1=n1_Durner, &
+                                                  w1=w1_Durner, &
+                                                  alpha2=alpha2_Durner, &
+                                                  n2=n2_Durner, &
+                                                  Lf=Lf, &
+                                                  Tf=Tf)
         case (6)
-            Ice => Type_Ice_GCC_Pointer(ModelType=case_num, &
-                                        isSegregation=.false., &
-                                        c_unit='m', &
-                                        nsize=nsize, &
-                                        thetaS=thetaS_DVGCH, &
-                                        thetaR=thetaR_DVGCH, &
-                                        alpha1=alpha1_DVGCH, &
-                                        n1=n1_DVGCH, &
-                                        w1=w1_DVGCH, &
-                                        alpha2=alpha2_DVGCH, &
-                                        n2=n2_DVGCH, &
-                                        Lf=Lf, &
-                                        Tf=Tf)
+            Ice => Construct_Type_Ice_GCC_Pointer(ModelType=case_num, &
+                                                  isSegregation=.false., &
+                                                  c_unit='m', &
+                                                  nsize=nsize, &
+                                                  thetaS=thetaS_DVGCH, &
+                                                  thetaR=thetaR_DVGCH, &
+                                                  alpha1=alpha1_DVGCH, &
+                                                  n1=n1_DVGCH, &
+                                                  w1=w1_DVGCH, &
+                                                  alpha2=alpha2_DVGCH, &
+                                                  n2=n2_DVGCH, &
+                                                  Lf=Lf, &
+                                                  Tf=Tf)
         end select
     case (3)
-        Ice => Type_Ice_EXP_Pointer(Lf, EXP_phi, Tf, EXP_a, nsize)
+        Ice => Construct_Type_Ice_EXP_Pointer(Lf, EXP_phi, Tf, EXP_a, nsize)
     end select
 
     case_num_VHC = 3
@@ -189,29 +189,34 @@ program test_VHC
     case (3)
         VHC = Type_VolumetricHeatCapacity_3Phase(Cp_soil, Cp_water, Cp_ice, Ice, Den_ice, Den_water, nsize)
     case (4)
-        VHC = Type_VolumetricHeatCapacity_4Phase(Cp_soil, Cp_water, Cp_ice, Cp_air, nsize)
+        VHC = Type_VolumetricHeatCapacity_4Phase(Cp_soil, Cp_water, Cp_ice, Cp_air, Ice, Den_ice, Den_water, nsize)
     end select
 
     open (unit=10, file='res.txt', status='replace')
     select type (v_p => VHC)
     type is (Type_VolumetricHeatCapacity_3Phase)
-        select type (i_ps => v_p%Ice)
+        select type (i_ps => Ice)
         type is (Type_Ice_GCC)
             phi = i_ps%WRF%thetaS
             print '(es12.3)', v_p%Ca_max
+
+            call i_ps%Update_Ice(T)
+            i_ps%Qw%pre(:) = phi - i_ps%Qice%pre(:)
+            call v_p%Update(1.0d0 - phi)
+            call v_p%Update_Ca(rho_ice=Den_ice, arr_Temperature=T)
             do i = 1, nsize
-                l_Cp = v_p%Calculate(phi1=1.0d0 - phi, phi2=phi - i_ps%Calculate_Ice(T(i)), phi3=i_ps%Calculate_Ice(T(i)))
-                l_Ca = v_p%Calculate_Ca(phi1=1.0d0 - phi, phi2=phi - i_ps%Calculate_Ice(T(i)), phi3=i_ps%Calculate_Ice(T(i)), rho_ice=Den_ice, Temperature=T(i))
-                write (10, '(3es14.6)'), T(i), l_Cp, l_Ca
+                write (10, '(3es14.6)'), T(i), v_p%value(i), v_p%Apparent(i)
             end do
         type is (Type_Ice_EXP)
-            ! print *,
             phi = i_ps%phi
             print '(es14.6)', v_p%Ca_max
+
+            call i_ps%Update_Ice(T)
+            i_ps%Qw%pre(:) = phi - i_ps%Qice%pre(:)
+            call v_p%Update(1.0d0 - phi)
+            call v_p%Update_Ca(rho_ice=Den_ice, arr_Temperature=T)
             do i = 1, nsize
-                l_Cp = v_p%Calculate(phi1=1.0d0 - phi, phi2=phi - i_ps%Calculate_Ice(T(i)), phi3=i_ps%Calculate_Ice(T(i)))
-                l_Ca = v_p%Calculate_Ca(phi1=1.0d0 - phi, phi2=phi - i_ps%Calculate_Ice(T(i)), phi3=i_ps%Calculate_Ice(T(i)), rho_ice=Den_ice, Temperature=T(i))
-                write (10, '(3es14.6)'), T(i), l_Cp, l_Ca
+                write (10, '(3es14.6)'), T(i), v_p%value(i), v_p%Apparent(i)
             end do
         end select
     end select
