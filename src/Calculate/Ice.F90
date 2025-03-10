@@ -64,6 +64,7 @@ module Calculate_Ice
     end type Type_Ice_GCC
 
     type, extends(Abstract_Ice) :: Type_Ice_EXP
+        real(real64) :: Lf !! Latent heat
         real(real64) :: phi !! Porosity
         real(real64) :: Tf !! Freezing point
         real(real64) :: a !! power model parameter
@@ -299,9 +300,10 @@ module Calculate_Ice
             real(real64), intent(in), optional :: arr_Pw(:)
         end subroutine Update_Ice_GCC_Derivative_Temperature_rhoW_array
 
-        module function Construct_Type_Ice_EXP(phi, Tf, a, nsize) result(self)
+        module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, nsize) result(self)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
+            real(real64), intent(in) :: Lf
             real(real64), intent(in) :: phi
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: a

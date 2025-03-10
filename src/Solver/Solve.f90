@@ -63,7 +63,7 @@ contains
         Solve_Initialize_BiCGStab%x => work(:, 10)
         Solve_Initialize_BiCGStab%b => work(:, 11)
 
-        call Duplicate_CRS(MCRS, Solve_Initialize_BiCGStab%CRS_A)
+        ! call Duplicate_CRS(MCRS, Solve_Initialize_BiCGStab%CRS_A)
 
     end function Solve_Initialize_BiCGStab
 

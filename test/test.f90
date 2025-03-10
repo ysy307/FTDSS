@@ -14,12 +14,12 @@ program test
     use :: Matrix_Assemble
     use :: error
     use :: Matrix_ConvertCRS
-    use :: Calculate_TRM, only:TRMethod
+    ! use :: Calculate_TRM, only:TRMethod
     use :: Solver_Solve
-    use :: Inout_Stdout
-    use :: Inout_Input
-    use :: Inout_Output
-    use :: Main_Solver
+    ! use :: Inout_Stdout
+    ! use :: Inout_Input
+    ! use :: Inout_Output
+    ! use :: Main_Solver
 
 #ifdef _OPENMP
     use omp_lib
@@ -32,10 +32,10 @@ program test
     type(CRS) :: CTop
     type(ILS) :: ILEQ
     type(DLS) :: DLEQ
-    type(Input) :: Inputs
+    ! type(Input) :: Inputs
     ! type(Output) :: Outputs
     ! type(Class_Solver) ::
-    type(Class_Solver) :: Heat, Water
+    ! type(Class_Solver) :: Heat, Water
 
     real(real64), pointer :: ptst, pdt, podt
     integer(int32), pointer :: piter, ptiter, piNL
@@ -60,13 +60,13 @@ program test
 
 #ifdef _OPENMP
     pts = omp_get_wtime()
-    call init_omp_config(Solver)
+    ! call init_omp_config(Solver)
 #endif
 
-    Inputs = Input()
-    ! Outputs = Output(Inputs)
-    Heat = Class_Solver(Inputs, "Thermal")
-    Water = Class_Solver(Inputs, "Hydraulic")
+    ! Inputs = Input()
+    ! ! Outputs = Output(Inputs)
+    ! Heat = Class_Solver(Inputs, "Thermal")
+    ! Water = Class_Solver(Inputs, "Hydraulic")
 
     stop
     ! call init_omp_config(Solver)
@@ -79,13 +79,13 @@ program test
     ! call Inout%Input_BC(Solver)
     ! call Inout%Input_Flags(Solver)
 
-    call Allocate_Solver(Solver)
+    ! call Allocate_Solver(Solver)
 
     !* Input coordinate and vertex data
     ! call Inout%Input_Vertices(Solver)
     ! call Inout%Input_Coodinates(Solver)
 
-    call Initialize_Solver(Solver)
+    ! call Initialize_Solver(Solver)
 
     ! print*, Solver%Heat%Variables%TFlux%x(1:10)
     ! call Calc_Area(Solver%N)

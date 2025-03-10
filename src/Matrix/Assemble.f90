@@ -31,10 +31,10 @@ module Matrix_Assemble
         implicit none
         type(CRS), intent(in) :: A
 
-        call Duplicate_CRS(A, tmpCRS1)
-        tmpCRS1%val(:) = 0.0d0
-        call Duplicate_CRS(A, tmpCRS2)
-        tmpCRS2%val(:) = 0.0d0
+        ! call Duplicate_CRS(A, tmpCRS1)
+        ! tmpCRS1%val(:) = 0.0d0
+        ! call Duplicate_CRS(A, tmpCRS2)
+        ! tmpCRS2%val(:) = 0.0d0
     end subroutine Init_Assemble
 
 	subroutine Set_C(C, case, p, C1, C2)

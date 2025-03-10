@@ -1,7 +1,7 @@
 module Condition_FixInitialCondition
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types, g => GravityAcceleration
-    use :: Allocate_Allocate, only:Duplicate_CRS
+    ! use :: Allocate_Allocate, only:Duplicate_CRS
     use :: Allocate_Structure
     use :: error
     use :: Calculate_Update

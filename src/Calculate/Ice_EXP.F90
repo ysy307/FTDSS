@@ -2,10 +2,11 @@ submodule(Calculate_Ice) Calculate_Ice_EXP_Implementation
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
 contains
-    module function Construct_Type_Ice_EXP(phi, Tf, a, nsize) result(structure)
+    module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, nsize) result(structure)
         use, intrinsic :: iso_fortran_env, only: real64
         use :: Allocate_Allocate, only:Allocate_Array
         implicit none
+        real(real64), intent(in) :: Lf
         real(real64), intent(in) :: phi
         real(real64), intent(in) :: Tf
         real(real64), intent(in) :: a
@@ -17,6 +18,7 @@ contains
 
         select type (this => structure)
         type is (Type_Ice_EXP)
+            this%Lf = Lf
             this%phi = phi
             this%Tf = Tf
             this%a = a

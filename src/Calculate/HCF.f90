@@ -5,6 +5,44 @@ module Calculate_HCF
     use omp_lib
 #endif
     implicit none
+    private
+
+    public :: Abstract_HCF
+    public :: Type_HCF
+
+    public :: Type_HCF_Base_BC
+    public :: Type_HCF_Base_Impedance_BC
+    public :: Type_HCF_Base_Viscosity_BC
+    public :: Type_HCF_Base_Impedance_Viscosity_BC
+
+    public :: Type_HCF_Base_VG
+    public :: Type_HCF_Base_Impedance_VG
+    public :: Type_HCF_Base_Viscosity_VG
+    public :: Type_HCF_Base_Impedance_Viscosity_VG
+
+    public :: Type_HCF_Base_KO
+    public :: Type_HCF_Base_Impedance_KO
+    public :: Type_HCF_Base_Viscosity_KO
+    public :: Type_HCF_Base_Impedance_Viscosity_KO
+
+    public :: Type_HCF_Base_MVG
+    public :: Type_HCF_Base_Impedance_MVG
+    public :: Type_HCF_Base_Viscosity_MVG
+    public :: Type_HCF_Base_Impedance_Viscosity_MVG
+
+    public :: Type_HCF_Base_Durner
+    public :: Type_HCF_Base_Impedance_Durner
+    public :: Type_HCF_Base_Viscosity_Durner
+    public :: Type_HCF_Base_Impedance_Viscosity_Durner
+
+    public :: Type_HCF_Base_DVGCH
+    public :: Type_HCF_Base_Impedance_DVGCH
+    public :: Type_HCF_Base_Viscosity_DVGCH
+    public :: Type_HCF_Base_Impedance_Viscosity_DVGCH
+
+    public :: Type_HCF_Impedance
+    public :: Type_HCF_Viscosity
+    public :: Type_HCF_Impedance_Viscosity
 
     type, abstract :: Abstract_HCF
         real(real64) :: Ks !! saturated hydraulic conductivity
@@ -112,6 +150,31 @@ module Calculate_HCF
         procedure :: Update_Kflh => Update_Kflh_Base_BC
     end type Type_HCF_Base_BC
 
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_BC
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_BC
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_BC
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_BC
+    end type Type_HCF_Base_Impedance_BC
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_BC
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_BC
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_BC
+        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_BC
+    end type Type_HCF_Base_Viscosity_BC
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_BC
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_BC
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_BC
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_BC
+    end type Type_HCF_Base_Impedance_Viscosity_BC
+
     type, extends(Abstract_HCF_Base) :: Type_HCF_Base_VG
         real(real64) :: m1
     contains
@@ -120,12 +183,65 @@ module Calculate_HCF
         procedure :: Update_Kflh => Update_Kflh_Base_VG
     end type Type_HCF_Base_VG
 
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_VG
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_VG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_VG
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_VG
+    end type Type_HCF_Base_Impedance_VG
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_VG
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_VG
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_VG
+        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_VG
+    end type Type_HCF_Base_Viscosity_VG
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_VG
+        real(real64) :: m1
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_VG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_VG
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_VG
+    end type Type_HCF_Base_Impedance_Viscosity_VG
+
     type, extends(Abstract_HCF_Base) :: Type_HCF_Base_KO
     contains
         procedure :: Calculate_kr => Calculate_kr_Base_KO
         procedure :: Calculate_Kflh => Calculate_Kflh_Base_KO
         procedure :: Update_Kflh => Update_Kflh_Base_KO
     end type Type_HCF_Base_KO
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_KO
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_KO
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_KO
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_KO
+    end type Type_HCF_Base_Impedance_KO
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_KO
+    contains
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_KO
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_KO
+        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_KO
+    end type Type_HCF_Base_Viscosity_KO
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_KO
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_KO
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_KO
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_KO
+    end type Type_HCF_Base_Impedance_Viscosity_KO
 
     type, extends(Abstract_HCF_Base) :: Type_HCF_Base_MVG
         real(real64) :: hcrit
@@ -135,6 +251,37 @@ module Calculate_HCF
         procedure :: Calculate_Kflh => Calculate_Kflh_Base_MVG
         procedure :: Update_Kflh => Update_Kflh_Base_MVG
     end type Type_HCF_Base_MVG
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_MVG
+        real(real64) :: m1
+        real(real64) :: hcrit
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_MVG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_MVG
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_MVG
+    end type Type_HCF_Base_Impedance_MVG
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_MVG
+        real(real64) :: m1
+        real(real64) :: hcrit
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_MVG
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_MVG
+        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_MVG
+    end type Type_HCF_Base_Viscosity_MVG
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_MVG
+        real(real64) :: m1
+        real(real64) :: hcrit
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_MVG
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_MVG
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_MVG
+    end type Type_HCF_Base_Impedance_Viscosity_MVG
 
     type, extends(Abstract_HCF_Base) :: Type_HCF_Base_Durner
         real(real64) :: m1
@@ -149,6 +296,49 @@ module Calculate_HCF
         procedure :: Update_Kflh => Update_Kflh_Base_Durner
     end type Type_HCF_Base_Durner
 
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_Durner
+        real(real64) :: m1
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Durner
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Durner
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Durner
+    end type Type_HCF_Base_Impedance_Durner
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_Durner
+        real(real64) :: m1
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_Durner
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_Durner
+        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_Durner
+    end type Type_HCF_Base_Viscosity_Durner
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_Durner
+        real(real64) :: m1
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_Durner
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_Durner
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_Durner
+    end type Type_HCF_Base_Impedance_Viscosity_Durner
+
     type, extends(Abstract_HCF_Base) :: Type_HCF_Base_DVGCH
         real(real64) :: m1
         real(real64) :: n2
@@ -160,6 +350,46 @@ module Calculate_HCF
         procedure :: Calculate_Kflh => Calculate_Kflh_Base_DVGCH
         procedure :: Update_Kflh => Update_Kflh_Base_DVGCH
     end type Type_HCF_Base_DVGCH
+
+    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_DVGCH
+        real(real64) :: m1
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_DVGCH
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_DVGCH
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_DVGCH
+    end type Type_HCF_Base_Impedance_DVGCH
+
+    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_DVGCH
+        real(real64) :: m1
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_DVGCH
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_DVGCH
+        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_DVGCH
+    end type Type_HCF_Base_Viscosity_DVGCH
+
+    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_DVGCH
+        real(real64) :: m1
+        real(real64) :: n2
+        real(real64) :: m2
+        real(real64) :: w1
+        real(real64) :: w2
+    contains
+        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_DVGCH
+        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
+        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
+        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_DVGCH
+        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_DVGCH
+    end type Type_HCF_Base_Impedance_Viscosity_DVGCH
 
     type, extends(Abstract_HCF_Impedance) :: Type_HCF_Impedance
     contains
@@ -182,198 +412,6 @@ module Calculate_HCF
         procedure, pass :: Calculate_Kflh => Calculate_Kflh_Impedance_Viscosity
         procedure, pass :: Update_Kflh => Update_Kflh_Impedance_Viscosity
     end type Type_HCF_Impedance_Viscosity
-
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_BC
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_BC
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_BC
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_BC
-    end type Type_HCF_Base_Impedance_BC
-
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_VG
-        real(real64) :: m1
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_VG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_VG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_VG
-    end type Type_HCF_Base_Impedance_VG
-
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_KO
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_KO
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_KO
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_KO
-    end type Type_HCF_Base_Impedance_KO
-
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_MVG
-        real(real64) :: m1
-        real(real64) :: hcrit
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_MVG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_MVG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_MVG
-    end type Type_HCF_Base_Impedance_MVG
-
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_Durner
-        real(real64) :: m1
-        real(real64) :: alpha2
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w1
-        real(real64) :: w2
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Durner
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Durner
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Durner
-    end type Type_HCF_Base_Impedance_Durner
-
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_DVGCH
-        real(real64) :: m1
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w1
-        real(real64) :: w2
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_DVGCH
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_DVGCH
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_DVGCH
-    end type Type_HCF_Base_Impedance_DVGCH
-
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_BC
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_BC
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_BC
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_BC
-    end type Type_HCF_Base_Viscosity_BC
-
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_VG
-        real(real64) :: m1
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_VG
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_VG
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_VG
-    end type Type_HCF_Base_Viscosity_VG
-
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_KO
-    contains
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_KO
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_KO
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_KO
-    end type Type_HCF_Base_Viscosity_KO
-
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_MVG
-        real(real64) :: m1
-        real(real64) :: hcrit
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_MVG
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_MVG
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_MVG
-    end type Type_HCF_Base_Viscosity_MVG
-
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_Durner
-        real(real64) :: m1
-        real(real64) :: alpha2
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w1
-        real(real64) :: w2
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_Durner
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_Durner
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_Durner
-    end type Type_HCF_Base_Viscosity_Durner
-
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_DVGCH
-        real(real64) :: m1
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w1
-        real(real64) :: w2
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_DVGCH
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_DVGCH
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_DVGCH
-    end type Type_HCF_Base_Viscosity_DVGCH
-
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_BC
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_BC
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_BC
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_BC
-    end type Type_HCF_Base_Impedance_Viscosity_BC
-
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_VG
-        real(real64) :: m1
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_VG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_VG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_VG
-    end type Type_HCF_Base_Impedance_Viscosity_VG
-
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_KO
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_KO
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_KO
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_KO
-    end type Type_HCF_Base_Impedance_Viscosity_KO
-
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_MVG
-        real(real64) :: m1
-        real(real64) :: hcrit
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_MVG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_MVG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_MVG
-    end type Type_HCF_Base_Impedance_Viscosity_MVG
-
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_Durner
-        real(real64) :: m1
-        real(real64) :: alpha2
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w1
-        real(real64) :: w2
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_Durner
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_Durner
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_Durner
-    end type Type_HCF_Base_Impedance_Viscosity_Durner
-
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_DVGCH
-        real(real64) :: m1
-        real(real64) :: n2
-        real(real64) :: m2
-        real(real64) :: w1
-        real(real64) :: w2
-    contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_DVGCH
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_DVGCH
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_DVGCH
-    end type Type_HCF_Base_Impedance_Viscosity_DVGCH
 
     abstract interface
         function Abstract_Calculate_Kflh_Base(self, h) result(Kflh)

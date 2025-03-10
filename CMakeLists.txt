@@ -27,7 +27,7 @@ if(NOT DEFINED CMAKE_Fortran_COMPILER)
 endif()
 
 # Source Files
-file(GLOB_RECURSE ALL_SRC_FILES ${PROJECT_SOURCE_DIR}/src/**/*.F90)
+file(GLOB_RECURSE ALL_SRC_FILES ${PROJECT_SOURCE_DIR}/src/**/**.F90)
 
 # Compilation Flags
 set(COMPILE_Fortran_FLAGS "-fpp -traceback")
@@ -91,7 +91,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     # Test Target
-    add_executable(test ${PROJECT_SOURCE_DIR}/test/test.F90 ${ALL_SRC_FILES})
+    add_executable(test ${PROJECT_SOURCE_DIR}/test/test_VHC.F90 ${ALL_SRC_FILES})
     # target_compile_options(test PUBLIC ${COMPILE_Fortran_FLAGS})
     target_link_libraries(test PUBLIC ${LINK_LIBRARIES} )
     target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
