@@ -13,6 +13,7 @@ module Calculate_VHC
     type, abstract, extends(Abstract_VolumetricHeatCapacity) :: Abstract_VolumetricHeatCapacity_Appearant
         real(real64), allocatable :: Apearant(:) ! Apearant volumetric heat capacity
         real(real64) :: Ca_max
+        class(Abstract_Ice), pointer :: Ice
     end type Abstract_VolumetricHeatCapacity_Appearant
 
     type, extends(Abstract_VolumetricHeatCapacity) :: Type_VolumetricHeatCapacity_1Phase
@@ -140,12 +141,15 @@ contains
         structure%value(:) = 0.0d0
     end function Construct_VolumetricHeatCapacity_2Phase
 
-    function Construct_VolumetricHeatCapacity_3Phase(Cp_soil, Cp_water, Cp_ice, nsize) result(structure)
+    function Construct_VolumetricHeatCapacity_3Phase(Cp_soil, Cp_water, Cp_ice, structure_Ice, rho_ice, rho_water, nsize) result(structure)
         implicit none
         real(real64), intent(in) :: Cp_soil !! Volumetric heat capacity of soil
         real(real64), intent(in) :: Cp_water !! Volumetric heat capacity of water
         real(real64), intent(in) :: Cp_ice !! Volumetric heat capacity of ice
         integer(int32), intent(in) :: nsize !! Size of array
+        class(Abstract_Ice), pointer, intent(in) :: structure_Ice
+        real(real64), intent(in) :: rho_ice !! Density of ice
+        real(real64), intent(in), optional :: rho_water !! Density of water
         type(Type_VolumetricHeatCapacity_3Phase) :: structure
 
         structure%Cp_soil = Cp_soil
@@ -156,6 +160,14 @@ contains
         call Allocate_Array(structure%Apearant, nsize)
         structure%value(:) = 0.0d0
         structure%Apearant(:) = 0.0d0
+
+        structure%Ice => structure_Ice
+        ! structure, initial_phi, rho_ice, rho_water, Temperature, Pw
+        if (.not. present(rho_water)) then
+            call Find_Ca_maximum(structure, rho_ice)
+        else
+            call Find_Ca_maximum(structure, rho_ice, rho_water)
+        end if
 
     end function Construct_VolumetricHeatCapacity_3Phase
 
@@ -269,6 +281,227 @@ contains
     end function Calculate_VolumetricHeatCapacity_Appearant_3Phase
 
     !----------------------------------------------------------------------------------------------------
+    ! Find maximum Volumetric heat capacity
+    !----------------------------------------------------------------------------------------------------
+
+    subroutine Find_Ca_maximum(structure, rho_ice, rho_water)
+        implicit none
+        class(Abstract_VolumetricHeatCapacity_Appearant), intent(inout) :: Structure
+        real(real64), intent(in) :: rho_ice !! Density of ice
+        real(real64), intent(in), optional :: rho_water !! Density of water
+
+        real(real64) :: initial_phi
+        real(real64) :: T0, T1, T2, T3, Ca1, Ca2, tau
+        real(real64), parameter :: epsilon = 1.0d-15
+
+        select type (this => Structure)
+        type is (Type_VolumetricHeatCapacity_3Phase)
+            select type (this_Ice => this%Ice)
+            type is (Type_Ice_GCC)
+                initial_phi = this_Ice%WRF%thetaS
+
+                tau = (sqrt(5.d0) - 1.d0) / 2.d0 ! golden ratio
+                T0 = 0.0d0 ! Upper limit
+                T3 = -1.0d0 ! Lower limit
+                T1 = T0 + (1.d0 - tau) * (T3 - T0)
+                T2 = T0 + tau * (T3 - T0)
+                select type (this_GCC => this_Ice%GCC)
+                type is (Type_GCC_NonSegregation_m)
+                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            Temperature=T1)
+                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            Temperature=T2)
+
+                    do while (abs(T3 - T0) > epsilon)
+                        if (Ca2 > Ca1) then
+                            T0 = T1
+                            T1 = T2
+                            T2 = T0 + tau * (T3 - T0)
+                            Ca1 = Ca2
+                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    Temperature=T2)
+                        else
+                            T3 = T2
+                            T2 = T1
+                            T1 = T0 + (1.d0 - tau) * (T3 - T0)
+                            Ca2 = Ca1
+                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    Temperature=T1)
+                        end if
+                    end do
+
+                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    Temperature=(T1 + T2) / 2.d0)
+                type is (Type_GCC_NonSegregation_Pa)
+                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            rho_water=rho_water, &
+                                            Temperature=T1)
+                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            rho_water=rho_water, &
+                                            Temperature=T2)
+
+                    do while (abs(T3 - T0) > epsilon)
+                        if (Ca2 > Ca1) then
+                            T0 = T1
+                            T1 = T2
+                            T2 = T0 + tau * (T3 - T0)
+                            Ca1 = Ca2
+                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=T2)
+                        else
+                            T3 = T2
+                            T2 = T1
+                            T1 = T0 + (1.d0 - tau) * (T3 - T0)
+                            Ca2 = Ca1
+                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=T1)
+                        end if
+                    end do
+
+                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=(T1 + T2) / 2.d0)
+                type is (Type_GCC_Segregation_m)
+                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            rho_water=rho_water, &
+                                            Temperature=T1)
+                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            rho_water=rho_water, &
+                                            Temperature=T2)
+
+                    do while (abs(T3 - T0) > epsilon)
+                        if (Ca2 > Ca1) then
+                            T0 = T1
+                            T1 = T2
+                            T2 = T0 + tau * (T3 - T0)
+                            Ca1 = Ca2
+                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=T2)
+                        else
+                            T3 = T2
+                            T2 = T1
+                            T1 = T0 + (1.d0 - tau) * (T3 - T0)
+                            Ca2 = Ca1
+                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=T1)
+                        end if
+                    end do
+
+                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=(T1 + T2) / 2.d0)
+                type is (Type_GCC_Segregation_Pa)
+                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            rho_water=rho_water, &
+                                            Temperature=T1, &
+                                            Pw=0.0d0)
+                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                            phi2=initial_phi, &
+                                            phi3=0.0d0, &
+                                            rho_ice=rho_ice, &
+                                            rho_water=rho_water, &
+                                            Temperature=T2, &
+                                            Pw=0.0d0)
+
+                    do while (abs(T3 - T0) > epsilon)
+                        if (Ca2 > Ca1) then
+                            T0 = T1
+                            T1 = T2
+                            T2 = T0 + tau * (T3 - T0)
+                            Ca1 = Ca2
+                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=T2, &
+                                                    Pw=0.0d0)
+                        else
+                            T3 = T2
+                            T2 = T1
+                            T1 = T0 + (1.d0 - tau) * (T3 - T0)
+                            Ca2 = Ca1
+                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=T1, &
+                                                    Pw=0.0d0)
+                        end if
+                    end do
+                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                    phi2=initial_phi, &
+                                                    phi3=0.0d0, &
+                                                    rho_ice=rho_ice, &
+                                                    rho_water=rho_water, &
+                                                    Temperature=(T1 + T2) / 2.d0, &
+                                                    Pw=0.0d0)
+                end select
+            type is (Type_Ice_EXP)
+                initial_phi = this_Ice%phi
+                this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
+                                                phi2=initial_phi, &
+                                                phi3=0.0d0, &
+                                                rho_ice=rho_ice, &
+                                                Temperature=this_Ice%Tf)
+            end select
+        end select
+    end subroutine Find_Ca_maximum
+
+    !----------------------------------------------------------------------------------------------------
     ! Wrapper
     !----------------------------------------------------------------------------------------------------
     function Calculate_VolumetricHeatCapacity_1Phase_Wrapped(self, phi1, phi2, phi3, phi4) result(Cp)
@@ -336,14 +569,13 @@ contains
         Cp = Calculate_VolumetricHeatCapacity_4Phase(self%Cp_soil, phi1, self%Cp_water, phi2, self%Cp_ice, phi3, self%Cp_air, phi4)
     end function Calculate_VolumetricHeatCapacity_4Phase_Wrapped
 
-    function Calculate_VolumetricHeatCapacity_Appearant_3Phase_Wrapped(self, phi1, phi2, phi3, phi4, structure_Ice, rho_ice, rho_water, Temperature, Pw) result(Ca)
+    function Calculate_VolumetricHeatCapacity_Appearant_3Phase_Wrapped(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(in) :: self
         real(real64), intent(in) :: phi1 !! the ratio of material 1
         real(real64), intent(in) :: phi2 !! the ratio of material 2
         real(real64), intent(in) :: phi3 !! the ratio of material 3
         real(real64), intent(in), optional :: phi4 !! the ratio of material 4
-        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
         real(real64), intent(in) :: Temperature !! Temperature
@@ -357,7 +589,7 @@ contains
                                                                    phi_water=phi2, &
                                                                    Cp_ice=self%Cp_ice, &
                                                                    phi_ice=phi3, &
-                                                                   structure_Ice=structure_Ice, &
+                                                                   structure_Ice=self%Ice, &
                                                                    rho_ice=rho_ice, &
                                                                    Temperature=Temperature)
         else if (present(rho_water) .and. .not. present(Pw)) then
@@ -367,7 +599,7 @@ contains
                                                                    phi_water=phi2, &
                                                                    Cp_ice=self%Cp_ice, &
                                                                    phi_ice=phi3, &
-                                                                   structure_Ice=structure_Ice, &
+                                                                   structure_Ice=self%Ice, &
                                                                    rho_ice=rho_ice, &
                                                                    rho_water=rho_water, &
                                                                    Temperature=Temperature)
@@ -378,7 +610,7 @@ contains
                                                                    phi_water=phi2, &
                                                                    Cp_ice=self%Cp_ice, &
                                                                    phi_ice=phi3, &
-                                                                   structure_Ice=structure_Ice, &
+                                                                   structure_Ice=self%Ice, &
                                                                    rho_ice=rho_ice, &
                                                                    rho_water=rho_water, &
                                                                    Temperature=Temperature, &

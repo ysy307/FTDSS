@@ -13,7 +13,6 @@ contains
         integer(int32), intent(in) :: nsize
         class(Abstract_Ice), allocatable :: structure
 
-        if (allocated(structure)) deallocate (structure)
         allocate (Type_Ice_EXP :: structure)
 
         select type (this => structure)
@@ -59,10 +58,69 @@ contains
         implicit none
         class(Abstract_Ice), allocatable :: structure
 
-        if (allocated(structure)) deallocate (structure)
         allocate (Type_Ice_EXP :: structure)
 
     end function Construct_Type_Ice_EXP_minimum
+
+    module function Construct_Type_Ice_EXP_Pointer(Lf, phi, Tf, a, nsize) result(structure)
+        use, intrinsic :: iso_fortran_env, only: real64
+        use :: Allocate_Allocate, only:Allocate_Array
+        implicit none
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: phi
+        real(real64), intent(in) :: Tf
+        real(real64), intent(in) :: a
+        integer(int32), intent(in) :: nsize
+        class(Abstract_Ice), pointer :: structure
+
+        allocate (Type_Ice_EXP :: structure)
+
+        select type (this => structure)
+        type is (Type_Ice_EXP)
+            this%Lf = Lf
+            this%phi = phi
+            this%Tf = Tf
+            this%a = a
+
+            call Allocate_Array(this%Qw%old, nsize)
+            call Allocate_Array(this%Qw%pre, nsize)
+            call Allocate_Array(this%Qw%new, nsize)
+            this%Qw%old(:) = 0.0d0
+            this%Qw%pre(:) = 0.0d0
+            this%Qw%new(:) = 0.0d0
+
+            call Allocate_Array(this%Qice%old, nsize)
+            call Allocate_Array(this%Qice%pre, nsize)
+            call Allocate_Array(this%Qice%new, nsize)
+            this%Qice%old(:) = 0.0d0
+            this%Qice%pre(:) = 0.0d0
+            this%Qice%new(:) = 0.0d0
+
+            call Allocate_Array(this%D_Qice%old, nsize)
+            call Allocate_Array(this%D_Qice%pre, nsize)
+            call Allocate_Array(this%D_Qice%new, nsize)
+            this%D_Qice%old(:) = 0.0d0
+            this%D_Qice%pre(:) = 0.0d0
+            this%D_Qice%new(:) = 0.0d0
+
+            call Allocate_Array(this%Si%old, nsize)
+            call Allocate_Array(this%Si%pre, nsize)
+            call Allocate_Array(this%Si%new, nsize)
+            this%Si%old(:) = 0.0d0
+            this%Si%pre(:) = 0.0d0
+            this%Si%new(:) = 0.0d0
+
+        end select
+
+    end function Construct_Type_Ice_EXP_Pointer
+
+    module function Construct_Type_Ice_EXP_minimum_Pointer() result(structure)
+        implicit none
+        class(Abstract_Ice), pointer :: structure
+
+        allocate (Type_Ice_EXP :: structure)
+
+    end function Construct_Type_Ice_EXP_minimum_Pointer
 
     module function Calculate_Ice_EXP(self, Temperature) result(Qice)
         !$omp declare simd uniform(self, Temperature)
@@ -71,7 +129,7 @@ contains
         real(real64), intent(in) :: Temperature
         real(real64) :: Qice
 
-        if (Temperature < self%Tf) then
+        if (Temperature <= self%Tf) then
             Qice = self%phi * (1.0d0 - (1.0d0 - Temperature + self%Tf)**self%a)
         else
             Qice = 0.0d0
@@ -86,7 +144,7 @@ contains
         real(real64), intent(in) :: Temperature
         real(real64) :: D_Qice
 
-        if (Temperature < self%Tf) then
+        if (Temperature <= self%Tf) then
             D_Qice = self%phi * self%a * (1.0d0 - Temperature + self%Tf)**(self%a - 1.0d0)
         else
             D_Qice = 0.0d0

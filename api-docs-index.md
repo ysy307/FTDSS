@@ -8,7 +8,7 @@ Work in progress
 土壌凍結融解過程の水分・熱移動の数値計算
 
 @note
-このプロジェクトでは，Fortranで係れている．
+このプロジェクトでは，Fortranで書かれている．
 @endnote
 
 @todo

@@ -2,7 +2,7 @@ module Solver_Initialize
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     use :: Allocate_Allocate
-    use :: Calculate_LatentHeat, only:Find_Ca_max
+    ! use :: Calculate_LatentHeat, only:Find_Ca_max
     implicit none
     private
 
@@ -50,7 +50,7 @@ contains
                                     + Solver%Heat%Constants%HeatCapacity%water * Solver%Heat%Constants%Porosity
 
         ! Find the maximum value of Ca
-        call Find_Ca_max(Solver%Heat)
+        ! call Find_Ca_max(Solver%Heat)
 
         if (Solver%BC%numEdges > 0) then
             do i = 1, Solver%BC%numEdges
