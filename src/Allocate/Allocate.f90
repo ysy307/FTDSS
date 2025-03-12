@@ -12,17 +12,29 @@ module Allocate_Allocate
         procedure :: Allocate_Rank1_real64
         procedure :: Allocate_Rank1_real128
         procedure :: Allocate_Rank1_logical
-        procedure :: Allocate_Rank2_int32
-        procedure :: Allocate_Rank2_int64
-        procedure :: Allocate_Rank2_real32
-        procedure :: Allocate_Rank2_real64
-        procedure :: Allocate_Rank2_real128
         procedure :: Allocate_Rank1_int32_specify
         procedure :: Allocate_Rank1_int64_specify
         procedure :: Allocate_Rank1_real32_specify
         procedure :: Allocate_Rank1_real64_specify
         procedure :: Allocate_Rank1_real128_specify
         procedure :: Allocate_Rank1_logical_specify
+        procedure :: Allocate_Rank2_int32
+        procedure :: Allocate_Rank2_int64
+        procedure :: Allocate_Rank2_real32
+        procedure :: Allocate_Rank2_real64
+        procedure :: Allocate_Rank2_real128
+        procedure :: Allocate_Rank1_int32_Pointer
+        procedure :: Allocate_Rank1_int64_Pointer
+        procedure :: Allocate_Rank1_real32_Pointer
+        procedure :: Allocate_Rank1_real64_Pointer
+        procedure :: Allocate_Rank1_real128_Pointer
+        procedure :: Allocate_Rank1_logical_Pointer
+        procedure :: Allocate_Rank1_int32_specify_Pointer
+        procedure :: Allocate_Rank1_int64_specify_Pointer
+        procedure :: Allocate_Rank1_real32_specify_Pointer
+        procedure :: Allocate_Rank1_real64_specify_Pointer
+        procedure :: Allocate_Rank1_real128_specify_Pointer
+        procedure :: Allocate_Rank1_logical_specify_Pointer
     end interface
 
     interface Allocate_Pointer
@@ -195,6 +207,162 @@ contains
             call error_message(953)
         end if
     end subroutine Allocate_Rank1_logical_specify
+
+    subroutine Allocate_Rank1_int32_Pointer(array, size)
+        implicit none
+        integer(int32), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: size
+
+        if (size <= 0) call error_message(951)
+        if (.not. associated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_int32_Pointer
+
+    subroutine Allocate_Rank1_int64_Pointer(array, size)
+        implicit none
+        integer(int64), intent(inout), dimension(:), pointer :: array
+        integer(int64), intent(in) :: size
+
+        if (size <= 0) call error_message(951)
+        if (.not. associated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_int64_Pointer
+
+    subroutine Allocate_Rank1_real32_Pointer(array, size)
+        implicit none
+        real(real32), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: size
+
+        if (size <= 0) call error_message(951)
+        if (.not. associated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real32_Pointer
+
+    subroutine Allocate_Rank1_real64_Pointer(array, size)
+        implicit none
+        real(real64), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: size
+
+        if (size <= 0) call error_message(951)
+        if (.not. associated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real64_Pointer
+
+    subroutine Allocate_Rank1_real128_Pointer(array, size)
+        implicit none
+        real(real128), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: size
+
+        if (size <= 0) call error_message(951)
+        if (.not. associated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real128_Pointer
+
+    subroutine Allocate_Rank1_logical_Pointer(array, size)
+        implicit none
+        logical, intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: size
+
+        if (size <= 0) call error_message(951)
+        if (.not. associated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_logical_Pointer
+
+    subroutine Allocate_Rank1_int32_specify_Pointer(array, first, last)
+        implicit none
+        integer(int32), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. associated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_int32_specify_Pointer
+
+    subroutine Allocate_Rank1_int64_specify_Pointer(array, first, last)
+        implicit none
+        integer(int64), intent(inout), dimension(:), pointer :: array
+        integer(int64), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. associated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_int64_specify_Pointer
+
+    subroutine Allocate_Rank1_real32_specify_Pointer(array, first, last)
+        implicit none
+        real(real32), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. associated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real32_specify_Pointer
+
+    subroutine Allocate_Rank1_real64_specify_Pointer(array, first, last)
+        implicit none
+        real(real64), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. associated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real64_specify_Pointer
+
+    subroutine Allocate_Rank1_real128_specify_Pointer(array, first, last)
+        implicit none
+        real(real128), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. associated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_real128_specify_Pointer
+
+    subroutine Allocate_Rank1_logical_specify_Pointer(array, first, last)
+        implicit none
+        logical(4), intent(inout), dimension(:), pointer :: array
+        integer(int32), intent(in) :: first, last
+
+        if (first > last) call error_message(952)
+        if (.not. associated(array)) then
+            allocate (array(first:last))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_logical_specify_Pointer
 
     ! Rank-2 配列の割り当て
     subroutine Allocate_Rank2_int32(array, size1, size2)

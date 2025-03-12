@@ -1,7 +1,8 @@
 program test_VHC
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Calculate_VHC
+    use :: Calculate_VolumetricHeatCapacity
     use :: Calculate_Ice
+    use :: Allocate_Allocate, only:Allocate_Array
     implicit none
     class(Abstract_VolumetricHeatCapacity), allocatable :: VHC
 
@@ -28,6 +29,7 @@ program test_VHC
     integer(int32) :: case_num_VHC
 
     class(Abstract_Ice), pointer :: Ice
+    type(Variables), pointer :: Temperature
     ! class(Abstract_Ice), allocatable :: Ice
 
     ! BC
@@ -94,8 +96,14 @@ program test_VHC
     end do
 
     nsize = size(T)
+    allocate (Temperature)
+    call Allocate_Array(Temperature%old, nsize)
+    call Allocate_Array(Temperature%pre, nsize)
+    call Allocate_Array(Temperature%new, nsize)
     case_type_num = 3
     case_num = 2
+
+    Temperature%pre(:) = T(:)
 
     select case (case_type_num)
     case (1)
@@ -177,7 +185,7 @@ program test_VHC
                                                   Tf=Tf)
         end select
     case (3)
-        Ice => Construct_Type_Ice_EXP_Pointer(Lf, EXP_phi, Tf, EXP_a, nsize)
+        Ice => Construct_Type_Ice_EXP_Pointer(Lf, EXP_phi, Tf, EXP_a, Temperature, nsize)
     end select
 
     case_num_VHC = 3
@@ -211,7 +219,7 @@ program test_VHC
             phi = i_ps%phi
             print '(es14.6)', v_p%Ca_max
 
-            call i_ps%Update_Ice(T)
+            call i_ps%Update_Ice()
             i_ps%Qw%pre(:) = phi - i_ps%Qice%pre(:)
             call v_p%Update(1.0d0 - phi)
             call v_p%Update_Ca(rho_ice=Den_ice, arr_Temperature=T)

@@ -2,8 +2,8 @@ module Calculate_Update
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use omp_lib
     use :: Types, g => GravityAcceleration
-    use :: RootFinding_SecantMethod, only:Secant_method
-    use :: RootFinding_BinaryFinding, only:Binary_finding
+    ! use :: RootFinding_SecantMethod, only:Secant_method
+    ! use :: RootFinding_BinaryFinding, only:Binary_finding
     implicit none
     private
     real(real64), parameter :: threshold = 1.0d-20
@@ -275,7 +275,7 @@ contains
             else if (Tp < 0.0d0 .and. To >= 0.0d0) then
                 Solver%Heat%Variables%Phase(iN) = pTransition
                 ! call Secant_method(Solver, iN)
-                call Binary_finding(Solver, iN)
+                ! call Binary_finding(Solver, iN)
             else
                 Solver%Heat%Variables%Phase(iN) = nTransition
             end if

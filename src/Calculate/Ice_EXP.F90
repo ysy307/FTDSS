@@ -2,7 +2,7 @@ submodule(Calculate_Ice) Calculate_Ice_EXP_Implementation
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
 contains
-    module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, nsize) result(structure)
+    module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, Temperature, nsize) result(structure)
         use, intrinsic :: iso_fortran_env, only: real64
         use :: Allocate_Allocate, only:Allocate_Array
         implicit none
@@ -10,6 +10,7 @@ contains
         real(real64), intent(in) :: phi
         real(real64), intent(in) :: Tf
         real(real64), intent(in) :: a
+        type(Variables), intent(in), pointer :: Temperature
         integer(int32), intent(in) :: nsize
         class(Abstract_Ice), allocatable :: structure
 
@@ -21,6 +22,8 @@ contains
             this%phi = phi
             this%Tf = Tf
             this%a = a
+
+            this%nsize = nsize
 
             call Allocate_Array(this%Qw%old, nsize)
             call Allocate_Array(this%Qw%pre, nsize)
@@ -49,6 +52,9 @@ contains
             this%Si%old(:) = 0.0d0
             this%Si%pre(:) = 0.0d0
             this%Si%new(:) = 0.0d0
+
+            if (associated(this%Temperature)) deallocate (this%Temperature)
+            this%Temperature => Temperature
 
         end select
 
@@ -62,7 +68,7 @@ contains
 
     end function Construct_Type_Ice_EXP_minimum
 
-    module function Construct_Type_Ice_EXP_Pointer(Lf, phi, Tf, a, nsize) result(structure)
+    module function Construct_Type_Ice_EXP_Pointer(Lf, phi, Tf, a, Temperature, nsize) result(structure)
         use, intrinsic :: iso_fortran_env, only: real64
         use :: Allocate_Allocate, only:Allocate_Array
         implicit none
@@ -70,6 +76,7 @@ contains
         real(real64), intent(in) :: phi
         real(real64), intent(in) :: Tf
         real(real64), intent(in) :: a
+        type(Variables), intent(in), pointer :: Temperature
         integer(int32), intent(in) :: nsize
         class(Abstract_Ice), pointer :: structure
 
@@ -82,6 +89,7 @@ contains
             this%Tf = Tf
             this%a = a
 
+            allocate (this%Qw)
             call Allocate_Array(this%Qw%old, nsize)
             call Allocate_Array(this%Qw%pre, nsize)
             call Allocate_Array(this%Qw%new, nsize)
@@ -89,6 +97,7 @@ contains
             this%Qw%pre(:) = 0.0d0
             this%Qw%new(:) = 0.0d0
 
+            allocate (this%Qice)
             call Allocate_Array(this%Qice%old, nsize)
             call Allocate_Array(this%Qice%pre, nsize)
             call Allocate_Array(this%Qice%new, nsize)
@@ -96,6 +105,15 @@ contains
             this%Qice%pre(:) = 0.0d0
             this%Qice%new(:) = 0.0d0
 
+            allocate (this%Si)
+            call Allocate_Array(this%Si%old, nsize)
+            call Allocate_Array(this%Si%pre, nsize)
+            call Allocate_Array(this%Si%new, nsize)
+            this%Si%old(:) = 0.0d0
+            this%Si%pre(:) = 0.0d0
+            this%Si%new(:) = 0.0d0
+
+            allocate (this%D_Qice)
             call Allocate_Array(this%D_Qice%old, nsize)
             call Allocate_Array(this%D_Qice%pre, nsize)
             call Allocate_Array(this%D_Qice%new, nsize)
@@ -103,12 +121,7 @@ contains
             this%D_Qice%pre(:) = 0.0d0
             this%D_Qice%new(:) = 0.0d0
 
-            call Allocate_Array(this%Si%old, nsize)
-            call Allocate_Array(this%Si%pre, nsize)
-            call Allocate_Array(this%Si%new, nsize)
-            this%Si%old(:) = 0.0d0
-            this%Si%pre(:) = 0.0d0
-            this%Si%new(:) = 0.0d0
+            this%Temperature => Temperature
 
         end select
 
@@ -152,19 +165,16 @@ contains
 
     end function Calculate_Ice_EXP_Derivative_Temperature
 
-    module subroutine Update_Ice_EXP(self, arr_Temperature)
+    module subroutine Update_Ice_EXP(self)
         implicit none
         class(Type_Ice_EXP), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
 
-        integer(int32) :: iN, n
-
-        n = size(arr_Temperature)
+        integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, n
-            if (arr_Temperature(iN) < self%Tf) then
-                self%Qice%pre(iN) = self%Calculate_Ice(arr_Temperature(iN))
+        do iN = 1, self%nsize
+            if (self%Temperature%pre(iN) < self%Tf) then
+                self%Qice%pre(iN) = self%Calculate_Ice(self%Temperature%pre(iN))
             else
                 self%Qice%pre(iN) = 0.0d0
             end if
@@ -172,19 +182,15 @@ contains
 
     end subroutine Update_Ice_EXP
 
-    module subroutine Update_Ice_EXP_Derivative_Temperature(self, arr_Temperature)
+    module subroutine Update_Ice_EXP_Derivative_Temperature(self)
         implicit none
         class(Type_Ice_EXP), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
-
-        integer(int32) :: iN, n
-
-        n = size(arr_Temperature)
+        integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, n
-            if (arr_Temperature(iN) < self%Tf) then
-                self%D_Qice%pre(iN) = self%Calculate_Ice_Derivative(arr_Temperature(iN))
+        do iN = 1, self%nsize
+            if (self%Temperature%pre(iN) < self%Tf) then
+                self%D_Qice%pre(iN) = self%Calculate_Ice_Derivative(self%Temperature%pre(iN))
             else
                 self%Qice%pre(iN) = 0.0d0
             end if

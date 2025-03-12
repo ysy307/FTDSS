@@ -1,4 +1,4 @@
-module Calculate_VHC
+module Calculate_VolumetricHeatCapacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Allocate_Allocate, only:Allocate_Array
     use :: Calculate_Ice
@@ -39,7 +39,7 @@ module Calculate_VHC
     type, extends(Abstract_VolumetricHeatCapacity) :: Type_VolumetricHeatCapacity_1Phase
         real(real64) :: Cp1 ! Material volumetric heat capacity
     contains
-        procedure :: Calculate => Calculate_VolumetricHeatCapacity_1Phase_Wrapped
+        procedure :: Calculate => Calculate_VolumetricHeatCapacity_1Phase_Wrap
 
         procedure :: Update => Update_VolumetricHeatCapacity_1Phase
     end type Type_VolumetricHeatCapacity_1Phase
@@ -48,7 +48,7 @@ module Calculate_VHC
         real(real64) :: Cp1 ! Material volumetric heat capacity
         real(real64) :: Cp2 ! Material volumetric heat capacity
     contains
-        procedure :: Calculate => Calculate_VolumetricHeatCapacity_2Phase_Wrapped
+        procedure :: Calculate => Calculate_VolumetricHeatCapacity_2Phase_Wrap
         procedure, pass(self), private :: Update_Scalar => Update_VolumetricHeatCapacity_2Phase_Scalar
         procedure, pass(self), private :: Update_Array => Update_VolumetricHeatCapacity_2Phase_Array
         generic, public :: Update => Update_Scalar, Update_Array
@@ -59,8 +59,8 @@ module Calculate_VHC
         real(real64) :: Cp_water ! Water volumetric heat capacity
         real(real64) :: Cp_ice ! Ice volumetric heat capacity
     contains
-        procedure :: Calculate => Calculate_VolumetricHeatCapacity_3Phase_Wrapped
-        procedure :: Calculate_Ca => Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrapped
+        procedure :: Calculate => Calculate_VolumetricHeatCapacity_3Phase_Wrap
+        procedure :: Calculate_Ca => Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrap
         procedure, pass(self), private :: Update_Scalar => Update_VolumetricHeatCapacity_3Phase_Scalar
         procedure, pass(self), private :: Update_Array => Update_VolumetricHeatCapacity_3Phase_Array
         generic, public :: Update => Update_Scalar, Update_Array
@@ -75,8 +75,8 @@ module Calculate_VHC
         real(real64) :: Cp_ice ! Ice volumetric heat capacity
         real(real64) :: Cp_air ! Air volumetric heat capacity
     contains
-        procedure :: Calculate => Calculate_VolumetricHeatCapacity_4Phase_Wrapped
-        procedure :: Calculate_Ca => Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrapped
+        procedure :: Calculate => Calculate_VolumetricHeatCapacity_4Phase_Wrap
+        procedure :: Calculate_Ca => Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrap
         procedure, pass(self), private :: Update_Scalar => Update_VolumetricHeatCapacity_4Phase_Scalar
         procedure, pass(self), private :: Update_Array => Update_VolumetricHeatCapacity_4Phase_Array
         generic, public :: Update => Update_Scalar, Update_Array
@@ -585,7 +585,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Wrapper of calculating volumetric heat capacity
     !----------------------------------------------------------------------------------------------------
-    function Calculate_VolumetricHeatCapacity_1Phase_Wrapped(self, phi1, phi2, phi3, phi4) result(Cp)
+    function Calculate_VolumetricHeatCapacity_1Phase_Wrap(self, phi1, phi2, phi3, phi4) result(Cp)
         implicit none
         class(Type_VolumetricHeatCapacity_1Phase), intent(in) :: self
         real(real64), intent(in), optional :: phi1 !! the ratio of material 1
@@ -595,9 +595,9 @@ contains
         real(real64) :: Cp
 
         Cp = Calculate_VolumetricHeatCapacity_1Phase(self%Cp1)
-    end function Calculate_VolumetricHeatCapacity_1Phase_Wrapped
+    end function Calculate_VolumetricHeatCapacity_1Phase_Wrap
 
-    function Calculate_VolumetricHeatCapacity_2Phase_Wrapped(self, phi1, phi2, phi3, phi4) result(Cp)
+    function Calculate_VolumetricHeatCapacity_2Phase_Wrap(self, phi1, phi2, phi3, phi4) result(Cp)
         implicit none
         class(Type_VolumetricHeatCapacity_2Phase), intent(in) :: self
         real(real64), intent(in), optional :: phi1 !! the ratio of material 1
@@ -608,12 +608,12 @@ contains
 
         if (.not. present(phi1) .or. &
             .not. present(phi2) &
-            ) stop 'Error: Calculate_VolumetricHeatCapacity_2Phase_Wrapped'
+            ) stop 'Error: Calculate_VolumetricHeatCapacity_2Phase_Wrap'
 
         Cp = Calculate_VolumetricHeatCapacity_2Phase(self%Cp1, phi1, self%Cp2, phi2)
-    end function Calculate_VolumetricHeatCapacity_2Phase_Wrapped
+    end function Calculate_VolumetricHeatCapacity_2Phase_Wrap
 
-    function Calculate_VolumetricHeatCapacity_3Phase_Wrapped(self, phi1, phi2, phi3, phi4) result(Cp)
+    function Calculate_VolumetricHeatCapacity_3Phase_Wrap(self, phi1, phi2, phi3, phi4) result(Cp)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(in) :: self
         real(real64), intent(in), optional :: phi1 !! the ratio of material 1
@@ -625,12 +625,12 @@ contains
         if (.not. present(phi1) .or. &
             .not. present(phi2) .or. &
             .not. present(phi3) &
-            ) stop 'Error: Calculate_VolumetricHeatCapacity_3Phase_Wrapped'
+            ) stop 'Error: Calculate_VolumetricHeatCapacity_3Phase_Wrap'
 
         Cp = Calculate_VolumetricHeatCapacity_3Phase(self%Cp_soil, phi1, self%Cp_water, phi2, self%Cp_ice, phi3)
-    end function Calculate_VolumetricHeatCapacity_3Phase_Wrapped
+    end function Calculate_VolumetricHeatCapacity_3Phase_Wrap
 
-    function Calculate_VolumetricHeatCapacity_4Phase_Wrapped(self, phi1, phi2, phi3, phi4) result(Cp)
+    function Calculate_VolumetricHeatCapacity_4Phase_Wrap(self, phi1, phi2, phi3, phi4) result(Cp)
         implicit none
         class(Type_VolumetricHeatCapacity_4Phase), intent(in) :: self
         real(real64), intent(in), optional :: phi1 !! the ratio of material 1
@@ -643,15 +643,15 @@ contains
             .not. present(phi2) .or. &
             .not. present(phi3) .or. &
             .not. present(phi4) &
-            ) stop 'Error: Calculate_VolumetricHeatCapacity_4Phase_Wrapped'
+            ) stop 'Error: Calculate_VolumetricHeatCapacity_4Phase_Wrap'
 
         Cp = Calculate_VolumetricHeatCapacity_4Phase(self%Cp_soil, phi1, self%Cp_water, phi2, self%Cp_ice, phi3, self%Cp_air, phi4)
-    end function Calculate_VolumetricHeatCapacity_4Phase_Wrapped
+    end function Calculate_VolumetricHeatCapacity_4Phase_Wrap
 
     !----------------------------------------------------------------------------------------------------
     ! Wrapper of calculating Apparent volumetric heat capacity
     !----------------------------------------------------------------------------------------------------
-    function Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrapped(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
+    function Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrap(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(in) :: self
         real(real64), intent(in) :: phi1 !! the ratio of material 1
@@ -699,9 +699,9 @@ contains
                                                                   Pw=Pw)
         end if
 
-    end function Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrapped
+    end function Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrap
 
-    function Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrapped(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
+    function Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrap(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
         implicit none
         class(Type_VolumetricHeatCapacity_4Phase), intent(in) :: self
         real(real64), intent(in) :: phi1 !! the ratio of material 1
@@ -755,7 +755,7 @@ contains
                                                                   Pw=Pw)
         end if
 
-    end function Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrapped
+    end function Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrap
 
     !----------------------------------------------------------------------------------------------------
     ! Update volumetric heat capacity
@@ -1072,4 +1072,4 @@ contains
 
     end subroutine Update_VolumetricHeatCapacity_Apparent_4Phase_Array
 
-end module Calculate_VHC
+end module Calculate_VolumetricHeatCapacity

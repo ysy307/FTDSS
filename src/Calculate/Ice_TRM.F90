@@ -3,12 +3,13 @@ submodule(Calculate_Ice) Calculate_Ice_TRM_Implementation
     implicit none
 
 contains
-    module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(structure)
+    module function Construct_Type_Ice_TRM(Lf, Tf, Temperature, nsize) result(structure)
         use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: Tf
         integer(int32), intent(in) :: nsize
+        type(Variables), intent(in), pointer :: Temperature
         class(Abstract_Ice), allocatable :: structure
 
         allocate (Type_Ice_TRM :: structure)
@@ -17,6 +18,7 @@ contains
         type is (Type_Ice_TRM)
             this%Lf = Lf
             this%Tf = Tf
+            this%nsize = nsize
 
             call Allocate_Array(this%Qw%old, nsize)
             call Allocate_Array(this%Qw%pre, nsize)
@@ -38,6 +40,9 @@ contains
             this%Si%old(:) = 0.0d0
             this%Si%pre(:) = 0.0d0
             this%Si%new(:) = 0.0d0
+
+            allocate (this%Temperature)
+            this%Temperature => Temperature
 
         end select
 
@@ -51,12 +56,13 @@ contains
 
     end function Construct_Type_Ice_TRM_minimum
 
-    module function Construct_Type_Ice_TRM_Pointer(Lf, Tf, nsize) result(structure)
+    module function Construct_Type_Ice_TRM_Pointer(Lf, Tf, Temperature, nsize) result(structure)
         use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: Tf
         integer(int32), intent(in) :: nsize
+        type(Variables), intent(in), pointer :: Temperature
         class(Abstract_Ice), pointer :: structure
 
         allocate (Type_Ice_TRM :: structure)
@@ -65,6 +71,7 @@ contains
         type is (Type_Ice_TRM)
             this%Lf = Lf
             this%Tf = Tf
+            this%nsize = nsize
 
             call Allocate_Array(this%Qw%old, nsize)
             call Allocate_Array(this%Qw%pre, nsize)
@@ -87,6 +94,9 @@ contains
             this%Si%pre(:) = 0.0d0
             this%Si%new(:) = 0.0d0
 
+            allocate (this%Temperature)
+            this%Temperature => Temperature
+
         end select
 
     end function Construct_Type_Ice_TRM_Pointer
@@ -99,66 +109,58 @@ contains
 
     end function Construct_Type_Ice_TRM_minimum_Pointer
 
-    module subroutine Update_Ice_TRM_scalar(self, arr_Temperature, arr_Si, rhoW, arr_Cp)
+    module subroutine Update_Ice_TRM_scalar(self, rhoW, arr_Cp)
         implicit none
         class(Type_Ice_TRM), intent(inout) :: self
-        type(Variables), intent(inout) :: arr_Temperature
-        type(Variables), intent(inout) :: arr_Si
         real(real64), intent(in) :: rhoW
         real(real64), intent(in) :: arr_Cp(:)
 
-        integer(int32) :: iN, n
+        integer(int32) :: iN
         real(real64) :: C, tmpSi
 
-        n = size(arr_Temperature%pre(:))
-
         !$omp parallel do schedule(guided) private(iN, C, tmpSi)
-        do iN = 1, n
+        do iN = 1, self%nsize
             C = arr_Cp(iN) / (self%Qw%pre(iN) * rhoW * self%Lf)
-            tmpSi = self%Si%old(iN) + C * (self%Tf - arr_Temperature%new(iN))
+            tmpSi = self%Si%old(iN) + C * (self%Tf - self%Temperature%new(iN))
 
             if (tmpSi <= 0.0d0 .and. self%Si%old(iN) == 0.0d0) then
                 self%Si%new(iN) = 0.0d0
             else if (tmpSi >= 1.0d0 .and. self%Si%old(iN) == 1.0d0) then
                 self%Si%new(iN) = 1.0d0
             else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN) <= 1.0d0) then
-                arr_Temperature%new(iN) = self%Tf
+                self%Temperature%new(iN) = self%Tf
                 self%Si%new(iN) = tmpSi
             else if (0.0d0 < self%Si%old(iN) .and. self%Si%old(iN) < 1.0d0 .and. tmpSi >= 1.0d0) then
-                arr_Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
+                self%Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
                 self%Si%new(iN) = 1.0d0
             end if
         end do
 
     end subroutine Update_Ice_TRM_scalar
 
-    module subroutine Update_Ice_TRM_array(self, arr_Temperature, arr_Si, arr_rhoW, arr_Cp)
+    module subroutine Update_Ice_TRM_array(self, arr_rhoW, arr_Cp)
         implicit none
         class(Type_Ice_TRM), intent(inout) :: self
-        type(Variables), intent(inout) :: arr_Temperature
-        type(Variables), intent(inout) :: arr_Si
         real(real64), intent(in) :: arr_rhoW(:)
         real(real64), intent(in) :: arr_Cp(:)
 
-        integer(int32) :: iN, n
+        integer(int32) :: iN
         real(real64) :: C, tmpSi
 
-        n = size(arr_Temperature%pre(:))
-
         !$omp parallel do schedule(guided) private(iN, C, tmpSi)
-        do iN = 1, n
+        do iN = 1, self%nsize
             C = arr_Cp(iN) / (self%Qw%pre(iN) * arr_rhoW(iN) * self%Lf)
-            tmpSi = self%Si%old(iN) + C * (self%Tf - arr_Temperature%new(iN))
+            tmpSi = self%Si%old(iN) + C * (self%Tf - self%Temperature%new(iN))
 
             if (tmpSi <= 0.0d0 .and. self%Si%old(iN) == 0.0d0) then
                 self%Si%new(iN) = 0.0d0
             else if (tmpSi >= 1.0d0 .and. self%Si%old(iN) == 1.0d0) then
                 self%Si%new(iN) = 1.0d0
             else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN) <= 1.0d0) then
-                arr_Temperature%new(iN) = self%Tf
+                self%Temperature%new(iN) = self%Tf
                 self%Si%new(iN) = tmpSi
             else if (0.0d0 < self%Si%old(iN) .and. self%Si%old(iN) < 1.0d0 .and. tmpSi >= 1.0d0) then
-                arr_Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
+                self%Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
                 self%Si%new(iN) = 1.0d0
             end if
         end do

@@ -83,6 +83,7 @@ contains
                                         Lf=Lf) !&
             end if
 
+            allocate (this%Qw)
             call Allocate_Array(this%Qw%old, nsize)
             call Allocate_Array(this%Qw%pre, nsize)
             call Allocate_Array(this%Qw%new, nsize)
@@ -91,6 +92,7 @@ contains
             this%Qw%pre(:) = 0.0d0
             this%Qw%new(:) = 0.0d0
 
+            allocate (this%Qice)
             call Allocate_Array(this%Qice%old, nsize)
             call Allocate_Array(this%Qice%pre, nsize)
             call Allocate_Array(this%Qice%new, nsize)
@@ -99,6 +101,7 @@ contains
             this%Qice%pre(:) = 0.0d0
             this%Qice%new(:) = 0.0d0
 
+            allocate (this%Si)
             call Allocate_Array(this%Si%old, nsize)
             call Allocate_Array(this%Si%pre, nsize)
             call Allocate_Array(this%Si%new, nsize)
@@ -107,6 +110,7 @@ contains
             this%Si%pre(:) = 0.0d0
             this%Si%new(:) = 0.0d0
 
+            allocate (this%D_Qice)
             call Allocate_Array(this%D_Qice%old, nsize)
             call Allocate_Array(this%D_Qice%pre, nsize)
             call Allocate_Array(this%D_Qice%new, nsize)
