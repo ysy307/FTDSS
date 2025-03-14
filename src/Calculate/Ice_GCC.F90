@@ -29,58 +29,58 @@ contains
         type is (Type_Ice_GCC)
             select case (ModelType)
             case (1:3)
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1) !&
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1)
             case (4)
-                if (.not. present(hcrit)) stop 'hcrit is required' !&
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1, & !&
-                                        hcrit=hcrit) !&
+                if (.not. present(hcrit)) stop 'hcrit is required'
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1, &
+                                        hcrit=hcrit)
             case (5)
-                if (.not. present(w1) .or. & !&
-                    .not. present(alpha2) .or. & !&
-                    .not. present(n2) & !&
+                if (.not. present(w1) .or. &
+                    .not. present(alpha2) .or. &
+                    .not. present(n2) &
                     ) stop 'w1, alpha2, n2 are required'
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1, & !&
-                                        w1=w1, & !&
-                                        alpha2=alpha2, & !&
-                                        n2=n2) !&
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1, &
+                                        w1=w1, &
+                                        alpha2=alpha2, &
+                                        n2=n2)
             case (6)
-                if (.not. present(w1) .or. & !&
-                    .not. present(n2) & !&
-                    ) stop 'w1, alpha2, n2 are required' !&
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1, & !&
-                                        w1=w1, & !&
-                                        n2=n2) !&
+                if (.not. present(w1) .or. &
+                    .not. present(n2) &
+                    ) stop 'w1, alpha2, n2 are required'
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1, &
+                                        w1=w1, &
+                                        n2=n2)
             case default
                 stop 'Invalid ModelType'
             end select
             if (isSegregation) then
                 if (.not. present(rhoI)) stop 'rhoI is required'
-                this%GCC = this%Set_GCC(isSegregation=isSegregation, & !&
-                                        c_unit=c_unit, & !&
-                                        Tf=Tf, & !&
-                                        Lf=Lf, & !&
-                                        rhoI=rhoI) !&
+                this%GCC = this%Set_GCC(isSegregation=isSegregation, &
+                                        c_unit=c_unit, &
+                                        Tf=Tf, &
+                                        Lf=Lf, &
+                                        rhoI=rhoI)
             else
-                this%GCC = this%Set_GCC(isSegregation=isSegregation, & !&
-                                        c_unit=c_unit, & !&
-                                        Tf=Tf, & !&
-                                        Lf=Lf) !&
+                this%GCC = this%Set_GCC(isSegregation=isSegregation, &
+                                        c_unit=c_unit, &
+                                        Tf=Tf, &
+                                        Lf=Lf)
             end if
 
             allocate (this%Qw)
@@ -137,8 +137,8 @@ contains
         type is (Type_Ice_GCC)
             this%WRF = this%Set_WRF(ModelType=ModelType)
 
-            this%GCC = this%Set_GCC(isSegregation=isSegregation, & !&
-                                        c_unit=c_unit) !&
+            this%GCC = this%Set_GCC(isSegregation=isSegregation, &
+                                    c_unit=c_unit)
         end select
 
     end function Construct_Type_Ice_GCC_minimum
@@ -173,58 +173,58 @@ contains
         type is (Type_Ice_GCC)
             select case (ModelType)
             case (1:3)
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1) !&
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1)
             case (4)
-                if (.not. present(hcrit)) stop 'hcrit is required' !&
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1, & !&
-                                        hcrit=hcrit) !&
+                if (.not. present(hcrit)) stop 'hcrit is required'
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1, &
+                                        hcrit=hcrit)
             case (5)
-                if (.not. present(w1) .or. & !&
-                    .not. present(alpha2) .or. & !&
-                    .not. present(n2) & !&
+                if (.not. present(w1) .or. &
+                    .not. present(alpha2) .or. &
+                    .not. present(n2) &
                     ) stop 'w1, alpha2, n2 are required'
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1, & !&
-                                        w1=w1, & !&
-                                        alpha2=alpha2, & !&
-                                        n2=n2) !&
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1, &
+                                        w1=w1, &
+                                        alpha2=alpha2, &
+                                        n2=n2)
             case (6)
-                if (.not. present(w1) .or. & !&
-                    .not. present(n2) & !&
-                    ) stop 'w1, alpha2, n2 are required' !&
-                this%WRF = this%Set_WRF(ModelType=ModelType, & !&
-                                        thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1, & !&
-                                        w1=w1, & !&
-                                        n2=n2) !&
+                if (.not. present(w1) .or. &
+                    .not. present(n2) &
+                    ) stop 'w1, alpha2, n2 are required'
+                this%WRF = this%Set_WRF(ModelType=ModelType, &
+                                        thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1, &
+                                        w1=w1, &
+                                        n2=n2)
             case default
                 stop 'Invalid ModelType'
             end select
             if (isSegregation) then
                 if (.not. present(rhoI)) stop 'rhoI is required'
-                this%GCC = this%Set_GCC(isSegregation=isSegregation, & !&
-                                        c_unit=c_unit, & !&
-                                        Tf=Tf, & !&
-                                        Lf=Lf, & !&
-                                        rhoI=rhoI) !&
+                this%GCC = this%Set_GCC(isSegregation=isSegregation, &
+                                        c_unit=c_unit, &
+                                        Tf=Tf, &
+                                        Lf=Lf, &
+                                        rhoI=rhoI)
             else
-                this%GCC = this%Set_GCC(isSegregation=isSegregation, & !&
-                                        c_unit=c_unit, & !&
-                                        Tf=Tf, & !&
-                                        Lf=Lf) !&
+                this%GCC = this%Set_GCC(isSegregation=isSegregation, &
+                                        c_unit=c_unit, &
+                                        Tf=Tf, &
+                                        Lf=Lf)
             end if
 
             call Allocate_Array(this%Qw%old, nsize)
@@ -277,8 +277,8 @@ contains
         type is (Type_Ice_GCC)
             this%WRF = this%Set_WRF(ModelType=ModelType)
 
-            this%GCC = this%Set_GCC(isSegregation=isSegregation, & !&
-                                        c_unit=c_unit) !&
+            this%GCC = this%Set_GCC(isSegregation=isSegregation, &
+                                    c_unit=c_unit)
         end select
 
     end function Construct_Type_Ice_GCC_minimum_Pointer
@@ -299,41 +299,41 @@ contains
         if (allocated(structure_WRF)) deallocate (structure_WRF)
         select case (ModelType)
         case (1)
-            structure_WRF = Type_WRF_BC(thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1) !&
+            structure_WRF = Type_WRF_BC(thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1)
         case (2)
-            structure_WRF = Type_WRF_VG(thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1) !&
+            structure_WRF = Type_WRF_VG(thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1)
         case (3)
-            structure_WRF = Type_WRF_KO(thetaS=thetaS, & !&
-                                        thetaR=thetaR, & !&
-                                        alpha1=alpha1, & !&
-                                        n1=n1) !&
+            structure_WRF = Type_WRF_KO(thetaS=thetaS, &
+                                        thetaR=thetaR, &
+                                        alpha1=alpha1, &
+                                        n1=n1)
         case (4)
-            structure_WRF = Type_WRF_MVG(thetaS=thetaS, & !&
-                                         thetaR=thetaR, & !&
-                                         alpha1=alpha1, & !&
-                                         n1=n1, & !&
-                                         hcrit=hcrit) !&
+            structure_WRF = Type_WRF_MVG(thetaS=thetaS, &
+                                         thetaR=thetaR, &
+                                         alpha1=alpha1, &
+                                         n1=n1, &
+                                         hcrit=hcrit)
         case (5)
-            structure_WRF = Type_WRF_Durner(thetaS=thetaS, & !&
-                                            thetaR=thetaR, & !&
-                                            alpha1=alpha1, & !&
-                                            n1=n1, & !&
-                                            w1=w1, & !&
-                                            alpha2=alpha2, & !&
-                                            n2=n2) !&
+            structure_WRF = Type_WRF_Durner(thetaS=thetaS, &
+                                            thetaR=thetaR, &
+                                            alpha1=alpha1, &
+                                            n1=n1, &
+                                            w1=w1, &
+                                            alpha2=alpha2, &
+                                            n2=n2)
         case (6)
-            structure_WRF = Type_WRF_DVGCH(thetaS=thetaS, & !&
-                                           thetaR=thetaR, & !&
-                                           alpha1=alpha1, & !&
-                                           n1=n1, & !&
-                                           w1=w1, & !&
-                                           n2=n2) !&
+            structure_WRF = Type_WRF_DVGCH(thetaS=thetaS, &
+                                           thetaR=thetaR, &
+                                           alpha1=alpha1, &
+                                           n1=n1, &
+                                           w1=w1, &
+                                           n2=n2)
         end select
 
     end function Set_Type_Ice_GCC_WRF
