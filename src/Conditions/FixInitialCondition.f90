@@ -90,18 +90,18 @@ contains
     subroutine Fix_InitialCondition_Gradient_Heat(Solver)
         implicit none
         type(SolverInfo), intent(inout) :: Solver
-        type(ILS), allocatable :: ILEQ
+        ! type(ILS), allocatable :: ILEQ
         integer(int32) :: ierr
 
-        ILEQ = ILS(Solver, Solver%Heat%LHS_A)
+        ! ILEQ = ILS(Solver, Solver%Heat%LHS_A)
 
         call Update_Parameters_Heat(Solver)
         call Assemble_GM_Heat_IC(Solver)
         call Fix_BoundaryConditions(Solver, Temperature)
 
-        call ILEQ%BiCGStab(Solver, Solver%Heat%LHS_A, Solver%Heat%Rhs, Solver%T%pre, ierr)
-        call ILEQ%Chkerr(ierr, 0.0d0)
-        deallocate (ILEQ)
+        ! call ILEQ%BiCGStab(Solver, Solver%Heat%LHS_A, Solver%Heat%Rhs, Solver%T%pre, ierr)
+        ! call ILEQ%Chkerr(ierr, 0.0d0)
+        ! deallocate (ILEQ)
     end subroutine Fix_InitialCondition_Gradient_Heat
 
     subroutine Fix_InitialCondition_Gradient_Water(Solver)

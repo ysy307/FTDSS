@@ -118,7 +118,7 @@ contains
             is = A%ptr(i)
             ie = A%ptr(i + 1) - 1
             do j = is, ie
-                vtemp = vtemp + A%val(j) * x(A%ind(j) + 1)
+                vtemp = vtemp + A%val(j) * x(A%ind(j))
             end do
             y(i) = vtemp
         end do
