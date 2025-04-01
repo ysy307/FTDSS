@@ -9,7 +9,7 @@ contains
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: Tf
         integer(int32), intent(in) :: nsize
-        type(Variables), intent(in), pointer :: Temperature
+        type(Variables), pointer :: Temperature
         class(Abstract_Ice), allocatable :: structure
 
         allocate (Type_Ice_TRM :: structure)
@@ -62,7 +62,7 @@ contains
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: Tf
         integer(int32), intent(in) :: nsize
-        type(Variables), intent(in), pointer :: Temperature
+        type(Variables), pointer :: Temperature
         class(Abstract_Ice), pointer :: structure
 
         allocate (Type_Ice_TRM :: structure)

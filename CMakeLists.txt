@@ -91,7 +91,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     # Test Target
-    add_executable(test ${PROJECT_SOURCE_DIR}/test/test_VHC.F90 ${ALL_SRC_FILES})
+    add_executable(test ${PROJECT_SOURCE_DIR}/test/test_paradiso.F90 ${ALL_SRC_FILES})
     # target_compile_options(test PUBLIC ${COMPILE_Fortran_FLAGS})
     target_link_libraries(test PUBLIC ${LINK_LIBRARIES} )
     target_include_directories(test PUBLIC ${My_INCLUDE_PATH})

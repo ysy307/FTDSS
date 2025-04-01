@@ -115,7 +115,7 @@ module Calculate_Ice
             real(real64), intent(in) :: Lf
             real(real64), intent(in) :: Tf
             integer(int32), intent(in) :: nsize
-            type(Variables), intent(in), pointer :: Temperature
+            type(Variables), pointer :: Temperature
             class(Abstract_Ice), allocatable :: structure
 
         end function Construct_Type_Ice_TRM
@@ -132,7 +132,7 @@ module Calculate_Ice
             real(real64), intent(in) :: Lf
             real(real64), intent(in) :: Tf
             integer(int32), intent(in) :: nsize
-            type(Variables), intent(in), pointer :: Temperature
+            type(Variables), pointer :: Temperature
             class(Abstract_Ice), pointer :: structure
 
         end function Construct_Type_Ice_TRM_Pointer
