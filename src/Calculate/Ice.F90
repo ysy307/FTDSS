@@ -10,10 +10,10 @@ module Calculate_Ice
 
     type, abstract :: Abstract_Ice
         integer(int32) :: nsize
-        type(Variables), pointer :: Qw
-        type(Variables), pointer :: Qice
-        type(Variables), pointer :: Si
-        type(Variables), pointer :: Temperature
+        type(Variables) :: Qw
+        type(Variables) :: Qice
+        type(Variables) :: Si
+        type(Variables) :: Temperature
     end type
 
     type, extends(Abstract_Ice) :: Type_Ice_TRM
@@ -29,7 +29,7 @@ module Calculate_Ice
     type, extends(Abstract_Ice) :: Type_Ice_GCC
         class(Abstract_WRF), allocatable :: WRF
         class(Abstract_GCC), allocatable :: GCC
-        type(Variables), pointer :: D_Qice
+        type(Variables) :: D_Qice
     contains
         procedure, nopass, private :: Set_Type_Ice_GCC_WRF
         procedure, nopass, private :: Set_Type_Ice_GCC_WRF_minimum
@@ -70,7 +70,7 @@ module Calculate_Ice
         real(real64) :: phi !! Porosity
         real(real64) :: Tf !! Freezing point
         real(real64) :: a !! power model parameter
-        type(Variables), pointer :: D_Qice
+        type(Variables) :: D_Qice
     contains
         procedure, pass(self), public :: Calculate_Ice => Calculate_Ice_EXP
         procedure, pass(self), public :: Calculate_Ice_Derivative => Calculate_Ice_EXP_Derivative_Temperature
@@ -83,19 +83,9 @@ module Calculate_Ice
         module procedure Construct_Type_Ice_TRM_minimum
     end interface
 
-    interface Type_Ice_TRM_Pointer
-        module procedure Construct_Type_Ice_TRM_Pointer
-        module procedure Construct_Type_Ice_TRM_minimum_Pointer
-    end interface
-
     interface Type_Ice_GCC
         module procedure Construct_Type_Ice_GCC
         module procedure Construct_Type_Ice_GCC_minimum
-    end interface
-
-    interface Type_Ice_GCC_Pointer
-        procedure Construct_Type_Ice_GCC_Pointer
-        procedure Construct_Type_Ice_GCC_minimum_Pointer
     end interface
 
     interface Type_Ice_EXP
@@ -103,19 +93,13 @@ module Calculate_Ice
         module procedure Construct_Type_Ice_EXP_minimum
     end interface
 
-    interface Type_Ice_EXP_Pointer
-        module procedure Construct_Type_Ice_EXP_Pointer
-        module procedure Construct_Type_Ice_EXP_minimum_Pointer
-    end interface
-
     interface
-        module function Construct_Type_Ice_TRM(Lf, Tf, Temperature, nsize) result(structure)
+        module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(structure)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
             real(real64), intent(in) :: Lf
             real(real64), intent(in) :: Tf
             integer(int32), intent(in) :: nsize
-            type(Variables), pointer :: Temperature
             class(Abstract_Ice), allocatable :: structure
 
         end function Construct_Type_Ice_TRM
@@ -125,23 +109,6 @@ module Calculate_Ice
             class(Abstract_Ice), allocatable :: structure
 
         end function Construct_Type_Ice_TRM_minimum
-
-        module function Construct_Type_Ice_TRM_Pointer(Lf, Tf, Temperature, nsize) result(structure)
-            use, intrinsic :: iso_fortran_env, only: real64
-            implicit none
-            real(real64), intent(in) :: Lf
-            real(real64), intent(in) :: Tf
-            integer(int32), intent(in) :: nsize
-            type(Variables), pointer :: Temperature
-            class(Abstract_Ice), pointer :: structure
-
-        end function Construct_Type_Ice_TRM_Pointer
-
-        module function Construct_Type_Ice_TRM_minimum_Pointer() result(structure)
-            implicit none
-            class(Abstract_Ice), pointer :: structure
-
-        end function Construct_Type_Ice_TRM_minimum_Pointer
 
         module subroutine Update_Ice_TRM_scalar(self, rhoW, arr_Cp)
             use, intrinsic :: iso_fortran_env, only: real64
@@ -192,38 +159,6 @@ module Calculate_Ice
             class(Abstract_Ice), allocatable :: construct
 
         end function Construct_Type_Ice_GCC_minimum
-
-        module function Construct_Type_Ice_GCC_Pointer(ModelType, isSegregation, c_unit, nsize, thetaS, thetaR, alpha1, n1, w1, hcrit, alpha2, n2, Tf, Lf, rhoI) result(construct)
-            implicit none
-            integer(int32), intent(in) :: ModelType
-            logical(4), intent(in) :: isSegregation
-            character(*), intent(in) :: c_unit
-            integer(int32), intent(in) :: nsize
-            real(real64), intent(in) :: thetaS
-            real(real64), intent(in) :: thetaR
-            real(real64), intent(in) :: alpha1
-            real(real64), intent(in) :: n1
-            real(real64), intent(in), optional :: w1
-            real(real64), intent(in), optional :: hcrit
-            real(real64), intent(in), optional :: alpha2
-            real(real64), intent(in), optional :: n2
-            real(real64), intent(in) :: Tf
-            real(real64), intent(in) :: Lf
-            real(real64), intent(in), optional :: rhoI
-
-            class(Abstract_Ice), pointer :: construct
-
-        end function Construct_Type_Ice_GCC_Pointer
-
-        module function Construct_Type_Ice_GCC_minimum_Pointer(ModelType, isSegregation, c_unit) result(construct)
-            implicit none
-            integer(int32), intent(in) :: ModelType
-            logical(4), intent(in) :: isSegregation
-            character(*), intent(in) :: c_unit
-
-            class(Abstract_Ice), pointer :: construct
-
-        end function Construct_Type_Ice_GCC_minimum_Pointer
 
         module function Set_Type_Ice_GCC_WRF(ModelType, thetaS, thetaR, alpha1, n1, w1, hcrit, alpha2, n2) result(structure_WRF)
             implicit none
@@ -363,14 +298,13 @@ module Calculate_Ice
             real(real64), intent(in), optional :: arr_Pw(:)
         end subroutine Update_Ice_GCC_Derivative_Temperature_rhoW_array
 
-        module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, Temperature, nsize) result(self)
+        module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, nsize) result(self)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
             real(real64), intent(in) :: Lf
             real(real64), intent(in) :: phi
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: a
-            type(Variables), intent(in), pointer :: Temperature
             integer(int32), intent(in) :: nsize
             class(Abstract_Ice), allocatable :: self
 
@@ -381,25 +315,6 @@ module Calculate_Ice
             class(Abstract_Ice), allocatable :: self
 
         end function Construct_Type_Ice_EXP_minimum
-
-        module function Construct_Type_Ice_EXP_Pointer(Lf, phi, Tf, a, Temperature, nsize) result(self)
-            use, intrinsic :: iso_fortran_env, only: real64
-            implicit none
-            real(real64), intent(in) :: Lf
-            real(real64), intent(in) :: phi
-            real(real64), intent(in) :: Tf
-            real(real64), intent(in) :: a
-            type(Variables), intent(in), pointer :: Temperature
-            integer(int32), intent(in) :: nsize
-            class(Abstract_Ice), pointer :: self
-
-        end function Construct_Type_Ice_EXP_Pointer
-
-        module function Construct_Type_Ice_EXP_minimum_Pointer() result(self)
-            implicit none
-            class(Abstract_Ice), pointer :: self
-
-        end function Construct_Type_Ice_EXP_minimum_Pointer
 
         module function Calculate_Ice_EXP(self, Temperature) result(Qice)
             use, intrinsic :: iso_fortran_env, only: real64
@@ -419,18 +334,20 @@ module Calculate_Ice
             real(real64) :: D_Qice
         end function Calculate_Ice_EXP_Derivative_Temperature
 
-        module subroutine Update_Ice_EXP(self)
+        module subroutine Update_Ice_EXP(self, arr_Temperature)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Type_Ice_EXP
             implicit none
             class(Type_Ice_EXP), intent(inout) :: self
+            real(real64), intent(in) :: arr_Temperature(:)
         end subroutine Update_Ice_EXP
 
-        module subroutine Update_Ice_EXP_Derivative_Temperature(self)
+        module subroutine Update_Ice_EXP_Derivative_Temperature(self, arr_Temperature)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Type_Ice_EXP
             implicit none
             class(Type_Ice_EXP), intent(inout) :: self
+            real(real64), intent(in) :: arr_Temperature(:)
         end subroutine Update_Ice_EXP_Derivative_Temperature
     end interface
 

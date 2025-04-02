@@ -3,13 +3,12 @@ submodule(Calculate_Ice) Calculate_Ice_TRM_Implementation
     implicit none
 
 contains
-    module function Construct_Type_Ice_TRM(Lf, Tf, Temperature, nsize) result(structure)
+    module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(structure)
         use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: Tf
         integer(int32), intent(in) :: nsize
-        type(Variables), pointer :: Temperature
         class(Abstract_Ice), allocatable :: structure
 
         allocate (Type_Ice_TRM :: structure)
@@ -40,9 +39,6 @@ contains
             this%Si%old(:) = 0.0d0
             this%Si%pre(:) = 0.0d0
             this%Si%new(:) = 0.0d0
-
-            allocate (this%Temperature)
-            this%Temperature => Temperature
 
         end select
 
@@ -55,59 +51,6 @@ contains
         allocate (Type_Ice_TRM :: structure)
 
     end function Construct_Type_Ice_TRM_minimum
-
-    module function Construct_Type_Ice_TRM_Pointer(Lf, Tf, Temperature, nsize) result(structure)
-        use :: Allocate_Allocate, only:Allocate_Array
-        implicit none
-        real(real64), intent(in) :: Lf
-        real(real64), intent(in) :: Tf
-        integer(int32), intent(in) :: nsize
-        type(Variables), pointer :: Temperature
-        class(Abstract_Ice), pointer :: structure
-
-        allocate (Type_Ice_TRM :: structure)
-
-        select type (this => structure)
-        type is (Type_Ice_TRM)
-            this%Lf = Lf
-            this%Tf = Tf
-            this%nsize = nsize
-
-            call Allocate_Array(this%Qw%old, nsize)
-            call Allocate_Array(this%Qw%pre, nsize)
-            call Allocate_Array(this%Qw%new, nsize)
-            this%Qw%old(:) = 0.0d0
-            this%Qw%pre(:) = 0.0d0
-            this%Qw%new(:) = 0.0d0
-
-            call Allocate_Array(this%Qice%old, nsize)
-            call Allocate_Array(this%Qice%pre, nsize)
-            call Allocate_Array(this%Qice%new, nsize)
-            this%Qice%old(:) = 0.0d0
-            this%Qice%pre(:) = 0.0d0
-            this%Qice%new(:) = 0.0d0
-
-            call Allocate_Array(this%Si%old, nsize)
-            call Allocate_Array(this%Si%pre, nsize)
-            call Allocate_Array(this%Si%new, nsize)
-            this%Si%old(:) = 0.0d0
-            this%Si%pre(:) = 0.0d0
-            this%Si%new(:) = 0.0d0
-
-            allocate (this%Temperature)
-            this%Temperature => Temperature
-
-        end select
-
-    end function Construct_Type_Ice_TRM_Pointer
-
-    module function Construct_Type_Ice_TRM_minimum_Pointer() result(structure)
-        implicit none
-        class(Abstract_Ice), pointer :: structure
-
-        allocate (Type_Ice_TRM :: structure)
-
-    end function Construct_Type_Ice_TRM_minimum_Pointer
 
     module subroutine Update_Ice_TRM_scalar(self, rhoW, arr_Cp)
         implicit none

@@ -1,8 +1,9 @@
 program test_Ice
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Calculate_Ice
+    ! , only:Type_Ice_GCC, Construct_Type_Ice_EXP, Abstract_Ice, Type_Ice_TRM
     implicit none
-    real(real64) :: T(501)
+    real(real64), dimension(501) :: T
     real(real64) :: Qice(size(T)), D_Qice(size(T)), rhoW(size(T)), Pw(size(T))
     integer(int32) :: i
 
@@ -84,78 +85,78 @@ program test_Ice
     case (2)
         select case (case_num)
         case (1)
-            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
-                                         isSegregation=.false., &
-                                         c_unit='m', &
-                                         nsize=nsize, &
-                                         thetaR=thetaR_BC, &
-                                         thetaS=thetaS_BC, &
-                                         alpha1=alpha1_BC, &
-                                         n1=n1_BC, &
-                                         Lf=Lf, &
-                                         Tf=Tf)
+            Ice = Type_Ice_GCC(ModelType=case_num, &
+                               isSegregation=.false., &
+                               c_unit='m', &
+                               nsize=nsize, &
+                               thetaR=thetaR_BC, &
+                               thetaS=thetaS_BC, &
+                               alpha1=alpha1_BC, &
+                               n1=n1_BC, &
+                               Lf=Lf, &
+                               Tf=Tf)
         case (2)
-            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
-                                         isSegregation=.false., &
-                                         c_unit='m', &
-                                         nsize=nsize, &
-                                         thetaS=thetaS_vG, &
-                                         thetaR=thetaR_vG, &
-                                         alpha1=alpha1_vG, &
-                                         n1=n1_vG, &
-                                         Lf=Lf, &
-                                         Tf=Tf)
+            Ice = Type_Ice_GCC(ModelType=case_num, &
+                               isSegregation=.false., &
+                               c_unit='m', &
+                               nsize=nsize, &
+                               thetaS=thetaS_vG, &
+                               thetaR=thetaR_vG, &
+                               alpha1=alpha1_vG, &
+                               n1=n1_vG, &
+                               Lf=Lf, &
+                               Tf=Tf)
         case (3)
-            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
-                                         isSegregation=.false., &
-                                         c_unit='m', &
-                                         nsize=nsize, &
-                                         thetaS=thetaS_KO, &
-                                         thetaR=thetaR_KO, &
-                                         alpha1=alpha1_KO, &
-                                         n1=n1_KO, &
-                                         Lf=Lf, &
-                                         Tf=Tf)
+            Ice = Type_Ice_GCC(ModelType=case_num, &
+                               isSegregation=.false., &
+                               c_unit='m', &
+                               nsize=nsize, &
+                               thetaS=thetaS_KO, &
+                               thetaR=thetaR_KO, &
+                               alpha1=alpha1_KO, &
+                               n1=n1_KO, &
+                               Lf=Lf, &
+                               Tf=Tf)
         case (4)
-            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
-                                         isSegregation=.false., &
-                                         c_unit='m', &
-                                         nsize=nsize, &
-                                         thetaS=thetaS_MVG, &
-                                         thetaR=thetaR_MVG, &
-                                         alpha1=alpha1_MVG, &
-                                         n1=n1_MVG, &
-                                         Lf=Lf, &
-                                         Tf=Tf, &
-                                         hcrit=theatM_MVG)
+            Ice = Type_Ice_GCC(ModelType=case_num, &
+                               isSegregation=.false., &
+                               c_unit='m', &
+                               nsize=nsize, &
+                               thetaS=thetaS_MVG, &
+                               thetaR=thetaR_MVG, &
+                               alpha1=alpha1_MVG, &
+                               n1=n1_MVG, &
+                               Lf=Lf, &
+                               Tf=Tf, &
+                               hcrit=theatM_MVG)
         case (5)
-            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
-                                         isSegregation=.false., &
-                                         c_unit='m', &
-                                         nsize=nsize, &
-                                         thetaS=thetaS_Durner, &
-                                         thetaR=thetaR_Durner, &
-                                         alpha1=alpha1_Durner, &
-                                         n1=n1_Durner, &
-                                         w1=w1_Durner, &
-                                         alpha2=alpha2_Durner, &
-                                         n2=n2_Durner, &
-                                         Lf=Lf, &
-                                         Tf=Tf)
+            Ice = Type_Ice_GCC(ModelType=case_num, &
+                               isSegregation=.false., &
+                               c_unit='m', &
+                               nsize=nsize, &
+                               thetaS=thetaS_Durner, &
+                               thetaR=thetaR_Durner, &
+                               alpha1=alpha1_Durner, &
+                               n1=n1_Durner, &
+                               w1=w1_Durner, &
+                               alpha2=alpha2_Durner, &
+                               n2=n2_Durner, &
+                               Lf=Lf, &
+                               Tf=Tf)
         case (6)
-            Ice = Construct_Type_Ice_GCC(ModelType=case_num, &
-                                         isSegregation=.false., &
-                                         c_unit='m', &
-                                         nsize=nsize, &
-                                         thetaS=thetaS_DVGCH, &
-                                         thetaR=thetaR_DVGCH, &
-                                         alpha1=alpha1_DVGCH, &
-                                         n1=n1_DVGCH, &
-                                         w1=w1_DVGCH, &
-                                         alpha2=alpha2_DVGCH, &
-                                         n2=n2_DVGCH, &
-                                         Lf=Lf, &
-                                         Tf=Tf)
+            Ice = Type_Ice_GCC(ModelType=case_num, &
+                               isSegregation=.false., &
+                               c_unit='m', &
+                               nsize=nsize, &
+                               thetaS=thetaS_DVGCH, &
+                               thetaR=thetaR_DVGCH, &
+                               alpha1=alpha1_DVGCH, &
+                               n1=n1_DVGCH, &
+                               w1=w1_DVGCH, &
+                               alpha2=alpha2_DVGCH, &
+                               n2=n2_DVGCH, &
+                               Lf=Lf, &
+                               Tf=Tf)
         end select
 
         select type (tI => Ice)
@@ -169,7 +170,7 @@ program test_Ice
 
         end select
     case (3)
-        Ice = Construct_Type_Ice_EXP(EXP_phi, Tf, EXP_a, nsize)
+        Ice = Type_Ice_EXP(Lf, EXP_phi, Tf, EXP_a, nsize)
         select type (tI => Ice)
         type is (Type_Ice_EXP)
             call tI%Update_Ice(T)

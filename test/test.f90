@@ -8,12 +8,12 @@ program test
     use :: Calculate_Area
     use :: Calculate_Shape
     use :: Calculate_Observation
-    use :: Condition_FixInitialCondition
-    use :: Condition_FixBoundaryCondition
+    ! use :: Condition_FixInitialCondition
+    ! use :: Condition_FixBoundaryCondition
     use :: Calculate_Update
     use :: Matrix_Assemble
     use :: error
-    use :: Matrix_ConvertCRS
+    ! use :: Matrix_ConvertCRS
     ! use :: Calculate_TRM, only:TRMethod
     use :: Solver_Solve
     ! use :: Inout_Stdout
@@ -30,8 +30,8 @@ program test
     ! type(IO) :: Inout
 
     type(CRS) :: CTop
-    type(ILS) :: ILEQ
-    type(DLS) :: DLEQ
+    ! type(ILS) :: ILEQ
+    ! type(DLS) :: DLEQ
     ! type(Input) :: Inputs
     ! type(Output) :: Outputs
     ! type(Class_Solver) ::
@@ -47,21 +47,6 @@ program test
     real(real64) :: pts, pte, ts, te, dt, tst, tst_old, its, otst, conv_time_out, dt_max, dt_min, outtst
     ! real(real64) :: lis_sum_time, lis_sum_itime, lis_sum_ptime
     real(real64) :: sdts, sdte
-
-#ifdef _MPI
-    call MPI_Init(ierr)
-    call MPI_Comm_size(MPI_COMM_WORLD, Solver%MPI%size, ierr)
-    call MPI_Comm_rank(MPI_COMM_WORLD, Solver%MPI%rank, ierr)
-
-    write (*, *) "MPI size: ", Solver%MPI%size
-    write (*, *) "MPI rank: ", Solver%MPI%rank
-    call MPI_Barrier(MPI_COMM_WORLD, ierr)
-#endif
-
-#ifdef _OPENMP
-    pts = omp_get_wtime()
-    ! call init_omp_config(Solver)
-#endif
 
     ! Inputs = Input()
     ! ! Outputs = Output(Inputs)

@@ -65,7 +65,6 @@ module Types
     end type Phases
 
     type :: Shape
-        sequence
         real(real64), allocatable :: a(:, :), b(:, :), c(:, :), d(:, :)
     end type Shape
 

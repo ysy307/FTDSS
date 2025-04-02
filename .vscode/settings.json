@@ -11,7 +11,8 @@
         "*.FOR": "FortranFreeForm",
         "*.f95": "FortranFreeForm",
         "*.f03": "FortranFreeForm",
-        "*.f90": "FortranFreeForm"
+        "*.f90": "FortranFreeForm",
+        "*.F90": "FortranFreeForm"
     },
     "fortran.fortls.path": "/usr/local/bin/fortls",
     "fortran.linter.extraArgs": [
@@ -22,6 +23,8 @@
         "/opt/intel/oneapi/mpi/2021.14/include/mpi",
         "-module",
         "/opt/intel/oneapi/2025.0/include/mpi",
+        "-module",
+        "/workspaces/FTDSS/EXTERNAL/fortran_stdlib/include/fortran_stdlib/IntelLLVM-2025.0.4",
         "-D_MKL"
     ],
     "fortran.linter.compiler": "ifx",

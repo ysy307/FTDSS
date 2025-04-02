@@ -1,5 +1,5 @@
 module Inout_Input
-!     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+    use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
 !     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
 !     use :: error
 !     use :: Allocate_Allocate
@@ -8,7 +8,7 @@ module Inout_Input
 !     ! use :: tomlf
 !     use :: json_module, only:json_file
 !     use :: Inout_VTK
-!     implicit none
+    implicit none
 !     private
 
 !     integer(int32), parameter :: min_calculation_type = 1, max_calculation_type = 7
@@ -104,7 +104,34 @@ module Inout_Input
 ! #ifdef _MPI
 !     integer(int32), parameter :: root = 0
 ! #endif
-
+    type :: Input_Ice
+        !***********************************************************************
+        integer(int32) :: QiceType
+        real(real64) :: Lf
+        real(real64) :: Tf
+        integer(int32) :: nsize
+        !***********************************************************************
+        ! GCC optional parameters
+        !***********************************************************************
+        integer(int32) :: ModelType
+        logical(4) :: isSegregation
+        character(:), allocatable :: c_unit
+        real(real64) :: thetaS
+        real(real64) :: thetaR
+        real(real64) :: alpha1
+        real(real64) :: n1
+        real(real64) :: w1
+        real(real64) :: hcrit
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: rhoI
+        !***********************************************************************
+        ! EXP optional parameters
+        !***********************************************************************
+        real(real64) :: phi
+        real(real64) :: a
+        !***********************************************************************
+    end type Input_Ice
 !     public :: Input
 
 !     type :: Input

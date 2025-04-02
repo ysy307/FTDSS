@@ -83,7 +83,6 @@ contains
                                         Lf=Lf)
             end if
 
-            allocate (this%Qw)
             call Allocate_Array(this%Qw%old, nsize)
             call Allocate_Array(this%Qw%pre, nsize)
             call Allocate_Array(this%Qw%new, nsize)
@@ -92,7 +91,6 @@ contains
             this%Qw%pre(:) = 0.0d0
             this%Qw%new(:) = 0.0d0
 
-            allocate (this%Qice)
             call Allocate_Array(this%Qice%old, nsize)
             call Allocate_Array(this%Qice%pre, nsize)
             call Allocate_Array(this%Qice%new, nsize)
@@ -101,7 +99,6 @@ contains
             this%Qice%pre(:) = 0.0d0
             this%Qice%new(:) = 0.0d0
 
-            allocate (this%Si)
             call Allocate_Array(this%Si%old, nsize)
             call Allocate_Array(this%Si%pre, nsize)
             call Allocate_Array(this%Si%new, nsize)
@@ -110,7 +107,6 @@ contains
             this%Si%pre(:) = 0.0d0
             this%Si%new(:) = 0.0d0
 
-            allocate (this%D_Qice)
             call Allocate_Array(this%D_Qice%old, nsize)
             call Allocate_Array(this%D_Qice%pre, nsize)
             call Allocate_Array(this%D_Qice%new, nsize)
@@ -142,146 +138,6 @@ contains
         end select
 
     end function Construct_Type_Ice_GCC_minimum
-
-    module function Construct_Type_Ice_GCC_Pointer(ModelType, isSegregation, c_unit, nsize, thetaS, thetaR, alpha1, n1, w1, hcrit, alpha2, n2, Tf, Lf, rhoI) result(construct)
-        use :: Allocate_Allocate, only:Allocate_Array
-        implicit none
-        integer(int32), intent(in) :: ModelType
-        logical(4), intent(in) :: isSegregation
-        character(*), intent(in) :: c_unit
-        integer(int32), intent(in) :: nsize
-        real(real64), intent(in) :: thetaS
-        real(real64), intent(in) :: thetaR
-        real(real64), intent(in) :: alpha1
-        real(real64), intent(in) :: n1
-        real(real64), intent(in), optional :: w1
-        real(real64), intent(in), optional :: hcrit
-        real(real64), intent(in), optional :: alpha2
-        real(real64), intent(in), optional :: n2
-        real(real64), intent(in) :: Tf
-        real(real64), intent(in) :: Lf
-        real(real64), intent(in), optional :: rhoI
-
-        class(Abstract_Ice), pointer :: construct
-
-        allocate (Type_Ice_GCC :: construct)
-        if (.not. associated(construct)) then
-            stop "construct was not properly allocated"
-        end if
-
-        select type (this => construct)
-        type is (Type_Ice_GCC)
-            select case (ModelType)
-            case (1:3)
-                this%WRF = this%Set_WRF(ModelType=ModelType, &
-                                        thetaS=thetaS, &
-                                        thetaR=thetaR, &
-                                        alpha1=alpha1, &
-                                        n1=n1)
-            case (4)
-                if (.not. present(hcrit)) stop 'hcrit is required'
-                this%WRF = this%Set_WRF(ModelType=ModelType, &
-                                        thetaS=thetaS, &
-                                        thetaR=thetaR, &
-                                        alpha1=alpha1, &
-                                        n1=n1, &
-                                        hcrit=hcrit)
-            case (5)
-                if (.not. present(w1) .or. &
-                    .not. present(alpha2) .or. &
-                    .not. present(n2) &
-                    ) stop 'w1, alpha2, n2 are required'
-                this%WRF = this%Set_WRF(ModelType=ModelType, &
-                                        thetaS=thetaS, &
-                                        thetaR=thetaR, &
-                                        alpha1=alpha1, &
-                                        n1=n1, &
-                                        w1=w1, &
-                                        alpha2=alpha2, &
-                                        n2=n2)
-            case (6)
-                if (.not. present(w1) .or. &
-                    .not. present(n2) &
-                    ) stop 'w1, alpha2, n2 are required'
-                this%WRF = this%Set_WRF(ModelType=ModelType, &
-                                        thetaS=thetaS, &
-                                        thetaR=thetaR, &
-                                        alpha1=alpha1, &
-                                        n1=n1, &
-                                        w1=w1, &
-                                        n2=n2)
-            case default
-                stop 'Invalid ModelType'
-            end select
-            if (isSegregation) then
-                if (.not. present(rhoI)) stop 'rhoI is required'
-                this%GCC = this%Set_GCC(isSegregation=isSegregation, &
-                                        c_unit=c_unit, &
-                                        Tf=Tf, &
-                                        Lf=Lf, &
-                                        rhoI=rhoI)
-            else
-                this%GCC = this%Set_GCC(isSegregation=isSegregation, &
-                                        c_unit=c_unit, &
-                                        Tf=Tf, &
-                                        Lf=Lf)
-            end if
-
-            call Allocate_Array(this%Qw%old, nsize)
-            call Allocate_Array(this%Qw%pre, nsize)
-            call Allocate_Array(this%Qw%new, nsize)
-
-            this%Qw%old(:) = 0.0d0
-            this%Qw%pre(:) = 0.0d0
-            this%Qw%new(:) = 0.0d0
-
-            call Allocate_Array(this%Qice%old, nsize)
-            call Allocate_Array(this%Qice%pre, nsize)
-            call Allocate_Array(this%Qice%new, nsize)
-
-            this%Qice%old(:) = 0.0d0
-            this%Qice%pre(:) = 0.0d0
-            this%Qice%new(:) = 0.0d0
-
-            call Allocate_Array(this%Si%old, nsize)
-            call Allocate_Array(this%Si%pre, nsize)
-            call Allocate_Array(this%Si%new, nsize)
-
-            this%Si%old(:) = 0.0d0
-            this%Si%pre(:) = 0.0d0
-            this%Si%new(:) = 0.0d0
-
-            call Allocate_Array(this%D_Qice%old, nsize)
-            call Allocate_Array(this%D_Qice%pre, nsize)
-            call Allocate_Array(this%D_Qice%new, nsize)
-
-            this%D_Qice%old(:) = 0.0d0
-            this%D_Qice%pre(:) = 0.0d0
-            this%D_Qice%new(:) = 0.0d0
-
-        end select
-
-    end function Construct_Type_Ice_GCC_Pointer
-
-    module function Construct_Type_Ice_GCC_minimum_Pointer(ModelType, isSegregation, c_unit) result(construct)
-        implicit none
-        integer(int32), intent(in) :: ModelType
-        logical(4), intent(in) :: isSegregation
-        character(*), intent(in) :: c_unit
-
-        class(Abstract_Ice), pointer :: construct
-
-        allocate (Type_Ice_GCC :: construct)
-
-        select type (this => construct)
-        type is (Type_Ice_GCC)
-            this%WRF = this%Set_WRF(ModelType=ModelType)
-
-            this%GCC = this%Set_GCC(isSegregation=isSegregation, &
-                                    c_unit=c_unit)
-        end select
-
-    end function Construct_Type_Ice_GCC_minimum_Pointer
 
     module function Set_Type_Ice_GCC_WRF(ModelType, thetaS, thetaR, alpha1, n1, w1, hcrit, alpha2, n2) result(structure_WRF)
         implicit none

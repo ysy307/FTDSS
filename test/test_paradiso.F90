@@ -2,7 +2,7 @@ program pardiso_example
     use, intrinsic :: iso_fortran_env, only: real64, int64, int32
     use :: Solver_Solve
     use :: Matrix_CRS
-    ! implicit none
+    implicit none
     integer(int32) :: N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGLVL, ERROR
     integer(int32) :: nnz
     real(real64), allocatable :: B(:), X(:)
