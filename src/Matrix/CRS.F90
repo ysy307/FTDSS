@@ -13,6 +13,8 @@ module Matrix_CRS
         integer(int32), allocatable :: Ptr(:) !! pointer to the start of each row
         integer(int32), allocatable :: Ind(:) !! index of the non-zero elements
         real(real64), allocatable :: Val(:) !! values of the non-zero elements
+    contains
+        procedure, public, pass(self) :: Find => Find_CRS_Location
     end type Type_CRS
 
     public :: operator(*)
@@ -124,6 +126,28 @@ contains
         end do
         !$omp end parallel do
     end function Matrix_Vector_Product_CRS
+
+    subroutine Find_CRS_Location(self, serch_column, serch_index, index)
+        implicit none
+        class(Type_CRS) :: self
+        integer(int32), intent(in) :: serch_column, serch_index
+        integer(int32), intent(inout) :: index
+        integer(int32) :: i, start_index, end_index
+
+        index = 0
+        ! serch_columnのindex範囲を取得
+        start_index = self%Ptr(serch_column)
+        end_index = self%Ptr(serch_column + 1) - 1
+
+        ! 範囲内でserch_indexになる値のインデックスを見つける
+        do i = start_index, end_index
+            if (self%Ind(i) == serch_index) then
+                index = i
+                exit
+            end if
+        end do
+
+    end subroutine Find_CRS_Location
 
     function Matrix_Multiplication_CRS(A, B) result(C)
         !* Matrix-Matrix Product in CRS format
