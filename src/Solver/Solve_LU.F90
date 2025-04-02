@@ -16,18 +16,17 @@ contains
         class(Abstract_Solver_CRS), allocatable :: structure
 
         integer(int32) :: i
-        integer :: converter
 
         allocate (Solver_CRS_LU :: structure)
         select type (this => structure)
         type is (Solver_CRS_LU)
-            this%N = transfer(N, converter)
-            this%MAXFCT = transfer(MAXFCT, converter)
-            this%MNUM = transfer(MNUM, converter)
-            this%MTYPE = transfer(MTYPE, converter)
-            this%PHASE = transfer(PHASE, converter)
-            this%NRHS = transfer(NRHS, converter)
-            this%MSGLVL = transfer(MSGVLV, converter)
+            this%N = transfer(N, this%N)
+            this%MAXFCT = transfer(MAXFCT, this%MAXFCT)
+            this%MNUM = transfer(MNUM, this%MNUM)
+            this%MTYPE = transfer(MTYPE, this%MTYPE)
+            this%PHASE = transfer(PHASE, this%PHASE)
+            this%NRHS = transfer(NRHS, this%NRHS)
+            this%MSGLVL = transfer(MSGVLV, this%MSGLVL)
             allocate (this%PT(64))
             allocate (this%IPARM(64))
             allocate (this%PERM(N))
@@ -35,10 +34,10 @@ contains
             allocate (this%IA(N + 1))
 
             do i = 1, A%nnz
-                this%JA(i) = transfer(A%Ind(i), converter)
+                this%JA(i) = transfer(A%Ind(i), this%JA(i))
             end do
             do i = 1, N + 1
-                this%IA(i) = transfer(A%Ptr(i), converter)
+                this%IA(i) = transfer(A%Ptr(i), this%IA(i))
             end do
         end select
 
@@ -69,5 +68,55 @@ contains
         end if
 
     end subroutine Check_CRS_LU
+
+    module function Solver_Full_LU_Constructor(N) result(structure)
+        implicit none
+        integer(int32), intent(in) :: N
+
+        class(Abstract_Solver_Full), allocatable :: structure
+
+        allocate (Solver_Full_LU :: structure)
+        select type (this => structure)
+        type is (Solver_Full_LU)
+            this%N = transfer(N, this%N)
+            allocate (this%IPIV(this%N))
+        end select
+
+    end function Solver_Full_LU_Constructor
+
+    module subroutine Solve_Full_LU(self, A, b, x, status)
+        implicit none
+        class(Solver_Full_LU) :: self
+        real(real64), intent(in) :: A(:, :)
+        real(real64), intent(inout) :: b(:)
+        real(real64), intent(inout) :: x(:)
+        integer(int32), intent(inout) :: status
+
+        !* LU decomposition
+        call Dgetrf(self%N, self%N, A, self%N, self%IPIV, self%ERROR)
+        if (self%ERROR /= 0) call error_message(942)
+
+        !* solve linear equation
+        call Dgetrs('N', self%N, 1, A, self%N, self%IPIV, b, self%N, self%ERROR)
+        if (self%ERROR /= 0) call error_message(943)
+
+        x(:) = b(:)
+
+        status = transfer(self%ERROR, status)
+
+    end subroutine Solve_Full_LU
+
+    module subroutine Check_Full_LU(self, status, time)
+        implicit none
+        class(Solver_Full_LU) :: self
+        integer(int32), intent(in) :: status
+        real(real64), intent(in) :: time
+
+        if (status /= 0) then
+            print *, 'LU 解法エラー'
+            stop
+        end if
+
+    end subroutine Check_Full_LU
 
 end submodule Solver_Solve_LU_Implementation

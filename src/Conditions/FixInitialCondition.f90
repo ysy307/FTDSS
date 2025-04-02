@@ -107,7 +107,7 @@ contains
     subroutine Fix_InitialCondition_Gradient_Water(Solver)
         implicit none
         type(SolverInfo), intent(inout) :: Solver
-        type(DLS) :: DLEQ
+        ! type(DLS) :: DLEQ
 
         Solver%Si%old(:) = Solver%Si%pre(:)
         Solver%Si%pre(:) = 0.0d0
@@ -116,8 +116,8 @@ contains
         call Assemble_GM_Water_IC(Solver)
         call Fix_BoundaryConditions(Solver, Pressure)
 
-        DLEQ = DLS(Solver)
-        call DLEQ%LU(Solver%Water%RA, Solver%Water%Rhs, Solver%P%pre)
+        ! DLEQ = DLS(Solver)
+        ! call DLEQ%LU(Solver%Water%RA, Solver%Water%Rhs, Solver%P%pre)
 
     end subroutine Fix_InitialCondition_Gradient_Water
 

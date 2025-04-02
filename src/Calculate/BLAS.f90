@@ -7,8 +7,9 @@ module Calculate_BLAS
     private
 #ifdef _MKL
     include "mkl_blas.fi"
-#endif
+
     integer :: converter
+#endif
 
     public :: norm_2
     public :: dot

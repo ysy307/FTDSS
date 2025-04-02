@@ -2,13 +2,16 @@ program pardiso_example
     use, intrinsic :: iso_fortran_env, only: real64, int64, int32
     use :: Solver_Solve
     use :: Matrix_CRS
-    implicit none
+    ! implicit none
     integer(int32) :: N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGLVL, ERROR
     integer(int32) :: nnz
     real(real64), allocatable :: B(:), X(:)
+    real(real64), allocatable :: BF(:), XF(:)
+    real(real64), allocatable :: AF(:, :)
 
     type(Type_CRS) :: A_CRS
-    class(Abstract_Solver_CRS), allocatable :: solver
+    class(Abstract_Solver_CRS), allocatable :: solver, solver_2
+    class(Abstract_Solver_Full), allocatable :: solver_3
     integer(int32) :: status
     real(real64), allocatable :: bb(:)
     real(real64), allocatable :: xx(:)
@@ -46,14 +49,33 @@ program pardiso_example
     print *, '解ベクトル X:'
     print *, X
 
-    deallocate (solver)
+    ! deallocate (solver)
 
-    solver = Solver_CRS_BiCGSTAB_Constructor(5, 1.0d-6, 1000, 1)
+    solver_2 = solver_CRS_BiCGSTAB_Constructor(5, 1.0d-6, 1000, 1)
 
-    call solver%Solve(A_CRS, bb, xx, status)
-    call solver%Check(status, 0.0d0)
+    call solver_2%Solve(A_CRS, bb, xx, status)
+    call solver_2%Check(status, 0.0d0)
 
     print *, '解ベクトル X:'
     print *, xx
+
+    solver_3 = Solver_Full_LU_Constructor(N)
+
+    allocate (AF(N, N))
+    allocate (BF(N))
+    allocate (XF(N))
+    ! AF(:, :) = 0.0d0
+    AF(1, :) = [4.0d0, -1.0d0, 0.0d0, 0.0d0, -1.0d0]
+    AF(2, :) = [-1.0d0, 4.0d0, -1.0d0, 0.0d0, 0.0d0]
+    AF(3, :) = [0.0d0, -1.0d0, 4.0d0, -1.0d0, 0.0d0]
+    AF(4, :) = [0.0d0, 0.0d0, -1.0d0, 4.0d0, -1.0d0]
+    AF(5, :) = [-1.0d0, 0.0d0, 0.0d0, -1.0d0, 4.0d0]
+
+    BF(:) = [15.0d0, 10.0d0, 10.0d0, 10.0d0, 15.0d0]
+    XF(:) = 0.0d0
+    call solver_3%Solve(AF, BF, XF, status)
+    call solver_3%Check(status, 0.0d0)
+    print *, '解ベクトル X:'
+    print *, XF
 
 end program pardiso_example
