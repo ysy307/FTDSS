@@ -56,7 +56,7 @@ list(APPEND LINK_LIBRARIES fortran_stdlib::fortran_stdlib)
 message(STATUS "Fortran Compiler ID: ${CMAKE_Fortran_COMPILER_ID}")
 
 set(MAIN_FILE "${PROJECT_SOURCE_DIR}/app/ysy_fc.F90")
-set(TEST_FILE "${PROJECT_SOURCE_DIR}/test/test_Ice.F90")
+set(TEST_FILE "${PROJECT_SOURCE_DIR}/test/test.F90")
 
 # Build Targets
 if(BUILD_APP STREQUAL "ysy_fc")

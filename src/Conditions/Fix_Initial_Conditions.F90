@@ -1,4 +1,4 @@
-module Condition_FixInitialCondition
+module Fix_Initial_Conditions
     use, intrinsic :: iso_fortran_env, only: int32, real64
     ! use :: Types, g => GravityAcceleration
     ! use :: Allocate_Allocate, only:Duplicate_CRS
@@ -171,4 +171,4 @@ contains
 
     !     if (Solver%Flags%isStdOut) write (*, '(a)') "Set initial value of Freezing rate."
     ! end subroutine Fix_InitialCondition_FreezingRate
-end module Condition_FixInitialCondition
+end module Fix_Initial_Conditions
