@@ -1,13 +1,13 @@
 module Inout_Input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
-!     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
-!     use :: error
+    use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
+    use :: error
 !     use :: Allocate_Allocate
 !     use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type, Allocate_Structure_Hydraulic_Type
-!     use :: Types
+    use :: Types
 !     ! use :: tomlf
 !     use :: json_module, only:json_file
-!     use :: Inout_VTK
+    use :: Inout_VTK
     implicit none
 !     private
 
@@ -98,8 +98,8 @@ module Inout_Input
 !     character(*), parameter :: NoneName = "None"
 !     character(*), parameter :: HeatTransferName = "HeatTransfer"
 
-!     !! Positive NaN
-!     real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
+    !! Positive NaN
+    real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
 
 ! #ifdef _MPI
 !     integer(int32), parameter :: root = 0
@@ -107,9 +107,6 @@ module Inout_Input
     type :: Input_Ice
         !***********************************************************************
         integer(int32) :: QiceType
-        real(real64) :: Lf
-        real(real64) :: Tf
-        integer(int32) :: nsize
         !***********************************************************************
         ! GCC optional parameters
         !***********************************************************************
@@ -132,11 +129,19 @@ module Inout_Input
         real(real64) :: a
         !***********************************************************************
     end type Input_Ice
-!     public :: Input
 
-!     type :: Input
+    type :: Input_Thermal
+        real(real64), allocatable :: Cp(:)
+        real(real64), allocatable :: c(:)
+        real(real64), allocatable :: rho(:)
+        real(real64), allocatable :: lambda(:)
+    end type Input_Thermal
+
+    type :: Type_Input
 !         private
-!         character(256) :: Basic_FileName, Conditions_FileName, Geometry_FileName
+        character(256) :: Basic_FileName
+        character(256) :: Conditions_FileName
+        character(256) :: Geometry_FileName
 !         ! character(256) :: Basic_FileName, COO_FileName, BC_FileName, Obs_FileName, ObsFlag_FileName, Top_FileName, IC_FileName
 
 !         ! Basic.in
@@ -144,13 +149,13 @@ module Inout_Input
 !         type(Basic_params) :: Basic
 !         type(Type_Region), allocatable :: Regions(:)
 !         type(Type_Solver) :: Solver
-!         type(Type_VTK) :: VTK
+        type(Type_VTK) :: VTK
 !         type(Type_Conditions) :: Conditions
 
-!     contains
+    contains
 
 !         procedure :: Input_Parameters => Inout_Input_Parameters_JSON
-!         procedure :: Input_Geometry => Inout_Input_Geometry_VTK
+        procedure :: Input_Geometry => Inout_Input_Geometry_VTK
 !         procedure :: Input_Conditions => Inout_Input_Conditions_JSON
 
 !         procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
@@ -166,62 +171,62 @@ module Inout_Input
 
 !         ! final :: Inout_Input_Finalize
 
-!     end type Input
+    end type Type_Input
 
-!     interface Input
-!         module procedure Input_Constructor
-!     end interface
+    interface Type_Input
+        module procedure Input_Constructor
+    end interface
 
-!     interface Inout_Input_Connect_dot
-!         procedure :: Inout_Input_Connect_dot_2
-!         procedure :: Inout_Input_Connect_dot_3
-!         procedure :: Inout_Input_Connect_dot_4
-!         procedure :: Inout_Input_Connect_dot_5
-!         procedure :: Inout_Input_Connect_dot_6
-!     end interface
+    interface Inout_Input_Connect_dot
+        procedure :: Inout_Input_Connect_dot_2
+        procedure :: Inout_Input_Connect_dot_3
+        procedure :: Inout_Input_Connect_dot_4
+        procedure :: Inout_Input_Connect_dot_5
+        procedure :: Inout_Input_Connect_dot_6
+    end interface
 
-! contains
+contains
 
-!     type(Input) function Input_Constructor
-!         implicit none
-!         character(256) :: dir_Path ! Path to the project directory
-!         integer(int32) :: access ! File access status
-!         integer(int32) :: status ! File access status
-!         logical(4) :: exists ! File existence status
-!         character(256) :: access_mode
+    type(Type_Input) function Input_Constructor
+        implicit none
+        character(256) :: dir_Path ! Path to the project directory
+        integer(int32) :: access ! File access status
+        integer(int32) :: status ! File access status
+        logical(4) :: exists ! File existence status
+        character(256) :: access_mode
 
-!         ! Path settings
-!         dir_Path = GetProjectPath()
+        ! Path settings
+        dir_Path = GetProjectPath()
 
-!         inquire (DIRECTORY=trim(adjustl(dir_Path))//"Input/", exist=exists)
+        inquire (DIRECTORY=trim(adjustl(dir_Path))//"Input/", exist=exists)
 
-!         Input_Constructor%Basic_FileName = trim(adjustl(dir_Path))//"Input/Basic.json"
-!         Input_Constructor%Conditions_FileName = trim(adjustl(dir_Path))//"Input/Conditions.json"
-!         Input_Constructor%Geometry_FileName = trim(adjustl(dir_Path))//"Input/Geometry.vtk"
+        Input_Constructor%Basic_FileName = trim(adjustl(dir_Path))//"Input/Basic.json"
+        Input_Constructor%Conditions_FileName = trim(adjustl(dir_Path))//"Input/Conditions.json"
+        Input_Constructor%Geometry_FileName = trim(adjustl(dir_Path))//"Input/Geometry.vtk"
 !         ! Input_Constructor%IC_FileName = trim(adjustl(dir_Path))//"Input/IC.in"
 !         ! Input_Constructor%Obs_FileName = trim(adjustl(dir_Path))//"Input/Obs.in"
 !         ! Input_Constructor%ObsFlag_FileName = trim(adjustl(dir_Path))//"Input/printobs.in"
 !         ! Input_Constructor%Top_FileName = trim(adjustl(dir_Path))//"Input/top.in"
 !         ! Input_Constructor%COO_FileName = trim(adjustl(dir_Path))//"Input/coordinate.in"
 
-!         ! Check the existence of the file
-!         inquire (file=Input_Constructor%Basic_FileName, exist=exists)
-!         if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Basic_FileName)
+        ! Check the existence of the file
+        inquire (file=Input_Constructor%Basic_FileName, exist=exists)
+        if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Basic_FileName)
 
-!         inquire (file=Input_Constructor%Conditions_FileName, exist=exists)
-!         if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Conditions_FileName)
+        inquire (file=Input_Constructor%Conditions_FileName, exist=exists)
+        if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Conditions_FileName)
 
-!         inquire (file=Input_Constructor%Geometry_FileName, exist=exists)
-!         if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Geometry_FileName)
+        inquire (file=Input_Constructor%Geometry_FileName, exist=exists)
+        if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Geometry_FileName)
 
 !         call Input_Constructor%Input_Parameters()
-!         call Input_Constructor%Input_Geometry()
+        call Input_Constructor%Input_Geometry()
 !         call Input_Constructor%Input_Conditions()
 !         ! call Input_Constructor%Input_IC()
 !         ! call Input_Constructor%Input_Observation()
 !         ! call Input_Constructor%Input_Flags()
 
-!     end function Input_Constructor
+    end function Input_Constructor
 
 !     subroutine Inout_Input_Parameters_JSON(self)
 !         !< Load the input parameters from the JSON file
@@ -1220,13 +1225,13 @@ module Inout_Input
 
 !     end subroutine Inout_Input_Conditions_JSON_IC
 
-!     subroutine Inout_Input_Geometry_VTK(self)
-!         !> Load the geometry from the VTK file
-!         implicit none
-!         class(Input) :: self
+    subroutine Inout_Input_Geometry_VTK(self)
+        !> Load the geometry from the VTK file
+        implicit none
+        class(Type_Input) :: self
 
-!         call Inout_VTK_Read(self%Geometry_FileName, self%VTK)
-!     end subroutine Inout_Input_Geometry_VTK
+        call Inout_VTK_Read(self%Geometry_FileName, self%VTK)
+    end subroutine Inout_Input_Geometry_VTK
 
 !     ! subroutine Inout_Input_Finalize(self)
 !     !     implicit none
@@ -1636,68 +1641,68 @@ module Inout_Input
 
 !     end subroutine Inout_Input_Get_int32_rank2
 
-!     function Inout_Input_Connect_dot_2(c1, c2) result(key)
-!         !> connect two strings with dot
-!         implicit none
-!         character(*), intent(in) :: c1 !! First string
-!         character(*), intent(in) :: c2 !! Second string
-!         character(:), allocatable :: key
+    function Inout_Input_Connect_dot_2(c1, c2) result(key)
+        !> connect two strings with dot
+        implicit none
+        character(*), intent(in) :: c1 !! First string
+        character(*), intent(in) :: c2 !! Second string
+        character(:), allocatable :: key
 
-!         key = trim(adjustl(c1))//"."//trim(adjustl(c2))
+        key = trim(adjustl(c1))//"."//trim(adjustl(c2))
 
-!     end function Inout_Input_Connect_dot_2
+    end function Inout_Input_Connect_dot_2
 
-!     function Inout_Input_Connect_dot_3(c1, c2, c3) result(key)
-!         !> connect three strings with dot
-!         implicit none
-!         character(*), intent(in) :: c1 !! First string
-!         character(*), intent(in) :: c2 !! Second string
-!         character(*), intent(in) :: c3 !! Third string
-!         character(:), allocatable :: key
+    function Inout_Input_Connect_dot_3(c1, c2, c3) result(key)
+        !> connect three strings with dot
+        implicit none
+        character(*), intent(in) :: c1 !! First string
+        character(*), intent(in) :: c2 !! Second string
+        character(*), intent(in) :: c3 !! Third string
+        character(:), allocatable :: key
 
-!         key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))
+        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))
 
-!     end function Inout_Input_Connect_dot_3
+    end function Inout_Input_Connect_dot_3
 
-!     function Inout_Input_Connect_dot_4(c1, c2, c3, c4) result(key)
-!         !> connect four strings with dot
-!         implicit none
-!         character(*), intent(in) :: c1 !! First string
-!         character(*), intent(in) :: c2 !! Second string
-!         character(*), intent(in) :: c3 !! Third string
-!         character(*), intent(in) :: c4 !! Fourth string
-!         character(:), allocatable :: key
+    function Inout_Input_Connect_dot_4(c1, c2, c3, c4) result(key)
+        !> connect four strings with dot
+        implicit none
+        character(*), intent(in) :: c1 !! First string
+        character(*), intent(in) :: c2 !! Second string
+        character(*), intent(in) :: c3 !! Third string
+        character(*), intent(in) :: c4 !! Fourth string
+        character(:), allocatable :: key
 
-!         key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))
+        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))
 
-!     end function Inout_Input_Connect_dot_4
+    end function Inout_Input_Connect_dot_4
 
-!     function Inout_Input_Connect_dot_5(c1, c2, c3, c4, c5) result(key)
-!         !> connect five strings with dot
-!         implicit none
-!         character(*), intent(in) :: c1 !! First string
-!         character(*), intent(in) :: c2 !! Second string
-!         character(*), intent(in) :: c3 !! Third string
-!         character(*), intent(in) :: c4 !! Fourth string
-!         character(*), intent(in) :: c5 !! Fifth string
-!         character(:), allocatable :: key
+    function Inout_Input_Connect_dot_5(c1, c2, c3, c4, c5) result(key)
+        !> connect five strings with dot
+        implicit none
+        character(*), intent(in) :: c1 !! First string
+        character(*), intent(in) :: c2 !! Second string
+        character(*), intent(in) :: c3 !! Third string
+        character(*), intent(in) :: c4 !! Fourth string
+        character(*), intent(in) :: c5 !! Fifth string
+        character(:), allocatable :: key
 
-!         key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))//"."//trim(adjustl(c5))
+        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))//"."//trim(adjustl(c5))
 
-!     end function Inout_Input_Connect_dot_5
+    end function Inout_Input_Connect_dot_5
 
-!     function Inout_Input_Connect_dot_6(c1, c2, c3, c4, c5, c6) result(key)
-!         !> connect six strings with dot
-!         implicit none
-!         character(*), intent(in) :: c1 !! First string
-!         character(*), intent(in) :: c2 !! Second string
-!         character(*), intent(in) :: c3 !! Third string
-!         character(*), intent(in) :: c4 !! Fourth string
-!         character(*), intent(in) :: c5 !! Fifth string
-!         character(*), intent(in) :: c6 !! Sixth string
-!         character(:), allocatable :: key
+    function Inout_Input_Connect_dot_6(c1, c2, c3, c4, c5, c6) result(key)
+        !> connect six strings with dot
+        implicit none
+        character(*), intent(in) :: c1 !! First string
+        character(*), intent(in) :: c2 !! Second string
+        character(*), intent(in) :: c3 !! Third string
+        character(*), intent(in) :: c4 !! Fourth string
+        character(*), intent(in) :: c5 !! Fifth string
+        character(*), intent(in) :: c6 !! Sixth string
+        character(:), allocatable :: key
 
-!         key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))//"."//trim(adjustl(c5))//"."//trim(adjustl(c6))
+        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))//"."//trim(adjustl(c5))//"."//trim(adjustl(c6))
 
-!     end function Inout_Input_Connect_dot_6
+    end function Inout_Input_Connect_dot_6
 end module Inout_Input

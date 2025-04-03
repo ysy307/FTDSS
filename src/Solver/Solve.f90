@@ -17,7 +17,6 @@ module Solver_Solve
     include "mkl_lapack.fi"
 #endif
 
-    type(CRS) :: CRS_A
     real(real64), allocatable, target :: work(:, :)
 
     public :: Abstract_Solver_CRS

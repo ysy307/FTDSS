@@ -1,7 +1,6 @@
 module Matrix_CRS
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Allocate_Allocate, only:Allocate_Array
-    use :: Types, only:DP3d
     implicit none
     private
 
@@ -15,6 +14,7 @@ module Matrix_CRS
         real(real64), allocatable :: Val(:) !! values of the non-zero elements
     contains
         procedure, public, pass(self) :: Find => Find_CRS_Location
+        procedure, public, pass(self) :: Copy => Copy_CRS
     end type Type_CRS
 
     public :: operator(*)
@@ -24,14 +24,12 @@ module Matrix_CRS
         module procedure Matrix_Vector_Product_CRS
     end interface
     interface operator(+)
-        module procedure Matrix_Multiplication_CRS
+        module procedure Matrix_Addition_CRS
     end interface
 
     interface Type_CRS
         module procedure Initialize_CRS
     end interface
-
-    public :: Copy_CRS
 
 contains
 
@@ -149,7 +147,7 @@ contains
 
     end subroutine Find_CRS_Location
 
-    function Matrix_Multiplication_CRS(A, B) result(C)
+    function Matrix_Addition_CRS(A, B) result(C)
         !* Matrix-Matrix Product in CRS format
         implicit none
         type(Type_CRS), intent(in) :: A
@@ -158,23 +156,23 @@ contains
 
         C%Val(:) = A%Val(:) + B%Val(:)
 
-    end function Matrix_Multiplication_CRS
+    end function Matrix_Addition_CRS
 
-    function Copy_CRS(A) result(B)
+    function Copy_CRS(self) result(B)
         !* Copy CRS matrix
         implicit none
-        type(Type_CRS), intent(in) :: A
+        class(Type_CRS) :: self
         type(Type_CRS) :: B
 
-        call Allocate_Array(B%Ptr, A%nrow + 1_int32)
-        call Allocate_Array(B%Ind, A%nnz)
-        call Allocate_Array(B%Val, A%nnz)
+        call Allocate_Array(B%Ptr, self%nrow + 1_int32)
+        call Allocate_Array(B%Ind, self%nnz)
+        call Allocate_Array(B%Val, self%nnz)
 
-        B%nnz = A%nnz
-        B%nrow = A%nrow
-        B%Ptr(:) = A%Ptr(:)
-        B%Ind(:) = A%Ind(:)
-        B%Val(:) = A%Val(:)
+        B%nnz = self%nnz
+        B%nrow = self%nrow
+        B%Ptr(:) = self%Ptr(:)
+        B%Ind(:) = self%Ind(:)
+        B%Val(:) = self%Val(:)
 
     end function Copy_CRS
 

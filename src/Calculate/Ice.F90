@@ -7,6 +7,12 @@ module Calculate_Ice
     use omp_lib
 #endif
     implicit none
+    private
+
+    public :: Type_Ice_TRM
+    public :: Type_Ice_GCC
+    public :: Type_Ice_EXP
+    public :: Abstract_Ice
 
     type, abstract :: Abstract_Ice
         integer(int32) :: nsize

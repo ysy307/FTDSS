@@ -362,83 +362,83 @@ contains
     !     return
     ! end subroutine Output_time
 
-    subroutine Inout_Output_All_vtk(self, Solver, num)
+    ! subroutine Inout_Output_All_vtk(self, Solver, num)
 
-        implicit none
-        class(Output) :: self
-        type(SolverInfo), intent(inout) :: Solver
-        integer(int32), intent(in) :: num
+    !     implicit none
+    !     class(Output) :: self
+    !     type(SolverInfo), intent(inout) :: Solver
+    !     integer(int32), intent(in) :: num
 
-        character(256) :: oName, fmt
-        integer(int32) :: ios, unit_num, iN
-        real(real64) :: wFlux_all(3, Solver%N%node)
+    !     character(256) :: oName, fmt
+    !     integer(int32) :: ios, unit_num, iN
+    !     real(real64) :: wFlux_all(3, Solver%N%node)
 
-        write (oName, Solver%fmt_Fileout) trim(self%dir_Path), "Output/DATFILE/Output_", num, ".vtk"
-        open (newunit=unit_num, file=oName, status='replace', action='write', iostat=ios)
-        if (ios /= 0) call error_message(931)
+    !     write (oName, Solver%fmt_Fileout) trim(self%dir_Path), "Output/DATFILE/Output_", num, ".vtk"
+    !     open (newunit=unit_num, file=oName, status='replace', action='write', iostat=ios)
+    !     if (ios /= 0) call error_message(931)
 
-        write (unit_num, '(a)') "# vtk DataFile Version 2.0"
-        write (unit_num, '(a)') "Analysis ASCII VTK file"
-        write (unit_num, '(a)') "ASCII"
-        write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
-        write (unit_num, '(a,i0,a)') "POINTS ", Solver%N%node, " double"
-        do iN = 1, Solver%N%node
-            write (unit_num, '(3f18.13)') Solver%N%vCood%x(iN), Solver%N%vCood%y(iN), 0
-        end do
-        write (unit_num, '(a)') ""
-        write (unit_num, '(a,i0,a,i0,a)') "CELLS ", Solver%N%element, " ", Solver%N%element * 4
-        do iN = 1, Solver%N%element
-            write (unit_num, '(i0,a,i0,a,i0,a,i0)') Solver%N%ShCoe, " ", Solver%N%pElement(1, iN) - 1, " ", Solver%N%pElement(2, iN) - 1, " ", Solver%N%pElement(3, iN) - 1
-        end do
-        write (unit_num, '(a,i0,a)') "CELL_TYPES ", Solver%N%element
-        do iN = 1, Solver%N%element
-            write (unit_num, '(i0)') 5
-        end do
+    !     write (unit_num, '(a)') "# vtk DataFile Version 2.0"
+    !     write (unit_num, '(a)') "Analysis ASCII VTK file"
+    !     write (unit_num, '(a)') "ASCII"
+    !     write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
+    !     write (unit_num, '(a,i0,a)') "POINTS ", Solver%N%node, " double"
+    !     do iN = 1, Solver%N%node
+    !         write (unit_num, '(3f18.13)') Solver%N%vCood%x(iN), Solver%N%vCood%y(iN), 0
+    !     end do
+    !     write (unit_num, '(a)') ""
+    !     write (unit_num, '(a,i0,a,i0,a)') "CELLS ", Solver%N%element, " ", Solver%N%element * 4
+    !     do iN = 1, Solver%N%element
+    !         write (unit_num, '(i0,a,i0,a,i0,a,i0)') Solver%N%ShCoe, " ", Solver%N%pElement(1, iN) - 1, " ", Solver%N%pElement(2, iN) - 1, " ", Solver%N%pElement(3, iN) - 1
+    !     end do
+    !     write (unit_num, '(a,i0,a)') "CELL_TYPES ", Solver%N%element
+    !     do iN = 1, Solver%N%element
+    !         write (unit_num, '(i0)') 5
+    !     end do
 
-        select case (Solver%nAnalysis)
-        case (1)
-            ! do iN = 1, Solver%N%node
-            !     write(unit_num, '(es15.7,a,es15.7)') Solver%T%pre(iN), ', ', Solver%T%Si(iN)
-            ! end do
-        case (2)
-        case (3)
-        case (4)
-            write (unit_num, '(a, i0)') "POINT_DATA ", Solver%N%node
-            write (unit_num, '(a)') "SCALARS Temperature double 1"
-            write (unit_num, '(a)') "LOOKUP_TABLE default"
-            write (unit_num, '(es13.5)') Solver%T%pre(:)
-            write (unit_num, '(a)') "SCALARS Pressure double 1"
-            write (unit_num, '(a)') "LOOKUP_TABLE default"
-            write (unit_num, '(es13.5)') Solver%P%pre(:)
-            write (unit_num, '(a)') "SCALARS Si double 1"
-            write (unit_num, '(a)') "LOOKUP_TABLE default"
-            write (unit_num, '(es13.5)') Solver%Si%pre(:)
-        case (6)
-            wFlux_all(1, :) = Solver%Water%Variables%wFlux%x(:)
-            wFlux_all(2, :) = Solver%Water%Variables%wFlux%y(:)
-            wFlux_all(3, :) = 0.0d0
-            write (unit_num, '(a, i0)') "POINT_DATA ", Solver%N%node
-            write (unit_num, '(a)') "SCALARS Temperature double 1"
-            write (unit_num, '(a)') "LOOKUP_TABLE default"
-            write (unit_num, '(es13.5)') Solver%T%pre(:)
-            write (unit_num, '(a)') ""
-            write (unit_num, '(a)') "SCALARS Pressure double 1"
-            write (unit_num, '(a)') "LOOKUP_TABLE default"
-            write (unit_num, '(es13.5)') Solver%P%pre(:)
-            write (unit_num, '(a)') ""
-            write (unit_num, '(a)') "SCALARS Si double 1"
-            write (unit_num, '(a)') "LOOKUP_TABLE default"
-            write (unit_num, '(es13.5)') Solver%Si%pre(:)
-            write (unit_num, '(a)') ""
-            write (unit_num, '(a)') "VECTORS WaterFlux double"
-            write (unit_num, '(3es13.5)') wFlux_all
+    !     select case (Solver%nAnalysis)
+    !     case (1)
+    !         ! do iN = 1, Solver%N%node
+    !         !     write(unit_num, '(es15.7,a,es15.7)') Solver%T%pre(iN), ', ', Solver%T%Si(iN)
+    !         ! end do
+    !     case (2)
+    !     case (3)
+    !     case (4)
+    !         write (unit_num, '(a, i0)') "POINT_DATA ", Solver%N%node
+    !         write (unit_num, '(a)') "SCALARS Temperature double 1"
+    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
+    !         write (unit_num, '(es13.5)') Solver%T%pre(:)
+    !         write (unit_num, '(a)') "SCALARS Pressure double 1"
+    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
+    !         write (unit_num, '(es13.5)') Solver%P%pre(:)
+    !         write (unit_num, '(a)') "SCALARS Si double 1"
+    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
+    !         write (unit_num, '(es13.5)') Solver%Si%pre(:)
+    !     case (6)
+    !         wFlux_all(1, :) = Solver%Water%Variables%wFlux%x(:)
+    !         wFlux_all(2, :) = Solver%Water%Variables%wFlux%y(:)
+    !         wFlux_all(3, :) = 0.0d0
+    !         write (unit_num, '(a, i0)') "POINT_DATA ", Solver%N%node
+    !         write (unit_num, '(a)') "SCALARS Temperature double 1"
+    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
+    !         write (unit_num, '(es13.5)') Solver%T%pre(:)
+    !         write (unit_num, '(a)') ""
+    !         write (unit_num, '(a)') "SCALARS Pressure double 1"
+    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
+    !         write (unit_num, '(es13.5)') Solver%P%pre(:)
+    !         write (unit_num, '(a)') ""
+    !         write (unit_num, '(a)') "SCALARS Si double 1"
+    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
+    !         write (unit_num, '(es13.5)') Solver%Si%pre(:)
+    !         write (unit_num, '(a)') ""
+    !         write (unit_num, '(a)') "VECTORS WaterFlux double"
+    !         write (unit_num, '(3es13.5)') wFlux_all
 
-        case (7)
+    !     case (7)
 
-        end select
-        close (unit_num)
+    !     end select
+    !     close (unit_num)
 
-    end subroutine Inout_Output_All_vtk
+    ! end subroutine Inout_Output_All_vtk
 
     ! subroutine Measure_Time(nsec, ar_sec, ar_secsum)
     !     implicit none
@@ -450,16 +450,16 @@ contains
     !     return
     ! end subroutine Measure_Time
 
-    subroutine Set_Output_Flag(iValue, inFlag)
-        implicit none
-        integer(int32), intent(in) :: iValue
-        logical, intent(inout) :: inFlag
+    ! subroutine Set_Output_Flag(iValue, inFlag)
+    !     implicit none
+    !     integer(int32), intent(in) :: iValue
+    !     logical, intent(inout) :: inFlag
 
-        if (iValue == 1) then
-            inFlag = .true.
-        else
-            inFlag = .false.
-        end if
+    !     if (iValue == 1) then
+    !         inFlag = .true.
+    !     else
+    !         inFlag = .false.
+    !     end if
 
-    end subroutine Set_Output_Flag
+    ! end subroutine Set_Output_Flag
 end module Inout_Output

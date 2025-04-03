@@ -1,18 +1,16 @@
 module Matrix_Assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Matrix_CRS
-    use :: Types
 #ifdef _OPENMP
     use omp_lib
 #endif
     implicit none
     private
 contains
-    subroutine Assemble_Mass_Lumped_231(A, Elements, Basis, Area, C, N)
+    subroutine Assemble_Mass_Lumped_231(A, Elements, Area, C, N)
         implicit none
         type(Type_CRS), intent(inout) :: A
         real(real64), intent(in) :: Elements(:, :)
-        type(Shape), intent(in) :: Basis
         real(real64), intent(in) :: Area(:)
         real(real64), intent(in) :: C(:)
         integer(int32), intent(in) :: N
@@ -42,7 +40,7 @@ contains
         implicit none
         type(Type_CRS), intent(inout) :: A
         real(real64), intent(in) :: Elements(:, :)
-        type(Shape), intent(in) :: Basis
+        real(real64), intent(in) :: Basis(:, :, :)
         real(real64), intent(in) :: Area(:)
         real(real64), intent(in) :: lambda(:)
         integer(int32), intent(in) :: N
@@ -57,12 +55,12 @@ contains
             p3 = Elements(3, iN)
             CoeA = (lambda(p1) + lambda(p2) + lambda(p3)) / (12.0d0 * Area(iN))
 
-            be1 = Basis%b(1, iN)
-            be2 = Basis%b(2, iN)
-            be3 = Basis%b(3, iN)
-            ga1 = Basis%c(1, iN)
-            ga2 = Basis%c(2, iN)
-            ga3 = Basis%c(3, iN)
+            be1 = Basis(1, 2, iN)
+            be2 = Basis(2, 2, iN)
+            be3 = Basis(3, 2, iN)
+            ga1 = Basis(1, 3, iN)
+            ga2 = Basis(2, 3, iN)
+            ga3 = Basis(3, 3, iN)
 
             call A%Find(p1, p1, indexes(1))
             call A%Find(p1, p2, indexes(2))
@@ -90,7 +88,7 @@ contains
         implicit none
         type(Type_CRS), intent(inout) :: A
         real(real64), intent(in) :: Elements(:, :)
-        type(Shape), intent(in) :: Basis
+        real(real64), intent(in) :: Basis(:, :, :)
         real(real64), intent(in) :: Area(:)
         real(real64), intent(in) :: lambda_xx(:)
         real(real64), intent(in) :: lambda_xy(:)
@@ -114,12 +112,12 @@ contains
             lambda3 = (lambda_yy(p1) + lambda_yy(p2) + lambda_yy(p3)) / 3.0d0
             CoeA = 1.0d0 / (4.0d0 * Area(iN))
 
-            be1 = Basis%b(1, iN)
-            be2 = Basis%b(2, iN)
-            be3 = Basis%b(3, iN)
-            ga1 = Basis%c(1, iN)
-            ga2 = Basis%c(2, iN)
-            ga3 = Basis%c(3, iN)
+            be1 = Basis(1, 2, iN)
+            be2 = Basis(2, 2, iN)
+            be3 = Basis(3, 2, iN)
+            ga1 = Basis(1, 3, iN)
+            ga2 = Basis(2, 3, iN)
+            ga3 = Basis(3, 3, iN)
 
             call A%Find(p1, p1, indexes(1))
             call A%Find(p1, p2, indexes(2))

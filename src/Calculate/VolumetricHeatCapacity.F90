@@ -2,6 +2,7 @@ module Calculate_VolumetricHeatCapacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Allocate_Allocate, only:Allocate_Array
     use :: Calculate_Ice
+    use :: Calculate_GCC
     implicit none
     !----------------------------------------------------------------------------------------------------
     ! Access settings
@@ -31,7 +32,6 @@ module Calculate_VolumetricHeatCapacity
     type, abstract, extends(Abstract_VolumetricHeatCapacity) :: Abstract_VolumetricHeatCapacity_Apparent
         real(real64), allocatable :: Apparent(:) ! Apparent volumetric heat capacity
         real(real64) :: Ca_max
-        class(Abstract_Ice), pointer :: Ice
     contains
         procedure(Abstract_Calculate_VolumetricHeatCapacity_Apparent), pass(self), deferred :: Calculate_Ca
     end type Abstract_VolumetricHeatCapacity_Apparent
@@ -98,11 +98,13 @@ module Calculate_VolumetricHeatCapacity
             real(real64) :: Cp
         end function Abstract_Calculate_VolumetricHeatCapacity
 
-        function Abstract_Calculate_VolumetricHeatCapacity_Apparent(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
+        function Abstract_Calculate_VolumetricHeatCapacity_Apparent(self, structure_Ice, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
             use, intrinsic :: iso_fortran_env, only: real64
             import :: Abstract_VolumetricHeatCapacity_Apparent
+            import :: Abstract_Ice
             implicit none
             class(Abstract_VolumetricHeatCapacity_Apparent), intent(in) :: self
+            class(Abstract_Ice), intent(inout) :: structure_Ice
             real(real64), intent(in) :: phi1 !! the ratio of material 1
             real(real64), intent(in) :: phi2 !! the ratio of material 2
             real(real64), intent(in) :: phi3 !! the ratio of material 3
@@ -166,12 +168,12 @@ contains
         structure%value(:) = 0.0d0
     end function Construct_VolumetricHeatCapacity_2Phase
 
-    function Construct_VolumetricHeatCapacity_3Phase(Cp_soil, Cp_water, Cp_ice, structure_Ice, rho_ice, rho_water, nsize) result(structure)
+    function Construct_VolumetricHeatCapacity_3Phase(structure_Ice, Cp_soil, Cp_water, Cp_ice, rho_ice, rho_water, nsize) result(structure)
         implicit none
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: Cp_soil !! Volumetric heat capacity of soil
         real(real64), intent(in) :: Cp_water !! Volumetric heat capacity of water
         real(real64), intent(in) :: Cp_ice !! Volumetric heat capacity of ice
-        class(Abstract_Ice), pointer, intent(in) :: structure_Ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
         integer(int32), intent(in) :: nsize !! Size of array
@@ -187,17 +189,15 @@ contains
         structure%value(:) = 0.0d0
         structure%Apparent(:) = 0.0d0
 
-        structure%Ice => structure_Ice
-
         if (.not. present(rho_water)) then
-            call Find_Ca_maximum(structure, rho_ice)
+            call Find_Ca_maximum(structure, structure_Ice, rho_ice)
         else
-            call Find_Ca_maximum(structure, rho_ice, rho_water)
+            call Find_Ca_maximum(structure, structure_Ice, rho_ice, rho_water)
         end if
 
     end function Construct_VolumetricHeatCapacity_3Phase
 
-    function Construct_VolumetricHeatCapacity_4Phase(Cp_soil, Cp_water, Cp_ice, Cp_air, structure_Ice, rho_ice, rho_water, nsize) result(structure)
+    function Construct_VolumetricHeatCapacity_4Phase(structure_Ice, Cp_soil, Cp_water, Cp_ice, Cp_air, rho_ice, rho_water, nsize) result(structure)
         implicit none
         real(real64), intent(in) :: Cp_soil !! Volumetric heat capacity of soil
         real(real64), intent(in) :: Cp_water !! Volumetric heat capacity of water
@@ -278,15 +278,15 @@ contains
         Cp = phi_soil * Cp_soil + phi_water * Cp_water + phi_Ice * Cp_ice + phi_air * Cp_air
     end function Calculate_VolumetricHeatCapacity_4Phase
 
-    function Calculate_VolumetricHeatCapacity_Apparent_3Phase(Cp_soil, phi_soil, Cp_water, phi_water, Cp_ice, phi_ice, structure_Ice, rho_ice, rho_water, Temperature, Pw) result(Ca)
+    function Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, Cp_soil, phi_soil, Cp_water, phi_water, Cp_ice, phi_ice, rho_ice, rho_water, Temperature, Pw) result(Ca)
         implicit none
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: Cp_soil !! Volumetric heat capacity of soil
         real(real64), intent(in) :: phi_soil !! the ratio of soil
         real(real64), intent(in) :: Cp_water !! Volumetric heat capacity of water
         real(real64), intent(in) :: phi_water !! the ratio of water
         real(real64), intent(in) :: Cp_ice !! Volumetric heat capacity of ice
         real(real64), intent(in) :: phi_ice !! the ratio of ice
-        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
         real(real64), intent(in) :: Temperature !! Temperature
@@ -319,8 +319,9 @@ contains
 
     end function Calculate_VolumetricHeatCapacity_Apparent_3Phase
 
-    function Calculate_VolumetricHeatCapacity_Apparent_4Phase(Cp_soil, phi_soil, Cp_water, phi_water, Cp_ice, phi_ice, Cp_air, phi_air, structure_Ice, rho_ice, rho_water, Temperature, Pw) result(Ca)
+    function Calculate_VolumetricHeatCapacity_Apparent_4Phase(structure_Ice, Cp_soil, phi_soil, Cp_water, phi_water, Cp_ice, phi_ice, Cp_air, phi_air, rho_ice, rho_water, Temperature, Pw) result(Ca)
         implicit none
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: Cp_soil !! Volumetric heat capacity of soil
         real(real64), intent(in) :: phi_soil !! the ratio of soil
         real(real64), intent(in) :: Cp_water !! Volumetric heat capacity of water
@@ -329,7 +330,6 @@ contains
         real(real64), intent(in) :: phi_ice !! the ratio of ice
         real(real64), intent(in) :: Cp_air !! Volumetric heat capacity of air
         real(real64), intent(in) :: phi_air !! the ratio of air
-        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
         real(real64), intent(in) :: Temperature !! Temperature
@@ -365,9 +365,10 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Find maximum volumetric heat capacity
     !----------------------------------------------------------------------------------------------------
-    subroutine Find_Ca_maximum(structure, rho_ice, rho_water)
+    subroutine Find_Ca_maximum(structure, structure_Ice, rho_ice, rho_water)
         implicit none
         class(Abstract_VolumetricHeatCapacity_Apparent), intent(inout) :: Structure
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
 
@@ -377,7 +378,7 @@ contains
 
         select type (this => Structure)
         type is (Type_VolumetricHeatCapacity_3Phase)
-            select type (this_Ice => this%Ice)
+            select type (this_Ice => structure_Ice)
             type is (Type_Ice_GCC)
                 initial_phi = this_Ice%WRF%thetaS
 
@@ -388,16 +389,24 @@ contains
                 T2 = T0 + tau * (T3 - T0)
                 select type (this_GCC => this_Ice%GCC)
                 type is (Type_GCC_NonSegregation_m)
-                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            Temperature=T1)
-                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            Temperature=T2)
+                    Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           Temperature=T1)
+                    Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           Temperature=T2)
 
                     do while (abs(T3 - T0) > epsilon)
                         if (Ca2 > Ca1) then
@@ -405,42 +414,61 @@ contains
                             T1 = T2
                             T2 = T0 + tau * (T3 - T0)
                             Ca1 = Ca2
-                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    Temperature=T2)
+                            Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   Temperature=T2)
                         else
                             T3 = T2
                             T2 = T1
                             T1 = T0 + (1.d0 - tau) * (T3 - T0)
                             Ca2 = Ca1
-                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    Temperature=T1)
+                            Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   Temperature=T1)
                         end if
                     end do
-
-                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    Temperature=(T1 + T2) / 2.d0)
+                    this%Ca_max = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   Temperature=(T1 + T2) / 2.d0)
                 type is (Type_GCC_NonSegregation_Pa)
-                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            rho_water=rho_water, &
-                                            Temperature=T1)
-                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            rho_water=rho_water, &
-                                            Temperature=T2)
+                    Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           rho_water=rho_water, &
+                                                                           Temperature=T1)
+                    Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           rho_water=rho_water, &
+                                                                           Temperature=T2)
 
                     do while (abs(T3 - T0) > epsilon)
                         if (Ca2 > Ca1) then
@@ -448,138 +476,181 @@ contains
                             T1 = T2
                             T2 = T0 + tau * (T3 - T0)
                             Ca1 = Ca2
-                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=T2)
+                            Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   rho_water=rho_water, &
+                                                                                   Temperature=T2)
                         else
                             T3 = T2
                             T2 = T1
                             T1 = T0 + (1.d0 - tau) * (T3 - T0)
                             Ca2 = Ca1
-                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=T1)
+                            Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   rho_water=rho_water, &
+                                                                                   Temperature=T1)
                         end if
                     end do
-
-                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=(T1 + T2) / 2.d0)
+                    this%Ca_max = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   rho_water=rho_water, &
+                                                                                   Temperature=(T1 + T2) / 2.d0)
                 type is (Type_GCC_Segregation_m)
-                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            rho_water=rho_water, &
-                                            Temperature=T1)
-                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            rho_water=rho_water, &
-                                            Temperature=T2)
-
+                    Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           Temperature=T1)
+                    Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           Temperature=T2)
                     do while (abs(T3 - T0) > epsilon)
                         if (Ca2 > Ca1) then
                             T0 = T1
                             T1 = T2
                             T2 = T0 + tau * (T3 - T0)
                             Ca1 = Ca2
-                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=T2)
+                            Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   Temperature=T2)
                         else
                             T3 = T2
                             T2 = T1
                             T1 = T0 + (1.d0 - tau) * (T3 - T0)
                             Ca2 = Ca1
-                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=T1)
+                            Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   Temperature=T1)
                         end if
                     end do
-
-                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=(T1 + T2) / 2.d0)
+                    this%Ca_max = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   Temperature=(T1 + T2) / 2.d0)
                 type is (Type_GCC_Segregation_Pa)
-                    Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            rho_water=rho_water, &
-                                            Temperature=T1, &
-                                            Pw=0.0d0)
-                    Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                            phi2=initial_phi, &
-                                            phi3=0.0d0, &
-                                            rho_ice=rho_ice, &
-                                            rho_water=rho_water, &
-                                            Temperature=T2, &
-                                            Pw=0.0d0)
-
+                    Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           rho_water=rho_water, &
+                                                                           Temperature=T1)
+                    Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                           Cp_soil=this%Cp_soil, &
+                                                                           phi_soil=1.0d0 - initial_phi, &
+                                                                           Cp_water=this%Cp_water, &
+                                                                           phi_water=initial_phi, &
+                                                                           Cp_ice=this%Cp_ice, &
+                                                                           phi_ice=0.0d0, &
+                                                                           rho_ice=rho_ice, &
+                                                                           rho_water=rho_water, &
+                                                                           Temperature=T2)
                     do while (abs(T3 - T0) > epsilon)
                         if (Ca2 > Ca1) then
                             T0 = T1
                             T1 = T2
                             T2 = T0 + tau * (T3 - T0)
                             Ca1 = Ca2
-                            Ca2 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=T2, &
-                                                    Pw=0.0d0)
+                            Ca2 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   rho_water=rho_water, &
+                                                                                   Temperature=T2)
                         else
                             T3 = T2
                             T2 = T1
                             T1 = T0 + (1.d0 - tau) * (T3 - T0)
                             Ca2 = Ca1
-                            Ca1 = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=T1, &
-                                                    Pw=0.0d0)
+                            Ca1 = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   rho_water=rho_water, &
+                                                                                   Temperature=T1)
                         end if
                     end do
-                    this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                    phi2=initial_phi, &
-                                                    phi3=0.0d0, &
-                                                    rho_ice=rho_ice, &
-                                                    rho_water=rho_water, &
-                                                    Temperature=(T1 + T2) / 2.d0, &
-                                                    Pw=0.0d0)
+                    this%Ca_max = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                                   Cp_soil=this%Cp_soil, &
+                                                                                   phi_soil=1.0d0 - initial_phi, &
+                                                                                   Cp_water=this%Cp_water, &
+                                                                                   phi_water=initial_phi, &
+                                                                                   Cp_ice=this%Cp_ice, &
+                                                                                   phi_ice=0.0d0, &
+                                                                                   rho_ice=rho_ice, &
+                                                                                   rho_water=rho_water, &
+                                                                                   Temperature=(T1 + T2) / 2.d0)
                 end select
             type is (Type_Ice_EXP)
                 initial_phi = this_Ice%phi
-                this%Ca_max = this%Calculate_Ca(phi1=1.0d0 - initial_phi, &
-                                                phi2=initial_phi, &
-                                                phi3=0.0d0, &
-                                                rho_ice=rho_ice, &
-                                                Temperature=this_Ice%Tf)
+                this%Ca_max = Calculate_VolumetricHeatCapacity_Apparent_3Phase(structure_Ice, &
+                                                                               Cp_soil=this%Cp_soil, &
+                                                                               phi_soil=1.0d0 - initial_phi, &
+                                                                               Cp_water=this%Cp_water, &
+                                                                               phi_water=initial_phi, &
+                                                                               Cp_ice=this%Cp_ice, &
+                                                                               phi_ice=0.0d0, &
+                                                                               rho_ice=rho_ice, &
+                                                                               Temperature=this_Ice%Tf)
             end select
         end select
+
     end subroutine Find_Ca_maximum
 
     !----------------------------------------------------------------------------------------------------
@@ -651,9 +722,10 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Wrapper of calculating Apparent volumetric heat capacity
     !----------------------------------------------------------------------------------------------------
-    function Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrap(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
+    function Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrap(self, structure_Ice, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(in) :: self
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: phi1 !! the ratio of material 1
         real(real64), intent(in) :: phi2 !! the ratio of material 2
         real(real64), intent(in) :: phi3 !! the ratio of material 3
@@ -671,7 +743,7 @@ contains
                                                                   phi_water=phi2, &
                                                                   Cp_ice=self%Cp_ice, &
                                                                   phi_ice=phi3, &
-                                                                  structure_Ice=self%Ice, &
+                                                                  structure_Ice=structure_Ice, &
                                                                   rho_ice=rho_ice, &
                                                                   Temperature=Temperature)
         else if (present(rho_water) .and. .not. present(Pw)) then
@@ -681,7 +753,7 @@ contains
                                                                   phi_water=phi2, &
                                                                   Cp_ice=self%Cp_ice, &
                                                                   phi_ice=phi3, &
-                                                                  structure_Ice=self%Ice, &
+                                                                  structure_Ice=structure_Ice, &
                                                                   rho_ice=rho_ice, &
                                                                   rho_water=rho_water, &
                                                                   Temperature=Temperature)
@@ -692,7 +764,7 @@ contains
                                                                   phi_water=phi2, &
                                                                   Cp_ice=self%Cp_ice, &
                                                                   phi_ice=phi3, &
-                                                                  structure_Ice=self%Ice, &
+                                                                  structure_Ice=structure_Ice, &
                                                                   rho_ice=rho_ice, &
                                                                   rho_water=rho_water, &
                                                                   Temperature=Temperature, &
@@ -701,9 +773,10 @@ contains
 
     end function Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrap
 
-    function Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrap(self, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
+    function Calculate_VolumetricHeatCapacity_Apparent_4Phase_Wrap(self, structure_Ice, phi1, phi2, phi3, phi4, rho_ice, rho_water, Temperature, Pw) result(Ca)
         implicit none
         class(Type_VolumetricHeatCapacity_4Phase), intent(in) :: self
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: phi1 !! the ratio of material 1
         real(real64), intent(in) :: phi2 !! the ratio of material 2
         real(real64), intent(in) :: phi3 !! the ratio of material 3
@@ -723,7 +796,7 @@ contains
                                                                   phi_ice=phi3, &
                                                                   Cp_air=self%Cp_air, &
                                                                   phi_air=phi4, &
-                                                                  structure_Ice=self%Ice, &
+                                                                  structure_Ice=structure_Ice, &
                                                                   rho_ice=rho_ice, &
                                                                   Temperature=Temperature)
         else if (present(rho_water) .and. .not. present(Pw)) then
@@ -735,7 +808,7 @@ contains
                                                                   phi_ice=phi3, &
                                                                   Cp_air=self%Cp_air, &
                                                                   phi_air=phi4, &
-                                                                  structure_Ice=self%Ice, &
+                                                                  structure_Ice=structure_Ice, &
                                                                   rho_ice=rho_ice, &
                                                                   rho_water=rho_water, &
                                                                   Temperature=Temperature)
@@ -748,7 +821,7 @@ contains
                                                                   phi_ice=phi3, &
                                                                   Cp_air=self%Cp_air, &
                                                                   phi_air=phi4, &
-                                                                  structure_Ice=self%Ice, &
+                                                                  structure_Ice=structure_Ice, &
                                                                   rho_ice=rho_ice, &
                                                                   rho_water=rho_water, &
                                                                   Temperature=Temperature, &
@@ -797,76 +870,84 @@ contains
         !$omp end parallel do
     end subroutine Update_VolumetricHeatCapacity_2Phase_Array
 
-    subroutine Update_VolumetricHeatCapacity_3Phase_Scalar(self, phi_soil)
+    subroutine Update_VolumetricHeatCapacity_3Phase_Scalar(self, phi_soil, arr_Qw, arr_Qice)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(inout) :: self
         real(real64), intent(in) :: phi_soil !! the ratio of soil
+        real(real64), intent(in) :: arr_Qw(:) !! the ratio of water
+        real(real64), intent(in) :: arr_Qice(:) !! the ratio of ice
 
         integer(int32) :: iN
 
         ! $omp parallel do private(iN)
         do iN = 1, self%nsize
-            ! print *, iN, self%Ice%Qw%pre(iN), self%Ice%Qice%pre(iN)
             self%value(iN) = self%Cp_soil * phi_soil &
-                             + self%Cp_water * self%Ice%Qw%pre(iN) &
-                             + self%Cp_ice * self%Ice%Qice%pre(iN)
+                             + self%Cp_water * arr_Qw(iN) &
+                             + self%Cp_ice * arr_Qice(iN)
         end do
         ! $omp end parallel do
     end subroutine Update_VolumetricHeatCapacity_3Phase_Scalar
 
-    subroutine Update_VolumetricHeatCapacity_3Phase_Array(self, arr_phi_soil)
+    subroutine Update_VolumetricHeatCapacity_3Phase_Array(self, arr_phi_soil, arr_Qw, arr_Qice)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(inout) :: self
         real(real64), intent(in) :: arr_phi_soil(:) !! the ratio of soil
+        real(real64), intent(in) :: arr_Qw(:) !! the ratio of water
+        real(real64), intent(in) :: arr_Qice(:) !! the ratio of ice
 
         integer(int32) :: iN
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
             self%value(iN) = self%Cp_soil * arr_phi_soil(iN) &
-                             + self%Cp_water * self%Ice%Qw%pre(iN) &
-                             + self%Cp_ice * self%Ice%Qice%pre(iN)
+                             + self%Cp_water * arr_Qw(iN) &
+                             + self%Cp_ice * arr_Qice(iN)
         end do
         !$omp end parallel do
     end subroutine Update_VolumetricHeatCapacity_3Phase_Array
 
-    subroutine Update_VolumetricHeatCapacity_4Phase_Scalar(self, phi_soil)
+    subroutine Update_VolumetricHeatCapacity_4Phase_Scalar(self, phi_soil, arr_Qw, arr_Qice)
         implicit none
         class(Type_VolumetricHeatCapacity_4Phase), intent(inout) :: self
         real(real64), intent(in) :: phi_soil !! the ratio of soil
+        real(real64), intent(in) :: arr_Qw(:) !! the ratio of water
+        real(real64), intent(in) :: arr_Qice(:) !! the ratio of ice
 
         integer(int32) :: iN
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
             self%value(iN) = self%Cp_soil * phi_soil &
-                             + self%Cp_water * self%Ice%Qw%pre(iN) &
-                             + self%Cp_ice * self%Ice%Qice%pre(iN) &
-                             + self%Cp_air * (1.0d0 - phi_soil - self%Ice%Qw%pre(iN) - self%Ice%Qice%pre(iN))
+                             + self%Cp_water * arr_Qw(iN) &
+                             + self%Cp_ice * arr_Qice(iN) &
+                             + self%Cp_air * (1.0d0 - phi_soil - arr_Qw(iN) - arr_Qice(iN))
         end do
         !$omp end parallel do
     end subroutine Update_VolumetricHeatCapacity_4Phase_Scalar
 
-    subroutine Update_VolumetricHeatCapacity_4Phase_Array(self, arr_phi_soil)
+    subroutine Update_VolumetricHeatCapacity_4Phase_Array(self, arr_phi_soil, arr_Qw, arr_Qice)
         implicit none
         class(Type_VolumetricHeatCapacity_4Phase), intent(inout) :: self
         real(real64), intent(in) :: arr_phi_soil(:) !! the ratio of soil
+        real(real64), intent(in) :: arr_Qw(:) !! the ratio of water
+        real(real64), intent(in) :: arr_Qice(:) !! the ratio of ice
 
         integer(int32) :: iN
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
             self%value(iN) = self%Cp_soil * arr_phi_soil(iN) &
-                             + self%Cp_water * self%Ice%Qw%pre(iN) &
-                             + self%Cp_ice * self%Ice%Qice%pre(iN) &
-                             + self%Cp_air * (1.0d0 - arr_phi_soil(iN) - self%Ice%Qw%pre(iN) - self%Ice%Qice%pre(iN))
+                             + self%Cp_water * arr_Qw(iN) &
+                             + self%Cp_ice * arr_Qice(iN) &
+                             + self%Cp_air * (1.0d0 - arr_phi_soil(iN) - arr_Qw(iN) - arr_Qice(iN))
         end do
         !$omp end parallel do
     end subroutine Update_VolumetricHeatCapacity_4Phase_Array
 
-    subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar(self, rho_ice, rho_water, arr_Temperature, arr_Pw)
+    subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar(self, structure_Ice, rho_ice, rho_water, arr_Temperature, arr_Pw)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(inout) :: self
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
         real(real64), intent(in) :: arr_Temperature(:) !! Temperature
@@ -875,7 +956,7 @@ contains
         real(real64) :: Lf
         integer(int32) :: iN
 
-        select type (Ice => self%Ice)
+        select type (Ice => structure_Ice)
         type is (Type_Ice_GCC)
             Lf = Ice%GCC%Lf
 
@@ -916,9 +997,10 @@ contains
 
     end subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar
 
-    subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Array(self, arr_rho_ice, arr_rho_water, arr_Temperature, arr_Pw)
+    subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Array(self, structure_Ice, arr_rho_ice, arr_rho_water, arr_Temperature, arr_Pw)
         implicit none
         class(Type_VolumetricHeatCapacity_3Phase), intent(inout) :: self
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: arr_rho_ice(:) !! Density of ice
         real(real64), intent(in), optional :: arr_rho_water(:) !! Density of water
         real(real64), intent(in) :: arr_Temperature(:) !! Temperature
@@ -927,7 +1009,7 @@ contains
         real(real64) :: Lf
         integer(int32) :: iN
 
-        select type (Ice => self%Ice)
+        select type (Ice => structure_Ice)
         type is (Type_Ice_GCC)
             Lf = Ice%GCC%Lf
 
@@ -968,9 +1050,10 @@ contains
 
     end subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Array
 
-    subroutine Update_VolumetricHeatCapacity_Apparent_4Phase_Scalar(self, rho_ice, rho_water, arr_Temperature, arr_Pw)
+    subroutine Update_VolumetricHeatCapacity_Apparent_4Phase_Scalar(self, structure_Ice, rho_ice, rho_water, arr_Temperature, arr_Pw)
         implicit none
         class(Type_VolumetricHeatCapacity_4Phase), intent(inout) :: self
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
         real(real64), intent(in) :: arr_Temperature(:) !! Temperature
@@ -979,7 +1062,7 @@ contains
         real(real64) :: Lf
         integer(int32) :: iN
 
-        select type (Ice => self%Ice)
+        select type (Ice => structure_Ice)
         type is (Type_Ice_GCC)
             Lf = Ice%GCC%Lf
 
@@ -1020,9 +1103,10 @@ contains
 
     end subroutine Update_VolumetricHeatCapacity_Apparent_4Phase_Scalar
 
-    subroutine Update_VolumetricHeatCapacity_Apparent_4Phase_Array(self, arr_rho_ice, arr_rho_water, arr_Temperature, arr_Pw)
+    subroutine Update_VolumetricHeatCapacity_Apparent_4Phase_Array(self, structure_Ice, arr_rho_ice, arr_rho_water, arr_Temperature, arr_Pw)
         implicit none
         class(Type_VolumetricHeatCapacity_4Phase), intent(inout) :: self
+        class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: arr_rho_ice(:) !! Density of ice
         real(real64), intent(in), optional :: arr_rho_water(:) !! Density of water
         real(real64), intent(in) :: arr_Temperature(:) !! Temperature
@@ -1031,7 +1115,7 @@ contains
         real(real64) :: Lf
         integer(int32) :: iN
 
-        select type (Ice => self%Ice)
+        select type (Ice => structure_Ice)
         type is (Type_Ice_GCC)
             Lf = Ice%GCC%Lf
 

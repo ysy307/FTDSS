@@ -17,7 +17,7 @@ program test
     ! use :: Calculate_TRM, only:TRMethod
     ! use :: Solver_Solve
     ! use :: Inout_Stdout
-    ! use :: Inout_Input
+    use :: Inout_Input
     ! use :: Inout_Output
     ! use :: Main_Solver
 
@@ -25,6 +25,20 @@ program test
     use omp_lib
 #endif
     implicit none
+
+    type(Type_Input) :: Input
+    integer(int32) :: i, j, k
+
+    Input = Type_Input()
+
+    ! do i = 1, Input%VTK%CELLS(5)%nCells
+    !     print *, Input%VTK%CELLS(5)%Nodes(:, i)
+    ! end do
+
+    ! do i = 1, Input%VTK%numPoints
+    !     print *, Input%VTK%POINTS%x(i), Input%VTK%POINTS%y(i), Input%VTK%POINTS%z(i)
+    ! end do
+    ! print *, Input%VTK%POINTS%x(:)
 
     ! type(SolverInfo) :: Solver
     ! type(IO) :: Inout
