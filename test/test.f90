@@ -1,6 +1,6 @@
 program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    ! use :: Types
+    use :: Types
     ! use :: Allocate_Allocate
     ! use :: Allocate_Structure
     ! use :: Solver_Initialize
@@ -20,6 +20,7 @@ program test
     use :: Inout_Input
     ! use :: Inout_Output
     ! use :: Main_Solver
+    use :: Main_Thermal
 
 #ifdef _OPENMP
     use omp_lib
@@ -27,11 +28,70 @@ program test
     implicit none
 
     type(Type_Input) :: Input
+    type(Input_Ice) :: Ice
+    type(Input_Thermal) :: ThermalInput
+    type(Type_Thermal_3Phase) :: Thermal
     integer(int32) :: i, j, k
+    integer(int32), allocatable :: Elements(:, :)
+    real(real64) :: Lf, Tf, phi_soil
+    integer(int32) :: meshType
+
+    meshType = 3
+
+    Lf = 334560.d0
+    Tf = 0.0d0
+    phi_soil = 0.3d0
 
     Input = Type_Input()
+    allocate (Elements(3, Input%VTK%CELLS(5)%nCells))
 
-    ! do i = 1, Input%VTK%CELLS(5)%nCells
+    do i = 1, Input%VTK%CELLS(5)%nCells
+        do j = 1, 3
+            Elements(j, i) = Input%VTK%CELLS(5)%Nodes(j, i)
+        end do
+    end do
+
+    Ice%QiceType = 2
+    Ice%ModelType = 2
+    Ice%isSegregation = .false.
+    Ice%c_unit = "m"
+    Ice%thetaS = 0.30d0
+    Ice%thetaR = 0.0d0
+    Ice%alpha1 = 0.2d0
+    Ice%n1 = 1.8d0
+
+    allocate (ThermalInput%c(3))
+    ThermalInput%c(1) = 921.0d0
+    ThermalInput%c(2) = 4180.d0
+    ThermalInput%c(3) = 2100.d0
+    allocate (ThermalInput%rho(3))
+    ThermalInput%rho(1) = 2800.0d0
+    ThermalInput%rho(2) = 1000.0d0
+    ThermalInput%rho(3) = 917.0d0
+    allocate (ThermalInput%lambda(3))
+    ThermalInput%lambda(1) = 3.78d0
+    ThermalInput%lambda(2) = 0.6d0
+    ThermalInput%lambda(3) = 2.2d0
+    allocate (ThermalInput%Cp(3))
+    ThermalInput%Cp(1) = ThermalInput%c(1) * ThermalInput%rho(1)
+    ThermalInput%Cp(2) = ThermalInput%c(2) * ThermalInput%rho(2)
+    ThermalInput%Cp(3) = ThermalInput%c(3) * ThermalInput%rho(3)
+
+    Thermal = Type_Thermal_3Phase(Elements, Input%VTK%POINTS, meshType, Lf, Tf, Ice, ThermalInput, Input%Conditions, Input%VTK%numPoints, Input%VTK)
+
+    Thermal%T%pre(:) = 18.0d0
+    call Thermal%BC%Fix_Bounday_Values(Thermal%T%pre(:))
+    print *, Thermal%T%pre(:)
+    select type (Ice => Thermal%Ice)
+    type is (Type_Ice_GCC)
+        call Ice%Update_Ice(Thermal%T%pre(:))
+    end select
+    ! print *, Ice%Qice
+    ! print *, Thermal%Ice%Qice%pre(:)
+    call Thermal%lambda%Update(phi_soil, Thermal%Ice%Qw%pre, Thermal%Ice%Qice%pre)
+    call Thermal%C%Update(phi_soil, Thermal%Ice%Qw%pre, Thermal%Ice%Qice%pre)
+    call Thermal%C%Update_Ca(structure_Ice=Thermal%Ice, rho_ice=ThermalInput%rho(3), arr_Temperature=Thermal%T%pre(:))
+    print *, Thermal%C%Apparent(:)
     !     print *, Input%VTK%CELLS(5)%Nodes(:, i)
     ! end do
 

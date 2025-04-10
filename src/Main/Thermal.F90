@@ -6,7 +6,10 @@ module Main_Thermal
     use :: Calculate_VolumetricHeatCapacity
     use :: Calculate_ThermalConductivity
     use :: Calculate_Area, only:Update_Area
+    use :: Calculate_Shape, only:Calculate_Basis
+    use :: Matrix_Assemble
     use :: Matrix_CRS
+    use :: Condition_Fix_Boundary_Conditions, only:Type_BC_Thermal
     implicit none
 
     type, abstract :: Abstract_Thermal
@@ -14,7 +17,7 @@ module Main_Thermal
         type(Type_CRS) :: KT_star_0
         type(Type_CRS) :: KT_l
         type(Type_CRS) :: KT_old
-        type(Type_CRS) :: CT
+        type(Type_CRS) :: CT_l
         type(Type_CRS) :: CT_old
         real(real64), allocatable :: FT(:)
         real(real64), allocatable :: FT_old(:)
@@ -25,6 +28,7 @@ module Main_Thermal
         integer(int32), allocatable :: Element(:, :)
         type(DP3d) :: Coordinate
         real(real64), allocatable :: Basis(:, :, :)
+        type(Type_BC_Thermal) :: BC
     end type Abstract_Thermal
 
     type, extends(Abstract_Thermal) :: Type_Thermal_3Phase
@@ -34,8 +38,12 @@ module Main_Thermal
 
     end type Type_Thermal_3Phase
 
+    interface Type_Thermal_3Phase
+        module procedure Type_Thermal_3Phase_Construct
+    end interface
+
 contains
-    function Type_Thermal_3Phase_Construct(Elements, Coordinate, meshType, Lf, Tf, Input_Ice_Param, Input_Thermal_Params, nsize) result(structure)
+    function Type_Thermal_3Phase_Construct(Elements, Coordinate, meshType, Lf, Tf, Input_Ice_Param, Input_Thermal_Params, Input_Thermal_BC, nsize, Input_VTK) result(structure)
         implicit none
         type(Type_Thermal_3Phase) :: structure
         integer(int32), intent(in) :: Elements(:, :)
@@ -45,7 +53,10 @@ contains
         real(real64), intent(in) :: Tf
         type(Input_Ice), intent(in) :: Input_Ice_Param
         type(Input_Thermal), intent(in) :: Input_Thermal_Params
+        type(Type_BC_Thermal), intent(in) :: Input_Thermal_BC
         integer(int32), intent(in) :: nsize
+        type(Type_VTK), intent(in) :: Input_VTK
+        integer(int32) :: nElement
 
         allocate (structure%Element, source=Elements)
         call Allocate_Array(structure%Coordinate%x, nsize)
@@ -54,17 +65,18 @@ contains
         structure%Coordinate%x(:) = Coordinate%x(:)
         structure%Coordinate%y(:) = Coordinate%y(:)
         structure%Coordinate%z(:) = Coordinate%z(:)
-        call Allocate_Array(structure%Area, nsize)
+        nElement = size(Elements, 2)
+        call Allocate_Array(structure%Area, nElement)
         call Update_Area(structure%Element, structure%Coordinate, structure%Area)
         if (meshType == 3) then
-            allocate (structure%Basis(3, 3, nsize))
+            allocate (structure%Basis(3, 3, nElement))
             call Calculate_Basis(structure%Element, structure%Coordinate, structure%Basis)
         end if
 
         structure%KT_star_0 = Type_CRS(Elements, nsize)
         structure%KT_l = structure%KT_star_0%Copy()
         structure%KT_old = structure%KT_star_0%Copy()
-        structure%CT = structure%KT_star_0%Copy()
+        structure%CT_l = structure%KT_star_0%Copy()
         structure%CT_old = structure%KT_star_0%Copy()
         call Allocate_Array(structure%FT, nsize)
         call Allocate_Array(structure%FT_old, nsize)
@@ -156,5 +168,30 @@ contains
                                                            Input_Thermal_Params%lambda(3), &
                                                            nsize)
 
+        structure%BC = Type_BC_Thermal(Input_Thermal_BC%BCGroup, Input_Thermal_BC%BC_Info, Input_Thermal_BC%Edge, structure%Coordinate, Input_VTK)
+
     end function Type_Thermal_3Phase_Construct
+
+    subroutine Type_Thermal_3Phase_Assemble(self, alpha, dt, nsize, iiter)
+        implicit none
+        class(Type_Thermal_3Phase), intent(inout) :: self
+        real(real64), intent(in) :: alpha
+        real(real64), intent(in) :: dt
+        integer(int32), intent(in) :: nsize
+        integer(int32) :: iiter
+
+        self%CT_l%Val(:) = 0.0d0
+        self%KT_l%Val(:) = 0.0d0
+        call Assemble_Mass_Lumped_231(self%CT_l, self%Element, self%Area, self%C%Apparent, nsize)
+        call Assemble_Diffusion_231(self%KT_l, self%Element, self%Basis, self%Area, self%lambda%value, nsize)
+        if (iiter == 1) then
+            self%KT_star_0%Val(:) = alpha * dt * self%KT_l%Val(:) + self%CT_l%Val(:)
+            self%CT_old%Val(:) = self%CT_l%Val(:)
+            self%KT_old%Val(:) = self%KT_l%Val(:)
+            self%PHIT(:) = 0.0d0
+            self%PHIT_old(:) = (1.0d0 - alpha) * dt * (self%KT_old * self%T%old(:)) - self%CT_old * self%T%old(:)
+        end if
+        self%PHIT(:) = alpha * dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
+
+    end subroutine Type_Thermal_3Phase_Assemble
 end module Main_Thermal

@@ -5,12 +5,12 @@ module Matrix_Assemble
     use omp_lib
 #endif
     implicit none
-    private
+    ! private
 contains
     subroutine Assemble_Mass_Lumped_231(A, Elements, Area, C, N)
         implicit none
         type(Type_CRS), intent(inout) :: A
-        real(real64), intent(in) :: Elements(:, :)
+        integer(int32), intent(in) :: Elements(:, :)
         real(real64), intent(in) :: Area(:)
         real(real64), intent(in) :: C(:)
         integer(int32), intent(in) :: N
@@ -39,7 +39,7 @@ contains
     subroutine Assemble_Diffusion_231(A, Elements, Basis, Area, lambda, N)
         implicit none
         type(Type_CRS), intent(inout) :: A
-        real(real64), intent(in) :: Elements(:, :)
+        integer(int32), intent(in) :: Elements(:, :)
         real(real64), intent(in) :: Basis(:, :, :)
         real(real64), intent(in) :: Area(:)
         real(real64), intent(in) :: lambda(:)
@@ -87,7 +87,7 @@ contains
     subroutine Assemble_Diffusion_Dispersity_231(A, Elements, Basis, Area, lambda_xx, lambda_xy, lambda_yy, N)
         implicit none
         type(Type_CRS), intent(inout) :: A
-        real(real64), intent(in) :: Elements(:, :)
+        integer(int32), intent(in) :: Elements(:, :)
         real(real64), intent(in) :: Basis(:, :, :)
         real(real64), intent(in) :: Area(:)
         real(real64), intent(in) :: lambda_xx(:)

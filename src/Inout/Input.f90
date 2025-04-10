@@ -5,98 +5,100 @@ module Inout_Input
 !     use :: Allocate_Allocate
 !     use :: Allocate_Structure, only:Allocate_Structure_Thermal_Type, Allocate_Structure_Ice_Type, Allocate_Structure_WRF_Type, Allocate_Structure_Hydraulic_Type
     use :: Types
-!     ! use :: tomlf
-!     use :: json_module, only:json_file
+!     ! use :: tomlf]
+    use :: Condition_Fix_Boundary_Conditions
+    use :: json_module, only:json_file
     use :: Inout_VTK
     implicit none
 !     private
 
-!     integer(int32), parameter :: min_calculation_type = 1, max_calculation_type = 7
-!     integer(int32), parameter :: min_model_type = 11, max_model_type = 18
-!     integer(int32), parameter :: min_Coordinate_Dimesion_type = 1, max_Coordinate_Dimesion_type = 3
-!     character(*), parameter :: BasicName = "Basic"
-!     character(*), parameter :: ThermalName = "Thermal"
-!     character(*), parameter :: HydraulicName = "Hydraulic"
-!     character(*), parameter :: ElementName = "Element"
-!     character(*), parameter :: NodeName = "Node"
-!     character(*), parameter :: ShapeName = "ShapeType"
-!     character(*), parameter :: DimensionName = "DimensionType"
-!     character(*), parameter :: RegionName = "Region"
-!     character(*), parameter :: BelongName = "Belong"
-!     character(*), parameter :: SurfaceName = "Surface"
-!     character(*), parameter :: EdgeName = "Edge"
-!     character(*), parameter :: CalculationName = "Calculation"
-!     character(*), parameter :: InputName = "Input"
-!     character(*), parameter :: OutputName = "Output"
-!     character(*), parameter :: IntervalName = "Interval"
-!     character(*), parameter :: timeUnitName = "timeUnit"
-!     character(*), parameter :: stepName = "step"
-!     character(*), parameter :: calculationPeriodName = "calculationPeriod"
-!     character(*), parameter :: isDisplayPromptName = "isDisplayPrompt"
-!     character(*), parameter :: FileOutputName = "FileOutput"
+    integer(int32), parameter :: min_calculation_type = 1, max_calculation_type = 7
+    integer(int32), parameter :: min_model_type = 11, max_model_type = 18
+    integer(int32), parameter :: min_Coordinate_Dimesion_type = 1, max_Coordinate_Dimesion_type = 3
+    character(*), parameter :: BasicName = "Basic"
+    character(*), parameter :: ThermalName = "Thermal"
+    character(*), parameter :: HydraulicName = "Hydraulic"
+    character(*), parameter :: ElementName = "Element"
+    character(*), parameter :: NodeName = "Node"
+    character(*), parameter :: ShapeName = "ShapeType"
+    character(*), parameter :: DimensionName = "DimensionType"
+    character(*), parameter :: RegionName = "Region"
+    character(*), parameter :: BelongName = "Belong"
+    character(*), parameter :: SurfaceName = "Surface"
+    character(*), parameter :: EdgeName = "Edge"
+    character(*), parameter :: CalculationName = "Calculation"
+    character(*), parameter :: InputName = "Input"
+    character(*), parameter :: OutputName = "Output"
+    character(*), parameter :: IntervalName = "Interval"
+    character(*), parameter :: timeUnitName = "timeUnit"
+    character(*), parameter :: stepName = "step"
+    character(*), parameter :: calculationPeriodName = "calculationPeriod"
+    character(*), parameter :: isDisplayPromptName = "isDisplayPrompt"
+    character(*), parameter :: FileOutputName = "FileOutput"
 
-!     character(*), parameter :: CalculationTypeName = "CalculationType"
-!     character(*), parameter :: ModelnumberName = "Modelnumber"
-!     character(*), parameter :: isFrozenName = "isFrozen"
-!     character(*), parameter :: PorosityName = "Porosity"
-!     character(*), parameter :: LatentHeatName = "LatentHeat"
-!     character(*), parameter :: Phase1Name = "Phase1"
-!     character(*), parameter :: Phase2Name = "Phase2"
-!     character(*), parameter :: SoilName = "Soil"
-!     character(*), parameter :: WaterName = "Water"
-!     character(*), parameter :: IceName = "Ice"
-!     character(*), parameter :: DensityName = "Density"
-!     character(*), parameter :: SpecificHeatName = "SpecificHeat"
-!     character(*), parameter :: ThermalConductivityName = "ThermalConductivity"
-!     character(*), parameter :: dispersityName = "dispersity"
-!     character(*), parameter :: xName = "x"
-!     character(*), parameter :: yName = "y"
-!     character(*), parameter :: zName = "z"
-!     character(*), parameter :: QiceTypeName = "QiceType"
-!     character(*), parameter :: TfName = "Tf"
-!     character(*), parameter :: ParametersName = "Parameters"
-!     character(*), parameter :: ModelName = "Model"
-!     character(*), parameter :: thetaSName = "thetaS"
-!     character(*), parameter :: thetaRName = "thetaR"
-!     character(*), parameter :: alpha1Name = "alpha1"
-!     character(*), parameter :: alpha2Name = "alpha2"
-!     character(*), parameter :: n1Name = "n1"
-!     character(*), parameter :: n2Name = "n2"
-!     character(*), parameter :: w1Name = "w1"
-!     character(*), parameter :: hcritName = "hcrit"
-!     character(*), parameter :: KTDynamicsName = "KTDynamics"
-!     character(*), parameter :: ImpedanceName = "Impedance"
-!     character(*), parameter :: KsName = "Ks"
+    character(*), parameter :: CalculationTypeName = "CalculationType"
+    character(*), parameter :: ModelnumberName = "Modelnumber"
+    character(*), parameter :: isFrozenName = "isFrozen"
+    character(*), parameter :: PorosityName = "Porosity"
+    character(*), parameter :: LatentHeatName = "LatentHeat"
+    character(*), parameter :: Phase1Name = "Phase1"
+    character(*), parameter :: Phase2Name = "Phase2"
+    character(*), parameter :: SoilName = "Soil"
+    character(*), parameter :: WaterName = "Water"
+    character(*), parameter :: IceName = "Ice"
+    character(*), parameter :: DensityName = "Density"
+    character(*), parameter :: SpecificHeatName = "SpecificHeat"
+    character(*), parameter :: ThermalConductivityName = "ThermalConductivity"
+    character(*), parameter :: dispersityName = "dispersity"
+    character(*), parameter :: xName = "x"
+    character(*), parameter :: yName = "y"
+    character(*), parameter :: zName = "z"
+    character(*), parameter :: QiceTypeName = "QiceType"
+    character(*), parameter :: TfName = "Tf"
+    character(*), parameter :: ParametersName = "Parameters"
+    character(*), parameter :: ModelName = "Model"
+    character(*), parameter :: thetaSName = "thetaS"
+    character(*), parameter :: thetaRName = "thetaR"
+    character(*), parameter :: alpha1Name = "alpha1"
+    character(*), parameter :: alpha2Name = "alpha2"
+    character(*), parameter :: n1Name = "n1"
+    character(*), parameter :: n2Name = "n2"
+    character(*), parameter :: w1Name = "w1"
+    character(*), parameter :: hcritName = "hcrit"
+    character(*), parameter :: KTDynamicsName = "KTDynamics"
+    character(*), parameter :: ImpedanceName = "Impedance"
+    character(*), parameter :: KsName = "Ks"
 
-!     character(*), parameter :: AName = "a"
+    character(*), parameter :: AName = "a"
 
-!     character(*), parameter :: useHCFName = "useHCF"
-!     character(*), parameter :: useImpedanceName = "useImpedance"
-!     character(*), parameter :: useKTDynamicsName = "useKTDynamics"
-!     character(*), parameter :: lName = "l"
-!     character(*), parameter :: OmegaName = "Omega"
-!     character(*), parameter :: TimeDiscretizationName = "TimeDiscretization"
-!     character(*), parameter :: SolveName = "Solve"
-!     character(*), parameter :: SolverName = "Solver"
-!     character(*), parameter :: PreconditionerName = "Preconditioner"
-!     character(*), parameter :: MaxIterationName = "MaxIteration"
-!     character(*), parameter :: ToleranceName = "Tolerance"
-!     character(*), parameter :: useSolverName = "useSolver"
+    character(*), parameter :: useHCFName = "useHCF"
+    character(*), parameter :: useImpedanceName = "useImpedance"
+    character(*), parameter :: useKTDynamicsName = "useKTDynamics"
+    character(*), parameter :: lName = "l"
+    character(*), parameter :: OmegaName = "Omega"
+    character(*), parameter :: TimeDiscretizationName = "TimeDiscretization"
+    character(*), parameter :: SolveName = "Solve"
+    character(*), parameter :: SolverName = "Solver"
+    character(*), parameter :: PreconditionerName = "Preconditioner"
+    character(*), parameter :: MaxIterationName = "MaxIteration"
+    character(*), parameter :: ToleranceName = "Tolerance"
+    character(*), parameter :: useSolverName = "useSolver"
 
-!     character(*), parameter :: BCName = "BoundaryConditions"
-!     character(*), parameter :: ICName = "InitialConditions"
-!     character(*), parameter :: ConstantName = "Constant"
-!     character(*), parameter :: LaplaceName = "Laplace"
+    character(*), parameter :: BCName = "BoundaryConditions"
+    character(*), parameter :: ICName = "InitialConditions"
+    character(*), parameter :: ConstantName = "Constant"
+    character(*), parameter :: LaplaceName = "Laplace"
 
-!     character(*), parameter :: GroupName = "Groups"
-!     character(*), parameter :: TypeName = "Type"
-!     character(*), parameter :: ValueName = "Value"
-!     character(*), parameter :: DirichletName = "Dirichlet"
-!     character(*), parameter :: AdiabaticName = "Adiabatic"
-!     character(*), parameter :: ImpermeableName = "Impermeable"
-!     character(*), parameter :: FreeHeatTransferName = "FreeHeatTransfer"
-!     character(*), parameter :: NoneName = "None"
-!     character(*), parameter :: HeatTransferName = "HeatTransfer"
+    character(*), parameter :: GroupName = "Groups"
+    character(*), parameter :: TypeName = "Type"
+    character(*), parameter :: ValueName = "Value"
+    character(*), parameter :: DirichletName = "Dirichlet"
+    character(*), parameter :: AdiabaticName = "Adiabatic"
+    character(*), parameter :: ImpermeableName = "Impermeable"
+    character(*), parameter :: FreeHeatTransferName = "FreeHeatTransfer"
+    character(*), parameter :: NoneName = "None"
+    character(*), parameter :: HeatTransferName = "HeatTransfer"
+    character(*), parameter :: UniformName = "Uniform"
 
     !! Positive NaN
     real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
@@ -150,13 +152,13 @@ module Inout_Input
 !         type(Type_Region), allocatable :: Regions(:)
 !         type(Type_Solver) :: Solver
         type(Type_VTK) :: VTK
-!         type(Type_Conditions) :: Conditions
+        type(Type_BC_Thermal) :: Conditions
 
     contains
 
 !         procedure :: Input_Parameters => Inout_Input_Parameters_JSON
         procedure :: Input_Geometry => Inout_Input_Geometry_VTK
-!         procedure :: Input_Conditions => Inout_Input_Conditions_JSON
+        procedure :: Input_Conditions => Inout_Input_Conditions_JSON
 
 !         procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
 !         procedure, pass :: Input_Get_Regional_Params => Inout_Input_Get_Regional_Params
@@ -221,7 +223,7 @@ contains
 
 !         call Input_Constructor%Input_Parameters()
         call Input_Constructor%Input_Geometry()
-!         call Input_Constructor%Input_Conditions()
+        call Input_Constructor%Input_Conditions()
 !         ! call Input_Constructor%Input_IC()
 !         ! call Input_Constructor%Input_Observation()
 !         ! call Input_Constructor%Input_Flags()
@@ -1070,160 +1072,164 @@ contains
 
 !     end subroutine Inout_Input_Parameters_JSON_Solver_Settings
 
-!     subroutine Inout_Input_Conditions_JSON(self)
-!         !> Load the boundary/initial conditions from the JSON file
-!         implicit none
-!         class(Input) :: self
+    subroutine Inout_Input_Conditions_JSON(self)
+        !> Load the boundary/initial conditions from the JSON file
+        implicit none
+        class(Type_Input) :: self
 
-!         type(json_file) :: json
-!         character(:), allocatable :: key
-!         integer(int32) :: iRegion
+        type(json_file) :: json
+        character(:), allocatable :: key
+        integer(int32) :: iRegion
 
-!         call json%initialize()
-!         call json%load(filename=self%Conditions_FileName)
-!         call json%print_error_message(output_unit)
+        call json%initialize()
+        call json%load(filename=self%Conditions_FileName)
+        call json%print_error_message(output_unit)
 
-!         call Inout_Input_Conditions_JSON_BC(self, json)
-!         call Inout_Input_Conditions_JSON_IC(self, json)
+        call Inout_Input_Conditions_JSON_BC(self, json)
+        ! call Inout_Input_Conditions_JSON_IC(self, json)
 
-!         call json%destroy()
-!         call json%print_error_message(output_unit)
+        call json%destroy()
+        call json%print_error_message(output_unit)
 
-!     end subroutine Inout_Input_Conditions_JSON
+    end subroutine Inout_Input_Conditions_JSON
 
-!     subroutine Inout_Input_Conditions_JSON_BC(self, json)
-!         !> Load the boundary conditions from the JSON file
-!         implicit none
-!         class(Input) :: self
-!         type(json_file), intent(inout) :: json !! JSON parser
+    subroutine Inout_Input_Conditions_JSON_BC(self, json)
+        !> Load the boundary conditions from the JSON file
+        implicit none
+        class(Type_Input) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
 
-!         character(:), allocatable :: key
-!         character(2) :: cBCGroup
-!         integer(int32) :: iBC
+        character(:), allocatable :: key
+        character(2) :: cBCGroup
+        integer(int32) :: iBC
 
-!         key = Inout_Input_Connect_dot(BCName, GroupName)
-!         call json%get(key, self%Conditions%BCGroup)
-!         call json%print_error_message(output_unit)
-!         allocate (self%Conditions%BC_Thermal(size(self%Conditions%BCGroup)))
-!         allocate (self%Conditions%BC_Hydraulic(size(self%Conditions%BCGroup)))
+        key = Inout_Input_Connect_dot(BCName, GroupName)
+        call json%get(key, self%Conditions%BCGroup)
+        call json%print_error_message(output_unit)
+        self%Conditions%numBCGroup = size(self%Conditions%BCGroup)
+        allocate (self%Conditions%BC_Info(self%Conditions%numBCGroup))
+        ! allocate (self%Conditions%BC_Hydraulic(size(self%Conditions%BCGroup)))
 
-!         do iBC = 1, size(self%Conditions%BCGroup)
-!             write (cBCGroup, '(i0)') self%Conditions%BCGroup(iBC)
-!             key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, TypeName)
-!             call json%get(key, self%Conditions%BC_Thermal(iBC)%type)
-!             call json%print_error_message(output_unit)
+        do iBC = 1, size(self%Conditions%BCGroup)
+            write (cBCGroup, '(i0)') self%Conditions%BCGroup(iBC)
+            key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, TypeName)
+            call json%get(key, self%Conditions%BC_Info(iBC)%type)
+            call json%print_error_message(output_unit)
 
-!             select case (self%Conditions%BC_Thermal(iBC)%type)
-!             case (DirichletName, HeatTransferName)
-!                 key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, ValueName)
-!                 call json%get(key, self%Conditions%BC_Thermal(iBC)%value)
-!                 call json%print_error_message(output_unit)
-!             case default
-!                 self%Conditions%BC_Thermal(iBC)%value = NaNValue
-!             end select
+            select case (self%Conditions%BC_Info(iBC)%type)
+            case (DirichletName, HeatTransferName)
+                key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, ValueName)
+                call json%get(key, self%Conditions%BC_Info(iBC)%value)
+                call json%print_error_message(output_unit)
+                key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, UniformName)
+                call json%get(key, self%Conditions%BC_Info(iBC)%isUniform)
+                call json%print_error_message(output_unit)
+            case default
+                self%Conditions%BC_Info(iBC)%value = NaNValue
+            end select
 
-!             key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, TypeName)
-!             call json%get(key, self%Conditions%BC_Hydraulic(iBC)%type)
-!             call json%print_error_message(output_unit)
+            ! key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, TypeName)
+            ! call json%get(key, self%Conditions%BC_Hydraulic(iBC)%type)
+            ! call json%print_error_message(output_unit)
 
-!             select case (self%Conditions%BC_Hydraulic(iBC)%type)
-!             case (DirichletName, HeatTransferName)
-!                 key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, ValueName)
-!                 call json%get(key, self%Conditions%BC_Hydraulic(iBC)%value)
-!                 call json%print_error_message(output_unit)
-!             case default
-!                 self%Conditions%BC_Hydraulic(iBC)%value = NaNValue
-!             end select
-!         end do
+            ! select case (self%Conditions%BC_Hydraulic(iBC)%type)
+            ! case (DirichletName, HeatTransferName)
+            !     key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, ValueName)
+            !     call json%get(key, self%Conditions%BC_Hydraulic(iBC)%value)
+            !     call json%print_error_message(output_unit)
+            ! case default
+            !     self%Conditions%BC_Hydraulic(iBC)%value = NaNValue
+            ! end select
+        end do
 
-!     end subroutine Inout_Input_Conditions_JSON_BC
+    end subroutine Inout_Input_Conditions_JSON_BC
 
-!     subroutine Inout_Input_Conditions_JSON_IC(self, json)
-!         !> Load the initialy conditions from the JSON file
-!         implicit none
-!         class(Input) :: self
-!         type(json_file), intent(inout) :: json !! JSON parser
+    ! subroutine Inout_Input_Conditions_JSON_IC(self, json)
+    !     !> Load the initialy conditions from the JSON file
+    !     implicit none
+    !     class(Type_Input) :: self
+    !     type(json_file), intent(inout) :: json !! JSON parser
 
-!         character(:), allocatable :: key
-!         character(:), allocatable :: tmp
+    !     character(:), allocatable :: key
+    !     character(:), allocatable :: tmp
 
-!         character(2) :: cICGroup
-!         integer(int32) :: i, count
-!         logical(4) :: isFind
+    !     character(2) :: cICGroup
+    !     integer(int32) :: i, count
+    !     logical(4) :: isFind
 
-!         key = Inout_Input_Connect_dot(ICName, ThermalName, TypeName)
-!         call json%get(key, self%Conditions%IC_Thermal%type)
-!         call json%print_error_message(output_unit)
+    !     key = Inout_Input_Connect_dot(ICName, ThermalName, TypeName)
+    !     call json%get(key, self%Conditions%IC_Thermal%type)
+    !     call json%print_error_message(output_unit)
 
-!         select case (self%Conditions%IC_Thermal%type)
-!         case (ConstantName)
-!             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName)
-!             call json%get(key, self%Conditions%IC_Thermal%value)
-!             call json%print_error_message(output_unit)
-!         case (LaplaceName)
-!             count = 0
-!             do i = 1, size(self%Conditions%BCGroup)
-!                 write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-!                 key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
-!                 call json%get(key, tmp, found=isFind)
-!                 if (isFind) count = count + 1
-!             end do
-!             allocate (self%Conditions%IC_Thermal%IC_BC(count))
-!             do i = 1, size(self%Conditions%BCGroup)
-!                 write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-!                 key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
-!                 call json%get(key, tmp, found=isFind)
-!                 if (.not. isFind) cycle
+    !     select case (self%Conditions%IC_Thermal%type)
+    !     case (ConstantName)
+    !         key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName)
+    !         call json%get(key, self%Conditions%IC_Thermal%value)
+    !         call json%print_error_message(output_unit)
+    !     case (LaplaceName)
+    !         count = 0
+    !         do i = 1, size(self%Conditions%BCGroup)
+    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
+    !             call json%get(key, tmp, found=isFind)
+    !             if (isFind) count = count + 1
+    !         end do
+    !         allocate (self%Conditions%IC_Thermal%IC_BC(count))
+    !         do i = 1, size(self%Conditions%BCGroup)
+    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
+    !             call json%get(key, tmp, found=isFind)
+    !             if (.not. isFind) cycle
 
-!                 key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
-!                 call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%type)
-!                 call json%print_error_message(output_unit)
+    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
+    !             call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%type)
+    !             call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, ValueName)
-!                 call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%value)
-!                 call json%print_error_message(output_unit)
-!             end do
+    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, ValueName)
+    !             call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%value)
+    !             call json%print_error_message(output_unit)
+    !         end do
 
-!         end select
+    !     end select
 
-!         key = Inout_Input_Connect_dot(ICName, HydraulicName, TypeName)
-!         call json%get(key, self%Conditions%IC_Hydraulic%type)
-!         call json%print_error_message(output_unit)
+    !     key = Inout_Input_Connect_dot(ICName, HydraulicName, TypeName)
+    !     call json%get(key, self%Conditions%IC_Hydraulic%type)
+    !     call json%print_error_message(output_unit)
 
-!         select case (self%Conditions%IC_Hydraulic%type)
-!         case (ConstantName)
-!             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName)
-!             call json%get(key, self%Conditions%IC_Hydraulic%value)
-!             call json%print_error_message(output_unit)
-!         case (LaplaceName)
-!             count = 0
-!             do i = 1, size(self%Conditions%BCGroup)
-!                 write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-!                 key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-!                 call json%get(key, tmp, found=isFind)
-!                 if (isFind) count = count + 1
-!             end do
-!             allocate (self%Conditions%IC_Hydraulic%IC_BC(count))
-!             count = 0
-!             do i = 1, size(self%Conditions%BCGroup)
-!                 write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-!                 key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-!                 call json%get(key, tmp, found=isFind)
+    !     select case (self%Conditions%IC_Hydraulic%type)
+    !     case (ConstantName)
+    !         key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName)
+    !         call json%get(key, self%Conditions%IC_Hydraulic%value)
+    !         call json%print_error_message(output_unit)
+    !     case (LaplaceName)
+    !         count = 0
+    !         do i = 1, size(self%Conditions%BCGroup)
+    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+    !             call json%get(key, tmp, found=isFind)
+    !             if (isFind) count = count + 1
+    !         end do
+    !         allocate (self%Conditions%IC_Hydraulic%IC_BC(count))
+    !         count = 0
+    !         do i = 1, size(self%Conditions%BCGroup)
+    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+    !             call json%get(key, tmp, found=isFind)
 
-!                 if (.not. isFind) cycle
-!                 count = count + 1
+    !             if (.not. isFind) cycle
+    !             count = count + 1
 
-!                 key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-!                 call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%type)
-!                 call json%print_error_message(output_unit)
+    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+    !             call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%type)
+    !             call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
-!                 call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%value)
-!                 call json%print_error_message(output_unit)
-!             end do
-!         end select
+    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
+    !             call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%value)
+    !             call json%print_error_message(output_unit)
+    !         end do
+    !     end select
 
-!     end subroutine Inout_Input_Conditions_JSON_IC
+    ! end subroutine Inout_Input_Conditions_JSON_IC
 
     subroutine Inout_Input_Geometry_VTK(self)
         !> Load the geometry from the VTK file

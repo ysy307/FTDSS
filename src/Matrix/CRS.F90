@@ -40,16 +40,15 @@ contains
         type(Type_CRS) :: A
 
         integer(int32) :: iN, iE, iT, irT, iNC, iNNZ, row_nnz
-        integer(int32) :: nElment, nTop
+        integer(int32) :: nElment, nTop, tmpsize
         integer(int32), allocatable :: vertex(:), row(:), tmpInd(:)
 
         nTop = size(Elements, 1)
         nElment = size(Elements, 2)
         A%nrow = nNode + 1
-
         ! 1-origin用に配列を割り当て
         ! CRS のポインタ配列は nNode+1 個（A%Ptr(1)=1, A%Ptr(i+1)=row_iの開始位置を保持）
-        call Allocate_Array(A%Ptr, nNode + 1_int32)
+        call Allocate_Array(A%Ptr, A%nrow)
         call Allocate_Array(row, nNode)
         call Allocate_Array(tmpInd, 8_int32 * nNode)
         call Allocate_Array(vertex, nTop)
@@ -164,7 +163,7 @@ contains
         class(Type_CRS) :: self
         type(Type_CRS) :: B
 
-        call Allocate_Array(B%Ptr, self%nrow + 1_int32)
+        call Allocate_Array(B%Ptr, self%nrow)
         call Allocate_Array(B%Ind, self%nnz)
         call Allocate_Array(B%Val, self%nnz)
 

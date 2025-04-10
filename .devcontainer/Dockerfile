@@ -67,7 +67,8 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "export MPIF90=mpiifx" >> ~/.zshrc && \
     echo "export MPIF77=mpiifx" >> ~/.zshrc && \
     echo "export MPICC=mpiicc" >> ~/.zshrc && \
-    echo "export MPICXX=mpiicpc" >> ~/.zshrc
+    echo "export MPICXX=mpiicpc" >> ~/.zshrc &&\
+    echo "ulimit -s unlimited" >> ~/.zshrc
 
 # デフォルトのシェルをZshに設定
 RUN echo "export SHELL=/usr/bin/zsh" >> /root/.bashrc && \

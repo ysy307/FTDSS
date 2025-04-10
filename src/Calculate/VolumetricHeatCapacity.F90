@@ -881,7 +881,7 @@ contains
 
         ! $omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN) = self%Cp_soil * phi_soil &
+            self%value(iN) = self%Cp_soil * (1.0d0 - phi_soil) &
                              + self%Cp_water * arr_Qw(iN) &
                              + self%Cp_ice * arr_Qice(iN)
         end do
@@ -899,7 +899,7 @@ contains
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN) = self%Cp_soil * arr_phi_soil(iN) &
+            self%value(iN) = self%Cp_soil * (1.0d0 - arr_phi_soil(iN)) &
                              + self%Cp_water * arr_Qw(iN) &
                              + self%Cp_ice * arr_Qice(iN)
         end do
@@ -917,7 +917,7 @@ contains
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN) = self%Cp_soil * phi_soil &
+            self%value(iN) = self%Cp_soil * (1.0d0 - phi_soil) &
                              + self%Cp_water * arr_Qw(iN) &
                              + self%Cp_ice * arr_Qice(iN) &
                              + self%Cp_air * (1.0d0 - phi_soil - arr_Qw(iN) - arr_Qice(iN))
@@ -936,7 +936,7 @@ contains
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN) = self%Cp_soil * arr_phi_soil(iN) &
+            self%value(iN) = self%Cp_soil * (1.0d0 - arr_phi_soil(iN)) &
                              + self%Cp_water * arr_Qw(iN) &
                              + self%Cp_ice * arr_Qice(iN) &
                              + self%Cp_air * (1.0d0 - arr_phi_soil(iN) - arr_Qw(iN) - arr_Qice(iN))

@@ -1,30 +1,27 @@
 {
     "BoundaryConditions": {
         "Groups": [
+            2,
             3,
             4,
             5,
             6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15
+            7
         ],
-        "3": {
+        "2": {
             "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": 18.0
+                "Type": "Adiabatic"
             },
             "Hydraulic": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": 10.0
+                "Type": "Impermeable"
+            }
+        },
+        "3": {
+            "Thermal": {
+                "Type": "Adiabatic"
+            },
+            "Hydraulic": {
+                "Type": "Impermeable"
             }
         },
         "4": {
@@ -37,7 +34,7 @@
         },
         "5": {
             "Thermal": {
-                "Type": "FreeHeatDischarge"
+                "Type": "Adiabatic"
             },
             "Hydraulic": {
                 "Type": "Dirichlet",
@@ -47,7 +44,11 @@
         },
         "6": {
             "Thermal": {
-                "Type": "Adiabatic"
+                "Type": "Dirichlet",
+                "Uniform": true,
+                "Value": [
+                    -30.0
+                ]
             },
             "Hydraulic": {
                 "Type": "Impermeable"
@@ -57,91 +58,9 @@
             "Thermal": {
                 "Type": "Dirichlet",
                 "Uniform": true,
-                "Value": -30.0
-            },
-            "Hydraulic": {
-                "Type": "Impermeable"
-            }
-        },
-        "8": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": -30.0
-            },
-            "Hydraulic": {
-                "Type": "Impermeable"
-            }
-        },
-        "9": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": -30.0
-            },
-            "Hydraulic": {
-                "Type": "Impermeable"
-            }
-        },
-        "10": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": -30.0
-            },
-            "Hydraulic": {
-                "Type": "Impermeable"
-            }
-        },
-        "11": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": -30.0
-            },
-            "Hydraulic": {
-                "Type": "Impermeable"
-            }
-        },
-        "12": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": -30.0
-            },
-            "Hydraulic": {
-                "Type": "Impermeable"
-            }
-        },
-        "13": {
-            "Thermal": {
-                "Type": "HeatTransfer",
-                "Uniform": true,
                 "Value": [
-                    1.5,
-                    20
+                    -30.0
                 ]
-            },
-            "Hydraulic": {
-                "Type": "None"
-            }
-        },
-        "14": {
-            "Thermal": {
-                "Type": "HeatTransfer",
-                "Uniform": true,
-                "Value": [
-                    11.6,
-                    20
-                ]
-            },
-            "Hydraulic": {
-                "Type": "None"
-            }
-        },
-        "15": {
-            "Thermal": {
-                "Type": "None"
             },
             "Hydraulic": {
                 "Type": "Impermeable"

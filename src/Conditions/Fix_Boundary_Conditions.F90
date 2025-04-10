@@ -24,12 +24,12 @@ module Condition_Fix_Boundary_Conditions
     type :: Condition_BC_Local
         character(:), allocatable :: type
         logical(4) :: isUniform
-        real(real64), allocatable :: value(:, :)
+        real(real64), allocatable :: value(:)
     end type Condition_BC_Local
 
     type, abstract :: Abstract_Condition_BC
-        private
         !! Boundary conditions information
+        integer(int32) :: numBCGroup
         integer(int32), allocatable :: BCGroup(:)
         type(Condition_BC_Local), allocatable :: BC_Info(:)
         !! Boundary conditions information of the Edges
@@ -111,25 +111,29 @@ contains
 
     end subroutine Calculate_Edge_UnitNormalVector
 
-    function Type_BC_Thermal_Constructor(BC_Group, BC_Info, Edges, EdgeType, Coordinate) result(Structure)
+    function Type_BC_Thermal_Constructor(BC_Group, BC_Info, Edges, Coordinate, Input_VTK) result(Structure)
+        ! function Type_BC_Thermal_Constructor(BC_Group, BC_Info, Edges, EdgeType, Coordinate) result(Structure)
         implicit none
         integer(int32), intent(in) :: BC_Group(:)
         type(Condition_BC_Local), intent(in) :: BC_Info(:)
         integer(int32), intent(in) :: Edges(:, :)
-        integer(int32), intent(in) :: EdgeType(:)
+        ! integer(int32), intent(in) :: EdgeType(:)
         type(DP3d), intent(in) :: Coordinate
+        type(Type_VTK), intent(in) :: Input_VTK
 
         type(Type_BC_Thermal) :: Structure
 
         integer(int32) :: i
 
         allocate (Structure%BCGroup, source=BC_Group)
+        allocate (Structure%BC_Info(size(Structure%BCGroup)))
         do i = 1, size(BC_Info)
             Structure%BC_Info(i) = BC_Info(i)
         end do
-        Structure%numEdges = size(Edges, 2)
-        allocate (Structure%Edge, source=Edges)
-        allocate (Structure%EdgeType, source=EdgeType)
+        Structure%numEdges = Input_VTK%CELLS(3)%nCells
+        ! print *, Input_VTK%CELLS(3)%Nodes(:, :)
+        allocate (Structure%Edge, source=Input_VTK%CELLS(3)%Nodes)
+        allocate (Structure%EdgeType, source=Input_VTK%CellEntityIds(1:Structure%numEdges))
 
         !***************************************************************************************************************************
         ! 辺が一次要素のときはこれで計算ができるが，二次要素になると(2,numEdges)にしないといけない
@@ -156,23 +160,23 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(i)%type)
+            select case (self%BC_Info(self%EdgeType(i))%type)
             case (Neumann)
-                call Fix_BoundaryCondition_Neumann(b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i), lambda)
+                call Fix_BoundaryCondition_Neumann(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), lambda)
             case (HeatFlux)
-                call Fix_BoundaryCondition_Flux(b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_Flux(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
             case (Robin)
-                call Fix_BoundaryCondition_Robin_CRS(A, b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i), self%Edge_UnitNormal, Cw, Structure_HeatFlux)
+                call Fix_BoundaryCondition_Robin_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), self%Edge_UnitNormal, Cw, Structure_HeatFlux)
             case (HeatTransfer)
-                call Fix_BoundaryCondition_HeatTransfer_CRS(A, b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_HeatTransfer_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
             case (HeatRadiation)
-                call Fix_BoundaryCondition_HeatRadiation_CRS(A, b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_HeatRadiation_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
             end select
         end do
         do i = 1, self%numEdges
-            select case (self%BC_Info(i)%type)
+            select case (self%BC_Info(self%EdgeType(i))%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_CRS(A, b, self%BC_Info(i), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
             end select
         end do
     end subroutine Fix_BoundaryConditions_CRS
@@ -189,23 +193,23 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(i)%type)
+            select case (self%BC_Info(self%EdgeType(i))%type)
             case (Neumann)
-                call Fix_BoundaryCondition_Neumann(b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i), lambda)
+                call Fix_BoundaryCondition_Neumann(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), lambda)
             case (HeatFlux)
-                call Fix_BoundaryCondition_Flux(b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_Flux(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
             case (Robin)
-                call Fix_BoundaryCondition_Robin_Full(A, b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i), self%Edge_UnitNormal, Cw, Structure_HeatFlux)
+                call Fix_BoundaryCondition_Robin_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), self%Edge_UnitNormal, Cw, Structure_HeatFlux)
             case (HeatTransfer)
-                call Fix_BoundaryCondition_HeatTransfer_Full(A, b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_HeatTransfer_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
             case (HeatRadiation)
-                call Fix_BoundaryCondition_HeatRadiation_Full(A, b, self%BC_Info(i), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_HeatRadiation_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
             end select
         end do
         do i = 1, self%numEdges
-            select case (self%BC_Info(i)%type)
+            select case (self%BC_Info(self%EdgeType(i))%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(i), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
             end select
         end do
     end subroutine Fix_BoundaryConditions_Full
@@ -218,9 +222,9 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(i)%type)
+            select case (self%BC_Info(self%EdgeType(i))%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_CRS(A, b, self%BC_Info(i), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
             end select
         end do
     end subroutine Fix_Bounday_Values_CRS
@@ -233,9 +237,9 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(i)%type)
+            select case (self%BC_Info(self%EdgeType(i))%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(i), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
             end select
         end do
     end subroutine Fix_Bounday_Values_Full
@@ -247,11 +251,11 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(i)%type)
+            select case (self%BC_Info(self%EdgeType(i))%type)
             case (Dirichlet)
-                if (self%BC_Info(i)%isUniform) then
-                    b(self%Edge(1, i)) = self%BC_Info(i)%value(1, 1)
-                    b(self%Edge(2, i)) = self%BC_Info(i)%value(1, 1)
+                if (self%BC_Info(self%EdgeType(i))%isUniform) then
+                    b(self%Edge(1, i)) = self%BC_Info(self%EdgeType(i))%value(1)
+                    b(self%Edge(2, i)) = self%BC_Info(self%EdgeType(i))%value(1)
                 end if
             end select
         end do
@@ -304,17 +308,40 @@ contains
             pe = A%Ptr(p1 + 1) - 1
             A%val(ps:pe) = 0.0d0
             A%val(ind) = 1.0d0
-            b(p1) = BC_Info%value(1, 1)
+            b(p1) = BC_Info%value(1)
 
             call A%Find(p2, p2, ind)
             ps = A%Ptr(p2)
             pe = A%Ptr(p2 + 1) - 1
             A%val(ps:pe) = 0.0d0
             A%val(ind) = 1.0d0
-            b(p2) = BC_Info%value(1, 1)
+            b(p2) = BC_Info%value(1)
 
         end if
     end subroutine Fix_BoundaryCondition_Dirichlet_CRS_Initial
+
+    subroutine Fix_BoundaryCondition_Dirichlet_Full(A, b, BC_Info, Edge)
+        implicit none
+        real(real64), intent(inout) :: A(:, :)
+        real(real64), intent(inout) :: b(:)
+        type(Condition_BC_Local), intent(inout) :: BC_Info
+        integer(int32), intent(in) :: Edge(:)
+        integer(int32) :: i, ind, ps, pe
+        integer(int32) :: p1, p2
+
+        if (BC_Info%isUniform) then
+            p1 = Edge(1)
+            p2 = Edge(2)
+
+            A(p1, :) = 0.0d0
+            A(p1, p1) = 1.0d0
+            b(p1) = 0.0d0
+
+            A(p2, :) = 0.0d0
+            A(p2, p2) = 1.0d0
+            b(p2) = 0.0d0
+        end if
+    end subroutine Fix_BoundaryCondition_Dirichlet_Full
 
     subroutine Fix_BoundaryCondition_Neumann(b, BC_Info, Edge, Edge_Distance, c)
         implicit none
@@ -329,8 +356,8 @@ contains
         p1 = Edge(1)
         p2 = Edge(2)
         if (BC_Info%isUniform) then
-            b(p1) = b(p1) + (2.0d0 * BC_Info%value(1, 1) * c(p1) + BC_Info%value(1, 1) * c(p2)) * Edge_Distance / 6.0d0
-            b(p2) = b(p2) + (BC_Info%value(1, 1) * c(p1) + 2.0d0 * BC_Info%value(1, 1) * c(p2)) * Edge_Distance / 6.0d0
+            b(p1) = b(p1) + (2.0d0 * BC_Info%value(1) * c(p1) + BC_Info%value(1) * c(p2)) * Edge_Distance / 6.0d0
+            b(p2) = b(p2) + (BC_Info%value(1) * c(p1) + 2.0d0 * BC_Info%value(1) * c(p2)) * Edge_Distance / 6.0d0
         end if
 
     end subroutine Fix_BoundaryCondition_Neumann
@@ -348,7 +375,7 @@ contains
         p1 = Edge(1)
         p2 = Edge(2)
         if (BC_Info%isUniform) then
-            val = 0.5d0 * BC_Info%value(1, 1) * Edge_Distance
+            val = 0.5d0 * BC_Info%value(1) * Edge_Distance
             b(p1) = b(p1) - val
             b(p2) = b(p2) - val
         end if
@@ -435,12 +462,12 @@ contains
 
         p1 = Edge(1)
         p2 = Edge(2)
-        val1 = BC_Info%value(1, 1)
-        val2 = BC_Info%value(2, 1)
+        val1 = BC_Info%value(1)
+        val2 = BC_Info%value(2)
 
         if (BC_Info%isUniform) then
-            b(p1) = b(p1) - 0.5d0 * val1 * BC_Info%value(2, 1) * Edge_Distance
-            b(p2) = b(p2) - 0.5d0 * val1 * BC_Info%value(2, 1) * Edge_Distance
+            b(p1) = b(p1) - 0.5d0 * val1 * val2 * Edge_Distance
+            b(p2) = b(p2) - 0.5d0 * val1 * val2 * Edge_Distance
         end if
 
         !! Assemble Heat Transfer Boundary to the Global Matrix
@@ -468,8 +495,8 @@ contains
 
         p1 = Edge(1)
         p2 = Edge(2)
-        val1 = BC_Info%value(1, 1)
-        val2 = BC_Info%value(2, 1)
+        val1 = BC_Info%value(1)
+        val2 = val2
 
         if (BC_Info%isUniform) then
             b(p1) = b(p1) - 0.5d0 * val1 * val2 * Edge_Distance
@@ -495,8 +522,8 @@ contains
         integer(int32) :: p1, p2, ind
         real(real64) :: val1, val2
 
-        val1 = BC_Info%value(1, 1)
-        val2 = BC_Info%value(2, 1)
+        val1 = BC_Info%value(1)
+        val2 = BC_Info%value(2)
 
         if (BC_Info%isUniform) then
             b(p1) = b(p1) - 0.5d0 * val1 * val2 * Edge_Distance
@@ -527,8 +554,8 @@ contains
 
         p1 = Edge(1)
         p2 = Edge(2)
-        val1 = BC_Info%value(1, 1)
-        val2 = BC_Info%value(2, 1)
+        val1 = BC_Info%value(1)
+        val2 = BC_Info%value(2)
 
         if (BC_Info%isUniform) then
             b(p1) = b(p1) - 0.5d0 * val1 * val2 * Edge_Distance

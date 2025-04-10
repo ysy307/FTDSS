@@ -363,6 +363,7 @@ contains
         type is (Type_GCC_NonSegregation_m)
             !$omp parallel do schedule(guided) private(iN)
             do iN = 1, n
+                self%Qw%pre(iN) = self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(iN)))
                 self%Qice%pre(iN) = Qs - self%WRF%Calculate_WRF(-GCC%Calculate_GCC(arr_Temperature(iN)))
             end do
         end select

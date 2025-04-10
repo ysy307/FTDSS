@@ -136,7 +136,7 @@ contains
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN) = self%soil**phi_soil &
+            self%value(iN) = self%soil**(1.0d0 - phi_soil) &
                              * self%water**arr_Qw(iN) &
                              * self%ice**arr_Qice(iN)
         end do
@@ -154,7 +154,7 @@ contains
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN) = self%soil**arr_phi_soil(iN) &
+            self%value(iN) = self%soil**(1.0d0 - arr_phi_soil(iN)) &
                              * self%water**arr_Qw(iN) &
                              * self%ice**arr_Qice(iN)
         end do
