@@ -10,6 +10,7 @@ module Main_Thermal
     use :: Matrix_Assemble
     use :: Matrix_CRS
     use :: Condition_Fix_Boundary_Conditions, only:Type_BC_Thermal
+    use :: Solver_Solve
     implicit none
 
     type, abstract :: Abstract_Thermal
@@ -18,24 +19,30 @@ module Main_Thermal
         type(Type_CRS) :: KT_l
         type(Type_CRS) :: KT_old
         type(Type_CRS) :: CT_l
-        type(Type_CRS) :: CT_old
+        type(Type_CRS), allocatable :: CT_old(:)
+
         real(real64), allocatable :: FT(:)
         real(real64), allocatable :: FT_old(:)
         real(real64), allocatable :: PHIT(:)
         real(real64), allocatable :: PHIT_old(:)
 
+        integer(int32) :: nsize
+        integer(int32) :: nElement
         real(real64), allocatable :: Area(:)
         integer(int32), allocatable :: Element(:, :)
         type(DP3d) :: Coordinate
         real(real64), allocatable :: Basis(:, :, :)
         type(Type_BC_Thermal) :: BC
+        class(Abstract_Solver_CRS), allocatable :: Solver
     end type Abstract_Thermal
 
     type, extends(Abstract_Thermal) :: Type_Thermal_3Phase
         class(Abstract_Ice), allocatable :: Ice
         type(Type_VolumetricHeatCapacity_3Phase) :: C
         type(Type_ThermalConductivity_3Phase) :: lambda
-
+    contains
+        procedure :: Assemble => Type_Thermal_3Phase_Assemble
+        procedure :: Update => Type_Thermal_3Phase_Update
     end type Type_Thermal_3Phase
 
     interface Type_Thermal_3Phase
@@ -58,13 +65,12 @@ contains
         type(Type_VTK), intent(in) :: Input_VTK
         integer(int32) :: nElement
 
+        structure%nsize = nsize
+        structure%nElement = size(Elements, 2)
+
         allocate (structure%Element, source=Elements)
-        call Allocate_Array(structure%Coordinate%x, nsize)
-        call Allocate_Array(structure%Coordinate%y, nsize)
-        call Allocate_Array(structure%Coordinate%z, nsize)
-        structure%Coordinate%x(:) = Coordinate%x(:)
-        structure%Coordinate%y(:) = Coordinate%y(:)
-        structure%Coordinate%z(:) = Coordinate%z(:)
+        call structure%Coordinate%allocate(nsize)
+        structure%Coordinate = Coordinate
         nElement = size(Elements, 2)
         call Allocate_Array(structure%Area, nElement)
         call Update_Area(structure%Element, structure%Coordinate, structure%Area)
@@ -77,15 +83,16 @@ contains
         structure%KT_l = structure%KT_star_0%Copy()
         structure%KT_old = structure%KT_star_0%Copy()
         structure%CT_l = structure%KT_star_0%Copy()
-        structure%CT_old = structure%KT_star_0%Copy()
+        allocate (structure%CT_old(3))
+        structure%CT_old(1) = structure%KT_star_0%Copy()
+        structure%CT_old(2) = structure%KT_star_0%Copy()
+        structure%CT_old(3) = structure%KT_star_0%Copy()
         call Allocate_Array(structure%FT, nsize)
         call Allocate_Array(structure%FT_old, nsize)
         call Allocate_Array(structure%PHIT, nsize)
         call Allocate_Array(structure%PHIT_old, nsize)
 
-        call Allocate_Array(structure%T%pre, nsize)
-        call Allocate_Array(structure%T%old, nsize)
-        call Allocate_Array(structure%T%new, nsize)
+        call structure%T%allocate(nsize, 2)
 
         select case (Input_Ice_Param%QiceType)
         case (1)
@@ -161,6 +168,7 @@ contains
                                                          Input_Thermal_Params%Cp(3), &
                                                          Input_Thermal_Params%rho(3), &
                                                          Input_Thermal_Params%rho(2), &
+                                                         Input_Ice_Param%phi, &
                                                          nsize)
 
         structure%lambda = Type_ThermalConductivity_3Phase(Input_Thermal_Params%lambda(1), &
@@ -170,28 +178,62 @@ contains
 
         structure%BC = Type_BC_Thermal(Input_Thermal_BC%BCGroup, Input_Thermal_BC%BC_Info, Input_Thermal_BC%Edge, structure%Coordinate, Input_VTK)
 
+        structure%Solver = Solver_CRS_LU_Constructor(nsize, 1, 1, 11, 13, 1, 0, structure%KT_star_0)
+        ! structure%Solver = Solver_CRS_BiCGSTAB_Constructor(nsize, 1.0d-8, 100000_int32, 1_int32)
+
     end function Type_Thermal_3Phase_Construct
 
-    subroutine Type_Thermal_3Phase_Assemble(self, alpha, dt, nsize, iiter)
+    subroutine Type_Thermal_3Phase_Assemble(self, dt, step, iter)
         implicit none
         class(Type_Thermal_3Phase), intent(inout) :: self
-        real(real64), intent(in) :: alpha
         real(real64), intent(in) :: dt
-        integer(int32), intent(in) :: nsize
-        integer(int32) :: iiter
+        integer(int32), intent(in) :: step
+        integer(int32), intent(in) :: iter
 
         self%CT_l%Val(:) = 0.0d0
         self%KT_l%Val(:) = 0.0d0
-        call Assemble_Mass_Lumped_231(self%CT_l, self%Element, self%Area, self%C%Apparent, nsize)
-        call Assemble_Diffusion_231(self%KT_l, self%Element, self%Basis, self%Area, self%lambda%value, nsize)
-        if (iiter == 1) then
-            self%KT_star_0%Val(:) = alpha * dt * self%KT_l%Val(:) + self%CT_l%Val(:)
-            self%CT_old%Val(:) = self%CT_l%Val(:)
+        self%KT_star_0%Val(:) = 0.0d0
+        ! if (step == 1) then
+
+        ! end if
+        call Assemble_Mass_Lumped_231(self%CT_l, self%Element, self%Area, self%C%Apparent, self%nElement)
+        call Assemble_Diffusion_231(self%KT_l, self%Element, self%Basis, self%Area, self%lambda%value, self%nElement)
+        self%KT_star_0%Val(:) = dt * self%KT_l%Val(:) + self%CT_l%Val(:)
+        if (iter == 1) then
+            ! print *, "iter = ", iter
+            self%CT_old(1)%Val(:) = self%CT_l%Val(:)
             self%KT_old%Val(:) = self%KT_l%Val(:)
             self%PHIT(:) = 0.0d0
-            self%PHIT_old(:) = (1.0d0 - alpha) * dt * (self%KT_old * self%T%old(:)) - self%CT_old * self%T%old(:)
+            self%PHIT_old(:) = self%CT_old(1) * self%T%old(:, 1)
+            ! self%PHIT_old(:) = dt * (self%KT_old * self%T%old(:, 1)) + self%CT_old(1) * self%T%old(:, 1)
         end if
-        self%PHIT(:) = alpha * dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
+        ! print *, self%CT_old(1)%Val(:)
+        ! print *, self%T%old(:, 1)
+        ! self%PHIT(:) = self%CT_l * self%T%old(:, 1)
 
+        self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) - self%PHIT_old(:)
+        ! self%PHIT(:) = self%PHIT_old(:)
     end subroutine Type_Thermal_3Phase_Assemble
+
+    subroutine Type_Thermal_3Phase_Update(self, phi_soil, rho_ice, iiter)
+        implicit none
+        class(Type_Thermal_3Phase), intent(inout) :: self
+        real(real64), intent(in) :: phi_soil
+        real(real64), intent(in) :: rho_ice
+        integer(int32), intent(in) :: iiter
+
+        select type (Ice => self%Ice)
+        type is (Type_Ice_GCC)
+            call Ice%Update_Ice(self%T%pre(:))
+        end select
+        call self%lambda%Update(phi_soil, self%Ice%Qw%pre, self%Ice%Qice%pre)
+        call self%C%Update(phi_soil, self%Ice%Qw%pre, self%Ice%Qice%pre)
+        ! if (iiter == 1) then
+        !     call self%C%Update_Ca_Revise(structure_Ice=self%Ice, rho_ice=ThermalInput%rho(3), arr_Temperature=self%T%pre(:), arr_Temperature_old=self%T%old(:))
+        ! else
+        call self%C%Update_Ca(structure_Ice=self%Ice, rho_ice=rho_ice, arr_Temperature=self%T%pre(:))
+        ! end if
+
+    end subroutine Type_Thermal_3Phase_Update
+
 end module Main_Thermal

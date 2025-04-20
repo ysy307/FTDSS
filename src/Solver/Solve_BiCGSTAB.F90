@@ -39,6 +39,7 @@ contains
     end function Solver_CRS_BiCGSTAB_Constructor
 
     module subroutine Solve_CRS_BiCGSTAB(self, A, b, x, status)
+        use :: Matrix_CRS
         implicit none
         class(Solver_CRS_BiCGSTAB) :: self
         type(Type_CRS), intent(in) :: A
@@ -66,7 +67,7 @@ contains
         self%x(:) = 0.0d0
 
         ! 3: r0 = b-Ax0
-        self%r(:) = A * x(:)
+        self%r(:) = A * self%x(:)
         self%r(:) = b(:) - self%r(:)
         ! 4: Create preconditioned matrix
         call self%Create_Preconditioner(A)

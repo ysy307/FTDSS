@@ -124,14 +124,16 @@ contains
         type(Type_BC_Thermal) :: Structure
 
         integer(int32) :: i
+        integer(int32) :: minimum, maximum
 
         allocate (Structure%BCGroup, source=BC_Group)
-        allocate (Structure%BC_Info(size(Structure%BCGroup)))
-        do i = 1, size(BC_Info)
-            Structure%BC_Info(i) = BC_Info(i)
+        minimum = minval(Structure%BCGroup)
+        maximum = maxval(Structure%BCGroup)
+        allocate (Structure%BC_Info(minimum:maximum))
+        do i = minimum, maximum
+            Structure%BC_Info(i) = BC_Info(i - 1)
         end do
         Structure%numEdges = Input_VTK%CELLS(3)%nCells
-        ! print *, Input_VTK%CELLS(3)%Nodes(:, :)
         allocate (Structure%Edge, source=Input_VTK%CELLS(3)%Nodes)
         allocate (Structure%EdgeType, source=Input_VTK%CellEntityIds(1:Structure%numEdges))
 
@@ -153,9 +155,9 @@ contains
         class(Type_BC_Thermal), intent(inout) :: self
         type(Type_CRS), intent(inout) :: A
         real(real64), intent(inout) :: b(:)
-        real(real64), intent(in) :: lambda(:)
-        real(real64), intent(in) :: Cw
-        type(DP3d), intent(in) :: Structure_HeatFlux
+        real(real64), optional, intent(in) :: lambda(:)
+        real(real64), optional, intent(in) :: Cw
+        type(DP3d), optional, intent(in) :: Structure_HeatFlux
 
         integer(int32) :: i
 
@@ -224,7 +226,7 @@ contains
         do i = 1, self%numEdges
             select case (self%BC_Info(self%EdgeType(i))%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_CRS_Value(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
             end select
         end do
     end subroutine Fix_Bounday_Values_CRS
@@ -289,6 +291,35 @@ contains
             b(p2) = 0.0d0
         end if
     end subroutine Fix_BoundaryCondition_Dirichlet_CRS
+
+    subroutine Fix_BoundaryCondition_Dirichlet_CRS_Value(A, b, BC_Info, Edge)
+        implicit none
+        type(Type_CRS), intent(inout) :: A
+        real(real64), intent(inout) :: b(:)
+        type(Condition_BC_Local), intent(inout) :: BC_Info
+        integer(int32), intent(in) :: Edge(:)
+        integer(int32) :: i, ind, ps, pe
+        integer(int32) :: p1, p2
+
+        if (BC_Info%isUniform) then
+            p1 = Edge(1)
+            p2 = Edge(2)
+
+            call A%Find(p1, p1, ind)
+            ps = A%Ptr(p1)
+            pe = A%Ptr(p1 + 1) - 1
+            A%val(ps:pe) = 0.0d0
+            A%val(ind) = 1.0d0
+            b(p1) = BC_Info%value(1)
+
+            call A%Find(p2, p2, ind)
+            ps = A%Ptr(p2)
+            pe = A%Ptr(p2 + 1) - 1
+            A%val(ps:pe) = 0.0d0
+            A%val(ind) = 1.0d0
+            b(p2) = BC_Info%value(1)
+        end if
+    end subroutine Fix_BoundaryCondition_Dirichlet_CRS_Value
 
     subroutine Fix_BoundaryCondition_Dirichlet_CRS_Initial(A, b, BC_Info, Edge)
         implicit none

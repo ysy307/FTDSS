@@ -23,33 +23,10 @@ contains
 
             this%nsize = nsize
 
-            call Allocate_Array(this%Qw%old, nsize)
-            call Allocate_Array(this%Qw%pre, nsize)
-            call Allocate_Array(this%Qw%new, nsize)
-            this%Qw%old(:) = 0.0d0
-            this%Qw%pre(:) = 0.0d0
-            this%Qw%new(:) = 0.0d0
-
-            call Allocate_Array(this%Qice%old, nsize)
-            call Allocate_Array(this%Qice%pre, nsize)
-            call Allocate_Array(this%Qice%new, nsize)
-            this%Qice%old(:) = 0.0d0
-            this%Qice%pre(:) = 0.0d0
-            this%Qice%new(:) = 0.0d0
-
-            call Allocate_Array(this%D_Qice%old, nsize)
-            call Allocate_Array(this%D_Qice%pre, nsize)
-            call Allocate_Array(this%D_Qice%new, nsize)
-            this%D_Qice%old(:) = 0.0d0
-            this%D_Qice%pre(:) = 0.0d0
-            this%D_Qice%new(:) = 0.0d0
-
-            call Allocate_Array(this%Si%old, nsize)
-            call Allocate_Array(this%Si%pre, nsize)
-            call Allocate_Array(this%Si%new, nsize)
-            this%Si%old(:) = 0.0d0
-            this%Si%pre(:) = 0.0d0
-            this%Si%new(:) = 0.0d0
+            call this%Qw%allocate(nsize, 3)
+            call this%Qice%allocate(nsize, 3)
+            call this%Si%allocate(nsize, 3)
+            call this%D_Qice%allocate(nsize, 3)
 
         end select
 

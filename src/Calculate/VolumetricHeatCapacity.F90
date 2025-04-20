@@ -1,5 +1,6 @@
 module Calculate_VolumetricHeatCapacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
     use :: Allocate_Allocate, only:Allocate_Array
     use :: Calculate_Ice
     use :: Calculate_GCC
@@ -58,6 +59,7 @@ module Calculate_VolumetricHeatCapacity
         real(real64) :: Cp_soil ! Soil volumetric heat capacity
         real(real64) :: Cp_water ! Water volumetric heat capacity
         real(real64) :: Cp_ice ! Ice volumetric heat capacity
+        real(real64) :: Cp_unfrozn ! Unfrozen volumetric heat capacity
     contains
         procedure :: Calculate => Calculate_VolumetricHeatCapacity_3Phase_Wrap
         procedure :: Calculate_Ca => Calculate_VolumetricHeatCapacity_Apparent_3Phase_Wrap
@@ -65,8 +67,10 @@ module Calculate_VolumetricHeatCapacity
         procedure, pass(self), private :: Update_Array => Update_VolumetricHeatCapacity_3Phase_Array
         generic, public :: Update => Update_Scalar, Update_Array
         procedure, pass(self), private :: Update_Ca_Scalar => Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar
+        ! procedure, pass(self), private :: Update_Ca_Scalar_Revise => Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar_Revise
         procedure, pass(self), private :: Update_Ca_Array => Update_VolumetricHeatCapacity_Apparent_3Phase_Array
         generic, public :: Update_Ca => Update_Ca_Scalar, Update_Ca_Array
+        ! generic, public :: Update_Ca_Revise => Update_Ca_Scalar_Revise
     end type Type_VolumetricHeatCapacity_3Phase
 
     type, extends(Abstract_VolumetricHeatCapacity_Apparent) :: Type_VolumetricHeatCapacity_4Phase
@@ -168,7 +172,7 @@ contains
         structure%value(:) = 0.0d0
     end function Construct_VolumetricHeatCapacity_2Phase
 
-    function Construct_VolumetricHeatCapacity_3Phase(structure_Ice, Cp_soil, Cp_water, Cp_ice, rho_ice, rho_water, nsize) result(structure)
+    function Construct_VolumetricHeatCapacity_3Phase(structure_Ice, Cp_soil, Cp_water, Cp_ice, rho_ice, rho_water, phi, nsize) result(structure)
         implicit none
         class(Abstract_Ice), intent(inout) :: structure_Ice
         real(real64), intent(in) :: Cp_soil !! Volumetric heat capacity of soil
@@ -176,6 +180,7 @@ contains
         real(real64), intent(in) :: Cp_ice !! Volumetric heat capacity of ice
         real(real64), intent(in) :: rho_ice !! Density of ice
         real(real64), intent(in), optional :: rho_water !! Density of water
+        real(real64), intent(in) :: phi !! Density of water
         integer(int32), intent(in) :: nsize !! Size of array
         type(Type_VolumetricHeatCapacity_3Phase) :: structure
 
@@ -183,6 +188,7 @@ contains
         structure%Cp_water = Cp_water
         structure%Cp_ice = Cp_ice
         structure%nsize = nsize
+        structure%Cp_unfrozn = Cp_soil * (1.0d0 - phi) + Cp_water * phi
 
         call Allocate_Array(structure%value, nsize)
         call Allocate_Array(structure%Apparent, nsize)
@@ -996,6 +1002,98 @@ contains
         end select
 
     end subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar
+
+    ! subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar_Revise(self, structure_Ice, rho_ice, rho_water, arr_Temperature, arr_Temperature_old, arr_Pw)
+    !     implicit none
+    !     class(Type_VolumetricHeatCapacity_3Phase), intent(inout) :: self
+    !     class(Abstract_Ice), intent(inout) :: structure_Ice
+    !     real(real64), intent(in) :: rho_ice !! Density of ice
+    !     real(real64), intent(in), optional :: rho_water !! Density of water
+    !     real(real64), intent(in) :: arr_Temperature(:) !! Temperature
+    !     real(real64), intent(in) :: arr_Temperature_old(:) !! Temperature
+    !     real(real64), intent(in), optional :: arr_Pw(:) !! Water pressure
+
+    !     real(real64) :: Lf, Tp, To
+    !     real(real64) :: x0, x1, x2, Tnew, f0, f1, err
+    !     real(real64) :: eps, epsilon
+    !     integer(int32) :: max_iter = 1000
+    !     integer(int32) :: iN, iter
+
+    !     select type (Ice => structure_Ice)
+    !     type is (Type_Ice_GCC)
+    !         Lf = Ice%GCC%Lf
+
+    !         select type (structure_GCC => Ice%GCC)
+    !         type is (Type_GCC_NonSegregation_m)
+    !             !$omp parallel do private(iN, iter, x0, x1, x2, Tnew, f0, f1, err)
+    !             do iN = 1, self%nsize
+    !                 Tp = arr_Temperature(iN)
+    !                 To = arr_Temperature_old(iN)
+    !                 if (Tp >= 0.0d0 .and. To >= 0.0d0) then
+    !                     self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(arr_Temperature(iN))
+    !                 else if (Tp < 0.0d0 .and. To < 0.0d0) then
+    !                     self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(arr_Temperature(iN))
+    !                 else if (Tp < 0.0d0 .and. To >= 0.0d0) then
+
+    !                     x0 = 0.0d0
+    !                     x1 = arr_Temperature(iN)
+    !                     Tnew = arr_Temperature(iN)
+    !                     do iter = 1, max_iter
+    !                         f0 = self%Cp_unfrozn * (x0 - Tnew) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(x0)
+    !                         f1 = self%Cp_unfrozn * (x1 - Tnew) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(x1)
+    !                         if (abs(f1 - f0) < epsilon(1.0d0)) then
+    !                             print *, "Secant_method_GCC: f1 - f0 is too small"
+    !                             stop
+    !                         else
+    !                             err = f1 * (x1 - x0) / (f1 - f0)
+    !                             x2 = x1 - err
+    !                             if (abs(err) < eps) exit
+    !                             x0 = x1
+    !                             x1 = x2
+    !                         end if
+    !                     end do
+    !                     if (iter >= max_iter) then
+    !                         write (*, "(a)"), "Secant_method_GCC: iteration limit exceeded"
+    !                         stop
+    !                     end if
+    !                     if (ieee_is_nan(x2)) x2 = 0.0d0
+
+    !                     self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(x2)
+    !                 else
+    !                     self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(arr_Temperature(iN))
+    !                 end if
+
+    !             end do
+    !             !$omp end parallel do
+    !         type is (Type_GCC_NonSegregation_Pa)
+    !             !$omp parallel do private(iN)
+    !             do iN = 1, self%nsize
+    !                 self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(arr_Temperature(iN), rho_water)
+    !             end do
+    !             !$omp end parallel do
+    !         type is (Type_GCC_Segregation_m)
+    !             !$omp parallel do private(iN)
+    !             do iN = 1, self%nsize
+    !                 self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(arr_Temperature(iN), arr_Pw(iN), rho_water)
+    !             end do
+    !             !$omp end parallel do
+    !         type is (Type_GCC_Segregation_Pa)
+    !             !$omp parallel do private(iN)
+    !             do iN = 1, self%nsize
+    !                 self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(arr_Temperature(iN), arr_Pw(iN), rho_water)
+    !             end do
+    !             !$omp end parallel do
+    !         end select
+    !     type is (Type_Ice_EXP)
+    !         Lf = Ice%Lf
+    !         !$omp parallel do private(iN)
+    !         do iN = 1, self%nsize
+    !             self%Apparent(iN) = self%value(iN) - Lf * rho_ice * Ice%Calculate_Ice_Derivative(arr_Temperature(iN))
+    !         end do
+    !         !$omp end parallel do
+    !     end select
+
+    ! end subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Scalar_Revise
 
     subroutine Update_VolumetricHeatCapacity_Apparent_3Phase_Array(self, structure_Ice, arr_rho_ice, arr_rho_water, arr_Temperature, arr_Pw)
         implicit none

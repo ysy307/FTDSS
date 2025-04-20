@@ -359,7 +359,7 @@ contains
                 counts = counts + 1
                 select case (iCell)
                 case (VTK_VERTEX, VTK_POLY_VERTEX, VTK_POLY_LINE, VTK_TRIANGLE_STRIP, VTK_POLYGON)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes_Array, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 1_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_LINE, VTK_QUADRATIC_EDGE)
                     call Allocate_Array(vtk%CELLS(iCell)%Nodes, 2_int32, vtk%CELLS(iCell)%nCells)
                 case (VTK_TRIANGLE)
@@ -395,25 +395,25 @@ contains
             select case (CellType(iCell))
             case (VTK_VERTEX)
                 Counters(VTK_VERTEX) = Counters(VTK_VERTEX) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VERTEX)%Nodes_Array(Counters(VTK_VERTEX))
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VERTEX)%Nodes(1, Counters(VTK_VERTEX))
             case (VTK_POLY_VERTEX)
                 Counters(VTK_POLY_VERTEX) = Counters(VTK_POLY_VERTEX) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_VERTEX)%Nodes_Array(Counters(VTK_POLY_VERTEX))
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_VERTEX)%Nodes(1, Counters(VTK_POLY_VERTEX))
             case (VTK_LINE)
                 Counters(VTK_LINE) = Counters(VTK_LINE) + 1
                 read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_LINE)%Nodes(1:2, Counters(VTK_LINE))
             case (VTK_POLY_LINE)
                 Counters(VTK_POLY_LINE) = Counters(VTK_POLY_LINE) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_LINE)%Nodes_Array(Counters(VTK_POLY_LINE))
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_LINE)%Nodes(1, Counters(VTK_POLY_LINE))
             case (VTK_TRIANGLE)
                 Counters(VTK_TRIANGLE) = Counters(VTK_TRIANGLE) + 1
                 read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE)%Nodes(1:3, Counters(VTK_TRIANGLE))
             case (VTK_TRIANGLE_STRIP)
                 Counters(VTK_TRIANGLE_STRIP) = Counters(VTK_TRIANGLE_STRIP) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE_STRIP)%Nodes_Array(Counters(VTK_TRIANGLE_STRIP))
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE_STRIP)%Nodes(1, Counters(VTK_TRIANGLE_STRIP))
             case (VTK_POLYGON)
                 Counters(VTK_POLYGON) = Counters(VTK_POLYGON) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLYGON)%Nodes_Array(Counters(VTK_POLYGON))
+                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLYGON)%Nodes(1, Counters(VTK_POLYGON))
             case (VTK_PIXEL)
                 Counters(VTK_PIXEL) = Counters(VTK_PIXEL) + 1
                 read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_PIXEL)%Nodes(1:4, Counters(VTK_PIXEL))
@@ -454,10 +454,8 @@ contains
         end do
 
         do iCell = 1, MAX_VTK_SHAPE
-            if (allocated(vtk%CELLS(iCell)%Nodes_Array) .or. allocated(vtk%CELLS(iCell)%Nodes)) then
-                if (allocated(vtk%CELLS(iCell)%Nodes_Array)) then
-                    vtk%CELLS(iCell)%Nodes_Array(:) = vtk%CELLS(iCell)%Nodes_Array(:) + 1
-                else if (allocated(vtk%CELLS(iCell)%Nodes)) then
+            if (allocated(vtk%CELLS(iCell)%Nodes)) then
+                if (allocated(vtk%CELLS(iCell)%Nodes)) then
                     vtk%CELLS(iCell)%Nodes(:, :) = vtk%CELLS(iCell)%Nodes(:, :) + 1
                 end if
             end if

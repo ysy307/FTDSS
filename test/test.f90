@@ -1,26 +1,11 @@
 program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
-    ! use :: Allocate_Allocate
-    ! use :: Allocate_Structure
-    ! use :: Solver_Initialize
-    ! use :: Solver_InitCopy
-    ! use :: Calculate_Area
-    ! use :: Calculate_Shape
-    ! use :: Calculate_Observation
-    ! use :: Condition_FixInitialCondition
-    ! use :: Condition_FixBoundaryCondition
-    ! use :: Calculate_Update
-    ! use :: Matrix_Assemble
-    ! use :: error
-    ! use :: Matrix_ConvertCRS
-    ! use :: Calculate_TRM, only:TRMethod
-    ! use :: Solver_Solve
-    ! use :: Inout_Stdout
     use :: Inout_Input
-    ! use :: Inout_Output
-    ! use :: Main_Solver
+    use :: Inout_Output
+    use :: Calculate_BLAS
     use :: Main_Thermal
+    use :: stdlib_strings, only:to_string
 
 #ifdef _OPENMP
     use omp_lib
@@ -31,10 +16,24 @@ program test
     type(Input_Ice) :: Ice
     type(Input_Thermal) :: ThermalInput
     type(Type_Thermal_3Phase) :: Thermal
+    type(Type_Time) :: Time
+    type(Type_Iteration) :: Iteration
+    type(Type_Output) :: Output
     integer(int32) :: i, j, k
     integer(int32), allocatable :: Elements(:, :)
     real(real64) :: Lf, Tf, phi_soil
     integer(int32) :: meshType
+    real(real64) :: norm_old, norm_new
+    integer(int32) :: stat, count
+
+    character(:), allocatable :: filename
+
+    time%start_time = 0.0d0
+    time%end_time = 86400.0d0
+    time%dt = 1.0d0
+    allocate (time%dt_old(1))
+
+    Iteration%max_iter = 20
 
     meshType = 3
 
@@ -78,249 +77,78 @@ program test
     ThermalInput%Cp(3) = ThermalInput%c(3) * ThermalInput%rho(3)
 
     Thermal = Type_Thermal_3Phase(Elements, Input%VTK%POINTS, meshType, Lf, Tf, Ice, ThermalInput, Input%Conditions, Input%VTK%numPoints, Input%VTK)
+    Thermal%T%new(:) = 18.0d0
+    call Thermal%BC%Fix_Bounday_Values(Thermal%T%new(:))
+    Thermal%T%pre(:) = Thermal%T%new(:)
 
-    Thermal%T%pre(:) = 18.0d0
-    call Thermal%BC%Fix_Bounday_Values(Thermal%T%pre(:))
-    print *, Thermal%T%pre(:)
-    select type (Ice => Thermal%Ice)
-    type is (Type_Ice_GCC)
-        call Ice%Update_Ice(Thermal%T%pre(:))
-    end select
-    ! print *, Ice%Qice
-    ! print *, Thermal%Ice%Qice%pre(:)
-    call Thermal%lambda%Update(phi_soil, Thermal%Ice%Qw%pre, Thermal%Ice%Qice%pre)
-    call Thermal%C%Update(phi_soil, Thermal%Ice%Qw%pre, Thermal%Ice%Qice%pre)
-    call Thermal%C%Update_Ca(structure_Ice=Thermal%Ice, rho_ice=ThermalInput%rho(3), arr_Temperature=Thermal%T%pre(:))
-    print *, Thermal%C%Apparent(:)
-    !     print *, Input%VTK%CELLS(5)%Nodes(:, i)
-    ! end do
+    call Thermal%Update(phi_soil, ThermalInput%rho(3), 0)
+    call Thermal%T%Shift()
+    count = 0
+    filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
+    ! print *, count, filename
+    call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numCells, Elements, Input%VTK%POINTS, Thermal%T%pre(:), Thermal%Ice%Si%pre)
+    Iteration%step = 0
 
-    ! do i = 1, Input%VTK%numPoints
-    !     print *, Input%VTK%POINTS%x(i), Input%VTK%POINTS%y(i), Input%VTK%POINTS%z(i)
-    ! end do
-    ! print *, Input%VTK%POINTS%x(:)
+    ! print *, Thermal%T%old(:, 1)
 
-    ! type(SolverInfo) :: Solver
-    ! type(IO) :: Inout
+    Iteration%isConverged = .true.
+    ! stop
+    TIME_LOOP: do while (time%time < time%end_time)
+        time%time_old = time%time
+        time%time = time%time + time%dt
+        time%dt_old(1) = time%dt
 
-    ! type(CRS) :: CTop
-    ! type(ILS) :: ILEQ
-    ! type(DLS) :: DLEQ
-    ! type(Input) :: Inputs
-    ! type(Output) :: Outputs
-    ! type(Class_Solver) ::
-    ! type(Class_Solver) :: Heat, Water
+        Iteration%iter = 0
 
-    ! real(real64), pointer :: ptst, pdt, podt
-    ! integer(int32), pointer :: piter, ptiter, piNL
+        !! Thermal Newton-Raphson Iteration
+        NR_LOOP_THERMAL: do while (Iteration%iter <= Iteration%max_iter)
+            if (Iteration%isConverged) then
+                Iteration%step = Iteration%step + 1
+                Iteration%isConverged = .false.
+            end if
+            Iteration%iter = Iteration%iter + 1
+            ! print *, Iteration%iter, Iteration%step, Iteration%isConverged
 
-    ! integer(int32) :: i, j, ig
-    ! integer(int32) :: ierr, max_thread, idamax, iNI
+            call Thermal%Assemble(time%dt, Iteration%step, Iteration%iter)
+            call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
+            Thermal%PHIT(:) = -Thermal%PHIT(:)
+            call Thermal%Solver%Solve(Thermal%KT_star_0, Thermal%PHIT, Thermal%T%dif, stat)
 
-    ! Time variables
-    ! real(real64) :: pts, pte, ts, te, dt, tst, tst_old, its, otst, conv_time_out, dt_max, dt_min, outtst
-    ! real(real64) :: lis_sum_time, lis_sum_itime, lis_sum_ptime
-    ! real(real64) :: sdts, sdte
+            Thermal%T%new(:) = Thermal%T%pre(:) + Thermal%T%dif(:)
 
-    ! Inputs = Input()
-    ! ! Outputs = Output(Inputs)
-    ! Heat = Class_Solver(Inputs, "Thermal")
-    ! Water = Class_Solver(Inputs, "Hydraulic")
+            ! norm_new = norm_2(Thermal%nsize, Thermal%T%dif)
+            norm_new = maxval(abs(Thermal%T%dif))
+
+            !! Convergence check
+            ! if (Iteration%iter >= 3) then
+            if (norm_new < 1.0d-5) then
+                print *, Iteration%iter, norm_new
+                Iteration%isConverged = .true.
+                call Thermal%T%Shift()
+                exit NR_LOOP_THERMAL
+            end if
+
+            Thermal%T%pre(:) = Thermal%T%new(:)
+            call Thermal%Update(phi_soil, ThermalInput%rho(3), Iteration%iter)
+        end do NR_LOOP_THERMAL
+
+        if (Iteration%iter >= Iteration%max_iter) then
+            time%time = time%time_old
+            time%dt = time%dt * 0.5d0
+            call Thermal%T%Shift(reverse=.true.)
+        end if
+
+        ! print *, mod(Iteration%step, 100)
+        if (mod(Iteration%step, 100) == 0) then
+            count = count + 1
+            filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
+            ! print *, count, filename
+            call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numCells, Elements, Input%VTK%POINTS, Thermal%T%pre, Thermal%Ice%Si%pre)
+            ! if (count == 100) stop
+        end if
+
+    end do TIME_LOOP
 
     stop
-    ! call init_omp_config(Solver)
-    ! Inout = IO()
-
-    ! !* Input basic data
-    ! call Inout%Input_Parameters(Solver)
-    ! !* Input initial and boundary condition
-    ! call Inout%Input_IC(Solver)
-    ! call Inout%Input_BC(Solver)
-    ! call Inout%Input_Flags(Solver)
-
-    ! call Allocate_Solver(Solver)
-
-    !* Input coordinate and vertex data
-    ! call Inout%Input_Vertices(Solver)
-    ! call Inout%Input_Coodinates(Solver)
-
-    ! call Initialize_Solver(Solver)
-
-    ! print*, Solver%Heat%Variables%TFlux%x(1:10)
-    ! call Calc_Area(Solver%N)
-    ! call Calc_Shape(Solver%N)
-    ! call Convert_CRS(Solver, CTop)
-    ! if (Solver%isHeat) call Duplicate_CRS(CTop, Solver%Heat%LHS_A)
-    ! if (Solver%isWater) call Duplicate_CRS(CTop, Solver%Water%LHS_A)
-    ! call Init_Assemble(CTop)
-
-    ! call Inout%Input_Observation(Solver)
-!     if (Solver%Obs%nObsType == 2) call Set_Obs_Coo(Solver)
-
-!     call Fix_InitialCondition(Solver)
-!     call Update_Parameters_Water(Solver)
-!     call Update_Parameters_Heat(Solver)
-
-!     ! if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, 0)
-!     ! call Inout%Output_Observation(Solver, 0.0d0)
-
-!     ptst => Solver%Time%tst
-!     pdt => Solver%Time%dt
-!     podt => Solver%Time%odt
-
-!     piter => Solver%Iter%iter
-!     ptiter => Solver%Iter%titer
-!     piNL => Solver%Iter%iNL
-
-!     ! Construct BiCGSTAB Solver object
-!     if (Solver%isHeat) ILEQ = ILS(Solver, CTop)
-!     if (Solver%isWater) DLEQ = DLS(Solver)
-
-!     !* Main loop section
-!     do while (.true.)
-!     if (Solver%Flags%isOutput) then
-! #ifdef _OPENMP
-!         its = omp_get_wtime()
-!         Solver%Flags%isOutput = .false.
-! #endif
-!     end if
-!     otst = ptst
-!     podt = pdt
-!     ptst = ptst + pdt
-!     outtst = ptst * Solver%Time%tconv
-!     ig = 1
-!     Local_loop: do while (.true.)
-!         piNL = 1
-!         if (Solver%isHeat) then
-!         non_linear_heat: do while (piNL <= Solver%Iter%iNLmax)
-!             if (ig == 1 .and. piNL == 1) call Init_Copy_Temperature(Solver)
-
-!             call Update_Parameters_Heat(Solver)
-
-!             if (has_nan(Solver%Water%Variables%wFlux%x(:)) .or. has_nan(Solver%Water%Variables%wFlux%x(:))) then
-!                 write (*, '(es13.4,a)'), outtst, " Day: Water flux has NaN."
-!                 stop
-!             end if
-
-!             call Assemble_GM_Heat(Solver)
-!             call Fix_BoundaryConditions(Solver, Temperature)
-
-!             call ILEQ%BiCGStab(Solver, Solver%Heat%LHS_A, Solver%Heat%Rhs, Solver%T%new, ierr)
-!             call ILEQ%Chkerr(ierr, outtst)
-
-!             if (Solver%Flags%isTRM) then
-!                 call TRMethod(Solver)
-!                 Solver%T%pre(:) = Solver%T%new(:)
-!                 Solver%Si%pre(:) = Solver%Si%new(:)
-!                 call Update_theta(Solver)
-!                 exit non_linear_heat
-!             else if (Solver%Flags%isGCC .or. Solver%Flags%isPower) then
-!                 Solver%T%pre(:) = Solver%T%new(:)
-!                 if (piNL == 1) call Update_Phase_Revise(Solver)
-!                 call Update_Si(Solver)
-!                 call Update_theta(Solver)
-!                 if (piNL >= 2) exit non_linear_heat
-!             end if
-
-!             piNL = piNL + 1
-!         end do non_linear_heat
-!         end if
-!         if (has_nan(Solver%T%pre(:))) then
-!             write (*, '(es13.4,a)'), outtst, " Day: Temperature has NaN."
-!             stop
-!         end if
-!         if (ig >= 2) exit Local_loop
-
-!         if (Solver%isWater) then
-!             piNL = 1
-!             non_linear_water: do while (piNL <= Solver%Iter%titer)
-!                 if (ig == 1 .and. piNL == 1) call Init_Copy_Pressure(Solver)
-
-!                 call Update_Parameters_Water(Solver)
-!                 call Assemble_GM_Water(Solver)
-!                 call Fix_BoundaryConditions(Solver, Pressure)
-
-!                 call DLEQ%LU(Solver%Water%RA, Solver%Water%Rhs, Solver%P%pre)
-
-!                 if (has_nan(Solver%P%pre(:))) then
-!                     write (*, '(es13.4,a)'), outtst, " Day: Pressure has NaN."
-!                     stop
-!                 end if
-!                 call Update_Gradient(Solver, Solver%P%pre(:), Solver%Water%Variables%hGrad)
-!                 if (has_nan(Solver%Water%Variables%hGrad%x(:)) .or. has_nan(Solver%Water%Variables%hGrad%x(:))) then
-!                     write (*, '(es13.4,a)'), outtst, " Day: Water gradient has NaN."
-!                     stop
-!                 end if
-
-!                 if (piNL == 1) exit non_linear_water
-
-!                 piNL = piNL + 1
-
-!             end do non_linear_water
-!         end if
-!         if (.not. Solver%isWater) exit Local_loop
-!         exit Local_loop
-!         Solver%T%pre(:) = Solver%T%old(:)
-!         Solver%Si%pre(:) = Solver%Si%old(:)
-
-!         ig = ig + 1
-
-!     end do Local_loop
-
-!     if (ptst - otst > epsilon(otst)) then
-!         call Update_Gradient(Solver, Solver%T%pre(:), Solver%Heat%Variables%Tgrad)
-!         ! call Inout%Output_Observation(Solver, outtst)
-!         piNL = 1
-!     end if
-
-!     if (ptst >= Solver%Time%cinterval * piter) then
-! #ifdef _OPENMP
-!         pte = omp_get_wtime()
-! #endif
-!         if (Solver%Flags%isStdOut) write (*, Solver%fmt_Stdout), "Progress:", piter, "/", Solver%Iter%itermax, "; Elapsed time:", pte - its, "/", pte - pts, " sec"
-!         ! if (Solver%Flags%isOutputAll) call Inout%Output_All(Solver, piter)
-!         piter = piter + 1
-!         Solver%Flags%isOutput = .true.
-!     end if
-!     if (ptst >= Solver%Time%te) exit
-!     ptiter = ptiter + 1
-
-!     end do
-! #ifdef _OPENMP
-!     pte = omp_get_wtime()
-! #endif
-!     if (Solver%Flags%isStdOut) write (*, '(a)') ""
-!     if (Solver%Flags%isStdOut) write (*, '(a,i0)') "Total iteration: ", piter - 1
-!     if (Solver%Flags%isStdOut) write (*, '(a)') ""
-!     if (Solver%Flags%isStdOut) write (*, '(a)') "-----------------------------------------------------------------"
-! ! if (Solver%isHeat .and. Solver%isWater) then
-! !         if (Solver%Flags%isStdOut) write(*,'(4a,f17.10,a)') Tsolver_name, ":",Psolver_name, ": Total time         = ", pte - pts,     " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(4a,f17.10,a)') Tsolver_name, ":",Psolver_name, "-Lis: Elapsed time   = ", lis_sum_time,  " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(4a,f17.10,a)') Tsolver_name, ":",Psolver_name, "-Lis: Linear solver  = ", lis_sum_itime, " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(4a,f17.10,a)') Tsolver_name, ":",Psolver_name, "-Lis: Preconditioner = ", lis_sum_ptime, " s"
-! ! else
-! ! if (Solver%isHeat) then
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Tsolver_name, ": Total time         = ", pte - pts,     " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Tsolver_name, "-Lis: Elapsed time   = ", lis_sum_time,  " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Tsolver_name, "-Lis: Linear solver  = ", lis_sum_itime, " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Tsolver_name, "-Lis: Preconditioner = ", lis_sum_ptime, " s"
-! ! else if (Solver%isWater) then
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Psolver_name, ": Total time         = ", pte - pts,     " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Psolver_name, "-Lis: Elapsed time   = ", lis_sum_time,  " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Psolver_name, "-Lis: Linear solver  = ", lis_sum_itime, " s"
-! !         if (Solver%Flags%isStdOut) write(*,'(2a,f17.10,a)') Psolver_name, "-Lis: Preconditioner = ", lis_sum_ptime, " s"
-! ! end if
-!     if (Solver%Flags%isStdOut) write (*, '(a)') "-----------------------------------------------------------------"
-!     if (Solver%Flags%isStdOut) write (*, '(a)') ""
-!     if (Solver%Flags%isStdOut) write (*, '(a)') "End of programsd"
-
-! #ifdef _MPI
-!     call MPI_Finalize(ierr)
-! #endif
-! ! end program main
-
-! ! program test
-
-! ! contains
 
 end program test

@@ -2,12 +2,13 @@ module Matrix_CRS
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Allocate_Allocate, only:Allocate_Array
     implicit none
-    private
+    ! private
 
     public :: Type_CRS
 
     type :: Type_CRS
         integer(int32) :: nnz !! number of non-zero elements
+        integer(int32) :: ncol !! number of columns
         integer(int32) :: nrow !! number of rows
         integer(int32), allocatable :: Ptr(:) !! pointer to the start of each row
         integer(int32), allocatable :: Ind(:) !! index of the non-zero elements
@@ -45,6 +46,7 @@ contains
 
         nTop = size(Elements, 1)
         nElment = size(Elements, 2)
+        A%ncol = nNode
         A%nrow = nNode + 1
         ! 1-origin用に配列を割り当て
         ! CRS のポインタ配列は nNode+1 個（A%Ptr(1)=1, A%Ptr(i+1)=row_iの開始位置を保持）
@@ -102,8 +104,8 @@ contains
         !* Matrix-Vector Product in CRS format
         implicit none
         type(Type_CRS), intent(in) :: A
-        real(real64), intent(in) :: x(A%nrow)
-        real(real64) :: y(A%nrow)
+        real(real64), intent(in) :: x(A%ncol)
+        real(real64) :: y(A%ncol)
         real(real64) :: vtemp
         integer(int32) :: i, j, is, ie
 
@@ -111,7 +113,7 @@ contains
         y(:) = 0.0d0
 
         !$omp parallel do private(vtemp, i, j, is, ie)
-        do i = 1, A%nrow
+        do i = 1, A%ncol
             vtemp = 0.0d0
 
             is = A%ptr(i)
@@ -169,6 +171,7 @@ contains
 
         B%nnz = self%nnz
         B%nrow = self%nrow
+        B%ncol = self%ncol
         B%Ptr(:) = self%Ptr(:)
         B%Ind(:) = self%Ind(:)
         B%Val(:) = self%Val(:)

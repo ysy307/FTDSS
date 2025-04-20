@@ -19,26 +19,9 @@ contains
             this%Tf = Tf
             this%nsize = nsize
 
-            call Allocate_Array(this%Qw%old, nsize)
-            call Allocate_Array(this%Qw%pre, nsize)
-            call Allocate_Array(this%Qw%new, nsize)
-            this%Qw%old(:) = 0.0d0
-            this%Qw%pre(:) = 0.0d0
-            this%Qw%new(:) = 0.0d0
-
-            call Allocate_Array(this%Qice%old, nsize)
-            call Allocate_Array(this%Qice%pre, nsize)
-            call Allocate_Array(this%Qice%new, nsize)
-            this%Qice%old(:) = 0.0d0
-            this%Qice%pre(:) = 0.0d0
-            this%Qice%new(:) = 0.0d0
-
-            call Allocate_Array(this%Si%old, nsize)
-            call Allocate_Array(this%Si%pre, nsize)
-            call Allocate_Array(this%Si%new, nsize)
-            this%Si%old(:) = 0.0d0
-            this%Si%pre(:) = 0.0d0
-            this%Si%new(:) = 0.0d0
+            call this%Qw%allocate(nsize, 3)
+            call this%Qice%allocate(nsize, 3)
+            call this%Si%allocate(nsize, 3)
 
         end select
 
@@ -64,16 +47,16 @@ contains
         !$omp parallel do schedule(guided) private(iN, C, tmpSi)
         do iN = 1, self%nsize
             C = arr_Cp(iN) / (self%Qw%pre(iN) * rhoW * self%Lf)
-            tmpSi = self%Si%old(iN) + C * (self%Tf - self%Temperature%new(iN))
+            tmpSi = self%Si%old(iN, 1) + C * (self%Tf - self%Temperature%new(iN))
 
-            if (tmpSi <= 0.0d0 .and. self%Si%old(iN) == 0.0d0) then
+            if (tmpSi <= 0.0d0 .and. self%Si%old(iN, 1) == 0.0d0) then
                 self%Si%new(iN) = 0.0d0
-            else if (tmpSi >= 1.0d0 .and. self%Si%old(iN) == 1.0d0) then
+            else if (tmpSi >= 1.0d0 .and. self%Si%old(iN, 1) == 1.0d0) then
                 self%Si%new(iN) = 1.0d0
-            else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN) <= 1.0d0) then
+            else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN, 1) <= 1.0d0) then
                 self%Temperature%new(iN) = self%Tf
                 self%Si%new(iN) = tmpSi
-            else if (0.0d0 < self%Si%old(iN) .and. self%Si%old(iN) < 1.0d0 .and. tmpSi >= 1.0d0) then
+            else if (0.0d0 < self%Si%old(iN, 1) .and. self%Si%old(iN, 1) < 1.0d0 .and. tmpSi >= 1.0d0) then
                 self%Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
                 self%Si%new(iN) = 1.0d0
             end if
@@ -93,16 +76,16 @@ contains
         !$omp parallel do schedule(guided) private(iN, C, tmpSi)
         do iN = 1, self%nsize
             C = arr_Cp(iN) / (self%Qw%pre(iN) * arr_rhoW(iN) * self%Lf)
-            tmpSi = self%Si%old(iN) + C * (self%Tf - self%Temperature%new(iN))
+            tmpSi = self%Si%old(iN, 1) + C * (self%Tf - self%Temperature%new(iN))
 
-            if (tmpSi <= 0.0d0 .and. self%Si%old(iN) == 0.0d0) then
+            if (tmpSi <= 0.0d0 .and. self%Si%old(iN, 1) == 0.0d0) then
                 self%Si%new(iN) = 0.0d0
-            else if (tmpSi >= 1.0d0 .and. self%Si%old(iN) == 1.0d0) then
+            else if (tmpSi >= 1.0d0 .and. self%Si%old(iN, 1) == 1.0d0) then
                 self%Si%new(iN) = 1.0d0
-            else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN) <= 1.0d0) then
+            else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN, 1) <= 1.0d0) then
                 self%Temperature%new(iN) = self%Tf
                 self%Si%new(iN) = tmpSi
-            else if (0.0d0 < self%Si%old(iN) .and. self%Si%old(iN) < 1.0d0 .and. tmpSi >= 1.0d0) then
+            else if (0.0d0 < self%Si%old(iN, 1) .and. self%Si%old(iN, 1) < 1.0d0 .and. tmpSi >= 1.0d0) then
                 self%Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
                 self%Si%new(iN) = 1.0d0
             end if

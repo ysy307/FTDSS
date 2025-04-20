@@ -1,5 +1,5 @@
 module Inout_Output
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int8, int32, real64
     use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
     use :: error
     use :: Allocate_Allocate
@@ -9,24 +9,24 @@ module Inout_Output
     implicit none
     private
 
-    type :: Output
-        private
-        integer(int32), allocatable :: Output_Observation_Flag(:)
-        character(256) :: T_FileName, Fr_FileName, TC_FileName, C_FileName, P_FileName, Flux_FileName, K_FileName
-        character(256) :: dir_Path
-        logical, allocatable :: is_Output(:)
-        logical :: is_Output_Dat, is_Output_VTK
+    type :: Type_Output
+        ! private
+        ! integer(int32), allocatable :: Output_Observation_Flag(:)
+        ! character(256) :: T_FileName, Fr_FileName, TC_FileName, C_FileName, P_FileName, Flux_FileName, K_FileName
+        ! character(256) :: dir_Path
+        ! logical, allocatable :: is_Output(:)
+        ! logical :: is_Output_Dat, is_Output_VTK
     contains
-        ! procedure :: Output_All         => Inout_Output_All_vtk
+        procedure :: Output_All => Inout_Output_All_vtk
         ! procedure :: Output_All => Inout_Output_All
         ! procedure :: Output_Observation => Inout_Output_Observation
-    end type Output
+    end type Type_Output
 
     ! interface Output
     !     module procedure Output_Constructor
     ! end interface
 
-    public :: Output
+    public :: Type_Output
 
 contains
 
@@ -362,83 +362,113 @@ contains
     !     return
     ! end subroutine Output_time
 
-    ! subroutine Inout_Output_All_vtk(self, Solver, num)
+    subroutine Inout_Output_All_vtk(self, filename, nPoints, nCells, Elements, Coordinates, arr_Temperature, arr_Si)
+        use vtk_fortran, only: vtk_file
+        implicit none
+        class(Type_Output) :: self
+        character(len=*), intent(in) :: filename
+        integer(int32), intent(in) :: nPoints, nCells
+        type(DP3d), intent(in) :: Coordinates
+        integer(int32), intent(in) :: Elements(:, :) ! (nNodesPerCell, nCells)
+        real(real64), intent(in) :: arr_Temperature(:)
+        real(real64), intent(in) :: arr_Si(:)
 
-    !     implicit none
-    !     class(Output) :: self
-    !     type(SolverInfo), intent(inout) :: Solver
-    !     integer(int32), intent(in) :: num
+        type(vtk_file) :: a_vtk_file
+        integer(int32) :: status
+        integer(int32) :: i, nNodesPerCell, nCell
+        integer(int32), allocatable :: connectivity(:)
+        integer(int32), allocatable :: offset(:)
+        integer(int8), allocatable :: cell_type(:)
 
-    !     character(256) :: oName, fmt
-    !     integer(int32) :: ios, unit_num, iN
-    !     real(real64) :: wFlux_all(3, Solver%N%node)
+        nNodesPerCell = size(Elements, 1)
+        nCell = size(Elements, 2)
+        ! print *, size(Elements, 1), size(Elements, 2), nCells
 
-    !     write (oName, Solver%fmt_Fileout) trim(self%dir_Path), "Output/DATFILE/Output_", num, ".vtk"
-    !     open (newunit=unit_num, file=oName, status='replace', action='write', iostat=ios)
-    !     if (ios /= 0) call error_message(931)
+        ! Allocate and compute connectivity-related data
+        allocate (connectivity(3 * nCell))
+        allocate (offset(nCell))
+        allocate (cell_type(nCell))
 
-    !     write (unit_num, '(a)') "# vtk DataFile Version 2.0"
-    !     write (unit_num, '(a)') "Analysis ASCII VTK file"
-    !     write (unit_num, '(a)') "ASCII"
-    !     write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
-    !     write (unit_num, '(a,i0,a)') "POINTS ", Solver%N%node, " double"
-    !     do iN = 1, Solver%N%node
-    !         write (unit_num, '(3f18.13)') Solver%N%vCood%x(iN), Solver%N%vCood%y(iN), 0
-    !     end do
-    !     write (unit_num, '(a)') ""
-    !     write (unit_num, '(a,i0,a,i0,a)') "CELLS ", Solver%N%element, " ", Solver%N%element * 4
-    !     do iN = 1, Solver%N%element
-    !         write (unit_num, '(i0,a,i0,a,i0,a,i0)') Solver%N%ShCoe, " ", Solver%N%pElement(1, iN) - 1, " ", Solver%N%pElement(2, iN) - 1, " ", Solver%N%pElement(3, iN) - 1
-    !     end do
-    !     write (unit_num, '(a,i0,a)') "CELL_TYPES ", Solver%N%element
-    !     do iN = 1, Solver%N%element
-    !         write (unit_num, '(i0)') 5
-    !     end do
+        do i = 1, nCell
+            connectivity((i - 1) * 3 + 1:i * 3) = Elements(:, i) - 1
+            offset(i) = i * 3
+            cell_type(i) = 5 ! 例：VTK_TRIANGLE (必要に応じて変更)
+        end do
 
-    !     select case (Solver%nAnalysis)
-    !     case (1)
-    !         ! do iN = 1, Solver%N%node
-    !         !     write(unit_num, '(es15.7,a,es15.7)') Solver%T%pre(iN), ', ', Solver%T%Si(iN)
-    !         ! end do
-    !     case (2)
-    !     case (3)
-    !     case (4)
-    !         write (unit_num, '(a, i0)') "POINT_DATA ", Solver%N%node
-    !         write (unit_num, '(a)') "SCALARS Temperature double 1"
-    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
-    !         write (unit_num, '(es13.5)') Solver%T%pre(:)
-    !         write (unit_num, '(a)') "SCALARS Pressure double 1"
-    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
-    !         write (unit_num, '(es13.5)') Solver%P%pre(:)
-    !         write (unit_num, '(a)') "SCALARS Si double 1"
-    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
-    !         write (unit_num, '(es13.5)') Solver%Si%pre(:)
-    !     case (6)
-    !         wFlux_all(1, :) = Solver%Water%Variables%wFlux%x(:)
-    !         wFlux_all(2, :) = Solver%Water%Variables%wFlux%y(:)
-    !         wFlux_all(3, :) = 0.0d0
-    !         write (unit_num, '(a, i0)') "POINT_DATA ", Solver%N%node
-    !         write (unit_num, '(a)') "SCALARS Temperature double 1"
-    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
-    !         write (unit_num, '(es13.5)') Solver%T%pre(:)
-    !         write (unit_num, '(a)') ""
-    !         write (unit_num, '(a)') "SCALARS Pressure double 1"
-    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
-    !         write (unit_num, '(es13.5)') Solver%P%pre(:)
-    !         write (unit_num, '(a)') ""
-    !         write (unit_num, '(a)') "SCALARS Si double 1"
-    !         write (unit_num, '(a)') "LOOKUP_TABLE default"
-    !         write (unit_num, '(es13.5)') Solver%Si%pre(:)
-    !         write (unit_num, '(a)') ""
-    !         write (unit_num, '(a)') "VECTORS WaterFlux double"
-    !         write (unit_num, '(3es13.5)') wFlux_all
+        ! Initialize VTK file
+        status = a_vtk_file%initialize(format='ascii', filename=filename, mesh_topology='UnstructuredGrid')
 
-    !     case (7)
+        ! Write data
+        status = a_vtk_file%xml_writer%write_piece(np=nPoints, nc=nCell)
+        status = a_vtk_file%xml_writer%write_geo(np=nPoints, nc=nCell, &
+                                                 x=Coordinates%x, y=Coordinates%y, z=Coordinates%z)
+        status = a_vtk_file%xml_writer%write_connectivity(nc=nCell, &
+                                                          connectivity=connectivity, offset=offset, cell_type=cell_type)
 
-    !     end select
-    !     close (unit_num)
+        status = a_vtk_file%xml_writer%write_dataarray(location='node', action='open')
+        status = a_vtk_file%xml_writer%write_dataarray(data_name='Temperature', x=arr_Temperature)
+        status = a_vtk_file%xml_writer%write_dataarray(data_name='Si', x=arr_Si)
+        status = a_vtk_file%xml_writer%write_dataarray(location='node', action='close')
+        status = a_vtk_file%xml_writer%write_piece()
 
-    ! end subroutine Inout_Output_All_vtk
+        ! Finalize VTK file
+        status = a_vtk_file%finalize()
+
+    end subroutine Inout_Output_All_vtk
+
+    ! subroutine Inout_Output_All_vtk(self, filename, nPoints, nCell, Elements, Coordinates, arr_Temperature, arr_Si)
+    ! use vtk_fortran, only: vtk_file
+    ! implicit none
+    ! class(Type_Output) :: self
+    ! character(len=*), intent(in) :: filename
+    ! integer(int32), intent(in) :: nPoints, nCells
+    ! type(DP3d), intent(in) :: Coordinates
+    ! integer(int32), intent(in) :: Elements(:, :) ! (nNodesPerCell, nCells)
+    ! real(real64), intent(in) :: arr_Temperature(:)
+    ! real(real64), intent(in) :: arr_Si(:)
+
+    ! type(vtk_file) :: a_vtk_file
+    ! integer(int32) :: status
+    ! integer(int32) :: i, nNodesPerCell
+    ! integer(int32), allocatable :: connectivity(:)
+    ! integer(int32), allocatable :: offset(:)
+    ! integer(int8), allocatable :: cell_type(:)
+    ! integer(int32) :: unit_num, ios
+    ! integer(int32) :: iN, iC
+
+    ! nNodesPerCell = size(Elements, 1)
+
+    ! open (newunit=unit_num, file=filename, status='replace', action='write', iostat=ios)
+    ! ! if (ios /= 0) call error_message(931)
+
+    ! write (unit_num, '(a)') "# vtk DataFile Version 2.0"
+    ! write (unit_num, '(a)') "Analysis ASCII VTK file"
+    ! write (unit_num, '(a)') "ASCII"
+    ! write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
+    ! write (unit_num, '(a,i0,a)') "POINTS ", nPoints, " double"
+    ! do iN = 1, nPoints
+    !     write (unit_num, '(3f18.13)') Coordinates%x(iN), Coordinates%y(iN), Coordinates%z(iN)
+    ! end do
+    ! write (unit_num, '(a)') ""
+    ! write (unit_num, '(a,i0,a,i0,a)') "CELLS ", nCells, " ", nCells * 4
+    ! do iN = 1, nCells
+    !     write (unit_num, '(i0,a,i0,a,i0,a,i0)') 3, " ", Elements(1, iN) - 1, " ", Elements(2, iN) - 1, " ", Elements(3, iN) - 1
+    ! end do
+    ! write (unit_num, '(a,i0,a)') "CELL_TYPES ", nCells
+    ! do iN = 1, nCells
+    !     write (unit_num, '(i0)') 5
+    ! end do
+
+    ! write (unit_num, '(a, i0)') "POINT_DATA ", nPoints
+    ! write (unit_num, '(a)') "SCALARS Temperature double 1"
+    ! write (unit_num, '(a)') "LOOKUP_TABLE default"
+    ! write (unit_num, '(es13.5)') arr_Temperature(:)
+    ! write (unit_num, '(a, i0)') "POINT_DATA ", nPoints
+    ! write (unit_num, '(a)') "SCALARS Si double 1"
+    ! write (unit_num, '(a)') "LOOKUP_TABLE default"
+    ! write (unit_num, '(es13.5)') arr_Si(:)
+
+    ! close (unit_num)
 
     ! subroutine Measure_Time(nsec, ar_sec, ar_secsum)
     !     implicit none

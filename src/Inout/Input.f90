@@ -1102,30 +1102,33 @@ contains
         character(:), allocatable :: key
         character(2) :: cBCGroup
         integer(int32) :: iBC
+        integer(int32) :: minium, maximum
 
         key = Inout_Input_Connect_dot(BCName, GroupName)
         call json%get(key, self%Conditions%BCGroup)
         call json%print_error_message(output_unit)
         self%Conditions%numBCGroup = size(self%Conditions%BCGroup)
-        allocate (self%Conditions%BC_Info(self%Conditions%numBCGroup))
+        minium = minval(self%Conditions%BCGroup)
+        maximum = maxval(self%Conditions%BCGroup)
+        allocate (self%Conditions%BC_Info(minium:maximum))
         ! allocate (self%Conditions%BC_Hydraulic(size(self%Conditions%BCGroup)))
 
         do iBC = 1, size(self%Conditions%BCGroup)
             write (cBCGroup, '(i0)') self%Conditions%BCGroup(iBC)
             key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, TypeName)
-            call json%get(key, self%Conditions%BC_Info(iBC)%type)
+            call json%get(key, self%Conditions%BC_Info(self%Conditions%BCGroup(iBC))%type)
             call json%print_error_message(output_unit)
 
-            select case (self%Conditions%BC_Info(iBC)%type)
+            select case (self%Conditions%BC_Info(self%Conditions%BCGroup(iBC))%type)
             case (DirichletName, HeatTransferName)
                 key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, ValueName)
-                call json%get(key, self%Conditions%BC_Info(iBC)%value)
+                call json%get(key, self%Conditions%BC_Info(self%Conditions%BCGroup(iBC))%value)
                 call json%print_error_message(output_unit)
                 key = Inout_Input_Connect_dot(BCName, cBCGroup, ThermalName, UniformName)
-                call json%get(key, self%Conditions%BC_Info(iBC)%isUniform)
+                call json%get(key, self%Conditions%BC_Info(self%Conditions%BCGroup(iBC))%isUniform)
                 call json%print_error_message(output_unit)
             case default
-                self%Conditions%BC_Info(iBC)%value = NaNValue
+                self%Conditions%BC_Info(self%Conditions%BCGroup(iBC))%value = NaNValue
             end select
 
             ! key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, TypeName)

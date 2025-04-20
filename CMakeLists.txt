@@ -9,7 +9,7 @@ option(ENABLE_OPTIMIZE "Enable optimization flags" ON)
 option(ENABLE_OPENMP   "Enable OpenMP support"     ON)
 option(ENABLE_MKL      "Enable MKL support"        ON)
 option(ENABLE_MPI      "Enable MPI support"        OFF)
-option(ENABLE_DEBUG    "Enable debug flags"        ON)
+option(ENABLE_DEBUG    "Enable debug flags"        OFF)
 
 # Select the application to build
 set(BUILD_APP "" CACHE STRING "Specify the application to build: ysy_fc or test")
@@ -45,6 +45,7 @@ endif()
 # Include Paths
 set(My_INCLUDE_PATH
     ${CMAKE_INCLUDE_PATH}/Json-Fortran
+    ${CMAKE_INCLUDE_PATH}/VTKFortran
 )
 
 # External Libraries
@@ -115,8 +116,8 @@ elseif(BUILD_APP STREQUAL "test")
         target_compile_options(test PUBLIC -O0 -g -check all)
         target_link_options   (test PUBLIC -O0 -g -check all)
     elseif(ENABLE_OPTIMIZE)
-        target_compile_options(test PUBLIC -O3 -flto -xCORE-AVX2)
-        target_link_options   (test PUBLIC -O3 -flto -xCORE-AVX2)
+        target_compile_options(test PUBLIC -O3 -xCORE-AVX2)
+        target_link_options   (test PUBLIC -O3 -xCORE-AVX2)
     endif()
 
 
