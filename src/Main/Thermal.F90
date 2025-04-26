@@ -190,6 +190,11 @@ contains
         integer(int32), intent(in) :: step
         integer(int32), intent(in) :: iter
 
+        if (step >= 2) then
+            self%CT_old(2)%Val(:) = self%CT_old(1)%Val(:)
+            self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+        end if
+
         self%CT_l%Val(:) = 0.0d0
         self%KT_l%Val(:) = 0.0d0
         self%KT_star_0%Val(:) = 0.0d0
@@ -198,20 +203,22 @@ contains
         ! end if
         call Assemble_Mass_Lumped_231(self%CT_l, self%Element, self%Area, self%C%Apparent, self%nElement)
         call Assemble_Diffusion_231(self%KT_l, self%Element, self%Basis, self%Area, self%lambda%value, self%nElement)
-        self%KT_star_0%Val(:) = dt * self%KT_l%Val(:) + self%CT_l%Val(:)
-        if (iter == 1) then
-            ! print *, "iter = ", iter
-            self%CT_old(1)%Val(:) = self%CT_l%Val(:)
-            self%KT_old%Val(:) = self%KT_l%Val(:)
-            self%PHIT(:) = 0.0d0
-            self%PHIT_old(:) = self%CT_old(1) * self%T%old(:, 1)
-            ! self%PHIT_old(:) = dt * (self%KT_old * self%T%old(:, 1)) + self%CT_old(1) * self%T%old(:, 1)
+        if (step == 1) then
+            self%KT_star_0%Val(:) = dt * self%KT_l%Val(:) + self%CT_l%Val(:)
+            if (iter == 1) then
+                self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+                self%KT_old%Val(:) = self%KT_l%Val(:)
+                self%PHIT(:) = 0.0d0
+                self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
+            end if
+            self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
+        else
+            self%KT_star_0%Val(:) = 2.0d0 * dt * self%KT_l%Val(:) + 3.0d0 * self%CT_l%Val(:)
+            if (iter == 1) then
+                self%PHIT_old(:) = -4.0d0 * (self%CT_old(1) * self%T%old(:, 1)) + self%CT_old(2) * self%T%old(:, 2)
+            end if
+            self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
         end if
-        ! print *, self%CT_old(1)%Val(:)
-        ! print *, self%T%old(:, 1)
-        ! self%PHIT(:) = self%CT_l * self%T%old(:, 1)
-
-        self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) - self%PHIT_old(:)
         ! self%PHIT(:) = self%PHIT_old(:)
     end subroutine Type_Thermal_3Phase_Assemble
 

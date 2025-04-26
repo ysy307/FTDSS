@@ -1,5 +1,5 @@
 module Types
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int8, int32, real64
     implicit none
     public
 #ifdef _MPI
@@ -62,8 +62,8 @@ module Types
         character(:), allocatable :: POINTS_DATATYPE !! dataType is one of the types bit, unsigned_char, char, unsigned_short, short, unsigned_int, int,  unsigned_long, long, float, or double.
         integer(int32) :: numPoints !! Number of points
         type(DP3d) :: POINTS !! VTK 3D geometry coordinates
-        integer(int32) :: numCells !! Number of cells
-        integer(int32) :: numCellsList !! Number of cells in the list
+        integer(int32) :: numTotalCells !! Number of cells
+        integer(int32) :: maxCellTypes
         integer(int32) :: numCellTypes !! Number of cell types
 
         type(Type_VTK_CELLS), allocatable :: CELLS(:) !! Cell information
@@ -73,7 +73,9 @@ module Types
     end type Type_VTK
 
     type :: Type_VTK_CELLS
-        integer(int32) :: nCells !! Number of cells beloging to the region
+        logical(4) :: exists
+        integer(int32) :: numCells !! Number of cells beloging to the region
+        integer(int8), allocatable :: offset(:)
         integer(int32), allocatable :: Nodes(:, :) !! Node numbers of the cells
     end type Type_VTK_CELLS
 

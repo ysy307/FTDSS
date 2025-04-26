@@ -30,10 +30,11 @@ program test
 
     time%start_time = 0.0d0
     time%end_time = 86400.0d0
-    time%dt = 1.0d0
+    time%dt = 10.0d0
+    time%time = time%start_time
     allocate (time%dt_old(1))
 
-    Iteration%max_iter = 20
+    Iteration%max_iter = 100
 
     meshType = 3
 
@@ -42,9 +43,9 @@ program test
     phi_soil = 0.3d0
 
     Input = Type_Input()
-    allocate (Elements(3, Input%VTK%CELLS(5)%nCells))
+    allocate (Elements(3, Input%VTK%CELLS(5)%numCells))
 
-    do i = 1, Input%VTK%CELLS(5)%nCells
+    do i = 1, Input%VTK%CELLS(5)%numCells
         do j = 1, 3
             Elements(j, i) = Input%VTK%CELLS(5)%Nodes(j, i)
         end do
@@ -86,7 +87,7 @@ program test
     count = 0
     filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
     ! print *, count, filename
-    call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numCells, Elements, Input%VTK%POINTS, Thermal%T%pre(:), Thermal%Ice%Si%pre)
+    call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numTotalCells, Elements, Input%VTK%POINTS, Thermal%T%pre(:), Thermal%Ice%Si%pre)
     Iteration%step = 0
 
     ! print *, Thermal%T%old(:, 1)
@@ -107,7 +108,13 @@ program test
                 Iteration%isConverged = .false.
             end if
             Iteration%iter = Iteration%iter + 1
-            ! print *, Iteration%iter, Iteration%step, Iteration%isConverged
+            if (Iteration%iter == 1) then
+                if (Iteration%step >= 2) then
+                    Thermal%T%pre(:) = Thermal%T%old(:, 1) + (Thermal%T%old(:, 1) - Thermal%T%old(:, 2)) * (time%dt / time%dt_old(1))
+                    ! Thermal%T%pre(:) = 2.0d0 * Thermal%T%old(:, 1) - Thermal%T%old(:, 2)
+                    call Thermal%Update(phi_soil, ThermalInput%rho(3), Iteration%iter)
+                end if
+            end if
 
             call Thermal%Assemble(time%dt, Iteration%step, Iteration%iter)
             call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
@@ -122,7 +129,7 @@ program test
             !! Convergence check
             ! if (Iteration%iter >= 3) then
             if (norm_new < 1.0d-5) then
-                print *, Iteration%iter, norm_new
+                print *, Iteration%step, Iteration%iter, norm_new
                 Iteration%isConverged = .true.
                 call Thermal%T%Shift()
                 exit NR_LOOP_THERMAL
@@ -139,11 +146,11 @@ program test
         end if
 
         ! print *, mod(Iteration%step, 100)
-        if (mod(Iteration%step, 100) == 0) then
+        if (mod(Iteration%step, 10) == 0) then
             count = count + 1
             filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
             ! print *, count, filename
-            call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numCells, Elements, Input%VTK%POINTS, Thermal%T%pre, Thermal%Ice%Si%pre)
+            call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numTotalCells, Elements, Input%VTK%POINTS, Thermal%T%pre, Thermal%Ice%Qice%pre)
             ! if (count == 100) stop
         end if
 

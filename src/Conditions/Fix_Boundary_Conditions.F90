@@ -133,7 +133,7 @@ contains
         do i = minimum, maximum
             Structure%BC_Info(i) = BC_Info(i - 1)
         end do
-        Structure%numEdges = Input_VTK%CELLS(3)%nCells
+        Structure%numEdges = Input_VTK%CELLS(3)%numCells
         allocate (Structure%Edge, source=Input_VTK%CELLS(3)%Nodes)
         allocate (Structure%EdgeType, source=Input_VTK%CellEntityIds(1:Structure%numEdges))
 

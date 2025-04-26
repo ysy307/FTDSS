@@ -1,5 +1,5 @@
 module Inout_VTK
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int8, int32, real64
     use :: Types, only:Type_VTK
     use :: Allocate_Allocate, only:Allocate_Array
     use :: Allocate_Structure, only:Allocate_DP
@@ -69,6 +69,8 @@ contains
         integer(int32) :: new_unit
         logical :: exists
 
+        vtk%maxCellTypes = MAX_VTK_SHAPE
+
         inquire (file=filename, exist=exists)
         if (.not. exists) then
             write (*, *) "File does not exist: ", filename
@@ -91,17 +93,17 @@ contains
         character(256) :: line
         integer(int32) :: iostat
 
-        read (unit, '(a)', iostat=iostat) line
-        read (unit, '(a)', iostat=iostat) line
-        read (unit, '(a)', iostat=iostat) line
+        read (unit, '(a)', iostat=iostat) line !! data version information
+        read (unit, '(a)', iostat=iostat) line !! data file header
+        read (unit, '(a)', iostat=iostat) line !! file format
         select case (trim(line))
         case (c_ASCII)
             vtk%format = c_ASCII
         case (c_BINARY)
             vtk%format = c_BINARY
         end select
-        read (unit, '(a)', iostat=iostat) line
 
+        read (unit, '(a)', iostat=iostat) line
         ! DATASET DATASET_NAME
         ! 12345678901234567890
         ! len(DATASET) = 7 is final character of DATASET_NAME
@@ -130,10 +132,12 @@ contains
         character(256) :: line, dtype
         character(256), allocatable :: lines(:)
         character(16) :: keyword
+        integer(int8), allocatable :: offset(:)
         integer(int32) :: iostat, numPoints
         integer(int32) :: pos1, pos2
         integer(int32) :: iPoints
 
+        !! DATASET (UNSTRUCTURED_GRID)
         read (unit, '(a)', iostat=iostat) line
         if (iostat /= 0) stop
 
@@ -156,7 +160,7 @@ contains
         keyword = line(1:pos1 - 1)
 
         if (keyword == c_CELLS) then
-            call Inout_VTK_Read_Data_Cells(unit, vtk, line, lines)
+            call Inout_VTK_Read_Data_Cells(unit, vtk, line, lines, offset)
         end if
 
         read (unit, '(a)', iostat=iostat) line
@@ -199,13 +203,13 @@ contains
         integer(int32) :: pos1, pos2
         integer(int32) :: iPoint
 
+        !! line
+        !! POINTS ***** double
         pos1 = index(headline, space)
-
         pos2 = index(headline(pos1 + 1:), space) + pos1
         if (pos2 == pos1) stop
 
         read (headline(pos1 + 1:pos2 - 1), '(i)') numPoints
-
         dtype = headline(pos2 + 1:)
 
         vtk%numPoints = numPoints
@@ -232,7 +236,7 @@ contains
             vtk%POINTS_DATATYPE = c_double
         end select
 
-        call Allocate_DP(vtk%POINTS, numPoints)
+        call vtk%POINTS%allocate(numPoints)
 
         do iPoint = 1, vtk%numPoints
             read (unit, *, iostat=iostat) vtk%POINTS%x(iPoint), vtk%POINTS%y(iPoint), vtk%POINTS%z(iPoint)
@@ -243,14 +247,15 @@ contains
 
     end subroutine Inout_VTK_Read_Data_Points
 
-    subroutine Inout_VTK_Read_Data_Cells(unit, vtk, headline, lines)
+    subroutine Inout_VTK_Read_Data_Cells(unit, vtk, headline, lines, offset)
         !> Read VTK data cells
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
         type(Type_VTK), intent(inout) :: vtk !! VTK data
         character(*), intent(in) :: headline !! Headline
         character(256), allocatable, intent(inout) :: lines(:)
-        integer(int32) :: iostat, numCells, numCellsList
+        integer(int8), allocatable, intent(inout) :: offset(:)
+        integer(int32) :: iostat, numTotalCells
         integer(int32) :: pos1, pos2
         integer(int32) :: iCell
 
@@ -258,21 +263,21 @@ contains
         pos2 = index(headline(pos1 + 1:), space) + pos1
         if (pos2 == pos1) stop
 
-        read (headline(pos1 + 1:pos2 - 1), '(i)') numCells
-        read (headline(pos2 + 1:), '(i)') numCellsList
+        read (headline(pos1 + 1:pos2 - 1), '(i)') numTotalCells
 
-        vtk%numCells = numCells
-        vtk%numCellsList = numCellsList
+        vtk%numTotalCells = numTotalCells
 
-        allocate (lines(vtk%numCells))
+        allocate (lines(vtk%numTotalCells))
+        allocate (offset(vtk%numTotalCells))
 
-        do iCell = 1, vtk%numCells
+        do iCell = 1, vtk%numTotalCells
             read (unit, '(a)', iostat=iostat) lines(iCell)
             if (iostat /= 0) stop
-        end do
 
-        do iCell = 1, vtk%numCells
             pos1 = index(lines(iCell), space)
+
+            read (lines(iCell) (:pos1), '(i)') offset(iCell)
+            if (iostat /= 0) stop
             lines(iCell) = lines(iCell) (pos1 + 1:)
         end do
         read (unit, '(a)', iostat=iostat) ! Skip
@@ -299,7 +304,7 @@ contains
         if (pos2 == pos1) stop
 
         read (headline(pos1 + 1:pos2 - 1), '(i)') numCellTypes
-        allocate (vtk%CELLS(MAX_VTK_SHAPE))
+        allocate (vtk%CELLS(vtk%maxCellTypes))
 
         vtk%numCellTypes = numCellTypes
         call Allocate_Array(CellType, vtk%numCellTypes)
@@ -309,73 +314,81 @@ contains
             if (iostat /= 0) stop
         end do
 
-        vtk%CELLS(:)%nCells = 0
-        do iCell = 1, vtk%numCells
+        vtk%CELLS(:)%numCells = 0
+
+        do iCell = 1, vtk%numTotalCells
             select case (CellType(iCell))
             case (VTK_VERTEX)
-                vtk%CELLS(VTK_VERTEX)%nCells = vtk%CELLS(VTK_VERTEX)%nCells + 1
+                vtk%CELLS(VTK_VERTEX)%numCells = vtk%CELLS(VTK_VERTEX)%numCells + 1
             case (VTK_POLY_VERTEX)
-                vtk%CELLS(VTK_POLY_VERTEX)%nCells = vtk%CELLS(VTK_POLY_VERTEX)%nCells + 1
+                vtk%CELLS(VTK_POLY_VERTEX)%numCells = vtk%CELLS(VTK_POLY_VERTEX)%numCells + 1
             case (VTK_LINE)
-                vtk%CELLS(VTK_LINE)%nCells = vtk%CELLS(VTK_LINE)%nCells + 1
+                vtk%CELLS(VTK_LINE)%numCells = vtk%CELLS(VTK_LINE)%numCells + 1
             case (VTK_POLY_LINE)
-                vtk%CELLS(VTK_POLY_LINE)%nCells = vtk%CELLS(VTK_POLY_LINE)%nCells + 1
+                vtk%CELLS(VTK_POLY_LINE)%numCells = vtk%CELLS(VTK_POLY_LINE)%numCells + 1
             case (VTK_TRIANGLE)
-                vtk%CELLS(VTK_TRIANGLE)%nCells = vtk%CELLS(VTK_TRIANGLE)%nCells + 1
+                vtk%CELLS(VTK_TRIANGLE)%numCells = vtk%CELLS(VTK_TRIANGLE)%numCells + 1
             case (VTK_TRIANGLE_STRIP)
-                vtk%CELLS(VTK_TRIANGLE_STRIP)%nCells = vtk%CELLS(VTK_TRIANGLE_STRIP)%nCells + 1
+                vtk%CELLS(VTK_TRIANGLE_STRIP)%numCells = vtk%CELLS(VTK_TRIANGLE_STRIP)%numCells + 1
             case (VTK_POLYGON)
-                vtk%CELLS(VTK_POLYGON)%nCells = vtk%CELLS(VTK_POLYGON)%nCells + 1
+                vtk%CELLS(VTK_POLYGON)%numCells = vtk%CELLS(VTK_POLYGON)%numCells + 1
             case (VTK_PIXEL)
-                vtk%CELLS(VTK_PIXEL)%nCells = vtk%CELLS(VTK_PIXEL)%nCells + 1
+                vtk%CELLS(VTK_PIXEL)%numCells = vtk%CELLS(VTK_PIXEL)%numCells + 1
             case (VTK_QUAD)
-                vtk%CELLS(VTK_QUAD)%nCells = vtk%CELLS(VTK_QUAD)%nCells + 1
+                vtk%CELLS(VTK_QUAD)%numCells = vtk%CELLS(VTK_QUAD)%numCells + 1
             case (VTK_TETRA)
-                vtk%CELLS(VTK_TETRA)%nCells = vtk%CELLS(VTK_TETRA)%nCells + 1
+                vtk%CELLS(VTK_TETRA)%numCells = vtk%CELLS(VTK_TETRA)%numCells + 1
             case (VTK_VOXEL)
-                vtk%CELLS(VTK_VOXEL)%nCells = vtk%CELLS(VTK_VOXEL)%nCells + 1
+                vtk%CELLS(VTK_VOXEL)%numCells = vtk%CELLS(VTK_VOXEL)%numCells + 1
             case (VTK_HEXAHEDRON)
-                vtk%CELLS(VTK_HEXAHEDRON)%nCells = vtk%CELLS(VTK_HEXAHEDRON)%nCells + 1
+                vtk%CELLS(VTK_HEXAHEDRON)%numCells = vtk%CELLS(VTK_HEXAHEDRON)%numCells + 1
             case (VTK_WEDGE)
-                vtk%CELLS(VTK_WEDGE)%nCells = vtk%CELLS(VTK_WEDGE)%nCells + 1
+                vtk%CELLS(VTK_WEDGE)%numCells = vtk%CELLS(VTK_WEDGE)%numCells + 1
             case (VTK_PYRAMID)
-                vtk%CELLS(VTK_PYRAMID)%nCells = vtk%CELLS(VTK_PYRAMID)%nCells + 1
+                vtk%CELLS(VTK_PYRAMID)%numCells = vtk%CELLS(VTK_PYRAMID)%numCells + 1
             case (VTK_QUADRATIC_EDGE)
-                vtk%CELLS(VTK_QUADRATIC_EDGE)%nCells = vtk%CELLS(VTK_QUADRATIC_EDGE)%nCells + 1
+                vtk%CELLS(VTK_QUADRATIC_EDGE)%numCells = vtk%CELLS(VTK_QUADRATIC_EDGE)%numCells + 1
             case (VTK_QUADRATIC_TRIANGLE)
-                vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%nCells = vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%nCells + 1
+                vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%numCells = vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%numCells + 1
             case (VTK_QUADRATIC_QUAD)
-                vtk%CELLS(VTK_QUADRATIC_QUAD)%nCells = vtk%CELLS(VTK_QUADRATIC_QUAD)%nCells + 1
+                vtk%CELLS(VTK_QUADRATIC_QUAD)%numCells = vtk%CELLS(VTK_QUADRATIC_QUAD)%numCells + 1
             case (VTK_QUADRATIC_TETRA)
-                vtk%CELLS(VTK_QUADRATIC_TETRA)%nCells = vtk%CELLS(VTK_QUADRATIC_TETRA)%nCells + 1
+                vtk%CELLS(VTK_QUADRATIC_TETRA)%numCells = vtk%CELLS(VTK_QUADRATIC_TETRA)%numCells + 1
             case (VTK_QUADRATIC_HEXAHEDRON)
-                vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%nCells = vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%nCells + 1
+                vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%numCells = vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%numCells + 1
             end select
+        end do
+
+        vtk%CELLS(:)%exists = .false.
+        do iCell = 1, MAX_VTK_SHAPE
+            if (vtk%CELLS(iCell)%numCells > 0) then
+                vtk%CELLS(iCell)%exists = .true.
+            end if
         end do
 
         counts = 0
         do iCell = 1, MAX_VTK_SHAPE
-            if (vtk%CELLS(iCell)%nCells > 0) then
+            if (vtk%CELLS(iCell)%numCells > 0) then
                 counts = counts + 1
                 select case (iCell)
                 case (VTK_VERTEX, VTK_POLY_VERTEX, VTK_POLY_LINE, VTK_TRIANGLE_STRIP, VTK_POLYGON)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 1_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 1_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_LINE, VTK_QUADRATIC_EDGE)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 2_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 2_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_TRIANGLE)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 3_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 3_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_PIXEL, VTK_QUAD, VTK_TETRA)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 4_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 4_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_PYRAMID)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 5_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 5_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_WEDGE, VTK_QUADRATIC_TRIANGLE)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 6_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 6_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_VOXEL, VTK_HEXAHEDRON, VTK_QUADRATIC_QUAD)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 8_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 8_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_QUADRATIC_TETRA)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 10_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 10_int32, vtk%CELLS(iCell)%numCells)
                 case (VTK_QUADRATIC_HEXAHEDRON)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 20_int32, vtk%CELLS(iCell)%nCells)
+                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 20_int32, vtk%CELLS(iCell)%numCells)
                 end select
             end if
         end do
@@ -383,7 +396,7 @@ contains
         call Allocate_Array(vtk%Invalid_CELLS_LIST, counts)
         iiCell = 0
         do iCell = 1, MAX_VTK_SHAPE
-            if (vtk%CELLS(iCell)%nCells > 0) then
+            if (vtk%CELLS(iCell)%numCells > 0) then
                 iiCell = iiCell + 1
                 vtk%Invalid_CELLS_LIST(iiCell) = iCell
             end if
@@ -391,7 +404,7 @@ contains
 
         call Allocate_Array(Counters, MAX_VTK_SHAPE)
         Counters(:) = 0
-        do iCell = 1, vtk%numCells
+        do iCell = 1, vtk%numTotalCells
             select case (CellType(iCell))
             case (VTK_VERTEX)
                 Counters(VTK_VERTEX) = Counters(VTK_VERTEX) + 1
