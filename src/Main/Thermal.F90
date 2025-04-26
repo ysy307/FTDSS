@@ -50,9 +50,11 @@ module Main_Thermal
     end interface
 
 contains
-    function Type_Thermal_3Phase_Construct(Elements, Coordinate, meshType, Lf, Tf, Input_Ice_Param, Input_Thermal_Params, Input_Thermal_BC, nsize, Input_VTK) result(structure)
+    function Type_Thermal_3Phase_Construct(Input, Elements, Coordinate, meshType, Lf, Tf, Input_Ice_Param, Input_Thermal_Params, Input_Thermal_BC, nsize, Input_VTK) result(structure)
         implicit none
         type(Type_Thermal_3Phase) :: structure
+        type(Type_Input), intent(in) :: Input
+
         integer(int32), intent(in) :: Elements(:, :)
         type(DP3d), intent(in) :: Coordinate
         integer(int32), intent(in) :: meshType

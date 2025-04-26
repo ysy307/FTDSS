@@ -92,17 +92,6 @@ module Types
         procedure, pass(self) :: allocate => Variables_Allocate
     end type Variables
 
-    type :: Type_Time
-        real(real64) :: start_time
-        real(real64) :: end_time
-        real(real64) :: time
-        real(real64) :: time_old
-        real(real64) :: dt
-        real(real64), allocatable :: dt_old(:)
-        real(real64) :: dt_max
-        real(real64) :: dt_min
-    end type Type_Time
-
     type :: Type_Iteration
         integer(int32) :: iter
         integer(int32) :: max_iter

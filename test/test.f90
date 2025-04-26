@@ -1,6 +1,7 @@
 program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
+    use :: Solver_Time
     use :: Inout_Input
     use :: Inout_Output
     use :: Calculate_BLAS
@@ -28,12 +29,6 @@ program test
 
     character(:), allocatable :: filename
 
-    time%start_time = 0.0d0
-    time%end_time = 86400.0d0
-    time%dt = 10.0d0
-    time%time = time%start_time
-    allocate (time%dt_old(1))
-
     Iteration%max_iter = 100
 
     meshType = 3
@@ -43,6 +38,7 @@ program test
     phi_soil = 0.3d0
 
     Input = Type_Input()
+    time = Type_Time(Input)
     allocate (Elements(3, Input%VTK%CELLS(5)%numCells))
 
     do i = 1, Input%VTK%CELLS(5)%numCells

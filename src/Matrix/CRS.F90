@@ -3,10 +3,10 @@ module Matrix_CRS
     use :: Allocate_Allocate, only:Allocate_Array
     implicit none
 
-    public :: Type_CRS
-    public :: operator(*)
-    public :: operator(+)
-    public :: Transpose_CRS
+    ! public :: Type_CRS
+    ! public :: operator(*)
+    ! public :: operator(+)
+    ! public :: Transpose_CRS
 
     type :: Type_CRS
         integer(int32) :: nnz ! number of non-zero elements
@@ -25,6 +25,10 @@ module Matrix_CRS
     end interface
     interface operator(+)
         module procedure Matrix_Addition_CRS
+    end interface
+
+    interface Type_CRS
+        module procedure Initialize_CRS
     end interface
 
 contains
@@ -48,7 +52,7 @@ contains
         ! Allocate temp arrays
         call Allocate_Array(A%Ptr, A%nrow)
         call Allocate_Array(rowCount, nNode)
-        call Allocate_Array(tmpInd, nTop * nNode)
+        call Allocate_Array(tmpInd, 10_int32 * nNode)
         call Allocate_Array(vertex, nTop)
 
         A%Ptr(1) = 1
