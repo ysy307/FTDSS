@@ -1,10 +1,51 @@
 module Inout_VTK
     use, intrinsic :: iso_fortran_env, only: int8, int32, real64
-    use :: Types, only:Type_VTK
+    use :: Types, only:DP3d
     use :: Allocate_Allocate, only:Allocate_Array
-    use :: Allocate_Structure, only:Allocate_DP
     implicit none
     private
+
+    type :: VTK_CELL_NAMES
+        integer(int32) :: VTK_VERTEX = 1
+        integer(int32) :: VTK_POLY_VERTEX = 2
+        integer(int32) :: VTK_LINE = 3
+        integer(int32) :: VTK_POLY_LINE = 4
+        integer(int32) :: VTK_TRIANGLE = 5
+        integer(int32) :: VTK_TRIANGLE_STRIP = 6
+        integer(int32) :: VTK_POLYGON = 7
+        integer(int32) :: VTK_PIXEL = 8
+        integer(int32) :: VTK_QUAD = 9
+        integer(int32) :: VTK_TETRA = 10
+        integer(int32) :: VTK_VOXEL = 11
+        integer(int32) :: VTK_HEXAHEDRON = 12
+        integer(int32) :: VTK_WEDGE = 13
+        integer(int32) :: VTK_PYRAMID = 14
+        integer(int32) :: VTK_QUADRATIC_EDGE = 21
+        integer(int32) :: VTK_QUADRATIC_TRIANGLE = 22
+        integer(int32) :: VTK_QUADRATIC_QUAD = 23
+        integer(int32) :: VTK_QUADRATIC_TETRA = 24
+        integer(int32) :: VTK_QUADRATIC_HEXAHEDRON = 25
+    end type VTK_CELL_NAMES
+
+    type :: Type_VTK_CELLS
+        integer(int8) :: offset
+        integer(int8) :: CellEntityId
+        integer(int8) :: CellType
+        integer(int32), allocatable :: Connectivity(:) !! Node numbers of the cells
+    end type Type_VTK_CELLS
+
+    type :: Type_VTK
+        character(:), allocatable :: format !! ASCII or BINARY
+        character(:), allocatable :: dataset !! STRUCTURED_POINTS, STRUCTURED_GRID, RECTILINEAR_GRID, POLYDATA, UNSTRUCTURED_GRID
+        character(:), allocatable :: POINTS_DATATYPE !! dataType is one of the types bit, unsigned_char, char, unsigned_short, short, unsigned_int, int,  unsigned_long, long, float, or double.
+        integer(int32) :: numPoints !! Number of points
+        type(DP3d) :: POINTS !! VTK 3D geometry coordinates
+        integer(int32) :: numTotalCells !! Number of cells
+        integer(int32) :: numCellTypes !! Number of cell types
+
+        type(Type_VTK_CELLS), allocatable :: CELLS(:) !! Cell information
+        type(VTK_CELL_NAMES) :: Names !! Cell names
+    end type Type_VTK
 
     character(*), parameter :: c_ASCII = "ASCII"
     character(*), parameter :: c_BINARY = "BINARY"
@@ -33,43 +74,23 @@ module Inout_VTK
     character(*), parameter :: c_long = "long"
     character(*), parameter :: c_float = "float"
     character(*), parameter :: c_double = "double"
-
-    integer(int32), parameter :: VTK_VERTEX = 1
-    integer(int32), parameter :: VTK_POLY_VERTEX = 2
-    integer(int32), parameter :: VTK_LINE = 3
-    integer(int32), parameter :: VTK_POLY_LINE = 4
-    integer(int32), parameter :: VTK_TRIANGLE = 5
-    integer(int32), parameter :: VTK_TRIANGLE_STRIP = 6
-    integer(int32), parameter :: VTK_POLYGON = 7
-    integer(int32), parameter :: VTK_PIXEL = 8
-    integer(int32), parameter :: VTK_QUAD = 9
-    integer(int32), parameter :: VTK_TETRA = 10
-    integer(int32), parameter :: VTK_VOXEL = 11
-    integer(int32), parameter :: VTK_HEXAHEDRON = 12
-    integer(int32), parameter :: VTK_WEDGE = 13
-    integer(int32), parameter :: VTK_PYRAMID = 14
-    integer(int32), parameter :: VTK_QUADRATIC_EDGE = 21
-    integer(int32), parameter :: VTK_QUADRATIC_TRIANGLE = 22
-    integer(int32), parameter :: VTK_QUADRATIC_QUAD = 23
-    integer(int32), parameter :: VTK_QUADRATIC_TETRA = 24
-    integer(int32), parameter :: VTK_QUADRATIC_HEXAHEDRON = 25
-    integer(int32), parameter :: MAX_VTK_SHAPE = 25
-
     character(*), parameter :: space = " "
 
-    public :: Inout_VTK_Read
+    public :: Type_VTK
+
+    interface Type_VTK
+        procedure :: Inout_VTK_Read
+    end interface
 
 contains
 
-    subroutine Inout_VTK_Read(filename, vtk)
+    function Inout_VTK_Read(filename) result(vtk)
         !> Read VTK file
         implicit none
-        character(*), intent(in) :: filename !! .VTK file name
-        type(Type_VTK), intent(inout) :: vtk !! VTK data
+        character(*), intent(in) :: filename !! ***.VTK file name
+        type(Type_VTK) :: vtk !! VTK data
         integer(int32) :: new_unit
         logical :: exists
-
-        vtk%maxCellTypes = MAX_VTK_SHAPE
 
         inquire (file=filename, exist=exists)
         if (.not. exists) then
@@ -82,7 +103,7 @@ contains
         call Inout_VTK_Read_Data(new_unit, vtk)
         close (new_unit)
 
-    end subroutine Inout_VTK_Read
+    end function Inout_VTK_Read
 
     subroutine Inout_VTK_Read_Header(unit, vtk)
         !> Read VTK header
@@ -130,9 +151,7 @@ contains
         type(Type_VTK), intent(inout) :: vtk !! VTK data
 
         character(256) :: line, dtype
-        character(256), allocatable :: lines(:)
         character(16) :: keyword
-        integer(int8), allocatable :: offset(:)
         integer(int32) :: iostat, numPoints
         integer(int32) :: pos1, pos2
         integer(int32) :: iPoints
@@ -160,7 +179,7 @@ contains
         keyword = line(1:pos1 - 1)
 
         if (keyword == c_CELLS) then
-            call Inout_VTK_Read_Data_Cells(unit, vtk, line, lines, offset)
+            call Inout_VTK_Read_Data_Cells(unit, vtk, line)
         end if
 
         read (unit, '(a)', iostat=iostat) line
@@ -172,7 +191,7 @@ contains
         keyword = line(1:pos1 - 1)
 
         if (keyword == c_CELL_TYPES) then
-            call Inout_VTK_Read_Data_Cells_Types(unit, vtk, line, lines)
+            call Inout_VTK_Read_Data_Cells_Types(unit, vtk, line)
         end if
 
         read (unit, '(a)', iostat=iostat) line
@@ -186,8 +205,6 @@ contains
         if (keyword == c_CELL_DATA) then
             call Inout_VTK_Read_Data_CellEntityIds(unit, vtk, line)
         end if
-
-        deallocate (lines)
 
     end subroutine Inout_VTK_Read_Data
 
@@ -247,17 +264,16 @@ contains
 
     end subroutine Inout_VTK_Read_Data_Points
 
-    subroutine Inout_VTK_Read_Data_Cells(unit, vtk, headline, lines, offset)
+    subroutine Inout_VTK_Read_Data_Cells(unit, vtk, headline)
         !> Read VTK data cells
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
         type(Type_VTK), intent(inout) :: vtk !! VTK data
         character(*), intent(in) :: headline !! Headline
-        character(256), allocatable, intent(inout) :: lines(:)
-        integer(int8), allocatable, intent(inout) :: offset(:)
         integer(int32) :: iostat, numTotalCells
         integer(int32) :: pos1, pos2
         integer(int32) :: iCell
+        character(256) :: line
 
         pos1 = index(headline, space)
         pos2 = index(headline(pos1 + 1:), space) + pos1
@@ -267,223 +283,60 @@ contains
 
         vtk%numTotalCells = numTotalCells
 
-        allocate (lines(vtk%numTotalCells))
-        allocate (offset(vtk%numTotalCells))
+        allocate (vtk%CELLS(vtk%numTotalCells))
 
         do iCell = 1, vtk%numTotalCells
-            read (unit, '(a)', iostat=iostat) lines(iCell)
+            read (unit, '(a)', iostat=iostat) line
             if (iostat /= 0) stop
 
-            pos1 = index(lines(iCell), space)
+            pos1 = index(line, space)
 
-            read (lines(iCell) (:pos1), '(i)') offset(iCell)
+            read (line(:pos1), '(i)') vtk%CELLS(iCell)%offset
             if (iostat /= 0) stop
-            lines(iCell) = lines(iCell) (pos1 + 1:)
+
+            call Allocate_Array(vtk%CELLS(iCell)%Connectivity, transfer(vtk%CELLS(iCell)%offset, iCell))
+            read (line(pos1 + 1:), *) vtk%CELLS(iCell)%Connectivity(:)
         end do
+
+        do iCell = 1, vtk%numTotalCells
+            vtk%CELLS(iCell)%Connectivity(:) = vtk%CELLS(iCell)%Connectivity(:) + 1
+        end do
+
         read (unit, '(a)', iostat=iostat) ! Skip
 
     end subroutine Inout_VTK_Read_Data_Cells
 
-    subroutine Inout_VTK_Read_Data_Cells_Types(unit, vtk, headline, lines)
+    subroutine Inout_VTK_Read_Data_Cells_Types(unit, vtk, headline)
         !> Read VTK data cells
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
         type(Type_VTK), intent(inout) :: vtk !! VTK data
         character(*), intent(in) :: headline !! Headline
-        character(256), allocatable, intent(inout) :: lines(:)
 
         character(256) :: line
         integer(int32) :: iostat, numCellTypes
         integer(int32) :: pos1, pos2
-        integer(int32) :: iCell, iiCell
-        integer(int32), allocatable :: CellType(:), Counters(:)
-        integer(int32) :: counts
+        integer(int32) :: iCell
+        integer(int32) :: dum
 
         pos1 = index(headline, space)
         pos2 = index(headline(pos1 + 1:), space) + pos1
         if (pos2 == pos1) stop
 
         read (headline(pos1 + 1:pos2 - 1), '(i)') numCellTypes
-        allocate (vtk%CELLS(vtk%maxCellTypes))
 
-        vtk%numCellTypes = numCellTypes
-        call Allocate_Array(CellType, vtk%numCellTypes)
-
-        do iCell = 1, vtk%numCellTypes
-            read (unit, '(i)', iostat=iostat) CellType(iCell)
+        do iCell = 1, numCellTypes
+            read (unit, *, iostat=iostat) vtk%CELLS(iCell)%CellType
             if (iostat /= 0) stop
         end do
 
-        vtk%CELLS(:)%numCells = 0
-
-        do iCell = 1, vtk%numTotalCells
-            select case (CellType(iCell))
-            case (VTK_VERTEX)
-                vtk%CELLS(VTK_VERTEX)%numCells = vtk%CELLS(VTK_VERTEX)%numCells + 1
-            case (VTK_POLY_VERTEX)
-                vtk%CELLS(VTK_POLY_VERTEX)%numCells = vtk%CELLS(VTK_POLY_VERTEX)%numCells + 1
-            case (VTK_LINE)
-                vtk%CELLS(VTK_LINE)%numCells = vtk%CELLS(VTK_LINE)%numCells + 1
-            case (VTK_POLY_LINE)
-                vtk%CELLS(VTK_POLY_LINE)%numCells = vtk%CELLS(VTK_POLY_LINE)%numCells + 1
-            case (VTK_TRIANGLE)
-                vtk%CELLS(VTK_TRIANGLE)%numCells = vtk%CELLS(VTK_TRIANGLE)%numCells + 1
-            case (VTK_TRIANGLE_STRIP)
-                vtk%CELLS(VTK_TRIANGLE_STRIP)%numCells = vtk%CELLS(VTK_TRIANGLE_STRIP)%numCells + 1
-            case (VTK_POLYGON)
-                vtk%CELLS(VTK_POLYGON)%numCells = vtk%CELLS(VTK_POLYGON)%numCells + 1
-            case (VTK_PIXEL)
-                vtk%CELLS(VTK_PIXEL)%numCells = vtk%CELLS(VTK_PIXEL)%numCells + 1
-            case (VTK_QUAD)
-                vtk%CELLS(VTK_QUAD)%numCells = vtk%CELLS(VTK_QUAD)%numCells + 1
-            case (VTK_TETRA)
-                vtk%CELLS(VTK_TETRA)%numCells = vtk%CELLS(VTK_TETRA)%numCells + 1
-            case (VTK_VOXEL)
-                vtk%CELLS(VTK_VOXEL)%numCells = vtk%CELLS(VTK_VOXEL)%numCells + 1
-            case (VTK_HEXAHEDRON)
-                vtk%CELLS(VTK_HEXAHEDRON)%numCells = vtk%CELLS(VTK_HEXAHEDRON)%numCells + 1
-            case (VTK_WEDGE)
-                vtk%CELLS(VTK_WEDGE)%numCells = vtk%CELLS(VTK_WEDGE)%numCells + 1
-            case (VTK_PYRAMID)
-                vtk%CELLS(VTK_PYRAMID)%numCells = vtk%CELLS(VTK_PYRAMID)%numCells + 1
-            case (VTK_QUADRATIC_EDGE)
-                vtk%CELLS(VTK_QUADRATIC_EDGE)%numCells = vtk%CELLS(VTK_QUADRATIC_EDGE)%numCells + 1
-            case (VTK_QUADRATIC_TRIANGLE)
-                vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%numCells = vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%numCells + 1
-            case (VTK_QUADRATIC_QUAD)
-                vtk%CELLS(VTK_QUADRATIC_QUAD)%numCells = vtk%CELLS(VTK_QUADRATIC_QUAD)%numCells + 1
-            case (VTK_QUADRATIC_TETRA)
-                vtk%CELLS(VTK_QUADRATIC_TETRA)%numCells = vtk%CELLS(VTK_QUADRATIC_TETRA)%numCells + 1
-            case (VTK_QUADRATIC_HEXAHEDRON)
-                vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%numCells = vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%numCells + 1
-            end select
-        end do
-
-        vtk%CELLS(:)%exists = .false.
-        do iCell = 1, MAX_VTK_SHAPE
-            if (vtk%CELLS(iCell)%numCells > 0) then
-                vtk%CELLS(iCell)%exists = .true.
-            end if
-        end do
-
-        counts = 0
-        do iCell = 1, MAX_VTK_SHAPE
-            if (vtk%CELLS(iCell)%numCells > 0) then
-                counts = counts + 1
-                select case (iCell)
-                case (VTK_VERTEX, VTK_POLY_VERTEX, VTK_POLY_LINE, VTK_TRIANGLE_STRIP, VTK_POLYGON)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 1_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_LINE, VTK_QUADRATIC_EDGE)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 2_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_TRIANGLE)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 3_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_PIXEL, VTK_QUAD, VTK_TETRA)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 4_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_PYRAMID)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 5_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_WEDGE, VTK_QUADRATIC_TRIANGLE)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 6_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_VOXEL, VTK_HEXAHEDRON, VTK_QUADRATIC_QUAD)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 8_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_QUADRATIC_TETRA)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 10_int32, vtk%CELLS(iCell)%numCells)
-                case (VTK_QUADRATIC_HEXAHEDRON)
-                    call Allocate_Array(vtk%CELLS(iCell)%Nodes, 20_int32, vtk%CELLS(iCell)%numCells)
-                end select
-            end if
-        end do
-
-        call Allocate_Array(vtk%Invalid_CELLS_LIST, counts)
-        iiCell = 0
-        do iCell = 1, MAX_VTK_SHAPE
-            if (vtk%CELLS(iCell)%numCells > 0) then
-                iiCell = iiCell + 1
-                vtk%Invalid_CELLS_LIST(iiCell) = iCell
-            end if
-        end do
-
-        call Allocate_Array(Counters, MAX_VTK_SHAPE)
-        Counters(:) = 0
-        do iCell = 1, vtk%numTotalCells
-            select case (CellType(iCell))
-            case (VTK_VERTEX)
-                Counters(VTK_VERTEX) = Counters(VTK_VERTEX) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VERTEX)%Nodes(1, Counters(VTK_VERTEX))
-            case (VTK_POLY_VERTEX)
-                Counters(VTK_POLY_VERTEX) = Counters(VTK_POLY_VERTEX) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_VERTEX)%Nodes(1, Counters(VTK_POLY_VERTEX))
-            case (VTK_LINE)
-                Counters(VTK_LINE) = Counters(VTK_LINE) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_LINE)%Nodes(1:2, Counters(VTK_LINE))
-            case (VTK_POLY_LINE)
-                Counters(VTK_POLY_LINE) = Counters(VTK_POLY_LINE) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLY_LINE)%Nodes(1, Counters(VTK_POLY_LINE))
-            case (VTK_TRIANGLE)
-                Counters(VTK_TRIANGLE) = Counters(VTK_TRIANGLE) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE)%Nodes(1:3, Counters(VTK_TRIANGLE))
-            case (VTK_TRIANGLE_STRIP)
-                Counters(VTK_TRIANGLE_STRIP) = Counters(VTK_TRIANGLE_STRIP) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TRIANGLE_STRIP)%Nodes(1, Counters(VTK_TRIANGLE_STRIP))
-            case (VTK_POLYGON)
-                Counters(VTK_POLYGON) = Counters(VTK_POLYGON) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_POLYGON)%Nodes(1, Counters(VTK_POLYGON))
-            case (VTK_PIXEL)
-                Counters(VTK_PIXEL) = Counters(VTK_PIXEL) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_PIXEL)%Nodes(1:4, Counters(VTK_PIXEL))
-            case (VTK_QUAD)
-                Counters(VTK_QUAD) = Counters(VTK_QUAD) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUAD)%Nodes(1:4, Counters(VTK_QUAD))
-            case (VTK_TETRA)
-                Counters(VTK_TETRA) = Counters(VTK_TETRA) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_TETRA)%Nodes(1:4, Counters(VTK_TETRA))
-            case (VTK_VOXEL)
-                Counters(VTK_VOXEL) = Counters(VTK_VOXEL) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_VOXEL)%Nodes(1:8, Counters(VTK_VOXEL))
-            case (VTK_HEXAHEDRON)
-                Counters(VTK_HEXAHEDRON) = Counters(VTK_HEXAHEDRON) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_HEXAHEDRON)%Nodes(1:8, Counters(VTK_HEXAHEDRON))
-            case (VTK_WEDGE)
-                Counters(VTK_WEDGE) = Counters(VTK_WEDGE) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_WEDGE)%Nodes(1:6, Counters(VTK_WEDGE))
-            case (VTK_PYRAMID)
-                Counters(VTK_PYRAMID) = Counters(VTK_PYRAMID) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_PYRAMID)%Nodes(1:5, Counters(VTK_PYRAMID))
-            case (VTK_QUADRATIC_EDGE)
-                Counters(VTK_QUADRATIC_EDGE) = Counters(VTK_QUADRATIC_EDGE) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_EDGE)%Nodes(1:3, Counters(VTK_QUADRATIC_EDGE))
-            case (VTK_QUADRATIC_TRIANGLE)
-                Counters(VTK_QUADRATIC_TRIANGLE) = Counters(VTK_QUADRATIC_TRIANGLE) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_TRIANGLE)%Nodes(1:6, Counters(VTK_QUADRATIC_TRIANGLE))
-            case (VTK_QUADRATIC_QUAD)
-                Counters(VTK_QUADRATIC_QUAD) = Counters(VTK_QUADRATIC_QUAD) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_QUAD)%Nodes(1:8, Counters(VTK_QUADRATIC_QUAD))
-            case (VTK_QUADRATIC_TETRA)
-                Counters(VTK_QUADRATIC_TETRA) = Counters(VTK_QUADRATIC_TETRA) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_TETRA)%Nodes(1:10, Counters(VTK_QUADRATIC_TETRA))
-            case (VTK_QUADRATIC_HEXAHEDRON)
-                Counters(VTK_QUADRATIC_HEXAHEDRON) = Counters(VTK_QUADRATIC_HEXAHEDRON) + 1
-                read (lines(iCell), *, iostat=iostat) vtk%CELLS(VTK_QUADRATIC_HEXAHEDRON)%Nodes(1:20, Counters(VTK_QUADRATIC_HEXAHEDRON))
-            end select
-        end do
-
-        do iCell = 1, MAX_VTK_SHAPE
-            if (allocated(vtk%CELLS(iCell)%Nodes)) then
-                if (allocated(vtk%CELLS(iCell)%Nodes)) then
-                    vtk%CELLS(iCell)%Nodes(:, :) = vtk%CELLS(iCell)%Nodes(:, :) + 1
-                end if
-            end if
-        end do
-
         read (unit, '(a)', iostat=iostat) ! Skip
-
-        deallocate (CellType)
-        deallocate (Counters)
 
     end subroutine Inout_VTK_Read_Data_Cells_Types
 
     subroutine Inout_VTK_Read_Data_CellEntityIds(unit, vtk, headline)
         !> Read VTK data cell entity ids
-        implicit none
+        ! implicit none
         integer(int32), intent(in) :: unit !! Unit number
         type(Type_VTK), intent(inout) :: vtk !! VTK data
         character(*), intent(in) :: headline !! Headline
@@ -497,7 +350,6 @@ contains
         pos2 = index(headline(pos1 + 1:), space) + pos1
         if (pos2 == pos1) stop
         read (headline(pos1 + 1:pos2 - 1), '(i)') numCellEntityIds
-        call Allocate_Array(vtk%CellEntityIds, numCellEntityIds)
 
         read (unit, '(A)') line
         pos1 = index(line, space)
@@ -506,7 +358,7 @@ contains
         if (CellEntity == c_CellEntityIds) then
             read (unit, *) ! Skip
             do iCellEntityId = 1, numCellEntityIds
-                read (unit, '(i)') vtk%CellEntityIds(iCellEntityId)
+                read (unit, '(i)') vtk%CELLS(iCellEntityId)%CellEntityId
             end do
         end if
 

@@ -10,6 +10,7 @@ module Main_Thermal
     use :: Matrix_Assemble
     use :: Matrix_CRS
     use :: Condition_Fix_Boundary_Conditions, only:Type_BC_Thermal
+    use :: Solver_Element
     use :: Solver_Solve
     implicit none
 
@@ -29,165 +30,201 @@ module Main_Thermal
         integer(int32) :: nsize
         integer(int32) :: nElement
         real(real64), allocatable :: Area(:)
-        integer(int32), allocatable :: Element(:, :)
-        type(DP3d) :: Coordinate
+        type(DP3d), pointer :: Coordinate
         real(real64), allocatable :: Basis(:, :, :)
         type(Type_BC_Thermal) :: BC
         class(Abstract_Solver_CRS), allocatable :: Solver
     end type Abstract_Thermal
 
-    type, extends(Abstract_Thermal) :: Type_Thermal_3Phase
+    type, extends(Abstract_Thermal) :: Type_Thermal_3Phase_2D
+        type(ElementHolder), allocatable :: Elements(:)
         class(Abstract_Ice), allocatable :: Ice
         type(Type_VolumetricHeatCapacity_3Phase) :: C
         type(Type_ThermalConductivity_3Phase) :: lambda
     contains
-        procedure :: Assemble => Type_Thermal_3Phase_Assemble
-        procedure :: Update => Type_Thermal_3Phase_Update
-    end type Type_Thermal_3Phase
+        procedure :: Assemble => Type_Thermal_3Phase_2D_Assemble
+        procedure :: Update => Type_Thermal_3Phase_2D_Update
+    end type Type_Thermal_3Phase_2D
 
-    interface Type_Thermal_3Phase
-        module procedure Type_Thermal_3Phase_Construct
+    interface Type_Thermal_3Phase_2D
+        module procedure Type_Thermal_3Phase_2D_Construct
     end interface
 
 contains
-    function Type_Thermal_3Phase_Construct(Input, Elements, Coordinate, meshType, Lf, Tf, Input_Ice_Param, Input_Thermal_Params, Input_Thermal_BC, nsize, Input_VTK) result(structure)
+    function Type_Thermal_3Phase_2D_Construct(Structure_Input) result(structure)
         implicit none
-        type(Type_Thermal_3Phase) :: structure
-        type(Type_Input), intent(in) :: Input
+        type(Type_Thermal_3Phase_2D) :: structure
+        type(Type_Input), intent(in) :: Structure_Input
+        integer(int32) :: CountElements
+        integer(int32) :: iCell, idx
+        integer(int32) :: i
+        ! Initialize the structure
+        allocate (structure%Coordinate)
+        call structure%Coordinate%allocate(Structure_Input%VTK%numPoints)
+        structure%Coordinate = Structure_Input%VTK%POINTS
 
-        integer(int32), intent(in) :: Elements(:, :)
-        type(DP3d), intent(in) :: Coordinate
-        integer(int32), intent(in) :: meshType
-        real(real64), intent(in) :: Lf
-        real(real64), intent(in) :: Tf
-        type(Input_Ice), intent(in) :: Input_Ice_Param
-        type(Input_Thermal), intent(in) :: Input_Thermal_Params
-        type(Type_BC_Thermal), intent(in) :: Input_Thermal_BC
-        integer(int32), intent(in) :: nsize
-        type(Type_VTK), intent(in) :: Input_VTK
-        integer(int32) :: nElement
+        ! Count the number of elements (e.g., triangles)
+        CountElements = 0
+        if (Structure_Input%VTK%numTotalCells == 0) then
+            print *, "Error: No cells found in the VTK structure."
+            return
+        end if
+        if (Structure_Input%Basic%DimensionType == 1) then
+            do iCell = 1, Structure_Input%VTK%numTotalCells
+                if (Structure_Input%VTK%CELLS(iCell)%CellType == Structure_Input%VTK%Names%VTK_TRIANGLE .or. &
+                    Structure_Input%VTK%CELLS(iCell)%CellType == Structure_Input%VTK%Names%VTK_TRIANGLE_STRIP .or. &
+                    Structure_Input%VTK%CELLS(iCell)%CellType == Structure_Input%VTK%Names%VTK_POLYGON .or. &
+                    Structure_Input%VTK%CELLS(iCell)%CellType == Structure_Input%VTK%Names%VTK_PIXEL .or. &
+                    Structure_Input%VTK%CELLS(iCell)%CellType == Structure_Input%VTK%Names%VTK_QUAD .or. &
+                    Structure_Input%VTK%CELLS(iCell)%CellType == Structure_Input%VTK%Names%VTK_QUADRATIC_TRIANGLE .or. &
+                    Structure_Input%VTK%CELLS(iCell)%CellType == Structure_Input%VTK%Names%VTK_QUADRATIC_QUAD) then
+                    CountElements = CountElements + 1
+                end if
+            end do
 
-        structure%nsize = nsize
-        structure%nElement = size(Elements, 2)
+            structure%nElement = CountElements
+            structure%nsize = Structure_Input%VTK%numPoints
 
-        allocate (structure%Element, source=Elements)
-        call structure%Coordinate%allocate(nsize)
-        structure%Coordinate = Coordinate
-        nElement = size(Elements, 2)
-        call Allocate_Array(structure%Area, nElement)
-        call Update_Area(structure%Element, structure%Coordinate, structure%Area)
-        if (meshType == 3) then
-            allocate (structure%Basis(3, 3, nElement))
-            call Calculate_Basis(structure%Element, structure%Coordinate, structure%Basis)
+            allocate (structure%Elements(structure%nElement)) ! pointer 多形配列にディスクリプタを確保
+
+            ! 各要素ごとに具象オブジェクトをポインタで割り当て
+            idx = 0
+            do iCell = 1, Structure_Input%VTK%numTotalCells
+                select case (Structure_Input%VTK%CELLS(iCell)%CellType)
+                case (5) ! VTK_TRIANGLE
+                    idx = idx + 1
+                    structure%Elements(idx)%p = TriangleFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
+                case (9) ! VTK_QUAD
+                    idx = idx + 1
+                    structure%Elements(idx)%p = SquareFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
+                end select
+            end do
         end if
 
-        structure%KT_star_0 = Type_CRS(Elements, nsize)
+        structure%KT_star_0 = Type_CRS(structure%Elements, structure%nsize)
         structure%KT_l = structure%KT_star_0%Copy()
         structure%KT_old = structure%KT_star_0%Copy()
         structure%CT_l = structure%KT_star_0%Copy()
-        allocate (structure%CT_old(3))
-        structure%CT_old(1) = structure%KT_star_0%Copy()
-        structure%CT_old(2) = structure%KT_star_0%Copy()
-        structure%CT_old(3) = structure%KT_star_0%Copy()
-        call Allocate_Array(structure%FT, nsize)
-        call Allocate_Array(structure%FT_old, nsize)
-        call Allocate_Array(structure%PHIT, nsize)
-        call Allocate_Array(structure%PHIT_old, nsize)
+        allocate (structure%CT_old(Structure_Input%Basic%Order))
+        do i = 1, Structure_Input%Basic%Order
+            structure%CT_old(i) = structure%KT_star_0%Copy()
+        end do
 
-        call structure%T%allocate(nsize, 2)
+        call Allocate_Array(structure%FT, structure%nsize)
+        call Allocate_Array(structure%FT_old, structure%nsize)
+        call Allocate_Array(structure%PHIT, structure%nsize)
+        call Allocate_Array(structure%PHIT_old, structure%nsize)
 
-        select case (Input_Ice_Param%QiceType)
-        case (1)
-            structure%Ice = Type_Ice_TRM(Lf, Tf, nsize)
-        case (2)
-            if (Input_Ice_Param%isSegregation) then
+        call structure%T%allocate(structure%nsize, Structure_Input%Basic%Order)
+
+        do i = 1, Structure_Input%Basic%numRegion
+            select case (Structure_Input%Regions(i)%Ice%QiceType)
+            case (1)
+                structure%Ice = Type_Ice_TRM(Structure_Input%Regions(i)%Thermal%LatentHeat, Structure_Input%Regions(i)%Ice%Tf, structure%nsize)
+            case (2)
+                if (Structure_Input%Regions(i)%Flag%isFrostHeavePressure) then
                 !!! TBI
-            else
-                select case (Input_Ice_Param%c_unit)
-                case ("m")
-                    select case (Input_Ice_Param%ModelType)
-                    case (1:3)
-                        structure%Ice = Type_Ice_GCC(ModelType=Input_Ice_Param%ModelType, &
-                                                     isSegregation=Input_Ice_Param%isSegregation, &
-                                                     c_unit=Input_Ice_Param%c_unit, &
-                                                     nsize=nsize, &
-                                                     thetaR=Input_Ice_Param%thetaR, &
-                                                     thetaS=Input_Ice_Param%thetaS, &
-                                                     alpha1=Input_Ice_Param%alpha1, &
-                                                     n1=Input_Ice_Param%n1, &
-                                                     Lf=Lf, &
-                                                     Tf=Tf)
-                    case (4)
-                        structure%Ice = Type_Ice_GCC(ModelType=Input_Ice_Param%ModelType, &
-                                                     isSegregation=Input_Ice_Param%isSegregation, &
-                                                     c_unit=Input_Ice_Param%c_unit, &
-                                                     nsize=nsize, &
-                                                     thetaS=Input_Ice_Param%thetaS, &
-                                                     thetaR=Input_Ice_Param%thetaR, &
-                                                     alpha1=Input_Ice_Param%alpha1, &
-                                                     hcrit=Input_Ice_Param%hcrit, &
-                                                     n1=Input_Ice_Param%n1, &
-                                                     Lf=Lf, &
-                                                     Tf=Tf)
-                    case (5)
-                        structure%Ice = Type_Ice_GCC(ModelType=Input_Ice_Param%ModelType, &
-                                                     isSegregation=Input_Ice_Param%isSegregation, &
-                                                     c_unit=Input_Ice_Param%c_unit, &
-                                                     nsize=nsize, &
-                                                     thetaS=Input_Ice_Param%thetaS, &
-                                                     thetaR=Input_Ice_Param%thetaR, &
-                                                     alpha1=Input_Ice_Param%alpha1, &
-                                                     n1=Input_Ice_Param%n1, &
-                                                     w1=Input_Ice_Param%w1, &
-                                                     alpha2=Input_Ice_Param%alpha2, &
-                                                     n2=Input_Ice_Param%n2, &
-                                                     Lf=Lf, &
-                                                     Tf=Tf)
-                    case (6)
-                        structure%Ice = Type_Ice_GCC(ModelType=Input_Ice_Param%ModelType, &
-                                                     isSegregation=Input_Ice_Param%isSegregation, &
-                                                     c_unit=Input_Ice_Param%c_unit, &
-                                                     nsize=nsize, &
-                                                     thetaS=Input_Ice_Param%thetaS, &
-                                                     thetaR=Input_Ice_Param%thetaR, &
-                                                     alpha1=Input_Ice_Param%alpha1, &
-                                                     n1=Input_Ice_Param%n1, &
-                                                     n2=Input_Ice_Param%n2, &
-                                                     Lf=Lf, &
-                                                     Tf=Tf)
-                    end select
-                case ("Pa")
+                else
+                    select case (Structure_Input%Regions(i)%Ice%c_unit)
+                    case ("m")
+                        select case (Structure_Input%Regions(i)%Ice%ModelType)
+                        case (1:3)
+                            structure%Ice = Type_Ice_GCC(ModelType=Structure_Input%Regions(i)%Ice%ModelType, &
+                                                         isSegregation=Structure_Input%Regions(i)%Flag%isFrostHeavePressure, &
+                                                         c_unit=Structure_Input%Regions(i)%Ice%c_unit, &
+                                                         nsize=structure%nsize, &
+                                                         thetaR=Structure_Input%Regions(i)%Ice%thetaR, &
+                                                         thetaS=Structure_Input%Regions(i)%Ice%thetaS, &
+                                                         alpha1=Structure_Input%Regions(i)%Ice%alpha1, &
+                                                         n1=Structure_Input%Regions(i)%Ice%n1, &
+                                                         Lf=Structure_Input%Regions(i)%Thermal%LatentHeat, &
+                                                         Tf=Structure_Input%Regions(i)%Ice%Tf)
+                        case (4)
+                            structure%Ice = Type_Ice_GCC(ModelType=Structure_Input%Regions(i)%Ice%ModelType, &
+                                                         isSegregation=Structure_Input%Regions(i)%Flag%isFrostHeavePressure, &
+                                                         c_unit=Structure_Input%Regions(i)%Ice%c_unit, &
+                                                         nsize=structure%nsize, &
+                                                         thetaS=Structure_Input%Regions(i)%Ice%thetaS, &
+                                                         thetaR=Structure_Input%Regions(i)%Ice%thetaR, &
+                                                         alpha1=Structure_Input%Regions(i)%Ice%alpha1, &
+                                                         hcrit=Structure_Input%Regions(i)%Ice%hcrit, &
+                                                         n1=Structure_Input%Regions(i)%Ice%n1, &
+                                                         Lf=Structure_Input%Regions(i)%Thermal%LatentHeat, &
+                                                         Tf=Structure_Input%Regions(i)%Ice%Tf)
+                        case (5)
+                            structure%Ice = Type_Ice_GCC(ModelType=Structure_Input%Regions(i)%Ice%ModelType, &
+                                                         isSegregation=Structure_Input%Regions(i)%Flag%isFrostHeavePressure, &
+                                                         c_unit=Structure_Input%Regions(i)%Ice%c_unit, &
+                                                         nsize=structure%nsize, &
+                                                         thetaS=Structure_Input%Regions(i)%Ice%thetaS, &
+                                                         thetaR=Structure_Input%Regions(i)%Ice%thetaR, &
+                                                         alpha1=Structure_Input%Regions(i)%Ice%alpha1, &
+                                                         n1=Structure_Input%Regions(i)%Ice%n1, &
+                                                         w1=Structure_Input%Regions(i)%Ice%w1, &
+                                                         alpha2=Structure_Input%Regions(i)%Ice%alpha2, &
+                                                         n2=Structure_Input%Regions(i)%Ice%n2, &
+                                                         Lf=Structure_Input%Regions(i)%Thermal%LatentHeat, &
+                                                         Tf=Structure_Input%Regions(i)%Ice%Tf)
+                        case (6)
+                            structure%Ice = Type_Ice_GCC(ModelType=Structure_Input%Regions(i)%Ice%ModelType, &
+                                                         isSegregation=Structure_Input%Regions(i)%Flag%isFrostHeavePressure, &
+                                                         c_unit=Structure_Input%Regions(i)%Ice%c_unit, &
+                                                         nsize=structure%nsize, &
+                                                         thetaS=Structure_Input%Regions(i)%Ice%thetaS, &
+                                                         thetaR=Structure_Input%Regions(i)%Ice%thetaR, &
+                                                         alpha1=Structure_Input%Regions(i)%Ice%alpha1, &
+                                                         n1=Structure_Input%Regions(i)%Ice%n1, &
+                                                         n2=Structure_Input%Regions(i)%Ice%n2, &
+                                                         Lf=Structure_Input%Regions(i)%Thermal%LatentHeat, &
+                                                         Tf=Structure_Input%Regions(i)%Ice%Tf)
+                        end select
+                    case ("Pa")
                 !! TBD
-                end select
+                    end select
+                end if
+            case (3)
+                structure%Ice = Type_Ice_EXP(Structure_Input%Regions(i)%Thermal%LatentHeat, Structure_Input%Regions(i)%Ice%phi, Structure_Input%Regions(i)%Ice%Tf, Structure_Input%Regions(i)%Ice%a, structure%nsize)
+            end select
+
+            structure%C = Type_VolumetricHeatCapacity_3Phase(structure%Ice, &
+                                                             Structure_Input%Regions(i)%Thermal%Cp(1), &
+                                                             Structure_Input%Regions(i)%Thermal%Cp(2), &
+                                                             Structure_Input%Regions(i)%Thermal%Cp(3), &
+                                                             Structure_Input%Regions(i)%Thermal%rho(3), &
+                                                             Structure_Input%Regions(i)%Thermal%rho(2), &
+                                                             Structure_Input%Regions(i)%Ice%phi, &
+                                                             structure%nsize)
+
+            structure%lambda = Type_ThermalConductivity_3Phase(Structure_Input%Regions(i)%Thermal%lambda(1), &
+                                                               Structure_Input%Regions(i)%Thermal%lambda(2), &
+                                                               Structure_Input%Regions(i)%Thermal%lambda(3), &
+                                                               structure%nsize)
+        end do
+
+        structure%BC = Type_BC_Thermal(Structure_Input%Conditions, Structure_Input%VTK)
+
+        if (Structure_Input%Solver_Thermal%useSolver == 1) then
+            structure%Solver = Solver_CRS_LU_Constructor(N=structure%nsize, &
+                                                         MAXFCT=1, &
+                                                         MNUM=1, &
+                                                         MTYPE=11, &
+                                                         PHASE=13, &
+                                                         NRHS=1, &
+                                                         MSGVLV=0, &
+                                                         a=structure%KT_star_0)
+        else if (Structure_Input%Solver_Thermal%useSolver == 2) then
+            if (Structure_Input%Solver_Thermal%useSolverType == 4) then
+                structure%Solver = Solver_CRS_BiCGSTAB_Constructor(N=structure%nsize, &
+                                                                   tol=Structure_Input%Solver_Thermal%tolerance, &
+                                                                   maxiter=Structure_Input%Solver_Thermal%maxIteration, &
+                                                                   Preconditioner=Structure_Input%Solver_Thermal%usePreconditionerType)
             end if
-        case (3)
-            structure%Ice = Type_Ice_EXP(Lf, Input_Ice_Param%phi, Tf, Input_Ice_Param%a, nsize)
-        end select
+        end if
+    end function Type_Thermal_3Phase_2D_Construct
 
-        structure%C = Type_VolumetricHeatCapacity_3Phase(structure%Ice, &
-                                                         Input_Thermal_Params%Cp(1), &
-                                                         Input_Thermal_Params%Cp(2), &
-                                                         Input_Thermal_Params%Cp(3), &
-                                                         Input_Thermal_Params%rho(3), &
-                                                         Input_Thermal_Params%rho(2), &
-                                                         Input_Ice_Param%phi, &
-                                                         nsize)
-
-        structure%lambda = Type_ThermalConductivity_3Phase(Input_Thermal_Params%lambda(1), &
-                                                           Input_Thermal_Params%lambda(2), &
-                                                           Input_Thermal_Params%lambda(3), &
-                                                           nsize)
-
-        structure%BC = Type_BC_Thermal(Input_Thermal_BC%BCGroup, Input_Thermal_BC%BC_Info, Input_Thermal_BC%Edge, structure%Coordinate, Input_VTK)
-
-        structure%Solver = Solver_CRS_LU_Constructor(nsize, 1, 1, 11, 13, 1, 0, structure%KT_star_0)
-        ! structure%Solver = Solver_CRS_BiCGSTAB_Constructor(nsize, 1.0d-8, 100000_int32, 1_int32)
-
-    end function Type_Thermal_3Phase_Construct
-
-    subroutine Type_Thermal_3Phase_Assemble(self, dt, step, iter)
+    subroutine Type_Thermal_3Phase_2D_Assemble(self, dt, step, iter)
         implicit none
-        class(Type_Thermal_3Phase), intent(inout) :: self
+        class(Type_Thermal_3Phase_2D), intent(inout) :: self
         real(real64), intent(in) :: dt
         integer(int32), intent(in) :: step
         integer(int32), intent(in) :: iter
@@ -200,33 +237,37 @@ contains
         self%CT_l%Val(:) = 0.0d0
         self%KT_l%Val(:) = 0.0d0
         self%KT_star_0%Val(:) = 0.0d0
+        ! ! if (step == 1) then
+
+        ! ! end if
+        call Assemble_Mass_1(self%CT_l, self%Elements, self%C%Apparent)
+        ! stop
+        ! print *, "Assembled1"
+        call Assemble_Diffusion_1_Isotropic(self%KT_l, self%Elements, self%lambda%value)
+        ! print *, "Assembled2"
         ! if (step == 1) then
-
+        self%KT_star_0 = dt * self%KT_l + self%CT_l
+        !     if (iter == 1) then
+        self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+        !         self%KT_old%Val(:) = self%KT_l%Val(:)
+        !         self%PHIT(:) = 0.0d0
+        ! self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
+        !     end if
+        self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
+        ! self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
+        ! else
+        !     self%KT_star_0%Val(:) = 2.0d0 * dt * self%KT_l%Val(:) + 3.0d0 * self%CT_l%Val(:)
+        !     if (iter == 1) then
+        !         self%PHIT_old(:) = -4.0d0 * (self%CT_old(1) * self%T%old(:, 1)) + self%CT_old(2) * self%T%old(:, 2)
+        !     end if
+        !     self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
         ! end if
-        call Assemble_Mass_Lumped_231(self%CT_l, self%Element, self%Area, self%C%Apparent, self%nElement)
-        call Assemble_Diffusion_231(self%KT_l, self%Element, self%Basis, self%Area, self%lambda%value, self%nElement)
-        if (step == 1) then
-            self%KT_star_0%Val(:) = dt * self%KT_l%Val(:) + self%CT_l%Val(:)
-            if (iter == 1) then
-                self%CT_old(1)%Val(:) = self%CT_l%Val(:)
-                self%KT_old%Val(:) = self%KT_l%Val(:)
-                self%PHIT(:) = 0.0d0
-                self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
-            end if
-            self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
-        else
-            self%KT_star_0%Val(:) = 2.0d0 * dt * self%KT_l%Val(:) + 3.0d0 * self%CT_l%Val(:)
-            if (iter == 1) then
-                self%PHIT_old(:) = -4.0d0 * (self%CT_old(1) * self%T%old(:, 1)) + self%CT_old(2) * self%T%old(:, 2)
-            end if
-            self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
-        end if
         ! self%PHIT(:) = self%PHIT_old(:)
-    end subroutine Type_Thermal_3Phase_Assemble
+    end subroutine Type_Thermal_3Phase_2D_Assemble
 
-    subroutine Type_Thermal_3Phase_Update(self, phi_soil, rho_ice, iiter)
+    subroutine Type_Thermal_3Phase_2D_Update(self, phi_soil, rho_ice, iiter)
         implicit none
-        class(Type_Thermal_3Phase), intent(inout) :: self
+        class(Type_Thermal_3Phase_2D), intent(inout) :: self
         real(real64), intent(in) :: phi_soil
         real(real64), intent(in) :: rho_ice
         integer(int32), intent(in) :: iiter
@@ -243,6 +284,6 @@ contains
         call self%C%Update_Ca(structure_Ice=self%Ice, rho_ice=rho_ice, arr_Temperature=self%T%pre(:))
         ! end if
 
-    end subroutine Type_Thermal_3Phase_Update
+    end subroutine Type_Thermal_3Phase_2D_Update
 
 end module Main_Thermal

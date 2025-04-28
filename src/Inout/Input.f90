@@ -116,9 +116,26 @@ module Inout_Input
     !! Positive NaN
     real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
 
-! #ifdef _MPI
-!     integer(int32), parameter :: root = 0
-! #endif
+    type :: Input_OutputSettings
+        character(:), allocatable :: FileFormat
+        character(:), allocatable :: Output_TimeUnit
+        character(:), allocatable :: Interval_TimeUnit
+        real(real64) :: Interval_Step
+
+        integer(int32) :: ObservationType
+        integer(int32) :: NumObservation
+        type(DP3d) :: Cood_Obs
+        integer(int32), allocatable :: ObsID(:)
+
+        logical(4) :: outTemp
+        logical(4) :: outSi
+        logical(4) :: outTC
+        logical(4) :: outC
+        logical(4) :: outPres
+        logical(4) :: outFlux
+        logical(4) :: outK
+    end type Input_OutputSettings
+
     type :: Input_Basic
         integer(int32) :: DimensionType
         integer(int32) :: numRegion
@@ -214,22 +231,22 @@ module Inout_Input
         character(256) :: Basic_FileName
         character(256) :: Conditions_FileName
         character(256) :: Geometry_FileName
-!         ! character(256) :: Basic_FileName, COO_FileName, BC_FileName, Obs_FileName, ObsFlag_FileName, Top_FileName, IC_FileName
+        character(256) :: Output_FileName
 
-!         ! Basic.in
-!         ! Basic section
         type(Input_Basic) :: Basic
         type(Input_Region), allocatable :: Regions(:)
         type(Input_Solver) :: Solver_Thermal
         type(Input_Solver) :: Solver_Hydraulic
         type(Type_VTK) :: VTK
         type(Type_BC_Thermal) :: Conditions
+        type(Input_OutputSettings) :: OutputSettings
 
     contains
 
         procedure :: Input_Parameters => Inout_Input_Parameters_JSON
         procedure :: Input_Geometry => Inout_Input_Geometry_VTK
         procedure :: Input_Conditions => Inout_Input_Conditions_JSON
+        procedure :: Input_OutputSettings => Inout_Input_OutputSettings_JSON
 
         ! procedure, pass :: Input_Get_Basic_Params => Inout_Input_Get_Basic_Params
 !         procedure, pass :: Input_Get_Regional_Params => Inout_Input_Get_Regional_Params
@@ -277,11 +294,7 @@ contains
         Input_Constructor%Basic_FileName = trim(adjustl(dir_Path))//"Input/Basic.json"
         Input_Constructor%Conditions_FileName = trim(adjustl(dir_Path))//"Input/Conditions.json"
         Input_Constructor%Geometry_FileName = trim(adjustl(dir_Path))//"Input/Geometry.vtk"
-        ! Input_Constructor%IC_FileName = trim(adjustl(dir_Path))//"Input/IC.in"
-        ! Input_Constructor%Obs_FileName = trim(adjustl(dir_Path))//"Input/Obs.in"
-        ! Input_Constructor%ObsFlag_FileName = trim(adjustl(dir_Path))//"Input/printobs.in"
-        ! Input_Constructor%Top_FileName = trim(adjustl(dir_Path))//"Input/top.in"
-        ! Input_Constructor%COO_FileName = trim(adjustl(dir_Path))//"Input/coordinate.in"
+        Input_Constructor%Output_FileName = trim(adjustl(dir_Path))//"Input/Output.json"
 
         ! Check the existence of the file
         inquire (file=Input_Constructor%Basic_FileName, exist=exists)
@@ -293,9 +306,13 @@ contains
         inquire (file=Input_Constructor%Geometry_FileName, exist=exists)
         if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Geometry_FileName)
 
+        inquire (file=Input_Constructor%Output_FileName, exist=exists)
+        if (.not. exists) call error_message(901, opt_file_name=Input_Constructor%Output_FileName)
+
         call Input_Constructor%Input_Parameters()
         call Input_Constructor%Input_Geometry()
         call Input_Constructor%Input_Conditions()
+        call Input_Constructor%Input_OutputSettings()
         ! call Input_Constructor%Input_IC()
         ! call Input_Constructor%Input_Observation()
         ! call Input_Constructor%Input_Flags()
@@ -545,6 +562,7 @@ contains
 
         if (allocated(self%Regions(iRegion)%Thermal%c) .and. &
             allocated(self%Regions(iRegion)%Thermal%rho)) then
+            allocate (self%Regions(iRegion)%Thermal%Cp, mold=self%Regions(iRegion)%Thermal%c)
             self%Regions(iRegion)%Thermal%Cp(:) = self%Regions(iRegion)%Thermal%c(:) * self%Regions(iRegion)%Thermal%rho(:)
         end if
 
@@ -851,11 +869,11 @@ contains
         character(:), allocatable :: key
 
         if (any(self%Regions(:)%Flag%isHeat)) then
-            key = Connect_dot(SolverName, ThermalName, OrderName)
+            key = Connect_dot(SolverName, OrderName)
             call json%get(key, self%Basic%Order)
             call json%print_error_message(output_unit)
 
-            key = Connect_dot(SolverName, ThermalName, MaxNonlinearIterationName)
+            key = Connect_dot(SolverName, MaxNonlinearIterationName)
             call json%get(key, self%Basic%MaxNonlinearIteration)
             call json%print_error_message(output_unit)
 
@@ -1146,7 +1164,7 @@ contains
         implicit none
         class(Type_Input) :: self
 
-        call Inout_VTK_Read(self%Geometry_FileName, self%VTK)
+        self%VTK = Type_VTK(self%Geometry_FileName)
     end subroutine Inout_Input_Geometry_VTK
 
 !     ! subroutine Inout_Input_Finalize(self)
@@ -1556,6 +1574,24 @@ contains
 !         end select
 
 !     end subroutine Inout_Input_Get_int32_rank2
+
+    subroutine Inout_Input_OutputSettings_JSON(self)
+        implicit none
+        class(Type_Input) :: self
+        type(json_file) :: json
+        integer(int32) :: status, unit_num
+        integer(int32) :: iRegion
+
+        call json%initialize()
+
+        call json%load(filename=self%Output_FileName)
+        call json%print_error_message(output_unit)
+
+        print *, trim(self%Output_FileName)
+
+        stop
+
+    end subroutine Inout_Input_OutputSettings_JSON
 
     function Inout_Input_Connect_dot_2(c1, c2) result(key)
         !> connect two strings with dot

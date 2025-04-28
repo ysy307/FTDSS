@@ -27,59 +27,59 @@ module Solver_Time
 
 contains
 
-    function Time_Construct(Input) result(time)
+    function Time_Construct(Structure_Input) result(time)
         implicit none
-        type(Type_Input), intent(in) :: Input
+        type(Type_Input), intent(in) :: Structure_Input
         type(Type_Time) :: time
 
-        select case (Input%Basic%Calculation_TimeUnit)
+        select case (Structure_Input%Basic%Calculation_TimeUnit)
         case ("Second")
-            time%dt = Input%Basic%Calculation_Step
-            time%dt_max = Input%Basic%Calculation_StepMaximum
-            time%dt_min = Input%Basic%Calculation_StepMinimum
+            time%dt = Structure_Input%Basic%Calculation_Step
+            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum
+            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum
         case ("Minute")
-            time%dt = Input%Basic%Calculation_Step * 60.0d0
-            time%dt_max = Input%Basic%Calculation_StepMaximum * 60.0d0
-            time%dt_min = Input%Basic%Calculation_StepMinimum * 60.0d0
+            time%dt = Structure_Input%Basic%Calculation_Step * 60.0d0
+            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 60.0d0
+            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 60.0d0
         case ("Hour")
-            time%dt = Input%Basic%Calculation_Step * 3600.0d0
-            time%dt_max = Input%Basic%Calculation_StepMaximum * 3600.0d0
-            time%dt_min = Input%Basic%Calculation_StepMinimum * 3600.0d0
+            time%dt = Structure_Input%Basic%Calculation_Step * 3600.0d0
+            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 3600.0d0
+            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 3600.0d0
         case ("Day")
-            time%dt = Input%Basic%Calculation_Step * 86400.0d0
-            time%dt_max = Input%Basic%Calculation_StepMaximum * 86400.0d0
-            time%dt_min = Input%Basic%Calculation_StepMinimum * 86400.0d0
+            time%dt = Structure_Input%Basic%Calculation_Step * 86400.0d0
+            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 86400.0d0
+            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 86400.0d0
         case ("Year")
-            time%dt = Input%Basic%Calculation_Step * 31557600.0d0
-            time%dt_max = Input%Basic%Calculation_StepMaximum * 31557600.0d0
-            time%dt_min = Input%Basic%Calculation_StepMinimum * 31557600.0d0
+            time%dt = Structure_Input%Basic%Calculation_Step * 31557600.0d0
+            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 31557600.0d0
+            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 31557600.0d0
         case default
             write (*, *) "Error: Unknown time unit"
             stop
         end select
 
-        select case (Input%Basic%Input_TimeUnit)
+        select case (Structure_Input%Basic%Input_TimeUnit)
         case ("Second")
-            time%start_time = Input%Basic%StartCalculation
-            time%end_time = Input%Basic%EndCalculation
+            time%start_time = Structure_Input%Basic%StartCalculation
+            time%end_time = Structure_Input%Basic%EndCalculation
         case ("Minute")
-            time%start_time = Input%Basic%StartCalculation * 60.0d0
-            time%end_time = Input%Basic%EndCalculation * 60.0d0
+            time%start_time = Structure_Input%Basic%StartCalculation * 60.0d0
+            time%end_time = Structure_Input%Basic%EndCalculation * 60.0d0
         case ("Hour")
-            time%start_time = Input%Basic%StartCalculation * 3600.0d0
-            time%end_time = Input%Basic%EndCalculation * 3600.0d0
+            time%start_time = Structure_Input%Basic%StartCalculation * 3600.0d0
+            time%end_time = Structure_Input%Basic%EndCalculation * 3600.0d0
         case ("Day")
-            time%start_time = Input%Basic%StartCalculation * 86400.0d0
-            time%end_time = Input%Basic%EndCalculation * 86400.0d0
+            time%start_time = Structure_Input%Basic%StartCalculation * 86400.0d0
+            time%end_time = Structure_Input%Basic%EndCalculation * 86400.0d0
         case ("Year")
-            time%start_time = Input%Basic%StartCalculation * 31557600.0d0
-            time%end_time = Input%Basic%EndCalculation * 31557600.0d0
+            time%start_time = Structure_Input%Basic%StartCalculation * 31557600.0d0
+            time%end_time = Structure_Input%Basic%EndCalculation * 31557600.0d0
         case default
             write (*, *) "Error: Unknown time unit"
             stop
         end select
 
-        call Allocate_Array(time%dt_old, Input%Basic%Order)
+        call Allocate_Array(time%dt_old, Structure_Input%Basic%Order)
     end function Time_Construct
 
     subroutine Get_RealTime(self, date, time, zone)

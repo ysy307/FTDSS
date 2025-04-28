@@ -4,6 +4,7 @@ module Condition_Fix_Boundary_Conditions
     use :: Allocate_Allocate
     use :: Allocate_Structure
     use :: Matrix_CRS
+    use :: Inout_VTK
     implicit none
     private
 
@@ -21,6 +22,14 @@ module Condition_Fix_Boundary_Conditions
     public :: Abstract_Condition_BC
     public :: Type_BC_Thermal
 
+    type :: Type_Edge
+        integer(int32) :: EdgeType
+        integer(int32) :: EdgeGroup
+        integer(int32), allocatable :: Conn(:)
+        real(real64), allocatable :: Distance(:)
+        type(Vector3D), allocatable :: UnitNormal(:)
+    end type Type_Edge
+
     type :: Condition_BC_Local
         character(:), allocatable :: type
         logical(4) :: isUniform
@@ -34,10 +43,12 @@ module Condition_Fix_Boundary_Conditions
         type(Condition_BC_Local), allocatable :: BC_Info(:)
         !! Boundary conditions information of the Edges
         integer(int32) :: numEdges
-        integer(int32), allocatable :: Edge(:, :)
-        integer(int32), allocatable :: EdgeType(:)
-        real(real64), allocatable :: Edge_Distances(:, :)
-        type(DP3d) :: Edge_UnitNormal
+        type(Type_Edge), allocatable :: EdgeInfo(:)
+
+        ! integer(int32), allocatable :: Edge(:, :)
+        ! integer(int32), allocatable :: EdgeType(:)
+        ! real(real64), allocatable :: Edge_Distances(:, :)
+        ! type(DP3d) :: Edge_UnitNormal
     end type Abstract_Condition_BC
 
     type, extends(Abstract_Condition_BC) :: Type_BC_Thermal
@@ -89,64 +100,82 @@ contains
         Edge_Distance = sqrt((x2 - x1)**2.0d0 + (y2 - y1)**2.0d0)
     end function
 
-    subroutine Calculate_Edge_UnitNormalVector(Edge, Coordinate, Distances, UnitNOrmalVector)
-        integer(int32), intent(in) :: Edge(:, :)
+    function Calculate_Edge_UnitNormalVector(Edge, Coordinate, Distance) result(UnitNormalVector)
+        integer(int32), intent(in) :: Edge(:)
         type(DP3d), intent(in) :: Coordinate
-        real(real64), intent(in) :: Distances(:)
-        type(DP3d), intent(inout) :: UnitNOrmalVector
+        real(real64), intent(in) :: Distance
+        type(Vector3D) :: UnitNormalVector
 
-        integer(int32) :: i
         real(real64) :: x1, y1, x2, y2
 
-        do i = 1, size(Edge, 2)
-            x1 = Coordinate%x(Edge(1, i))
-            y1 = Coordinate%y(Edge(1, i))
-            x2 = Coordinate%x(Edge(2, i))
-            y2 = Coordinate%y(Edge(2, i))
+        x1 = Coordinate%x(Edge(1))
+        y1 = Coordinate%y(Edge(1))
+        x2 = Coordinate%x(Edge(2))
+        y2 = Coordinate%y(Edge(2))
 
-            UnitNOrmalVector%x(i) = (y2 - y1) / Distances(i)
-            UnitNOrmalVector%y(i) = -(x2 - x1) / Distances(i)
-            UnitNOrmalVector%z(i) = 0.0d0
-        end do
+        UnitNormalVector%x = (y2 - y1) / Distance
+        UnitNormalVector%y = -(x2 - x1) / Distance
 
-    end subroutine Calculate_Edge_UnitNormalVector
+    end function Calculate_Edge_UnitNormalVector
 
-    function Type_BC_Thermal_Constructor(BC_Group, BC_Info, Edges, Coordinate, Input_VTK) result(Structure)
-        ! function Type_BC_Thermal_Constructor(BC_Group, BC_Info, Edges, EdgeType, Coordinate) result(Structure)
+    function Type_BC_Thermal_Constructor(Structure_Input, Input_VTK) result(Structure)
         implicit none
-        integer(int32), intent(in) :: BC_Group(:)
-        type(Condition_BC_Local), intent(in) :: BC_Info(:)
-        integer(int32), intent(in) :: Edges(:, :)
-        ! integer(int32), intent(in) :: EdgeType(:)
-        type(DP3d), intent(in) :: Coordinate
+        type(Type_BC_Thermal), intent(in) :: Structure_Input
         type(Type_VTK), intent(in) :: Input_VTK
-
         type(Type_BC_Thermal) :: Structure
 
-        integer(int32) :: i
+        integer(int32) :: i, iCell, idx
         integer(int32) :: minimum, maximum
+        integer(int32) :: CounterEdge
+        integer(int32) :: tmpEdge(2)
 
-        allocate (Structure%BCGroup, source=BC_Group)
+        allocate (Structure%BCGroup, source=Structure_Input%BCGroup)
         minimum = minval(Structure%BCGroup)
         maximum = maxval(Structure%BCGroup)
         allocate (Structure%BC_Info(minimum:maximum))
-        do i = minimum, maximum
-            Structure%BC_Info(i) = BC_Info(i - 1)
+        do i = 1, size(Structure_Input%BC_Info)
+            Structure%BC_Info(Structure%BCGroup(i)) = Structure_Input%BC_Info(Structure%BCGroup(i))
         end do
-        Structure%numEdges = Input_VTK%CELLS(3)%numCells
-        allocate (Structure%Edge, source=Input_VTK%CELLS(3)%Nodes)
-        allocate (Structure%EdgeType, source=Input_VTK%CellEntityIds(1:Structure%numEdges))
 
-        !***************************************************************************************************************************
-        ! 辺が一次要素のときはこれで計算ができるが，二次要素になると(2,numEdges)にしないといけない
-        !***************************************************************************************************************************
-        call Allocate_Array(Structure%Edge_Distances, 1_int32, Structure%numEdges)
-        do i = 1, Structure%numEdges
-            Structure%Edge_Distances(1, i) = Calculate_Edge_Dinstance(Structure%Edge(:, i), Coordinate)
+        CounterEdge = 0
+        do iCell = 1, Input_VTK%numTotalCells
+            if (Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_LINE .or. &
+                Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_QUADRATIC_EDGE) then
+                CounterEdge = CounterEdge + 1
+            end if
         end do
-        call Allocate_DP(Structure%Edge_UnitNormal, Structure%numEdges)
-        call Calculate_Edge_UnitNormalVector(Structure%Edge, Coordinate, Structure%Edge_Distances(1, :), Structure%Edge_UnitNormal)
-        !***************************************************************************************************************************
+        Structure%numEdges = CounterEdge
+        allocate (Structure%EdgeInfo(Structure%numEdges))
+
+        idx = 0
+        do iCell = 1, Input_VTK%numTotalCells
+            if (Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_LINE) then
+                idx = idx + 1
+                Structure%EdgeInfo(idx)%EdgeType = Input_VTK%Names%VTK_LINE
+                Structure%EdgeInfo(idx)%EdgeGroup = Input_VTK%CELLS(iCell)%CellEntityId
+                allocate (Structure%EdgeInfo(idx)%Conn, source=Input_VTK%CELLS(iCell)%Connectivity)
+                allocate (Structure%EdgeInfo(idx)%Distance(1))
+                allocate (Structure%EdgeInfo(idx)%UnitNormal(1))
+
+                tmpEdge = [Structure%EdgeInfo(idx)%Conn(1), Structure%EdgeInfo(idx)%Conn(2)]
+                Structure%EdgeInfo(idx)%Distance(1) = Calculate_Edge_Dinstance(tmpEdge, Input_VTK%POINTS)
+                Structure%EdgeInfo(idx)%UnitNormal(1) = Calculate_Edge_UnitNormalVector(tmpEdge, Input_VTK%POINTS, Structure%EdgeInfo(idx)%Distance(1))
+            else if (Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_QUADRATIC_EDGE) then
+                idx = idx + 1
+                Structure%EdgeInfo(idx)%EdgeType = Input_VTK%Names%VTK_QUADRATIC_EDGE
+                Structure%EdgeInfo(idx)%EdgeGroup = Input_VTK%CELLS(iCell)%CellEntityId
+                allocate (Structure%EdgeInfo(idx)%Conn, source=Input_VTK%CELLS(iCell)%Connectivity)
+                allocate (Structure%EdgeInfo(idx)%Distance(2))
+                allocate (Structure%EdgeInfo(idx)%UnitNormal(2))
+
+                tmpEdge = [Structure%EdgeInfo(idx)%Conn(1), Structure%EdgeInfo(idx)%Conn(3)]
+                Structure%EdgeInfo(idx)%Distance(1) = Calculate_Edge_Dinstance(tmpEdge, Input_VTK%POINTS)
+                Structure%EdgeInfo(idx)%UnitNormal(1) = Calculate_Edge_UnitNormalVector(tmpEdge, Input_VTK%POINTS, Structure%EdgeInfo(idx)%Distance(1))
+                tmpEdge = [Structure%EdgeInfo(idx)%Conn(3), Structure%EdgeInfo(idx)%Conn(2)]
+                Structure%EdgeInfo(idx)%Distance(2) = Calculate_Edge_Dinstance(tmpEdge, Input_VTK%POINTS)
+                Structure%EdgeInfo(idx)%UnitNormal(2) = Calculate_Edge_UnitNormalVector(tmpEdge, Input_VTK%POINTS, Structure%EdgeInfo(idx)%Distance(2))
+            end if
+        end do
 
     end function Type_BC_Thermal_Constructor
 
@@ -162,25 +191,28 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(self%EdgeType(i))%type)
-            case (Neumann)
-                call Fix_BoundaryCondition_Neumann(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), lambda)
-            case (HeatFlux)
-                call Fix_BoundaryCondition_Flux(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
-            case (Robin)
-                call Fix_BoundaryCondition_Robin_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), self%Edge_UnitNormal, Cw, Structure_HeatFlux)
-            case (HeatTransfer)
-                call Fix_BoundaryCondition_HeatTransfer_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
-            case (HeatRadiation)
-                call Fix_BoundaryCondition_HeatRadiation_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
-            end select
+            if (self%EdgeInfo(i)%EdgeType == 3) then !! VTK_LINE
+                select case (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%type)
+                case (Neumann)
+                    call Fix_BoundaryCondition_Neumann(b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1), lambda)
+                case (HeatFlux)
+                    call Fix_BoundaryCondition_Flux(b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1))
+                case (Robin)
+                    call Fix_BoundaryCondition_Robin_CRS(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1), self%EdgeInfo(i)%UnitNormal(1), Cw, Structure_HeatFlux)
+                case (HeatTransfer)
+                    call Fix_BoundaryCondition_HeatTransfer_CRS(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1))
+                case (HeatRadiation)
+                    call Fix_BoundaryCondition_HeatRadiation_CRS(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1))
+                end select
+            end if
         end do
         do i = 1, self%numEdges
-            select case (self%BC_Info(self%EdgeType(i))%type)
+            select case (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_CRS(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_CRS(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:))
             end select
         end do
+
     end subroutine Fix_BoundaryConditions_CRS
 
     subroutine Fix_BoundaryConditions_Full(self, A, b, lambda, Cw, Structure_HeatFlux)
@@ -195,23 +227,23 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(self%EdgeType(i))%type)
+            select case (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%type)
             case (Neumann)
-                call Fix_BoundaryCondition_Neumann(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), lambda)
+                call Fix_BoundaryCondition_Neumann(b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1), lambda)
             case (HeatFlux)
-                call Fix_BoundaryCondition_Flux(b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_Flux(b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1))
             case (Robin)
-                call Fix_BoundaryCondition_Robin_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i), self%Edge_UnitNormal, Cw, Structure_HeatFlux)
+                call Fix_BoundaryCondition_Robin_Full(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1), self%EdgeInfo(i)%UnitNormal(1), Cw, Structure_HeatFlux)
             case (HeatTransfer)
-                call Fix_BoundaryCondition_HeatTransfer_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_HeatTransfer_Full(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1))
             case (HeatRadiation)
-                call Fix_BoundaryCondition_HeatRadiation_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i), self%Edge_Distances(1, i))
+                call Fix_BoundaryCondition_HeatRadiation_Full(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:), self%EdgeInfo(i)%Distance(1))
             end select
         end do
         do i = 1, self%numEdges
-            select case (self%BC_Info(self%EdgeType(i))%type)
+            select case (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:))
             end select
         end do
     end subroutine Fix_BoundaryConditions_Full
@@ -224,9 +256,9 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(self%EdgeType(i))%type)
+            select case (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_CRS_Value(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_CRS_Value(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:))
             end select
         end do
     end subroutine Fix_Bounday_Values_CRS
@@ -239,9 +271,9 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(self%EdgeType(i))%type)
+            select case (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%type)
             case (Dirichlet)
-                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(self%EdgeType(i)), self%Edge(:, i))
+                call Fix_BoundaryCondition_Dirichlet_Full(A, b, self%BC_Info(self%EdgeInfo(i)%EdgeGroup), self%EdgeInfo(i)%Conn(:))
             end select
         end do
     end subroutine Fix_Bounday_Values_Full
@@ -253,11 +285,11 @@ contains
         integer(int32) :: i
 
         do i = 1, self%numEdges
-            select case (self%BC_Info(self%EdgeType(i))%type)
+            select case (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%type)
             case (Dirichlet)
-                if (self%BC_Info(self%EdgeType(i))%isUniform) then
-                    b(self%Edge(1, i)) = self%BC_Info(self%EdgeType(i))%value(1)
-                    b(self%Edge(2, i)) = self%BC_Info(self%EdgeType(i))%value(1)
+                if (self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%isUniform) then
+                    b(self%EdgeInfo(i)%Conn(1)) = self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%value(1)
+                    b(self%EdgeInfo(i)%Conn(2)) = self%BC_Info(self%EdgeInfo(i)%EdgeGroup)%value(1)
                 end if
             end select
         end do
@@ -420,7 +452,7 @@ contains
         type(Condition_BC_Local), intent(inout) :: BC_Info
         integer(int32), intent(in) :: Edge(:)
         real(real64), intent(in) :: Edge_Distance
-        type(DP3d), intent(in) :: Edge_UnitNormal
+        type(Vector3D), intent(in) :: Edge_UnitNormal
         real(real64), intent(in) :: Cw
         type(DP3d), intent(in) :: Flux
 
@@ -430,8 +462,8 @@ contains
         p1 = Edge(1)
         p2 = Edge(2)
 
-        Q1 = Flux%x(p1) * Edge_UnitNormal%x(1) + Flux%y(p1) * Edge_UnitNormal%y(1)
-        Q2 = Flux%x(p2) * Edge_UnitNormal%x(2) + Flux%y(p2) * Edge_UnitNormal%y(2)
+        Q1 = Flux%x(p1) * Edge_UnitNormal%x + Flux%y(p1) * Edge_UnitNormal%y
+        Q2 = Flux%x(p2) * Edge_UnitNormal%x + Flux%y(p2) * Edge_UnitNormal%y
         if (BC_Info%isUniform) then
             b(p1) = b(p1) - (2.0d0 * Q1 + Q2) * Edge_Distance / 6.0d0
             b(p2) = b(p2) - (Q1 + 2.0d0 * Q2) * Edge_Distance / 6.0d0
@@ -456,7 +488,7 @@ contains
         type(Condition_BC_Local), intent(inout) :: BC_Info
         integer(int32), intent(in) :: Edge(:)
         real(real64), intent(in) :: Edge_Distance
-        type(DP3d), intent(in) :: Edge_UnitNormal
+        type(Vector3D), intent(in) :: Edge_UnitNormal
         real(real64), intent(in) :: Cw
         type(DP3d), intent(in) :: Flux
 
@@ -466,8 +498,8 @@ contains
         p1 = Edge(1)
         p2 = Edge(2)
 
-        Q1 = Flux%x(p1) * Edge_UnitNormal%x(1) + Flux%y(p1) * Edge_UnitNormal%y(1)
-        Q2 = Flux%x(p2) * Edge_UnitNormal%x(2) + Flux%y(p2) * Edge_UnitNormal%y(2)
+        Q1 = Flux%x(p1) * Edge_UnitNormal%x + Flux%y(p1) * Edge_UnitNormal%y
+        Q2 = Flux%x(p2) * Edge_UnitNormal%x + Flux%y(p2) * Edge_UnitNormal%y
         if (BC_Info%isUniform) then
             b(p1) = b(p1) - (2.0d0 * Q1 + Q2) * Edge_Distance / 6.0d0
             b(p2) = b(p2) - (Q1 + 2.0d0 * Q2) * Edge_Distance / 6.0d0
