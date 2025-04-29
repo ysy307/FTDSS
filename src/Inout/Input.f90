@@ -53,7 +53,6 @@ module Inout_Input
     character(*), parameter :: DispersityName = "ThermalConductivityDispersity"
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: calculationPeriodName = "calculationPeriod"
-    character(*), parameter :: FileOutputName = "FileOutput"
 
     character(*), parameter :: Phase1Name = "Phase1"
     character(*), parameter :: Phase2Name = "Phase2"
@@ -112,6 +111,23 @@ module Inout_Input
     character(*), parameter :: NoneName = "None"
     character(*), parameter :: HeatTransferName = "HeatTransfer"
     character(*), parameter :: UniformName = "Uniform"
+
+    !!-------------------------------------
+    character(*), parameter :: FileOutputName = "FileOutput"
+    character(*), parameter :: TimeSettingsName = "TimeSettings"
+    character(*), parameter :: ObservationName = "Observation"
+    character(*), parameter :: TotalNumberName = "TotalNumber"
+    character(*), parameter :: CoordinatesName = "Coordinates"
+    character(*), parameter :: OutputSettingsName = "OutputSettings"
+    character(*), parameter :: KindsName = "Kinds"
+    character(*), parameter :: TempName = "Temp"
+    character(*), parameter :: SiName = "Si"
+    character(*), parameter :: TCName = "TC"
+    character(*), parameter :: CName = "C"
+    character(*), parameter :: PresName = "Pres"
+    character(*), parameter :: FluxName = "Flux"
+    character(*), parameter :: KName = "K"
+    !!-------------------------------------
 
     !! Positive NaN
     real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
@@ -1194,402 +1210,100 @@ contains
 
 !     ! end subroutine Inout_Input_Finalize
 
-!     subroutine Inout_Input_Get_Basic_Params(self, Structure)
-!         !> Get the Basic_Params of the input data
-!         implicit none
-!         class(Input) :: self
-!         type(Basic_params), intent(inout) :: Structure
-
-!         Structure%Element = self%Basic%Element
-!         Structure%Node = self%Basic%Node
-!         Structure%ShapeType = self%Basic%ShapeType
-!         Structure%DimensionType = self%Basic%DimensionType
-!         Structure%Region = self%Basic%Region
-!         Structure%Calculation_timeUnit = self%Basic%Calculation_timeUnit
-!         Structure%Input_timeUnit = self%Basic%Input_timeUnit
-!         Structure%Output_timeUnit = self%Basic%Output_timeUnit
-!         Structure%Interval_timeUnit = self%Basic%Interval_timeUnit
-!         Structure%Calculation_step = self%Basic%Calculation_step
-!         Structure%CalculationPeriod = self%Basic%CalculationPeriod
-!         Structure%Interval = self%Basic%Interval
-!         Structure%isDisplayPrompt = self%Basic%isDisplayPrompt
-!         Structure%FileOutput = self%Basic%FileOutput
-!         Structure%TimeDiscretization = self%Basic%TimeDiscretization
-
-!     end subroutine Inout_Input_Get_Basic_Params
-
-!     subroutine Inout_Input_Get_Regional_Params(self, Structure, iRegion, cType)
-!         !> Get the Basic_Params of the input data
-!         implicit none
-!         class(Input) :: self
-!         type(Type_Region), intent(inout) :: Structure
-!         integer(int32), intent(in) :: iRegion
-!         character(*), intent(in) :: cType
-
-!         select case (cType)
-!         case ("Thermal")
-!             Structure%BelongingSurface = self%Regions(iRegion)%BelongingSurface
-!             allocate (Structure%BelongingEdge, source=self%Regions(iRegion)%BelongingEdge)
-!             Structure%CalculationType = self%Regions(iRegion)%CalculationType
-!             Structure%Modelnumber = self%Regions(iRegion)%Modelnumber
-!             Structure%Flags%is1Phase = self%Regions(iRegion)%Flags%is1Phase
-!             Structure%Flags%is2Phase = self%Regions(iRegion)%Flags%is2Phase
-!             Structure%Flags%is3Phase = self%Regions(iRegion)%Flags%is3Phase
-!             Structure%Flags%isHeat = self%Regions(iRegion)%Flags%isHeat
-!             Structure%Flags%isWater = self%Regions(iRegion)%Flags%isWater
-!             Structure%Flags%isStress = self%Regions(iRegion)%Flags%isStress
-!             Structure%Flags%isCompression = self%Regions(iRegion)%Flags%isCompression
-!             Structure%Flags%isFrostHeavePressure = self%Regions(iRegion)%Flags%isFrostHeavePressure
-!             Structure%Flags%isDispersity = self%Regions(iRegion)%Flags%isDispersity
-!             Structure%Flags%isFrozen = self%Regions(iRegion)%Flags%isFrozen
-!             call Allocate_Structure_Thermal_Type(Structure%Thermal, Structure%Flags)
-!         case ("Hydraulic")
-!             Structure%BelongingSurface = self%Regions(iRegion)%BelongingSurface
-!             allocate (Structure%BelongingEdge, source=self%Regions(iRegion)%BelongingEdge)
-!             Structure%CalculationType = self%Regions(iRegion)%CalculationType
-!             Structure%Modelnumber = self%Regions(iRegion)%Modelnumber
-!             Structure%Flags%is1Phase = self%Regions(iRegion)%Flags%is1Phase
-!             Structure%Flags%is2Phase = self%Regions(iRegion)%Flags%is2Phase
-!             Structure%Flags%is3Phase = self%Regions(iRegion)%Flags%is3Phase
-!             Structure%Flags%isHeat = self%Regions(iRegion)%Flags%isHeat
-!             Structure%Flags%isWater = self%Regions(iRegion)%Flags%isWater
-!             Structure%Flags%isStress = self%Regions(iRegion)%Flags%isStress
-!             Structure%Flags%isCompression = self%Regions(iRegion)%Flags%isCompression
-!             Structure%Flags%isFrostHeavePressure = self%Regions(iRegion)%Flags%isFrostHeavePressure
-!             Structure%Flags%isDispersity = self%Regions(iRegion)%Flags%isDispersity
-!             Structure%Flags%isFrozen = self%Regions(iRegion)%Flags%isFrozen
-!             call Allocate_Structure_Hydraulic_Type(Structure%Hydraulic)
-!         end select
-
-!     end subroutine Inout_Input_Get_Regional_Params
-
-!     subroutine Inout_Input_Get_Themal_Params(self, Structure, iRegion)
-!         !> Get the Themal_Params of the input data
-!         implicit none
-!         class(Input) :: self
-!         type(Type_Thermal), intent(inout) :: Structure
-!         integer(int32), intent(in) :: iRegion
-
-!         select type (Density => Structure%Density)
-!         type is (Type_Density_1Phase)
-!             select type (self_Density => self%Regions(iRegion)%Thermal%Density)
-!             type is (Type_Density_1Phase)
-!                 Density%Phase1 = self_Density%Phase1
-!             end select
-!         type is (Type_Density_2Phase)
-!             select type (self_Density => self%Regions(iRegion)%Thermal%Density)
-!             type is (Type_Density_2Phase)
-!                 Density%Phase1 = self_Density%Phase1
-!                 Density%Phase2 = self_Density%Phase2
-!             end select
-!         type is (Type_Density_3Phase)
-!             select type (self_Density => self%Regions(iRegion)%Thermal%Density)
-!             type is (Type_Density_3Phase)
-!                 Density%Soil = self_Density%Soil
-!                 Density%Water = self_Density%Water
-!                 Density%Ice = self_Density%Ice
-!             end select
-!         end select
-
-!         select type (SpecificHeat => Structure%SpecificHeat)
-!         type is (Type_SpecificHeat_1Phase)
-!             select type (self_SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
-!             type is (Type_SpecificHeat_1Phase)
-!                 SpecificHeat%Phase1 = self_SpecificHeat%Phase1
-!             end select
-!         type is (Type_SpecificHeat_2Phase)
-!             select type (self_SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
-!             type is (Type_SpecificHeat_2Phase)
-!                 SpecificHeat%Phase1 = self_SpecificHeat%Phase1
-!                 SpecificHeat%Phase2 = self_SpecificHeat%Phase2
-!             end select
-!         type is (Type_SpecificHeat_3Phase)
-!             select type (self_SpecificHeat => self%Regions(iRegion)%Thermal%SpecificHeat)
-!             type is (Type_SpecificHeat_3Phase)
-!                 SpecificHeat%Soil = self_SpecificHeat%Soil
-!                 SpecificHeat%Water = self_SpecificHeat%Water
-!                 SpecificHeat%Ice = self_SpecificHeat%Ice
-!             end select
-!         end select
-
-!         select type (ThermalConductivity => Structure%ThermalConductivity)
-!         type is (Type_ThermalConductivity_1Phase)
-!             select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
-!             type is (Type_ThermalConductivity_1Phase)
-!                 ThermalConductivity%Phase1 = self_ThermalConductivity%Phase1
-!             end select
-!         type is (Type_ThermalConductivity_2Phase)
-!             select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
-!             type is (Type_ThermalConductivity_2Phase)
-!                 ThermalConductivity%Phase1 = self_ThermalConductivity%Phase1
-!                 ThermalConductivity%Phase2 = self_ThermalConductivity%Phase2
-!             end select
-!         type is (Type_ThermalConductivity_3Phase)
-!             select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
-!             type is (Type_ThermalConductivity_3Phase)
-!                 ThermalConductivity%Soil = self_ThermalConductivity%Soil
-!                 ThermalConductivity%Water = self_ThermalConductivity%Water
-!                 ThermalConductivity%Ice = self_ThermalConductivity%Ice
-!             end select
-!         type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
-!             select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
-!             type is (Type_ThermalConductivity_3Phase_Dispersity_2D)
-!                 ThermalConductivity%Soil = self_ThermalConductivity%Soil
-!                 ThermalConductivity%Water = self_ThermalConductivity%Water
-!                 ThermalConductivity%Ice = self_ThermalConductivity%Ice
-!                 ThermalConductivity%dispersity%x = self_ThermalConductivity%dispersity%x
-!                 ThermalConductivity%dispersity%y = self_ThermalConductivity%dispersity%y
-!             end select
-!         type is (Type_ThermalConductivity_3Phase_Dispersity_3D)
-!             select type (self_ThermalConductivity => self%Regions(iRegion)%Thermal%ThermalConductivity)
-!             type is (Type_ThermalConductivity_3Phase_Dispersity_3D)
-!                 ThermalConductivity%Soil = self_ThermalConductivity%Soil
-!                 ThermalConductivity%Water = self_ThermalConductivity%Water
-!                 ThermalConductivity%Ice = self_ThermalConductivity%Ice
-!                 ThermalConductivity%dispersity%x = self_ThermalConductivity%dispersity%x
-!                 ThermalConductivity%dispersity%y = self_ThermalConductivity%dispersity%y
-!                 ThermalConductivity%dispersity%z = self_ThermalConductivity%dispersity%z
-!             end select
-!         end select
-
-!         if (self%Regions(iRegion)%Flags%isFrozen) then
-!             select type (self_Ice => self%Regions(iRegion)%Thermal%Ice)
-!             type is (Type_Ice_TRM)
-!                 allocate (Type_Ice_TRM :: Structure%Ice)
-!                 select type (Ice => Structure%Ice)
-!                 type is (Type_Ice_TRM)
-!                     Ice%Tf = self_Ice%Tf
-!                 end select
-!             type is (Type_Ice_GCC)
-!                 allocate (Type_Ice_GCC :: Structure%Ice)
-!                 call Allocate_Structure_WRF_Type(Structure, self_Ice%ModelType)
-!                 select type (Ice => Structure%Ice)
-!                 type is (Type_Ice_GCC)
-!                     Ice%LatentHeat = self_Ice%LatentHeat
-!                     Ice%Tf = self_Ice%Tf
-!                     Ice%ModelType = self_Ice%ModelType
-
-!                     select type (WRF => Ice%WRF)
-!                     type is (Type_WRF_BC)
-!                         select type (self_WRF => self_Ice%WRF)
-!                         type is (Type_WRF_BC)
-!                             WRF%thetaS = self_WRF%thetaS
-!                             WRF%thetaR = self_WRF%thetaR
-!                             WRF%alpha1 = self_WRF%alpha1
-!                             WRF%n1 = self_WRF%n1
-!                         end select
-!                     type is (Type_WRF_VG)
-!                         select type (self_WRF => self_Ice%WRF)
-!                         type is (Type_WRF_VG)
-!                             WRF%thetaS = self_WRF%thetaS
-!                             WRF%thetaR = self_WRF%thetaR
-!                             WRF%alpha1 = self_WRF%alpha1
-!                             WRF%n1 = self_WRF%n1
-!                             WRF%m1 = self_WRF%m1
-!                         end select
-!                     type is (Type_WRF_KO)
-!                         select type (self_WRF => self_Ice%WRF)
-!                         type is (Type_WRF_KO)
-!                             WRF%thetaS = self_WRF%thetaS
-!                             WRF%thetaR = self_WRF%thetaR
-!                             WRF%alpha1 = self_WRF%alpha1
-!                             WRF%n1 = self_WRF%n1
-!                         end select
-!                     type is (Type_WRF_MVG)
-!                         select type (self_WRF => self_Ice%WRF)
-!                         type is (Type_WRF_MVG)
-!                             WRF%thetaS = self_WRF%thetaS
-!                             WRF%thetaR = self_WRF%thetaR
-!                             WRF%alpha1 = self_WRF%alpha1
-!                             WRF%n1 = self_WRF%n1
-!                             WRF%m1 = self_WRF%m1
-!                         end select
-!                     type is (Type_WRF_Durner)
-!                         select type (self_WRF => self_Ice%WRF)
-!                         type is (Type_WRF_Durner)
-!                             WRF%thetaS = self_WRF%thetaS
-!                             WRF%thetaR = self_WRF%thetaR
-!                             WRF%alpha1 = self_WRF%alpha1
-!                             WRF%n1 = self_WRF%n1
-!                             WRF%m1 = self_WRF%m1
-!                             WRF%alpha2 = self_WRF%alpha2
-!                             WRF%n2 = self_WRF%n2
-!                             WRF%m2 = self_WRF%m2
-!                             WRF%w1 = self_WRF%w1
-!                             WRF%w2 = self_WRF%w2
-!                         end select
-!                     type is (Type_WRF_DVGCH)
-!                         select type (self_WRF => self_Ice%WRF)
-!                         type is (Type_WRF_DVGCH)
-!                             WRF%thetaS = self_WRF%thetaS
-!                             WRF%thetaR = self_WRF%thetaR
-!                             WRF%alpha1 = self_WRF%alpha1
-!                             WRF%n1 = self_WRF%n1
-!                             WRF%m1 = self_WRF%m1
-!                             WRF%n2 = self_WRF%n2
-!                             WRF%m2 = self_WRF%m2
-!                             WRF%w1 = self_WRF%w1
-!                             WRF%w2 = self_WRF%w2
-!                         end select
-!                     end select
-!                 end select
-!             type is (Type_Ice_EXP)
-!                 allocate (Type_Ice_EXP :: Structure%Ice)
-!                 select type (Ice => Structure%Ice)
-!                 type is (Type_Ice_EXP)
-!                     Ice%Tf = self_Ice%Tf
-!                     Ice%a = self_Ice%a
-!                 end select
-!             end select
-!         end if
-!     end subroutine Inout_Input_Get_Themal_Params
-
-!     subroutine Inout_Input_Get_DP3d(self, key, Structure_DP)
-!         !> Get the DP2d/3d of the input data
-!         implicit none
-!         class(Input) :: self
-!         character(*), intent(in) :: key !! Key of the array
-!         type(DP3d), intent(inout) :: Structure_DP
-
-!         select case (key)
-!         case ("POINTS")
-!             allocate (Structure_DP%x, source=self%VTK%POINTS%x)
-!             allocate (Structure_DP%y, source=self%VTK%POINTS%y)
-!             allocate (Structure_DP%z, source=self%VTK%POINTS%z)
-!         end select
-
-!     end subroutine Inout_Input_Get_DP3d
-
-!     subroutine Inout_Input_Get_BoundaryConditions(self, key, group, Structure_BC)
-!         !> Get the BoundaryConditions of the input data
-!         implicit none
-!         class(Input) :: self
-!         character(*), intent(in) :: key !! Key of the array
-!         integer(int32), allocatable, intent(inout) :: group(:) !! Group of the array
-!         type(BC_Condition), allocatable, intent(inout) :: Structure_BC(:) !! Structure to store the data
-
-!         integer(int32) :: i
-
-!         select case (key)
-!         case (ThermalName)
-!             allocate (group, source=self%Conditions%BCGroup)
-!             allocate (Structure_BC(size(self%Conditions%BCGroup)))
-!             do i = 1, size(self%Conditions%BCGroup)
-!                 Structure_BC(i)%type = self%Conditions%BC_Thermal(i)%type
-!                 Structure_BC(i)%value = self%Conditions%BC_Thermal(i)%value
-!             end do
-!         case (HydraulicName)
-!             allocate (group, source=self%Conditions%BCGroup)
-!             allocate (Structure_BC(size(self%Conditions%BCGroup)))
-!             do i = 1, size(self%Conditions%BCGroup)
-!                 Structure_BC(i)%type = self%Conditions%BC_Hydraulic(i)%type
-!                 Structure_BC(i)%value = self%Conditions%BC_Hydraulic(i)%value
-!             end do
-!         end select
-
-!     end subroutine Inout_Input_Get_BoundaryConditions
-
-!     subroutine Inout_Input_Get_InitialConditions(self, key, Structure_IC)
-!         !> Get the InitialConditions of the input data
-!         implicit none
-!         class(Input) :: self
-!         character(*), intent(in) :: key !! Key of the array
-!         type(IC_Condition), intent(inout) :: Structure_IC
-!         integer(int32) :: i
-
-!         select case (key)
-!         case (ThermalName)
-!             Structure_IC%type = self%Conditions%IC_Thermal%type
-!             Structure_IC%value = self%Conditions%IC_Thermal%value
-!             if (allocated(self%Conditions%IC_Thermal%IC_BC)) then
-!                 allocate (Structure_IC%IC_BC(size(self%Conditions%IC_Thermal%IC_BC)))
-!                 do i = 1, size(self%Conditions%IC_Thermal%IC_BC)
-!                     Structure_IC%IC_BC(i)%type = self%Conditions%IC_Thermal%IC_BC(i)%type
-!                     Structure_IC%IC_BC(i)%value = self%Conditions%IC_Thermal%IC_BC(i)%value
-!                 end do
-!             end if
-!         case (HydraulicName)
-!             Structure_IC%type = self%Conditions%IC_Hydraulic%type
-!             Structure_IC%value = self%Conditions%IC_Hydraulic%value
-!             if (allocated(self%Conditions%IC_Hydraulic%IC_BC)) then
-!                 allocate (Structure_IC%IC_BC(size(self%Conditions%IC_Hydraulic%IC_BC)))
-!                 do i = 1, size(self%Conditions%IC_Hydraulic%IC_BC)
-!                     Structure_IC%IC_BC(i)%type = self%Conditions%IC_Hydraulic%IC_BC(i)%type
-!                     Structure_IC%IC_BC(i)%value = self%Conditions%IC_Hydraulic%IC_BC(i)%value
-!                 end do
-!             end if
-
-!         end select
-
-!     end subroutine Inout_Input_Get_InitialConditions
-
-!     subroutine Inout_Input_Get_int32(self, key, idata, optnum)
-!         !> Get the int32 of the input data
-!         implicit none
-!         class(Input) :: self
-!         character(*), intent(in) :: key !! Key of the array
-!         integer(int32), intent(inout) :: idata !! Array to store the data
-!         integer(int32), intent(in), optional :: optnum !! Number of the array
-
-!         select case (key)
-!         case ("numCellTypes")
-!             idata = self%VTK%numCellTypes
-!         case ("nCell")
-!             if (present(optnum)) then
-!                 idata = self%VTK%CELLS(optnum)%nCells
-!             end if
-!         end select
-
-!     end subroutine Inout_Input_Get_int32
-
-!     subroutine Inout_Input_Get_int32_rank1(self, key, array_int32, optnum)
-!         !> Get the int32 rank1 array of the input data
-!         implicit none
-!         class(Input) :: self
-!         character(*), intent(in) :: key !! Key of the array
-!         integer(int32), intent(inout), allocatable :: array_int32(:) !! Array to store the data
-!         integer(int32), intent(in), optional :: optnum !! Number of the array
-
-!         select case (key)
-!         case ("CellEntityIds")
-!             allocate (array_int32, source=self%VTK%CellEntityIds)
-
-!         end select
-
-!     end subroutine Inout_Input_Get_int32_rank1
-
-!     subroutine Inout_Input_Get_int32_rank2(self, key, array_int32, optnum)
-!         !> Get the int32 rank1 array of the input data
-!         implicit none
-!         class(Input) :: self
-!         character(*), intent(in) :: key !! Key of the array
-!         integer(int32), intent(inout), allocatable :: array_int32(:, :) !! Array to store the data
-!         integer(int32), intent(in), optional :: optnum !! Number of the array
-
-!         select case (key)
-!         case ("CellNodes")
-!             if (present(optnum)) then
-!                 allocate (array_int32, source=self%VTK%Cells(optnum)%Nodes)
-!             end if
-!         end select
-
-!     end subroutine Inout_Input_Get_int32_rank2
-
     subroutine Inout_Input_OutputSettings_JSON(self)
         implicit none
         class(Type_Input) :: self
         type(json_file) :: json
         integer(int32) :: status, unit_num
         integer(int32) :: iRegion
+        character(:), allocatable :: key
 
         call json%initialize()
 
         call json%load(filename=self%Output_FileName)
         call json%print_error_message(output_unit)
 
-        print *, trim(self%Output_FileName)
+        key = trim(adjustl(FileOutputName))
+        call json%get(key, self%OutputSettings%FileFormat)
+        call json%print_error_message(output_unit)
 
-        stop
+        key = Connect_dot(TimeSettingsName, UnitName)
+        call json%get(key, self%OutputSettings%Output_TimeUnit)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(TimeSettingsName, IntervalName, UnitName)
+        call json%get(key, self%OutputSettings%Interval_TimeUnit)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(TimeSettingsName, IntervalName, StepName)
+        call json%get(key, self%OutputSettings%Interval_Step)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(ObservationName, TypeName)
+        call json%get(key, self%OutputSettings%ObservationType)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(ObservationName, TotalNumberName)
+        call json%get(key, self%OutputSettings%NumObservation)
+        call json%print_error_message(output_unit)
+
+        select case (self%OutputSettings%ObservationType)
+        case (1)
+            key = Connect_dot(ObservationName, NodeName)
+            call json%get(key, self%OutputSettings%ObsID)
+            call json%print_error_message(output_unit)
+            if (.not. size(self%OutputSettings%ObsID) == self%OutputSettings%NumObservation) then
+                write (*, *) "dont match shapes"
+                stop
+            end if
+        case (2)
+            key = Connect_dot(ObservationName, CoordinatesName, xName)
+            call json%get(key, self%OutputSettings%Cood_Obs%x)
+            call json%print_error_message(output_unit)
+
+            key = Connect_dot(ObservationName, CoordinatesName, yName)
+            call json%get(key, self%OutputSettings%Cood_Obs%y)
+            call json%print_error_message(output_unit)
+
+            key = Connect_dot(ObservationName, CoordinatesName, zName)
+            call json%get(key, self%OutputSettings%Cood_Obs%z)
+            call json%print_error_message(output_unit)
+
+            if (.not. size(self%OutputSettings%Cood_Obs%x) == self%OutputSettings%NumObservation .or. &
+                .not. size(self%OutputSettings%Cood_Obs%y) == self%OutputSettings%NumObservation .or. &
+                .not. size(self%OutputSettings%Cood_Obs%z) == self%OutputSettings%NumObservation) then
+                write (*, *) "dont match shapes"
+                stop
+            end if
+        end select
+
+        key = Connect_dot(OutputSettingsName, KindsName, TempName)
+        call json%get(key, self%OutputSettings%outTemp)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(OutputSettingsName, KindsName, SiName)
+        call json%get(key, self%OutputSettings%outSi)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(OutputSettingsName, KindsName, TCName)
+        call json%get(key, self%OutputSettings%outTC)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(OutputSettingsName, KindsName, CName)
+        call json%get(key, self%OutputSettings%outC)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(OutputSettingsName, KindsName, PresName)
+        call json%get(key, self%OutputSettings%outPres)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(OutputSettingsName, KindsName, FluxName)
+        call json%get(key, self%OutputSettings%outFlux)
+        call json%print_error_message(output_unit)
+
+        key = Connect_dot(OutputSettingsName, KindsName, KName)
+        call json%get(key, self%OutputSettings%outK)
+        call json%print_error_message(output_unit)
 
     end subroutine Inout_Input_OutputSettings_JSON
 

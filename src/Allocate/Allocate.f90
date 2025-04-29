@@ -6,6 +6,7 @@ module Allocate_Allocate
     private
 
     interface Allocate_Array
+        procedure :: Allocate_Rank1_int8
         procedure :: Allocate_Rank1_int32
         procedure :: Allocate_Rank1_int64
         procedure :: Allocate_Rank1_real32
@@ -52,6 +53,19 @@ module Allocate_Allocate
 contains
 
     ! Rank-1 配列の割り当て
+    subroutine Allocate_Rank1_int8(array, size)
+        implicit none
+        integer(int8), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in) :: size
+
+        if (size <= 0) call error_message(951)
+        if (.not. allocated(array)) then
+            allocate (array(size))
+        else
+            call error_message(953)
+        end if
+    end subroutine Allocate_Rank1_int8
+
     subroutine Allocate_Rank1_int32(array, size)
         implicit none
         integer(int32), intent(inout), allocatable :: array(:)

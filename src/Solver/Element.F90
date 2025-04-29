@@ -34,7 +34,6 @@ module Solver_Element
         integer(int32) :: ElementType ! 要素型
         integer(int32) :: size ! 節点数
         integer(int32), allocatable :: conn(:) ! 接続情報
-        real(real64) :: det ! ヤコビアンの行列式
         type(RealPointer), allocatable :: coords_x(:)
         type(RealPointer), allocatable :: coords_y(:)
         integer(int32) :: nGauss ! ガウス積分点数
@@ -168,8 +167,6 @@ contains
             end do
         end if
 
-        Structure%det = 1.0_real64
-
         Structure%nGauss = 4
         call Allocate_Array(Structure%weight, Structure%nGauss)
         call Allocate_Array(Structure%gauss, 2_int32, Structure%nGauss)
@@ -215,8 +212,6 @@ contains
                 Structure%coords_y(i)%val => Global_Coordinate%y(Structure%conn(i))
             end do
         end if
-
-        Structure%det = 1.0_real64
 
         Structure%nGauss = 1
         call Allocate_Array(Structure%weight, Structure%nGauss)
@@ -319,11 +314,11 @@ contains
         real(real64) :: N
         select case (i)
         case (1)
-            N = 1.0d0 - xi - eta
-        case (2)
             N = xi
-        case (3)
+        case (2)
             N = eta
+        case (3)
+            N = 1.0d0 - xi - eta
         case default
             N = 0.0d0
         end select
@@ -339,11 +334,11 @@ contains
         real(real64) :: dN
         select case (i)
         case (1)
-            dN = -1.0d0
-        case (2)
             dN = 1.0d0
-        case (3)
+        case (2)
             dN = 0.0d0
+        case (3)
+            dN = -1.0d0
         case default
             dN = 0.0d0
         end select
@@ -359,11 +354,11 @@ contains
         real(real64) :: dN
         select case (i)
         case (1)
-            dN = -1.0d0
-        case (2)
             dN = 0.0d0
-        case (3)
+        case (2)
             dN = 1.0d0
+        case (3)
+            dN = -1.0d0
         case default
             dN = 0.0d0
         end select
@@ -383,20 +378,12 @@ contains
 
         integer(int32) :: i
 
-        dx_xi = 0.0d0
-        dx_eta = 0.0d0
-        dy_xi = 0.0d0
-        dy_eta = 0.0d0
-
-        do i = 1, self%size
-            dx_xi = dx_xi + self%shape_dxi(i, eta) * self%coords_x(i)%val
-            dx_eta = dx_eta + self%shape_deta(i, xi) * self%coords_x(i)%val
-            dy_xi = dy_xi + self%shape_dxi(i, eta) * self%coords_y(i)%val
-            dy_eta = dy_eta + self%shape_deta(i, xi) * self%coords_y(i)%val
-        end do
+        dx_xi = self%Jacobian_Components(1, 1, xi, eta)
+        dx_eta = self%Jacobian_Components(1, 2, xi, eta)
+        dy_xi = self%Jacobian_Components(2, 1, xi, eta)
+        dy_eta = self%Jacobian_Components(2, 2, xi, eta)
 
         Jacobian_Det = dx_xi * dy_eta - dx_eta * dy_xi
-
     end function Tri_Jacobian_Det
     !---------------------------------------------------
     ! J_{i, (三角形)
@@ -407,30 +394,37 @@ contains
         real(real64), intent(in) :: xi, eta
 
         real(real64) :: Jval
-        integer(int32) :: isize, jlocal
+        integer(int32) :: ii, jlocal
 
         Jval = 0
+        !! dx
         select case (i)
         case (1)
             select case (j)
             case (1)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_dxi(isize, eta) * self%coords_x(isize)%val
+                !! dx_dxi
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_x(ii)%val
                 end do
             case (2)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_deta(isize, xi) * self%coords_x(isize)%val
+                !! dx_deta
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_x(ii)%val
                 end do
             end select
+
+        !! dy
         case (2)
             select case (j)
             case (1)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_dxi(isize, eta) * self%coords_y(isize)%val
+                !! dy_dxi
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_y(ii)%val
                 end do
             case (2)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_deta(isize, xi) * self%coords_y(isize)%val
+                !! dy_deta
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_y(ii)%val
                 end do
             end select
         end select
@@ -445,30 +439,37 @@ contains
         real(real64), intent(in) :: xi, eta
 
         real(real64) :: Jval
-        integer(int32) :: isize, jlocal
+        integer(int32) :: ii, jlocal
 
         Jval = 0
+        !! dx
         select case (i)
         case (1)
             select case (j)
             case (1)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_dxi(isize, eta) * self%coords_x(isize)%val
+                !! dx_dxi
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_x(ii)%val
                 end do
             case (2)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_deta(isize, xi) * self%coords_x(isize)%val
+                !! dx_deta
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_x(ii)%val
                 end do
             end select
+
+        !! dy
         case (2)
             select case (j)
             case (1)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_dxi(isize, eta) * self%coords_y(isize)%val
+                !! dy_dxi
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_y(ii)%val
                 end do
             case (2)
-                do isize = 1, self%size
-                    Jval = Jval + self%shape_deta(isize, xi) * self%coords_y(isize)%val
+                !! dy_deta
+                do ii = 1, self%size
+                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_y(ii)%val
                 end do
             end select
         end select
@@ -494,12 +495,10 @@ contains
         dy_xi = 0.0d0
         dy_eta = 0.0d0
 
-        do i = 1, self%size
-            dx_xi = dx_xi + self%shape_dxi(i, eta) * self%coords_x(i)%val
-            dx_eta = dx_eta + self%shape_deta(i, xi) * self%coords_x(i)%val
-            dy_xi = dy_xi + self%shape_dxi(i, eta) * self%coords_y(i)%val
-            dy_eta = dy_eta + self%shape_deta(i, xi) * self%coords_y(i)%val
-        end do
+        dx_xi = self%Jacobian_Components(1, 1, xi, eta)
+        dx_eta = self%Jacobian_Components(1, 2, xi, eta)
+        dy_xi = self%Jacobian_Components(2, 1, xi, eta)
+        dy_eta = self%Jacobian_Components(2, 2, xi, eta)
 
         Jacobian_Det = dx_xi * dy_eta - dx_eta * dy_xi
 

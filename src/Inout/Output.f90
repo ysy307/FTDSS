@@ -4,492 +4,275 @@ module Inout_Output
     use :: error
     use :: Allocate_Allocate
     use :: Inout_Input
-    use :: types
+    use :: Types
 
     implicit none
     private
 
+    type :: Output_Config
+        logical(4) :: doOutput
+        character(:), allocatable :: Filename
+    end type
+
+    type :: Output_VTK_Series
+        integer(int32) :: nPoints
+        integer(int32) :: nCell
+        type(DP3d) :: Coordinates
+        integer(int32), allocatable :: connectivity(:)
+        integer(int32), allocatable :: offset(:)
+        integer(int8), allocatable :: CellType(:)
+    end type
+
     type :: Type_Output
         ! private
-        ! integer(int32), allocatable :: Output_Observation_Flag(:)
-        ! character(256) :: T_FileName, Fr_FileName, TC_FileName, C_FileName, P_FileName, Flux_FileName, K_FileName
-        ! character(256) :: dir_Path
-        ! logical, allocatable :: is_Output(:)
-        ! logical :: is_Output_Dat, is_Output_VTK
+        character(:), allocatable :: fextend
+
+        type(Output_Config) :: Temperature
+        type(Output_Config) :: Si
+        type(Output_Config) :: TC
+        type(Output_Config) :: C
+        type(Output_Config) :: Pressure
+        type(Output_Config) :: Flux
+        type(Output_Config) :: K
+
+        logical(4) :: doOutput_stdout
+
+        character(:), allocatable :: dir_Output
+        character(:), allocatable :: dir_FileOutput
+        character(:), allocatable :: format_output
+
+        type(Output_VTK_Series) :: VTKInfo
+
     contains
-        procedure :: Output_All => Inout_Output_All_vtk
+        procedure, private, pass(self) :: Inout_Output_All_vtu
+        procedure, public, pass(self) :: Output_All => Inout_Output_All
         ! procedure :: Output_All => Inout_Output_All
         ! procedure :: Output_Observation => Inout_Output_Observation
     end type Type_Output
 
-    ! interface Output
-    !     module procedure Output_Constructor
-    ! end interface
+    interface Type_Output
+        module procedure Output_Constructor
+    end interface
 
     public :: Type_Output
 
 contains
 
-    ! type(Output) function Output_Constructor(Inputs)
-    !     implicit none
-    !     type(Input), intent(in) :: Inputs
-    !     integer(int32) :: Flag_Size
-    !     integer(int32), allocatable :: Output_Observation_Flag(:)
-    !     ! character(256) :: dir_Path
-    !     integer :: i
+    function Output_Constructor(Structure_Input) result(Structure)
+        implicit none
+        type(Type_Input), intent(in) :: Structure_Input
+        type(Type_Output) :: Structure
+        character(256) :: dir_Path
+        logical(4) :: exists
 
-    !     integer(int32) :: Output_File_Type
+        character(:), allocatable :: command
+        integer(int32) :: i, j
+        integer(int32) :: total
 
-    !     ! Path settings
-    !     Output_Constructor%dir_Path = GetProjectPath()
+        ! Path settings
+        dir_Path = GetProjectPath()
 
-    !     Output_File_Type = Inputs%Input_Get_Output_File()
-    !     if (Output_File_Type == 1) then
-    !         Output_Constructor%is_Output_Dat = .true.
-    !         Output_Constructor%is_Output_VTK = .false.
-    !     else if (Output_File_Type == 2) then
-    !         Output_Constructor%is_Output_Dat = .false.
-    !         Output_Constructor%is_Output_VTK = .true.
-    !     end if
+        Structure%dir_Output = trim(adjustl(dir_Path))//"Output/"
 
-    !     Output_Constructor%T_FileName = trim(Output_Constructor%dir_Path)//"Output/obsf_T.dat"
-    !     Output_Constructor%Fr_FileName = trim(Output_Constructor%dir_Path)//"Output/obsf_Fr.dat"
-    !     Output_Constructor%TC_FileName = trim(Output_Constructor%dir_Path)//"Output/obsf_TC.dat"
-    !     Output_Constructor%C_FileName = trim(Output_Constructor%dir_Path)//"Output/obsf_C.dat"
-    !     Output_Constructor%P_FileName = trim(Output_Constructor%dir_Path)//"Output/obsf_P.dat"
-    !     Output_Constructor%Flux_FileName = trim(Output_Constructor%dir_Path)//"Output/obsf_Flux.dat"
-    !     Output_Constructor%K_FileName = trim(Output_Constructor%dir_Path)//"Output/obsf_K.dat"
+        inquire (DIRECTORY=Structure%dir_Output, exist=exists)
+        if (.not. exists) then
+#ifdef _WIN32
+            command = "mkdir "//'"'//trim(adjustl(Structure%dir_Output))//'"'
+            call system(command)
+#endif
+#ifdef __linux__
+            command = "mkdir -p "//'"'//trim(adjustl(Structure%dir_Output))//'"'
+            call system(command)
+#endif
+        else
+#ifdef _WIN32
+            ! Windows:
+            command = "del /Q "//'"'//trim(adjustl(Structure%dir_Output))//"*.dat"//'"'
+            call system(command)
+            command = "del /Q "//'"'//trim(adjustl(Structure%dir_Output))//"*.csv"//'"'
+            call system(command)
+#endif
+#ifdef __linux__
+            ! Linux: .datと.csvだけ削除
+            command = "rm -f "//trim(adjustl(Structure%dir_Output))//"*.dat"
+            call system(command)
+            command = "rm -f "//trim(adjustl(Structure%dir_Output))//"*.csv"
+            call system(command)
+#endif
+        end if
 
-    !     Output_Observation_Flag = Inputs%Input_Get_Observation_Flag()
-    !     Flag_Size = size(Output_Observation_Flag)
-    !     call Allocate_Vector(Output_Constructor%is_Output, Flag_Size)
-    !     do i = 1, Flag_Size
-    !         call Set_Output_Flag(Output_Observation_Flag(i), Output_Constructor%is_Output(i))
-    !     end do
+        Structure%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
 
-    !     if (allocated(Output_Observation_Flag)) deallocate (Output_Observation_Flag)
+        inquire (DIRECTORY=Structure%dir_FileOutput, exist=exists)
+        if (.not. exists) then
+#ifdef _WIN32
+            command = "mkdir "//'"'//trim(adjustl(Structure%dir_FileOutput))//'"'
+            call system(command)
+#endif
+#ifdef __linux__
+            command = "mkdir -p "//'"'//trim(adjustl(Structure%dir_FileOutput))//'"'
+            call system(command)
+#endif
+        else
+#ifdef _WIN32
+            ! Windows: .datと.csvだけ削除
+            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.dat"//'"'
+            call system(command)
+            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.csv"//'"'
+            call system(command)
+            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.vtk"//'"'
+            call system(command)
+            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.vtu"//'"'
+            call system(command)
+#endif
+#ifdef __linux__
+            ! Linux: .datと.csvだけ削除
+            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.dat"
+            call system(command)
+            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.csv"
+            call system(command)
+            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.vtk"
+            call system(command)
+            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.vtu"
+            call system(command)
+#endif
+        end if
 
-    ! end function Output_Constructor
+        Structure%Temperature%Filename = trim(adjustl(Structure%dir_Output))//"obsf_T.dat"
+        Structure%Si%Filename = trim(adjustl(Structure%dir_Output))//"obsf_Si.dat"
+        Structure%TC%Filename = trim(adjustl(Structure%dir_Output))//"obsf_TC.dat"
+        Structure%C%Filename = trim(adjustl(Structure%dir_Output))//"obsf_C.dat"
+        Structure%Pressure%Filename = trim(adjustl(Structure%dir_Output))//"obsf_P.dat"
+        Structure%Flux%Filename = trim(adjustl(Structure%dir_Output))//"obsf_Flux.dat"
+        Structure%K%Filename = trim(adjustl(Structure%dir_Output))//"obsf_K.dat"
 
-    ! subroutine Inout_Output_All(self, Solver, num)
-    !     implicit none
-    !     class(Output) :: self
-    !     type(SolverInfo), intent(inout) :: Solver
-    !     integer(int32), intent(in) :: num
+        Structure%Temperature%doOutput = Structure_Input%OutputSettings%outTemp
+        Structure%Si%doOutput = Structure_Input%OutputSettings%outSi
+        Structure%TC%doOutput = Structure_Input%OutputSettings%outTC
+        Structure%C%doOutput = Structure_Input%OutputSettings%outC
+        Structure%Pressure%doOutput = Structure_Input%OutputSettings%outPres
+        Structure%Flux%doOutput = Structure_Input%OutputSettings%outFlux
+        Structure%K%doOutput = Structure_Input%OutputSettings%outK
 
-    !     if (self%is_Output_Dat) call Inout_Output_All_Dat(self, Solver, num)
-    !     if (self%is_Output_VTK) call Inout_Output_All_vtk(self, Solver, num)
+        Structure%fextend = "."//trim(adjustl(Structure_Input%OutputSettings%FileFormat))
 
-    ! end subroutine Inout_Output_All
+        Structure%doOutput_stdout = Structure_Input%Basic%shouldDisplayPrompt
 
-    ! subroutine Inout_Output_All_Dat(self, Solver, num)
-    !     implicit none
-    !     class(Output) :: self
-    !     type(SolverInfo), intent(inout) :: Solver
-    !     integer(int32), intent(in) :: num
+        Structure%format_output = '(a,a,i5.5,a)'
 
-    !     character(256) :: oName, fmt
-    !     integer(int32) :: ios, unit_num, iN
+        select case (Structure%fextend)
+        case (".vtk", ".vtu")
+            Structure%VTKInfo%nPoints = Structure_Input%VTK%numPoints
+            Structure%VTKInfo%nCell = Structure_Input%VTK%numTotalCells
+            call Structure%VTKInfo%Coordinates%allocate(Structure%VTKInfo%nPoints)
+            Structure%VTKInfo%Coordinates = Structure_Input%VTK%POINTS
 
-    !     write (oName, Solver%fmt_Fileout) trim(self%dir_Path), "Output/DATFILE/Output_", num, ".dat"
-    !     open (newunit=unit_num, file=oName, status='replace', action='write', iostat=ios)
-    !     if (ios /= 0) call error_message(931)
+            call Allocate_Array(Structure%VTKInfo%offset, Structure%VTKInfo%nCell)
+            call Allocate_Array(Structure%VTKInfo%CellType, Structure%VTKInfo%nCell)
 
-    !     select case (Solver%nAnalysis)
-    !     case (1)
-    !         ! do iN = 1, Solver%N%node
-    !         !     write(unit_num, '(es15.7,a,es15.7)') Solver%T%pre(iN), ', ', Solver%T%Si(iN)
-    !         ! end do
-    !     case (2)
-    !     case (3)
-    !     case (4)
-    !         fmt = '(2es13.5,2es13.5)'
-    !         do iN = 1, Solver%N%node
-    !             write (unit_num, fmt) Solver%N%vCood%x(iN), Solver%N%vCood%y(iN), Solver%T%pre(iN), Solver%Si%pre(iN)
-    !         end do
-    !     case (5)
-    !     case (6)
-    !         fmt = '(2es13.5,5es13.5)'
-    !         do iN = 1, Solver%N%node
-    !             write (unit_num, fmt) Solver%N%vCood%x(iN), Solver%N%vCood%y(iN), Solver%T%pre(iN), Solver%P%pre(iN), Solver%Si%pre(iN), Solver%Water%Variables%wFlux%x(iN), +Solver%Water%Variables%wFlux%y(iN)
-    !         end do
-    !     case (7)
+            do i = 1, Structure%VTKInfo%nCell
+                if (i == 1) then
+                    Structure%VTKInfo%offset(i) = Structure_Input%VTK%CELLS(i)%offset
+                else
+                    Structure%VTKInfo%offset(i) = Structure%VTKInfo%offset(i - 1) + &
+                                                  Structure_Input%VTK%CELLS(i)%offset
+                end if
 
-    !     end select
-    !     close (unit_num)
+                Structure%VTKInfo%CellType(i) = Structure_Input%VTK%CELLS(i)%CellType
+            end do
+            total = Structure%VTKInfo%offset(Structure%VTKInfo%nCell) + Structure_Input%VTK%CELLS(Structure%VTKInfo%nCell)%offset
+            call Allocate_Array(Structure%VTKInfo%connectivity, total)
+            do i = 1, Structure%VTKInfo%nCell
+                if (i == 1) then
+                    do j = 1, Structure%VTKInfo%offset(i)
+                        Structure%VTKInfo%connectivity(j) = Structure_Input%VTK%CELLS(i)%connectivity(j) - 1
+                    end do
+                else
+                    do j = 1, Structure%VTKInfo%offset(i) - Structure%VTKInfo%offset(i - 1)
+                        Structure%VTKInfo%connectivity(j + Structure%VTKInfo%offset(i - 1)) = &
+                            Structure_Input%VTK%CELLS(i)%connectivity(j) - 1
+                    end do
+                end if
+            end do
+        end select
 
-    ! end subroutine Inout_Output_All_Dat
+    end function Output_Constructor
 
-    ! subroutine Inout_Output_Observation(self, Solver, time)
-    !     implicit none
-    !     class(Output) :: self
-    !     type(SolverInfo), intent(inout) :: Solver
-    !     real(real64), intent(in) :: time
-
-    !     integer(int32) :: unit_num, ios, iObs, nObs, iS, dim
-    !     real(real64) :: obsValue(Solver%Obs%nObs), obsValue2d(2 * Solver%Obs%nObs)
-    !     real(real64) :: tmpValue
-
-    !     character(64) :: ofmt
-
-    !     nObs = Solver%Obs%nObs
-
-    !     if (Solver%Flags%outOBS(1)) then
-    !         write (ofmt, '(a, i0, a)') '(es15.7,', nObs, 'es16.8)'
-    !         if (time == 0.0d0) then
-    !             open (newunit=unit_num, file=self%T_FileName, status='replace', action='write', form='formatted', position='append', iostat=ios)
-    !         else
-    !             open (newunit=unit_num, file=self%T_FileName, status='old', action='write', form='formatted', position='append', iostat=ios)
-    !         end if
-    !         if (Solver%Obs%nObsType == 1) then
-    !             write (unit_num, ofmt) time, (Solver%T%pre(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !         else if (Solver%Obs%nObsType == 2) then
-    !             do iObs = 1, nObs
-    !                 tmpValue = 0.0d0
-    !                 do iS = 1, Solver%N%Shcoe
-    !                     tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%T%pre(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                 end do
-    !                 obsValue(iObs) = tmpValue
-    !             end do
-    !             write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, nObs)
-    !         end if
-    !         close (unit_num)
-    !     end if
-    !     if (Solver%Flags%outOBS(2)) then
-    !         write (ofmt, '(a, i0, a)') '(es15.7,', nObs, 'es16.8)'
-    !         if (time == 0.0d0) then
-    !             open (newunit=unit_num, file=self%Fr_FileName, status='replace', action='write', form='formatted', position='append', iostat=ios)
-    !         else
-    !             open (newunit=unit_num, file=self%Fr_FileName, status='old', action='write', form='formatted', position='append', iostat=ios)
-    !         end if
-    !         if (Solver%Obs%nObsType == 1) then
-    !             write (unit_num, ofmt) time, (Solver%Si%pre(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !         else if (Solver%Obs%nObsType == 2) then
-    !             do iObs = 1, nObs
-    !                 tmpValue = 0.0d0
-    !                 do iS = 1, Solver%N%Shcoe
-    !                     tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%Si%pre(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                 end do
-    !                 obsValue(iObs) = tmpValue
-    !             end do
-    !             write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, nObs)
-    !         end if
-    !         close (unit_num)
-    !     end if
-    !     if (Solver%Flags%outOBS(3)) then
-    !         write (ofmt, '(a, i0, a)') '(es15.7,', 2 * nObs, 'es16.8)'
-    !         if (time == 0.0d0) then
-    !             open (newunit=unit_num, file=self%TC_FileName, status='replace', action='write', form='formatted', position='append', iostat=ios)
-    !         else
-    !             open (newunit=unit_num, file=self%TC_FileName, status='old', action='write', form='formatted', position='append', iostat=ios)
-    !         end if
-    !         if (Solver%Obs%nObsType == 1) then
-    !             write (unit_num, ofmt) time, (Solver%Heat%Variables%Tgrad%x(Solver%Obs%obsPoint(iObs)), Solver%Heat%Variables%Tgrad%y(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !         else if (Solver%Obs%nObsType == 2) then
-    !             do iObs = 1, nObs
-    !                 tmpValue = 0.0d0
-    !                 do iS = 1, Solver%N%Shcoe
-    !                     tmpValue = tmpValue + (Solver%Obs%vAreaObs(iS, iObs) * Solver%Heat%Variables%Tgrad%x(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs))))**2
-    !                     ! tmpValue = tmpValue + sqrt((Solver%Obs%vAreaObs(iS, iObs) * Solver%Heat%Variables%Tgrad%x(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs))))**2+(Solver%Obs%vAreaObs(iS, iObs) * Solver%Heat%Variables%Tgrad%y(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs))))**2)
-    !                 end do
-    !                 obsValue(iObs) = tmpValue
-    !             end do
-    !             write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, nObs)
-    !         end if
-    !         close (unit_num)
-    !     end if
-    !     if (Solver%Flags%outOBS(4)) then
-    !         write (ofmt, '(a, i0, a)') '(es15.7,', nObs, 'es16.8)'
-    !         if (time == 0.0d0) then
-    !             open (newunit=unit_num, file=self%C_FileName, status='replace', action='write', form='formatted', position='append', iostat=ios)
-    !         else
-    !             open (newunit=unit_num, file=self%C_FileName, status='old', action='write', form='formatted', position='append', iostat=ios)
-    !         end if
-    !         if (Solver%Flags%isTRM) then
-    !             if (Solver%Obs%nObsType == 1) then
-    !                 write (unit_num, ofmt) time, (Solver%Heat%Variables%Cp%pre(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !             else if (Solver%Obs%nObsType == 2) then
-    !                 do iObs = 1, nObs
-    !                     tmpValue = 0.0d0
-    !                     do iS = 1, Solver%N%Shcoe
-    !                         tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%Heat%Variables%Cp%pre(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                     end do
-    !                     obsValue(iObs) = tmpValue
-    !                 end do
-    !                 write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, nObs)
-    !             end if
-    !         else
-    !             if (Solver%Obs%nObsType == 1) then
-    !                 write (unit_num, ofmt) time, (Solver%Heat%Variables%Ca%pre(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !             else if (Solver%Obs%nObsType == 2) then
-    !                 do iObs = 1, nObs
-    !                     tmpValue = 0.0d0
-    !                     do iS = 1, Solver%N%Shcoe
-    !                         tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%Heat%Variables%Ca%pre(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                     end do
-    !                     obsValue(iObs) = tmpValue
-    !                 end do
-    !                 write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, nObs)
-    !             end if
-    !         end if
-    !         close (unit_num)
-    !     end if
-    !     if (Solver%Flags%outOBS(5)) then
-    !         write (ofmt, '(a, i0, a)') '(es15.7,', nObs, 'es16.8)'
-    !         if (time == 0.0d0) then
-    !             open (newunit=unit_num, file=self%P_FileName, status='replace', action='write', form='formatted', position='append', iostat=ios)
-    !         else
-    !             open (newunit=unit_num, file=self%P_FileName, status='old', action='write', form='formatted', position='append', iostat=ios)
-    !         end if
-    !         if (Solver%Obs%nObsType == 1) then
-    !             write (unit_num, ofmt) time, (Solver%P%pre(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !         else if (Solver%Obs%nObsType == 2) then
-    !             do iObs = 1, nObs
-    !                 tmpValue = 0.0d0
-    !                 do iS = 1, Solver%N%Shcoe
-    !                     tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%P%pre(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                 end do
-    !                 obsValue(iObs) = tmpValue
-    !             end do
-    !             write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, nObs)
-    !         end if
-    !         close (unit_num)
-    !     end if
-    !     if (Solver%Flags%outOBS(6)) then
-    !         write (ofmt, '(a, i0, a)') '(es15.7,', 2 * nObs, 'es16.8)'
-    !         if (time == 0.0d0) then
-    !             open (newunit=unit_num, file=self%Flux_FileName, status='replace', action='write', form='formatted', position='append', iostat=ios)
-    !         else
-    !             open (newunit=unit_num, file=self%Flux_FileName, status='old', action='write', form='formatted', position='append', iostat=ios)
-    !         end if
-    !         if (Solver%Obs%nObsType == 1) then
-    !             write (unit_num, ofmt) time, (Solver%Water%Variables%wFlux%x(Solver%Obs%obsPoint(iObs)), Solver%Water%Variables%wFlux%y(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !         else if (Solver%Obs%nObsType == 2) then
-    !             do iObs = 1, nObs
-    !                 do dim = 1, 2
-    !                     if (dim == 1) then
-    !                         tmpValue = 0.0d0
-    !                         do iS = 1, Solver%N%Shcoe
-    !                             tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%Water%Variables%wFlux%x(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                         end do
-    !                     else
-    !                         do iS = 1, Solver%N%Shcoe
-    !                             tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%Water%Variables%wFlux%y(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                         end do
-    !                     end if
-    !                     obsValue(2 * (iObs - 1) + dim) = tmpValue
-    !                 end do
-
-    !             end do
-    !             write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, 2 * nObs)
-    !         end if
-    !         close (unit_num)
-    !     end if
-    !     if (Solver%Flags%outOBS(7)) then
-    !         write (ofmt, '(a, i0, a)') '(es15.7,', nObs, 'es16.8)'
-    !         if (time == 0.0d0) then
-    !             open (newunit=unit_num, file=self%K_FileName, status='replace', action='write', form='formatted', position='append', iostat=ios)
-    !         else
-    !             open (newunit=unit_num, file=self%K_FileName, status='old', action='write', form='formatted', position='append', iostat=ios)
-    !         end if
-    !         if (Solver%Obs%nObsType == 1) then
-    !             write (unit_num, ofmt) time, (Solver%Water%Variables%Klh%pre(Solver%Obs%obsPoint(iObs)), iObs=1, nObs)
-    !         else if (Solver%Obs%nObsType == 2) then
-    !             do iObs = 1, nObs
-    !                 tmpValue = 0.0d0
-    !                 do iS = 1, Solver%N%Shcoe
-    !                     tmpValue = tmpValue + Solver%Obs%vAreaObs(iS, iObs) * Solver%Water%Variables%Klh%pre(Solver%N%pElement(iS, Solver%Obs%nAreaObs(iObs)))
-    !                 end do
-    !                 obsValue(iObs) = tmpValue
-    !             end do
-    !             write (unit_num, ofmt) time, (obsValue(iObs), iObs=1, nObs)
-    !         end if
-    !         close (unit_num)
-    !     end if
-    ! end subroutine Inout_Output_Observation
-
-    ! subroutine Output_time(ar_secsum, ttime, dxmin, dt, tmax, nSType, nLFType)
-    !     implicit none
-    !     real(real64), intent(in) :: ar_secsum(:), ttime, dxmin, dt, tmax
-    !     integer(int32), intent(in) :: nSType, nLFType
-    !     integer(int32) :: ios, tdata(8)
-    !     character(len=100) :: oPath, oName
-    !     character(len=12) :: real_clock(3)
-    !     character(len=5) :: SType, LFType
-
-    !     call date_and_time(real_clock(1), real_clock(2), real_clock(3), tdata)
-    !     if (nSType == 1) then
-    !     SType = "LU"
-    !     else if (nSType == 2) then
-    !     SType = "GE"
-    !     else if (nSType == 3) then
-    !     SType = "CG"
-    !     else
-    !     SType= "ELSE"
-    !     end if
-    !     if (nLFType == 1) then
-    !     LFType = "TRM"
-    !     else if (nLFType == 2) then
-    !     LFType = "ASBM"
-    !     else
-    !     LFType = "ELSE"
-    !     end if
-    !     call get_path(oPath)
-    !     ! write(oName, '(a,f6.4,a,f4.1,a,f3.1,5a)') trim(oPath) // 'Output/TIME/' // 'Time_', dxmin, 'm_', dt, 's_', tmax/86400, 'day_',&
-    !     ! & trim(SType),'_', trim(LFType), '.dat'
-    !     ! print*, trim(oName)
-
-    !     oName = trim(oPath) // 'Output/TIME/time.dat'
-    !     open(100, file = oName, status='replace', action="write", iostat=ios)
-    !     if (ios /= 0) call error_message(931)
-
-    !     write(100,'(a,i4.4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)') 'Date : ', tdata(1), '/', tdata(2), '/', tdata(3), '   Time : ',&
-    !     & tdata(5), ':', tdata(6), ':', tdata(7)
-    !     write(100,'(a)') '--------------------------------------------------'
-    !     write(100,'(a,f6.4,a)') 'Minimum Distance  : ', dxmin, 'm'
-    !     write(100,'(a,f6.2,a)') 'Initial time step : ', dt, 's'
-    !     write(100,'(a,i0,a)')   'Termination time  : ', nint(tmax), 's'
-    !     write(100,'(a)') '--------------------------------------------------'
-    !     write(100,'(a,f13.5,a)') 'Total time      :', ttime, 's'
-    !     write(100,'(a,f13.5,a)') 'Assemble Section:', ar_secsum(1), 's'
-    !     write(100,'(a,f13.5,a)') 'Matrix Calculate:', ar_secsum(2), 's'
-    !     write(100,'(a,f13.5,a)') 'Solve linear Eq.:', ar_secsum(3), 's'
-    !     write(100,'(a,f13.5,a)') 'Latent Heat Clac:', ar_secsum(4), 's'
-    !     write(100,'(a)', advance='no') '--------------------------------------------------'
-
-    !     close(100)
-
-    !     return
-    ! end subroutine Output_time
-
-    subroutine Inout_Output_All_vtk(self, filename, nPoints, nCells, Elements, Coordinates, arr_Temperature, arr_Si)
+    subroutine Inout_Output_All(self, fc, Temp, Si, Pres, wFlux)
         use vtk_fortran, only: vtk_file
         implicit none
         class(Type_Output) :: self
-        character(len=*), intent(in) :: filename
-        integer(int32), intent(in) :: nPoints, nCells
-        type(DP3d), intent(in) :: Coordinates
-        integer(int32), intent(in) :: Elements(:, :) ! (nNodesPerCell, nCells)
-        real(real64), intent(in) :: arr_Temperature(:)
-        real(real64), intent(in) :: arr_Si(:)
+        integer(int32), intent(in) :: fc
 
-        type(vtk_file) :: a_vtk_file
+        real(real64), intent(in), optional :: Temp(:)
+        real(real64), intent(in), optional :: Si(:)
+        real(real64), intent(in), optional :: Pres(:)
+        type(DP3d), intent(in), optional :: wFlux
+
+        select case (trim(adjustl(self%fextend)))
+        case (".vtu")
+            call self%Inout_Output_All_vtu(fc=fc, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+        end select
+
+    end subroutine Inout_Output_All
+
+    subroutine Inout_Output_All_vtu(self, fc, Temp, Si, Pres, wFlux)
+        use vtk_fortran, only: vtk_file
+        implicit none
+        class(Type_Output) :: self
+        integer(int32), intent(in) :: fc
+
+        real(real64), intent(in), optional :: Temp(:)
+        real(real64), intent(in), optional :: Si(:)
+        real(real64), intent(in), optional :: Pres(:)
+        type(DP3d), intent(in), optional :: wFlux
+
+        type(vtk_file) :: vtu
         integer(int32) :: status
-        integer(int32) :: i, nNodesPerCell, nCell
-        integer(int32), allocatable :: connectivity(:)
-        integer(int32), allocatable :: offset(:)
-        integer(int8), allocatable :: cell_type(:)
 
-        nNodesPerCell = size(Elements, 1)
-        nCell = size(Elements, 2)
-        ! print *, size(Elements, 1), size(Elements, 2), nCells
-
-        ! Allocate and compute connectivity-related data
-        allocate (connectivity(3 * nCell))
-        allocate (offset(nCell))
-        allocate (cell_type(nCell))
-
-        do i = 1, nCell
-            connectivity((i - 1) * 3 + 1:i * 3) = Elements(:, i) - 1
-            offset(i) = i * 3
-            cell_type(i) = 5 ! 例：VTK_TRIANGLE (必要に応じて変更)
-        end do
+        character(256) :: outName
 
         ! Initialize VTK file
-        status = a_vtk_file%initialize(format='ascii', filename=filename, mesh_topology='UnstructuredGrid')
+        write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
+        status = vtu%initialize(format='ascii', filename=outName, mesh_topology='UnstructuredGrid')
 
         ! Write data
-        status = a_vtk_file%xml_writer%write_piece(np=nPoints, nc=nCell)
-        status = a_vtk_file%xml_writer%write_geo(np=nPoints, nc=nCell, &
-                                                 x=Coordinates%x, y=Coordinates%y, z=Coordinates%z)
-        status = a_vtk_file%xml_writer%write_connectivity(nc=nCell, &
-                                                          connectivity=connectivity, offset=offset, cell_type=cell_type)
+        status = vtu%xml_writer%write_piece(np=self%VTKInfo%nPoints, &
+                                            nc=self%VTKInfo%nCell)
+        status = vtu%xml_writer%write_geo(np=self%VTKInfo%nPoints, &
+                                          nc=self%VTKInfo%nCell, &
+                                          x=self%VTKInfo%Coordinates%x, &
+                                          y=self%VTKInfo%Coordinates%y, &
+                                          z=self%VTKInfo%Coordinates%z)
+        status = vtu%xml_writer%write_connectivity(nc=self%VTKInfo%nCell, &
+                                                   connectivity=self%VTKInfo%connectivity, &
+                                                   offset=self%VTKInfo%offset, &
+                                                   cell_type=self%VTKInfo%CellType)
 
-        status = a_vtk_file%xml_writer%write_dataarray(location='node', action='open')
-        status = a_vtk_file%xml_writer%write_dataarray(data_name='Temperature', x=arr_Temperature)
-        status = a_vtk_file%xml_writer%write_dataarray(data_name='Si', x=arr_Si)
-        status = a_vtk_file%xml_writer%write_dataarray(location='node', action='close')
-        status = a_vtk_file%xml_writer%write_piece()
+        status = vtu%xml_writer%write_dataarray(location='node', action='open')
+        if (present(Temp)) then
+            status = vtu%xml_writer%write_dataarray(data_name='Temperature', &
+                                                    x=Temp)
+        end if
+        if (present(Si)) then
+            status = vtu%xml_writer%write_dataarray(data_name='Si', &
+                                                    x=Si)
+        end if
+        if (present(Pres)) then
+            status = vtu%xml_writer%write_dataarray(data_name='Pressure', &
+                                                    x=Pres)
+        end if
+        if (present(wFlux)) then
+            status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
+                                                    x=wFlux%x, &
+                                                    y=wFlux%y, &
+                                                    z=wFlux%z)
+        end if
+        status = vtu%xml_writer%write_dataarray(location='node', action='close')
+        status = vtu%xml_writer%write_piece()
 
         ! Finalize VTK file
-        status = a_vtk_file%finalize()
+        status = vtu%finalize()
 
-    end subroutine Inout_Output_All_vtk
-
-    ! subroutine Inout_Output_All_vtk(self, filename, nPoints, nCell, Elements, Coordinates, arr_Temperature, arr_Si)
-    ! use vtk_fortran, only: vtk_file
-    ! implicit none
-    ! class(Type_Output) :: self
-    ! character(len=*), intent(in) :: filename
-    ! integer(int32), intent(in) :: nPoints, nCells
-    ! type(DP3d), intent(in) :: Coordinates
-    ! integer(int32), intent(in) :: Elements(:, :) ! (nNodesPerCell, nCells)
-    ! real(real64), intent(in) :: arr_Temperature(:)
-    ! real(real64), intent(in) :: arr_Si(:)
-
-    ! type(vtk_file) :: a_vtk_file
-    ! integer(int32) :: status
-    ! integer(int32) :: i, nNodesPerCell
-    ! integer(int32), allocatable :: connectivity(:)
-    ! integer(int32), allocatable :: offset(:)
-    ! integer(int8), allocatable :: cell_type(:)
-    ! integer(int32) :: unit_num, ios
-    ! integer(int32) :: iN, iC
-
-    ! nNodesPerCell = size(Elements, 1)
-
-    ! open (newunit=unit_num, file=filename, status='replace', action='write', iostat=ios)
-    ! ! if (ios /= 0) call error_message(931)
-
-    ! write (unit_num, '(a)') "# vtk DataFile Version 2.0"
-    ! write (unit_num, '(a)') "Analysis ASCII VTK file"
-    ! write (unit_num, '(a)') "ASCII"
-    ! write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
-    ! write (unit_num, '(a,i0,a)') "POINTS ", nPoints, " double"
-    ! do iN = 1, nPoints
-    !     write (unit_num, '(3f18.13)') Coordinates%x(iN), Coordinates%y(iN), Coordinates%z(iN)
-    ! end do
-    ! write (unit_num, '(a)') ""
-    ! write (unit_num, '(a,i0,a,i0,a)') "CELLS ", nCells, " ", nCells * 4
-    ! do iN = 1, nCells
-    !     write (unit_num, '(i0,a,i0,a,i0,a,i0)') 3, " ", Elements(1, iN) - 1, " ", Elements(2, iN) - 1, " ", Elements(3, iN) - 1
-    ! end do
-    ! write (unit_num, '(a,i0,a)') "CELL_TYPES ", nCells
-    ! do iN = 1, nCells
-    !     write (unit_num, '(i0)') 5
-    ! end do
-
-    ! write (unit_num, '(a, i0)') "POINT_DATA ", nPoints
-    ! write (unit_num, '(a)') "SCALARS Temperature double 1"
-    ! write (unit_num, '(a)') "LOOKUP_TABLE default"
-    ! write (unit_num, '(es13.5)') arr_Temperature(:)
-    ! write (unit_num, '(a, i0)') "POINT_DATA ", nPoints
-    ! write (unit_num, '(a)') "SCALARS Si double 1"
-    ! write (unit_num, '(a)') "LOOKUP_TABLE default"
-    ! write (unit_num, '(es13.5)') arr_Si(:)
-
-    ! close (unit_num)
-
-    ! subroutine Measure_Time(nsec, ar_sec, ar_secsum)
-    !     implicit none
-    !     integer(int32), intent(in) :: nsec
-    !     real(real64), intent(inout) :: ar_sec(:), ar_secsum(:)
-
-    !     ar_sec(nsec+1) = omp_get_wtime()
-    !     ar_secsum(nsec) = ar_secsum(nsec) + ar_sec(nsec+1) - ar_sec(nsec)
-    !     return
-    ! end subroutine Measure_Time
-
-    ! subroutine Set_Output_Flag(iValue, inFlag)
-    !     implicit none
-    !     integer(int32), intent(in) :: iValue
-    !     logical, intent(inout) :: inFlag
-
-    !     if (iValue == 1) then
-    !         inFlag = .true.
-    !     else
-    !         inFlag = .false.
-    !     end if
-
-    ! end subroutine Set_Output_Flag
+    end subroutine Inout_Output_All_vtu
 end module Inout_Output

@@ -32,6 +32,7 @@ program test
     Iteration%max_iter = 100
 
     Input = Type_Input()
+    Output = Type_Output(Input)
 
     time = Type_Time(Input)
 
@@ -43,9 +44,10 @@ program test
     call Thermal%Update(Input%Regions(1)%Thermal%Porosity, Input%Regions(1)%Thermal%rho(3), 0)
     call Thermal%T%Shift()
     count = 0
-    filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
+    ! filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
     ! print *, count, filename
-    call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numTotalCells, Elements, Input%VTK%POINTS, Thermal%T%pre(:), Thermal%Ice%Si%pre)
+    call Output%Output_All(fc=count, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre)
+    ! stop
     Iteration%step = 0
 
     ! print *, Thermal%T%old(:, 1)
@@ -82,32 +84,30 @@ program test
 
             call Thermal%Assemble(time%dt, Iteration%step, Iteration%iter)
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
-            Thermal%PHIT(:) = -Thermal%PHIT(:)
+            ! Thermal%PHIT(:) = -Thermal%PHIT(:)
             call Thermal%BC%Fix_Bounday_Values(Thermal%KT_star_0, Thermal%PHIT)
 
-            open (unit=10, file='debug.txt', status='replace')
-            do i = 1, Thermal%nsize
-                ! print *, Thermal%KT_star_0%Ptr(i), Thermal%KT_star_0%Ptr(i + 1) - 1
-                do j = Thermal%KT_star_0%Ptr(i), Thermal%KT_star_0%Ptr(i + 1) - 1
-                    write (10, '(i0, 2x, i0,2x,f16.7)') i, Thermal%KT_star_0%Ind(j), Thermal%KT_star_0%Val(j)
-                end do
-            end do
-            close (10)
-            open (unit=20, file='debug2.txt', status='replace')
-            do i = 1, size(Thermal%PHIT)
-                write (20, '( i0,2x,f16.7)') i, Thermal%PHIT(i)
-            end do
-            close (20)
-            ! stop
-            ! call Thermal%BC%Fix_Bounday_Values(Thermal%KT_star_0, Thermal%PHIT)
+            ! open (unit=10, file='debug.txt', status='replace')
+            ! do i = 1, Thermal%nsize
+            !     do j = Thermal%KT_star_0%Ptr(i), Thermal%KT_star_0%Ptr(i + 1) - 1
+            !         write (10, '(i0, 2x, i0,2x,f16.7)') i, Thermal%KT_star_0%Ind(j), Thermal%KT_star_0%Val(j)
+            !     end do
+            ! end do
+            ! close (10)
+            ! open (unit=20, file='debug2.txt', status='replace')
+            ! do i = 1, Thermal%nsize
+            !     write (20, '( i0,2x,f16.7)') i, Thermal%PHIT(i)
+            ! end do
+            ! close (20)
+            call Thermal%BC%Fix_Bounday_Values(Thermal%KT_star_0, Thermal%PHIT)
             call Thermal%Solver%Solve(Thermal%KT_star_0, Thermal%PHIT, Thermal%T%new(:), stat)
 
-            open (unit=20, file='debug3.txt', status='replace')
-            do i = 1, size(Thermal%PHIT)
-                write (20, '( i0,2x,f16.7)') i, Thermal%T%new(i)
-            end do
-            close (20)
-            stop
+            ! open (unit=30, file='debug3.txt', status='replace')
+            ! do i = 1, Thermal%nsize
+            !     write (30, '( i0,2x,f16.7)') i, Thermal%T%new(i)
+            ! end do
+            ! close (30)
+            ! stop
             ! call Thermal%Solver%Solve(Thermal%KT_star_0, Thermal%PHIT, Thermal%T%dif, stat)
 
             ! Thermal%T%new(:) = Thermal%T%pre(:) + Thermal%T%dif(:)
@@ -116,7 +116,7 @@ program test
             norm_new = maxval(abs(Thermal%T%dif))
 
             !! Convergence check
-            if (Iteration%iter >= 5) then
+            if (Iteration%iter >= 2) then
                 ! if (norm_new < 1.0d-5) then
                 print *, Iteration%step, Iteration%iter, norm_new
                 Iteration%isConverged = .true.
@@ -137,10 +137,7 @@ program test
         ! print *, mod(Iteration%step, 100)
         if (mod(Iteration%step, 10) == 0) then
             count = count + 1
-            filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
-            ! print *, count, filename
-            call Output%Output_All(filename, Input%VTK%numPoints, Input%VTK%numTotalCells, Elements, Input%VTK%POINTS, Thermal%T%pre, Thermal%Ice%Qice%pre)
-            ! if (count == 100) stop
+            call Output%Output_All(fc=count, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre)
         end if
 
     end do TIME_LOOP

@@ -195,4 +195,13 @@ contains
         X%z(:) = Y%z(:)
 
     end subroutine DP3d_Assignment
+    subroutine DP3d_Assignment_Allocate(X, Y)
+        class(DP3d), allocatable, intent(inout) :: X
+        class(DP3d), intent(in) :: Y
+
+        allocate (X%x, source=Y%x)
+        allocate (X%y, source=Y%y)
+        allocate (X%z, source=Y%z)
+
+    end subroutine DP3d_Assignment_Allocate
 end module Types

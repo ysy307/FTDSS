@@ -75,14 +75,14 @@ contains
             ! Collect indices
             do iNC = 1, nNode
                 if (rowCount(iNC) >= 1) then
-                    tmpInd(A%nnz + row_nnz + 1) = iNC
                     row_nnz = row_nnz + 1
+                    tmpInd(A%nnz + row_nnz) = iNC
                 end if
             end do
+
             A%nnz = A%nnz + row_nnz
             A%Ptr(iN + 1) = A%nnz + 1
         end do
-
         ! Allocate CRS arrays
         call Allocate_Array(A%Ind, A%nnz)
         call Allocate_Array(A%Val, A%nnz)
@@ -181,7 +181,7 @@ contains
         B%nrow = self%nrow
         B%nptr = self%nptr
         B%nnz = self%nnz
-        call Allocate_Array(B%Ptr, self%nrow)
+        call Allocate_Array(B%Ptr, self%nptr)
         call Allocate_Array(B%Ind, self%nnz)
         call Allocate_Array(B%Val, self%nnz)
         B%Ptr(:) = self%Ptr(:)

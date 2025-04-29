@@ -207,7 +207,7 @@ contains
             structure%Solver = Solver_CRS_LU_Constructor(N=structure%nsize, &
                                                          MAXFCT=1, &
                                                          MNUM=1, &
-                                                         MTYPE=11, &
+                                                         MTYPE=1, &
                                                          PHASE=13, &
                                                          NRHS=1, &
                                                          MSGVLV=0, &
@@ -229,10 +229,10 @@ contains
         integer(int32), intent(in) :: step
         integer(int32), intent(in) :: iter
 
-        if (step >= 2) then
-            self%CT_old(2)%Val(:) = self%CT_old(1)%Val(:)
-            self%CT_old(1)%Val(:) = self%CT_l%Val(:)
-        end if
+        ! if (step >= 2) then
+        !     self%CT_old(2)%Val(:) = self%CT_old(1)%Val(:)
+        !     self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+        ! end if
 
         self%CT_l%Val(:) = 0.0d0
         self%KT_l%Val(:) = 0.0d0
@@ -248,12 +248,13 @@ contains
         ! if (step == 1) then
         self%KT_star_0 = dt * self%KT_l + self%CT_l
         !     if (iter == 1) then
-        self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+        ! self%CT_old(1)%Val(:) = self%CT_l%Val(:)
         !         self%KT_old%Val(:) = self%KT_l%Val(:)
         !         self%PHIT(:) = 0.0d0
         ! self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
         !     end if
-        self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
+        self%PHIT(:) = self%CT_l * self%T%old(:, 1)
+        ! self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
         ! self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
         ! else
         !     self%KT_star_0%Val(:) = 2.0d0 * dt * self%KT_l%Val(:) + 3.0d0 * self%CT_l%Val(:)

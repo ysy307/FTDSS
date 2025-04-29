@@ -1,80 +1,80 @@
 {
     "Basic": {
-        "Element": 10646,
-        "Node": 5425,
-        "ShapeType": 5,
         "DimensionType": 1,
-        "Region": 2,
-        "Calculation": {
-            "timeUnit": "Second",
-            "step": 300
+        "Region": 1,
+        "Time": {
+            "Calculation": {
+                "Unit": "Second",
+                "Step": 10.0,
+                "StepMinimum": 10.0,
+                "StepMaximum": 10.0
+            },
+            "Input": {
+                "Unit": "Day",
+                "StartCalculation": 0.0,
+                "EndCalculation": 1.0
+            },
+            "Output": {
+                "Unit": "Day"
+            },
+            "Interval": {
+                "Unit": "Second",
+                "step": 3600
+            }
         },
-        "Input": {
-            "timeUnit": "Day",
-            "calculationPeriod": 60
-        },
-        "Output": {
-            "timeUnit": "Day"
-        },
-        "Interval": {
-            "timeUnit": "Second",
-            "step": 3600
-        },
-        "isDisplayPrompt": false,
+        "shouldDisplayPrompt": false,
         "FileOutput": "vtk"
     },
     "Region1": {
         "Belong": {
-            "Surface": 1,
+            "Surface": [
+                1
+            ],
             "Edge": [
+                2,
                 3,
                 4,
                 5,
                 6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12,
-                15
+                7
             ]
         },
-        "CalculationType": 6,
+        "CalculationType": 4,
         "Modelnumber": 32,
         "isFrozen": true,
         "Thermal": {
             "Porosity": 0.3,
             "LatentHeat": 334560,
-            "Density": {
-                "Soil": 2800,
-                "Water": 1000,
-                "Ice": 917
-            },
-            "SpecificHeat": {
-                "Soil": 921,
-                "Water": 4180,
-                "Ice": 2100
-            },
-            "ThermalConductivity": {
-                "Soil": 3.78,
-                "Water": 0.6,
-                "Ice": 2.2,
-                "dispersity": {
-                    "x": 1.0,
-                    "y": 0.1
-                }
-            },
+            "Density": [
+                2800,
+                1000,
+                917
+            ],
+            "SpecificHeat": [
+                1000,
+                4180,
+                2100
+            ],
+            "ThermalConductivity": [
+                2.0,
+                0.6,
+                2.2
+            ],
+            "ThermalConductivityDispersity": [
+                1.0,
+                0.1
+            ],
             "Ice": {
-                "QiceType": 2,
                 "Tf": 0.0,
+                "QiceType": 2,
                 "Parameters": {
                     "Model": 2,
                     "thetaS": 0.30,
                     "thetaR": 0.0,
                     "alpha1": 0.2,
                     "n1": 1.8
-                }
+                },
+                "Unit": "m"
             }
         },
         "Hydraulic": {
@@ -110,10 +110,11 @@
             "ThermalConductivity": 2.7
         }
     },
-    "Solve": {
-        "TimeDiscretization": 1.0,
+    "Solver": {
+        "Order": 1,
+        "MaxNonlinearIteration": 100,
         "Thermal": {
-            "useSolver": 2,
+            "useSolver": 1,
             "Parameters": {
                 "Solver": 4,
                 "Preconditioner": 1,
