@@ -35,10 +35,10 @@ module Main_Thermal
         real(real64), allocatable :: Basis(:, :, :)
         type(Type_BC_Thermal) :: BC
         class(Abstract_Solver_CRS), allocatable :: Solver
+        class(Abstract_Ice), allocatable :: Ice
     end type Abstract_Thermal
 
     type, extends(Abstract_Thermal) :: Type_Thermal_3Phase_2D
-        class(Abstract_Ice), allocatable :: Ice
         type(Type_VolumetricHeatCapacity_3Phase) :: C
         type(Type_ThermalConductivity_3Phase) :: lambda
     contains

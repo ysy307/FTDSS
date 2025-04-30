@@ -46,6 +46,7 @@ program test
     ! filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
     ! print *, count, filename
     call Output%Output_All(fc=count, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre)
+    call Output%Output_Observation(time=0.0d0, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre, Thermal=Thermal)
     ! stop
     Iteration%step = 0
 
@@ -134,6 +135,7 @@ program test
             call Thermal%T%Shift(reverse=.true.)
         end if
 
+        call Output%Output_Observation(time=time%time / 86400.0d0, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre, Thermal=Thermal)
         ! print *, mod(Iteration%step, 100)
         if (mod(Iteration%step, 10) == 0) then
             count = count + 1

@@ -191,31 +191,102 @@ contains
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
     end function Jac_Det_TriangleFirst
 
-    !--------------------------------------------------------------------
-    !> 任意の多角形内判定（Ray-casting 法）
-    !! pX, pY    : 判定したい点の座標
-    !! 戻り値     : .true. = 内部, .false. = 外部
-    !--------------------------------------------------------------------
-    module function is_in_TriangleFirst(self, px, py) result(is_in)
-        implicit none
+    !----------------------------------------------------------------------!
+    ! is_in_TriangleFirst:
+    !----------------------------------------------------------------------!
+    ! This function checks if the given physical coordinates (px, py) lie
+    ! within the boundaries of a square element.
+    ! The function uses a reverse mapping (Newton-Raphson method) to map
+    ! the physical coordinates to natural coordinates (ξ, η) and then
+    ! checks if the point lies within the square element.
+    !
+    ! Arguments:
+    !   self  : TriangleFirst type object.
+    !
+    !   px    : x-coordinate (real64 type) in the physical coordinate system.
+    !           This coordinate is checked to see if it lies inside the square element.
+    !
+    !   py    : y-coordinate (real64 type) in the physical coordinate system.
+    !           This coordinate is checked to see if it lies inside the square element.
+    !
+    ! Return Value:
+    !   is_in : .true. if the point lies within the square element,
+    !           .false. otherwise.
+    !           The function also returns .false. if the Newton-Raphson method
+    !           does not converge or if the natural coordinates fall outside
+    !           the square element's domain.
+    !
+    ! Algorithm:
+    !   - The function uses the Newton-Raphson method to map the physical
+    !     coordinates (px, py) to the natural coordinates (ξ, η).
+    !   - The function then checks if the natural coordinates (ξ, η) are
+    !     within the valid range [-1, 1]. If they are, the point is inside
+    !     the square element.
+    !   - If the method does not converge, or the natural coordinates fall
+    !     outside the valid range, the function returns .false.
+    !
+    !----------------------------------------------------------------------!
+    module subroutine is_in_TriangleFirst(self, px, py, pxi, peta, is_in)
         class(TriangleFirst), intent(in) :: self
         real(real64), intent(in) :: px, py
+        real(real64), intent(inout) :: pxi, peta
         logical(4) :: is_in
 
-        integer(int32) :: i, j
-        integer(int32) :: n
+        real(real64) :: xi, eta
+        real(real64) :: x0, y0
+        real(real64) :: dx_xi, dx_eta, dy_xi, dy_eta
+        real(real64) :: detJ
+        real(real64) :: dx, dy
+        integer(int32) :: iter, max_iter
+        real(real64) :: tol
+        integer(int32) :: i
+        logical(4) :: converged
 
-        is_in = .false.
-        n = self%getNumNodes()
-        j = n
-        do i = 1, n
-            if (((self%Y(i)%val > py) /= (self%Y(j)%val > py)) .and. &
-                (px < (self%X(j)%val - self%X(i)%val) * (py - self%Y(i)%val) / (self%Y(j)%val - self%Y(i)%val) + self%X(i)%val)) then
-                is_in = .not. is_in
+        ! 初期化
+        xi = 0.0d0
+        eta = 0.0d0
+        tol = 1.0d-15
+        max_iter = 100
+        converged = .false.
+
+        ! Newton-Raphson 法による逆写像
+        do iter = 1, max_iter
+            x0 = 0.0d0
+            y0 = 0.0d0
+
+            do i = 1, self%size
+                x0 = x0 + self%psi(i, xi, eta) * self%X(i)%val
+                y0 = y0 + self%psi(i, xi, eta) * self%Y(i)%val
+            end do
+
+            dx = px - x0
+            dy = py - y0
+
+            if (sqrt(dx * dx + dy * dy) < tol) then
+                converged = .true.
+                exit
             end if
-            j = i
+
+            dx_xi = self%Jac(1, 1, xi, eta)
+            dx_eta = self%Jac(1, 2, xi, eta)
+            dy_xi = self%Jac(2, 1, xi, eta)
+            dy_eta = self%Jac(2, 2, xi, eta)
+
+            detJ = self%Jac_Det(xi, eta)
+            if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
+
+            ! Newton-Raphson 更新
+            xi = xi + (dy_eta * dx - dx_eta * dy) / detJ
+            eta = eta + (-dy_xi * dx + dx_xi * dy) / detJ
         end do
 
-    end function is_in_TriangleFirst
+        ! 最終判定：収束かつ自然座標が範囲内
+        is_in = converged .and. (xi >= 0.0d0) .and. (eta >= 0.0d0) .and. (xi + eta <= 1.0d0)
+
+        if (is_in) then
+            pxi = xi
+            peta = eta
+        end if
+    end subroutine is_in_TriangleFirst
 
 end submodule Solver_Element_TriangleFirst

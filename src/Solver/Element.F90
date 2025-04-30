@@ -145,12 +145,14 @@ module Solver_Element
             real(real64) :: J_Det
         end function Jacobian_Det_if
 
-        function is_in_if(self, px, py) result(is_in)
+        subroutine is_in_if(self, px, py, pxi, peta, is_in)
             import Abstract_ElementType, real64
             class(Abstract_ElementType), intent(in) :: self
             real(real64), intent(in) :: px, py
+            real(real64), intent(inout) :: pxi, peta
             logical(4) :: is_in
-        end function is_in_if
+        end subroutine is_in_if
+
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -221,13 +223,13 @@ module Solver_Element
 
         end function Jac_Det_TriangleFirst
 
-        module function is_in_TriangleFirst(self, px, py) result(is_in)
-            implicit none
+        module subroutine is_in_TriangleFirst(self, px, py, pxi, peta, is_in)
             class(TriangleFirst), intent(in) :: self
             real(real64), intent(in) :: px, py
+            real(real64), intent(inout) :: pxi, peta
             logical(4) :: is_in
 
-        end function is_in_TriangleFirst
+        end subroutine is_in_TriangleFirst
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -295,13 +297,13 @@ module Solver_Element
 
         end function Jac_Det_SquareFirst
 
-        module function is_in_SquareFirst(self, px, py) result(is_in)
-            implicit none
+        module subroutine is_in_SquareFirst(self, px, py, pxi, peta, is_in)
             class(SquareFirst), intent(in) :: self
             real(real64), intent(in) :: px, py
+            real(real64), intent(inout) :: pxi, peta
             logical(4) :: is_in
 
-        end function is_in_SquareFirst
+        end subroutine is_in_SquareFirst
     end interface
 
     interface TriangleFirst

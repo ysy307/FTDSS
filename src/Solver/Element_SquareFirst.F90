@@ -211,12 +211,48 @@ contains
 
     end function Jac_Det_SquareFirst
 
-    !----------------------------------------------------------------------!
+    !--------------------------------------------------------------------------------------
     ! is_in_SquareFirst:
-    !----------------------------------------------------------------------!
-    module function is_in_SquareFirst(self, px, py) result(is_in)
+    !--------------------------------------------------------------------------------------
+    ! This subroutine checks if the given physical coordinates (px, py) lie
+    ! within the boundaries of a square element.
+    ! The subroutine uses a reverse mapping (Newton-Raphson method) to map
+    ! the physical coordinates to natural coordinates (ξ, η) and then
+    ! checks if the point lies within the square element.
+    !
+    ! Arguments:
+    !   self  : SquareFirst type object. Represents a square element.
+    !           It contains the coordinates (X, Y, Z) and connectivity
+    !           information (conn) of the element.
+    !
+    !   px    : x-coordinate (real64 type) in the physical coordinate system.
+    !           This coordinate is checked to see if it lies inside the square element.
+    !
+    !   py    : y-coordinate (real64 type) in the physical coordinate system.
+    !           This coordinate is checked to see if it lies inside the square element.
+    !
+    ! Return Value:
+    !   is_in : .true. if the point lies within the square element,
+    !           .false. otherwise.
+    !           The subroutine also returns .false. if the Newton-Raphson method
+    !           does not converge or if the natural coordinates fall outside
+    !           the square element's domain.
+    !
+    ! Algorithm:
+    !   - The subroutine uses the Newton-Raphson method to map the physical
+    !     coordinates (px, py) to the natural coordinates (ξ, η).
+    !   - The subroutine then checks if the natural coordinates (ξ, η) are
+    !     within the valid range [-1, 1]. If they are, the point is inside
+    !     the square element.
+    !   - If the method does not converge, or the natural coordinates fall
+    !     outside the valid range, the subroutine returns .false.
+    !
+    !--------------------------------------------------------------------------------------
+
+    module subroutine is_in_SquareFirst(self, px, py, pxi, peta, is_in)
         class(SquareFirst), intent(in) :: self
         real(real64), intent(in) :: px, py
+        real(real64), intent(inout) :: pxi, peta
         logical(4) :: is_in
 
         real(real64) :: xi, eta
@@ -233,7 +269,7 @@ contains
         xi = 0.0d0
         eta = 0.0d0
         tol = 1.0d-15
-        max_iter = 20
+        max_iter = 100
         converged = .false.
 
         ! Newton-Raphson 法による逆写像
@@ -270,13 +306,10 @@ contains
         ! 最終判定：収束かつ自然座標が範囲内
         is_in = converged .and. (abs(xi) <= 1.0d0) .and. (abs(eta) <= 1.0d0)
         if (is_in) then
-            print '(a,f12.5,a,f12.5,a)', "is_in_SquareFirst: (", px, ", ", py, ") is in the element"
-            do i = 1, 4
-                print *, self%X(i)%val, self%Y(i)%val
-            end do
-            print *, ""
+            pxi = xi
+            peta = eta
         end if
-    end function is_in_SquareFirst
+    end subroutine is_in_SquareFirst
 
 end submodule Solver_Element_SquareFirst
 
