@@ -1,19 +1,20 @@
-module Types
-    use, intrinsic :: iso_fortran_env, only: int8, int32, real64
+module Core_BaseTypes
+    use, intrinsic :: iso_fortran_env
+    use :: Core_Allocate, only:Allocate_Array
     implicit none
-    public
+    private
 #ifdef _MPI
     include 'mpif.h'
 #endif
-    integer(int32), parameter :: Temperature = 1, Pressure = 2, Stress = 3
-    integer(int32), parameter :: Linear = 1, pTransition = 2, NonLinear = 3, nTransition = 4
-    real(real64), parameter :: GravityAcceleration = 9.80655d0
-    integer(int32), parameter :: undumped = 0, dumped = 1
 
-    type :: VC
-        sequence
-        real(real64) :: x, y
-    end type VC
+    public :: Vector2D, Vector3D
+    public :: DP2d, DP3d
+    public :: INT2d, INT3d
+    public :: Variables
+    public :: RealPointer
+    public :: Type_Iteration
+
+    public :: assignment(=)
 
     type :: Vector2D
         sequence
@@ -26,7 +27,6 @@ module Types
     end type Vector3D
 
     type :: DP2d
-        sequence
         real(real64), allocatable :: x(:), y(:)
     end type DP2d
 
@@ -37,26 +37,13 @@ module Types
     end type DP3d
 
     type :: INT2d
-        sequence
         integer(int32), allocatable :: x(:), y(:)
     end type INT2d
 
     type :: INT3d
-        sequence
         integer(int32), allocatable :: x(:), y(:), z(:)
     end type INT3d
 
-    type :: PH
-        sequence
-        real(real64) :: soil, water, ice
-    end type PH
-
-    type :: Phases
-        sequence
-        real(real64) :: soil, water, ice
-    end type Phases
-
-    !!KEEP THIS TYPE
     type :: Variables
         integer(int32) :: rank
         integer(int32) :: nsize
@@ -76,6 +63,15 @@ module Types
         logical(4) :: isConverged
         integer(int32) :: step
     end type Type_Iteration
+
+    !--------------------------------------------------------------------------------------
+    ! Pointer type for real numbers
+    !  - This is used to manage the memory of coorinate values in a polymorphic way
+    !  - The pointer is initialized to null and can be associated with coorinate values
+    !--------------------------------------------------------------------------------------
+    type :: RealPointer
+        real(real64), pointer :: val => null()
+    end type RealPointer
 
     interface assignment(=)
         module procedure DP3d_Assignment
@@ -164,10 +160,10 @@ contains
         self%rank = rank
         self%nsize = nsize
 
-        allocate (self%new(nsize))
-        allocate (self%pre(nsize))
-        allocate (self%old(nsize, self%rank + 1))
-        allocate (self%dif(nsize))
+        call Allocate_Array(self%new, nsize)
+        call Allocate_Array(self%pre, nsize)
+        call Allocate_Array(self%old, nsize, self%rank + 1)
+        call Allocate_Array(self%dif, nsize)
 
         self%new(:) = 0.0d0
         self%pre(:) = 0.0d0
@@ -180,9 +176,9 @@ contains
         class(DP3d), intent(inout) :: self
         integer(int32), intent(in) :: nsize
 
-        allocate (self%x(nsize))
-        allocate (self%y(nsize))
-        allocate (self%z(nsize))
+        call Allocate_Array(self%x, nsize)
+        call Allocate_Array(self%y, nsize)
+        call Allocate_Array(self%z, nsize)
 
     end subroutine DP3d_Allocate
 
@@ -195,13 +191,4 @@ contains
         X%z(:) = Y%z(:)
 
     end subroutine DP3d_Assignment
-    subroutine DP3d_Assignment_Allocate(X, Y)
-        class(DP3d), allocatable, intent(inout) :: X
-        class(DP3d), intent(in) :: Y
-
-        allocate (X%x, source=Y%x)
-        allocate (X%y, source=Y%y)
-        allocate (X%z, source=Y%z)
-
-    end subroutine DP3d_Assignment_Allocate
-end module Types
+end module Core_BaseTypes

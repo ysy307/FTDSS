@@ -1,4 +1,4 @@
-module error
+module Core_Error
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
     implicit none
@@ -166,4 +166,4 @@ contains
             in_range = .false.
         end if
     end function value_in_range_real64
-end module error
+end module Core_Error

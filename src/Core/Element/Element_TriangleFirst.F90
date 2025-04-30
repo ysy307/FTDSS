@@ -1,4 +1,4 @@
-submodule(Solver_Element) Solver_Element_TriangleFirst
+submodule(Core_Element) Core_Element_TriangleFirst
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
 contains
@@ -289,4 +289,4 @@ contains
         end if
     end subroutine is_in_TriangleFirst
 
-end submodule Solver_Element_TriangleFirst
+end submodule Core_Element_TriangleFirst

@@ -1,10 +1,9 @@
 module Condition_Fix_Boundary_Conditions
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Types
-    use :: Allocate_Allocate
-    use :: Allocate_Structure
+    use :: Core_BaseTypes
+    use :: Core_Allocate
+    use :: Core_VTK
     use :: Matrix_CRS
-    use :: Inout_VTK
     implicit none
     private
 

@@ -1,6 +1,6 @@
-module Inout_VTK
+module Core_VTK
     use, intrinsic :: iso_fortran_env, only: int8, int32, real64
-    use :: Types, only:DP3d
+    use :: Core_BaseTypes, only:DP3d
     use :: Allocate_Allocate, only:Allocate_Array
     implicit none
     private
@@ -79,12 +79,12 @@ module Inout_VTK
     public :: Type_VTK
 
     interface Type_VTK
-        procedure :: Inout_VTK_Read
+        procedure :: Core_VTK_Read
     end interface
 
 contains
 
-    function Inout_VTK_Read(filename) result(vtk)
+    function Core_VTK_Read(filename) result(vtk)
         !> Read VTK file
         implicit none
         character(*), intent(in) :: filename !! ***.VTK file name
@@ -99,13 +99,13 @@ contains
         end if
 
         open (newunit=new_unit, file=filename, status="old", action="read")
-        call Inout_VTK_Read_Header(new_unit, vtk)
-        call Inout_VTK_Read_Data(new_unit, vtk)
+        call Core_VTK_Read_Header(new_unit, vtk)
+        call Core_VTK_Read_Data(new_unit, vtk)
         close (new_unit)
 
-    end function Inout_VTK_Read
+    end function Core_VTK_Read
 
-    subroutine Inout_VTK_Read_Header(unit, vtk)
+    subroutine Core_VTK_Read_Header(unit, vtk)
         !> Read VTK header
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
@@ -142,9 +142,9 @@ contains
             vtk%dataset = c_UNSTRUCTURED_GRID
         end select
 
-    end subroutine Inout_VTK_Read_Header
+    end subroutine Core_VTK_Read_Header
 
-    subroutine Inout_VTK_Read_Data(unit, vtk)
+    subroutine Core_VTK_Read_Data(unit, vtk)
         !> Read VTK data
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
@@ -167,7 +167,7 @@ contains
         keyword = line(1:pos1 - 1)
 
         if (keyword == c_POINTS) then
-            call Inout_VTK_Read_Data_Points(unit, vtk, line)
+            call Core_VTK_Read_Data_Points(unit, vtk, line)
         end if
 
         read (unit, '(a)', iostat=iostat) line
@@ -179,7 +179,7 @@ contains
         keyword = line(1:pos1 - 1)
 
         if (keyword == c_CELLS) then
-            call Inout_VTK_Read_Data_Cells(unit, vtk, line)
+            call Core_VTK_Read_Data_Cells(unit, vtk, line)
         end if
 
         read (unit, '(a)', iostat=iostat) line
@@ -191,7 +191,7 @@ contains
         keyword = line(1:pos1 - 1)
 
         if (keyword == c_CELL_TYPES) then
-            call Inout_VTK_Read_Data_Cells_Types(unit, vtk, line)
+            call Core_VTK_Read_Data_Cells_Types(unit, vtk, line)
         end if
 
         read (unit, '(a)', iostat=iostat) line
@@ -203,12 +203,12 @@ contains
         keyword = line(1:pos1 - 1)
 
         if (keyword == c_CELL_DATA) then
-            call Inout_VTK_Read_Data_CellEntityIds(unit, vtk, line)
+            call Core_VTK_Read_Data_CellEntityIds(unit, vtk, line)
         end if
 
-    end subroutine Inout_VTK_Read_Data
+    end subroutine Core_VTK_Read_Data
 
-    subroutine Inout_VTK_Read_Data_Points(unit, vtk, headline)
+    subroutine Core_VTK_Read_Data_Points(unit, vtk, headline)
         !> Read VTK data points
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
@@ -262,9 +262,9 @@ contains
 
         read (unit, '(a)', iostat=iostat) ! Skip
 
-    end subroutine Inout_VTK_Read_Data_Points
+    end subroutine Core_VTK_Read_Data_Points
 
-    subroutine Inout_VTK_Read_Data_Cells(unit, vtk, headline)
+    subroutine Core_VTK_Read_Data_Cells(unit, vtk, headline)
         !> Read VTK data cells
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
@@ -304,9 +304,9 @@ contains
 
         read (unit, '(a)', iostat=iostat) ! Skip
 
-    end subroutine Inout_VTK_Read_Data_Cells
+    end subroutine Core_VTK_Read_Data_Cells
 
-    subroutine Inout_VTK_Read_Data_Cells_Types(unit, vtk, headline)
+    subroutine Core_VTK_Read_Data_Cells_Types(unit, vtk, headline)
         !> Read VTK data cells
         implicit none
         integer(int32), intent(in) :: unit !! Unit number
@@ -332,9 +332,9 @@ contains
 
         read (unit, '(a)', iostat=iostat) ! Skip
 
-    end subroutine Inout_VTK_Read_Data_Cells_Types
+    end subroutine Core_VTK_Read_Data_Cells_Types
 
-    subroutine Inout_VTK_Read_Data_CellEntityIds(unit, vtk, headline)
+    subroutine Core_VTK_Read_Data_CellEntityIds(unit, vtk, headline)
         !> Read VTK data cell entity ids
         ! implicit none
         integer(int32), intent(in) :: unit !! Unit number
@@ -362,6 +362,6 @@ contains
             end do
         end if
 
-    end subroutine Inout_VTK_Read_Data_CellEntityIds
+    end subroutine Core_VTK_Read_Data_CellEntityIds
 
-end module Inout_VTK
+end module Core_VTK

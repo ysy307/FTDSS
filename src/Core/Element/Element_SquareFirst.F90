@@ -1,4 +1,4 @@
-submodule(Solver_Element) Solver_Element_SquareFirst
+submodule(Core_Element) Core_Element_SquareFirst
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
 contains
@@ -248,7 +248,6 @@ contains
     !     outside the valid range, the subroutine returns .false.
     !
     !--------------------------------------------------------------------------------------
-
     module subroutine is_in_SquareFirst(self, px, py, pxi, peta, is_in)
         class(SquareFirst), intent(in) :: self
         real(real64), intent(in) :: px, py
@@ -311,5 +310,5 @@ contains
         end if
     end subroutine is_in_SquareFirst
 
-end submodule Solver_Element_SquareFirst
+end submodule Core_Element_SquareFirst
 

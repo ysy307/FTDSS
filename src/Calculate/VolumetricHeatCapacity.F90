@@ -1,7 +1,7 @@
 module Calculate_VolumetricHeatCapacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
-    use :: Allocate_Allocate, only:Allocate_Array
+    use :: Core_Allocate, only:Allocate_Array
     use :: Calculate_Ice
     use :: Calculate_GCC
     implicit none

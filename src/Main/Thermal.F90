@@ -208,7 +208,7 @@ contains
                                                          MAXFCT=1, &
                                                          MNUM=1, &
                                                          MTYPE=11, &
-                                                         PHASE=13, &
+                                                         PHASE=33, &
                                                          NRHS=1, &
                                                          MSGVLV=0, &
                                                          a=structure%KT_star_0)

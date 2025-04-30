@@ -2,7 +2,7 @@ module Calculate_Ice
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Calculate_WRF
     use :: Calculate_GCC
-    use :: Types, only:Variables
+    use :: Core_BaseTypes, only:Variables
 #ifdef _OPENMP
     use omp_lib
 #endif

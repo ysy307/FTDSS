@@ -1,6 +1,6 @@
 module Calculate_ThermalConductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Allocate_Allocate, only:Allocate_Array
+    use :: Core_Allocate, only:Allocate_Array
     use :: Calculate_Ice
     implicit none
 

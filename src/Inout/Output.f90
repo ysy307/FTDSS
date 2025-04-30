@@ -1,10 +1,10 @@
 module Inout_Output
     use, intrinsic :: iso_fortran_env, only: int8, int32, real64
-    use :: Inout_SetProjectPath, only:GetProjectPath => Inout_SetProjectPath_GetProjectPath
-    use :: error
-    use :: Allocate_Allocate
+    use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
+    use :: Core_BaseTypes
+    use :: Core_Allocate
+    use :: Core_Error
     use :: Inout_Input
-    use :: Types
     use :: Solver_Element
     use :: Main_Thermal
 
@@ -182,13 +182,13 @@ contains
         Structure%Observation%wFlux%doOutput = Structure_Input%OutputSettings%outFlux
         Structure%Observation%K%doOutput = Structure_Input%OutputSettings%outK
 
-        Structure%Observation%Temperature%numUnit = -1
-        Structure%Observation%Si%numUnit = -1
-        Structure%Observation%TC%numUnit = -1
-        Structure%Observation%C%numUnit = -1
-        Structure%Observation%Pressure%numUnit = -1
-        Structure%Observation%wFlux%numUnit = -1
-        Structure%Observation%K%numUnit = -1
+        Structure%Observation%Temperature%numUnit = 0
+        Structure%Observation%Si%numUnit = 0
+        Structure%Observation%TC%numUnit = 0
+        Structure%Observation%C%numUnit = 0
+        Structure%Observation%Pressure%numUnit = 0
+        Structure%Observation%wFlux%numUnit = 0
+        Structure%Observation%K%numUnit = 0
 
         Structure%Observation%Temperature%VariableUnit = "°C"
         Structure%Observation%Si%VariableUnit = "-"
@@ -642,7 +642,7 @@ contains
         nObs = self%Observation%NumObservation
         select case (data_name)
         case ("Temperature")
-            if (self%Observation%Temperature%numUnit < 0) then
+            if (self%Observation%Temperature%numUnit >= 0) then
                 open (newunit=self%Observation%Temperature%numUnit, &
                       file=trim(adjustl(self%Observation%Temperature%Filename)), &
                       status='replace', &
@@ -676,7 +676,7 @@ contains
                     "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
             end if
         case ("Si")
-            if (self%Observation%Si%numUnit < 0) then
+            if (self%Observation%Si%numUnit >= 0) then
                 open (newunit=self%Observation%Si%numUnit, &
                       file=trim(adjustl(self%Observation%Si%Filename)), &
                       status='replace', &
@@ -710,7 +710,7 @@ contains
                     "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
             end if
         case ("TC")
-            if (self%Observation%TC%numUnit < 0) then
+            if (self%Observation%TC%numUnit >= 0) then
                 open (newunit=self%Observation%TC%numUnit, &
                       file=trim(adjustl(self%Observation%TC%Filename)), &
                       status='replace', &
@@ -744,7 +744,7 @@ contains
                     "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
             end if
         case ("C")
-            if (self%Observation%C%numUnit < 0) then
+            if (self%Observation%C%numUnit >= 0) then
                 open (newunit=self%Observation%C%numUnit, &
                       file=trim(adjustl(self%Observation%C%Filename)), &
                       status='replace', &
@@ -778,7 +778,7 @@ contains
                     "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
             end if
         case ("Pressure")
-            if (self%Observation%Pressure%numUnit < 0) then
+            if (self%Observation%Pressure%numUnit >= 0) then
                 open (newunit=self%Observation%Pressure%numUnit, &
                       file=trim(adjustl(self%Observation%Pressure%Filename)), &
                       status='replace', &
@@ -812,7 +812,7 @@ contains
                     "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
             end if
         case ("wFlux")
-            if (self%Observation%wFlux%numUnit < 0) then
+            if (self%Observation%wFlux%numUnit >= 0) then
                 open (newunit=self%Observation%wFlux%numUnit, &
                       file=trim(adjustl(self%Observation%wFlux%Filename)), &
                       status='replace', &
@@ -846,7 +846,7 @@ contains
                     "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
             end if
         case ("K")
-            if (self%Observation%K%numUnit < 0) then
+            if (self%Observation%K%numUnit >= 0) then
                 open (newunit=self%Observation%K%numUnit, &
                       file=trim(adjustl(self%Observation%K%Filename)), &
                       status='replace', &

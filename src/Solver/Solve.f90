@@ -1,9 +1,8 @@
 module Solver_Solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Types
-    use :: Allocate_Allocate
-    use :: Allocate_Structure
-    use :: error
+    use :: Core_BaseTypes
+    use :: Core_Allocate
+    use :: Core_error
     use :: Calculate_BLAS, only:norm => norm_2, dot
     use :: Matrix_CRS
 #ifdef _OPENMP

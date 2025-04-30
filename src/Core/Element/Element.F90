@@ -1,6 +1,6 @@
-module Solver_Element
+module Core_Element
     !---------------------------------------------------------------------------------------
-    !  Module: Solver_Element
+    !  Module: Core_Element
     !  Purpose: Define 2D finite element types (square and triangle) and their
     !           associated operations (shape functions, Jacobian, Gauss points).
     !  Ford Coding Standard:
@@ -9,15 +9,15 @@ module Solver_Element
     !    - Preserve original function and type names
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Types
-    use :: Allocate_Allocate, only:Allocate_Array
+    use :: Core_BaseTypes, only:DP3d, RealPointer
+    use :: Core_Allocate, only:Allocate_Array
     implicit none
     private
+
     public :: Abstract_ElementType
     public :: SquareFirst
     public :: TriangleFirst
     public :: ElementHolder
-    public :: RealPointer
 
     !--------------------------------------------------------------------------------------
     ! Holder for polymorphic element objects
@@ -25,15 +25,6 @@ module Solver_Element
     type :: ElementHolder
         class(Abstract_ElementType), allocatable :: e
     end type ElementHolder
-
-    !--------------------------------------------------------------------------------------
-    ! Pointer type for real numbers
-    !  - This is used to manage the memory of coorinate values in a polymorphic way
-    !  - The pointer is initialized to null and can be associated with coorinate values
-    !--------------------------------------------------------------------------------------
-    type :: RealPointer
-        real(real64), pointer :: val => null()
-    end type RealPointer
 
     !--------------------------------------------------------------------------------------
     !   Abstract base type for 2D elements
@@ -58,13 +49,13 @@ module Solver_Element
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
     contains
-        procedure(nNodes_if), pass(self), deferred :: getNumNodes
-        procedure(shape_if), pass(self), deferred :: psi
-        procedure(shape_dxi_if), pass(self), deferred :: dpsi_dxi
-        procedure(shape_deta_if), pass(self), deferred :: dpsi_deta
-        procedure(Jacobian_Components_if), pass(self), deferred :: Jac
-        procedure(Jacobian_Det_if), pass(self), deferred :: Jac_Det
-        procedure(is_in_if), pass(self), deferred :: is_inside
+        procedure(Abstract_getNmNodes), pass(self), deferred :: getNumNodes
+        procedure(Abstract_psi), pass(self), deferred :: psi
+        procedure(Abstract_dpsi_dxi), pass(self), deferred :: dpsi_dxi
+        procedure(Abstract_dpsi_deta), pass(self), deferred :: dpsi_deta
+        procedure(Abstract_Jac), pass(self), deferred :: Jac
+        procedure(Abstract_Jac_Det), pass(self), deferred :: Jac_Det
+        procedure(Abstract_is_inside), pass(self), deferred :: is_inside
     end type Abstract_ElementType
 
     !--------------------------------------------------------------------------------------
@@ -99,59 +90,59 @@ module Solver_Element
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
-        function nNodes_if(self) result(n)
+        function Abstract_getNmNodes(self) result(n)
             import :: Abstract_ElementType, int32
             class(Abstract_ElementType), intent(in) :: self
             integer(int32) :: n
-        end function nNodes_if
+        end function Abstract_getNmNodes
 
-        function shape_if(self, i, xi, eta) result(psi)
+        function Abstract_psi(self, i, xi, eta) result(psi)
             import :: Abstract_ElementType, int32, real64
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: psi
-        end function shape_if
+        end function Abstract_psi
 
-        function shape_dxi_if(self, i, eta) result(dpsi)
+        function Abstract_dpsi_dxi(self, i, eta) result(dpsi)
             import :: Abstract_ElementType, int32, real64
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: eta
             real(real64) :: dpsi
-        end function shape_dxi_if
+        end function Abstract_dpsi_dxi
 
-        function shape_deta_if(self, i, xi) result(dpsi)
+        function Abstract_dpsi_deta(self, i, xi) result(dpsi)
             import :: Abstract_ElementType, int32, real64
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi
             real(real64) :: dpsi
-        end function shape_deta_if
+        end function Abstract_dpsi_deta
 
-        function Jacobian_Components_if(self, i, j, xi, eta) result(Jval)
+        function Abstract_Jac(self, i, j, xi, eta) result(Jval)
             import :: Abstract_ElementType, int32, real64
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
 
             real(real64) :: Jval
-        end function Jacobian_Components_if
+        end function Abstract_Jac
 
-        function Jacobian_Det_if(self, xi, eta) result(J_Det)
+        function Abstract_Jac_Det(self, xi, eta) result(J_Det)
             import :: Abstract_ElementType, int32, real64
             class(Abstract_ElementType), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
-        end function Jacobian_Det_if
+        end function Abstract_Jac_Det
 
-        subroutine is_in_if(self, px, py, pxi, peta, is_in)
+        subroutine Abstract_is_inside(self, px, py, pxi, peta, is_in)
             import Abstract_ElementType, real64
             class(Abstract_ElementType), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
             logical(4) :: is_in
-        end subroutine is_in_if
+        end subroutine Abstract_is_inside
 
     end interface
 
@@ -316,4 +307,4 @@ module Solver_Element
 
 contains
 
-end module Solver_Element
+end module Core_Element

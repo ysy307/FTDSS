@@ -1,7 +1,7 @@
 module Solver_Time
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Inout_Input
-    use :: Allocate_Allocate, only:Allocate_Array
+    use :: Core_Allocate, only:Allocate_Array
     implicit none
 
     type :: Type_Time
