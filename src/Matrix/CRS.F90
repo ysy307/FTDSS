@@ -12,7 +12,7 @@ module Matrix_CRS
 
     type :: Type_CRS
         integer(int32) :: nnz ! number of non-zero elements
-        integer(int32) :: nrow ! number of columns
+        integer(int32) :: nrow ! number of rows
         integer(int32) :: nptr ! size of Ptr (nrow+1 entries)
         integer(int32), allocatable :: Ptr(:) ! pointers to row starts (1-based)
         integer(int32), allocatable :: Ind(:) ! column indices of non-zeros
@@ -54,7 +54,7 @@ contains
         ! Allocate temp arrays
         call Allocate_Array(A%Ptr, A%nptr)
         call Allocate_Array(rowCount, nNode)
-        call Allocate_Array(tmpInd, 10_int32 * nNode)
+        call Allocate_Array(tmpInd, 30_int32 * nNode)
 
         A%Ptr(1) = 1
         A%nnz = 0
@@ -63,10 +63,10 @@ contains
             row_nnz = 0
             ! Scan elements to build sparsity row
             do iE = 1, size(Elements)
-                do iT = 1, Elements(iE)%p%size
-                    if (Elements(iE)%p%conn(iT) == iN) then
-                        do irT = 1, Elements(iE)%p%size
-                            rowCount(Elements(iE)%p%conn(irT)) = 1
+                do iT = 1, Elements(iE)%e%size
+                    if (Elements(iE)%e%conn(iT) == iN) then
+                        do irT = 1, Elements(iE)%e%size
+                            rowCount(Elements(iE)%e%conn(irT)) = 1
                         end do
                         exit
                     end if
@@ -88,7 +88,7 @@ contains
         call Allocate_Array(A%Val, A%nnz)
         do iNNZ = 1, A%nnz
             A%Ind(iNNZ) = tmpInd(iNNZ)
-            A%Val(iNNZ) = 0.0_real64
+            A%Val(iNNZ) = 0.0d0
         end do
 
         deallocate (rowCount, tmpInd)
@@ -98,12 +98,12 @@ contains
         implicit none
         type(Type_CRS), intent(in) :: A
         real(real64), intent(in) :: x(A%nrow)
-        real(real64) :: y(A%nrow - 1)
+        real(real64) :: y(A%nrow)
         integer(int32) :: i, j, is, ie
         real(real64) :: sum
 
-        y = 0.0d0
-        do i = 1, A%nrow - 1
+        y(:) = 0.0d0
+        do i = 1, A%nrow
             sum = 0.0d0
             is = A%Ptr(i)
             ie = A%Ptr(i + 1) - 1

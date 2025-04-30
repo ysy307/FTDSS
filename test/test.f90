@@ -6,7 +6,6 @@ program test
     use :: Inout_Output
     use :: Calculate_BLAS
     use :: Main_Thermal
-    use :: stdlib_strings, only:to_string
 
 #ifdef _OPENMP
     use omp_lib
@@ -32,11 +31,11 @@ program test
     Iteration%max_iter = 100
 
     Input = Type_Input()
-    Output = Type_Output(Input)
 
     time = Type_Time(Input)
-
     Thermal = Type_Thermal_3Phase_2D(Input)
+    Output = Type_Output(Input, Thermal=Thermal)
+
     Thermal%T%new(:) = 18.0d0
     call Thermal%BC%Fix_Bounday_Values(Thermal%T%new(:))
     Thermal%T%pre(:) = Thermal%T%new(:)
@@ -87,18 +86,19 @@ program test
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
             call Thermal%BC%Fix_Bounday_Values(Thermal%KT_star_0, Thermal%PHIT)
 
-            ! open (unit=10, file='debug.txt', status='replace')
+            ! open (unit=10, file='debug4.txt', status='replace')
             ! do i = 1, Thermal%nsize
             !     do j = Thermal%KT_star_0%Ptr(i), Thermal%KT_star_0%Ptr(i + 1) - 1
             !         write (10, '(i0, 2x, i0,2x,f16.7)') i, Thermal%KT_star_0%Ind(j), Thermal%KT_star_0%Val(j)
             !     end do
             ! end do
             ! close (10)
-            ! open (unit=20, file='debug2.txt', status='replace')
+            ! open (unit=20, file='debug5.txt', status='replace')
             ! do i = 1, Thermal%nsize
             !     write (20, '( i0,2x,f16.7)') i, Thermal%PHIT(i)
             ! end do
             ! close (20)
+            ! stop
             call Thermal%BC%Fix_Bounday_Values(Thermal%KT_star_0, Thermal%PHIT)
             call Thermal%Solver%Solve(Thermal%KT_star_0, Thermal%PHIT, Thermal%T%new(:), stat)
 
@@ -116,7 +116,7 @@ program test
             norm_new = maxval(abs(Thermal%T%dif))
 
             !! Convergence check
-            if (Iteration%iter >= 2) then
+            if (Iteration%iter >= 1) then
                 ! if (norm_new < 1.0d-5) then
                 print *, Iteration%step, Iteration%iter, norm_new
                 Iteration%isConverged = .true.

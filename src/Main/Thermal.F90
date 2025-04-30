@@ -31,13 +31,13 @@ module Main_Thermal
         integer(int32) :: nElement
         real(real64), allocatable :: Area(:)
         type(DP3d), pointer :: Coordinate
+        type(ElementHolder), allocatable :: Elements(:)
         real(real64), allocatable :: Basis(:, :, :)
         type(Type_BC_Thermal) :: BC
         class(Abstract_Solver_CRS), allocatable :: Solver
     end type Abstract_Thermal
 
     type, extends(Abstract_Thermal) :: Type_Thermal_3Phase_2D
-        type(ElementHolder), allocatable :: Elements(:)
         class(Abstract_Ice), allocatable :: Ice
         type(Type_VolumetricHeatCapacity_3Phase) :: C
         type(Type_ThermalConductivity_3Phase) :: lambda
@@ -93,10 +93,10 @@ contains
                 select case (Structure_Input%VTK%CELLS(iCell)%CellType)
                 case (5) ! VTK_TRIANGLE
                     idx = idx + 1
-                    structure%Elements(idx)%p = TriangleFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
+                    structure%Elements(idx)%e = TriangleFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
                 case (9) ! VTK_QUAD
                     idx = idx + 1
-                    structure%Elements(idx)%p = SquareFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
+                    structure%Elements(idx)%e = SquareFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
                 end select
             end do
         end if
@@ -207,7 +207,7 @@ contains
             structure%Solver = Solver_CRS_LU_Constructor(N=structure%nsize, &
                                                          MAXFCT=1, &
                                                          MNUM=1, &
-                                                         MTYPE=1, &
+                                                         MTYPE=11, &
                                                          PHASE=13, &
                                                          NRHS=1, &
                                                          MSGVLV=0, &
@@ -253,7 +253,9 @@ contains
         !         self%PHIT(:) = 0.0d0
         ! self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
         !     end if
+        ! print *, size(self%T%old(:, 1))
         self%PHIT(:) = self%CT_l * self%T%old(:, 1)
+        ! stop
         ! self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
         ! self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
         ! else

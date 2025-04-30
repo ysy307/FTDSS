@@ -1,5 +1,5 @@
 module Solver_Element
-    !------------------------------------------------------------------------------
+    !---------------------------------------------------------------------------------------
     !  Module: Solver_Element
     !  Purpose: Define 2D finite element types (square and triangle) and their
     !           associated operations (shape functions, Jacobian, Gauss points).
@@ -7,502 +7,311 @@ module Solver_Element
     !    - Use ISO_FORTRAN_ENV for portable kinds
     !    - Maintain explicit interfaces and consistent indentation
     !    - Preserve original function and type names
-    !------------------------------------------------------------------------------
+    !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Types
     use :: Allocate_Allocate, only:Allocate_Array
     implicit none
     private
-    public :: Abstract_ElementType_2D, SquareFirst, TriangleFirst, &
-              ElementHolder, RealPointer
+    public :: Abstract_ElementType
+    public :: SquareFirst
+    public :: TriangleFirst
+    public :: ElementHolder
+    public :: RealPointer
 
-    !------------------------------------------------------------------------------
+    !--------------------------------------------------------------------------------------
     ! Holder for polymorphic element objects
-    !------------------------------------------------------------------------------
+    !--------------------------------------------------------------------------------------
     type :: ElementHolder
-        class(Abstract_ElementType_2D), allocatable :: p
+        class(Abstract_ElementType), allocatable :: e
     end type ElementHolder
 
+    !--------------------------------------------------------------------------------------
+    ! Pointer type for real numbers
+    !  - This is used to manage the memory of coorinate values in a polymorphic way
+    !  - The pointer is initialized to null and can be associated with coorinate values
+    !--------------------------------------------------------------------------------------
     type :: RealPointer
         real(real64), pointer :: val => null()
     end type RealPointer
 
-    !
-    !----- 抽象基底型 -----
-    !
-    type, abstract :: Abstract_ElementType_2D
-        integer(int32) :: ElementType ! 要素型
-        integer(int32) :: size ! 節点数
-        integer(int32), allocatable :: conn(:) ! 接続情報
-        type(RealPointer), allocatable :: coords_x(:)
-        type(RealPointer), allocatable :: coords_y(:)
-        integer(int32) :: nGauss ! ガウス積分点数
-        real(real64), allocatable :: weight(:)
-        real(real64), allocatable :: gauss(:, :)
-    contains
-        procedure(nNodes_if), deferred, pass :: getNumNodes
-        procedure(shape_if), deferred :: shape
-        procedure(shape_dxi_if), deferred :: shape_dxi
-        procedure(shape_deta_if), deferred :: shape_deta
-        procedure(Jacobian_Det_if), deferred :: Jacobian_Det
-        procedure(Jacobian_Components_if), deferred :: Jacobian_Components
-    end type Abstract_ElementType_2D
+    !--------------------------------------------------------------------------------------
+    !   Abstract base type for 2D elements
+    !--------------------------------------------------------------------------------------
+    type, abstract :: Abstract_ElementType
+        integer(int32) :: ElementID
+        integer(int32) :: ElementType ! Element type (5: triangle 1st, 9: square 1st)
+        integer(int32) :: size ! Number of nodes in the element
+        integer(int32), allocatable :: conn(:) !! connectivity information
+        type(RealPointer), allocatable :: X(:) !! X coordinate
+        type(RealPointer), allocatable :: Y(:) !! Y coordinate
+        type(RealPointer), allocatable :: Z(:) !! Z coordinate
 
-    !
-    !----- 四角形要素型 -----
-    !
-    type, extends(Abstract_ElementType_2D) :: SquareFirst
+        !----------------------------------------------------------------------------------
+        ! Gauss Quadrature points and weights
+        !  - Gauss Quadrature points are defined in the local coordinate system
+        !  - The number of Gauss points is determined by the element type
+        !  - The weights are used for numerical integration over the element
+        !  - The Gauss points are used to evaluate the shape functions and their derivatives
+        !----------------------------------------------------------------------------------
+        integer(int32) :: nGauss !! Number of Gauss Quadrature points
+        real(real64), allocatable :: weight(:) !! Gauss weight
+        real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
     contains
-        ! Type-Bound Procedure のバインド
-        procedure, pass(self) :: getNumNodes => getNumNodesQuad
-        procedure, pass(self) :: shape => shapeQuad
-        procedure, pass(self) :: shape_dxi => shapeQuad_dxi
-        procedure, pass(self) :: shape_deta => shapeQuad_deta
-        procedure, pass(self) :: Jacobian_Det => Quad_Jacobian_Det
-        procedure, pass(self) :: Jacobian_Components => QuadFirst_Jacobian_Components
-    end type SquareFirst
+        procedure(nNodes_if), pass(self), deferred :: getNumNodes
+        procedure(shape_if), pass(self), deferred :: psi
+        procedure(shape_dxi_if), pass(self), deferred :: dpsi_dxi
+        procedure(shape_deta_if), pass(self), deferred :: dpsi_deta
+        procedure(Jacobian_Components_if), pass(self), deferred :: Jac
+        procedure(Jacobian_Det_if), pass(self), deferred :: Jac_Det
+        procedure(is_in_if), pass(self), deferred :: is_inside
+    end type Abstract_ElementType
 
-    !
-    !----- 三角形線形要素型 -----
-    !
-    type, extends(Abstract_ElementType_2D) :: TriangleFirst
+    !--------------------------------------------------------------------------------------
+    !   Triangle First Order Element Type
+    !--------------------------------------------------------------------------------------
+    type, extends(Abstract_ElementType) :: TriangleFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodesTri
-        procedure, pass(self) :: shape => shapeTri
-        procedure, pass(self) :: shape_dxi => shapeTri_dxi
-        procedure, pass(self) :: shape_deta => shapeTri_deta
-        procedure, pass(self) :: Jacobian_Det => Tri_Jacobian_Det
-        procedure, pass(self) :: Jacobian_Components => TriFirst_Jacobian_Components
+        procedure, pass(self) :: getNumNodes => getNumNodes_TriangleFirst
+        procedure, pass(self) :: psi => psi_TriangleFirst
+        procedure, pass(self) :: dpsi_dxi => dpsi_dxi_TriangleFirst
+        procedure, pass(self) :: dpsi_deta => dpsi_deta_TriangleFirst
+        procedure, pass(self) :: Jac => Jac_TriangleFirst
+        procedure, pass(self) :: Jac_Det => Jac_Det_TriangleFirst
+        procedure, pass(self) :: is_inside => is_in_TriangleFirst
     end type TriangleFirst
+
+    !--------------------------------------------------------------------------------------
+    !   Square First Order Element Type
+    !--------------------------------------------------------------------------------------
+    type, extends(Abstract_ElementType) :: SquareFirst
+    contains
+        procedure, pass(self) :: getNumNodes => getNumNodes_SquareFirst
+        procedure, pass(self) :: psi => psi_SquareFirst
+        procedure, pass(self) :: dpsi_dxi => dpsi_dxi_SquareFirst
+        procedure, pass(self) :: dpsi_deta => dpsi_deta_SquareFirst
+        procedure, pass(self) :: Jac => Jac_SquareFirst
+        procedure, pass(self) :: Jac_Det => Jac_Det_SquareFirst
+        procedure, pass(self) :: is_inside => is_in_SquareFirst
+    end type SquareFirst
 
     !
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
         function nNodes_if(self) result(n)
-            import :: Abstract_ElementType_2D, int32
-            class(Abstract_ElementType_2D), intent(in) :: self
+            import :: Abstract_ElementType, int32
+            class(Abstract_ElementType), intent(in) :: self
             integer(int32) :: n
         end function nNodes_if
 
-        function shape_if(self, i, xi, eta) result(N)
-            import :: Abstract_ElementType_2D, int32, real64
-            class(Abstract_ElementType_2D), intent(in) :: self
+        function shape_if(self, i, xi, eta) result(psi)
+            import :: Abstract_ElementType, int32, real64
+            class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
-            real(real64) :: N
+            real(real64) :: psi
         end function shape_if
 
-        function shape_dxi_if(self, i, eta) result(dN)
-            import :: Abstract_ElementType_2D, int32, real64
-            class(Abstract_ElementType_2D), intent(in) :: self
+        function shape_dxi_if(self, i, eta) result(dpsi)
+            import :: Abstract_ElementType, int32, real64
+            class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: eta
-            real(real64) :: dN
+            real(real64) :: dpsi
         end function shape_dxi_if
 
-        function shape_deta_if(self, i, xi) result(dN)
-            import :: Abstract_ElementType_2D, int32, real64
-            class(Abstract_ElementType_2D), intent(in) :: self
+        function shape_deta_if(self, i, xi) result(dpsi)
+            import :: Abstract_ElementType, int32, real64
+            class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi
-            real(real64) :: dN
+            real(real64) :: dpsi
         end function shape_deta_if
 
-        function Jacobian_Det_if(self, xi, eta) result(det)
-            import :: Abstract_ElementType_2D, int32, real64
-            class(Abstract_ElementType_2D), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64) :: det
-        end function Jacobian_Det_if
-
         function Jacobian_Components_if(self, i, j, xi, eta) result(Jval)
-            import :: Abstract_ElementType_2D, int32, real64
-            class(Abstract_ElementType_2D), intent(in) :: self
+            import :: Abstract_ElementType, int32, real64
+            class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
 
             real(real64) :: Jval
         end function Jacobian_Components_if
+
+        function Jacobian_Det_if(self, xi, eta) result(J_Det)
+            import :: Abstract_ElementType, int32, real64
+            class(Abstract_ElementType), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64) :: J_Det
+        end function Jacobian_Det_if
+
+        function is_in_if(self, px, py) result(is_in)
+            import Abstract_ElementType, real64
+            class(Abstract_ElementType), intent(in) :: self
+            real(real64), intent(in) :: px, py
+            logical(4) :: is_in
+        end function is_in_if
+    end interface
+
+    !--------------------------------------------------------------------------------------
+    !   三角形一次要素型 procedures interface
+    !--------------------------------------------------------------------------------------
+    interface
+        module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
+            implicit none
+            integer(int32), intent(in) :: iElem
+            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            integer(int32), intent(in) :: Connectivity(3)
+            integer(int32), intent(in) :: DimensionType
+            class(Abstract_ElementType), allocatable :: Structure
+            integer(int32), parameter :: ndim = 3
+            integer(int32) :: i
+
+        end function TriangleFirst_Construct
+
+        module function getNumNodes_TriangleFirst(self) result(n)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32) :: n
+
+        end function getNumNodes_TriangleFirst
+
+        module function psi_TriangleFirst(self, i, xi, eta) result(N)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64), intent(in) :: xi, eta
+            real(real64) :: N
+
+        end function psi_TriangleFirst
+
+        module function dpsi_dxi_TriangleFirst(self, i, eta) result(dpsi)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64), intent(in) :: eta
+            real(real64) :: dpsi
+
+        end function dpsi_dxi_TriangleFirst
+
+        module function dpsi_deta_TriangleFirst(self, i, xi) result(dpsi)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64), intent(in) :: xi
+            real(real64) :: dpsi
+
+        end function dpsi_deta_TriangleFirst
+
+        module function Jac_TriangleFirst(self, i, j, xi, eta) result(Jval)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32), intent(in) :: i, j
+            real(real64), intent(in) :: xi, eta
+
+            real(real64) :: Jval
+
+        end function Jac_TriangleFirst
+
+        module function Jac_Det_TriangleFirst(self, xi, eta) result(J_Det)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64) :: J_Det
+
+        end function Jac_Det_TriangleFirst
+
+        module function is_in_TriangleFirst(self, px, py) result(is_in)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            real(real64), intent(in) :: px, py
+            logical(4) :: is_in
+
+        end function is_in_TriangleFirst
+    end interface
+
+    !--------------------------------------------------------------------------------------
+    !   四角形一次要素型 procedures interface
+    !--------------------------------------------------------------------------------------
+    interface
+        module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
+            implicit none
+            integer(int32), intent(in) :: iElem
+            type(DP3d), intent(in), pointer :: Global_Coordinate
+            integer(int32), intent(in) :: Connectivity(4)
+            integer(int32), intent(in) :: DimensionType
+            class(Abstract_ElementType), allocatable :: Structure
+
+        end function SquareFirst_Construct
+
+        module function getNumNodes_SquareFirst(self) result(n)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32) :: n
+
+        end function getNumNodes_SquareFirst
+
+        module function psi_SquareFirst(self, i, xi, eta) result(psi)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64), intent(in) :: xi, eta
+            real(real64) :: psi
+
+        end function psi_SquareFirst
+
+        module function dpsi_dxi_SquareFirst(self, i, eta) result(dpsi)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64), intent(in) :: eta
+            real(real64) :: dpsi
+
+        end function dpsi_dxi_SquareFirst
+
+        module function dpsi_deta_SquareFirst(self, i, xi) result(dpsi)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64), intent(in) :: xi
+            real(real64) :: dpsi
+
+        end function dpsi_deta_SquareFirst
+
+        module function Jac_SquareFirst(self, i, j, xi, eta) result(Jval)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32), intent(in) :: i, j
+            real(real64), intent(in) :: xi, eta
+            real(real64) :: Jval
+
+        end function Jac_SquareFirst
+
+        module function Jac_Det_SquareFirst(self, xi, eta) result(J_Det)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64) :: J_Det
+
+        end function Jac_Det_SquareFirst
+
+        module function is_in_SquareFirst(self, px, py) result(is_in)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            real(real64), intent(in) :: px, py
+            logical(4) :: is_in
+
+        end function is_in_SquareFirst
+    end interface
+
+    interface TriangleFirst
+        procedure :: TriangleFirst_Construct
     end interface
 
     interface SquareFirst
         procedure :: SquareFirst_Construct
     end interface
-    interface TriangleFirst
-        procedure :: TriangleFirst_Construct
-    end interface
 
 contains
-    !----------------------------------------------------------------
-    ! SquareFirst のコンストラクタ
-    ! iElem: 要素インデックス
-    ! Global_Coordinate: 全節点座標を保持する DP3d
-    ! Connectivity(4): 要素–節点接続
-    ! DimensionType: 1: 2次元水平, 2: 2次元鉛直, 3: 3次元
-    !----------------------------------------------------------------
-    function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
-        integer(int32), intent(in) :: iElem
-        type(DP3d), intent(in), pointer :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(4)
-        integer(int32), intent(in) :: DimensionType
-        class(Abstract_ElementType_2D), allocatable :: Structure
-        integer(int32), parameter :: ndim = 4
-        integer(int32) :: i
-
-        allocate (SquareFirst :: Structure)
-        Structure%ElementType = 9
-        Structure%size = ndim
-        allocate (Structure%conn(ndim))
-        Structure%conn(1:ndim) = Connectivity(1:ndim)
-
-        if (DimensionType == 1) then
-            allocate (Structure%coords_x(ndim))
-            allocate (Structure%coords_y(ndim))
-            do i = 1, ndim
-                nullify (Structure%coords_x(i)%val)
-                nullify (Structure%coords_y(i)%val)
-                Structure%coords_x(i)%val => Global_Coordinate%x(Structure%conn(i))
-                Structure%coords_y(i)%val => Global_Coordinate%y(Structure%conn(i))
-            end do
-        end if
-
-        Structure%nGauss = 4
-        call Allocate_Array(Structure%weight, Structure%nGauss)
-        call Allocate_Array(Structure%gauss, 2_int32, Structure%nGauss)
-
-        Structure%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
-        Structure%gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
-        Structure%gauss(:, 2) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
-        Structure%gauss(:, 3) = [sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
-        Structure%gauss(:, 4) = [sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
-
-    end function SquareFirst_Construct
-
-    !----------------------------------------------------------------
-    ! TriangleFirst のコンストラクタ
-    ! iElem: 要素インデックス
-    ! Global_Coordinate: 全節点座標を保持する DP3d
-    ! Connectivity(3): 要素–節点接続
-    ! DimensionType: 1: 2次元水平, 2: 2次元鉛直, 3: 3次元
-    !----------------------------------------------------------------
-    function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
-        integer(int32), intent(in) :: iElem
-        type(DP3d), pointer, intent(in) :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(3)
-        integer(int32), intent(in) :: DimensionType
-        class(Abstract_ElementType_2D), allocatable :: Structure
-        integer(int32), parameter :: ndim = 3
-        integer(int32) :: i
-
-        allocate (TriangleFirst :: Structure)
-        Structure%ElementType = 5
-
-        Structure%size = ndim
-        allocate (Structure%conn(ndim))
-        Structure%conn(:) = Connectivity(1:ndim)
-
-        if (DimensionType == 1) then
-            allocate (Structure%coords_x(ndim))
-            allocate (Structure%coords_y(ndim))
-            do i = 1, ndim
-                nullify (Structure%coords_x(i)%val)
-                nullify (Structure%coords_y(i)%val)
-                Structure%coords_x(i)%val => Global_Coordinate%x(Structure%conn(i))
-                Structure%coords_y(i)%val => Global_Coordinate%y(Structure%conn(i))
-            end do
-        end if
-
-        Structure%nGauss = 1
-        call Allocate_Array(Structure%weight, Structure%nGauss)
-        call Allocate_Array(Structure%gauss, 2_int32, Structure%nGauss)
-        Structure%weight(:) = [0.5d0]
-        Structure%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
-    end function TriangleFirst_Construct
-
-    !---------------------------------------------------
-    ! 四角形要素の節点数を返す
-    !---------------------------------------------------
-    function getNumNodesQuad(self) result(n)
-        class(SquareFirst), intent(in) :: self
-        integer(int32) :: n
-        n = self%size
-    end function getNumNodesQuad
-
-    !---------------------------------------------------
-    ! 四角形線形要素の形状関数 N_i(ξ,η)
-    !---------------------------------------------------
-    function shapeQuad(self, i, xi, eta) result(N)
-        class(SquareFirst), intent(in) :: self
-        integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
-        real(real64) :: N
-        select case (i)
-        case (1)
-            N = 0.25d0 * (1.0d0 - xi) * (1.0d0 - eta)
-        case (2)
-            N = 0.25d0 * (1.0d0 + xi) * (1.0d0 - eta)
-        case (3)
-            N = 0.25d0 * (1.0d0 + xi) * (1.0d0 + eta)
-        case (4)
-            N = 0.25d0 * (1.0d0 - xi) * (1.0d0 + eta)
-        case default
-            N = 0.0d0
-        end select
-    end function shapeQuad
-
-    !---------------------------------------------------
-    ! ∂N_i/∂ξ (四角形)
-    !---------------------------------------------------
-    function shapeQuad_dxi(self, i, eta) result(dN)
-        class(SquareFirst), intent(in) :: self
-        integer(int32), intent(in) :: i
-        real(real64), intent(in) :: eta
-        real(real64) :: dN
-        select case (i)
-        case (1)
-            dN = -0.25d0 * (1.0d0 - eta)
-        case (2)
-            dN = 0.25d0 * (1.0d0 - eta)
-        case (3)
-            dN = 0.25d0 * (1.0d0 + eta)
-        case (4)
-            dN = -0.25d0 * (1.0d0 + eta)
-        case default
-            dN = 0.0d0
-        end select
-    end function shapeQuad_dxi
-
-    !---------------------------------------------------
-    ! ∂N_i/∂η (四角形)
-    !---------------------------------------------------
-    function shapeQuad_deta(self, i, xi) result(dN)
-        class(SquareFirst), intent(in) :: self
-        integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi
-        real(real64) :: dN
-        select case (i)
-        case (1)
-            dN = -0.25d0 * (1.0d0 - xi)
-        case (2)
-            dN = -0.25d0 * (1.0d0 + xi)
-        case (3)
-            dN = 0.25d0 * (1.0d0 + xi)
-        case (4)
-            dN = 0.25d0 * (1.0d0 - xi)
-        case default
-            dN = 0.0d0
-        end select
-    end function shapeQuad_deta
-
-    !---------------------------------------------------
-    ! 三角形線形要素の節点数を返す
-    !---------------------------------------------------
-    function getNumNodesTri(self) result(n)
-        class(TriangleFirst), intent(in) :: self
-        integer(int32) :: n
-        n = self%size
-    end function getNumNodesTri
-
-    !---------------------------------------------------
-    ! 三角形線形要素の形状関数 N_i(ξ,η)
-    !---------------------------------------------------
-    function shapeTri(self, i, xi, eta) result(N)
-        class(TriangleFirst), intent(in) :: self
-        integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
-        real(real64) :: N
-        select case (i)
-        case (1)
-            N = xi
-        case (2)
-            N = eta
-        case (3)
-            N = 1.0d0 - xi - eta
-        case default
-            N = 0.0d0
-        end select
-    end function shapeTri
-
-    !---------------------------------------------------
-    ! ∂N_i/∂ξ (三角形)
-    !---------------------------------------------------
-    function shapeTri_dxi(self, i, eta) result(dN)
-        class(TriangleFirst), intent(in) :: self
-        integer(int32), intent(in) :: i
-        real(real64), intent(in) :: eta
-        real(real64) :: dN
-        select case (i)
-        case (1)
-            dN = 1.0d0
-        case (2)
-            dN = 0.0d0
-        case (3)
-            dN = -1.0d0
-        case default
-            dN = 0.0d0
-        end select
-    end function shapeTri_dxi
-
-    !---------------------------------------------------
-    ! ∂N_i/∂η (三角形)
-    !---------------------------------------------------
-    function shapeTri_deta(self, i, xi) result(dN)
-        class(TriangleFirst), intent(in) :: self
-        integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi
-        real(real64) :: dN
-        select case (i)
-        case (1)
-            dN = 0.0d0
-        case (2)
-            dN = 1.0d0
-        case (3)
-            dN = -1.0d0
-        case default
-            dN = 0.0d0
-        end select
-    end function shapeTri_deta
-
-    !---------------------------------------------------
-    ! Jacobian Determinant (三角形)
-    !---------------------------------------------------
-    function Tri_Jacobian_Det(self, xi, eta) result(Jacobian_Det)
-        implicit none
-        class(TriangleFirst), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
-        real(real64) :: Jacobian_Det
-
-        real(real64) :: dx_xi, dx_eta
-        real(real64) :: dy_xi, dy_eta
-
-        integer(int32) :: i
-
-        dx_xi = self%Jacobian_Components(1, 1, xi, eta)
-        dx_eta = self%Jacobian_Components(1, 2, xi, eta)
-        dy_xi = self%Jacobian_Components(2, 1, xi, eta)
-        dy_eta = self%Jacobian_Components(2, 2, xi, eta)
-
-        Jacobian_Det = dx_xi * dy_eta - dx_eta * dy_xi
-    end function Tri_Jacobian_Det
-    !---------------------------------------------------
-    ! J_{i, (三角形)
-    !---------------------------------------------------
-    function TriFirst_Jacobian_Components(self, i, j, xi, eta) result(Jval)
-        class(TriangleFirst), intent(in) :: self
-        integer(int32), intent(in) :: i, j
-        real(real64), intent(in) :: xi, eta
-
-        real(real64) :: Jval
-        integer(int32) :: ii, jlocal
-
-        Jval = 0
-        !! dx
-        select case (i)
-        case (1)
-            select case (j)
-            case (1)
-                !! dx_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_x(ii)%val
-                end do
-            case (2)
-                !! dx_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_x(ii)%val
-                end do
-            end select
-
-        !! dy
-        case (2)
-            select case (j)
-            case (1)
-                !! dy_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_y(ii)%val
-                end do
-            case (2)
-                !! dy_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_y(ii)%val
-                end do
-            end select
-        end select
-
-    end function TriFirst_Jacobian_Components
-    !---------------------------------------------------
-    ! ∂x_i/∂ξ (四角形)
-    !---------------------------------------------------
-    function QuadFirst_Jacobian_Components(self, i, j, xi, eta) result(Jval)
-        class(SquareFirst), intent(in) :: self
-        integer(int32), intent(in) :: i, j
-        real(real64), intent(in) :: xi, eta
-
-        real(real64) :: Jval
-        integer(int32) :: ii, jlocal
-
-        Jval = 0
-        !! dx
-        select case (i)
-        case (1)
-            select case (j)
-            case (1)
-                !! dx_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_x(ii)%val
-                end do
-            case (2)
-                !! dx_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_x(ii)%val
-                end do
-            end select
-
-        !! dy
-        case (2)
-            select case (j)
-            case (1)
-                !! dy_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_dxi(ii, eta) * self%coords_y(ii)%val
-                end do
-            case (2)
-                !! dy_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%shape_deta(ii, xi) * self%coords_y(ii)%val
-                end do
-            end select
-        end select
-
-    end function QuadFirst_Jacobian_Components
-
-    !---------------------------------------------------
-    ! Jacobian Determinant (四角形)
-    !---------------------------------------------------
-    function Quad_Jacobian_Det(self, xi, eta) result(Jacobian_Det)
-        implicit none
-        class(SquareFirst), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
-        real(real64) :: Jacobian_Det
-
-        real(real64) :: dx_xi, dx_eta
-        real(real64) :: dy_xi, dy_eta
-
-        integer(int32) :: i
-
-        dx_xi = 0.0d0
-        dx_eta = 0.0d0
-        dy_xi = 0.0d0
-        dy_eta = 0.0d0
-
-        dx_xi = self%Jacobian_Components(1, 1, xi, eta)
-        dx_eta = self%Jacobian_Components(1, 2, xi, eta)
-        dy_xi = self%Jacobian_Components(2, 1, xi, eta)
-        dy_eta = self%Jacobian_Components(2, 2, xi, eta)
-
-        Jacobian_Det = dx_xi * dy_eta - dx_eta * dy_xi
-
-    end function Quad_Jacobian_Det
-    !---------------------------------------------------
 
 end module Solver_Element

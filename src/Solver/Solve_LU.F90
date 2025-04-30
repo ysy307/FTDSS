@@ -1,5 +1,6 @@
 submodule(Solver_Solve) Solver_Solve_LU_Implementation
     use, intrinsic :: iso_fortran_env, only: int32, int64, real64
+    use :: Matrix_CRS
     implicit none
 
 contains
@@ -31,12 +32,12 @@ contains
             allocate (this%IPARM(64))
             allocate (this%PERM(N))
             allocate (this%JA(A%nnz))
-            allocate (this%IA(N + 1))
+            allocate (this%IA(A%nptr))
 
             do i = 1, A%nnz
                 this%JA(i) = transfer(A%Ind(i), this%JA(i))
             end do
-            do i = 1, N + 1
+            do i = 1, A%nptr
                 this%IA(i) = transfer(A%Ptr(i), this%IA(i))
             end do
         end select
@@ -53,6 +54,7 @@ contains
 
         call PARDISO(self%PT, self%MAXFCT, self%MNUM, self%MTYPE, self%PHASE, self%N, A%Val, self%IA, self%JA, self%PERM, self%NRHS, self%IPARM, self%MSGLVL, b, x, self%ERROR)
         status = transfer(self%ERROR, status)
+        stop
 
     end subroutine Solve_CRS_LU
 

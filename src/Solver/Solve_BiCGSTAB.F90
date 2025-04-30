@@ -1,5 +1,6 @@
 submodule(Solver_Solve) Solver_Solve_BiCGSTAB_Implementation
     use, intrinsic :: iso_fortran_env, only: int32
+    use :: Matrix_CRS
     implicit none
 
 contains
