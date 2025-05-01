@@ -40,6 +40,8 @@ contains
             do i = 1, A%nptr
                 this%IA(i) = transfer(A%Ptr(i), this%IA(i))
             end do
+
+            call pardisoinit(this%pt, this%mtype, this%iparm)
         end select
 
     end function Solver_CRS_LU_Constructor
@@ -54,7 +56,6 @@ contains
 
         call PARDISO(self%PT, self%MAXFCT, self%MNUM, self%MTYPE, self%PHASE, self%N, A%Val, self%IA, self%JA, self%PERM, self%NRHS, self%IPARM, self%MSGLVL, b, x, self%ERROR)
         status = transfer(self%ERROR, status)
-        stop
 
     end subroutine Solve_CRS_LU
 

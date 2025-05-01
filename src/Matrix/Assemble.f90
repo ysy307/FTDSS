@@ -1,7 +1,7 @@
 module Matrix_Assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Matrix_CRS
-    use :: Solver_Element
+    use :: Core_Element
 #ifdef _OPENMP
     use omp_lib
 #endif

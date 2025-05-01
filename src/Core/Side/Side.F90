@@ -1,7 +1,7 @@
 module Core_Side
     !---------------------------------------------------------------------------------------
     !  Module: Core_Side
-    !  Purpose: Define 2D finite element types (square and triangle) and their
+    !  Purpose: Define 1D finite element types (square and triangle) and their
     !           associated operations (shape functions, Jacobian, Gauss points).
     !  Ford Coding Standard:
     !    - Use ISO_FORTRAN_ENV for portable kinds

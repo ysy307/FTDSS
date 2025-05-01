@@ -1,7 +1,7 @@
 module Matrix_CRS
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Allocate_Allocate, only:Allocate_Array
-    use :: Solver_Element
+    use :: Core_Allocate, only:Allocate_Array
+    use :: Core_Element
     implicit none
     private
 

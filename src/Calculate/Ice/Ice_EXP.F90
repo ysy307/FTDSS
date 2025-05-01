@@ -3,7 +3,6 @@ submodule(Calculate_Ice) Calculate_Ice_EXP_Implementation
     implicit none
 contains
     module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, nsize) result(structure)
-        use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: phi

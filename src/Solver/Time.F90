@@ -3,6 +3,9 @@ module Solver_Time
     use :: Inout_Input
     use :: Core_Allocate, only:Allocate_Array
     implicit none
+    private
+
+    public :: Type_Time
 
     type :: Type_Time
         real(real64) :: start_time

@@ -1,16 +1,14 @@
 module Main_Thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Types, only:Variables, DP3d, Vector2d
+    use :: Core_BaseTypes, only:Variables, DP3d, Vector2d
+    use :: Core_Element
     use :: Inout_Input
     use :: Calculate_Ice, only:Abstract_Ice, Type_Ice_TRM, Type_Ice_GCC, Type_Ice_EXP
     use :: Calculate_VolumetricHeatCapacity
     use :: Calculate_ThermalConductivity
-    use :: Calculate_Area, only:Update_Area
-    use :: Calculate_Shape, only:Calculate_Basis
     use :: Matrix_Assemble
     use :: Matrix_CRS
     use :: Condition_Fix_Boundary_Conditions, only:Type_BC_Thermal
-    use :: Solver_Element
     use :: Solver_Solve
     implicit none
 

@@ -3,7 +3,6 @@ submodule(Calculate_Ice) Calculate_Ice_GCC_Implementation
     implicit none
 contains
     module function Construct_Type_Ice_GCC(ModelType, isSegregation, c_unit, nsize, thetaS, thetaR, alpha1, n1, w1, hcrit, alpha2, n2, Tf, Lf, rhoI) result(construct)
-        use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         integer(int32), intent(in) :: ModelType
         logical(4), intent(in) :: isSegregation

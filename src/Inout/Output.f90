@@ -5,8 +5,10 @@ module Inout_Output
     use :: Core_Allocate
     use :: Core_Error
     use :: Inout_Input
-    use :: Solver_Element
+    use :: Core_Element
     use :: Main_Thermal
+
+    use :: stdlib_strings, only:to_string
 
     implicit none
     private
@@ -369,7 +371,6 @@ contains
     end subroutine Inout_Output_All
 
     subroutine Inout_Output_All_vtk(self, fc, Temp, Si, Pres, wFlux)
-        use :: stdlib_strings, only:to_string
         implicit none
         class(Type_Output) :: self
         integer(int32), intent(in) :: fc
@@ -530,7 +531,6 @@ contains
     end subroutine Inout_Output_All_vtu
 
     subroutine Inout_Output_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal)
-        use :: stdlib_strings, only:to_string
         implicit none
         class(Type_Output) :: self
         real(real64), intent(in) :: time
@@ -630,7 +630,6 @@ contains
     end subroutine Inout_Output_Observation
 
     subroutine Inout_Output_Observation_Header(self, time, data_name)
-        use :: stdlib_strings, only:to_string
         implicit none
         class(Type_Output) :: self
         real(real64), intent(in) :: time

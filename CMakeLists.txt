@@ -9,7 +9,7 @@ option(ENABLE_OPTIMIZE "Enable optimization flags" ON)
 option(ENABLE_OPENMP   "Enable OpenMP support"     ON)
 option(ENABLE_MKL      "Enable MKL support"        ON)
 option(ENABLE_MPI      "Enable MPI support"        OFF)
-option(ENABLE_DEBUG    "Enable debug flags"        OFF)
+option(ENABLE_DEBUG    "Enable debug flags"        ON)
 
 # Select the application to build
 set(BUILD_APP "" CACHE STRING "Specify the application to build: ysy_fc or test")

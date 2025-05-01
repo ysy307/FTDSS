@@ -3,6 +3,7 @@ module Calculate_Ice
     use :: Calculate_WRF
     use :: Calculate_GCC
     use :: Core_BaseTypes, only:Variables
+    use :: Core_Allocate, only:Allocate_Array
 #ifdef _OPENMP
     use omp_lib
 #endif

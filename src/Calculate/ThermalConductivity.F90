@@ -81,7 +81,6 @@ contains
     ! Constructe each type of heat conductivity
     !----------------------------------------------------------------------------------------------------
     function Construct_ThermalConductivity_3Phase(lambad_soil, lambad_water, lambad_ice, nsize) result(structure)
-        use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         real(real64), intent(in) :: lambad_soil
         real(real64), intent(in) :: lambad_water

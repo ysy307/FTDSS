@@ -15,6 +15,10 @@
         "*.F90": "FortranFreeForm"
     },
     "fortran.fortls.path": "/usr/local/bin/fortls",
+    // "fortran.fortls.extraArgs": [
+    //     "--config",
+    //     ".vscode/.fortls"
+    // ],
     "fortran.linter.extraArgs": [
         "-fpp",
         "-module",
@@ -24,8 +28,15 @@
         "-module",
         "/opt/intel/oneapi/2025.1/include/mpi",
         "-module",
+        "-isystem",
         "/workspaces/FTDSS/EXTERNAL/fortran_stdlib/include/fortran_stdlib/IntelLLVM-2025.0.4",
         "-I/workspaces/FTDSS/include/Json-Fortran",
+        "-I/workspaces/FTDSS/include/VTKFortran",
+        "/workspaces/FTDSS/lib/libjsonfortran-static.a",
+        "/workspaces/FTDSS/lib/libjsonfortran.a",
+        "/workspaces/FTDSS/lib/libtomlf.a",
+        "/workspaces/FTDSS/lib/libvtkfortran.a",
+        "/workspaces/FTDSS/EXTERNAL/fortran_stdlib/lib/libfortran_stdlib.a",
         "-D_MKL"
     ],
     "fortran.linter.compiler": "ifx",
@@ -86,7 +97,8 @@
         "files.encoding": "utf8"
     },
     "files.exclude": {
-        "**/.git": false
+        "**/.git": true,
+        "**/.tmp.drive*": true
     },
     "docker.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
     "workbench.colorCustomizations": {
@@ -107,5 +119,7 @@
     "editor.rulers": [
         132
     ],
-    "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
+    "fortran.fortls.preprocessor.suffixes": [
+        "F90"
+    ],
 }

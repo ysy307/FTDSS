@@ -162,7 +162,7 @@ contains
 
         call Allocate_Array(self%new, nsize)
         call Allocate_Array(self%pre, nsize)
-        call Allocate_Array(self%old, nsize, self%rank + 1)
+        call Allocate_Array(self%old, nsize, self%rank + 1_int32)
         call Allocate_Array(self%dif, nsize)
 
         self%new(:) = 0.0d0

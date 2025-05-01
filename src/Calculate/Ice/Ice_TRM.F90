@@ -4,7 +4,6 @@ submodule(Calculate_Ice) Calculate_Ice_TRM_Implementation
 
 contains
     module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(structure)
-        use :: Allocate_Allocate, only:Allocate_Array
         implicit none
         real(real64), intent(in) :: Lf
         real(real64), intent(in) :: Tf

@@ -1,6 +1,7 @@
 module Core_Unique
     use, intrinsic :: iso_fortran_env
     use :: stdlib_sorting
+    use :: Core_Allocate, only:Allocate_Array
     implicit none
 
     interface Unique
@@ -22,7 +23,7 @@ contains
 
         if (size(array) == 0) then
             ! 空の配列が渡された場合
-            call Allocate_Array(unique_array, 0_int8)
+            call Allocate_Array(unique_array, 0_int32)
             return
         end if
 
@@ -58,7 +59,7 @@ contains
 
         if (size(array) == 0) then
             ! 空の配列が渡された場合
-            call Allocate_Array(unique_array, 0_int16)
+            call Allocate_Array(unique_array, 0_int32)
             return
         end if
 

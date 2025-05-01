@@ -271,7 +271,43 @@
             "args": [
                 "Scripts/Compile-Cmake-test.sh",
                 ">|",
-                "compile.log"
+                "log/compile.log"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "cmake build",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": "cmake",
+            "args": [
+                "-S",
+                ".",
+                "-B",
+                "CMakeBuild",
+                "-DBUILD_APP=test",
+                "-G",
+                "Ninja",
+                "-DCMAKE_VERBOSE_MAKEFILE=ON",
+                "&&",
+                "cmake",
+                "--build",
+                "CMakeBuild",
+                ">|",
+                "log/compile.log"
             ],
             "presentation": {
                 "echo": false,

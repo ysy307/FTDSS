@@ -1,7 +1,7 @@
 module Core_VTK
-    use, intrinsic :: iso_fortran_env, only: int8, int32, real64
+    use, intrinsic :: iso_fortran_env
     use :: Core_BaseTypes, only:DP3d
-    use :: Allocate_Allocate, only:Allocate_Array
+    use :: Core_Allocate, only:Allocate_Array
     implicit none
     private
 
