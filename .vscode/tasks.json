@@ -261,7 +261,32 @@
             "label": "cmake build & testrun",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceRoot}/CMakeBuild",
+                "cwd": "${workspaceRoot}/",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": "zsh",
+            "args": [
+                "Scripts/Compile-Cmake-test.sh",
+                ">|",
+                "log/compile.log"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "cmake build",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/",
             },
             "group": {
                 "kind": "build",
@@ -270,23 +295,19 @@
             "command": "cmake",
             "args": [
                 "-S",
-                "..",
-                "-DBUILD_APP=test",
-                "-DCMAKE_Fortran_COMPILER=ifx",
-                "-B",
                 ".",
+                "-B",
+                "CMakeBuild",
+                "-DBUILD_APP=test",
                 "-G",
                 "Ninja",
+                "-DCMAKE_VERBOSE_MAKEFILE=ON",
                 "&&",
                 "cmake",
                 "--build",
-                ".",
-                "&&",
-                "cmake",
-                "--build",
-                ".",
-                "--target",
-                "run_test"
+                "CMakeBuild",
+                ">|",
+                "log/compile.log"
             ],
             "presentation": {
                 "echo": false,

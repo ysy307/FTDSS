@@ -1,0 +1,89 @@
+{
+    "BoundaryConditions": {
+        "Groups": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ],
+        "2": {
+            "Thermal": {
+                "Type": "Adiabatic"
+            },
+            "Hydraulic": {
+                "Type": "Impermeable"
+            }
+        },
+        "3": {
+            "Thermal": {
+                "Type": "Adiabatic"
+            },
+            "Hydraulic": {
+                "Type": "Impermeable"
+            }
+        },
+        "4": {
+            "Thermal": {
+                "Type": "Adiabatic"
+            },
+            "Hydraulic": {
+                "Type": "Impermeable"
+            }
+        },
+        "5": {
+            "Thermal": {
+                "Type": "Adiabatic"
+            },
+            "Hydraulic": {
+                "Type": "Dirichlet",
+                "Uniform": true,
+                "Value": 0.0
+            }
+        },
+        "6": {
+            "Thermal": {
+                "Type": "Dirichlet",
+                "Uniform": true,
+                "Value": [
+                    -10.0
+                ]
+            },
+            "Hydraulic": {
+                "Type": "Impermeable"
+            }
+        },
+        "7": {
+            "Thermal": {
+                "Type": "Dirichlet",
+                "Uniform": true,
+                "Value": [
+                    -10.0
+                ]
+            },
+            "Hydraulic": {
+                "Type": "Impermeable"
+            }
+        }
+    },
+    "InitialConditions": {
+        "Thermal": {
+            "Type": "Constant",
+            "Value": 18.0
+        },
+        "Hydraulic": {
+            "Type": "Laplace",
+            "Value": {
+                "3": {
+                    "Type": "Dirichlet",
+                    "Value": 0.1
+                },
+                "5": {
+                    "Type": "Dirichlet",
+                    "Value": 0.0
+                }
+            }
+        }
+    }
+}

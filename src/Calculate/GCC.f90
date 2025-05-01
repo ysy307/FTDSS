@@ -1,157 +1,334 @@
 module Calculate_GCC
     use, intrinsic :: iso_fortran_env, only: int32, real64
+#ifdef _OPENMP
+!$  use omp_lib
+#endif
     implicit none
     private
-    real(real64), parameter :: g = 9.80665d0
-    real(real64), parameter :: TtoK = 273.15d0
 
-    public :: Calculate_GCC_NonSegregation
-    public :: Calculate_GCC_Segregation
-    public :: Set_Calculate_GCC_Segregation
+    public :: Abstract_GCC
+    public :: Type_GCC_NonSegregation_m
+    public :: Type_GCC_NonSegregation_Pa
+    public :: Type_GCC_Segregation_m
+    public :: Type_GCC_Segregation_Pa
 
-    interface Calculate_GCC_NonSegregation
-        module procedure Calculate_GCC_NonSegregation_kPa
-        module procedure Calculate_GCC_NonSegregation_m
-    end interface Calculate_GCC_NonSegregation
+    type, abstract :: Abstract_GCC
+        real(real64) :: Tf !! Freezing point
+        real(real64) :: Lf !! Latent heat of fusion
+        real(real64), private :: TtoK = 273.15d0
+        real(real64), private :: g = 9.80665d0
+    end type Abstract_GCC
 
-    interface Calculate_GCC_NonSegregation_Derivative
-        module procedure Calculate_GCC_NonSegregation_Derivative_kPa
-        module procedure Calculate_GCC_NonSegregation_Derivative_m
-    end interface Calculate_GCC_NonSegregation_Derivative
+    type, extends(Abstract_GCC) :: Type_GCC_NonSegregation_m
+    contains
+        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_NonSegregation_m
+        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_NonSegregation_Derivative_m
+    end type Type_GCC_NonSegregation_m
 
-    abstract interface
-        function Calculate_GCC_Segregation_interface(T, Pw, Tf, Lf, rhoW, rhoI) result(Suction)
+    type, extends(Abstract_GCC) :: Type_GCC_NonSegregation_Pa
+    contains
+        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_NonSegregation_Pa
+        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_NonSegregation_Derivative_Pa
+    end type Type_GCC_NonSegregation_Pa
+
+    type, abstract, extends(Abstract_GCC) :: Abstract_GCC_Segregation
+        real(real64) :: rhoI !! Density of ice
+    contains
+        procedure(Abstract_Calculate_GCC_Segregation), pass(self), deferred :: Calculate_GCC
+        procedure(Abstract_Calculate_GCC_Segregation_Derivative), pass(self), deferred :: Calculate_GCC_Derivative
+    end type Abstract_GCC_Segregation
+
+    type, extends(Abstract_GCC_Segregation) :: Type_GCC_Segregation_m
+    contains
+        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_Segregation_m
+        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_Segregation_Derivative_m
+    end type Type_GCC_Segregation_m
+
+    type, extends(Abstract_GCC_Segregation) :: Type_GCC_Segregation_Pa
+    contains
+        procedure, pass(self) :: Calculate_GCC => Calculate_GCC_Segregation_Pa
+        procedure, pass(self) :: Calculate_GCC_Derivative => Calculate_GCC_Segregation_Derivative_Pa
+    end type Type_GCC_Segregation_Pa
+
+    interface
+        function Abstract_Calculate_GCC_Segregation(self, T, Pw, rhoW) result(Suction)
             use, intrinsic :: iso_fortran_env, only: real64
+            import :: Abstract_GCC_Segregation
             implicit none
-            real(real64), intent(in) :: T, Pw, Tf, Lf, rhoW, rhoI
+            class(Abstract_GCC_Segregation), intent(in) :: self
+            real(real64), intent(in) :: T
+            real(real64), intent(in) :: Pw
+            real(real64), intent(in) :: rhoW
             real(real64) :: Suction
-        end function Calculate_GCC_Segregation_interface
+        end function Abstract_Calculate_GCC_Segregation
+
+        function Abstract_Calculate_GCC_Segregation_Derivative(self, T, Pw, rhoW) result(Suction_Derivative)
+            use, intrinsic :: iso_fortran_env, only: real64
+            import :: Abstract_GCC_Segregation
+            implicit none
+            class(Abstract_GCC_Segregation), intent(in) :: self
+            real(real64), intent(in) :: T
+            real(real64), intent(in) :: Pw
+            real(real64), intent(in) :: rhoW
+            real(real64) :: Suction_Derivative
+        end function Abstract_Calculate_GCC_Segregation_Derivative
     end interface
 
-    procedure(Calculate_GCC_Segregation_interface), pointer :: Calculate_GCC_Segregation => null()
-    procedure(Calculate_GCC_Segregation_interface), pointer :: Calculate_GCC_Segregation_Derivative => null()
+    interface Type_GCC_NonSegregation_m
+        module procedure Construct_Type_GCC_NonSegregation_m
+        module procedure Construct_Type_GCC_NonSegregation_m_minimum
+    end interface
+
+    interface Type_GCC_NonSegregation_Pa
+        module procedure Construct_Type_GCC_NonSegregation_Pa
+        module procedure Construct_Type_GCC_NonSegregation_Pa_minimum
+    end interface
+
+    interface Type_GCC_Segregation_m
+        module procedure Construct_Type_GCC_Segregation_m
+        module procedure Construct_Type_GCC_Segregation_m_minimum
+    end interface
+
+    interface Type_GCC_Segregation_Pa
+        module procedure Construct_Type_GCC_Segregation_Pa
+        module procedure Construct_Type_GCC_Segregation_Pa_minimum
+    end interface
 
 contains
-
-    function Calculate_GCC_NonSegregation_kPa(T, Tf, Lf, rhoW) result(Suction_kPa)
+    function Construct_Type_GCC_NonSegregation_m(Tf, Lf) result(structure)
         implicit none
-        real(real64), intent(in) :: T, Tf, Lf, rhoW
-        real(real64) :: Suction_kPa
+        real(real64), intent(in) :: Tf
+        real(real64), intent(in) :: Lf
+        class(Abstract_GCC), allocatable :: structure
 
-        if (T <= Tf) then
-            Suction_kPa = -Lf * rhoW * log((T + TtoK) / (Tf + TtoK))
-        else
-            Suction_kPa = 0.0d0
-        end if
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_m :: structure)
 
-    end function Calculate_GCC_NonSegregation_kPa
+        select type (this => structure)
+        type is (Type_GCC_NonSegregation_m)
+            this%Lf = Lf
+            this%Tf = Tf
+        end select
 
-    function Calculate_GCC_NonSegregation_m(T, Tf, Lf) result(Suction_m)
+    end function Construct_Type_GCC_NonSegregation_m
+
+    function Construct_Type_GCC_NonSegregation_m_minimum() result(structure)
         implicit none
-        real(real64), intent(in) :: T, Tf, Lf
-        real(real64) :: Suction_m
+        class(Abstract_GCC), allocatable :: structure
 
-        if (T <= Tf) then
-            Suction_m = -Lf * log((T + TtoK) / (Tf + TtoK)) / g
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_m :: structure)
+
+    end function Construct_Type_GCC_NonSegregation_m_minimum
+
+    function Calculate_GCC_NonSegregation_m(self, T) result(Suction)
+        !$omp declare simd uniform(self, T)
+        implicit none
+        class(Type_GCC_NonSegregation_m), intent(in) :: self
+        real(real64), intent(in) :: T
+        real(real64) :: Suction
+
+        if (T <= self%Tf) then
+            Suction = -self%Lf * log((T + self%TtoK) / (self%Tf + self%TtoK)) / self%g
         else
-            Suction_m = 0.0d0
+            Suction = 0.0d0
         end if
 
     end function Calculate_GCC_NonSegregation_m
 
-    function Calculate_GCC_NonSegregation_Derivative_kPa(T, Tf, Lf, rhoW) result(Suction_kPa_Derivative)
+    function Calculate_GCC_NonSegregation_Derivative_m(self, T) result(Suction)
+        !$omp declare simd uniform(self, T)
         implicit none
-        real(real64), intent(in) :: T, Tf, Lf, rhoW
-        real(real64) :: Suction_kPa_Derivative
+        class(Type_GCC_NonSegregation_m), intent(in) :: self
+        real(real64), intent(in) :: T
+        real(real64) :: Suction
 
-        if (T <= Tf) then
-            Suction_kPa_Derivative = -Lf * rhoW / (T + TtoK)
+        if (T <= self%Tf) then
+            Suction = -self%Lf / ((T + self%TtoK) * self%g)
         else
-            Suction_kPa_Derivative = 0.0d0
-        end if
-
-    end function Calculate_GCC_NonSegregation_Derivative_kPa
-
-    function Calculate_GCC_NonSegregation_Derivative_m(T, Tf, Lf) result(Suction_m)
-        implicit none
-        real(real64), intent(in) :: T, Tf, Lf
-        real(real64) :: Suction_m
-
-        if (T <= Tf) then
-            Suction_m = -Lf / ((T + TtoK) * g)
-        else
-            Suction_m = 0.0d0
+            Suction = 0.0d0
         end if
 
     end function Calculate_GCC_NonSegregation_Derivative_m
 
-    subroutine Set_Calculate_GCC_Segregation(Segregation_type)
+    function Construct_Type_GCC_NonSegregation_Pa(Tf, Lf) result(structure)
         implicit none
-        integer(int32), intent(in) :: Segregation_type
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: Tf
+        class(Abstract_GCC), allocatable :: structure
 
-        if (associated(Calculate_GCC_Segregation)) nullify (Calculate_GCC_Segregation)
-        if (associated(Calculate_GCC_Segregation_Derivative)) nullify (Calculate_GCC_Segregation_Derivative)
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_Pa :: structure)
 
-        select case (Segregation_type)
-        case (1)
-            Calculate_GCC_Segregation => Calculate_GCC_Segregation_kPa
-            Calculate_GCC_Segregation_Derivative => Calculate_GCC_Segregation_Derivative_kPa
-        case (2)
-            Calculate_GCC_Segregation => Calculate_GCC_Segregation_m
-            Calculate_GCC_Segregation_Derivative => Calculate_GCC_Segregation_Derivative_m
+        select type (this => structure)
+        type is (Type_GCC_NonSegregation_Pa)
+            this%Lf = Lf
+            this%Tf = Tf
         end select
-    end subroutine Set_Calculate_GCC_Segregation
 
-    function Calculate_GCC_Segregation_kPa(T, Pw_kPa, Tf, Lf, rhoW, rhoI) result(Suction_kPa)
+    end function Construct_Type_GCC_NonSegregation_Pa
+
+    function Construct_Type_GCC_NonSegregation_Pa_minimum() result(structure)
         implicit none
-        real(real64), intent(in) :: T, Pw_kPa, Tf, Lf, rhoW, rhoI
-        real(real64) :: Suction_kPa
+        class(Abstract_GCC), allocatable :: structure
 
-        if (T <= Tf) then
-            Suction_kPa = (rhoI / rhoW - 1.0d0) * Pw_kPa - Lf * rhoI * log((T + TtoK) / (Tf + TtoK))
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_NonSegregation_Pa :: structure)
+
+    end function Construct_Type_GCC_NonSegregation_Pa_minimum
+
+    function Calculate_GCC_NonSegregation_Pa(self, T, rhoW) result(Suction)
+        !$omp declare simd uniform(self, T, rhoW)
+        implicit none
+        class(Type_GCC_NonSegregation_Pa), intent(in) :: self
+        real(real64), intent(in) :: T, rhoW
+        real(real64) :: Suction
+
+        if (T <= self%Tf) then
+            Suction = -self%Lf * rhoW * log((T + self%TtoK) / (self%Tf + self%TtoK))
         else
-            Suction_kPa = 0.0d0
+            Suction = 0.0d0
         end if
 
-    end function Calculate_GCC_Segregation_kPa
+    end function Calculate_GCC_NonSegregation_Pa
 
-    function Calculate_GCC_Segregation_m(T, Pw_m, Tf, Lf, rhoW, rhoI) result(Suction_m)
+    function Calculate_GCC_NonSegregation_Derivative_Pa(self, T, rhoW) result(Suction_Derivative)
+        !$omp declare simd uniform(self, T, rhoW)
         implicit none
-        real(real64), intent(in) :: T, Pw_m, Tf, Lf, rhoW, rhoI
-        real(real64) :: Suction_m
+        class(Type_GCC_NonSegregation_Pa), intent(in) :: self
+        real(real64), intent(in) :: T, rhoW
+        real(real64) :: Suction_Derivative
 
-        if (T <= Tf) then
-            Suction_m = ((rhoI / rhoW - 1.0d0) * Pw_m - Lf * rhoI * log((T + TtoK) / (Tf + TtoK))) / (rhoW * g)
+        if (T <= self%Tf) then
+            Suction_Derivative = -self%Lf * rhoW / (T + self%TtoK)
         else
-            Suction_m = 0.0d0
+            Suction_Derivative = 0.0d0
+        end if
+
+    end function Calculate_GCC_NonSegregation_Derivative_Pa
+
+    function Construct_Type_GCC_Segregation_m(Tf, Lf, rhoI) result(structure)
+        implicit none
+        real(real64), intent(in) :: Tf
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: rhoI
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_m :: structure)
+
+        select type (this => structure)
+        type is (Type_GCC_Segregation_m)
+            this%Lf = Lf
+            this%Tf = Tf
+            this%rhoI = rhoI
+        end select
+
+    end function Construct_Type_GCC_Segregation_m
+
+    function Construct_Type_GCC_Segregation_m_minimum() result(structure)
+        implicit none
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_m :: structure)
+
+    end function Construct_Type_GCC_Segregation_m_minimum
+
+    function Calculate_GCC_Segregation_m(self, T, Pw, rhoW) result(Suction)
+        !$omp declare simd uniform(self, T, rhoW)
+        implicit none
+        class(Type_GCC_Segregation_m), intent(in) :: self
+        real(real64), intent(in) :: T
+        real(real64), intent(in) :: Pw
+        real(real64), intent(in) :: rhoW
+        real(real64) :: Suction
+
+        if (T <= self%Tf) then
+            Suction = ((self%rhoI / rhoW - 1.0d0) * Pw - self%Lf * self%rhoI * log((T + self%TtoK) / (self%Tf + self%TtoK))) / (rhoW * self%g)
+        else
+            Suction = 0.0d0
         end if
 
     end function Calculate_GCC_Segregation_m
 
-    function Calculate_GCC_Segregation_Derivative_kPa(T, Pw_kPa, Tf, Lf, rhoW, rhoI) result(Suction_kPa_Derivative)
+    function Calculate_GCC_Segregation_Derivative_m(self, T, Pw, rhoW) result(Suction_Derivative)
+        !$omp declare simd uniform(self, T, Pw, rhoW)
         implicit none
-        real(real64), intent(in) :: T, Pw_kPa, Tf, Lf, rhoW, rhoI
-        real(real64) :: Suction_kPa_Derivative
+        class(Type_GCC_Segregation_m), intent(in) :: self
+        real(real64), intent(in) :: T
+        real(real64), intent(in) :: Pw
+        real(real64), intent(in) :: rhoW
+        real(real64) :: Suction_Derivative
 
-        if (T <= Tf) then
-            Suction_kPa_Derivative = -Lf * rhoW / (T + TtoK)
+        if (T <= self%Tf) then
+            Suction_Derivative = -self%Lf * self%rhoI / ((T + self%TtoK) * rhoW * self%g)
         else
-            Suction_kPa_Derivative = 0.0d0
-        end if
-
-    end function Calculate_GCC_Segregation_Derivative_kPa
-
-    function Calculate_GCC_Segregation_Derivative_m(T, Pw_m, Tf, Lf, rhoW, rhoI) result(Suction_m_Derivative)
-        implicit none
-        real(real64), intent(in) :: T, Pw_m, Tf, Lf, rhoW, rhoI
-        real(real64) :: Suction_m_Derivative
-
-        if (T <= Tf) then
-            Suction_m_Derivative = -Lf / ((T + TtoK) * g)
-        else
-            Suction_m_Derivative = 0.0d0
+            Suction_Derivative = 0.0d0
         end if
 
     end function Calculate_GCC_Segregation_Derivative_m
+
+    function Construct_Type_GCC_Segregation_Pa(Tf, Lf, rhoI) result(structure)
+        implicit none
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: Tf
+        real(real64), intent(in) :: rhoI
+        class(Abstract_GCC), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_Pa :: structure)
+
+        select type (this => structure)
+        type is (Type_GCC_Segregation_Pa)
+            this%Lf = Lf
+            this%Tf = Tf
+            this%rhoI = rhoI
+        end select
+
+    end function Construct_Type_GCC_Segregation_Pa
+
+    function Construct_Type_GCC_Segregation_Pa_minimum() result(structure)
+        implicit none
+        class(Abstract_GCC_Segregation), allocatable :: structure
+
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_GCC_Segregation_Pa :: structure)
+
+    end function Construct_Type_GCC_Segregation_Pa_minimum
+
+    function Calculate_GCC_Segregation_Pa(self, T, Pw, rhoW) result(Suction)
+        !$omp declare simd uniform(self, T, Pw, rhoW)
+        implicit none
+        class(Type_GCC_Segregation_Pa), intent(in) :: self
+        real(real64), intent(in) :: T
+        real(real64), intent(in) :: Pw
+        real(real64), intent(in) :: rhoW
+        real(real64) :: Suction
+
+        if (T <= self%Tf) then
+            Suction = (self%rhoI / rhoW - 1.0d0) * Pw - self%Lf * self%rhoI * log((T + self%TtoK) / (self%Tf + self%TtoK))
+        else
+            Suction = 0.0d0
+        end if
+
+    end function Calculate_GCC_Segregation_Pa
+
+    function Calculate_GCC_Segregation_Derivative_Pa(self, T, Pw, rhoW) result(Suction_Derivative)
+        !$omp declare simd uniform(self, T, Pw, rhoW)
+        implicit none
+        class(Type_GCC_Segregation_Pa), intent(in) :: self
+        real(real64), intent(in) :: T
+        real(real64), intent(in) :: Pw
+        real(real64), intent(in) :: rhoW
+        real(real64) :: Suction_Derivative
+
+        if (T <= self%Tf) then
+            Suction_Derivative = -self%Lf * self%rhoI / (T + self%TtoK)
+        else
+            Suction_Derivative = 0.0d0
+        end if
+
+    end function Calculate_GCC_Segregation_Derivative_Pa
 
 end module Calculate_GCC

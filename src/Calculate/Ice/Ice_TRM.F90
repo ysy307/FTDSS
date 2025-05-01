@@ -1,0 +1,95 @@
+submodule(Calculate_Ice) Calculate_Ice_TRM_Implementation
+    use, intrinsic :: iso_fortran_env, only: int32, real64
+    implicit none
+
+contains
+    module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(structure)
+        implicit none
+        real(real64), intent(in) :: Lf
+        real(real64), intent(in) :: Tf
+        integer(int32), intent(in) :: nsize
+        class(Abstract_Ice), allocatable :: structure
+
+        allocate (Type_Ice_TRM :: structure)
+
+        select type (this => structure)
+        type is (Type_Ice_TRM)
+            this%Lf = Lf
+            this%Tf = Tf
+            this%nsize = nsize
+
+            call this%Qw%allocate(nsize, 3)
+            call this%Qice%allocate(nsize, 3)
+            call this%Si%allocate(nsize, 3)
+
+        end select
+
+    end function Construct_Type_Ice_TRM
+
+    module function Construct_Type_Ice_TRM_minimum() result(structure)
+        implicit none
+        class(Abstract_Ice), allocatable :: structure
+
+        allocate (Type_Ice_TRM :: structure)
+
+    end function Construct_Type_Ice_TRM_minimum
+
+    module subroutine Update_Ice_TRM_scalar(self, rhoW, arr_Cp)
+        implicit none
+        class(Type_Ice_TRM), intent(inout) :: self
+        real(real64), intent(in) :: rhoW
+        real(real64), intent(in) :: arr_Cp(:)
+
+        integer(int32) :: iN
+        real(real64) :: C, tmpSi
+
+        !$omp parallel do schedule(guided) private(iN, C, tmpSi)
+        do iN = 1, self%nsize
+            C = arr_Cp(iN) / (self%Qw%pre(iN) * rhoW * self%Lf)
+            tmpSi = self%Si%old(iN, 1) + C * (self%Tf - self%Temperature%new(iN))
+
+            if (tmpSi <= 0.0d0 .and. self%Si%old(iN, 1) == 0.0d0) then
+                self%Si%new(iN) = 0.0d0
+            else if (tmpSi >= 1.0d0 .and. self%Si%old(iN, 1) == 1.0d0) then
+                self%Si%new(iN) = 1.0d0
+            else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN, 1) <= 1.0d0) then
+                self%Temperature%new(iN) = self%Tf
+                self%Si%new(iN) = tmpSi
+            else if (0.0d0 < self%Si%old(iN, 1) .and. self%Si%old(iN, 1) < 1.0d0 .and. tmpSi >= 1.0d0) then
+                self%Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
+                self%Si%new(iN) = 1.0d0
+            end if
+        end do
+
+    end subroutine Update_Ice_TRM_scalar
+
+    module subroutine Update_Ice_TRM_array(self, arr_rhoW, arr_Cp)
+        implicit none
+        class(Type_Ice_TRM), intent(inout) :: self
+        real(real64), intent(in) :: arr_rhoW(:)
+        real(real64), intent(in) :: arr_Cp(:)
+
+        integer(int32) :: iN
+        real(real64) :: C, tmpSi
+
+        !$omp parallel do schedule(guided) private(iN, C, tmpSi)
+        do iN = 1, self%nsize
+            C = arr_Cp(iN) / (self%Qw%pre(iN) * arr_rhoW(iN) * self%Lf)
+            tmpSi = self%Si%old(iN, 1) + C * (self%Tf - self%Temperature%new(iN))
+
+            if (tmpSi <= 0.0d0 .and. self%Si%old(iN, 1) == 0.0d0) then
+                self%Si%new(iN) = 0.0d0
+            else if (tmpSi >= 1.0d0 .and. self%Si%old(iN, 1) == 1.0d0) then
+                self%Si%new(iN) = 1.0d0
+            else if (0.0d0 < tmpSi .and. tmpSi < 1.0d0 .and. self%Si%old(iN, 1) <= 1.0d0) then
+                self%Temperature%new(iN) = self%Tf
+                self%Si%new(iN) = tmpSi
+            else if (0.0d0 < self%Si%old(iN, 1) .and. self%Si%old(iN, 1) < 1.0d0 .and. tmpSi >= 1.0d0) then
+                self%Temperature%new(iN) = self%Tf + (1.0d0 - tmpSi) / C
+                self%Si%new(iN) = 1.0d0
+            end if
+        end do
+
+    end subroutine Update_Ice_TRM_array
+
+end submodule Calculate_Ice_TRM_Implementation

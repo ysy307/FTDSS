@@ -1,12 +1,18 @@
 module Calculate_BLAS
-    use omp_lib
-    use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Types
+    use, intrinsic :: iso_fortran_env, only: int32, int64, real64
+#ifdef _OPENMP
+    use :: omp_lib
+#endif
     implicit none
     private
+#ifdef _MKL
+    include "mkl_blas.fi"
+
+    integer :: converter
+#endif
 
     public :: norm_2
-    public :: ddots
+    public :: dot
 
 contains
 
@@ -15,50 +21,41 @@ contains
         integer(int32), intent(in) :: N
         real(real64), intent(in) :: x(:)
         real(real64) :: norm
-        integer(int32) :: iN, ithread, nthreads
-        real(real64), allocatable :: partial_sums(:)
+        integer(int32) :: iN
 
-        ! nthreads = omp_get_max_threads()
-        ! allocate(partial_sums(nthreads))
-        ! partial_sums = 0.0d0
         norm = 0.0d0
 
-        ! $omp parallel private(iN, ithread)
-        ! ithread = omp_get_thread_num() + 1
-        ! $omp do
+#ifdef _MKL
+        norm = dnrm2(transfer(N, converter), x, 1)
+#else
+        !$omp parallel do private(iN) reduction(+:norm)
         do iN = 1, N
             norm = norm + x(iN)**2
         end do
-        ! $omp end do
-        ! $omp end parallel
-
-        ! メモリ解放
-        deallocate (partial_sums)
+        !$omp end parallel do
+        norm = sqrt(norm)
+#endif
     end function norm_2
 
-    function ddots(N, x, y) result(dot)
+    function dot(N, x, y) result(d_dot)
         implicit none
         integer(int32), intent(in) :: N
-        real(real64), intent(in) :: x(:), y(:)
-        real(real64) :: dot
-        integer(int32) :: iN, ithread, nthreads
-        real(real64), allocatable :: partial_sums(:)
+        real(real64), intent(in) :: x(:)
+        real(real64), intent(in) :: y(:)
+        real(real64) :: d_dot
+        integer(int32) :: iN
 
-        ! nthreads = omp_get_max_threads()
-        ! allocate(partial_sums(nthreads))
-        ! partial_sums = 0.0d0
-        dot = 0.0d0
+        d_dot = 0.0d0
 
-        ! $omp parallel private(iN, ithread)
-        ! ithread = omp_get_thread_num() + 1
-        ! $omp do
+#ifdef _MKL
+        d_dot = ddot(transfer(N, converter), x, 1, y, 1)
+#else
+        !$omp parallel do private(iN) reduction(+:d_dot)
         do iN = 1, N
-            dot = dot + x(iN) * y(iN)
+            d_dot = d_dot + x(iN) * y(iN)
         end do
-        ! $omp end do
-        ! $omp end parallel
-
-        ! dot = sum(partial_sums)
-    end function ddots
+        !$omp end parallel do
+#endif
+    end function dot
 
 end module Calculate_BLAS
