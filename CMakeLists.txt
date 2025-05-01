@@ -62,6 +62,7 @@ add_library(Core
     src/Core/Element/Element_SquareFirst.F90
     src/Core/Element/Element_TriangleFirst.F90
     src/Core/Side/Side.F90
+    src/Core/Side/Side_First.F90
     src/Core/Unique.F90
     src/Core/VTK.F90
 )
@@ -126,6 +127,7 @@ target_link_libraries(calc_ice PRIVATE calc_gcc calc_wrf Core)
 add_library(calc_props
     src/Calculate/ThermalConductivity.F90
     src/Calculate/VolumetricHeatCapacity.F90
+    src/Calculate/Density.F90
 )
 target_link_libraries(calc_props PRIVATE Core calc_ice calc_gcc)
 

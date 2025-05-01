@@ -27,25 +27,37 @@ module Main_Thermal
 
         integer(int32) :: nsize
         integer(int32) :: nElement
-        real(real64), allocatable :: Area(:)
         type(DP3d), pointer :: Coordinate
         type(ElementHolder), allocatable :: Elements(:)
-        real(real64), allocatable :: Basis(:, :, :)
         type(Type_BC_Thermal) :: BC
         class(Abstract_Solver_CRS), allocatable :: Solver
         class(Abstract_Ice), allocatable :: Ice
+    contains
+        procedure(Abstract_Assemble), pass(self), deferred :: Assemble
     end type Abstract_Thermal
 
     type, extends(Abstract_Thermal) :: Type_Thermal_3Phase_2D
         type(Type_VolumetricHeatCapacity_3Phase) :: C
         type(Type_ThermalConductivity_3Phase) :: lambda
     contains
-        procedure :: Assemble => Type_Thermal_3Phase_2D_Assemble
+        procedure, pass(self) :: Assemble => Type_Thermal_3Phase_2D_Assemble
         procedure :: Update => Type_Thermal_3Phase_2D_Update
     end type Type_Thermal_3Phase_2D
 
     interface Type_Thermal_3Phase_2D
         module procedure Type_Thermal_3Phase_2D_Construct
+    end interface
+
+    abstract interface
+        subroutine Abstract_Assemble(self, dt, step, iter)
+            import :: Abstract_Thermal, int32, real64
+            implicit none
+            class(Abstract_Thermal), intent(inout) :: self
+            real(real64), intent(in) :: dt
+            integer(int32), intent(in) :: step
+            integer(int32), intent(in) :: iter
+
+        end subroutine Abstract_Assemble
     end interface
 
 contains
@@ -91,10 +103,10 @@ contains
                 select case (Structure_Input%VTK%CELLS(iCell)%CellType)
                 case (5) ! VTK_TRIANGLE
                     idx = idx + 1
-                    structure%Elements(idx)%e = TriangleFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
+                    structure%Elements(idx)%e = TriangleFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY)
                 case (9) ! VTK_QUAD
                     idx = idx + 1
-                    structure%Elements(idx)%e = SquareFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY, Structure_Input%Basic%DimensionType)
+                    structure%Elements(idx)%e = SquareFirst(iCell, structure%Coordinate, Structure_Input%VTK%CELLS(iCell)%CONNECTIVITY)
                 end select
             end do
         end if

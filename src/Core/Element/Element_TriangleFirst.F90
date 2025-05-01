@@ -1,5 +1,4 @@
 submodule(Core_Element) Core_Element_TriangleFirst
-    use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
 contains
     !----------------------------------------------------------------------!
@@ -19,11 +18,6 @@ contains
     !   Connectivity      : Integer array (size 3) specifying the indices of
     !                       nodes that form the triangular element.
     !
-    !   DimensionType     : Integer indicating spatial dimension type:
-    !                         1 = 2D horizontal,
-    !                         2 = 2D vertical,
-    !                         3 = 3D.
-    !
     ! Return Value:
     !   Structure         : Allocated polymorphic object of type
     !                       TriangleFirst (extends Abstract_ElementType).
@@ -35,12 +29,11 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
+    module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(3)
-        integer(int32), intent(in) :: DimensionType
         class(Abstract_ElementType), allocatable :: Structure
         integer(int32), parameter :: ndim = 3
         integer(int32) :: i
@@ -53,19 +46,17 @@ contains
         allocate (Structure%conn(ndim))
         Structure%conn(:) = Connectivity(1:ndim)
 
-        if (DimensionType == 1) then
-            allocate (Structure%X(ndim))
-            allocate (Structure%Y(ndim))
-            allocate (Structure%Z(ndim))
-            do i = 1, ndim
-                nullify (Structure%X(i)%val)
-                nullify (Structure%Y(i)%val)
-                nullify (Structure%Z(i)%val)
-                Structure%X(i)%val => Global_Coordinate%x(Structure%conn(i))
-                Structure%Y(i)%val => Global_Coordinate%y(Structure%conn(i))
-                Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
-            end do
-        end if
+        allocate (Structure%X(ndim))
+        allocate (Structure%Y(ndim))
+        allocate (Structure%Z(ndim))
+        do i = 1, ndim
+            nullify (Structure%X(i)%val)
+            nullify (Structure%Y(i)%val)
+            nullify (Structure%Z(i)%val)
+            Structure%X(i)%val => Global_Coordinate%x(Structure%conn(i))
+            Structure%Y(i)%val => Global_Coordinate%y(Structure%conn(i))
+            Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
+        end do
 
         Structure%nGauss = 1
         call Allocate_Array(Structure%weight, Structure%nGauss)
@@ -112,16 +103,16 @@ contains
     !          Represents the triangular element for which the shape
     !          function is evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1, 2, 3).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 3).
     !          Each index corresponds to a vertex of the triangle.
     !
-    !   xi   : Real(real64), the ξ (xi) coordinate in the natural coordinate
+    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
     !          system (barycentric or reference triangle).
     !
     !   eta  : Real(real64), the η coordinate in the natural coordinate system.
     !
     ! Return Value:
-    !   ps    : Real(real64), value of the i-th shape function ψ_i at (ξ, η).
+    !   psi  : Real(real64), value of the i-th shape function ψ_i at (ξ, η).
     !
     ! Function Details:
     !   - For a linear triangular element, the shape functions are:
@@ -161,7 +152,7 @@ contains
     !          Represents the triangular element for which the derivative
     !          is being evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1, 2, 3).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 3).
     !
     !   eta  : Real(real64), the η coordinate in the natural coordinate
     !          system (not used in linear case, but included for interface).
@@ -177,7 +168,6 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 3].
     !
     !----------------------------------------------------------------------!
-
     module function dpsi_dxi_TriangleFirst(self, i, eta) result(dpsi)
         implicit none
         class(TriangleFirst), intent(in) :: self

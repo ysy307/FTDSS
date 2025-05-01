@@ -1,21 +1,40 @@
 submodule(Core_Element) Core_Element_SquareFirst
-    use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
 contains
 
-    !----------------------------------------------------------------
-    ! SquareFirst のコンストラクタ
-    ! iElem: 要素インデックス
-    ! Global_Coordinate: 全節点座標を保持する DP3d
-    ! Connectivity(4): 要素–節点接続
-    ! DimensionType: 1: 2次元水平, 2: 2次元鉛直, 3: 3次元
-    !----------------------------------------------------------------
-    module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
+    !----------------------------------------------------------------------!
+    ! SquareFirst_Construct:
+    !----------------------------------------------------------------------!
+    ! This function constructs a SquareFirst element object based on the
+    ! given element index, global nodal coordinates, connectivity, and
+    ! spatial dimension type.
+    !
+    ! Arguments:
+    !   iElem             : Element index (int32).
+    !                       Identifies the target element.
+    !
+    !   Global_Coordinate : DP3d type pointer containing the global coordinates
+    !                       of all nodes in the mesh.
+    !
+    !   Connectivity      : Integer array (size 4) specifying the indices of
+    !                       nodes that form the square element.
+    !
+    ! Return Value:
+    !   Structure         : Allocated polymorphic object of type
+    !                       SquareFirst (extends Abstract_ElementType).
+    !
+    ! Function Details:
+    !   - Allocates a new SquareFirst element object.
+    !   - Stores element ID and connectivity information.
+    !   - Links to the corresponding global coordinates for each node.
+    !   - Initializes Gauss point and weight for integration.
+    !
+    !----------------------------------------------------------------------!
+    module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), intent(in), pointer :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(4)
-        integer(int32), intent(in) :: DimensionType
         class(Abstract_ElementType), allocatable :: Structure
         integer(int32), parameter :: ndim = 4
         integer(int32) :: i
@@ -27,7 +46,6 @@ contains
         allocate (Structure%conn(ndim))
         Structure%conn(1:ndim) = Connectivity(1:ndim)
 
-        ! if (DimensionType == 1) then
         allocate (Structure%X(ndim))
         allocate (Structure%Y(ndim))
         allocate (Structure%Z(ndim))
@@ -39,7 +57,6 @@ contains
             Structure%Y(i)%val => Global_Coordinate%y(Structure%conn(i))
             Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
         end do
-        ! end if
 
         Structure%nGauss = 4
         call Allocate_Array(Structure%weight, Structure%nGauss)
@@ -53,9 +70,25 @@ contains
 
     end function SquareFirst_Construct
 
-    !---------------------------------------------------
-    ! 四角形一次要素の節点数を返す
-    !---------------------------------------------------
+    !----------------------------------------------------------------------!
+    ! getNumNodes_SquareFirst:
+    !----------------------------------------------------------------------!
+    ! This function returns the number of nodes associated with a
+    ! SquareFirst element.
+    !
+    ! Arguments:
+    !   self : SquareFirst type object.
+    !          Represents the current square element instance.
+    !
+    ! Return Value:
+    !   n    : Integer (int32) indicating the number of nodes used by the
+    !          element. This is typically 4 for a linear square.
+    !
+    ! Function Details:
+    !   - Retrieves the value stored in `self%size`, which represents
+    !     the number of nodes for the element.
+    !
+    !----------------------------------------------------------------------!
     module function getNumNodes_SquareFirst(self) result(n)
         implicit none
         class(SquareFirst), intent(in) :: self
@@ -64,9 +97,37 @@ contains
         n = self%size
     end function getNumNodes_SquareFirst
 
-    !---------------------------------------------------
-    ! 四角形線形要素の形状関数 N_i(ξ,η)
-    !---------------------------------------------------
+    !----------------------------------------------------------------------!
+    ! psi_SquareFirst:
+    !----------------------------------------------------------------------!
+    ! This function evaluates the shape function ψ_i(ξ, η) for a linear
+    ! square element at the given natural coordinates (ξ, η).
+    !
+    ! Arguments:
+    !   self : SquareFirst type object.
+    !          Represents the square element for which the shape
+    !          function is evaluated.
+    !
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
+    !          Each index corresponds to a vertex of the square.
+    !
+    !   xi   : Real(real64), the ξ  coordinate in the natural coordinate
+    !          system (barycentric or reference square).
+    !
+    !   eta  : Real(real64), the η coordinate in the natural coordinate system.
+    !
+    ! Return Value:
+    !   psi  : Real(real64), value of the i-th shape function ψ_i at (ξ, η).
+    !
+    ! Function Details:
+    !   - For a linear square element, the shape functions are:
+    !       ψ₁(ξ, η) = 0.25 * (1 - ξ) * (1 - η)
+    !       ψ₂(ξ, η) = 0.25 * (1 + ξ) * (1 - η)
+    !       ψ₃(ξ, η) = 0.25 * (1 + ξ) * (1 + η)
+    !       ψ₄(ξ, η) = 0.25 * (1 - ξ) * (1 + η)
+    !   - Returns 0.0d0 for indices outside the range [1, 4].
+    !
+    !----------------------------------------------------------------------!
     module function psi_SquareFirst(self, i, xi, eta) result(psi)
         implicit none
         class(SquareFirst), intent(in) :: self
@@ -88,9 +149,35 @@ contains
         end select
     end function psi_SquareFirst
 
-    !---------------------------------------------------
-    ! ∂N_i/∂ξ (四角形)
-    !---------------------------------------------------
+    !----------------------------------------------------------------------!
+    ! dpsi_dxi_SquareFirst:
+    !----------------------------------------------------------------------!
+    ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
+    ! shape function for a linear square element with respect to ξ
+    ! at a given η coordinate.
+    !
+    ! Arguments:
+    !   self : SquareFirst type object.
+    !          Represents the square element for which the derivative
+    !          is being evaluated.
+    !
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
+    !
+    !   eta  : Real(real64), the η coordinate in the natural coordinate
+    !          system (not used in linear case, but included for interface).
+    !
+    ! Return Value:
+    !   dpsi : Real(real64), value of ∂ψ_i/∂ξ evaluated at (ξ, η).
+    !
+    ! Function Details:
+    !   - For a linear square element:
+    !       ∂ψ₁/∂ξ = -0.25 * (1 - η)
+    !       ∂ψ₂/∂ξ =  0.25 * (1 - η)
+    !       ∂ψ₃/∂ξ =  0.25 * (1 + η)
+    !       ∂ψ₄/∂ξ = -0.25 * (1 + η)
+    !   - Returns 0.0d0 for indices outside [1, 4].
+    !
+    !----------------------------------------------------------------------!
     module function dpsi_dxi_SquareFirst(self, i, eta) result(dpsi)
         implicit none
         class(SquareFirst), intent(in) :: self
@@ -112,9 +199,35 @@ contains
         end select
     end function dpsi_dxi_SquareFirst
 
-    !---------------------------------------------------
-    ! ∂N_i/∂η (四角形)
-    !---------------------------------------------------
+    !----------------------------------------------------------------------!
+    ! dpsi_deta_SquareFirst:
+    !----------------------------------------------------------------------!
+    ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
+    ! shape function for a linear square element with respect to η
+    ! at a given ξ coordinate.
+    !
+    ! Arguments:
+    !   self : SquareFirst type object.
+    !          Represents the square element for which the derivative
+    !          is being evaluated.
+    !
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
+    !
+    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
+    !          system (not used in linear case, but included for interface).
+    !
+    ! Return Value:
+    !   dpsi : Real(real64), value of ∂ψ_i/∂η evaluated at (ξ, η).
+    !
+    ! Function Details:
+    !   - For a linear square element:
+    !       ∂ψ₁/∂η = -0.25 * (1 - ξ)
+    !       ∂ψ₂/∂η = -0.25 * (1 + ξ)
+    !       ∂ψ₃/∂η =  0.25 * (1 + ξ)
+    !       ∂ψ₄/∂η =  0.25 * (1 - ξ)
+    !   - Returns 0.0d0 for indices outside [1, 4].
+    !
+    !----------------------------------------------------------------------!
     module function dpsi_deta_SquareFirst(self, i, xi) result(dpsi)
         implicit none
         class(SquareFirst), intent(in) :: self
@@ -136,9 +249,53 @@ contains
         end select
     end function dpsi_deta_SquareFirst
 
-    !---------------------------------------------------
-    ! ∂x_i/∂ξ (四角形)
-    !---------------------------------------------------
+    !----------------------------------------------------------------------!
+    ! Jac_SquareFirst:
+    !----------------------------------------------------------------------!
+    ! This function computes the (i,j) component of the Jacobian matrix J
+    ! for a linear square finite element at a given natural coordinate
+    ! (ξ, η). The Jacobian maps natural coordinates (ξ, η) to physical
+    ! coordinates (x, y).
+    !
+    ! Arguments:
+    !   self : SquareFirst type object.
+    !          Represents the element whose Jacobian is being evaluated.
+    !
+    !   i    : Integer (int32), the row index of the Jacobian component.
+    !          i = 1 → corresponds to x-component (dx/dξ or dx/dη),
+    !          i = 2 → corresponds to y-component (dy/dξ or dy/dη).
+    !
+    !   j    : Integer (int32), the column index of the Jacobian component.
+    !          j = 1 → partial derivative w.r.t ξ,
+    !          j = 2 → partial derivative w.r.t η.
+    !
+    !   xi   : Real(real64), ξ coordinate in natural coordinate system.
+    !
+    !   eta  : Real(real64), η coordinate in natural coordinate system.
+    !
+    ! Return Value:
+    !   Jval : Real(real64), the (i,j) component of the Jacobian matrix.
+    !
+    ! Function Details:
+    !   - The Jacobian matrix J is a 2×2 matrix defined as:
+    !         [ ∂x/∂ξ  ∂x/∂η ]
+    !         [ ∂y/∂ξ  ∂y/∂η ]
+    !
+    !   - Each entry is computed as a weighted sum over the shape function
+    !     derivatives with respect to ξ or η, multiplied by the physical
+    !     coordinates (X or Y) of the element's nodes.
+    !
+    !   - The derivatives of shape functions are accessed via:
+    !         self%dpsi_dxi(ii, eta)
+    !         self%dpsi_deta(ii, xi)
+    !
+    !   - For example:
+    !       ∂x/∂ξ = Σ (∂ψ_i/∂ξ) * x_i
+    !       ∂y/∂η = Σ (∂ψ_i/∂η) * y_i
+    !
+    !   - This function supports 2D problems.
+    !
+    !----------------------------------------------------------------------!
     module function Jac_SquareFirst(self, i, j, xi, eta) result(Jval)
         implicit none
         class(SquareFirst), intent(in) :: self
@@ -183,9 +340,40 @@ contains
 
     end function Jac_SquareFirst
 
-    !---------------------------------------------------
-    ! Jacobian Determinant (四角形)
-    !---------------------------------------------------
+    !----------------------------------------------------------------------!
+    ! Jac_Det_SquareFirst:
+    !----------------------------------------------------------------------!
+    ! This function computes the determinant of the Jacobian matrix J
+    ! for a linear square element at a specified point (ξ, η) in
+    ! the natural coordinate system.
+    !
+    ! Arguments:
+    !   self : SquareFirst type object.
+    !          Represents the finite element whose Jacobian is evaluated.
+    !
+    !   xi   : Real(real64), ξ coordinate in the natural coordinate system.
+    !
+    !   eta  : Real(real64), η coordinate in the natural coordinate system.
+    !
+    ! Return Value:
+    !   J_Det : Real(real64), the determinant of the Jacobian matrix J.
+    !
+    ! Function Details:
+    !   - The Jacobian matrix J is a 2×2 matrix defined as:
+    !         [ ∂x/∂ξ  ∂x/∂η ]
+    !         [ ∂y/∂ξ  ∂y/∂η ]
+    !
+    !   - The determinant is calculated using:
+    !         det(J) = (∂x/∂ξ)(∂y/∂η) - (∂x/∂η)(∂y/∂ξ)
+    !
+    !   - This determinant gives the area scaling factor for transformation
+    !     from natural to physical coordinates and is used in numerical
+    !     integration (e.g., Gauss quadrature) on the element.
+    !
+    !   - A zero or negative determinant typically indicates a problem
+    !     with the element geometry (e.g., inverted element).
+    !
+    !----------------------------------------------------------------------!
     module function Jac_Det_SquareFirst(self, xi, eta) result(J_Det)
         implicit none
         class(SquareFirst), intent(in) :: self

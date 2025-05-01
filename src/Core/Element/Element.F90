@@ -92,12 +92,14 @@ module Core_Element
     abstract interface
         function Abstract_getNmNodes(self) result(n)
             import :: Abstract_ElementType, int32
+            implicit none
             class(Abstract_ElementType), intent(in) :: self
             integer(int32) :: n
         end function Abstract_getNmNodes
 
         function Abstract_psi(self, i, xi, eta) result(psi)
             import :: Abstract_ElementType, int32, real64
+            implicit none
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
@@ -106,6 +108,7 @@ module Core_Element
 
         function Abstract_dpsi_dxi(self, i, eta) result(dpsi)
             import :: Abstract_ElementType, int32, real64
+            implicit none
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: eta
@@ -114,6 +117,7 @@ module Core_Element
 
         function Abstract_dpsi_deta(self, i, xi) result(dpsi)
             import :: Abstract_ElementType, int32, real64
+            implicit none
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi
@@ -122,15 +126,16 @@ module Core_Element
 
         function Abstract_Jac(self, i, j, xi, eta) result(Jval)
             import :: Abstract_ElementType, int32, real64
+            implicit none
             class(Abstract_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
-
             real(real64) :: Jval
         end function Abstract_Jac
 
         function Abstract_Jac_Det(self, xi, eta) result(J_Det)
             import :: Abstract_ElementType, int32, real64
+            implicit none
             class(Abstract_ElementType), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
@@ -138,6 +143,7 @@ module Core_Element
 
         subroutine Abstract_is_inside(self, px, py, pxi, peta, is_in)
             import Abstract_ElementType, real64
+            implicit none
             class(Abstract_ElementType), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
@@ -150,15 +156,12 @@ module Core_Element
     !   三角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
+        module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(3)
-            integer(int32), intent(in) :: DimensionType
             class(Abstract_ElementType), allocatable :: Structure
-            integer(int32), parameter :: ndim = 3
-            integer(int32) :: i
 
         end function TriangleFirst_Construct
 
@@ -201,7 +204,6 @@ module Core_Element
             class(TriangleFirst), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
-
             real(real64) :: Jval
 
         end function Jac_TriangleFirst
@@ -215,6 +217,7 @@ module Core_Element
         end function Jac_Det_TriangleFirst
 
         module subroutine is_in_TriangleFirst(self, px, py, pxi, peta, is_in)
+            implicit none
             class(TriangleFirst), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
@@ -227,12 +230,11 @@ module Core_Element
     !   四角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, DimensionType) result(Structure)
+        module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
             type(DP3d), intent(in), pointer :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(4)
-            integer(int32), intent(in) :: DimensionType
             class(Abstract_ElementType), allocatable :: Structure
 
         end function SquareFirst_Construct
@@ -289,6 +291,7 @@ module Core_Element
         end function Jac_Det_SquareFirst
 
         module subroutine is_in_SquareFirst(self, px, py, pxi, peta, is_in)
+            implicit none
             class(SquareFirst), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
@@ -304,7 +307,5 @@ module Core_Element
     interface SquareFirst
         procedure :: SquareFirst_Construct
     end interface
-
-contains
 
 end module Core_Element
