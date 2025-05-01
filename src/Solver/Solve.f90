@@ -16,8 +16,6 @@ module Solver_Solve
     include "mkl_lapack.fi"
 #endif
 
-    real(real64), allocatable, target :: work(:, :)
-
     public :: Abstract_Solver_CRS
     public :: Abstract_Solver_Full
     public :: Solver_CRS_BiCGSTAB
