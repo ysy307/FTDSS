@@ -76,29 +76,29 @@ add_library(Matrix
 target_link_libraries(Matrix PRIVATE Core)
 
 # --- BLAS ---
-add_library(calc_blas src/Calculate/BLAS.F90)
-target_link_libraries(calc_blas PRIVATE Matrix)
+add_library(Calc_BLAS src/Calculate/BLAS.F90)
+target_link_libraries(Calc_BLAS PRIVATE Matrix)
 
 # --- Conditions ---
-add_library(conds
+add_library(Conditions
     src/Conditions/Fix_Boundary_Conditions.F90
     src/Conditions/Fix_Initial_Conditions.F90
 )
-target_link_libraries(conds PRIVATE Core Matrix)
+target_link_libraries(Conditions PRIVATE Core Matrix)
 
 # --- Inout Input ---
-add_library(inout_input 
+add_library(Input 
     src/Inout/SetProjectPath.F90
     src/Inout/Input.F90
 )
-target_link_libraries(inout_input PRIVATE Core conds)
-target_include_directories(inout_input PUBLIC ${My_INCLUDE_PATH})
+target_link_libraries(Input PRIVATE Core Conditions)
+target_include_directories(Input PUBLIC ${My_INCLUDE_PATH})
 
 # --- Calculate WRF, HCF, GCC ---
-add_library(calc_wrf src/Calculate/WRF.F90)
-target_link_libraries(calc_wrf PRIVATE)
+add_library(Calc_WRF src/Calculate/WRF.F90)
+target_link_libraries(Calc_WRF PRIVATE)
 
-add_library(calc_hcf
+add_library(Calc_HCF
     src/Calculate/HCF/HCF.F90
     src/Calculate/HCF/HCF_BC.F90
     src/Calculate/HCF/HCF_VG.F90
@@ -109,46 +109,58 @@ add_library(calc_hcf
     src/Calculate/HCF/HCF_Impedance.F90
     src/Calculate/HCF/HCF_Viscosity.F90
 )
-target_link_libraries(calc_hcf PRIVATE calc_wrf Core)
+target_link_libraries(Calc_HCF PRIVATE Calc_WRF Core)
 
-add_library(calc_gcc src/Calculate/GCC.F90)
-target_link_libraries(calc_gcc PRIVATE calc_hcf)
+add_library(Calc_GCC src/Calculate/GCC.F90)
+target_link_libraries(Calc_GCC PRIVATE Calc_HCF)
 
 # --- Ice ---
-add_library(calc_ice 
+add_library(Calc_Ice 
     src/Calculate/Ice/Ice.F90
     src/Calculate/Ice/Ice_TRM.F90
     src/Calculate/Ice/Ice_GCC.F90
     src/Calculate/Ice/Ice_EXP.F90
 )
-target_link_libraries(calc_ice PRIVATE calc_gcc calc_wrf Core)
+target_link_libraries(Calc_Ice PRIVATE Calc_GCC Calc_WRF Core)
 
 # --- Material Properties ---
-add_library(calc_props
-    src/Calculate/ThermalConductivity.F90
-    src/Calculate/VolumetricHeatCapacity.F90
-    src/Calculate/Density.F90
+add_library(Calc_THC
+    src/Calculate/ThermalConductivity/ThermalConductivity.F90
+    src/Calculate/ThermalConductivity/ThermalConductivity_3Phase.F90
 )
-target_link_libraries(calc_props PRIVATE Core calc_ice calc_gcc)
+target_link_libraries(Calc_THC PRIVATE Input Core Calc_Ice Calc_GCC)
+
+add_library(Calc_VHC
+    src/Calculate/VolumetricHeatCapacity/VolumetricHeatCapacity.F90
+)
+target_link_libraries(Calc_VHC PRIVATE Input Core Calc_Ice Calc_GCC)
+
+add_library(Calc_DEN
+    src/Calculate/Density/Density.F90
+)
+target_link_libraries(Calc_DEN PRIVATE Input Core Calc_Ice Calc_GCC)
 
 # --- Solver ---
-add_library(solver 
+add_library(Solver 
     src/Solver/Solve.f90
     src/Solver/Solve_BiCGSTAB.F90
     src/Solver/Solve_LU.F90
     src/Solver/Solve_Preconditioner.F90
     src/Solver/Time.F90
 )
-target_link_libraries(solver PRIVATE Matrix inout_input Core calc_blas)
+target_link_libraries(Solver PRIVATE Matrix Input Core Calc_BLAS)
 
 # --- Main Thermal ---
-add_library(main_thermal src/Main/Thermal.F90)
-target_link_libraries(main_thermal PRIVATE Core inout_input calc_ice calc_props Matrix conds solver)
+add_library(Thermal 
+    src/Main/Thermal/Thermal.F90
+    src/Main/Thermal/Thermal_3Phase.F90
+)
+target_link_libraries(Thermal PRIVATE Core Input Calc_Ice Calc_Prop Matrix Conditions Solver)
 
 # --- Output ---
-add_library(inout_output src/Inout/Output.F90)
-target_link_libraries(inout_output PRIVATE inout_input Core main_thermal)
-target_include_directories(inout_output PUBLIC ${My_INCLUDE_PATH})
+add_library(Output src/Inout/Output.F90)
+target_link_libraries(Output PRIVATE Input Core Thermal)
+target_include_directories(Output PUBLIC ${My_INCLUDE_PATH})
 
 # Debug Information
 message(STATUS "Fortran Compiler ID: ${CMAKE_Fortran_COMPILER_ID}")
@@ -163,17 +175,19 @@ if(BUILD_APP STREQUAL "ysy_fc")
     target_link_libraries(ysy_fc PRIVATE
         Core
         Matrix
-        calc_blas
-        conds
-        inout_input
-        calc_wrf
-        calc_hcf
-        calc_gcc
-        calc_ice
-        calc_props
-        solver
-        main_thermal
-        inout_output
+        Calc_BLAS
+        Conditions
+        Input
+        Calc_WRF
+        Calc_HCF
+        Calc_GCC
+        Calc_Ice
+        Calc_THC
+        Calc_VHC
+        Calc_DEN
+        Solver
+        Thermal
+        Output
         ${LINK_LIBRARIES}
     )
     target_link_libraries(ysy_fc PRIVATE ${LINK_LIBRARIES})
@@ -218,17 +232,19 @@ elseif(BUILD_APP STREQUAL "test")
     target_link_libraries(test PRIVATE
         Core
         Matrix
-        calc_blas
-        conds
-        inout_input
-        calc_wrf
-        calc_hcf
-        calc_gcc
-        calc_ice
-        calc_props
-        solver
-        main_thermal
-        inout_output
+        Calc_BLAS
+        Conditions
+        Input
+        Calc_WRF
+        Calc_HCF
+        Calc_GCC
+        Calc_Ice
+        Calc_THC
+        Calc_VHC
+        Calc_DEN
+        Solver
+        Thermal
+        Output
         ${LINK_LIBRARIES}
     )
 

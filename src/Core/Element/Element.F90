@@ -301,11 +301,11 @@ module Core_Element
     end interface
 
     interface TriangleFirst
-        procedure :: TriangleFirst_Construct
+        module procedure :: TriangleFirst_Construct
     end interface
 
     interface SquareFirst
-        procedure :: SquareFirst_Construct
+        module procedure :: SquareFirst_Construct
     end interface
 
 end module Core_Element

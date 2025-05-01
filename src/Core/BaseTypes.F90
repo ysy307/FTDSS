@@ -13,6 +13,7 @@ module Core_BaseTypes
     public :: Variables
     public :: RealPointer
     public :: Type_Iteration
+    public :: Belonging
 
     public :: assignment(=)
 
@@ -55,6 +56,11 @@ module Core_BaseTypes
         procedure, pass(self) :: Shift => Variables_Shift
         procedure, pass(self) :: allocate => Variables_Allocate
     end type Variables
+
+    type :: Belonging
+        integer(int32) :: nsize
+        integer(int32), allocatable :: group(:)
+    end type Belonging
 
     type :: Type_Iteration
         integer(int32) :: iter
