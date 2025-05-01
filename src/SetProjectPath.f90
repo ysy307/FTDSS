@@ -1,16 +1,16 @@
-module Inout_SetProjectPath
+module Inout_ProjectPath
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: error
+    use :: Core_Error
     implicit none
     private
     character(256) :: ProjectPath
     logical :: isSetProjectPath = .false.
 
-    public :: Inout_SetProjectPath_GetProjectPath
+    public :: Inout_ProjectPath_GetProjectPath
 
 contains
 
-    subroutine Inout_SetProjectPath_SetProjectPath
+    subroutine Inout_ProjectPath_SetProjectPath
         implicit none
         character(64), parameter :: dName = "ProjectPath.dir"
         integer(int32) :: access, status, len_path, unit_num
@@ -53,15 +53,15 @@ contains
 
         isSetProjectPath = .true.
 
-    end subroutine Inout_SetProjectPath_SetProjectPath
+    end subroutine Inout_ProjectPath_SetProjectPath
 
-    character(256) function Inout_SetProjectPath_GetProjectPath()
+    character(256) function Inout_ProjectPath_GetProjectPath()
         implicit none
 
-        if (.not. isSetProjectPath) call Inout_SetProjectPath_SetProjectPath
+        if (.not. isSetProjectPath) call Inout_ProjectPath_SetProjectPath
 
-        Inout_SetProjectPath_GetProjectPath = ProjectPath
+        Inout_ProjectPath_GetProjectPath = ProjectPath
 
-    end function Inout_SetProjectPath_GetProjectPath
+    end function Inout_ProjectPath_GetProjectPath
 
-end module Inout_SetProjectPath
+end module Inout_ProjectPath
