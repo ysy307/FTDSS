@@ -148,8 +148,14 @@ contains
             !                                                  Input%Regions(i)%Ice%phi, &
             !                                                  Structure%nsize)
 
-            Structure%lambda = Type_ThermalConductivity_3Phase(Input)
         end do
+        Structure%THC = Type_ThermalConductivity_3Phase(Input)
+        Structure%DEN = Type_Density_3Phase(Input)
+        Structure%SPH = Type_SpecificHeat_3Phase(Input)
+
+        if (any(Input%Regions(:)%isFrozen)) then
+            Structure%HTC = Type_HeatCapacity_3Phase_Apparent(Input)
+        end if
 
         Structure%BC = Type_BC_Thermal(Input%Conditions, Input%VTK)
 
@@ -170,8 +176,6 @@ contains
                                                                    Preconditioner=Input%Solver_Thermal%usePreconditionerType)
             end if
         end if
-        ! end function Type_Thermal_3Phase_2D_Construct
-
     end function Type_Thermal_3Phase_2D_Construct
 
     module subroutine Type_Thermal_3Phase_2D_Assemble(self, dt, step, iter)

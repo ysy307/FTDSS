@@ -4,7 +4,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of heat conductivity
     !----------------------------------------------------------------------------------------------------
-    module function ThermalConductivity_3Phase_Construct(Input) result(structure)
+    module function THC_3Phase_Construct(Input) result(structure)
         implicit none
         type(Type_Input), intent(in) :: Input
         class(Abstract_ThermalConductivity), allocatable :: structure
@@ -31,12 +31,12 @@ contains
 
         end select
 
-    end function ThermalConductivity_3Phase_Construct
+    end function THC_3Phase_Construct
 
-    function Calculate_ThermalConductivity_3Phase(NodeBelonging, lambda_soil, phi_soil, &
-                                                  lambda_water, phi_water, lambda_ice, phi_ice) result(lambda)
+    function Calc_THC_3Phase(NodeBelonging, lambda_soil, phi_soil, &
+                             lambda_water, phi_water, lambda_ice, phi_ice) result(lambda)
         implicit none
-        type(Belonging), intent(in) :: NodeBelonging
+        type(Belonging), intent(inout) :: NodeBelonging
         real(real64), intent(in) :: lambda_soil(:)
         real(real64), intent(in) :: phi_soil
         real(real64), intent(in) :: lambda_water(:)
@@ -47,20 +47,20 @@ contains
 
         real(real64) :: val_lambda_soil, val_lambda_water, val_lambda_ice
 
-        val_lambda_soil = sum(lambda_soil(NodeBelonging%group(:))) / NodeBelonging%nsize
-        val_lambda_water = sum(lambda_water(NodeBelonging%group(:))) / NodeBelonging%nsize
-        val_lambda_ice = sum(lambda_ice(NodeBelonging%group(:))) / NodeBelonging%nsize
+        val_lambda_soil = NodeBelonging%value(lambda_soil)
+        val_lambda_water = NodeBelonging%value(lambda_water)
+        val_lambda_ice = NodeBelonging%value(lambda_ice)
 
-        lambda = val_lambda_soil**(1.0d0 - phi_soil) &
+        lambda = val_lambda_soil**phi_soil &
                  * val_lambda_water**phi_water &
                  * val_lambda_ice**phi_ice
 
-    end function Calculate_ThermalConductivity_3Phase
+    end function Calc_THC_3Phase
 
-    module function Calculate_ThermalConductivity_3Phase_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, waterFlux) result(lambda)
+    module function Calc_THC_3Phase_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, waterFlux) result(lambda)
         implicit none
         class(Type_ThermalConductivity_3Phase), intent(in) :: self
-        type(Belonging), intent(in) :: NodeBelonging
+        type(Belonging), intent(inout) :: NodeBelonging
         real(real64), intent(in), optional :: phi1
         real(real64), intent(in), optional :: phi2
         real(real64), intent(in), optional :: phi3
@@ -68,13 +68,13 @@ contains
         real(real64), intent(in), optional :: waterFlux(:)
         real(real64) :: lambda
 
-        lambda = Calculate_ThermalConductivity_3Phase(NodeBelonging, self%soil, phi1, self%water, phi2, self%ice, phi3)
-    end function Calculate_ThermalConductivity_3Phase_Wrap
+        lambda = Calc_THC_3Phase(NodeBelonging, self%soil, phi1, self%water, phi2, self%ice, phi3)
+    end function Calc_THC_3Phase_Wrap
 
-    module subroutine Update_ThermalConductivity_3Phase(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, waterFlux)
+    module subroutine Update_THC_3Phase(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, waterFlux)
         implicit none
         class(Type_ThermalConductivity_3Phase), intent(inout) :: self
-        type(Belonging), intent(in) :: NodeBelonging(:)
+        type(Belonging), intent(inout) :: NodeBelonging(:)
         real(real64), intent(in), optional :: arr_phi1(:)
         real(real64), intent(in), optional :: arr_phi2(:)
         real(real64), intent(in), optional :: arr_phi3(:)
@@ -85,15 +85,15 @@ contains
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN, 1) = Calculate_ThermalConductivity_3Phase(NodeBelonging(iN), &
-                                                                     self%soil, &
-                                                                     arr_phi1(iN), &
-                                                                     self%water, &
-                                                                     arr_phi2(iN), &
-                                                                     self%ice, &
-                                                                     arr_phi3(iN))
+            self%value(iN, 1) = Calc_THC_3Phase(NodeBelonging(iN), &
+                                                self%soil, &
+                                                arr_phi1(iN), &
+                                                self%water, &
+                                                arr_phi2(iN), &
+                                                self%ice, &
+                                                arr_phi3(iN))
         end do
         !$omp end parallel do
-    end subroutine Update_ThermalConductivity_3Phase
+    end subroutine Update_THC_3Phase
 
-end submodule
+end submodule Calculate_ThermalConductivity_3Phase

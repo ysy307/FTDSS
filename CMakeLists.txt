@@ -124,21 +124,48 @@ add_library(Calc_Ice
 target_link_libraries(Calc_Ice PRIVATE Calc_GCC Calc_WRF Core)
 
 # --- Material Properties ---
+
+
+
 add_library(Calc_THC
     src/Calculate/ThermalConductivity/ThermalConductivity.F90
     src/Calculate/ThermalConductivity/ThermalConductivity_3Phase.F90
 )
-target_link_libraries(Calc_THC PRIVATE Input Core Calc_Ice Calc_GCC)
-
-add_library(Calc_VHC
-    src/Calculate/VolumetricHeatCapacity/VolumetricHeatCapacity.F90
+target_link_libraries(Calc_THC PRIVATE
+    Core
+    Input
 )
-target_link_libraries(Calc_VHC PRIVATE Input Core Calc_Ice Calc_GCC)
 
 add_library(Calc_DEN
     src/Calculate/Density/Density.F90
+    src/Calculate/Density/Density_3Phase.F90
 )
-target_link_libraries(Calc_DEN PRIVATE Input Core Calc_Ice Calc_GCC)
+target_link_libraries(Calc_DEN PRIVATE
+    Core
+    Input
+)
+
+add_library(Calc_SPH
+    src/Calculate/SpecificHeat/SpecificHeat.F90
+    src/Calculate/SpecificHeat/SpecificHeat_3Phase.F90
+)
+target_link_libraries(Calc_SPH PRIVATE
+    Core
+    Input
+)
+
+add_library(Calc_VHC
+    src/Calculate/HeatCapacity/HeatCapacity.F90
+    src/Calculate/HeatCapacity/HeatCapacity_3Phase_Apparent.F90
+)
+target_link_libraries(Calc_VHC PRIVATE
+    Core
+    Input
+    Calc_Ice
+    Calc_GCC
+    Calc_DEN
+)
+
 
 # --- Solver ---
 add_library(Solver 
@@ -148,14 +175,30 @@ add_library(Solver
     src/Solver/Solve_Preconditioner.F90
     src/Solver/Time.F90
 )
-target_link_libraries(Solver PRIVATE Matrix Input Core Calc_BLAS)
+target_link_libraries(Solver PRIVATE 
+    Matrix
+    Core
+    Input
+    Calc_BLAS
+)
 
 # --- Main Thermal ---
 add_library(Thermal 
     src/Main/Thermal/Thermal.F90
     src/Main/Thermal/Thermal_3Phase.F90
 )
-target_link_libraries(Thermal PRIVATE Core Input Calc_Ice Calc_Prop Matrix Conditions Solver)
+target_link_libraries(Thermal PRIVATE 
+    Core
+    Input
+    Calc_Ice
+    Calc_THC
+    Calc_VHC
+    Calc_DEN
+    Calc_SPH
+    Matrix
+    Conditions
+    Solver
+)
 
 # --- Output ---
 add_library(Output src/Inout/Output.F90)
@@ -185,6 +228,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Calc_THC
         Calc_VHC
         Calc_DEN
+        Calc_SPH
         Solver
         Thermal
         Output

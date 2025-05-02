@@ -4,8 +4,10 @@ module Main_Thermal
     use :: Core_Element
     use :: Inout_Input
     use :: Calculate_Ice, only:Abstract_Ice, Type_Ice_TRM, Type_Ice_GCC, Type_Ice_EXP
-    use :: Calculate_VolumetricHeatCapacity
     use :: Calculate_ThermalConductivity
+    use :: Calculate_Density
+    use :: Calculate_SpecificHeat
+    use :: Calculate_HeatCapacity
     use :: Matrix_Assemble
     use :: Matrix_CRS
     use :: Condition_Fix_Boundary_Conditions, only:Type_BC_Thermal
@@ -33,8 +35,10 @@ module Main_Thermal
         type(Type_BC_Thermal) :: BC
         !! Thermal properties
         class(Abstract_Ice), allocatable :: Ice
-        ! class(Abstarct_VolumetricHeatCapacity), allocatable :: C
-        class(Abstract_ThermalConductivity), allocatable :: lambda
+        class(Abstract_ThermalConductivity), allocatable :: THC
+        class(Abstract_Density), allocatable :: DEN
+        class(Abstract_SpecificHeat), allocatable :: SPH
+        class(Abstract_HeatCapacity), allocatable :: HTC
 
         !! Solver
         class(Abstract_Solver_CRS), allocatable :: Solver
@@ -82,7 +86,7 @@ module Main_Thermal
     end interface
 
     interface Type_Thermal_3Phase_2D
-        module procedure Type_Thermal_3Phase_2D_Construct
+        module procedure :: Type_Thermal_3Phase_2D_Construct
     end interface
 
 contains

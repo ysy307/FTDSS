@@ -60,6 +60,9 @@ module Core_BaseTypes
     type :: Belonging
         integer(int32) :: nsize
         integer(int32), allocatable :: group(:)
+    contains
+        procedure, pass(self) :: allocate => Belonging_Allocate
+        procedure, pass(self) :: value => Belonging_Value
     end type Belonging
 
     type :: Type_Iteration
@@ -197,4 +200,23 @@ contains
         X%z(:) = Y%z(:)
 
     end subroutine DP3d_Assignment
+
+    subroutine Belonging_Allocate(self, nsize)
+        class(Belonging), intent(inout) :: self
+        integer(int32), intent(in) :: nsize
+
+        call Allocate_Array(self%group, nsize)
+        self%nsize = nsize
+        self%group(:) = 0
+
+    end subroutine Belonging_Allocate
+
+    function Belonging_Value(self, array) result(avg_value)
+        class(Belonging), intent(inout) :: self
+        real(real64), intent(in) :: array(:)
+        real(real64) :: avg_value
+
+        avg_value = sum(array(self%group(:))) / self%nsize
+
+    end function Belonging_Value
 end module Core_BaseTypes
