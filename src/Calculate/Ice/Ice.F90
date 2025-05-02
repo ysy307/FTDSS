@@ -15,12 +15,16 @@ module Calculate_Ice
     public :: Type_Ice_EXP
     public :: Abstract_Ice
 
+    type :: IceHolder
+        class(Abstract_Ice), allocatable :: Ice
+    end type IceHolder
+
     type, abstract :: Abstract_Ice
         integer(int32) :: nsize
-        type(Variables) :: Qw
-        type(Variables) :: Qice
-        type(Variables) :: Si
-        type(Variables) :: Temperature
+        ! type(Variables) :: Qw
+        ! type(Variables) :: Qice
+        ! type(Variables) :: Si
+        ! type(Variables) :: Temperature
     end type
 
     type, extends(Abstract_Ice) :: Type_Ice_TRM

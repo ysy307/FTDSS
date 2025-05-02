@@ -16,6 +16,10 @@ module Main_Thermal
 
     type, abstract :: Abstract_Thermal
         type(Variables) :: T
+        type(Variables) :: Qw
+        type(Variables) :: Qice
+        type(Variables) :: D_Qice
+        type(Variables) :: Si
 
         type(Type_CRS) :: KT_star_0
         type(Type_CRS) :: KT_l
@@ -34,7 +38,7 @@ module Main_Thermal
         type(ElementHolder), allocatable :: Elements(:)
         type(Type_BC_Thermal) :: BC
         !! Thermal properties
-        class(Abstract_Ice), allocatable :: Ice
+        class(Abstract_Ice), allocatable :: Ice(:)
         class(Abstract_ThermalConductivity), allocatable :: THC
         class(Abstract_Density), allocatable :: DEN
         class(Abstract_SpecificHeat), allocatable :: SPH

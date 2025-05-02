@@ -111,8 +111,13 @@ add_library(Calc_HCF
 )
 target_link_libraries(Calc_HCF PRIVATE Calc_WRF Core)
 
-add_library(Calc_GCC src/Calculate/GCC.F90)
-target_link_libraries(Calc_GCC PRIVATE Calc_HCF)
+add_library(Calc_GCC
+    src/Calculate/GCC/GCC.F90
+    src/Calculate/GCC/GCC_NonSegregation_m.F90
+    src/Calculate/GCC/GCC_NonSegregation_Pa.F90
+    src/Calculate/GCC/GCC_Segregation_m.F90
+    src/Calculate/GCC/GCC_Segregation_Pa.F90
+)
 
 # --- Ice ---
 add_library(Calc_Ice 

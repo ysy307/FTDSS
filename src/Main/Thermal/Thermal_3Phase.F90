@@ -70,85 +70,89 @@ contains
 
         call Structure%T%allocate(Structure%nsize, Input%Basic%Order)
 
-        do i = 1, Input%Basic%numRegion
-            select case (Input%Regions(i)%Ice%QiceType)
-            case (1)
-                Structure%Ice = Type_Ice_TRM(Input%Regions(i)%Thermal%LatentHeat, Input%Regions(i)%Ice%Tf, Structure%nsize)
-            case (2)
-                if (Input%Regions(i)%Flag%isFrostHeavePressure) then
-                !!! TBI
-                else
-                    select case (Input%Regions(i)%Ice%c_unit)
-                    case ("m")
-                        select case (Input%Regions(i)%Ice%ModelType)
-                        case (1:3)
-                            Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
-                                                         isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
-                                                         c_unit=Input%Regions(i)%Ice%c_unit, &
-                                                         nsize=Structure%nsize, &
-                                                         thetaR=Input%Regions(i)%Ice%thetaR, &
-                                                         thetaS=Input%Regions(i)%Ice%thetaS, &
-                                                         alpha1=Input%Regions(i)%Ice%alpha1, &
-                                                         n1=Input%Regions(i)%Ice%n1, &
-                                                         Lf=Input%Regions(i)%Thermal%LatentHeat, &
-                                                         Tf=Input%Regions(i)%Ice%Tf)
-                        case (4)
-                            Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
-                                                         isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
-                                                         c_unit=Input%Regions(i)%Ice%c_unit, &
-                                                         nsize=Structure%nsize, &
-                                                         thetaS=Input%Regions(i)%Ice%thetaS, &
-                                                         thetaR=Input%Regions(i)%Ice%thetaR, &
-                                                         alpha1=Input%Regions(i)%Ice%alpha1, &
-                                                         hcrit=Input%Regions(i)%Ice%hcrit, &
-                                                         n1=Input%Regions(i)%Ice%n1, &
-                                                         Lf=Input%Regions(i)%Thermal%LatentHeat, &
-                                                         Tf=Input%Regions(i)%Ice%Tf)
-                        case (5)
-                            Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
-                                                         isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
-                                                         c_unit=Input%Regions(i)%Ice%c_unit, &
-                                                         nsize=Structure%nsize, &
-                                                         thetaS=Input%Regions(i)%Ice%thetaS, &
-                                                         thetaR=Input%Regions(i)%Ice%thetaR, &
-                                                         alpha1=Input%Regions(i)%Ice%alpha1, &
-                                                         n1=Input%Regions(i)%Ice%n1, &
-                                                         w1=Input%Regions(i)%Ice%w1, &
-                                                         alpha2=Input%Regions(i)%Ice%alpha2, &
-                                                         n2=Input%Regions(i)%Ice%n2, &
-                                                         Lf=Input%Regions(i)%Thermal%LatentHeat, &
-                                                         Tf=Input%Regions(i)%Ice%Tf)
-                        case (6)
-                            Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
-                                                         isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
-                                                         c_unit=Input%Regions(i)%Ice%c_unit, &
-                                                         nsize=Structure%nsize, &
-                                                         thetaS=Input%Regions(i)%Ice%thetaS, &
-                                                         thetaR=Input%Regions(i)%Ice%thetaR, &
-                                                         alpha1=Input%Regions(i)%Ice%alpha1, &
-                                                         n1=Input%Regions(i)%Ice%n1, &
-                                                         n2=Input%Regions(i)%Ice%n2, &
-                                                         Lf=Input%Regions(i)%Thermal%LatentHeat, &
-                                                         Tf=Input%Regions(i)%Ice%Tf)
-                        end select
-                    case ("Pa")
-                !! TBD
-                    end select
-                end if
-            case (3)
-                Structure%Ice = Type_Ice_EXP(Input%Regions(i)%Thermal%LatentHeat, Input%Regions(i)%Ice%phi, Input%Regions(i)%Ice%Tf, Input%Regions(i)%Ice%a, Structure%nsize)
-            end select
+        ! allocate (Structure%Ice(Input%Basic%numRegion))
 
-            ! Structure%C = Type_VolumetricHeatCapacity_3Phase(Structure%Ice, &
-            !                                                  Input%Regions(i)%Thermal%Cp(1), &
-            !                                                  Input%Regions(i)%Thermal%Cp(2), &
-            !                                                  Input%Regions(i)%Thermal%Cp(3), &
-            !                                                  Input%Regions(i)%Thermal%rho(3), &
-            !                                                  Input%Regions(i)%Thermal%rho(2), &
-            !                                                  Input%Regions(i)%Ice%phi, &
-            !                                                  Structure%nsize)
+        ! do i = 1, Input%Basic%numRegion
+        !     select case (Input%Regions(i)%Ice%QiceType)
+        !     case (1)
+        !         Structure%Ice = Type_Ice_TRM(Input%Regions(i)%Thermal%LatentHeat, Input%Regions(i)%Ice%Tf, Structure%nsize)
+        !     case (2)
+        !         if (Input%Regions(i)%Flag%isFrostHeavePressure) then
+        !         !!! TBI
+        !         else
+        !             select case (Input%Regions(i)%Ice%c_unit)
+        !             case ("m")
+        !                 select case (Input%Regions(i)%Ice%ModelType)
+        !                 case (1:3)
+        !                     Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
+        !                                                  isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
+        !                                                  c_unit=Input%Regions(i)%Ice%c_unit, &
+        !                                                  nsize=Structure%nsize, &
+        !                                                  thetaR=Input%Regions(i)%Ice%thetaR, &
+        !                                                  thetaS=Input%Regions(i)%Ice%thetaS, &
+        !                                                  alpha1=Input%Regions(i)%Ice%alpha1, &
+        !                                                  n1=Input%Regions(i)%Ice%n1, &
+        !                                                  Lf=Input%Regions(i)%Thermal%LatentHeat, &
+        !                                                  Tf=Input%Regions(i)%Ice%Tf)
+        !                 case (4)
+        !                     Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
+        !                                                  isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
+        !                                                  c_unit=Input%Regions(i)%Ice%c_unit, &
+        !                                                  nsize=Structure%nsize, &
+        !                                                  thetaS=Input%Regions(i)%Ice%thetaS, &
+        !                                                  thetaR=Input%Regions(i)%Ice%thetaR, &
+        !                                                  alpha1=Input%Regions(i)%Ice%alpha1, &
+        !                                                  hcrit=Input%Regions(i)%Ice%hcrit, &
+        !                                                  n1=Input%Regions(i)%Ice%n1, &
+        !                                                  Lf=Input%Regions(i)%Thermal%LatentHeat, &
+        !                                                  Tf=Input%Regions(i)%Ice%Tf)
+        !                 case (5)
+        !                     Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
+        !                                                  isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
+        !                                                  c_unit=Input%Regions(i)%Ice%c_unit, &
+        !                                                  nsize=Structure%nsize, &
+        !                                                  thetaS=Input%Regions(i)%Ice%thetaS, &
+        !                                                  thetaR=Input%Regions(i)%Ice%thetaR, &
+        !                                                  alpha1=Input%Regions(i)%Ice%alpha1, &
+        !                                                  n1=Input%Regions(i)%Ice%n1, &
+        !                                                  w1=Input%Regions(i)%Ice%w1, &
+        !                                                  alpha2=Input%Regions(i)%Ice%alpha2, &
+        !                                                  n2=Input%Regions(i)%Ice%n2, &
+        !                                                  Lf=Input%Regions(i)%Thermal%LatentHeat, &
+        !                                                  Tf=Input%Regions(i)%Ice%Tf)
+        !                 case (6)
+        !                     Structure%Ice = Type_Ice_GCC(ModelType=Input%Regions(i)%Ice%ModelType, &
+        !                                                  isSegregation=Input%Regions(i)%Flag%isFrostHeavePressure, &
+        !                                                  c_unit=Input%Regions(i)%Ice%c_unit, &
+        !                                                  nsize=Structure%nsize, &
+        !                                                  thetaS=Input%Regions(i)%Ice%thetaS, &
+        !                                                  thetaR=Input%Regions(i)%Ice%thetaR, &
+        !                                                  alpha1=Input%Regions(i)%Ice%alpha1, &
+        !                                                  n1=Input%Regions(i)%Ice%n1, &
+        !                                                  n2=Input%Regions(i)%Ice%n2, &
+        !                                                  Lf=Input%Regions(i)%Thermal%LatentHeat, &
+        !                                                  Tf=Input%Regions(i)%Ice%Tf)
+        !                 end select
+        !             case ("Pa")
+        !         !! TBD
+        !             end select
+        !         end if
+        !     case (3)
+        !         Structure%Ice = Type_Ice_EXP(Input%Regions(i)%Thermal%LatentHeat, Input%Regions(i)%Ice%phi, Input%Regions(i)%Ice%Tf, Input%Regions(i)%Ice%a, Structure%nsize)
+        !     end select
 
-        end do
+        !     ! Structure%C = Type_VolumetricHeatCapacity_3Phase(Structure%Ice, &
+        !     !                                                  Input%Regions(i)%Thermal%Cp(1), &
+        !     !                                                  Input%Regions(i)%Thermal%Cp(2), &
+        !     !                                                  Input%Regions(i)%Thermal%Cp(3), &
+        !     !                                                  Input%Regions(i)%Thermal%rho(3), &
+        !     !                                                  Input%Regions(i)%Thermal%rho(2), &
+        !     !                                                  Input%Regions(i)%Ice%phi, &
+        !     !                                                  Structure%nsize)
+
+        ! end do
+
+        !! Thermal properties
         Structure%THC = Type_ThermalConductivity_3Phase(Input)
         Structure%DEN = Type_Density_3Phase(Input)
         Structure%SPH = Type_SpecificHeat_3Phase(Input)
