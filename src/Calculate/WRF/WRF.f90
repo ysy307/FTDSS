@@ -130,12 +130,12 @@ module Calculate_WRF
     end interface
 
     interface
-        module function Construct_Type_WRF_VG(Input) result(structure)
+        module function Type_WRF_VG_Construct(Input) result(structure)
             implicit none
             type(Input_Region), intent(in) :: Input
             class(Abstract_WRF), allocatable :: structure
 
-        end function Construct_Type_WRF_VG
+        end function Type_WRF_VG_Construct
 
         module function Calculate_WRF_VG(self, h) result(thetaW)
             implicit none
@@ -260,7 +260,7 @@ module Calculate_WRF
     end interface
 
     interface Type_WRF_VG
-        module procedure Construct_Type_WRF_VG
+        module procedure :: Type_WRF_VG_Construct
     end interface
 
     interface Type_WRF_KO

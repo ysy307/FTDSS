@@ -121,7 +121,7 @@ contains
     end function Calc_HTC_3Phase_Wrap
 
     module subroutine Update_HTC_3Phase(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, &
-                                        Ice, Temperature, Density, Pw)
+                                        Ice, Temperature, Density, arr_Pw)
         implicit none
         class(Type_HeatCapacity_3Phase_Apparent), intent(inout) :: self
         type(Belonging), intent(inout) :: NodeBelonging(:)
@@ -130,30 +130,49 @@ contains
         real(real64), intent(in), optional :: arr_phi3(:)
         real(real64), intent(in), optional :: arr_phi4(:)
         class(Abstract_Ice), intent(inout), optional :: Ice
-        real(real64), intent(in), optional :: Temperature
+        real(real64), intent(in), optional :: Temperature(:)
         class(Abstract_Density), intent(inout), optional :: Density
-        real(real64), intent(in), optional :: Pw
+        real(real64), intent(in), optional :: arr_Pw(:)
 
         integer(int32) :: iN
         real(real64) :: HeatCapacity_soil, HeatCapacity_water, HeatCapacity_ice
 
-        !$omp parallel do private(iN)
-        do iN = 1, self%nsize
-            self%value(iN, 1) = Calc_HTC_3Phase(NodeBelonging(iN), &
-                                                self%soil, &
-                                                arr_phi1(iN), &
-                                                self%water, &
-                                                arr_phi2(iN), &
-                                                self%ice, &
-                                                arr_phi3(iN))
-            self%value(iN, 2) = Calc_HTC_3Phase_Apparent(NodeBelonging(iN), &
-                                                         self%value(iN, 1), &
-                                                         Ice, &
-                                                         Temperature, &
-                                                         Density, &
-                                                         Pw)
-        end do
-        !$omp end parallel do
+        if (.not. present(arr_Pw)) then
+            do iN = 1, self%nsize
+                self%value(iN, 1) = Calc_HTC_3Phase(NodeBelonging(iN), &
+                                                    self%soil, &
+                                                    arr_phi1(iN), &
+                                                    self%water, &
+                                                    arr_phi2(iN), &
+                                                    self%ice, &
+                                                    arr_phi3(iN))
+                self%value(iN, 2) = Calc_HTC_3Phase_Apparent(NodeBelonging(iN), &
+                                                             self%value(iN, 1), &
+                                                             Ice, &
+                                                             Temperature(iN), &
+                                                             Density)
+            end do
+            ! $omp end parallel do
+        else
+            !$omp parallel do private(iN)
+            do iN = 1, self%nsize
+                self%value(iN, 1) = Calc_HTC_3Phase(NodeBelonging(iN), &
+                                                    self%soil, &
+                                                    arr_phi1(iN), &
+                                                    self%water, &
+                                                    arr_phi2(iN), &
+                                                    self%ice, &
+                                                    arr_phi3(iN))
+                self%value(iN, 2) = Calc_HTC_3Phase_Apparent(NodeBelonging(iN), &
+                                                             self%value(iN, 1), &
+                                                             Ice, &
+                                                             Temperature(iN), &
+                                                             Density, &
+                                                             arr_Pw(iN))
+            end do
+            !$omp end parallel do
+        end if
+
     end subroutine Update_HTC_3Phase
 
 end submodule Calculate_HeatCapacity_3Phase_Apparent

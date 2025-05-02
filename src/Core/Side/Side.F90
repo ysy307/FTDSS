@@ -44,9 +44,9 @@ module Core_Side
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:) !! Gauss Quadrature points Coordinate
     contains
-        procedure(Abstract_getNmNodes), pass(self), deferred :: getNumNodes
-        procedure(Abstract_psi), pass(self), deferred :: psi
-        procedure(Abstract_dpsi_dxi), pass(self), deferred :: dpsi_dxi
+        procedure(Abstract_getNmNodes), pass(self), deferred :: getNumNodes !&
+        procedure(Abstract_psi),        pass(self), deferred :: psi !&
+        procedure(Abstract_dpsi_dxi),   pass(self), deferred :: dpsi_dxi !&
         ! procedure(Jacobian_Components_if), pass(self), deferred :: Jac
         ! procedure(Jacobian_Det_if), pass(self), deferred :: Jac_Det
     end type Abstract_SideType
@@ -56,9 +56,9 @@ module Core_Side
     !--------------------------------------------------------------------------------------
     type, extends(Abstract_SideType) :: SideFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SideFirst
-        procedure, pass(self) :: psi => psi_SideFirst
-        procedure, pass(self) :: dpsi_dxi => dpsi_dxi_SideFirst
+        procedure, pass(self) :: getNumNodes => getNumNodes_SideFirst !&
+        procedure, pass(self) :: psi         => psi_SideFirst !&
+        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SideFirst !&
     end type SideFirst
 
     !--------------------------------------------------------------------------------------

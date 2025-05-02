@@ -2,106 +2,109 @@ submodule(Calculate_Ice) Calculate_Ice_EXP_Implementation
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
 contains
-    module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, nsize) result(structure)
+    module function Type_Ice_EXP_Construct(Input, nsize) result(Structure)
         implicit none
-        real(real64), intent(in) :: Lf
-        real(real64), intent(in) :: phi
-        real(real64), intent(in) :: Tf
-        real(real64), intent(in) :: a
+        type(Input_Region), intent(inout) :: Input
         integer(int32), intent(in) :: nsize
-        class(Abstract_Ice), allocatable :: structure
+        class(Abstract_Ice), allocatable :: Structure
 
+        if (allocated(Structure)) deallocate (Structure)
         allocate (Type_Ice_EXP :: structure)
 
         select type (this => structure)
         type is (Type_Ice_EXP)
-            this%Lf = Lf
-            this%phi = phi
-            this%Tf = Tf
-            this%a = a
-
+            this%Lf = Input%Thermal%LatentHeat
+            this%Tf = Input%Ice%Tf
+            this%a = Input%Ice%a
             this%nsize = nsize
-
-            call this%Qw%allocate(nsize, 3)
-            call this%Qice%allocate(nsize, 3)
-            call this%Si%allocate(nsize, 3)
-            call this%D_Qice%allocate(nsize, 3)
-
         end select
 
-    end function Construct_Type_Ice_EXP
+    end function Type_Ice_EXP_Construct
 
-    module function Construct_Type_Ice_EXP_minimum() result(structure)
-        implicit none
-        class(Abstract_Ice), allocatable :: structure
-
-        allocate (Type_Ice_EXP :: structure)
-
-    end function Construct_Type_Ice_EXP_minimum
-
-    module function Calculate_Ice_EXP(self, Temperature) result(Qice)
-        !$omp declare simd uniform(self, Temperature)
+    module function Calculate_Ice_EXP(self, T, phi, Pw, rhoW, rhoI) result(Qice)
         implicit none
         class(Type_Ice_EXP), intent(inout) :: self
-        real(real64), intent(in) :: Temperature
+        real(real64), intent(in), optional :: T
+        real(real64), intent(in), optional :: phi
+        real(real64), intent(in), optional :: Pw
+        real(real64), intent(in), optional :: rhoW
+        real(real64), intent(in), optional :: rhoI
         real(real64) :: Qice
 
-        if (Temperature <= self%Tf) then
-            Qice = self%phi * (1.0d0 - (1.0d0 - Temperature + self%Tf)**self%a)
+        if (T <= self%Tf) then
+            Qice = phi * (1.0d0 - (1.0d0 - T + self%Tf)**self%a)
         else
             Qice = 0.0d0
         end if
 
     end function Calculate_Ice_EXP
 
-    module function Calculate_Ice_EXP_Derivative_Temperature(self, Temperature) result(D_Qice)
-        !$omp declare simd uniform(self, Temperature)
+    module function Calculate_Ice_EXP_Derivative(self, T, phi, Pw, rhoW, rhoI) result(D_Qice)
         implicit none
         class(Type_Ice_EXP), intent(inout) :: self
-        real(real64), intent(in) :: Temperature
+        real(real64), intent(in), optional :: T
+        real(real64), intent(in), optional :: phi
+        real(real64), intent(in), optional :: Pw
+        real(real64), intent(in), optional :: rhoW
+        real(real64), intent(in), optional :: rhoI
         real(real64) :: D_Qice
 
-        if (Temperature <= self%Tf) then
-            D_Qice = self%phi * self%a * (1.0d0 - Temperature + self%Tf)**(self%a - 1.0d0)
+        if (T <= self%Tf) then
+            D_Qice = phi * self%a * (1.0d0 - T + self%Tf)**(self%a - 1.0d0)
         else
             D_Qice = 0.0d0
         end if
 
-    end function Calculate_Ice_EXP_Derivative_Temperature
+    end function Calculate_Ice_EXP_Derivative
 
-    module subroutine Update_Ice_EXP(self, arr_Temperature)
+    module subroutine Update_Ice_EXP(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Cp, arr_Qw, arr_Qice, arr_Si)
         implicit none
         class(Type_Ice_EXP), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
+        type(Belonging), intent(inout), optional :: NodeBelonging(:)
+        real(real64), intent(inout), optional :: arr_T(:)
+        real(real64), intent(in), optional :: arr_phi(:)
+        real(real64), intent(in), optional :: arr_Pw(:)
+        class(Abstract_Density), intent(in), optional :: Density
+        real(real64), intent(in) :: arr_Cp(:)
+        real(real64), intent(inout), optional :: arr_Qw(:)
+        real(real64), intent(inout), optional :: arr_Qice(:)
+        type(Variables), intent(inout), optional :: arr_Si
 
         integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
         do iN = 1, self%nsize
-            if (self%Temperature%pre(iN) < self%Tf) then
-                self%Qice%pre(iN) = self%Calculate_Ice(arr_Temperature(iN))
+            if (arr_T(iN) < self%Tf) then
+                arr_Qice(iN) = self%Calculate_Ice(arr_T(iN), arr_phi(iN))
             else
-                self%Qice%pre(iN) = 0.0d0
+                arr_Qice(iN) = 0.0d0
             end if
+            arr_Qw(iN) = arr_phi(iN) - arr_Qice(iN)
         end do
 
     end subroutine Update_Ice_EXP
 
-    module subroutine Update_Ice_EXP_Derivative_Temperature(self, arr_Temperature)
+    module subroutine Update_Ice_EXP_Derivative(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Dice)
         implicit none
         class(Type_Ice_EXP), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
+        type(Belonging), intent(inout), optional :: NodeBelonging(:)
+        real(real64), intent(in), optional :: arr_T(:)
+        real(real64), intent(in), optional :: arr_phi(:)
+        real(real64), intent(in), optional :: arr_Pw(:)
+        class(Abstract_Density), intent(in), optional :: Density
+        real(real64), intent(inout), optional :: arr_Dice(:)
+
         integer(int32) :: iN
 
         !$omp parallel do schedule(guided) private(iN)
         do iN = 1, self%nsize
-            if (self%Temperature%pre(iN) < self%Tf) then
-                self%D_Qice%pre(iN) = self%Calculate_Ice_Derivative(arr_Temperature(iN))
+            if (arr_T(iN) < self%Tf) then
+                arr_Dice(iN) = self%Calculate_Ice_Derivative(arr_T(iN), arr_phi(iN))
             else
-                self%Qice%pre(iN) = 0.0d0
+                arr_Dice(iN) = 0.0d0
             end if
         end do
 
-    end subroutine Update_Ice_EXP_Derivative_Temperature
+    end subroutine Update_Ice_EXP_Derivative
 
 end submodule Calculate_Ice_EXP_Implementation

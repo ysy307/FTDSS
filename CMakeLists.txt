@@ -5,6 +5,12 @@ cmake_minimum_required(VERSION 3.30)
 project(YSY_FC LANGUAGES Fortran)
 enable_language(Fortran)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING
+      "Choose the type of build: Debug or Release" FORCE)
+endif()
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 # Options
 option(ENABLE_OPTIMIZE "Enable optimization flags" ON)
 option(ENABLE_OPENMP   "Enable OpenMP support"     ON)
@@ -21,204 +27,34 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_INCLUDE_PATH             ${PROJECT_SOURCE_DIR}/include)
 
+
+# 共通スクリプト読み込み
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(Toolchain)
+
 ### Compiler Configuration
 if(NOT DEFINED CMAKE_Fortran_COMPILER)
     set(CMAKE_Fortran_COMPILER ifx)
 endif()
 
-# Libraries
-file(GLOB_RECURSE MY_ALL_LIBRARIES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.a)
-set(LINK_LIBRARIES ${MY_ALL_LIBRARIES})
-
-if(ENABLE_OPENMP)
-    find_package(OpenMP REQUIRED)
-    list(APPEND LINK_LIBRARIES OpenMP::OpenMP_Fortran)
-endif()
-
-if(ENABLE_MPI)
-    find_package(MPI REQUIRED)
-    list(APPEND LINK_LIBRARIES MPI::MPI_Fortran)
-endif()
-
-# Include Paths
-set(My_INCLUDE_PATH
-    ${CMAKE_INCLUDE_PATH}/Json-Fortran
-    ${CMAKE_INCLUDE_PATH}/VTKFortran
-    /workspaces/FTDSS/EXTERNAL/fortran_stdlib/include/fortran_stdlib/IntelLLVM-2025.0.4
-)
-
-# External Libraries
-set(fortran_stdlib_DIR "/workspaces/FTDSS/EXTERNAL/fortran_stdlib/lib/cmake/fortran_stdlib")
-find_package(fortran_stdlib REQUIRED)
-list(APPEND LINK_LIBRARIES fortran_stdlib::fortran_stdlib)
-
 # Source Files
-# --- Core ---
-add_library(Core
-    src/Core/Error.F90
-    src/Core/Allocate.F90
-    src/Core/BaseTypes.F90
-    src/Core/Element/Element.F90
-    src/Core/Element/Element_SquareFirst.F90
-    src/Core/Element/Element_TriangleFirst.F90
-    src/Core/Side/Side.F90
-    src/Core/Side/Side_First.F90
-    src/Core/Unique.F90
-    src/Core/VTK.F90
-)
-target_include_directories(Core PUBLIC ${My_INCLUDE_PATH})
-
-# --- Matrix CRS ---
-add_library(Matrix 
-    src/Matrix/CRS.F90
-    src/Matrix/Assemble.F90
-)
-target_link_libraries(Matrix PRIVATE Core)
-
-# --- BLAS ---
-add_library(Calc_BLAS src/Calculate/BLAS.F90)
-target_link_libraries(Calc_BLAS PRIVATE Matrix)
-
-# --- Conditions ---
-add_library(Conditions
-    src/Conditions/Fix_Boundary_Conditions.F90
-    src/Conditions/Fix_Initial_Conditions.F90
-)
-target_link_libraries(Conditions PRIVATE Core Matrix)
-
-# --- Inout Input ---
-add_library(Input 
-    src/Inout/SetProjectPath.F90
-    src/Inout/Input.F90
-)
-target_link_libraries(Input PRIVATE Core Conditions)
-target_include_directories(Input PUBLIC ${My_INCLUDE_PATH})
-
-# --- Calculate WRF, HCF, GCC ---
-add_library(Calc_WRF
-    src/Calculate/WRF/WRF.F90
-    src/Calculate/WRF/WRF_BC.F90
-    src/Calculate/WRF/WRF_VG.F90
-    src/Calculate/WRF/WRF_KO.F90
-    src/Calculate/WRF/WRF_MVG.F90
-    src/Calculate/WRF/WRF_Durner.F90
-    src/Calculate/WRF/WRF_DVGCH.F90
-)
-target_link_libraries(Calc_WRF PRIVATE
-    Input
-)
-
-add_library(Calc_HCF
-    src/Calculate/HCF/HCF.F90
-    src/Calculate/HCF/HCF_BC.F90
-    src/Calculate/HCF/HCF_VG.F90
-    src/Calculate/HCF/HCF_KO.F90
-    src/Calculate/HCF/HCF_MVG.F90
-    src/Calculate/HCF/HCF_Durner.F90
-    src/Calculate/HCF/HCF_DVGCH.F90
-    src/Calculate/HCF/HCF_Impedance.F90
-    src/Calculate/HCF/HCF_Viscosity.F90
-)
-target_link_libraries(Calc_HCF PRIVATE 
-    Core    
-    Calc_WRF 
-)
-
-add_library(Calc_GCC
-    src/Calculate/GCC/GCC.F90
-    src/Calculate/GCC/GCC_NonSegregation_m.F90
-    src/Calculate/GCC/GCC_NonSegregation_Pa.F90
-    src/Calculate/GCC/GCC_Segregation_m.F90
-    src/Calculate/GCC/GCC_Segregation_Pa.F90
-)
-
-# --- Ice ---
-add_library(Calc_Ice 
-    src/Calculate/Ice/Ice.F90
-    src/Calculate/Ice/Ice_TRM.F90
-    src/Calculate/Ice/Ice_GCC.F90
-    src/Calculate/Ice/Ice_EXP.F90
-)
-target_link_libraries(Calc_Ice PRIVATE Calc_GCC Calc_WRF Core)
-
-# --- Material Properties ---
-add_library(Calc_THC
-    src/Calculate/ThermalConductivity/ThermalConductivity.F90
-    src/Calculate/ThermalConductivity/ThermalConductivity_3Phase.F90
-)
-target_link_libraries(Calc_THC PRIVATE
-    Core
-    Input
-)
-
-add_library(Calc_DEN
-    src/Calculate/Density/Density.F90
-    src/Calculate/Density/Density_3Phase.F90
-)
-target_link_libraries(Calc_DEN PRIVATE
-    Core
-    Input
-)
-
-add_library(Calc_SPH
-    src/Calculate/SpecificHeat/SpecificHeat.F90
-    src/Calculate/SpecificHeat/SpecificHeat_3Phase.F90
-)
-target_link_libraries(Calc_SPH PRIVATE
-    Core
-    Input
-)
-
-add_library(Calc_VHC
-    src/Calculate/HeatCapacity/HeatCapacity.F90
-    src/Calculate/HeatCapacity/HeatCapacity_3Phase_Apparent.F90
-)
-target_link_libraries(Calc_VHC PRIVATE
-    Core
-    Input
-    Calc_Ice
-    Calc_GCC
-    Calc_DEN
-)
-
-
-# --- Solver ---
-add_library(Solver 
-    src/Solver/Solve.f90
-    src/Solver/Solve_BiCGSTAB.F90
-    src/Solver/Solve_LU.F90
-    src/Solver/Solve_Preconditioner.F90
-    src/Solver/Time.F90
-)
-target_link_libraries(Solver PRIVATE 
-    Matrix
-    Core
-    Input
-    Calc_BLAS
-)
-
-# --- Main Thermal ---
-add_library(Thermal 
-    src/Main/Thermal/Thermal.F90
-    src/Main/Thermal/Thermal_3Phase.F90
-)
-target_link_libraries(Thermal PRIVATE 
-    Core
-    Input
-    Calc_Ice
-    Calc_THC
-    Calc_VHC
-    Calc_DEN
-    Calc_SPH
-    Matrix
-    Conditions
-    Solver
-)
-
-# --- Output ---
-add_library(Output src/Inout/Output.F90)
-target_link_libraries(Output PRIVATE Input Core Thermal)
-target_include_directories(Output PUBLIC ${My_INCLUDE_PATH})
+add_subdirectory(src/Core)
+add_subdirectory(src/Matrix)
+add_subdirectory(src/Conditions)
+add_subdirectory(src/Inout/Input)
+add_subdirectory(src/Calculate/BLAS)
+add_subdirectory(src/Calculate/WRF)
+add_subdirectory(src/Calculate/HCF)
+add_subdirectory(src/Calculate/GCC)
+add_subdirectory(src/Calculate/ThermalConductivity)
+add_subdirectory(src/Calculate/Density)
+add_subdirectory(src/Calculate/SpecificHeat)
+add_subdirectory(src/Calculate/HeatCapacity)
+add_subdirectory(src/Calculate/Ice)
+add_subdirectory(src/Solver)
+add_subdirectory(src/Main/Thermal)
+add_subdirectory(src/Inout/Output)
+add_subdirectory(src/Main/FTDSS)
 
 # Debug Information
 message(STATUS "Fortran Compiler ID: ${CMAKE_Fortran_COMPILER_ID}")
@@ -247,10 +83,12 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Solver
         Thermal
         Output
+        FTDSS
         ${LINK_LIBRARIES}
     )
     target_link_libraries(ysy_fc PRIVATE ${LINK_LIBRARIES})
     target_include_directories(ysy_fc PUBLIC ${My_INCLUDE_PATH})
+    
 
     # Compilation Flags
     target_compile_options(ysy_fc PUBLIC -fpp -traceback)
@@ -285,7 +123,7 @@ elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
     target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
     target_compile_options(test PUBLIC -fpp -traceback)
-    target_link_options(test PUBLIC -fpp -traceback)
+    target_link_options   (test PUBLIC -fpp -traceback)
 
     # Link core libraries
     target_link_libraries(test PRIVATE
@@ -304,6 +142,7 @@ elseif(BUILD_APP STREQUAL "test")
         Solver
         Thermal
         Output
+        FTDSS
         ${LINK_LIBRARIES}
     )
 

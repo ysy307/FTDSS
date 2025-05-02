@@ -156,7 +156,7 @@ module Calculate_HeatCapacity
         end function Abstract_Calculate_HeatCapacity
 
         subroutine Abstract_Update_HeatCapacity(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, &
-                                                Ice, Temperature, Density, Pw)
+                                                Ice, Temperature, Density, arr_Pw)
             import :: Abstract_HeatCapacity, Abstract_Ice, Belonging, real64, Abstract_Density
             implicit none
             class(Abstract_HeatCapacity), intent(inout) :: self
@@ -166,9 +166,9 @@ module Calculate_HeatCapacity
             real(real64), intent(in), optional :: arr_phi3(:)
             real(real64), intent(in), optional :: arr_phi4(:)
             class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature
+            real(real64), intent(in), optional :: Temperature(:)
             class(Abstract_Density), intent(inout), optional :: Density
-            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: arr_Pw(:)
 
         end subroutine Abstract_Update_HeatCapacity
 
@@ -200,7 +200,7 @@ module Calculate_HeatCapacity
         end function Calc_HTC_3Phase_Wrap
 
         module subroutine Update_HTC_3Phase(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, &
-                                            Ice, Temperature, Density, Pw)
+                                            Ice, Temperature, Density, arr_Pw)
             implicit none
             class(Type_HeatCapacity_3Phase_Apparent), intent(inout) :: self
             type(Belonging), intent(inout) :: NodeBelonging(:)
@@ -209,9 +209,9 @@ module Calculate_HeatCapacity
             real(real64), intent(in), optional :: arr_phi3(:)
             real(real64), intent(in), optional :: arr_phi4(:)
             class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature
+            real(real64), intent(in), optional :: Temperature(:)
             class(Abstract_Density), intent(inout), optional :: Density
-            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: arr_Pw(:)
 
         end subroutine Update_HTC_3Phase
     end interface

@@ -1,365 +1,318 @@
 module Calculate_Ice
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env
+    use :: Core_BaseTypes
+    use :: Core_Allocate, only:Allocate_Array
+    use :: Inout_Input
     use :: Calculate_WRF
     use :: Calculate_GCC
-    use :: Core_BaseTypes, only:Variables
-    use :: Core_Allocate, only:Allocate_Array
+    use :: Calculate_Density
 #ifdef _OPENMP
     use omp_lib
 #endif
     implicit none
     private
 
+    public :: Abstract_Ice
     public :: Type_Ice_TRM
     public :: Type_Ice_GCC
     public :: Type_Ice_EXP
-    public :: Abstract_Ice
+    public :: IceHolder
 
     type :: IceHolder
-        class(Abstract_Ice), allocatable :: Ice
+        class(Abstract_Ice), allocatable :: f
     end type IceHolder
 
     type, abstract :: Abstract_Ice
         integer(int32) :: nsize
-        ! type(Variables) :: Qw
-        ! type(Variables) :: Qice
-        ! type(Variables) :: Si
-        ! type(Variables) :: Temperature
+    contains
+        procedure(Abstract_Calculate_Ice),            pass(self), deferred :: Calculate_Ice !&
+        procedure(Abstract_Calculate_Ice_Derivative), pass(self), deferred :: Calculate_Ice_Derivative !&
+        procedure(Abstract_Update_Ice),               pass(self), deferred :: Update_Ice !&
+        procedure(Abstract_Update_Ice_Derivative),    pass(self), deferred :: Update_Ice_Derivative !&
     end type
 
     type, extends(Abstract_Ice) :: Type_Ice_TRM
-        real(real64) :: Lf !! Latent heat
-        real(real64) :: Tf !! Freezing point
+        real(real64) :: Lf
+        real(real64) :: Tf
     contains
-        procedure, pass(self), private :: Update_Ice_TRM_scalar
-        procedure, pass(self), private :: Update_Ice_TRM_array
-        generic, public :: Update_Ice => Update_Ice_TRM_scalar, & !&
-                                         Update_Ice_TRM_array !&
+        procedure :: Calculate_Ice            => Calculate_Ice_TRM !&
+        procedure :: Calculate_Ice_Derivative => Calculate_Ice_TRM_Derivative !&
+        procedure :: Update_Ice               => Update_Ice_TRM !&
+        procedure :: Update_Ice_Derivative    => Update_Ice_TRM_Derivative !&
     end type
 
     type, extends(Abstract_Ice) :: Type_Ice_GCC
         class(Abstract_WRF), allocatable :: WRF
         class(Abstract_GCC), allocatable :: GCC
-        type(Variables) :: D_Qice
     contains
-        procedure, nopass, private :: Set_Type_Ice_GCC_WRF
-        procedure, nopass, private :: Set_Type_Ice_GCC_WRF_minimum
-        generic, private :: Set_WRF => Set_Type_Ice_GCC_WRF, & !&
-                                       Set_Type_Ice_GCC_WRF_minimum !&
-        procedure, nopass, private :: Set_Type_Ice_GCC_GCC
-        procedure, nopass, private :: Set_Type_Ice_GCC_GCC_minimum
-        generic, private :: Set_GCC => Set_Type_Ice_GCC_GCC, & !&
-                                       Set_Type_Ice_GCC_GCC_minimum !&
-
-        procedure, pass(self), private :: Calculate_Ice_GCC_NonSegregation_m
-        procedure, pass(self), private :: Calculate_Ice_GCC_rhoW_scalar
-        generic, public :: Calculate_Ice => Calculate_Ice_GCC_NonSegregation_m, & !&
-                                            Calculate_Ice_GCC_rhoW_Scalar
-
-        procedure, pass(self), private :: Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m
-        procedure, pass(self), private :: Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar
-        generic, public :: Calculate_Ice_Derivative => Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m, & !&
-                                                       Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar
-
-        procedure, pass(self), private :: Update_Ice_GCC_NonSegregation_m
-        procedure, pass(self), private :: Update_Ice_GCC_rhoW_scalar
-        procedure, pass(self), private :: Update_Ice_GCC_rhoW_array
-        generic, public :: Update_Ice => Update_Ice_GCC_NonSegregation_m, & !&
-                                            Update_Ice_GCC_rhoW_Scalar, & !&
-                                            Update_Ice_GCC_rhoW_Array !&
-
-        procedure, pass(self), private :: Update_Ice_GCC_Derivative_Temperature_NonSegregation_m
-        procedure, pass(self), private :: Update_Ice_GCC_Derivative_Temperature_rhoW_scalar
-        procedure, pass(self), private :: Update_Ice_GCC_Derivative_Temperature_rhoW_array
-        generic, public :: Update_Ice_Derivative => Update_Ice_GCC_Derivative_Temperature_NonSegregation_m, & !&
-                                                    Update_Ice_GCC_Derivative_Temperature_rhoW_scalar, & !&
-                                                    Update_Ice_GCC_Derivative_Temperature_rhoW_array !&
+        procedure :: Calculate_Ice            => Calculate_Ice_GCC !&
+        procedure :: Calculate_Ice_Derivative => Calculate_Ice_GCC_Derivative !&
+        procedure :: Update_Ice               => Update_Ice_GCC !&
+        procedure :: Update_Ice_Derivative    => Update_Ice_GCC_Derivative !&
     end type Type_Ice_GCC
 
     type, extends(Abstract_Ice) :: Type_Ice_EXP
-        real(real64) :: Lf !! Latent heat
-        real(real64) :: phi !! Porosity
-        real(real64) :: Tf !! Freezing point
-        real(real64) :: a !! power model parameter
-        type(Variables) :: D_Qice
+        real(real64) :: Lf
+        real(real64) :: Tf
+        real(real64) :: a
     contains
-        procedure, pass(self), public :: Calculate_Ice => Calculate_Ice_EXP
-        procedure, pass(self), public :: Calculate_Ice_Derivative => Calculate_Ice_EXP_Derivative_Temperature
-        procedure, pass(self), public :: Update_Ice => Update_Ice_EXP
-        procedure, pass(self), public :: Update_Ice_Derivative => Update_Ice_EXP_Derivative_Temperature
+        procedure :: Calculate_Ice            => Calculate_Ice_EXP !&
+        procedure :: Calculate_Ice_Derivative => Calculate_Ice_EXP_Derivative !&
+        procedure :: Update_Ice               => Update_Ice_EXP !&
+        procedure :: Update_Ice_Derivative    => Update_Ice_EXP_Derivative !&
     end type Type_Ice_EXP
 
-    interface Type_Ice_TRM
-        module procedure Construct_Type_Ice_TRM
-        module procedure Construct_Type_Ice_TRM_minimum
-    end interface
+    abstract interface
+        function Abstract_Calculate_Ice(self, T, phi, Pw, rhoW, rhoI) result(Qice)
+            import :: Abstract_Ice, real64
+            implicit none
+            class(Abstract_Ice), intent(inout) :: self
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
+            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
+            real(real64) :: Qice
 
-    interface Type_Ice_GCC
-        module procedure Construct_Type_Ice_GCC
-        module procedure Construct_Type_Ice_GCC_minimum
-    end interface
+        end function Abstract_Calculate_Ice
 
-    interface Type_Ice_EXP
-        module procedure Construct_Type_Ice_EXP
-        module procedure Construct_Type_Ice_EXP_minimum
+        function Abstract_Calculate_Ice_Derivative(self, T, phi, Pw, rhoW, rhoI) result(D_Qice)
+            import :: Abstract_Ice, real64
+            implicit none
+            class(Abstract_Ice), intent(inout) :: self
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
+            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
+            real(real64) :: D_Qice
+
+        end function Abstract_Calculate_Ice_Derivative
+
+        subroutine Abstract_Update_Ice(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Cp, arr_Qw, arr_Qice, arr_Si)
+            import :: Abstract_Ice, Belonging, Abstract_Density, real64, Variables
+            implicit none
+            class(Abstract_Ice), intent(inout) :: self
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(inout), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
+            real(real64), intent(in), optional :: arr_Pw(:)
+            class(Abstract_Density), intent(in), optional :: Density
+            real(real64), intent(in) :: arr_Cp(:)
+            real(real64), intent(inout), optional :: arr_Qw(:)
+            real(real64), intent(inout), optional :: arr_Qice(:)
+            type(Variables), intent(inout), optional :: arr_Si
+
+        end subroutine Abstract_Update_Ice
+
+        subroutine Abstract_Update_Ice_Derivative(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Dice)
+            import :: Abstract_Ice, Belonging, Abstract_Density, real64
+            implicit none
+            class(Abstract_Ice), intent(inout) :: self
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(in), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
+            real(real64), intent(in), optional :: arr_Pw(:)
+            class(Abstract_Density), intent(in), optional :: Density
+            real(real64), intent(inout), optional :: arr_Dice(:)
+
+        end subroutine Abstract_Update_Ice_Derivative
     end interface
 
     interface
-        module function Construct_Type_Ice_TRM(Lf, Tf, nsize) result(structure)
-            use, intrinsic :: iso_fortran_env, only: real64
+        module function Construct_Type_Ice_TRM(Input, nsize) result(structure)
             implicit none
-            real(real64), intent(in) :: Lf
-            real(real64), intent(in) :: Tf
+            type(Input_Region), intent(inout) :: Input
             integer(int32), intent(in) :: nsize
             class(Abstract_Ice), allocatable :: structure
 
         end function Construct_Type_Ice_TRM
 
-        module function Construct_Type_Ice_TRM_minimum() result(structure)
-            implicit none
-            class(Abstract_Ice), allocatable :: structure
-
-        end function Construct_Type_Ice_TRM_minimum
-
-        module subroutine Update_Ice_TRM_scalar(self, rhoW, arr_Cp)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_TRM
+        module function Calculate_Ice_TRM(self, T, phi, Pw, rhoW, rhoI) result(Qice)
             implicit none
             class(Type_Ice_TRM), intent(inout) :: self
-            real(real64), intent(in) :: rhoW
-            real(real64), intent(in) :: arr_Cp(:)
-        end subroutine Update_Ice_TRM_scalar
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
+            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
+            real(real64) :: Qice
 
-        module subroutine Update_Ice_TRM_array(self, arr_rhoW, arr_Cp)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_TRM
+        end function Calculate_Ice_TRM
+
+        module function Calculate_Ice_TRM_Derivative(self, T, phi, Pw, rhoW, rhoI) result(D_Qice)
             implicit none
             class(Type_Ice_TRM), intent(inout) :: self
-            real(real64), intent(in) :: arr_rhoW(:)
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
+            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
+            real(real64) :: D_Qice
+
+        end function Calculate_Ice_TRM_Derivative
+
+        module subroutine Update_Ice_TRM(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Cp, arr_Qw, arr_Qice, arr_Si)
+            implicit none
+            class(Type_Ice_TRM), intent(inout) :: self
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(inout), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
+            real(real64), intent(in), optional :: arr_Pw(:)
+            class(Abstract_Density), intent(in), optional :: Density
             real(real64), intent(in) :: arr_Cp(:)
-        end subroutine Update_Ice_TRM_array
+            real(real64), intent(inout), optional :: arr_Qw(:)
+            real(real64), intent(inout), optional :: arr_Qice(:)
+            type(Variables), intent(inout), optional :: arr_Si
 
-        module function Construct_Type_Ice_GCC(ModelType, isSegregation, c_unit, nsize, thetaS, thetaR, alpha1, n1, w1, hcrit, alpha2, n2, Tf, Lf, rhoI) result(construct)
+        end subroutine Update_Ice_TRM
+
+        module subroutine Update_Ice_TRM_Derivative(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Dice)
             implicit none
-            integer(int32), intent(in) :: ModelType
-            logical(4), intent(in) :: isSegregation
-            character(*), intent(in) :: c_unit
+            class(Type_Ice_TRM), intent(inout) :: self
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(in), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
+            real(real64), intent(in), optional :: arr_Pw(:)
+            class(Abstract_Density), intent(in), optional :: Density
+            real(real64), intent(inout), optional :: arr_Dice(:)
+
+        end subroutine Update_Ice_TRM_Derivative
+
+    end interface
+
+    interface
+        module function Type_Ice_GCC_Construct(Input, nsize) result(Structure)
+            implicit none
+            type(Input_Region), intent(inout) :: Input
             integer(int32), intent(in) :: nsize
-            real(real64), intent(in) :: thetaS
-            real(real64), intent(in) :: thetaR
-            real(real64), intent(in) :: alpha1
-            real(real64), intent(in) :: n1
-            real(real64), intent(in), optional :: w1
-            real(real64), intent(in), optional :: hcrit
-            real(real64), intent(in), optional :: alpha2
-            real(real64), intent(in), optional :: n2
-            real(real64), intent(in) :: Tf
-            real(real64), intent(in) :: Lf
-            real(real64), intent(in), optional :: rhoI
+            class(Abstract_Ice), allocatable :: Structure
 
-            class(Abstract_Ice), allocatable :: construct
+        end function Type_Ice_GCC_Construct
 
-        end function Construct_Type_Ice_GCC
-
-        module function Construct_Type_Ice_GCC_minimum(ModelType, isSegregation, c_unit) result(construct)
-            implicit none
-            integer(int32), intent(in) :: ModelType
-            logical(4), intent(in) :: isSegregation
-            character(*), intent(in) :: c_unit
-
-            class(Abstract_Ice), allocatable :: construct
-
-        end function Construct_Type_Ice_GCC_minimum
-
-        module function Set_Type_Ice_GCC_WRF(ModelType, thetaS, thetaR, alpha1, n1, w1, hcrit, alpha2, n2) result(structure_WRF)
-            implicit none
-            integer(int32), intent(in) :: ModelType
-            real(real64), intent(in) :: thetaS
-            real(real64), intent(in) :: thetaR
-            real(real64), intent(in) :: alpha1
-            real(real64), intent(in) :: n1
-            real(real64), intent(in), optional :: w1
-            real(real64), intent(in), optional :: hcrit
-            real(real64), intent(in), optional :: alpha2
-            real(real64), intent(in), optional :: n2
-            class(Abstract_WRF), allocatable :: structure_WRF
-
-        end function Set_Type_Ice_GCC_WRF
-
-        module function Set_Type_Ice_GCC_WRF_minimum(ModelType) result(structure_WRF)
-            implicit none
-            integer(int32), intent(in) :: ModelType
-            class(Abstract_WRF), allocatable :: structure_WRF
-
-        end function Set_Type_Ice_GCC_WRF_minimum
-
-        module function Set_Type_Ice_GCC_GCC(isSegregation, c_unit, Tf, Lf, rhoI) result(structure_GCC)
-            implicit none
-            logical(4), intent(in) :: isSegregation
-            character(*), intent(in) :: c_unit
-            real(real64), intent(in) :: Tf
-            real(real64), intent(in) :: Lf
-            real(real64), intent(in), optional :: rhoI
-
-            class(Abstract_GCC), allocatable :: structure_GCC
-
-        end function Set_Type_Ice_GCC_GCC
-
-        module function Set_Type_Ice_GCC_GCC_minimum(isSegregation, c_unit) result(structure_GCC)
-            implicit none
-            logical(4), intent(in) :: isSegregation
-            character(*), intent(in) :: c_unit
-
-            class(Abstract_GCC), allocatable :: structure_GCC
-
-        end function Set_Type_Ice_GCC_GCC_minimum
-
-        module function Calculate_Ice_GCC_NonSegregation_m(self, Temperature) result(Qice)
+        module function Calculate_Ice_GCC(self, T, phi, Pw, rhoW, rhoI) result(Qice)
             implicit none
             class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: Temperature
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
+            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
             real(real64) :: Qice
 
-        end function Calculate_Ice_GCC_NonSegregation_m
+        end function Calculate_Ice_GCC
 
-        module function Calculate_Ice_GCC_rhoW_scalar(self, Temperature, rhoW, Pw) result(Qice)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
+        module function Calculate_Ice_GCC_Derivative(self, T, phi, Pw, rhoW, rhoI) result(D_Qice)
             implicit none
             class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: Temperature
-            real(real64), intent(in) :: rhoW
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
             real(real64), intent(in), optional :: Pw
-            real(real64) :: Qice
-        end function Calculate_Ice_GCC_rhoW_scalar
-
-        module function Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m(self, Temperature) result(D_Qice)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
-            implicit none
-            class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: Temperature
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
             real(real64) :: D_Qice
-        end function Calculate_Ice_GCC_Derivative_Temperature_NonSegregation_m
 
-        module function Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar(self, Temperature, rhoW, Pw) result(D_Qice)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
+        end function Calculate_Ice_GCC_Derivative
+
+        module subroutine Update_Ice_GCC(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Cp, arr_Qw, arr_Qice, arr_Si)
             implicit none
             class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: Temperature
-            real(real64), intent(in) :: rhoW
-            real(real64), intent(in), optional :: Pw
-            real(real64) :: D_Qice
-        end function Calculate_Ice_GCC_Derivative_Temperature_rhoW_scalar
-
-        module subroutine Update_Ice_GCC_NonSegregation_m(self, arr_Temperature)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
-            implicit none
-            class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
-        end subroutine Update_Ice_GCC_NonSegregation_m
-
-        module subroutine Update_Ice_GCC_rhoW_scalar(self, arr_Temperature, rhoW, arr_Pw)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
-            implicit none
-            class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
-            real(real64), intent(in) :: rhoW
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(inout), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
             real(real64), intent(in), optional :: arr_Pw(:)
-        end subroutine Update_Ice_GCC_rhoW_scalar
+            class(Abstract_Density), intent(in), optional :: Density
+            real(real64), intent(in) :: arr_Cp(:)
+            real(real64), intent(inout), optional :: arr_Qw(:)
+            real(real64), intent(inout), optional :: arr_Qice(:)
+            type(Variables), intent(inout), optional :: arr_Si
 
-        module subroutine Update_Ice_GCC_rhoW_array(self, arr_Temperature, arr_rhoW, arr_Pw)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
+        end subroutine Update_Ice_GCC
+
+        module subroutine Update_Ice_GCC_Derivative(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Dice)
             implicit none
             class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
-            real(real64), intent(in) :: arr_rhoW(:)
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(in), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
             real(real64), intent(in), optional :: arr_Pw(:)
-        end subroutine Update_Ice_GCC_rhoW_array
+            class(Abstract_Density), intent(in), optional :: Density
+            real(real64), intent(inout), optional :: arr_Dice(:)
 
-        module subroutine Update_Ice_GCC_Derivative_Temperature_NonSegregation_m(self, arr_Temperature)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
-            implicit none
-            class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
-        end subroutine Update_Ice_GCC_Derivative_Temperature_NonSegregation_m
+        end subroutine Update_Ice_GCC_Derivative
+    end interface
 
-        module subroutine Update_Ice_GCC_Derivative_Temperature_rhoW_scalar(self, arr_Temperature, rhoW, arr_Pw)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
+    interface
+        module function Type_Ice_EXP_Construct(Input, nsize) result(Structure)
             implicit none
-            class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
-            real(real64), intent(in) :: rhoW
-            real(real64), intent(in), optional :: arr_Pw(:)
-        end subroutine Update_Ice_GCC_Derivative_Temperature_rhoW_scalar
-
-        module subroutine Update_Ice_GCC_Derivative_Temperature_rhoW_array(self, arr_Temperature, arr_rhoW, arr_Pw)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_GCC
-            implicit none
-            class(Type_Ice_GCC), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
-            real(real64), intent(in) :: arr_rhoW(:)
-            real(real64), intent(in), optional :: arr_Pw(:)
-        end subroutine Update_Ice_GCC_Derivative_Temperature_rhoW_array
-
-        module function Construct_Type_Ice_EXP(Lf, phi, Tf, a, nsize) result(self)
-            use, intrinsic :: iso_fortran_env, only: real64
-            implicit none
-            real(real64), intent(in) :: Lf
-            real(real64), intent(in) :: phi
-            real(real64), intent(in) :: Tf
-            real(real64), intent(in) :: a
+            type(Input_Region), intent(inout) :: Input
             integer(int32), intent(in) :: nsize
-            class(Abstract_Ice), allocatable :: self
+            class(Abstract_Ice), allocatable :: Structure
 
-        end function Construct_Type_Ice_EXP
+        end function Type_Ice_EXP_Construct
 
-        module function Construct_Type_Ice_EXP_minimum() result(self)
-            implicit none
-            class(Abstract_Ice), allocatable :: self
-
-        end function Construct_Type_Ice_EXP_minimum
-
-        module function Calculate_Ice_EXP(self, Temperature) result(Qice)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_EXP
+        module function Calculate_Ice_EXP(self, T, phi, Pw, rhoW, rhoI) result(Qice)
             implicit none
             class(Type_Ice_EXP), intent(inout) :: self
-            real(real64), intent(in) :: Temperature
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
+            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
             real(real64) :: Qice
+
         end function Calculate_Ice_EXP
 
-        module function Calculate_Ice_EXP_Derivative_Temperature(self, Temperature) result(D_Qice)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_EXP
+        module function Calculate_Ice_EXP_Derivative(self, T, phi, Pw, rhoW, rhoI) result(D_Qice)
             implicit none
             class(Type_Ice_EXP), intent(inout) :: self
-            real(real64), intent(in) :: Temperature
+            real(real64), intent(in), optional :: T
+            real(real64), intent(in), optional :: phi
+            real(real64), intent(in), optional :: Pw
+            real(real64), intent(in), optional :: rhoW
+            real(real64), intent(in), optional :: rhoI
             real(real64) :: D_Qice
-        end function Calculate_Ice_EXP_Derivative_Temperature
 
-        module subroutine Update_Ice_EXP(self, arr_Temperature)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_EXP
+        end function Calculate_Ice_EXP_Derivative
+
+        module subroutine Update_Ice_EXP(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Cp, arr_Qw, arr_Qice, arr_Si)
             implicit none
             class(Type_Ice_EXP), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(inout), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
+            real(real64), intent(in), optional :: arr_Pw(:)
+            class(Abstract_Density), intent(in), optional :: Density
+            real(real64), intent(in) :: arr_Cp(:)
+            real(real64), intent(inout), optional :: arr_Qw(:)
+            real(real64), intent(inout), optional :: arr_Qice(:)
+            type(Variables), intent(inout), optional :: arr_Si
+
         end subroutine Update_Ice_EXP
 
-        module subroutine Update_Ice_EXP_Derivative_Temperature(self, arr_Temperature)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Type_Ice_EXP
+        module subroutine Update_Ice_EXP_Derivative(self, NodeBelonging, arr_T, arr_phi, arr_Pw, Density, arr_Dice)
             implicit none
             class(Type_Ice_EXP), intent(inout) :: self
-            real(real64), intent(in) :: arr_Temperature(:)
-        end subroutine Update_Ice_EXP_Derivative_Temperature
+            type(Belonging), intent(inout), optional :: NodeBelonging(:)
+            real(real64), intent(in), optional :: arr_T(:)
+            real(real64), intent(in), optional :: arr_phi(:)
+            real(real64), intent(in), optional :: arr_Pw(:)
+            class(Abstract_Density), intent(in), optional :: Density
+            real(real64), intent(inout), optional :: arr_Dice(:)
+
+        end subroutine Update_Ice_EXP_Derivative
+    end interface
+
+    interface Type_Ice_TRM
+        module procedure Construct_Type_Ice_TRM
+    end interface
+
+    interface Type_Ice_GCC
+        module procedure Type_Ice_GCC_Construct
+    end interface
+
+    interface Type_Ice_EXP
+        module procedure Type_Ice_EXP_Construct
     end interface
 
 end module Calculate_Ice

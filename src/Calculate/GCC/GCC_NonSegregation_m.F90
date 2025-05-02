@@ -29,7 +29,7 @@ contains
         real(real64) :: Suction
 
         if (T <= self%Tf) then
-            Suction = ((rhoI / rhoW - 1.0d0) * Pw - self%Lf * rhoI * log((T + self%TtoK) / (self%Tf + self%TtoK))) / (rhoW * self%g)
+            Suction = -self%Lf * log((T + self%TtoK) / (self%Tf + self%TtoK)) / self%g
         else
             Suction = 0.0d0
         end if
@@ -46,11 +46,10 @@ contains
         real(real64) :: Suction_Derivative
 
         if (T <= self%Tf) then
-            Suction_Derivative = -self%Lf * rhoI / ((T + self%TtoK) * rhoW * self%g)
+            Suction_Derivative = -self%Lf / ((T + self%TtoK) * self%g)
         else
             Suction_Derivative = 0.0d0
         end if
-
     end function Calculate_GCC_NonSegregation_m_Derivative
 
 end submodule GCC_NonSegregation_m

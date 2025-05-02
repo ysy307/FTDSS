@@ -1,7 +1,7 @@
 submodule(Calculate_WRF) Calculate_WRF_VG
     implicit none
 contains
-    module function Construct_Type_WRF_VG(Input) result(structure)
+    module function Type_WRF_VG_Construct(Input) result(structure)
         implicit none
         type(Input_Region), intent(in) :: Input
         class(Abstract_WRF), allocatable :: structure
@@ -18,7 +18,7 @@ contains
             this%m1 = 1.0d0 - 1.0d0 / Input%Ice%n1
         end select
 
-    end function Construct_Type_WRF_VG
+    end function Type_WRF_VG_Construct
 
     module function Calculate_WRF_VG(self, h) result(thetaW)
         implicit none

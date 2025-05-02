@@ -49,13 +49,13 @@ module Core_Element
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
     contains
-        procedure(Abstract_getNmNodes), pass(self), deferred :: getNumNodes
-        procedure(Abstract_psi), pass(self), deferred :: psi
-        procedure(Abstract_dpsi_dxi), pass(self), deferred :: dpsi_dxi
-        procedure(Abstract_dpsi_deta), pass(self), deferred :: dpsi_deta
-        procedure(Abstract_Jac), pass(self), deferred :: Jac
-        procedure(Abstract_Jac_Det), pass(self), deferred :: Jac_Det
-        procedure(Abstract_is_inside), pass(self), deferred :: is_inside
+        procedure(Abstract_getNmNodes), pass(self), deferred :: getNumNodes !&
+        procedure(Abstract_psi),        pass(self), deferred :: psi !&
+        procedure(Abstract_dpsi_dxi),   pass(self), deferred :: dpsi_dxi !&
+        procedure(Abstract_dpsi_deta),  pass(self), deferred :: dpsi_deta !&
+        procedure(Abstract_Jac),        pass(self), deferred :: Jac !&
+        procedure(Abstract_Jac_Det),    pass(self), deferred :: Jac_Det !&
+        procedure(Abstract_is_inside),  pass(self), deferred :: is_inside !&
     end type Abstract_ElementType
 
     !--------------------------------------------------------------------------------------
@@ -63,13 +63,13 @@ module Core_Element
     !--------------------------------------------------------------------------------------
     type, extends(Abstract_ElementType) :: TriangleFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_TriangleFirst
-        procedure, pass(self) :: psi => psi_TriangleFirst
-        procedure, pass(self) :: dpsi_dxi => dpsi_dxi_TriangleFirst
-        procedure, pass(self) :: dpsi_deta => dpsi_deta_TriangleFirst
-        procedure, pass(self) :: Jac => Jac_TriangleFirst
-        procedure, pass(self) :: Jac_Det => Jac_Det_TriangleFirst
-        procedure, pass(self) :: is_inside => is_in_TriangleFirst
+        procedure, pass(self) :: getNumNodes => getNumNodes_TriangleFirst !&
+        procedure, pass(self) :: psi         => psi_TriangleFirst !&
+        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_TriangleFirst !&
+        procedure, pass(self) :: dpsi_deta   => dpsi_deta_TriangleFirst !&
+        procedure, pass(self) :: Jac         => Jac_TriangleFirst !&
+        procedure, pass(self) :: Jac_Det     => Jac_Det_TriangleFirst !&
+        procedure, pass(self) :: is_inside   => is_in_TriangleFirst !&
     end type TriangleFirst
 
     !--------------------------------------------------------------------------------------
@@ -77,13 +77,13 @@ module Core_Element
     !--------------------------------------------------------------------------------------
     type, extends(Abstract_ElementType) :: SquareFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SquareFirst
-        procedure, pass(self) :: psi => psi_SquareFirst
-        procedure, pass(self) :: dpsi_dxi => dpsi_dxi_SquareFirst
-        procedure, pass(self) :: dpsi_deta => dpsi_deta_SquareFirst
-        procedure, pass(self) :: Jac => Jac_SquareFirst
-        procedure, pass(self) :: Jac_Det => Jac_Det_SquareFirst
-        procedure, pass(self) :: is_inside => is_in_SquareFirst
+        procedure, pass(self) :: getNumNodes => getNumNodes_SquareFirst !&
+        procedure, pass(self) :: psi         => psi_SquareFirst !&
+        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SquareFirst !&
+        procedure, pass(self) :: dpsi_deta   => dpsi_deta_SquareFirst !&
+        procedure, pass(self) :: Jac         => Jac_SquareFirst !&
+        procedure, pass(self) :: Jac_Det     => Jac_Det_SquareFirst !&
+        procedure, pass(self) :: is_inside   => is_in_SquareFirst !&
     end type SquareFirst
 
     !
