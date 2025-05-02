@@ -95,8 +95,18 @@ target_link_libraries(Input PRIVATE Core Conditions)
 target_include_directories(Input PUBLIC ${My_INCLUDE_PATH})
 
 # --- Calculate WRF, HCF, GCC ---
-add_library(Calc_WRF src/Calculate/WRF.F90)
-target_link_libraries(Calc_WRF PRIVATE)
+add_library(Calc_WRF
+    src/Calculate/WRF/WRF.F90
+    src/Calculate/WRF/WRF_BC.F90
+    src/Calculate/WRF/WRF_VG.F90
+    src/Calculate/WRF/WRF_KO.F90
+    src/Calculate/WRF/WRF_MVG.F90
+    src/Calculate/WRF/WRF_Durner.F90
+    src/Calculate/WRF/WRF_DVGCH.F90
+)
+target_link_libraries(Calc_WRF PRIVATE
+    Input
+)
 
 add_library(Calc_HCF
     src/Calculate/HCF/HCF.F90
@@ -109,7 +119,10 @@ add_library(Calc_HCF
     src/Calculate/HCF/HCF_Impedance.F90
     src/Calculate/HCF/HCF_Viscosity.F90
 )
-target_link_libraries(Calc_HCF PRIVATE Calc_WRF Core)
+target_link_libraries(Calc_HCF PRIVATE 
+    Core    
+    Calc_WRF 
+)
 
 add_library(Calc_GCC
     src/Calculate/GCC/GCC.F90
@@ -129,9 +142,6 @@ add_library(Calc_Ice
 target_link_libraries(Calc_Ice PRIVATE Calc_GCC Calc_WRF Core)
 
 # --- Material Properties ---
-
-
-
 add_library(Calc_THC
     src/Calculate/ThermalConductivity/ThermalConductivity.F90
     src/Calculate/ThermalConductivity/ThermalConductivity_3Phase.F90
