@@ -1,21 +1,21 @@
-submodule(Core_Side) Core_Side_First
+submodule(Core_Side) Core_Side_Second
     implicit none
 contains
 
-    module function SideFirst_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
+    module function SideSecond_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iSide
         type(DP3d), pointer, intent(in) :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(2)
+        integer(int32), intent(in) :: Connectivity(3)
         integer(int32), intent(in) :: GroupID
         class(Abstract_SideType), allocatable :: Structure
 
-        integer(int32), parameter :: nsize = 2
+        integer(int32), parameter :: nsize = 3
         integer(int32) :: i
 
-        allocate (SideFirst :: Structure)
+        allocate (SideSecond :: Structure)
         Structure%SideID = iSide
-        Structure%SideType = 3
+        Structure%SideType = 21
         Structure%SideGroup = GroupID
 
         Structure%size = nsize
@@ -34,24 +34,24 @@ contains
             Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
         end do
 
-        Structure%nGauss = 1
+        Structure%nGauss = 2
         call Allocate_Array(Structure%weight, Structure%nGauss)
         call Allocate_Array(Structure%gauss, Structure%nGauss)
-        Structure%weight(:) = [0.0d0]
-        Structure%gauss(:) = [2.0d0]
-    end function SideFirst_Construct
+        Structure%weight(:) = [1.0d0, 1.0d0]
+        Structure%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+    end function SideSecond_Construct
 
-    module function getNumNodes_SideFirst(self) result(n)
+    module function getNumNodes_SideSecond(self) result(n)
         implicit none
-        class(SideFirst), intent(in) :: self
+        class(SideSecond), intent(in) :: self
         integer(int32) :: n
 
         n = self%size
-    end function getNumNodes_SideFirst
+    end function getNumNodes_SideSecond
 
-    module function psi_SideFirst(self, i, xi) result(psi)
+    module function psi_SideSecond(self, i, xi) result(psi)
         implicit none
-        class(SideFirst), intent(in) :: self
+        class(SideSecond), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi
         real(real64) :: psi
@@ -64,11 +64,11 @@ contains
         case default
             psi = 0.0d0
         end select
-    end function psi_SideFirst
+    end function psi_SideSecond
 
-    module function dpsi_dxi_SideFirst(self, i) result(dpsi)
+    module function dpsi_dxi_SideSecond(self, i) result(dpsi)
         implicit none
-        class(SideFirst), intent(in) :: self
+        class(SideSecond), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64) :: dpsi
 
@@ -80,6 +80,6 @@ contains
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_dxi_SideFirst
+    end function dpsi_dxi_SideSecond
 
-end submodule Core_Side_First
+end submodule Core_Side_Second

@@ -63,8 +63,8 @@ contains
         call Allocate_Array(Structure%gauss, 2_int32, Structure%nGauss)
         Structure%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
         Structure%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
-        Structure%gauss(:, 1) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
-        Structure%gauss(:, 1) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
+        Structure%gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
+        Structure%gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
     end function TriangleSecond_Construct
 
     !----------------------------------------------------------------------!

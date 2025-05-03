@@ -7,8 +7,8 @@ contains
         type(Type_Input), intent(inout) :: Input
         type(DP3d), intent(inout), pointer :: Coordinate
 
-        integer(int32) :: CountElements
-        integer(int32) :: iCell, idx
+        integer(int32) :: CountElements, CountSides
+        integer(int32) :: iCell, iSide, idx
         integer(int32) :: i
         integer(int32) :: iRegion
 
@@ -32,6 +32,10 @@ contains
                     Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_QUAD) then
                     CountElements = CountElements + 1
                 end if
+                if (Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_LINE .or. &
+                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_EDGE) then
+                    CountSides = CountSides + 1
+                end if
             end do
 
             Structure%nElement = CountElements
@@ -39,6 +43,7 @@ contains
             Structure%nRegion = Input%Basic%numRegion
 
             allocate (Structure%Elements(Structure%nElement)) ! pointer 多形配列にディスクリプタを確保
+            allocate (Structure%Sides(CountSides)) ! pointer 多形配列にディスクリプタを確保
             ! 各要素ごとに具象オブジェクトをポインタで割り当て
 
             idx = 0
@@ -50,8 +55,27 @@ contains
                 case (9) ! VTK_QUAD
                     idx = idx + 1
                     Structure%Elements(idx)%e = SquareFirst(iCell, Coordinate, Input%VTK%CELLS(iCell)%CONNECTIVITY)
+                case (22) ! VTK_QUADRATIC_TRIANGLE
+                    idx = idx + 1
+                    Structure%Elements(idx)%e = TriangleSecond(iCell, Coordinate, Input%VTK%CELLS(iCell)%CONNECTIVITY)
+                case (23) ! VTK_QUADRATIC_QUAD
+                    idx = idx + 1
+                    Structure%Elements(idx)%e = SquareSecond(iCell, Coordinate, Input%VTK%CELLS(iCell)%CONNECTIVITY)
                 end select
             end do
+
+            idx = 0
+            do iSide = 1, Input%VTK%numTotalCells
+                select case (Input%VTK%CELLS(iSide)%CellType)
+                case (3) ! VTK_LINE
+                    idx = idx + 1
+                    Structure%Sides(idx)%s = SideFirst(iSide, Coordinate, Input%VTK%CELLS(iSide)%CONNECTIVITY, Input%VTK%CELLS(iSide)%CellEntityId)
+                case (21) ! VTK_QUADRATIC_EDGE
+                    idx = idx + 1
+                    Structure%Sides(idx)%s = SideSecond(iSide, Coordinate, Input%VTK%CELLS(iSide)%CONNECTIVITY, Input%VTK%CELLS(iSide)%CellEntityId)
+                end select
+            end do
+
         end if
 
         Structure%KT_star_0 = Type_CRS(Structure%Elements, Structure%nsize)
@@ -115,6 +139,7 @@ contains
                                                                    Preconditioner=Input%Solver_Thermal%usePreconditionerType)
             end if
         end if
+
     end function Type_Thermal_3Phase_2D_Construct
 
     module subroutine Type_Thermal_3Phase_2D_Update(self, NodeBelonging, arr_phi)

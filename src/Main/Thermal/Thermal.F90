@@ -2,6 +2,7 @@ module Main_Thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_BaseTypes
     use :: Core_Element
+    use :: Core_Side
     use :: Inout_Input
     use :: Calculate_Ice
     use :: Calculate_ThermalConductivity
@@ -37,6 +38,7 @@ module Main_Thermal
         integer(int32) :: nElement
         integer(int32) :: nRegion
         type(ElementHolder), allocatable :: Elements(:)
+        type(SideHolder), allocatable :: Sides(:)
         type(Type_BC_Thermal) :: BC
         !! Thermal properties
         class(Abstract_ThermalConductivity), allocatable :: THC

@@ -16,7 +16,9 @@ module Core_Element
 
     public :: Abstract_ElementType
     public :: SquareFirst
+    public :: SquareSecond
     public :: TriangleFirst
+    public :: TriangleSecond
     public :: ElementHolder
 
     !--------------------------------------------------------------------------------------

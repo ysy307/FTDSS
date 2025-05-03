@@ -14,6 +14,11 @@ module Core_Side
     implicit none
     private
 
+    public :: SideHolder
+    public :: Abstract_SideType
+    public :: SideFirst
+    public :: SideSecond
+
     !--------------------------------------------------------------------------------------
     ! Holder for polymorphic element objects
     !--------------------------------------------------------------------------------------
@@ -27,6 +32,7 @@ module Core_Side
     type, abstract :: Abstract_SideType
         integer(int32) :: SideID
         integer(int32) :: SideType ! Edge type
+        integer(int32) :: SideGroup ! Group ID
         integer(int32) :: size ! Number of nodes in the Edge
         integer(int32), allocatable :: conn(:) !! connectivity information
         type(RealPointer), allocatable :: X(:) !! X coordinate
@@ -62,6 +68,16 @@ module Core_Side
     end type SideFirst
 
     !--------------------------------------------------------------------------------------
+    !   Triangle Second Order Element Type
+    !--------------------------------------------------------------------------------------
+    type, extends(Abstract_SideType) :: SideSecond
+    contains
+        procedure, pass(self) :: getNumNodes => getNumNodes_SideSecond !&
+        procedure, pass(self) :: psi         => psi_SideSecond !&
+        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SideSecond !&
+    end type SideSecond
+
+    !--------------------------------------------------------------------------------------
     !  Abstract interface for the 1D element
     !--------------------------------------------------------------------------------------
     abstract interface
@@ -94,11 +110,12 @@ module Core_Side
     !   Edge first order procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function SideFirst_Construct(iSide, Global_Coordinate, Connectivity) result(Structure)
+        module function SideFirst_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iSide
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(2)
+            integer(int32), intent(in) :: GroupID
             class(Abstract_SideType), allocatable :: Structure
 
         end function SideFirst_Construct
@@ -125,8 +142,48 @@ module Core_Side
         end function dpsi_dxi_SideFirst
     end interface
 
+    !--------------------------------------------------------------------------------------
+    !   Edge Second order procedures interface
+    !--------------------------------------------------------------------------------------
+    interface
+        module function SideSecond_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
+            implicit none
+            integer(int32), intent(in) :: iSide
+            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            integer(int32), intent(in) :: Connectivity(3)
+            integer(int32), intent(in) :: GroupID
+            class(Abstract_SideType), allocatable :: Structure
+
+        end function SideSecond_Construct
+
+        module function getNumNodes_SideSecond(self) result(n)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32) :: n
+        end function getNumNodes_SideSecond
+
+        module function psi_SideSecond(self, i, xi) result(psi)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64), intent(in) :: xi
+            real(real64) :: psi
+        end function psi_SideSecond
+
+        module function dpsi_dxi_SideSecond(self, i) result(dpsi)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32), intent(in) :: i
+            real(real64) :: dpsi
+        end function dpsi_dxi_SideSecond
+    end interface
+
     interface SideFirst
         procedure :: SideFirst_Construct
+    end interface
+
+    interface SideSecond
+        procedure :: SideSecond_Construct
     end interface
 
 end module Core_Side

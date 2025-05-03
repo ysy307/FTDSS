@@ -9,6 +9,7 @@ program test
     type(Type_FTDSS) :: FTDSS
     real(real64) :: norm_old, norm_new
     integer(int32) :: stat, count
+    integer(int32) :: i, j
 
     call FTDSS%Initialize()
 
@@ -32,6 +33,8 @@ program test
     print *, "Starting time loop"
     ! stop
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
+        ! print *, FTDSS%time%dt, FTDSS%time%time
+        ! stop
         FTDSS%time%time_old = FTDSS%time%time
         FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
         FTDSS%time%dt_old(1) = FTDSS%time%dt
@@ -63,29 +66,29 @@ program test
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
             call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
 
-            ! open (unit=10, file='debug4.txt', status='replace')
-            ! do i = 1, Thermal%nsize
-            !     do j = Thermal%KT_star_0%Ptr(i), Thermal%KT_star_0%Ptr(i + 1) - 1
-            !         write (10, '(i0, 2x, i0,2x,f16.7)') i, Thermal%KT_star_0%Ind(j), Thermal%KT_star_0%Val(j)
+            ! open (unit=10, file='log/debug4.txt', status='replace')
+            ! do i = 1, FTDSS%Thermal%nsize
+            !     do j = FTDSS%Thermal%KT_star_0%Ptr(i), FTDSS%Thermal%KT_star_0%Ptr(i + 1) - 1
+            !         write (10, '(i0, 2x, i0,2x,f16.7)') i, FTDSS%Thermal%KT_star_0%Ind(j), FTDSS%Thermal%KT_star_0%Val(j)
             !     end do
             ! end do
             ! close (10)
-            ! open (unit=20, file='debug5.txt', status='replace')
-            ! do i = 1, Thermal%nsize
-            !     write (20, '( i0,2x,f16.7)') i, Thermal%PHIT(i)
+            ! open (unit=20, file='log/debug5.txt', status='replace')
+            ! do i = 1, FTDSS%Thermal%nsize
+            !     write (20, '( i0,2x,f16.7)') i, FTDSS%Thermal%PHIT(i)
             ! end do
             ! close (20)
             ! stop
             call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
             call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
-            ! open (unit=30, file='debug3.txt', status='replace')
-            ! do i = 1, Thermal%nsize
-            !     write (30, '( i0,2x,f16.7)') i, Thermal%T%new(i)
+            ! open (unit=30, file='log/debug3.txt', status='replace')
+            ! do i = 1, FTDSS%Thermal%nsize
+            !     write (30, '( i0,2x,f16.7)') i, FTDSS%Thermal%T%new(i)
             ! end do
             ! close (30)
             ! stop
-            ! call Thermal%Solver%Solve(Thermal%KT_star_0, Thermal%PHIT, Thermal%T%dif, stat)
+            ! call Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
             ! Thermal%T%new(:) = Thermal%T%pre(:) + Thermal%T%dif(:)
 
@@ -105,11 +108,11 @@ program test
             call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
         end do NR_LOOP_THERMAL
 
-        if (FTDSS%Iteration%iter >= FTDSS%Iteration%max_iter) then
-            FTDSS%time%time = FTDSS%time%time_old
-            FTDSS%time%dt = FTDSS%time%dt * 0.5d0
-            call FTDSS%Thermal%T%Shift(reverse=.true.)
-        end if
+        ! if (FTDSS%Iteration%iter >= FTDSS%Iteration%max_iter) then
+        !     FTDSS%time%time = FTDSS%time%time_old
+        !     FTDSS%time%dt = FTDSS%time%dt * 0.5d0
+        !     call FTDSS%Thermal%T%Shift(reverse=.true.)
+        ! end if
 
         call FTDSS%Output%Output_Observation(time=FTDSS%time%time / 86400.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
         ! print *, mod(FTDSS%Iteration%step, 100)

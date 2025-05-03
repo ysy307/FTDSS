@@ -29,8 +29,8 @@ module Core_VTK
 
     type :: Type_VTK_CELLS
         integer(int8) :: offset
-        integer(int8) :: CellEntityId
-        integer(int8) :: CellType
+        integer(int32) :: CellEntityId
+        integer(int32) :: CellType
         integer(int32), allocatable :: Connectivity(:) !! Node numbers of the cells
     end type Type_VTK_CELLS
 

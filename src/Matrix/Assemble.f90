@@ -74,24 +74,24 @@ contains
 
                         ! 形状関数勾配（x,y方向）
                         dNdx_i = (Elements(iE)%e%Jac(2, 2, xi, eta) * &
-                                  Elements(iE)%e%dpsi_dxi(il, eta) - &
+                                  Elements(iE)%e%dpsi_dxi(il, xi, eta) - &
                                   Elements(iE)%e%Jac(2, 1, xi, eta) * &
-                                  Elements(iE)%e%dpsi_deta(il, xi) &
+                                  Elements(iE)%e%dpsi_deta(il, xi, eta) &
                                   ) / detJ
                         dNdy_i = (-Elements(iE)%e%Jac(1, 2, xi, eta) * &
-                                  Elements(iE)%e%dpsi_dxi(il, eta) + &
+                                  Elements(iE)%e%dpsi_dxi(il, xi, eta) + &
                                   Elements(iE)%e%Jac(1, 1, xi, eta) * &
-                                  Elements(iE)%e%dpsi_deta(il, xi) &
+                                  Elements(iE)%e%dpsi_deta(il, xi, eta) &
                                   ) / detJ
                         dNdx_j = (Elements(iE)%e%Jac(2, 2, xi, eta) * &
-                                  Elements(iE)%e%dpsi_dxi(jl, eta) - &
+                                  Elements(iE)%e%dpsi_dxi(jl, xi, eta) - &
                                   Elements(iE)%e%Jac(2, 1, xi, eta) * &
-                                  Elements(iE)%e%dpsi_deta(jl, xi) &
+                                  Elements(iE)%e%dpsi_deta(jl, xi, eta) &
                                   ) / detJ
                         dNdy_j = (-Elements(iE)%e%Jac(1, 2, xi, eta) * &
-                                  Elements(iE)%e%dpsi_dxi(jl, eta) + &
+                                  Elements(iE)%e%dpsi_dxi(jl, xi, eta) + &
                                   Elements(iE)%e%Jac(1, 1, xi, eta) * &
-                                  Elements(iE)%e%dpsi_deta(jl, xi) &
+                                  Elements(iE)%e%dpsi_deta(jl, xi, eta) &
                                   ) / detJ
 
                         val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * weight * detJ
