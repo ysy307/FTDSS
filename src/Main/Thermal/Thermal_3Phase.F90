@@ -89,10 +89,7 @@ contains
         Structure%DEN = Type_Density_3Phase(Input)
         Structure%SPH = Type_SpecificHeat_3Phase(Input)
 
-        ! print *, any(Input%Regions(:)%isFrozen), Input%Regions(1)%isFrozen
-        ! if (any(Input%Regions(:)%isFrozen)) then
         Structure%HTC = Type_HeatCapacity_3Phase_Apparent(Input)
-        ! end if
 
         call Structure%Qw%allocate(Structure%nsize, Input%Basic%Order)
         call Structure%Qice%allocate(Structure%nsize, Input%Basic%Order)

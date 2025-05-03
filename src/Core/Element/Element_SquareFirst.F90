@@ -111,10 +111,11 @@ contains
     !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
     !          Each index corresponds to a vertex of the square.
     !
-    !   xi   : Real(real64), the ξ  coordinate in the natural coordinate
-    !          system (barycentric or reference square).
+    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
+    !          system.
     !
-    !   eta  : Real(real64), the η coordinate in the natural coordinate system.
+    !   eta  : Real(real64), the η coordinate in the natural coordinate
+    !          system.
     !
     ! Return Value:
     !   psi  : Real(real64), value of the i-th shape function ψ_i at (ξ, η).
@@ -163,8 +164,11 @@ contains
     !
     !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
     !
-    !   eta  : Real(real64), the η coordinate in the natural coordinate
+    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
     !          system (not used in linear case, but included for interface).
+    !
+    !   eta  : Real(real64), the η coordinate in the natural coordinate
+    !          system.
     !
     ! Return Value:
     !   dpsi : Real(real64), value of ∂ψ_i/∂ξ evaluated at (ξ, η).
@@ -178,11 +182,11 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_dxi_SquareFirst(self, i, eta) result(dpsi)
+    module function dpsi_dxi_SquareFirst(self, i, xi, eta) result(dpsi)
         implicit none
         class(SquareFirst), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: eta
+        real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
 
         select case (i)
@@ -228,11 +232,11 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_deta_SquareFirst(self, i, xi) result(dpsi)
+    module function dpsi_deta_SquareFirst(self, i, xi, eta) result(dpsi)
         implicit none
         class(SquareFirst), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi
+        real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
 
         select case (i)
@@ -313,12 +317,12 @@ contains
             case (1)
                 !! dx_dxi
                 do ii = 1, self%size
-                    Jval = Jval + self%dpsi_dxi(ii, eta) * self%X(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%X(ii)%val
                 end do
             case (2)
                 !! dx_deta
                 do ii = 1, self%size
-                    Jval = Jval + self%dpsi_deta(ii, xi) * self%X(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%X(ii)%val
                 end do
             end select
 
@@ -328,12 +332,12 @@ contains
             case (1)
                 !! dy_dxi
                 do ii = 1, self%size
-                    Jval = Jval + self%dpsi_dxi(ii, eta) * self%Y(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%Y(ii)%val
                 end do
             case (2)
                 !! dy_deta
                 do ii = 1, self%size
-                    Jval = Jval + self%dpsi_deta(ii, xi) * self%Y(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%Y(ii)%val
                 end do
             end select
         end select

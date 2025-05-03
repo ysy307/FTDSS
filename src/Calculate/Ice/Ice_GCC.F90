@@ -97,7 +97,6 @@ contains
         integer(int32) :: iN
 
         if (.not. present(arr_Pw)) then
-            ! $omp parallel do schedule(guided) private(iN, rhoW, rhoI)
             do iN = 1, self%nsize
                 select type (DEN => Density)
                 type is (Type_Density_3Phase)
@@ -107,9 +106,7 @@ contains
                 arr_Qw(iN) = self%Calculate_Ice(T=arr_T(iN), phi=arr_phi(iN), rhoW=rhoW, rhoI=rhoI)
                 arr_Qice(iN) = arr_phi(iN) - arr_Qw(iN)
             end do
-            ! $omp end parallel do
         else
-            ! $omp parallel do schedule(guided) private(iN, rhoW, rhoI)
             do iN = 1, self%nsize
                 select type (DEN => Density)
                 type is (Type_Density_3Phase)
@@ -119,7 +116,6 @@ contains
                 arr_Qice(iN) = self%Calculate_Ice(arr_T(iN), arr_phi(iN), arr_Pw(iN), rhoW, rhoI)
                 arr_Qw(iN) = arr_phi(iN) - arr_Qice(iN)
             end do
-            ! $omp end parallel do
         end if
 
     end subroutine Update_Ice_GCC
@@ -137,7 +133,6 @@ contains
         real(real64) :: rhoW, rhoI
         integer(int32) :: iN
 
-        !$omp parallel do schedule(guided) private(iN, rhoW, rhoI)
         do iN = 1, self%nsize
             select type (DEN => Density)
             type is (Type_Density_3Phase)

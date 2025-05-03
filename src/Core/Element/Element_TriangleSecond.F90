@@ -1,10 +1,10 @@
-submodule(Core_Element) Core_Element_TriangleFirst
+submodule(Core_Element) Core_Element_TriangleSecond
     implicit none
 contains
     !----------------------------------------------------------------------!
-    ! TriangleFirst_Construct:
+    ! TriangleSecond_Construct:
     !----------------------------------------------------------------------!
-    ! This function constructs a TriangleFirst element object based on the
+    ! This function constructs a TriangleSecond element object based on the
     ! given element index, global nodal coordinates, connectivity, and
     ! spatial dimension type.
     !
@@ -15,41 +15,41 @@ contains
     !   Global_Coordinate : DP3d type pointer containing the global coordinates
     !                       of all nodes in the mesh.
     !
-    !   Connectivity      : Integer array (size 3) specifying the indices of
+    !   Connectivity      : Integer array (size 6) specifying the indices of
     !                       nodes that form the triangular element.
     !
     ! Return Value:
     !   Structure         : Allocated polymorphic object of type
-    !                       TriangleFirst (extends Abstract_ElementType).
+    !                       TriangleSecond (extends Abstract_ElementType).
     !
     ! Function Details:
-    !   - Allocates a new TriangleFirst element object.
+    !   - Allocates a new TriangleSecond element object.
     !   - Stores element ID and connectivity information.
     !   - Links to the corresponding global coordinates for each node.
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), pointer, intent(in) :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(3)
+        integer(int32), intent(in) :: Connectivity(6)
         class(Abstract_ElementType), allocatable :: Structure
-        integer(int32), parameter :: ndim = 3
+        integer(int32), parameter :: nsize = 6
         integer(int32) :: i
 
-        allocate (TriangleFirst :: Structure)
+        allocate (TriangleSecond :: Structure)
         Structure%ElementID = iElem
-        Structure%ElementType = 5
+        Structure%ElementType = 22
 
-        Structure%size = ndim
-        allocate (Structure%conn(ndim))
-        Structure%conn(:) = Connectivity(1:ndim)
+        Structure%size = nsize
+        allocate (Structure%conn(nsize))
+        Structure%conn(:) = Connectivity(1:nsize)
 
-        allocate (Structure%X(ndim))
-        allocate (Structure%Y(ndim))
-        allocate (Structure%Z(ndim))
-        do i = 1, ndim
+        allocate (Structure%X(nsize))
+        allocate (Structure%Y(nsize))
+        allocate (Structure%Z(nsize))
+        do i = 1, nsize
             nullify (Structure%X(i)%val)
             nullify (Structure%Y(i)%val)
             nullify (Structure%Z(i)%val)
@@ -58,190 +58,216 @@ contains
             Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
         end do
 
-        Structure%nGauss = 1
+        Structure%nGauss = 3
         call Allocate_Array(Structure%weight, Structure%nGauss)
         call Allocate_Array(Structure%gauss, 2_int32, Structure%nGauss)
-        Structure%weight(:) = [0.5d0]
-        Structure%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
-    end function TriangleFirst_Construct
+        Structure%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+        Structure%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+        Structure%gauss(:, 1) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
+        Structure%gauss(:, 1) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
+    end function TriangleSecond_Construct
 
     !----------------------------------------------------------------------!
-    ! getNumNodes_TriangleFirst:
+    ! getNumNodes_TriangleSecond:
     !----------------------------------------------------------------------!
     ! This function returns the number of nodes associated with a
-    ! TriangleFirst element.
+    ! TriangleSecond element.
     !
     ! Arguments:
-    !   self : TriangleFirst type object.
+    !   self : TriangleSecond type object.
     !          Represents the current triangular element instance.
     !
     ! Return Value:
     !   n    : Integer (int32) indicating the number of nodes used by the
-    !          element. This is typically 3 for a linear triangle.
+    !          element. This is typically 6 for a linear triangle.
     !
     ! Function Details:
     !   - Retrieves the value stored in `self%size`, which represents
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_TriangleFirst(self) result(n)
+    module function getNumNodes_TriangleSecond(self) result(n)
         implicit none
-        class(TriangleFirst), intent(in) :: self
+        class(TriangleSecond), intent(in) :: self
         integer(int32) :: n
 
         n = self%size
-    end function getNumNodes_TriangleFirst
+    end function getNumNodes_TriangleSecond
 
     !----------------------------------------------------------------------!
-    ! psi_TriangleFirst:
+    ! psi_TriangleSecond:
     !----------------------------------------------------------------------!
     ! This function evaluates the shape function ψ_i(ξ, η) for a linear
     ! triangular element at the given natural coordinates (ξ, η).
     !
     ! Arguments:
-    !   self : TriangleFirst type object.
+    !   self : TriangleSecond type object.
     !          Represents the triangular element for which the shape
     !          function is evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 3).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
     !          Each index corresponds to a vertex of the triangle.
     !
     !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system.
+    !          system (barycentric or reference triangle).
     !
-    !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system.
+    !   eta  : Real(real64), the η coordinate in the natural coordinate system.
     !
     ! Return Value:
     !   psi  : Real(real64), value of the i-th shape function ψ_i at (ξ, η).
     !
     ! Function Details:
-    !   - For a linear triangular element, the shape functions are:
-    !       ψ₁(ξ, η) = ξ
+    !   - For a bilenar triangular element, the shape functions are:
+    !       ψ₁(ξ, η) = ξ * (2 * ξ -1)
     !       ψ₂(ξ, η) = η
     !       ψ₃(ξ, η) = 1 - ξ - η
-    !   - Returns 0.0d0 for indices outside the range [1, 3].
+    !       ψ₄(ξ, η) = 4 * ξ * η
+    !       ψ₅(ξ, η) = 4 * (1 - ξ - η) * η
+    !       ψ₆(ξ, η) = 4 * ξ * (1 - ξ - η)
+    !   - Returns 0.0d0 for indices outside the range [1, 6].
     !
     !----------------------------------------------------------------------!
-    module function psi_TriangleFirst(self, i, xi, eta) result(psi)
+    module function psi_TriangleSecond(self, i, xi, eta) result(psi)
         implicit none
-        class(TriangleFirst), intent(in) :: self
+        class(TriangleSecond), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: psi
         select case (i)
         case (1)
-            psi = xi
+            psi = xi * (2.0d0 * xi - 1.0d0)
         case (2)
-            psi = eta
+            psi = eta * (2.0d0 * eta - 1.0d0)
         case (3)
-            psi = 1.0d0 - xi - eta
+            psi = (1.0d0 - xi - eta) * (1.0d0 - 2.0d0 * xi - 2.0d0 * eta)
+        case (4)
+            psi = 4.0d0 * xi * eta
+        case (5)
+            psi = 4.0d0 * (1.0d0 - xi - eta) * eta
+        case (6)
+            psi = 4.0d0 * xi * (1.0d0 - xi - eta)
         case default
             psi = 0.0d0
         end select
-    end function psi_TriangleFirst
+    end function psi_TriangleSecond
 
     !----------------------------------------------------------------------!
-    ! dpsi_dxi_TriangleFirst:
+    ! dpsi_dxi_TriangleSecond:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
     ! shape function for a linear triangular element with respect to ξ
     ! at a given η coordinate.
     !
     ! Arguments:
-    !   self : TriangleFirst type object.
+    !   self : TriangleSecond type object.
     !          Represents the triangular element for which the derivative
     !          is being evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 3).
-    !
-    !
-    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
     !
     !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !          system.
     !
     ! Return Value:
     !   dpsi : Real(real64), value of ∂ψ_i/∂ξ evaluated at (ξ, η).
     !
     ! Function Details:
     !   - For a linear triangle element:
-    !       ∂ψ₁/∂ξ =  1.0
-    !       ∂ψ₂/∂ξ =  0.0
-    !       ∂ψ₃/∂ξ = -1.0
-    !   - Returns 0.0d0 for indices outside [1, 3].
+    !       ∂ψ₁/∂ξ =  4 * ξ - 1
+    !       ∂ψ₂/∂ξ =  0
+    !       ∂ψ₃/∂ξ =  4 * ξ + 4 * η - 3
+    !       ∂ψ₄/∂ξ =  4 * η
+    !       ∂ψ₅/∂ξ = -4 * η
+    !       ∂ψ₆/∂ξ =  4 - 8 * ξ - 4 * η
+    !   - Returns 0.0 for indices outside [1, 6].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_dxi_TriangleFirst(self, i, xi, eta) result(dpsi)
+    module function dpsi_dxi_TriangleSecond(self, i, xi, eta) result(dpsi)
         implicit none
-        class(TriangleFirst), intent(in) :: self
+        class(TriangleSecond), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
+
         select case (i)
         case (1)
-            dpsi = 1.0d0
+            dpsi = 4.0d0 * xi - 1.0d0
         case (2)
             dpsi = 0.0d0
         case (3)
-            dpsi = -1.0d0
+            dpsi = -3.0d0 + 4.0d0 * xi + 4.0d0 * eta
+        case (4)
+            dpsi = 4.0d0 * eta
+        case (5)
+            dpsi = -4.0d0 * eta
+        case (6)
+            dpsi = 4.0d0 - 8.0d0 * xi - 4.0d0 * eta
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_dxi_TriangleFirst
+    end function dpsi_dxi_TriangleSecond
 
     !----------------------------------------------------------------------!
-    ! dpsi_deta_TriangleFirst:
+    ! dpsi_deta_TriangleSecond:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
     ! shape function for a linear triangular element with respect to η
     ! at a given ξ coordinate.
     !
     ! Arguments:
-    !   self : TriangleFirst type object.
+    !   self : TriangleSecond type object.
     !          Represents the triangular element for which the derivative
     !          is being evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1, 2, 3).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
     !
     !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !          system.
     !
     !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !          system.
     !
     ! Return Value:
     !   dpsi : Real(real64), value of ∂ψ_i/∂η evaluated at (ξ, η).
     !
     ! Function Details:
     !   - For a linear triangle element:
-    !       ∂ψ₁/∂η =  0.0
-    !       ∂ψ₂/∂η =  1.0
-    !       ∂ψ₃/∂η = -1.0
-    !   - Returns 0.0d0 for indices outside [1, 3].
+    !       ∂ψ₁/∂η = 0
+    !       ∂ψ₂/∂η = 4 * η - 1
+    !       ∂ψ₃/∂η = 4 * η + 4 * ξ - 3
+    !       ∂ψ₄/∂η = 4 * ξ
+    !       ∂ψ₅/∂η = 4 * (1 - ξ - η)
+    !       ∂ψ₆/∂η = -4 * ξ
+    !   - Returns 0.0d0 for indices outside [1, 6].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_deta_TriangleFirst(self, i, xi, eta) result(dpsi)
+    module function dpsi_deta_TriangleSecond(self, i, xi, eta) result(dpsi)
         implicit none
-        class(TriangleFirst), intent(in) :: self
+        class(TriangleSecond), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
+
         select case (i)
         case (1)
             dpsi = 0.0d0
         case (2)
-            dpsi = 1.0d0
+            dpsi = 4.0d0 * eta - 1.0d0
         case (3)
-            dpsi = -1.0d0
+            dpsi = -3.0d0 + 4.0d0 * eta + 4.0d0 * xi
+        case (4)
+            dpsi = 4.0d0 * xi
+        case (5)
+            dpsi = 4.0d0 - 4.0d0 * xi - 8.0d0 * eta
+        case (6)
+            dpsi = -4.0d0 * xi
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_deta_TriangleFirst
+    end function dpsi_deta_TriangleSecond
 
     !----------------------------------------------------------------------!
-    ! Jac_TriangleFirst:
+    ! Jac_TriangleSecond:
     !----------------------------------------------------------------------!
     ! This function computes the (i,j) component of the Jacobian matrix J
     ! for a linear triangular finite element at a given natural coordinate
@@ -249,7 +275,7 @@ contains
     ! coordinates (x, y).
     !
     ! Arguments:
-    !   self : TriangleFirst type object.
+    !   self : TriangleSecond type object.
     !          Represents the element whose Jacobian is being evaluated.
     !
     !   i    : Integer (int32), the row index of the Jacobian component.
@@ -287,9 +313,9 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    module function Jac_TriangleFirst(self, i, j, xi, eta) result(Jval)
+    module function Jac_TriangleSecond(self, i, j, xi, eta) result(Jval)
         implicit none
-        class(TriangleFirst), intent(in) :: self
+        class(TriangleSecond), intent(in) :: self
         integer(int32), intent(in) :: i, j
         real(real64), intent(in) :: xi, eta
 
@@ -329,17 +355,17 @@ contains
             end select
         end select
 
-    end function Jac_TriangleFirst
+    end function Jac_TriangleSecond
 
     !----------------------------------------------------------------------!
-    ! Jac_Det_TriangleFirst:
+    ! Jac_Det_TriangleSecond:
     !----------------------------------------------------------------------!
     ! This function computes the determinant of the Jacobian matrix J
     ! for a linear triangular element at a specified point (ξ, η) in
     ! the natural coordinate system.
     !
     ! Arguments:
-    !   self : TriangleFirst type object.
+    !   self : TriangleSecond type object.
     !          Represents the finite element whose Jacobian is evaluated.
     !
     !   xi   : Real(real64), ξ coordinate in the natural coordinate system.
@@ -365,9 +391,9 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    module function Jac_Det_TriangleFirst(self, xi, eta) result(J_Det)
+    module function Jac_Det_TriangleSecond(self, xi, eta) result(J_Det)
         implicit none
-        class(TriangleFirst), intent(in) :: self
+        class(TriangleSecond), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64) :: J_Det
 
@@ -382,10 +408,10 @@ contains
         dy_eta = self%Jac(2, 2, xi, eta)
 
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
-    end function Jac_Det_TriangleFirst
+    end function Jac_Det_TriangleSecond
 
     !----------------------------------------------------------------------!
-    ! is_in_TriangleFirst:
+    ! is_in_TriangleSecond:
     !----------------------------------------------------------------------!
     ! This function checks if the given physical coordinates (px, py) lie
     ! within the boundaries of a square element.
@@ -394,7 +420,7 @@ contains
     ! checks if the point lies within the square element.
     !
     ! Arguments:
-    !   self  : TriangleFirst type object.
+    !   self  : TriangleSecond type object.
     !
     !   px    : x-coordinate (real64 type) in the physical coordinate system.
     !           This coordinate is checked to see if it lies inside the square element.
@@ -419,8 +445,8 @@ contains
     !     outside the valid range, the function returns .false.
     !
     !----------------------------------------------------------------------!
-    module subroutine is_in_TriangleFirst(self, px, py, pxi, peta, is_in)
-        class(TriangleFirst), intent(in) :: self
+    module subroutine is_in_TriangleSecond(self, px, py, pxi, peta, is_in)
+        class(TriangleSecond), intent(in) :: self
         real(real64), intent(in) :: px, py
         real(real64), intent(inout) :: pxi, peta
         logical(4) :: is_in
@@ -480,6 +506,6 @@ contains
             pxi = xi
             peta = eta
         end if
-    end subroutine is_in_TriangleFirst
+    end subroutine is_in_TriangleSecond
 
-end submodule Core_Element_TriangleFirst
+end submodule Core_Element_TriangleSecond

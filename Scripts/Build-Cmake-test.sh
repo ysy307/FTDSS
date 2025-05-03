@@ -1,2 +1,2 @@
 #!/bin/zsh
-cmake --build CMakeBuild
+cmake --build CMakeBuild --parallel
