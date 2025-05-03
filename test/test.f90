@@ -1,80 +1,59 @@
 program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes
-    use :: Solver_Time
-    use :: Inout_Input
-    use :: Inout_Output
-    use :: Calculate_BLAS
-    use :: Main_Thermal
+    use :: Main_FTDSS
 
 #ifdef _OPENMP
     use omp_lib
 #endif
     implicit none
-
-    type(Type_Input) :: Input
-    ! type(Input_Ice) :: Ice
-    ! type(Input_Thermal) :: Input%Regions(1)%Thermal%Porosity, ThermalInput
-    type(Type_Thermal_3Phase_2D) :: Thermal
-    type(Type_Time) :: Time
-    type(Type_Iteration) :: Iteration
-    type(Type_Output) :: Output
-    integer(int32) :: i, j, k
-    integer(int32), allocatable :: Elements(:, :)
-    ! real(real64) :: Lf, Tf, Input%Regions(1)%Thermal%Porosity
-    integer(int32) :: meshType
+    type(Type_FTDSS) :: FTDSS
     real(real64) :: norm_old, norm_new
     integer(int32) :: stat, count
+    integer(int32) :: i, j
 
-    character(:), allocatable :: filename
+    call FTDSS%Initialize()
 
-    Iteration%max_iter = 100
+    FTDSS%Thermal%T%new(:) = 18.0d0
+    call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%T%new(:))
+    FTDSS%Thermal%T%pre(:) = FTDSS%Thermal%T%new(:)
 
-    Input = Type_Input()
-
-    time = Type_Time(Input)
-    Thermal = Type_Thermal_3Phase_2D(Input)
-    Output = Type_Output(Input, Thermal=Thermal)
-
-    Thermal%T%new(:) = 18.0d0
-    call Thermal%BC%Fix_Bounday_Values(Thermal%T%new(:))
-    Thermal%T%pre(:) = Thermal%T%new(:)
-
-    call Thermal%Update(Input%Regions(1)%Thermal%Porosity, Input%Regions(1)%Thermal%rho(3), 0)
-    call Thermal%T%Shift()
+    call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
+    call FTDSS%Thermal%T%Shift()
     count = 0
     ! filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
     ! print *, count, filename
-    call Output%Output_All(fc=count, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre)
-    call Output%Output_Observation(time=0.0d0, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre, Thermal=Thermal)
+    call FTDSS%Output%Output_All(fc=count, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
+    call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
     ! stop
-    Iteration%step = 0
+    FTDSS%Iteration%step = 0
 
     ! print *, Thermal%T%old(:, 1)
 
-    Iteration%isConverged = .true.
+    FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
     ! stop
-    TIME_LOOP: do while (time%time < time%end_time)
-        time%time_old = time%time
-        time%time = time%time + time%dt
-        time%dt_old(1) = time%dt
+    TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
+        ! print *, FTDSS%time%dt, FTDSS%time%time
+        ! stop
+        FTDSS%time%time_old = FTDSS%time%time
+        FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
+        FTDSS%time%dt_old(1) = FTDSS%time%dt
 
-        Iteration%iter = 0
+        FTDSS%Iteration%iter = 0
 
-        !! Thermal Newton-Raphson Iteration
-        NR_LOOP_THERMAL: do while (Iteration%iter <= Iteration%max_iter)
-            ! print *, Iteration%iter
-            if (Iteration%isConverged) then
-                Iteration%step = Iteration%step + 1
-                Iteration%isConverged = .false.
+        !! Thermal Newton-Raphson FTDSS%Iteration
+        NR_LOOP_THERMAL: do while (FTDSS%Iteration%iter <= FTDSS%Iteration%max_iter)
+            ! print *, FTDSS%Iteration%iter
+            if (FTDSS%Iteration%isConverged) then
+                FTDSS%Iteration%step = FTDSS%Iteration%step + 1
+                FTDSS%Iteration%isConverged = .false.
             end if
-            Iteration%iter = Iteration%iter + 1
-            ! if (Iteration%iter == 1) then
-            !     if (Iteration%step >= 2) then
-            !         Thermal%T%pre(:) = Thermal%T%old(:, 1) + (Thermal%T%old(:, 1) - Thermal%T%old(:, 2)) * (time%dt / time%dt_old(1))
+            FTDSS%Iteration%iter = FTDSS%Iteration%iter + 1
+            ! if (FTDSS%Iteration%iter == 1) then
+            !     if (FTDSS%Iteration%step >= 2) then
+            !         Thermal%T%pre(:) = Thermal%T%old(:, 1) + (Thermal%T%old(:, 1) - Thermal%T%old(:, 2)) * (FTDSS%time%dt / FTDSS%time%dt_old(1))
             !         ! Thermal%T%pre(:) = 2.0d0 * Thermal%T%old(:, 1) - Thermal%T%old(:, 2)
-            !         call Thermal%Update(Input%Regions(1)%Thermal%Porosity, Input%Regions(1)%Thermal%rho(3), Iteration%iter)
+            !         call Thermal%Update(Input%Regions(1)%Thermal%Porosity, Input%Regions(1)%Thermal%rho(3), FTDSS%Iteration%iter)
             !     end if
             ! ! end if
             ! print *, Thermal%KT_star_0%nnz
@@ -82,64 +61,64 @@ program test
             ! print *, Thermal%KT_star_0%ind(:)
             ! stop
 
-            call Thermal%Assemble(time%dt, Iteration%step, Iteration%iter)
+            call FTDSS%Thermal%Assemble(FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
-            call Thermal%BC%Fix_Bounday_Values(Thermal%KT_star_0, Thermal%PHIT)
+            call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
 
-            ! open (unit=10, file='debug4.txt', status='replace')
-            ! do i = 1, Thermal%nsize
-            !     do j = Thermal%KT_star_0%Ptr(i), Thermal%KT_star_0%Ptr(i + 1) - 1
-            !         write (10, '(i0, 2x, i0,2x,f16.7)') i, Thermal%KT_star_0%Ind(j), Thermal%KT_star_0%Val(j)
+            ! open (unit=10, file='log/debug4.txt', status='replace')
+            ! do i = 1, FTDSS%Thermal%nsize
+            !     do j = FTDSS%Thermal%KT_star_0%Ptr(i), FTDSS%Thermal%KT_star_0%Ptr(i + 1) - 1
+            !         write (10, '(i0, 2x, i0,2x,f16.7)') i, FTDSS%Thermal%KT_star_0%Ind(j), FTDSS%Thermal%KT_star_0%Val(j)
             !     end do
             ! end do
             ! close (10)
-            ! open (unit=20, file='debug5.txt', status='replace')
-            ! do i = 1, Thermal%nsize
-            !     write (20, '( i0,2x,f16.7)') i, Thermal%PHIT(i)
+            ! open (unit=20, file='log/debug5.txt', status='replace')
+            ! do i = 1, FTDSS%Thermal%nsize
+            !     write (20, '( i0,2x,f16.7)') i, FTDSS%Thermal%PHIT(i)
             ! end do
             ! close (20)
             ! stop
-            call Thermal%BC%Fix_Bounday_Values(Thermal%KT_star_0, Thermal%PHIT)
-            call Thermal%Solver%Solve(Thermal%KT_star_0, Thermal%PHIT, Thermal%T%new(:), stat)
+            call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
+            call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
-            ! open (unit=30, file='debug3.txt', status='replace')
-            ! do i = 1, Thermal%nsize
-            !     write (30, '( i0,2x,f16.7)') i, Thermal%T%new(i)
+            ! open (unit=30, file='log/debug3.txt', status='replace')
+            ! do i = 1, FTDSS%Thermal%nsize
+            !     write (30, '( i0,2x,f16.7)') i, FTDSS%Thermal%T%new(i)
             ! end do
             ! close (30)
             ! stop
-            ! call Thermal%Solver%Solve(Thermal%KT_star_0, Thermal%PHIT, Thermal%T%dif, stat)
+            ! call Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
             ! Thermal%T%new(:) = Thermal%T%pre(:) + Thermal%T%dif(:)
 
             ! norm_new = norm_2(Thermal%nsize, Thermal%T%dif)
-            norm_new = maxval(abs(Thermal%T%dif))
+            norm_new = maxval(abs(FTDSS%Thermal%T%dif))
 
             !! Convergence check
-            if (Iteration%iter >= 1) then
+            if (FTDSS%Iteration%iter >= 1) then
                 ! if (norm_new < 1.0d-5) then
-                print *, Iteration%step, Iteration%iter, norm_new
-                Iteration%isConverged = .true.
-                call Thermal%T%Shift()
+                print *, FTDSS%Iteration%step, FTDSS%Iteration%iter, norm_new
+                FTDSS%Iteration%isConverged = .true.
+                call FTDSS%Thermal%T%Shift()
                 exit NR_LOOP_THERMAL
             end if
 
-            Thermal%T%pre(:) = Thermal%T%new(:)
-            call Thermal%Update(Input%Regions(1)%Thermal%Porosity, Input%Regions(1)%Thermal%rho(3), Iteration%iter)
+            FTDSS%Thermal%T%pre(:) = FTDSS%Thermal%T%new(:)
+            call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
         end do NR_LOOP_THERMAL
 
-        if (Iteration%iter >= Iteration%max_iter) then
-            time%time = time%time_old
-            time%dt = time%dt * 0.5d0
-            call Thermal%T%Shift(reverse=.true.)
-        end if
+        ! if (FTDSS%Iteration%iter >= FTDSS%Iteration%max_iter) then
+        !     FTDSS%time%time = FTDSS%time%time_old
+        !     FTDSS%time%dt = FTDSS%time%dt * 0.5d0
+        !     call FTDSS%Thermal%T%Shift(reverse=.true.)
+        ! end if
 
-        call Output%Output_Observation(time=time%time / 86400.0d0, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre, Thermal=Thermal)
-        ! print *, mod(Iteration%step, 100)
-        if (mod(Iteration%step, 10) == 0) then
+        call FTDSS%Output%Output_Observation(time=FTDSS%time%time / 86400.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
+        ! print *, mod(FTDSS%Iteration%step, 100)
+        if (mod(FTDSS%Iteration%step, 10) == 0) then
             count = count + 1
-            call Output%Output_All(fc=count, Temp=Thermal%T%pre, Si=Thermal%Ice%Qice%pre)
+            call FTDSS%Output%Output_All(fc=count, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
         end if
 
     end do TIME_LOOP

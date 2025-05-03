@@ -13,6 +13,7 @@ module Core_BaseTypes
     public :: Variables
     public :: RealPointer
     public :: Type_Iteration
+    public :: Belonging
 
     public :: assignment(=)
 
@@ -55,6 +56,14 @@ module Core_BaseTypes
         procedure, pass(self) :: Shift => Variables_Shift
         procedure, pass(self) :: allocate => Variables_Allocate
     end type Variables
+
+    type :: Belonging
+        integer(int32) :: nsize
+        integer(int32), allocatable :: group(:)
+    contains
+        procedure, pass(self) :: allocate => Belonging_Allocate
+        procedure, pass(self) :: value => Belonging_Value
+    end type Belonging
 
     type :: Type_Iteration
         integer(int32) :: iter
@@ -191,4 +200,23 @@ contains
         X%z(:) = Y%z(:)
 
     end subroutine DP3d_Assignment
+
+    subroutine Belonging_Allocate(self, nsize)
+        class(Belonging), intent(inout) :: self
+        integer(int32), intent(in) :: nsize
+
+        call Allocate_Array(self%group, nsize)
+        self%nsize = nsize
+        self%group(:) = 0
+
+    end subroutine Belonging_Allocate
+
+    function Belonging_Value(self, array) result(avg_value)
+        class(Belonging), intent(inout) :: self
+        real(real64), intent(in) :: array(:)
+        real(real64) :: avg_value
+
+        avg_value = sum(array(self%group(:))) / self%nsize
+
+    end function Belonging_Value
 end module Core_BaseTypes

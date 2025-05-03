@@ -234,7 +234,7 @@ module Inout_Input
         integer(int32), allocatable :: BelongingEdge(:)
         integer(int32) :: CalculationType
         integer(int32) :: ModelNumber
-        logical :: isFrozen
+        logical(4) :: isFrozen
         type(Input_Flags) :: Flag
         type(Input_Ice) :: Ice
         type(Input_Thermal) :: Thermal

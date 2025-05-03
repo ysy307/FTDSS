@@ -2,6 +2,7 @@ submodule(Solver_Solve) Solver_Solve_BiCGSTAB_Implementation
     use, intrinsic :: iso_fortran_env, only: int32
     use :: Matrix_CRS
     implicit none
+    real(real64), allocatable, target :: work(:, :)
 
 contains
     module function Solver_CRS_BiCGSTAB_Constructor(N, tol, maxiter, Preconditioner) result(structure)

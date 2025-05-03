@@ -84,10 +84,11 @@ module Inout_Output
 
 contains
 
-    function Output_Constructor(Structure_Input, Thermal) result(Structure)
+    function Output_Constructor(Structure_Input, Thermal, Coordinate) result(Structure)
         implicit none
         type(Type_Input), intent(in) :: Structure_Input
         class(Abstract_Thermal), intent(in), optional :: Thermal
+        type(DP3d), pointer :: Coordinate
         type(Type_Output) :: Structure
 
         character(256) :: dir_Path
@@ -302,15 +303,13 @@ contains
                                 case (5)
                                     Structure%Observation%Element(i)%e = TriangleFirst( &
                                                                          j, &
-                                                                         Thermal%Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn, &
-                                                                         Structure_Input%Basic%DimensionType)
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
                                 case (9)
                                     Structure%Observation%Element(i)%e = SquareFirst( &
                                                                          j, &
-                                                                         Thermal%Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn, &
-                                                                         Structure_Input%Basic%DimensionType)
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
                                 end select
                                 Structure%Observation%obs_xi(i) = tmp_xi
                                 Structure%Observation%obs_eta(i) = tmp_eta
@@ -330,15 +329,13 @@ contains
                                 case (5)
                                     Structure%Observation%Element(i)%e = TriangleFirst( &
                                                                          j, &
-                                                                         Thermal%Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn, &
-                                                                         Structure_Input%Basic%DimensionType)
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
                                 case (9)
                                     Structure%Observation%Element(i)%e = SquareFirst( &
                                                                          j, &
-                                                                         Thermal%Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn, &
-                                                                         Structure_Input%Basic%DimensionType)
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
                                 end select
                                 Structure%Observation%obs_xi(i) = tmp_xi
                                 Structure%Observation%obs_eta(i) = tmp_eta
@@ -530,7 +527,7 @@ contains
 
     end subroutine Inout_Output_All_vtu
 
-    subroutine Inout_Output_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal)
+    subroutine Inout_Output_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi)
         implicit none
         class(Type_Output) :: self
         real(real64), intent(in) :: time
@@ -542,10 +539,12 @@ contains
         real(real64), intent(in), optional :: wFlux(:)
         real(real64), intent(in), optional :: K(:)
         class(Abstract_Thermal), intent(inout), optional :: Thermal
+        real(real64), intent(in), optional :: phi(:)
 
         integer(int32) :: iObs, iE, iS, iN
         integer(int32) :: nNodes, nObs
         real(real64) :: obsValues(self%Observation%NumObservation)
+        real(real64) :: tmpValues(self%Observation%NumObservation)
         real(real64) :: obsValues2d(2 * self%Observation%NumObservation)
 
         nObs = self%Observation%NumObservation
@@ -555,7 +554,7 @@ contains
             present(Temp) .and. &
             self%Observation%Temperature%doOutput &
             ) then
-            call self%Output_Observation_Header(time, "Temperature")
+            call self%Output_Observation_Header("Temperature")
             select case (self%Observation%ObservationType)
             case (1)
                 write (self%Observation%Temperature%numUnit, '(es22.15,'//to_string(nObs)//'(2x,es22.15))') &
@@ -584,16 +583,17 @@ contains
             present(Thermal) .and. &
             self%Observation%Si%doOutput &
             ) then
-            call self%Output_Observation_Header(time, "Si")
+            call self%Output_Observation_Header("Si")
             select case (self%Observation%ObservationType)
             case (1)
                 write (self%Observation%Si%numUnit, '(es22.15,'//to_string(nObs)//'(2x,es22.15))') &
                     time, (Si(self%Observation%ObsNodeID(iObs)), iObs=1, nObs)
             case (2)
                 obsValues(:) = 0.0d0
+                tmpValues(:) = 0.0d0
                 do iObs = 1, nObs
                     nNodes = self%Observation%Element(iObs)%e%getNumNodes()
-                    select type (Ice => Thermal%Ice)
+                    select type (Ice => Thermal%Ice(1)%f)
                     type is (Type_Ice_TRM)
                         do iN = 1, nNodes
                             obsValues(iObs) = obsValues(iObs) + &
@@ -609,8 +609,13 @@ contains
                                                self%Observation%Element(iN)%e%psi(iN, &
                                                                                   self%Observation%obs_xi(iObs), &
                                                                                   self%Observation%obs_eta(iObs)))
+                            tmpValues(iObs) = tmpValues(iObs) + &
+                                              (phi(self%Observation%Element(iObs)%e%conn(iN)) * &
+                                               self%Observation%Element(iN)%e%psi(iN, &
+                                                                                  self%Observation%obs_xi(iObs), &
+                                                                                  self%Observation%obs_eta(iObs)))
                         end do
-                        obsValues(iObs) = Ice%Calculate_Ice(obsValues(iObs))
+                        obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
                     type is (Type_Ice_EXP)
                         do iN = 1, nNodes
                             obsValues(iObs) = obsValues(iObs) + &
@@ -618,8 +623,13 @@ contains
                                                self%Observation%Element(iN)%e%psi(iN, &
                                                                                   self%Observation%obs_xi(iObs), &
                                                                                   self%Observation%obs_eta(iObs)))
+                            tmpValues(iObs) = tmpValues(iObs) + &
+                                              (phi(self%Observation%Element(iObs)%e%conn(iN)) * &
+                                               self%Observation%Element(iN)%e%psi(iN, &
+                                                                                  self%Observation%obs_xi(iObs), &
+                                                                                  self%Observation%obs_eta(iObs)))
                         end do
-                        obsValues(iObs) = Ice%Calculate_Ice(obsValues(iObs))
+                        obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
                     end select
                 end do
                 write (self%Observation%Si%numUnit, '(es22.15,'//to_string(nObs)//'(x,es22.15))') &
@@ -629,10 +639,10 @@ contains
 
     end subroutine Inout_Output_Observation
 
-    subroutine Inout_Output_Observation_Header(self, time, data_name)
+    subroutine Inout_Output_Observation_Header(self, data_name)
         implicit none
         class(Type_Output) :: self
-        real(real64), intent(in) :: time
+        ! real(real64), intent(in) :: time
         character(*), intent(in) :: data_name
 
         integer(int32) :: iObs, iN
@@ -659,8 +669,8 @@ contains
                 case (2)
                     write (self%Observation%Temperature%numUnit, '(a)') "# Observation Coordinate (x,y,z)"
                     do iObs = 1, nObs
-                        write (self%Observation%Temperature%numUnit, '(a,x,i0,a,3(x,es18.11,a),a)') &
-                            "# Point", iObs, ": (", &
+                        write (self%Observation%Temperature%numUnit, '(a,x,i0,a,3(x,es18.11,a))') &
+                            "#    Point", iObs, ": (", &
                             self%Observation%Cood_Obs%x(iObs), ",", &
                             self%Observation%Cood_Obs%y(iObs), ",", &
                             self%Observation%Cood_Obs%z(iObs), &
@@ -693,8 +703,8 @@ contains
                 case (2)
                     write (self%Observation%Si%numUnit, '(a)') "# Observation Coordinate (x,y,z)"
                     do iObs = 1, nObs
-                        write (self%Observation%Si%numUnit, '(a,x,i0,a,3(x,es18.11,a),a)') &
-                            "# Point", iObs, ": (", &
+                        write (self%Observation%Si%numUnit, '(a,x,i0,a,3(x,es18.11,a))') &
+                            "#    Point", iObs, ": (", &
                             self%Observation%Cood_Obs%x(iObs), ",", &
                             self%Observation%Cood_Obs%y(iObs), ",", &
                             self%Observation%Cood_Obs%z(iObs), &
@@ -727,8 +737,8 @@ contains
                 case (2)
                     write (self%Observation%TC%numUnit, '(a)') "# Observation Coordinate (x,y,z)"
                     do iObs = 1, nObs
-                        write (self%Observation%TC%numUnit, '(a,x,i0,a,3(x,es18.11,a),a)') &
-                            "# Point", iObs, ": (", &
+                        write (self%Observation%TC%numUnit, '(a,x,i0,a,3(x,es18.11,a))') &
+                            "#    Point", iObs, ": (", &
                             self%Observation%Cood_Obs%x(iObs), ",", &
                             self%Observation%Cood_Obs%y(iObs), ",", &
                             self%Observation%Cood_Obs%z(iObs), &
@@ -761,8 +771,8 @@ contains
                 case (2)
                     write (self%Observation%C%numUnit, '(a)') "# Observation Coordinate (x,y,z)"
                     do iObs = 1, nObs
-                        write (self%Observation%C%numUnit, '(a,x,i0,a,3(x,es18.11,a),a)') &
-                            "# Point", iObs, ": (", &
+                        write (self%Observation%C%numUnit, '(a,x,i0,a,3(x,es18.11,a))') &
+                            "#    Point", iObs, ": (", &
                             self%Observation%Cood_Obs%x(iObs), ",", &
                             self%Observation%Cood_Obs%y(iObs), ",", &
                             self%Observation%Cood_Obs%z(iObs), &
@@ -795,8 +805,8 @@ contains
                 case (2)
                     write (self%Observation%Pressure%numUnit, '(a)') "# Observation Coordinate (x,y,z)"
                     do iObs = 1, nObs
-                        write (self%Observation%Pressure%numUnit, '(a,x,i0,a,3(x,es18.11,a),a)') &
-                            "# Point", iObs, ": (", &
+                        write (self%Observation%Pressure%numUnit, '(a,x,i0,a,3(x,es18.11,a))') &
+                            "#    Point", iObs, ": (", &
                             self%Observation%Cood_Obs%x(iObs), ",", &
                             self%Observation%Cood_Obs%y(iObs), ",", &
                             self%Observation%Cood_Obs%z(iObs), &
@@ -829,8 +839,8 @@ contains
                 case (2)
                     write (self%Observation%wFlux%numUnit, '(a)') "# Observation Coordinate (x,y,z)"
                     do iObs = 1, nObs
-                        write (self%Observation%wFlux%numUnit, '(a,x,i0,a,3(x,es18.11,a),a)') &
-                            "# Point", iObs, ": (", &
+                        write (self%Observation%wFlux%numUnit, '(a,x,i0,a,3(x,es18.11,a))') &
+                            "#    Point", iObs, ": (", &
                             self%Observation%Cood_Obs%x(iObs), ",", &
                             self%Observation%Cood_Obs%y(iObs), ",", &
                             self%Observation%Cood_Obs%z(iObs), &
@@ -863,8 +873,8 @@ contains
                 case (2)
                     write (self%Observation%K%numUnit, '(a)') "# Observation Coordinate (x,y,z)"
                     do iObs = 1, nObs
-                        write (self%Observation%K%numUnit, '(a,x,i0,a,3(x,es18.11,a),a)') &
-                            "# Point", iObs, ": (", &
+                        write (self%Observation%K%numUnit, '(a,x,i0,a,3(x,es18.11,a))') &
+                            "#    Point", iObs, ": (", &
                             self%Observation%Cood_Obs%x(iObs), ",", &
                             self%Observation%Cood_Obs%y(iObs), ",", &
                             self%Observation%Cood_Obs%z(iObs), &
