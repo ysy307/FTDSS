@@ -13,9 +13,17 @@
                 "Unit": "Day",
                 "StartCalculation": 0.0,
                 "EndCalculation": 1.0
+            },
+            "Output": {
+                "Unit": "Day"
+            },
+            "Interval": {
+                "Unit": "Second",
+                "step": 3600
             }
         },
-        "shouldDisplayPrompt": false
+        "shouldDisplayPrompt": false,
+        "FileOutput": "vtk"
     },
     "Region1": {
         "Belong": {
@@ -32,7 +40,7 @@
             ]
         },
         "CalculationType": 4,
-        "Modelnumber": 31,
+        "Modelnumber": 32,
         "isFrozen": true,
         "Thermal": {
             "Porosity": 0.3,
@@ -68,10 +76,42 @@
                 },
                 "Unit": "m"
             }
+        },
+        "Hydraulic": {
+            "useHCF": 0,
+            "useImpedance": true,
+            "useKTDynamics": 0,
+            "Parameters": {
+                "Ks": 1.96e-7,
+                "thetaS": 0.30,
+                "thetaR": 0.0,
+                "alpha1": 0.2,
+                "n1": 1.8,
+                "l": 0.5,
+                "Omega": 10
+            }
+        }
+    },
+    "Region2": {
+        "Belong": {
+            "Surface": 2,
+            "Edge": [
+                13,
+                14,
+                15
+            ]
+        },
+        "CalculationType": 4,
+        "Modelnumber": 10,
+        "isFrozen": false,
+        "Thermal": {
+            "Density": 2623.3766,
+            "SpecificHeat": 1155,
+            "ThermalConductivity": 2.7
         }
     },
     "Solver": {
-        "Order": 1,
+        "Order": 2,
         "MaxNonlinearIteration": 100,
         "Thermal": {
             "useSolver": 2,
@@ -79,7 +119,7 @@
                 "Solver": 4,
                 "Preconditioner": 1,
                 "MaxIteration": 50000,
-                "Tolerance": 1.0e-15
+                "Tolerance": 1.0e-10
             }
         },
         "Hydraulic": {

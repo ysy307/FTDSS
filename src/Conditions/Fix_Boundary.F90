@@ -1,5 +1,5 @@
 module Condition_Fix_Boundary
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env
     use :: Core_BaseTypes
     use :: Core_Allocate
     use :: Core_Side

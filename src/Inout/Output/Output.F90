@@ -310,6 +310,16 @@ contains
                                                                          j, &
                                                                          Coordinate, &
                                                                          Thermal%Elements(j)%e%conn)
+                                case (22) ! VTK_QUADRATIC_TRIANGLE
+                                    Structure%Observation%Element(i)%e = TriangleSecond( &
+                                                                         j, &
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
+                                case (23) ! VTK_QUADRATIC_QUAD
+                                    Structure%Observation%Element(i)%e = SquareSecond( &
+                                                                         j, &
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
                                 end select
                                 Structure%Observation%obs_xi(i) = tmp_xi
                                 Structure%Observation%obs_eta(i) = tmp_eta
@@ -333,6 +343,16 @@ contains
                                                                          Thermal%Elements(j)%e%conn)
                                 case (9)
                                     Structure%Observation%Element(i)%e = SquareFirst( &
+                                                                         j, &
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
+                                case (22) ! VTK_QUADRATIC_TRIANGLE
+                                    Structure%Observation%Element(i)%e = TriangleSecond( &
+                                                                         j, &
+                                                                         Coordinate, &
+                                                                         Thermal%Elements(j)%e%conn)
+                                case (23) ! VTK_QUADRATIC_QUAD
+                                    Structure%Observation%Element(i)%e = SquareSecond( &
                                                                          j, &
                                                                          Coordinate, &
                                                                          Thermal%Elements(j)%e%conn)
@@ -566,9 +586,9 @@ contains
                     do iN = 1, nNodes
                         obsValues(iObs) = obsValues(iObs) + &
                                           (Temp(self%Observation%Element(iObs)%e%conn(iN)) * &
-                                           self%Observation%Element(iN)%e%psi(iN, &
-                                                                              self%Observation%obs_xi(iObs), &
-                                                                              self%Observation%obs_eta(iObs)))
+                                           self%Observation%Element(iObs)%e%psi(iN, &
+                                                                                self%Observation%obs_xi(iObs), &
+                                                                                self%Observation%obs_eta(iObs)))
                     end do
                 end do
                 write (self%Observation%Temperature%numUnit, '(es22.15,'//to_string(nObs)//'(x,es22.15))') &
@@ -598,36 +618,36 @@ contains
                         do iN = 1, nNodes
                             obsValues(iObs) = obsValues(iObs) + &
                                               (Si(self%Observation%Element(iObs)%e%conn(iN)) * &
-                                               self%Observation%Element(iN)%e%psi(iN, &
-                                                                                  self%Observation%obs_xi(iObs), &
-                                                                                  self%Observation%obs_eta(iObs)))
+                                               self%Observation%Element(iObs)%e%psi(iN, &
+                                                                                    self%Observation%obs_xi(iObs), &
+                                                                                    self%Observation%obs_eta(iObs)))
                         end do
                     type is (Type_Ice_GCC)
                         do iN = 1, nNodes
                             obsValues(iObs) = obsValues(iObs) + &
                                               (Temp(self%Observation%Element(iObs)%e%conn(iN)) * &
-                                               self%Observation%Element(iN)%e%psi(iN, &
-                                                                                  self%Observation%obs_xi(iObs), &
-                                                                                  self%Observation%obs_eta(iObs)))
+                                               self%Observation%Element(iObs)%e%psi(iN, &
+                                                                                    self%Observation%obs_xi(iObs), &
+                                                                                    self%Observation%obs_eta(iObs)))
                             tmpValues(iObs) = tmpValues(iObs) + &
                                               (phi(self%Observation%Element(iObs)%e%conn(iN)) * &
-                                               self%Observation%Element(iN)%e%psi(iN, &
-                                                                                  self%Observation%obs_xi(iObs), &
-                                                                                  self%Observation%obs_eta(iObs)))
+                                               self%Observation%Element(iObs)%e%psi(iN, &
+                                                                                    self%Observation%obs_xi(iObs), &
+                                                                                    self%Observation%obs_eta(iObs)))
                         end do
                         obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
                     type is (Type_Ice_EXP)
                         do iN = 1, nNodes
                             obsValues(iObs) = obsValues(iObs) + &
                                               (Temp(self%Observation%Element(iObs)%e%conn(iN)) * &
-                                               self%Observation%Element(iN)%e%psi(iN, &
-                                                                                  self%Observation%obs_xi(iObs), &
-                                                                                  self%Observation%obs_eta(iObs)))
+                                               self%Observation%Element(iObs)%e%psi(iN, &
+                                                                                    self%Observation%obs_xi(iObs), &
+                                                                                    self%Observation%obs_eta(iObs)))
                             tmpValues(iObs) = tmpValues(iObs) + &
                                               (phi(self%Observation%Element(iObs)%e%conn(iN)) * &
-                                               self%Observation%Element(iN)%e%psi(iN, &
-                                                                                  self%Observation%obs_xi(iObs), &
-                                                                                  self%Observation%obs_eta(iObs)))
+                                               self%Observation%Element(iObs)%e%psi(iN, &
+                                                                                    self%Observation%obs_xi(iObs), &
+                                                                                    self%Observation%obs_eta(iObs)))
                         end do
                         obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
                     end select

@@ -30,7 +30,8 @@ contains
                     Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_PIXEL .or. &
                     Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUAD .or. &
                     Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_TRIANGLE .or. &
-                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_QUAD) then
+                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_QUAD &
+                    ) then
                     CountElements = CountElements + 1
                 end if
                 if (Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_LINE .or. &
