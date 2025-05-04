@@ -11,7 +11,7 @@ module Main_Thermal
     use :: Calculate_HeatCapacity
     use :: Matrix_Assemble
     use :: Matrix_CRS
-    use :: Condition_Fix_Boundary_Conditions, only:Type_BC_Thermal
+    use :: Condition_Fix_Boundary
     use :: Solver_Solve
     implicit none
 
@@ -39,7 +39,7 @@ module Main_Thermal
         integer(int32) :: nRegion
         type(ElementHolder), allocatable :: Elements(:)
         type(SideHolder), allocatable :: Sides(:)
-        type(Type_BC_Thermal) :: BC
+        class(Abstract_Condition_BC), allocatable :: BC
         !! Thermal properties
         class(Abstract_ThermalConductivity), allocatable :: THC
         class(Abstract_Density), allocatable :: DEN

@@ -16,6 +16,7 @@ contains
 
         ! Count the number of elements (e.g., triangles)
         CountElements = 0
+        CountSides = 0
         if (Input%VTK%numTotalCells == 0) then
             print *, "Error: No cells found in the VTK Structure."
             return
@@ -120,7 +121,7 @@ contains
         call Structure%D_Qice%allocate(Structure%nsize, Input%Basic%Order)
         call Structure%Si%allocate(Structure%nsize, Input%Basic%Order)
 
-        Structure%BC = Type_BC_Thermal(Input%Conditions, Input%VTK)
+        Structure%BC = Type_BC_Thermal_CRS(Input)
 
         if (Input%Solver_Thermal%useSolver == 1) then
             Structure%Solver = Solver_CRS_LU_Constructor(N=Structure%nsize, &

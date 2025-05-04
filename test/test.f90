@@ -14,7 +14,11 @@ program test
     call FTDSS%Initialize()
 
     FTDSS%Thermal%T%new(:) = 18.0d0
-    call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%T%new(:))
+    ! call FTDSS%Thermal%BC%Fix_BC(FTDSS%Thermal%T%new(:), FTDSS%Sides)
+    call FTDSS%Thermal%BC%Fix_BC(b=FTDSS%Thermal%T%new(:), &
+                                 Sides=FTDSS%Thermal%Sides, &
+                                 time=FTDSS%time%time)
+
     FTDSS%Thermal%T%pre(:) = FTDSS%Thermal%T%new(:)
 
     call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
@@ -64,7 +68,11 @@ program test
             call FTDSS%Thermal%Assemble(FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
-            call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
+            ! call FTDSS%Thermal%BC%
+            call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
+                                         b=FTDSS%Thermal%PHIT, &
+                                         Sides=FTDSS%Thermal%Sides, &
+                                         time=FTDSS%time%time)
 
             ! open (unit=10, file='log/debug4.txt', status='replace')
             ! do i = 1, FTDSS%Thermal%nsize
@@ -79,7 +87,7 @@ program test
             ! end do
             ! close (20)
             ! stop
-            call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
+            ! call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
             call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
             ! open (unit=30, file='log/debug3.txt', status='replace')
