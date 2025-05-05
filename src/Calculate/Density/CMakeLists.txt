@@ -1,6 +1,7 @@
 add_library(Calc_DEN
-    Density.F90
-    Density_3Phase.F90
+    Interface.F90
+    Base.F90
+    3Phase.F90
 )
 target_link_libraries(Calc_DEN PRIVATE
     Core
