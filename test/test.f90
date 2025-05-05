@@ -11,7 +11,7 @@ program test
     integer(int32) :: stat, count
     integer(int32) :: i, j
 
-    call FTDSS%Initialize()
+    call FTDSS%initialize()
 
     FTDSS%Thermal%T%new(:) = 18.0d0
     ! call FTDSS%Thermal%BC%Fix_BC(FTDSS%Thermal%T%new(:), FTDSS%Sides)

@@ -1,7 +1,7 @@
 submodule(Calculate_SpecificHeat) Calc_SPH_Base
 contains
-    function Calc_SPH_3(NodeBelonging, SpecificHeat_soil, phi_soil, &
-                        SpecificHeat_water, phi_water, SpecificHeat_ice, phi_ice) result(SpecificHeat)
+    module function Calc_SPH_3(NodeBelonging, SpecificHeat_soil, phi_soil, &
+                               SpecificHeat_water, phi_water, SpecificHeat_ice, phi_ice) result(SpecificHeat)
         implicit none
         type(Belonging), intent(inout) :: NodeBelonging
         real(real64), intent(in) :: SpecificHeat_soil(:)

@@ -70,8 +70,8 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Core
         Matrix
         Calc_BLAS
-        Conditions
         Input
+        Conditions
         Calc_WRF
         Calc_HCF
         Calc_GCC
@@ -130,8 +130,8 @@ elseif(BUILD_APP STREQUAL "test")
         Core
         Matrix
         Calc_BLAS
-        Conditions
         Input
+        Conditions
         Calc_WRF
         Calc_HCF
         Calc_GCC

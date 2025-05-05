@@ -23,7 +23,7 @@ module Main_FTDSS
         type(Type_Output) :: Output
 
     contains
-        procedure, pass(self) :: Initialize => FDTSS_initialize
+        procedure, pass(self) :: initialize => FDTSS_initialize
     end type Type_FTDSS
 
 contains
