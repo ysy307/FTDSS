@@ -36,6 +36,7 @@ module Main_Thermal
         ! type(DP3d), pointer :: Coordinate
         integer(int32) :: nsize
         integer(int32) :: nElement
+        integer(int32) :: nSide
         integer(int32) :: nRegion
         type(ElementHolder), allocatable :: Elements(:)
         type(SideHolder), allocatable :: Sides(:)

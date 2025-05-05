@@ -26,6 +26,8 @@ module Core_Element
     !--------------------------------------------------------------------------------------
     type :: ElementHolder
         class(Abstract_ElementType), allocatable :: e
+    contains
+        procedure, pass(self) :: allocate => ElementHolder_allocate
     end type ElementHolder
 
     !--------------------------------------------------------------------------------------
@@ -180,6 +182,21 @@ module Core_Element
             logical(4) :: is_in
         end subroutine Abstract_is_inside
 
+    end interface
+
+    !--------------------------------------------------------------------------------------
+    !   ElementHolder procedures interface
+    !--------------------------------------------------------------------------------------
+    interface
+        module subroutine ElementHolder_allocate(self, iShape_Type, iElem, Global_Coordinate, Connectivity)
+            implicit none
+            class(ElementHolder), intent(inout) :: self
+            integer(int32), intent(in) :: iShape_Type
+            integer(int32), intent(in) :: iElem
+            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            integer(int32), intent(in) :: Connectivity(:)
+
+        end subroutine ElementHolder_allocate
     end interface
 
     !--------------------------------------------------------------------------------------

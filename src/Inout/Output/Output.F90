@@ -100,82 +100,27 @@ contains
         real(real64) :: tmp_xi, tmp_eta
         logical(4) :: is_inside
 
+        integer(int32) :: iObs, iElem
+
+        character(len=256) :: OutputExtentions(2) = [".dat", ".csv"]
+        character(len=256) :: OutputFileExtentions(4) = [".dat", ".csv", ".vtk", ".vtu"]
+
         ! Path settings
         dir_Path = GetProjectPath()
 
         Structure%dir_Output = trim(adjustl(dir_Path))//"Output/"
-
-        inquire (DIRECTORY=Structure%dir_Output, exist=exists)
-        if (.not. exists) then
-#ifdef _WIN32
-            command = "mkdir "//'"'//trim(adjustl(Structure%dir_Output))//'"'
-            call system(command)
-#endif
-#ifdef __linux__
-            command = "mkdir -p "//'"'//trim(adjustl(Structure%dir_Output))//'"'
-            call system(command)
-#endif
-        else
-#ifdef _WIN32
-            ! Windows
-            command = "del /Q "//'"'//trim(adjustl(Structure%dir_Output))//"*.dat"//'"'
-            call system(command)
-            command = "del /Q "//'"'//trim(adjustl(Structure%dir_Output))//"*.csv"//'"'
-            call system(command)
-#endif
-#ifdef __linux__
-            ! Linux .datと.csvだけ削除
-            command = "rm -f "//trim(adjustl(Structure%dir_Output))//"*.dat"
-            call system(command)
-            command = "rm -f "//trim(adjustl(Structure%dir_Output))//"*.csv"
-            call system(command)
-#endif
-        end if
+        call SetupDirectory(Structure%dir_Output, OutputExtentions)
 
         Structure%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
+        call SetupDirectory(Structure%dir_FileOutput, OutputFileExtentions)
 
-        inquire (DIRECTORY=Structure%dir_FileOutput, exist=exists)
-        if (.not. exists) then
-#ifdef _WIN32
-            command = "mkdir "//'"'//trim(adjustl(Structure%dir_FileOutput))//'"'
-            call system(command)
-#endif
-#ifdef __linux__
-            command = "mkdir -p "//'"'//trim(adjustl(Structure%dir_FileOutput))//'"'
-            call system(command)
-#endif
-        else
-#ifdef _WIN32
-            ! Windows .datと.csvだけ削除
-            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.dat"//'"'
-            call system(command)
-            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.csv"//'"'
-            call system(command)
-            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.vtk"//'"'
-            call system(command)
-            command = "del /Q "//'"'//trim(adjustl(Structure%dir_FileOutput))//"*.vtu"//'"'
-            call system(command)
-#endif
-#ifdef __linux__
-            ! Linux .datと.csvだけ削除
-            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.dat"
-            call system(command)
-            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.csv"
-            call system(command)
-            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.vtk"
-            call system(command)
-            command = "rm -f "//trim(adjustl(Structure%dir_FileOutput))//"*.vtu"
-            call system(command)
-#endif
-        end if
-
-        Structure%Observation%Temperature%Filename = trim(adjustl(Structure%dir_Output))//"obsf_T.dat"
-        Structure%Observation%Si%Filename = trim(adjustl(Structure%dir_Output))//"obsf_Si.dat"
-        Structure%Observation%TC%Filename = trim(adjustl(Structure%dir_Output))//"obsf_TC.dat"
-        Structure%Observation%C%Filename = trim(adjustl(Structure%dir_Output))//"obsf_C.dat"
-        Structure%Observation%Pressure%Filename = trim(adjustl(Structure%dir_Output))//"obsf_P.dat"
-        Structure%Observation%wFlux%Filename = trim(adjustl(Structure%dir_Output))//"obsf_Flux.dat"
-        Structure%Observation%K%Filename = trim(adjustl(Structure%dir_Output))//"obsf_K.dat"
+        Structure%Observation%Temperature%Filename = trim(adjustl(Structure%dir_Output))//"obsf_T.dat" !&
+        Structure%Observation%Si%Filename          = trim(adjustl(Structure%dir_Output))//"obsf_Si.dat" !&
+        Structure%Observation%TC%Filename          = trim(adjustl(Structure%dir_Output))//"obsf_TC.dat" !&
+        Structure%Observation%C%Filename           = trim(adjustl(Structure%dir_Output))//"obsf_C.dat" !&
+        Structure%Observation%Pressure%Filename    = trim(adjustl(Structure%dir_Output))//"obsf_P.dat" !&
+        Structure%Observation%wFlux%Filename       = trim(adjustl(Structure%dir_Output))//"obsf_Flux.dat" !&
+        Structure%Observation%K%Filename           = trim(adjustl(Structure%dir_Output))//"obsf_K.dat" !&
 
         Structure%Observation%Temperature%doOutput = Structure_Input%OutputSettings%outTemp
         Structure%Observation%Si%doOutput = Structure_Input%OutputSettings%outSi
@@ -291,74 +236,40 @@ contains
                 stop "need Elements"
             else
                 if (Structure_Input%Basic%DimensionType == 1) then
-                    do i = 1, Structure%Observation%NumObservation
-                        do j = 1, size(Thermal%Elements)
-                            call Thermal%Elements(j)%e%is_inside(Structure%Observation%Cood_Obs%x(i), &
-                                                                 Structure%Observation%Cood_Obs%y(i), &
-                                                                 tmp_xi, &
-                                                                 tmp_eta, &
-                                                                 is_inside)
+                    do iObs = 1, Structure%Observation%NumObservation
+                        do iElem = 1, Thermal%nElement
+                            call Thermal%Elements(iElem)%e%is_inside(Structure%Observation%Cood_Obs%x(iObs), &
+                                                                     Structure%Observation%Cood_Obs%y(iObs), &
+                                                                     tmp_xi, &
+                                                                     tmp_eta, &
+                                                                     is_inside)
                             if (is_inside) then
-                                select case (Thermal%Elements(j)%e%ElementType)
-                                case (5)
-                                    Structure%Observation%Element(i)%e = TriangleFirst( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                case (9)
-                                    Structure%Observation%Element(i)%e = SquareFirst( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                case (22) ! VTK_QUADRATIC_TRIANGLE
-                                    Structure%Observation%Element(i)%e = TriangleSecond( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                case (23) ! VTK_QUADRATIC_QUAD
-                                    Structure%Observation%Element(i)%e = SquareSecond( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                end select
-                                Structure%Observation%obs_xi(i) = tmp_xi
-                                Structure%Observation%obs_eta(i) = tmp_eta
+                                call Structure%Observation%Element(iObs)%allocate(Thermal%Elements(iElem)%e%ElementType, &
+                                                                                  Thermal%Elements(iElem)%e%ElementID, &
+                                                                                  Coordinate, &
+                                                                                  Thermal%Elements(iElem)%e%conn)
+                                Structure%Observation%obs_xi(iObs) = tmp_xi
+                                Structure%Observation%obs_eta(iObs) = tmp_eta
+                                exit
                             end if
                         end do
                     end do
                 else if (Structure_Input%Basic%DimensionType == 2) then
-                    do i = 1, Structure%Observation%NumObservation
-                        do j = 1, size(Thermal%Elements)
-                            call Thermal%Elements(j)%e%is_inside(Structure%Observation%Cood_Obs%x(i), &
-                                                                 Structure%Observation%Cood_Obs%z(i), &
-                                                                 tmp_xi, &
-                                                                 tmp_eta, &
-                                                                 is_inside)
+                    do iObs = 1, Structure%Observation%NumObservation
+                        do iElem = 1, Thermal%nElement
+                            call Thermal%Elements(iElem)%e%is_inside(Structure%Observation%Cood_Obs%x(iObs), &
+                                                                     Structure%Observation%Cood_Obs%z(iObs), &
+                                                                     tmp_xi, &
+                                                                     tmp_eta, &
+                                                                     is_inside)
                             if (is_inside) then
-                                select case (Thermal%Elements(j)%e%ElementType)
-                                case (5)
-                                    Structure%Observation%Element(i)%e = TriangleFirst( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                case (9)
-                                    Structure%Observation%Element(i)%e = SquareFirst( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                case (22) ! VTK_QUADRATIC_TRIANGLE
-                                    Structure%Observation%Element(i)%e = TriangleSecond( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                case (23) ! VTK_QUADRATIC_QUAD
-                                    Structure%Observation%Element(i)%e = SquareSecond( &
-                                                                         j, &
-                                                                         Coordinate, &
-                                                                         Thermal%Elements(j)%e%conn)
-                                end select
-                                Structure%Observation%obs_xi(i) = tmp_xi
-                                Structure%Observation%obs_eta(i) = tmp_eta
+                                call Structure%Observation%Element(iObs)%allocate(Thermal%Elements(iElem)%e%ElementType, &
+                                                                                  Thermal%Elements(iElem)%e%ElementID, &
+                                                                                  Coordinate, &
+                                                                                  Thermal%Elements(iElem)%e%conn)
+                                Structure%Observation%obs_xi(iObs) = tmp_xi
+                                Structure%Observation%obs_eta(iObs) = tmp_eta
+                                exit
                             end if
                         end do
                     end do
@@ -367,6 +278,40 @@ contains
         end select
 
     end function Output_Constructor
+
+    subroutine SetupDirectory(dirPath, fileExtensions)
+        implicit none
+        character(*), intent(in) :: dirPath
+        character(*), dimension(:), intent(in) :: fileExtensions
+
+        character(len=512) :: command
+        logical :: exists
+        integer :: i
+
+        inquire (DIRECTORY=trim(adjustl(dirPath)), exist=exists)
+
+        if (.not. exists) then
+#ifdef _WIN32
+            command = "mkdir "//'"'//trim(adjustl(dirPath))//'"'
+            call system(command)
+#endif
+#ifdef __linux__
+            command = "mkdir -p "//'"'//trim(adjustl(dirPath))//'"'
+            call system(command)
+#endif
+        else
+            do i = 1, size(fileExtensions)
+#ifdef _WIN32
+                command = "del /Q "//'"'//trim(adjustl(dirPath))//"*"//trim(fileExtensions(i))//'"'
+                call system(command)
+#endif
+#ifdef __linux__
+                command = "rm -f "//trim(adjustl(dirPath))//"*"//trim(fileExtensions(i))
+                call system(command)
+#endif
+            end do
+        end if
+    end subroutine SetupDirectory
 
     subroutine Inout_Output_All(self, fc, Temp, Si, Pres, wFlux)
         implicit none

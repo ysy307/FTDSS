@@ -56,7 +56,7 @@ contains
         integer(int32) :: i, idx
 
         do i = 1, size(self%Time) - 1
-            if (time >= self%Time(i) .and. time < self%Time(i + 1)) then
+            if (self%Time(i) < time .and. time <= self%Time(i + 1)) then
                 timeCoe = (time - self%Time(i)) / (self%Time(i + 1) - self%Time(i))
                 idx = i
                 exit

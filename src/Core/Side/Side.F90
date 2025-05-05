@@ -24,6 +24,8 @@ module Core_Side
     !--------------------------------------------------------------------------------------
     type :: SideHolder
         class(Abstract_SideType), allocatable :: s
+    contains
+        procedure, pass(self) :: allocate => SideHolder_Allocate
     end type SideHolder
 
     !--------------------------------------------------------------------------------------
@@ -104,6 +106,23 @@ module Core_Side
             integer(int32), intent(in) :: i
             real(real64) :: dpsi
         end function Abstract_dpsi_dxi
+    end interface
+
+    !--------------------------------------------------------------------------------------
+    !   SideHolder procedures interface
+    !--------------------------------------------------------------------------------------
+    interface
+        module subroutine SideHolder_Allocate(self, iShape_Type, iSide, Global_Coordinate, Connectivity, GroupID)
+            implicit none
+            class(SideHolder), intent(inout) :: self
+            integer(int32), intent(in) :: iShape_Type
+            integer(int32), intent(in) :: iSide
+            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            integer(int32), intent(in) :: Connectivity(:)
+            integer(int32), intent(in) :: GroupID
+            class(Abstract_SideType), allocatable :: Structure
+
+        end subroutine SideHolder_Allocate
     end interface
 
     !--------------------------------------------------------------------------------------
