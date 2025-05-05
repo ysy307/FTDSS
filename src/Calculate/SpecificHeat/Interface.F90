@@ -11,7 +11,7 @@ module Calculate_SpecificHeat
 
     type, abstract :: Abstract_SpecificHeat
         integer(int32) :: nsize
-        integer(int32) :: numRegion
+        integer(int32) :: nRegion
         real(real64), allocatable :: value(:, :)
     contains
         procedure(Abstract_Calculate_SpecificHeat), pass(self), deferred :: Calculate
@@ -23,8 +23,8 @@ module Calculate_SpecificHeat
         real(real64), allocatable :: water(:)
         real(real64), allocatable :: ice(:)
     contains
-        procedure :: Calculate => Calc_SPH_3Phase_Wrap
-        procedure :: Update => Update_SPH_3Phase
+        procedure :: Calculate => Calc_SPH_3_Wrap
+        procedure :: Update => Update_SPH_3
     end type Type_SpecificHeat_3Phase
 
     abstract interface
@@ -55,18 +55,34 @@ module Calculate_SpecificHeat
 
     end interface
 
+    interface
+        module function Calc_SPH_3(NodeBelonging, SpecificHeat_soil, phi_soil, &
+                                   SpecificHeat_water, phi_water, SpecificHeat_ice, phi_ice) result(SpecificHeat)
+            implicit none
+            type(Belonging), intent(inout) :: NodeBelonging
+            real(real64), intent(in) :: SpecificHeat_soil(:)
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: SpecificHeat_water(:)
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(in) :: SpecificHeat_ice(:)
+            real(real64), intent(in) :: phi_ice
+            real(real64) :: SpecificHeat
+
+        end function Calc_SPH_3
+    end interface
+
     !--------------------------------------------------------------------------------
     ! 3-phase SpecificHeat calculation interface
     !--------------------------------------------------------------------------------
     interface
-        module function SPH_3Phase_Construct(Input) result(Structure)
+        module function SPH_3_Construct(Input) result(Structure)
             implicit none
             type(Type_Input), intent(in) :: Input
             class(Abstract_SpecificHeat), allocatable :: Structure
 
-        end function SPH_3Phase_Construct
+        end function SPH_3_Construct
 
-        module function Calc_SPH_3Phase_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4) result(SpecificHeat)
+        module function Calc_SPH_3_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4) result(SpecificHeat)
             implicit none
             class(Type_SpecificHeat_3Phase), intent(in) :: self
             type(Belonging), intent(inout) :: NodeBelonging
@@ -76,9 +92,9 @@ module Calculate_SpecificHeat
             real(real64), intent(in), optional :: phi4
             real(real64) :: SpecificHeat
 
-        end function Calc_SPH_3Phase_Wrap
+        end function Calc_SPH_3_Wrap
 
-        module subroutine Update_SPH_3Phase(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4)
+        module subroutine Update_SPH_3(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4)
             implicit none
             class(Type_SpecificHeat_3Phase), intent(inout) :: self
             type(Belonging), intent(inout) :: NodeBelonging(:)
@@ -87,12 +103,12 @@ module Calculate_SpecificHeat
             real(real64), intent(in), optional :: arr_phi3(:)
             real(real64), intent(in), optional :: arr_phi4(:)
 
-        end subroutine Update_SPH_3Phase
+        end subroutine Update_SPH_3
 
     end interface
 
     interface Type_SpecificHeat_3Phase
-        module procedure :: SPH_3Phase_Construct
+        module procedure :: SPH_3_Construct
     end interface
 
 end module Calculate_SpecificHeat

@@ -77,14 +77,14 @@ module Inout_Output
     end type Type_Output
 
     interface Type_Output
-        module procedure Output_Constructor
+        module procedure Type_Output_Construct
     end interface
 
     public :: Type_Output
 
 contains
 
-    function Output_Constructor(Structure_Input, Thermal, Coordinate) result(Structure)
+    function Type_Output_Construct(Structure_Input, Thermal, Coordinate) result(Structure)
         implicit none
         type(Type_Input), intent(in) :: Structure_Input
         class(Abstract_Thermal), intent(in), optional :: Thermal
@@ -277,7 +277,7 @@ contains
             end if
         end select
 
-    end function Output_Constructor
+    end function Type_Output_Construct
 
     subroutine SetupDirectory(dirPath, fileExtensions)
         implicit none

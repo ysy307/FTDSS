@@ -1,6 +1,7 @@
 add_library(Calc_VHC
-    HeatCapacity.F90
-    HeatCapacity_3Phase_Apparent.F90
+    Interface.F90
+    Base.F90
+    3Phase_Apparent.F90
 )
 target_link_libraries(Calc_VHC PRIVATE
     Core
