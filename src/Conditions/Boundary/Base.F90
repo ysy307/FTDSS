@@ -1,4 +1,4 @@
-submodule(Condition_Fix_Boundary) Condition_Fix_Boundary_Base
+submodule(Condition_Boundary) Condition_Boundary_Base
     implicit none
 contains
     module subroutine Fix_BC_CRS_Dirichlet(A, b, Info, Edge, Dval)
@@ -36,4 +36,4 @@ contains
 
     end subroutine Fix_BC_CRS_Dirichlet
 
-end submodule Condition_Fix_Boundary_Base
+end submodule Condition_Boundary_Base

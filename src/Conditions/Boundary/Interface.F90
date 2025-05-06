@@ -1,4 +1,4 @@
-module Condition_Fix_Boundary
+module Condition_Boundary
     use, intrinsic :: iso_fortran_env
     use :: Core_BaseTypes
     use :: Core_Allocate
@@ -94,7 +94,7 @@ module Condition_Fix_Boundary
             type(Type_CRS), intent(inout) :: A
             real(real64), intent(inout) :: b(:)
             type(SideHolder), intent(in) :: Sides(:)
-            real(real64), intent(in) :: time
+            real(real64), intent(in), optional :: time
 
         end subroutine Abstract_BC_Thermal_CRS_Fix_All
 
@@ -104,7 +104,7 @@ module Condition_Fix_Boundary
             class(Abstract_Condition_BC), intent(in) :: self
             real(real64), intent(inout) :: b(:)
             type(SideHolder), intent(in) :: Sides(:)
-            real(real64), intent(in) :: time
+            real(real64), intent(in), optional :: time
 
         end subroutine Abstract_BC_Thermal_CRS_Fix_RHS
 
@@ -146,7 +146,7 @@ module Condition_Fix_Boundary
             type(Type_CRS), intent(inout) :: A
             real(real64), intent(inout) :: b(:)
             type(SideHolder), intent(in) :: Sides(:)
-            real(real64), intent(in) :: time
+            real(real64), intent(in), optional :: time
 
         end subroutine Type_BC_Thermal_CRS_Fix_BC_All
 
@@ -155,7 +155,7 @@ module Condition_Fix_Boundary
             class(Type_BC_Thermal_CRS), intent(in) :: self
             real(real64), intent(inout) :: b(:)
             type(SideHolder), intent(in) :: Sides(:)
-            real(real64), intent(in) :: time
+            real(real64), intent(in), optional :: time
 
         end subroutine Type_BC_Thermal_CRS_Fix_BC_RHS
 
@@ -760,4 +760,4 @@ contains
         A(p2, p2) = A(p2, p2) + 2.0d0 * val1 * Edge_Distance / 6.0d0
 
     end subroutine Fix_BoundaryCondition_HeatRadiation_Full
-end module Condition_Fix_Boundary
+end module Condition_Boundary

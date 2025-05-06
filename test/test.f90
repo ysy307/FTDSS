@@ -12,14 +12,9 @@ program test
     integer(int32) :: i, j
 
     call FTDSS%initialize()
-
-    FTDSS%Thermal%T%new(:) = 18.0d0
-    ! call FTDSS%Thermal%BC%Fix_BC(FTDSS%Thermal%T%new(:), FTDSS%Sides)
-    call FTDSS%Thermal%BC%Fix_BC(b=FTDSS%Thermal%T%new(:), &
-                                 Sides=FTDSS%Thermal%Sides, &
-                                 time=FTDSS%time%time)
-
-    FTDSS%Thermal%T%pre(:) = FTDSS%Thermal%T%new(:)
+    call FTDSS%Thermal%IC%Fix(value=FTDSS%Thermal%T, &
+                              Sides=FTDSS%Thermal%Sides, &
+                              BC=FTDSS%Thermal%BC)
 
     call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()

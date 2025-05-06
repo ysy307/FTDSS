@@ -12,6 +12,7 @@ target_link_libraries(Thermal PRIVATE
     Calc_SPH
     Matrix
     Boundary
+    Initial
     Solver
 )
 enable_build_flags(Thermal)

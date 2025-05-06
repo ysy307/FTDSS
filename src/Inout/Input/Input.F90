@@ -242,6 +242,16 @@ module Inout_Input
         type(Input_BC_Local), allocatable :: Water(:)
     end type Input_Boundary
 
+    type :: Input_IC_Local
+        character(:), allocatable :: type
+        real(real64) :: value
+        type(Input_BC_Local) :: Laplace
+    end type Input_IC_Local
+
+    type :: Input_Initial
+        type(Input_IC_Local) :: Heat
+    end type Input_Initial
+
     type :: Input_Region
         integer(int32), allocatable :: BelongingSurface(:)
         integer(int32), allocatable :: BelongingEdge(:)
@@ -265,7 +275,7 @@ module Inout_Input
         type(Input_Solver) :: Solver_Hydraulic
         type(Type_VTK) :: VTK
         type(Input_Boundary) :: Conditions
-        ! type(Type_BC_Thermal) :: Conditions
+        type(Input_Initial) :: IC
         type(Input_OutputSettings) :: OutputSettings
 
     contains
@@ -914,9 +924,6 @@ contains
                 call error_message(903, copt1=SolverName, copt2=ThermalName)
             end if
 
-            ! self%Solver_Thermal%useSolver
-
-            ! call Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, ThermalName)
         end if
         ! if (any(self%Regions(:)%Flag%isWater)) then
         !     key = Connect_dot(SolveName, HydraulicName, useSolverName)
@@ -927,85 +934,6 @@ contains
         ! end if
 
     end subroutine Inout_Input_Parameters_JSON_Solver
-
-    ! subroutine Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, c_target)
-    !     !> Load the solver detail settings from the JSON file
-    !     implicit none
-    !     class(Type_Input) :: self
-    !     type(json_file), intent(inout) :: json !! JSON parser
-    !     integer(int32), intent(in) :: useSolver !! Solver type
-    !     character(*), intent(in) :: c_target !! Target name
-
-    !     character(:), allocatable :: key
-
-    !     select case (c_target)
-    !     case (ThermalName)
-    !         select case (useSolver)
-    !         case (1)
-    !             allocate (Base_Solver :: self%Solver%Thermal)
-    !             self%Solver_Thermal%useSolver = useSolver
-    !         case (2)
-    !             allocate (Type_Solver_Iterative :: self%Solver%Thermal)
-    !             self%Solver%Thermal%useSolver = useSolver
-
-    !             select type (Thermal => self%Solver%Thermal)
-    !             type is (Type_Solver_Iterative)
-    !                 key = Inout_Input_Connect_dot(SolveName, ThermalName, ParametersName, SolverName)
-    !                 call json%get(key, Thermal%SolverType)
-    !                 call json%print_error_message(output_unit)
-
-    !                 key = Inout_Input_Connect_dot(SolveName, ThermalName, ParametersName, PreconditionerName)
-    !                 call json%get(key, Thermal%PreconditionerType)
-    !                 call json%print_error_message(output_unit)
-
-    !                 key = Inout_Input_Connect_dot(SolveName, ThermalName, ParametersName, MaxIterationName)
-    !                 call json%get(key, Thermal%MaxIter)
-    !                 call json%print_error_message(output_unit)
-
-    !                 key = Inout_Input_Connect_dot(SolveName, ThermalName, ParametersName, ToleranceName)
-    !                 call json%get(key, Thermal%Tol)
-    !                 call json%print_error_message(output_unit)
-    !             class default
-    !                 ! エラー処理
-    !                 write (*, '(A)') "Error: Unexpected type assigned to self%Solver%Thermal"
-    !                 stop
-    !             end select
-    !         end select
-    !         ! case (HydraulicName)
-    !         !     select case (useSolver)
-    !         !     case (1)
-    !         !         allocate (Base_Solver :: self%Solver%Hydraulic)
-    !         !         self%Solver%Hydraulic%useSolver = useSolver
-    !         !     case (2)
-    !         !         allocate (Type_Solver_Iterative :: self%Solver%Hydraulic)
-    !         !         self%Solver%Hydraulic%useSolver = useSolver
-
-    !         !         select type (Hydraulic => self%Solver%Hydraulic)
-    !         !         type is (Type_Solver_Iterative)
-    !         !             key = Inout_Input_Connect_dot(SolveName, HydraulicName, ParametersName, SolverName)
-    !         !             call json%get(key, Hydraulic%SolverType)
-    !         !             call json%print_error_message(output_unit)
-
-    !         !             key = Inout_Input_Connect_dot(SolveName, HydraulicName, ParametersName, PreconditionerName)
-    !         !             call json%get(key, Hydraulic%PreconditionerType)
-    !         !             call json%print_error_message(output_unit)
-
-    !         !             key = Inout_Input_Connect_dot(SolveName, HydraulicName, ParametersName, MaxIterationName)
-    !         !             call json%get(key, Hydraulic%MaxIter)
-    !         !             call json%print_error_message(output_unit)
-
-    !         !             key = Inout_Input_Connect_dot(SolveName, HydraulicName, ParametersName, ToleranceName)
-    !         !             call json%get(key, Hydraulic%Tol)
-    !         !             call json%print_error_message(output_unit)
-    !         !         class default
-    !         !             ! エラー処理
-    !         !             write (*, '(A)') "Error: Unexpected type assigned to self%Solver%Hydraulic"
-    !         !             stop
-    !         !         end select
-    !         !     end select
-    !     end select
-
-    ! end subroutine Inout_Input_Parameters_JSON_Solver_Settings
 
     subroutine Inout_Input_Conditions_JSON(self)
         !> Load the boundary/initial conditions from the JSON file
@@ -1021,7 +949,7 @@ contains
         call json%print_error_message(output_unit)
 
         call Inout_Input_Conditions_JSON_BC(self, json)
-        ! call Inout_Input_Conditions_JSON_IC(self, json)
+        call Inout_Input_Conditions_JSON_IC(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
@@ -1090,92 +1018,71 @@ contains
 
     end subroutine Inout_Input_Conditions_JSON_BC
 
-    ! subroutine Inout_Input_Conditions_JSON_IC(self, json)
-    !     !> Load the initialy conditions from the JSON file
-    !     implicit none
-    !     class(Type_Input) :: self
-    !     type(json_file), intent(inout) :: json !! JSON parser
+    subroutine Inout_Input_Conditions_JSON_IC(self, json)
+        !> Load the initialy conditions from the JSON file
+        implicit none
+        class(Type_Input) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
 
-    !     character(:), allocatable :: key
-    !     character(:), allocatable :: tmp
+        character(:), allocatable :: key
+        character(:), allocatable :: tmp
 
-    !     character(2) :: cICGroup
-    !     integer(int32) :: i, count
-    !     logical(4) :: isFind
+        character(2) :: cICGroup
+        integer(int32) :: i, count
+        logical(4) :: isFind
 
-    !     key = Inout_Input_Connect_dot(ICName, ThermalName, TypeName)
-    !     call json%get(key, self%Conditions%IC_Thermal%type)
-    !     call json%print_error_message(output_unit)
+        key = Connect_Dot(ICName, ThermalName, TypeName)
+        call json%get(key, self%IC%Heat%type)
+        call json%print_error_message(output_unit)
 
-    !     select case (self%Conditions%IC_Thermal%type)
-    !     case (ConstantName)
-    !         key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName)
-    !         call json%get(key, self%Conditions%IC_Thermal%value)
-    !         call json%print_error_message(output_unit)
-    !     case (LaplaceName)
-    !         count = 0
-    !         do i = 1, size(self%Conditions%BCGroup)
-    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
-    !             call json%get(key, tmp, found=isFind)
-    !             if (isFind) count = count + 1
-    !         end do
-    !         allocate (self%Conditions%IC_Thermal%IC_BC(count))
-    !         do i = 1, size(self%Conditions%BCGroup)
-    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
-    !             call json%get(key, tmp, found=isFind)
-    !             if (.not. isFind) cycle
+        select case (self%IC%Heat%type)
+        case (ConstantName)
+            key = Connect_Dot(ICName, ThermalName, ValueName)
+            call json%get(key, self%IC%Heat%value)
+            call json%print_error_message(output_unit)
+        case (LaplaceName)
+            stop 'Laplace type is not supported yet, sorry'
 
-    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, TypeName)
-    !             call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%type)
-    !             call json%print_error_message(output_unit)
+        end select
 
-    !             key = Inout_Input_Connect_dot(ICName, ThermalName, ValueName, cICGroup, ValueName)
-    !             call json%get(key, self%Conditions%IC_Thermal%IC_BC(i)%value)
-    !             call json%print_error_message(output_unit)
-    !         end do
+        ! key = Connect_Dot(ICName, HydraulicName, TypeName)
+        ! call json%get(key, self%Conditions%IC_Hydraulic%type)
+        ! call json%print_error_message(output_unit)
 
-    !     end select
+        ! select case (self%Conditions%IC_Hydraulic%type)
+        ! case (ConstantName)
+        !     key = Connect_Dot(ICName, HydraulicName, ValueName)
+        !     call json%get(key, self%Conditions%IC_Hydraulic%value)
+        !     call json%print_error_message(output_unit)
+        ! case (LaplaceName)
+        !     count = 0
+        !     do i = 1, size(self%Conditions%BCGroup)
+        !         write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+        !         call json%get(key, tmp, found=isFind)
+        !         if (isFind) count = count + 1
+        !     end do
+        !     allocate (self%Conditions%IC_Hydraulic%IC_BC(count))
+        !     count = 0
+        !     do i = 1, size(self%Conditions%BCGroup)
+        !         write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
+        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+        !         call json%get(key, tmp, found=isFind)
 
-    !     key = Inout_Input_Connect_dot(ICName, HydraulicName, TypeName)
-    !     call json%get(key, self%Conditions%IC_Hydraulic%type)
-    !     call json%print_error_message(output_unit)
+        !         if (.not. isFind) cycle
+        !         count = count + 1
 
-    !     select case (self%Conditions%IC_Hydraulic%type)
-    !     case (ConstantName)
-    !         key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName)
-    !         call json%get(key, self%Conditions%IC_Hydraulic%value)
-    !         call json%print_error_message(output_unit)
-    !     case (LaplaceName)
-    !         count = 0
-    !         do i = 1, size(self%Conditions%BCGroup)
-    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-    !             call json%get(key, tmp, found=isFind)
-    !             if (isFind) count = count + 1
-    !         end do
-    !         allocate (self%Conditions%IC_Hydraulic%IC_BC(count))
-    !         count = 0
-    !         do i = 1, size(self%Conditions%BCGroup)
-    !             write (cICGroup, '(i0)') self%Conditions%BCGroup(i)
-    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-    !             call json%get(key, tmp, found=isFind)
+        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
+        !         call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%type)
+        !         call json%print_error_message(output_unit)
 
-    !             if (.not. isFind) cycle
-    !             count = count + 1
+        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
+        !         call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%value)
+        !         call json%print_error_message(output_unit)
+        !     end do
+        ! end select
 
-    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-    !             call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%type)
-    !             call json%print_error_message(output_unit)
-
-    !             key = Inout_Input_Connect_dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
-    !             call json%get(key, self%Conditions%IC_Hydraulic%IC_BC(count)%value)
-    !             call json%print_error_message(output_unit)
-    !         end do
-    !     end select
-
-    ! end subroutine Inout_Input_Conditions_JSON_IC
+    end subroutine Inout_Input_Conditions_JSON_IC
 
     subroutine Inout_Input_Geometry_VTK(self)
         !> Load the geometry from the VTK file

@@ -134,6 +134,8 @@ contains
             end if
         end if
 
+        Structure%IC = Type_Condition_IC_CRS(Input, "Thermal")
+
     end function Type_Thermal_3Phase_2D_Construct
 
     module subroutine Type_Thermal_3Phase_2D_Update(self, NodeBelonging, arr_phi)

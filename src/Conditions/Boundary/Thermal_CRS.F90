@@ -1,4 +1,4 @@
-submodule(Condition_Fix_Boundary) Condition_Fix_Boundary_Thermal_CRS
+submodule(Condition_Boundary) Condition_Boundary_Thermal_CRS
     implicit none
 contains
     module function Type_BC_Thermal_CRS_Construct(Input) result(Structure)
@@ -48,7 +48,7 @@ contains
         type(Type_CRS), intent(inout) :: A
         real(real64), intent(inout) :: b(:)
         type(SideHolder), intent(in) :: Sides(:)
-        real(real64), intent(in) :: time
+        real(real64), intent(in), optional :: time
 
         integer(int32) :: iEdge, iGroup
         integer(int32) :: numEdges
@@ -87,36 +87,51 @@ contains
         class(Type_BC_Thermal_CRS), intent(in) :: self
         real(real64), intent(inout) :: b(:)
         type(SideHolder), intent(in) :: Sides(:)
-        real(real64), intent(in) :: time
+        real(real64), intent(in), optional :: time
 
         integer(int32) :: iEdge, iGroup
         integer(int32) :: numEdges
         real(real64) :: timeCoe, Dval
         integer(int32) :: i, idx
 
-        do i = 1, size(self%Time) - 1
-            if (time >= self%Time(i) .and. time < self%Time(i + 1)) then
-                timeCoe = (time - self%Time(i)) / (self%Time(i + 1) - self%Time(i))
-                idx = i
-                exit
-            end if
-        end do
-
         numEdges = size(Sides)
 
-        do iEdge = 1, numEdges
-            iGroup = Sides(iEdge)%s%SideGroup
-            select case (self%BCInfo(iGroup)%type)
-            case (Dirichlet)
-                Dval = (self%BCInfo(iGroup)%value(idx) * (1.0d0 - timeCoe) + &
-                        self%BCInfo(iGroup)%value(idx + 1) * timeCoe)
-                call self%Fix_BC_Dirichlet( &
-                    b=b, &
-                    Info=self%BCInfo(iGroup), &
-                    Edge=Sides(iEdge)%s%Conn(1:2), &
-                    Dval=Dval)
-            end select
-        end do
+        if (present(time)) then
+            do i = 1, size(self%Time) - 1
+                if (time >= self%Time(i) .and. time < self%Time(i + 1)) then
+                    timeCoe = (time - self%Time(i)) / (self%Time(i + 1) - self%Time(i))
+                    idx = i
+                    exit
+                end if
+            end do
+
+            do iEdge = 1, numEdges
+                iGroup = Sides(iEdge)%s%SideGroup
+                select case (self%BCInfo(iGroup)%type)
+                case (Dirichlet)
+                    Dval = (self%BCInfo(iGroup)%value(idx) * (1.0d0 - timeCoe) + &
+                            self%BCInfo(iGroup)%value(idx + 1) * timeCoe)
+                    call self%Fix_BC_Dirichlet( &
+                        b=b, &
+                        Info=self%BCInfo(iGroup), &
+                        Edge=Sides(iEdge)%s%Conn(1:2), &
+                        Dval=Dval)
+                end select
+            end do
+        else
+            do iEdge = 1, numEdges
+                iGroup = Sides(iEdge)%s%SideGroup
+                select case (self%BCInfo(iGroup)%type)
+                case (Dirichlet)
+                    Dval = self%BCInfo(iGroup)%value(1)
+                    call self%Fix_BC_Dirichlet( &
+                        b=b, &
+                        Info=self%BCInfo(iGroup), &
+                        Edge=Sides(iEdge)%s%Conn(1:2), &
+                        Dval=Dval)
+                end select
+            end do
+        end if
 
     end subroutine Type_BC_Thermal_CRS_Fix_BC_RHS
 
@@ -155,4 +170,4 @@ contains
 
     end subroutine Type_BC_Thermal_CRS_Dirichlet_NR
 
-end submodule Condition_Fix_Boundary_Thermal_CRS
+end submodule Condition_Boundary_Thermal_CRS

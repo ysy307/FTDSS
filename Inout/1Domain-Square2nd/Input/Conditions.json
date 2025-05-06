@@ -56,13 +56,25 @@
         "Hydraulic": {
             "Type": "Laplace",
             "Value": {
+                "2": {
+                    "Type": "Dirichlet",
+                    "Uniform": true,
+                    "Value": [
+                        0.1
+                    ]
+                },
                 "3": {
                     "Type": "Dirichlet",
-                    "Value": 0.1
+                    "Uniform": true,
+                    "Value": [
+                        0.0
+                    ]
+                },
+                "4": {
+                    "Type": "Adiabatic"
                 },
                 "5": {
-                    "Type": "Dirichlet",
-                    "Value": 0.0
+                    "Type": "Adiabatic"
                 }
             }
         }
