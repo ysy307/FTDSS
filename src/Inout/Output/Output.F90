@@ -82,6 +82,40 @@ module Inout_Output
 
     public :: Type_Output
 
+    !----------------------------------------------------------------------
+    ! Base interface
+    !-----------------------------------------------------------------------
+    interface
+        module subroutine Setup_Directory(dirPath, fileExtensions)
+            implicit none
+            character(*), intent(in) :: dirPath
+            character(*), dimension(:), intent(in) :: fileExtensions
+        end subroutine Setup_Directory
+
+        module function Get_UserName() result(UserName)
+            implicit none
+            character(:), allocatable :: UserName
+
+        end function Get_UserName
+
+        module function Get_HostName() result(HostName)
+            implicit none
+            character(:), allocatable :: HostName
+
+        end function Get_HostName
+
+    end interface
+
+    interface
+        module subroutine Write_Observation_Header(self, data_label, var_unit, num_unit, filename)
+            implicit none
+            class(Type_Output) :: self
+            character(*), intent(in) :: data_label, var_unit, filename
+            integer(int32), intent(inout) :: num_unit
+
+        end subroutine Write_Observation_Header
+    end interface
+
 contains
 
     function Type_Output_Construct(Structure_Input, Thermal, Coordinate) result(Structure)
@@ -109,10 +143,10 @@ contains
         dir_Path = GetProjectPath()
 
         Structure%dir_Output = trim(adjustl(dir_Path))//"Output/"
-        call SetupDirectory(Structure%dir_Output, OutputExtentions)
+        call Setup_Directory(Structure%dir_Output, OutputExtentions)
 
         Structure%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
-        call SetupDirectory(Structure%dir_FileOutput, OutputFileExtentions)
+        call Setup_Directory(Structure%dir_FileOutput, OutputFileExtentions)
 
         Structure%Observation%Temperature%Filename = trim(adjustl(Structure%dir_Output))//"obsf_T.dat" !&
         Structure%Observation%Si%Filename          = trim(adjustl(Structure%dir_Output))//"obsf_Si.dat" !&
@@ -278,40 +312,6 @@ contains
         end select
 
     end function Type_Output_Construct
-
-    subroutine SetupDirectory(dirPath, fileExtensions)
-        implicit none
-        character(*), intent(in) :: dirPath
-        character(*), dimension(:), intent(in) :: fileExtensions
-
-        character(len=512) :: command
-        logical :: exists
-        integer :: i
-
-        inquire (DIRECTORY=trim(adjustl(dirPath)), exist=exists)
-
-        if (.not. exists) then
-#ifdef _WIN32
-            command = "mkdir "//'"'//trim(adjustl(dirPath))//'"'
-            call system(command)
-#endif
-#ifdef __linux__
-            command = "mkdir -p "//'"'//trim(adjustl(dirPath))//'"'
-            call system(command)
-#endif
-        else
-            do i = 1, size(fileExtensions)
-#ifdef _WIN32
-                command = "del /Q "//'"'//trim(adjustl(dirPath))//"*"//trim(fileExtensions(i))//'"'
-                call system(command)
-#endif
-#ifdef __linux__
-                command = "rm -f "//trim(adjustl(dirPath))//"*"//trim(fileExtensions(i))
-                call system(command)
-#endif
-            end do
-        end if
-    end subroutine SetupDirectory
 
     subroutine Inout_Output_All(self, fc, Temp, Si, Pres, wFlux)
         implicit none

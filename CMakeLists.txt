@@ -120,13 +120,13 @@ if(BUILD_APP STREQUAL "ysy_fc")
     )
 
 elseif(BUILD_APP STREQUAL "test")
-    add_executable(test ${TEST_FILE})
-    target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
-    # target_compile_options(test PUBLIC -fpp -traceback)
-    # target_link_options   (test PUBLIC -fpp -traceback)
+    add_executable(test2 ${TEST_FILE})
+    target_include_directories(test2 PUBLIC ${My_INCLUDE_PATH})
+    # target_compile_options(test2 PUBLIC -fpp -traceback)
+    # target_link_options   (test2 PUBLIC -fpp -traceback)
 
     # Link core libraries
-    target_link_libraries(test PRIVATE
+    target_link_libraries(test2 PRIVATE
         Core
         Matrix
         Calc_BLAS
@@ -146,8 +146,8 @@ elseif(BUILD_APP STREQUAL "test")
         ${LINK_LIBRARIES}
     )
 
-    enable_build_flags(test)
-    enable_thirdparty (test)
+    enable_build_flags(test2)
+    enable_thirdparty (test2)
 
 endif()
 

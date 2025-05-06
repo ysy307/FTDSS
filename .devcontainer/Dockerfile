@@ -61,8 +61,8 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "export FC=ifx" >> ~/.zshrc && \
     echo "export F90=ifx" >> ~/.zshrc && \
     echo "export F77=ifx" >> ~/.zshrc && \
-    echo "export CC=icc" >> ~/.zshrc && \
-    echo "export CXX=icpc" >> ~/.zshrc && \
+    echo "export CC=icx" >> ~/.zshrc && \
+    echo "export CXX=icpx" >> ~/.zshrc && \
     echo "export MPIFC=mpiifx" >> ~/.zshrc && \
     echo "export MPIF90=mpiifx" >> ~/.zshrc && \
     echo "export MPIF77=mpiifx" >> ~/.zshrc && \

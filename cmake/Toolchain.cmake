@@ -16,7 +16,13 @@ endif()
 
 if(NOT TARGET fortran_stdlib::fortran_stdlib)
     find_package(fortran_stdlib REQUIRED
-        PATHS ${PROJECT_SOURCE_DIR}/EXTERNAL/fortran_stdlib/lib/cmake/fortran_stdlib
+        PATHS ${PROJECT_SOURCE_DIR}/third_parth/.local/lib/cmake/fortran_stdlib
+    )
+endif()
+
+if(NOT TARGET jsonfortran-intelllvm::jsonfortran-static)
+    find_package(jsonfortran-intelllvm REQUIRED
+        PATHS ${PROJECT_SOURCE_DIR}/third_party/.local/jsonfortran-intelllvm-9.0.3/cmake
     )
 endif()
 
@@ -66,11 +72,19 @@ endfunction()
 # --- サードパーティのヘッダ・ライブラリを追加 ---
 function(enable_thirdparty target)
     target_include_directories(${target} PUBLIC
-        ${PROJECT_SOURCE_DIR}/include/Json-Fortran
-        ${PROJECT_SOURCE_DIR}/include/VTKFortran
-        ${PROJECT_SOURCE_DIR}/EXTERNAL/fortran_stdlib/include/fortran_stdlib/IntelLLVM-2025.0.4
+    ${PROJECT_SOURCE_DIR}/include/VTKFortran
     )
-
-    target_link_libraries(${target} PUBLIC fortran_stdlib::fortran_stdlib)
     target_link_libraries(${target} PUBLIC ${MY_ALL_LIBRARIES})
+
+    target_include_directories(${target} PUBLIC 
+        $<TARGET_PROPERTY:fortran_stdlib::fortran_stdlib,INTERFACE_INCLUDE_DIRECTORIES>
+    )
+    target_link_libraries(${target} PUBLIC fortran_stdlib::fortran_stdlib)
+
+    target_include_directories(${target} PUBLIC 
+        $<TARGET_PROPERTY:jsonfortran-intelllvm::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
+    )
+    target_link_libraries(${target} PUBLIC jsonfortran-intelllvm::jsonfortran-static)
+
+
 endfunction()

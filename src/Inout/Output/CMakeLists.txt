@@ -1,5 +1,7 @@
 add_library(Output
     Output.F90
+    Base.F90
+    Observation.F90
 )
 target_link_libraries(Output PRIVATE
     Input
