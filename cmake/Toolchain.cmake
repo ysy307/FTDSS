@@ -16,13 +16,13 @@ endif()
 
 if(NOT TARGET fortran_stdlib::fortran_stdlib)
     find_package(fortran_stdlib REQUIRED
-        PATHS /workspaces/FTDSS/EXTERNAL/fortran_stdlib/lib/cmake/fortran_stdlib
+        PATHS ${PROJECT_SOURCE_DIR}/EXTERNAL/fortran_stdlib/lib/cmake/fortran_stdlib
     )
 endif()
 
 # --- 静的ライブラリは一度だけ探索 ---
 if(NOT MY_ALL_LIBRARIES)
-    file(GLOB MY_ALL_LIBRARIES CONFIGURE_DEPENDS /workspaces/FTDSS/lib/*.a)
+    file(GLOB MY_ALL_LIBRARIES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/lib/*.a)
 endif()
 
 # --- ターゲットに対してビルドフラグを設定 ---
@@ -37,7 +37,7 @@ function(enable_build_flags target)
 
     if(ENABLE_OPTIMIZE)
         target_compile_options(${target} PUBLIC
-            $<$<CONFIG:Release>:-O3 -flto -xCORE-AVX2>
+            $<$<CONFIG:Release>:-O3 -xCORE-AVX2>
         )
     endif()
 
@@ -66,9 +66,9 @@ endfunction()
 # --- サードパーティのヘッダ・ライブラリを追加 ---
 function(enable_thirdparty target)
     target_include_directories(${target} PUBLIC
-        /workspaces/FTDSS/include/Json-Fortran
-        /workspaces/FTDSS/include/VTKFortran
-        /workspaces/FTDSS/EXTERNAL/fortran_stdlib/include/fortran_stdlib/IntelLLVM-2025.0.4
+        ${PROJECT_SOURCE_DIR}/include/Json-Fortran
+        ${PROJECT_SOURCE_DIR}/include/VTKFortran
+        ${PROJECT_SOURCE_DIR}/EXTERNAL/fortran_stdlib/include/fortran_stdlib/IntelLLVM-2025.0.4
     )
 
     target_link_libraries(${target} PUBLIC fortran_stdlib::fortran_stdlib)

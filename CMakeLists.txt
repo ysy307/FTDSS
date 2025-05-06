@@ -16,7 +16,7 @@ option(ENABLE_OPTIMIZE "Enable optimization flags" ON)
 option(ENABLE_OPENMP   "Enable OpenMP support"     ON)
 option(ENABLE_MKL      "Enable MKL support"        ON)
 option(ENABLE_MPI      "Enable MPI support"        OFF)
-option(ENABLE_DEBUG    "Enable debug flags"        ON)
+option(ENABLE_DEBUG    "Enable debug flags"        OFF)
 
 # Select the application to build
 set(BUILD_APP "" CACHE STRING "Specify the application to build: ysy_fc or test")
@@ -41,7 +41,7 @@ endif()
 add_subdirectory(src/Core)
 add_subdirectory(src/Matrix)
 add_subdirectory(src/Inout/Input)
-add_subdirectory(src/Conditions)
+add_subdirectory(src/Conditions/Boundary)
 add_subdirectory(src/Calculate/BLAS)
 add_subdirectory(src/Calculate/WRF)
 add_subdirectory(src/Calculate/HCF)
@@ -71,7 +71,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Matrix
         Calc_BLAS
         Input
-        Conditions
+        Boundary
         Calc_WRF
         Calc_HCF
         Calc_GCC
@@ -122,8 +122,8 @@ if(BUILD_APP STREQUAL "ysy_fc")
 elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
     target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
-    target_compile_options(test PUBLIC -fpp -traceback)
-    target_link_options   (test PUBLIC -fpp -traceback)
+    # target_compile_options(test PUBLIC -fpp -traceback)
+    # target_link_options   (test PUBLIC -fpp -traceback)
 
     # Link core libraries
     target_link_libraries(test PRIVATE
@@ -131,7 +131,7 @@ elseif(BUILD_APP STREQUAL "test")
         Matrix
         Calc_BLAS
         Input
-        Conditions
+        Boundary
         Calc_WRF
         Calc_HCF
         Calc_GCC
@@ -146,41 +146,8 @@ elseif(BUILD_APP STREQUAL "test")
         ${LINK_LIBRARIES}
     )
 
-    # Link external and optional libraries
-    if(ENABLE_MKL)
-        set(MKL_LINK "static")
-        find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
-        target_compile_options(test PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
-        target_include_directories(test PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
-        target_link_libraries(test PUBLIC $<LINK_ONLY:MKL::MKL>)
-        add_definitions(-D_MKL)
-    endif()
-
-    if(ENABLE_OPENMP)
-        find_package(OpenMP REQUIRED)
-        target_link_libraries(test PUBLIC OpenMP::OpenMP_Fortran)
-    endif()
-
-    if(ENABLE_MPI)
-        find_package(MPI REQUIRED)
-        target_link_libraries(test PUBLIC MPI::MPI_Fortran)
-    endif()
-
-    # Debug or Optimization Flags
-    if(ENABLE_DEBUG)
-        target_compile_options(test PUBLIC -O0 -g -check all)
-        target_link_options(test PUBLIC -O0 -g -check all)
-    elseif(ENABLE_OPTIMIZE)
-        target_compile_options(test PUBLIC -O3 -xCORE-AVX2)
-        target_link_options(test PUBLIC -O3 -xCORE-AVX2)
-    endif()
-
-    # Run target
-    add_custom_target(run_test
-        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test
-        DEPENDS test
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    )
+    enable_build_flags(test)
+    enable_thirdparty (test)
 
 endif()
 

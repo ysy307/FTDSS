@@ -80,6 +80,7 @@ contains
         do i = 1, Input%Basic%Order
             Structure%CT_old(i) = Structure%KT_star_0%Copy()
         end do
+        print *, Structure%KT_star_0%nnz
 
         call Allocate_Array(Structure%FT, Structure%nsize)
         call Allocate_Array(Structure%FT_old, Structure%nsize)

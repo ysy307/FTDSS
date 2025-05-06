@@ -20,6 +20,11 @@ module Solver_Time
         character(10) :: start_Rdate, start_Rtime, start_Rzone
         character(10) :: end_Rdate, end_Rtime, end_Rzone
 
+        character(:), allocatable :: UserName
+        character(:), allocatable :: HostName
+        character(:), allocatable :: Version
+        character(:), allocatable :: Compiler
+
     contains
         procedure, public, pass(self) :: Get_RealTime
     end type Type_Time
@@ -93,5 +98,57 @@ contains
         call date_and_time(date=date, time=time, zone=zone)
 
     end subroutine Get_RealTime
+
+    function Get_UserName() result(UserName)
+        implicit none
+        character(:), allocatable :: UserName
+
+        character(64) :: tmpUserName
+        integer(int32) :: len, status
+        integer(int32) :: i
+
+        character(64) :: UserNameLists(4) = &
+                         ["LOGNAME", "USER", "LNAME", "USERNAME"]
+
+        do i = 1, size(UserNameLists)
+            call get_environment_variable(UserNameLists(i), &
+                                          tmpUserName, &
+                                          len, &
+                                          status)
+            if (status == 0 .and. len > 0) then
+                UserName = trim(adjustl(tmpUserName))
+                return
+            end if
+        end do
+
+        UserName = "Unknown"
+
+    end function Get_UserName
+
+    function Get_HostName() result(HostName)
+        implicit none
+        character(:), allocatable :: HostName
+
+        character(64) :: tmpHostName
+        integer(int32) :: len, status
+        integer(int32) :: i
+
+        character(64) :: HostNameLists(2) = &
+                         ["HostName", "COMPUTERNAME"]
+
+        do i = 1, size(HostNameLists)
+            call get_environment_variable(HostNameLists(i), &
+                                          tmpHostName, &
+                                          len, &
+                                          status)
+            if (status == 0 .and. len > 0) then
+                HostName = trim(adjustl(tmpHostName))
+                return
+            end if
+        end do
+
+        HostName = "Unknown"
+
+    end function Get_HostName
 
 end module Solver_Time
