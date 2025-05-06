@@ -3,8 +3,9 @@ program test
     use :: Main_FTDSS
 
 #ifdef _OPENMP
-    use omp_lib
+    use :: omp_lib
 #endif
+
     implicit none
     type(Type_FTDSS) :: FTDSS
     real(real64) :: norm_old, norm_new
@@ -19,21 +20,14 @@ program test
     call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0
-    ! filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
-    ! print *, count, filename
+
     call FTDSS%Output%Output_All(fc=count, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
-    ! stop
     FTDSS%Iteration%step = 0
-
-    ! print *, Thermal%T%old(:, 1)
 
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
-    ! stop
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
-        ! print *, FTDSS%time%dt, FTDSS%time%time
-        ! stop
         FTDSS%time%time_old = FTDSS%time%time
         FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
         FTDSS%time%dt_old(1) = FTDSS%time%dt

@@ -42,6 +42,7 @@ add_subdirectory(src/Core)
 add_subdirectory(src/Matrix)
 add_subdirectory(src/Inout/Input)
 add_subdirectory(src/Conditions/Boundary)
+add_subdirectory(src/Conditions/Initial)
 add_subdirectory(src/Calculate/BLAS)
 add_subdirectory(src/Calculate/WRF)
 add_subdirectory(src/Calculate/HCF)
@@ -72,6 +73,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Calc_BLAS
         Input
         Boundary
+        Initial
         Calc_WRF
         Calc_HCF
         Calc_GCC
@@ -120,18 +122,19 @@ if(BUILD_APP STREQUAL "ysy_fc")
     )
 
 elseif(BUILD_APP STREQUAL "test")
-    add_executable(test2 ${TEST_FILE})
-    target_include_directories(test2 PUBLIC ${My_INCLUDE_PATH})
-    # target_compile_options(test2 PUBLIC -fpp -traceback)
-    # target_link_options   (test2 PUBLIC -fpp -traceback)
+    add_executable(test ${TEST_FILE})
+    target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
+    # target_compile_options(test PUBLIC -fpp -traceback)
+    # target_link_options   (test PUBLIC -fpp -traceback)
 
     # Link core libraries
-    target_link_libraries(test2 PRIVATE
+    target_link_libraries(test PRIVATE
         Core
         Matrix
         Calc_BLAS
         Input
         Boundary
+        Initial
         Calc_WRF
         Calc_HCF
         Calc_GCC
@@ -146,8 +149,8 @@ elseif(BUILD_APP STREQUAL "test")
         ${LINK_LIBRARIES}
     )
 
-    enable_build_flags(test2)
-    enable_thirdparty (test2)
+    enable_build_flags(test)
+    enable_thirdparty (test)
 
 endif()
 

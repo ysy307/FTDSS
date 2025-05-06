@@ -51,8 +51,10 @@ contains
             end do
         case (2)
             write (num_unit, '(a)') "# Observation Coordinate (x,y,z)"
+            ! print *, self%Observation%Element(iObs)%e%ElementID
+            ! stop
             do iObs = 1, nObs
-                write (num_unit, '(a,x,i0,a,3(x,es18.11,a),2a)') &
+                write (num_unit, '(a,x,i0,a,3(x,es18.11,a),a,i0)') &
                     "#    Point", iObs, ": (", &
                     self%Observation%Cood_Obs%x(iObs), ",", &
                     self%Observation%Cood_Obs%y(iObs), ",", &
