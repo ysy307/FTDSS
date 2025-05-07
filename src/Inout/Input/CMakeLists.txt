@@ -4,7 +4,6 @@ add_library(Input
 )
 target_link_libraries(Input PRIVATE
     Core
-    Conditions
 )
 enable_build_flags(Input)
 enable_thirdparty (Input)

@@ -3,38 +3,34 @@ program test
     use :: Main_FTDSS
 
 #ifdef _OPENMP
-    use omp_lib
+    use :: omp_lib
 #endif
+
     implicit none
     type(Type_FTDSS) :: FTDSS
     real(real64) :: norm_old, norm_new
     integer(int32) :: stat, count
     integer(int32) :: i, j
 
-    call FTDSS%Initialize()
+    call FTDSS%initialize()
+    call FTDSS%Thermal%IC%Fix(value=FTDSS%Thermal%T, &
+                              Sides=FTDSS%Thermal%Sides, &
+                              BC=FTDSS%Thermal%BC)
 
-    FTDSS%Thermal%T%new(:) = 18.0d0
-    call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%T%new(:))
-    FTDSS%Thermal%T%pre(:) = FTDSS%Thermal%T%new(:)
+    ! FTDSS%phi%pre(:)
 
     call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0
-    ! filename = '/workspaces/FTDSS/tmp/output_'//to_string(count, '(i0)')//'.vtu'
-    ! print *, count, filename
+
     call FTDSS%Output%Output_All(fc=count, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
-    ! stop
     FTDSS%Iteration%step = 0
-
-    ! print *, Thermal%T%old(:, 1)
+    FTDSS%Iteration%max_iter = 100
 
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
-    ! stop
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
-        ! print *, FTDSS%time%dt, FTDSS%time%time
-        ! stop
         FTDSS%time%time_old = FTDSS%time%time
         FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
         FTDSS%time%dt_old(1) = FTDSS%time%dt
@@ -42,6 +38,7 @@ program test
         FTDSS%Iteration%iter = 0
 
         !! Thermal Newton-Raphson FTDSS%Iteration
+
         NR_LOOP_THERMAL: do while (FTDSS%Iteration%iter <= FTDSS%Iteration%max_iter)
             ! print *, FTDSS%Iteration%iter
             if (FTDSS%Iteration%isConverged) then
@@ -49,6 +46,7 @@ program test
                 FTDSS%Iteration%isConverged = .false.
             end if
             FTDSS%Iteration%iter = FTDSS%Iteration%iter + 1
+            ! print *, FTDSS%Iteration%iter
             ! if (FTDSS%Iteration%iter == 1) then
             !     if (FTDSS%Iteration%step >= 2) then
             !         Thermal%T%pre(:) = Thermal%T%old(:, 1) + (Thermal%T%old(:, 1) - Thermal%T%old(:, 2)) * (FTDSS%time%dt / FTDSS%time%dt_old(1))
@@ -64,7 +62,11 @@ program test
             call FTDSS%Thermal%Assemble(FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
-            call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
+            ! call FTDSS%Thermal%BC%
+            call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
+                                         b=FTDSS%Thermal%PHIT, &
+                                         Sides=FTDSS%Thermal%Sides, &
+                                         time=FTDSS%time%time)
 
             ! open (unit=10, file='log/debug4.txt', status='replace')
             ! do i = 1, FTDSS%Thermal%nsize
@@ -79,7 +81,7 @@ program test
             ! end do
             ! close (20)
             ! stop
-            call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
+            ! call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
             call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
             ! open (unit=30, file='log/debug3.txt', status='replace')
@@ -95,6 +97,7 @@ program test
             ! norm_new = norm_2(Thermal%nsize, Thermal%T%dif)
             norm_new = maxval(abs(FTDSS%Thermal%T%dif))
 
+            ! print *, FTDSS%Iteration%iter, FTDSS%Iteration%iter >= 2
             !! Convergence check
             if (FTDSS%Iteration%iter >= 1) then
                 ! if (norm_new < 1.0d-5) then

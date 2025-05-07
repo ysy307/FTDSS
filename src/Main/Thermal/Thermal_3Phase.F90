@@ -8,14 +8,16 @@ contains
         type(DP3d), intent(inout), pointer :: Coordinate
 
         integer(int32) :: CountElements, CountSides
-        integer(int32) :: iCell, iSide, idx
+        integer(int32) :: iCell, iElem, iSide, idx
         integer(int32) :: i
         integer(int32) :: iRegion
 
+        if (allocated(Structure)) deallocate (Structure)
         allocate (Type_Thermal_3Phase_2D :: Structure)
 
         ! Count the number of elements (e.g., triangles)
         CountElements = 0
+        CountSides = 0
         if (Input%VTK%numTotalCells == 0) then
             print *, "Error: No cells found in the VTK Structure."
             return
@@ -24,58 +26,49 @@ contains
         if (Input%Basic%DimensionType == 1) then
             do iCell = 1, Input%VTK%numTotalCells
                 if (Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_TRIANGLE .or. &
-                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_TRIANGLE_STRIP .or. &
-                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_POLYGON .or. &
                     Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_PIXEL .or. &
                     Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUAD .or. &
                     Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_TRIANGLE .or. &
-                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_QUAD) then
+                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_QUAD &
+                    ) then
                     CountElements = CountElements + 1
                 end if
                 if (Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_LINE .or. &
-                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_EDGE) then
+                    Input%VTK%CELLS(iCell)%CellType == Input%VTK%Names%VTK_QUADRATIC_EDGE &
+                    ) then
                     CountSides = CountSides + 1
                 end if
             end do
 
             Structure%nElement = CountElements
+            Structure%nSide = CountSides
             Structure%nsize = Input%VTK%numPoints
             Structure%nRegion = Input%Basic%numRegion
 
             allocate (Structure%Elements(Structure%nElement)) ! pointer 多形配列にディスクリプタを確保
-            allocate (Structure%Sides(CountSides)) ! pointer 多形配列にディスクリプタを確保
+            allocate (Structure%Sides(Structure%nSide)) ! pointer 多形配列にディスクリプタを確保
             ! 各要素ごとに具象オブジェクトをポインタで割り当て
 
-            idx = 0
+            iElem = 1
+            iSide = 1
             do iCell = 1, Input%VTK%numTotalCells
-                select case (Input%VTK%CELLS(iCell)%CellType)
-                case (5) ! VTK_TRIANGLE
-                    idx = idx + 1
-                    Structure%Elements(idx)%e = TriangleFirst(iCell, Coordinate, Input%VTK%CELLS(iCell)%CONNECTIVITY)
-                case (9) ! VTK_QUAD
-                    idx = idx + 1
-                    Structure%Elements(idx)%e = SquareFirst(iCell, Coordinate, Input%VTK%CELLS(iCell)%CONNECTIVITY)
-                case (22) ! VTK_QUADRATIC_TRIANGLE
-                    idx = idx + 1
-                    Structure%Elements(idx)%e = TriangleSecond(iCell, Coordinate, Input%VTK%CELLS(iCell)%CONNECTIVITY)
-                case (23) ! VTK_QUADRATIC_QUAD
-                    idx = idx + 1
-                    Structure%Elements(idx)%e = SquareSecond(iCell, Coordinate, Input%VTK%CELLS(iCell)%CONNECTIVITY)
-                end select
-            end do
+                if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%CellType, 1)) then
+                    call Structure%Sides(iSide)%allocate(Input%VTK%CELLS(iCell)%CellType, &
+                                                         iCell, &
+                                                         Coordinate, &
+                                                         Input%VTK%CELLS(iCell)%CONNECTIVITY, &
+                                                         Input%VTK%CELLS(iCell)%CellEntityId)
+                    iSide = iSide + 1
+                end if
+                if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%CellType, 2)) then
+                    call Structure%Elements(iElem)%allocate(Input%VTK%CELLS(iCell)%CellType, &
+                                                            iCell, &
+                                                            Coordinate, &
+                                                            Input%VTK%CELLS(iCell)%CONNECTIVITY)
+                    iElem = iElem + 1
+                end if
 
-            idx = 0
-            do iSide = 1, Input%VTK%numTotalCells
-                select case (Input%VTK%CELLS(iSide)%CellType)
-                case (3) ! VTK_LINE
-                    idx = idx + 1
-                    Structure%Sides(idx)%s = SideFirst(iSide, Coordinate, Input%VTK%CELLS(iSide)%CONNECTIVITY, Input%VTK%CELLS(iSide)%CellEntityId)
-                case (21) ! VTK_QUADRATIC_EDGE
-                    idx = idx + 1
-                    Structure%Sides(idx)%s = SideSecond(iSide, Coordinate, Input%VTK%CELLS(iSide)%CONNECTIVITY, Input%VTK%CELLS(iSide)%CellEntityId)
-                end select
             end do
-
         end if
 
         Structure%KT_star_0 = Type_CRS(Structure%Elements, Structure%nsize)
@@ -87,6 +80,7 @@ contains
         do i = 1, Input%Basic%Order
             Structure%CT_old(i) = Structure%KT_star_0%Copy()
         end do
+        print *, Structure%KT_star_0%nnz
 
         call Allocate_Array(Structure%FT, Structure%nsize)
         call Allocate_Array(Structure%FT_old, Structure%nsize)
@@ -120,7 +114,7 @@ contains
         call Structure%D_Qice%allocate(Structure%nsize, Input%Basic%Order)
         call Structure%Si%allocate(Structure%nsize, Input%Basic%Order)
 
-        Structure%BC = Type_BC_Thermal(Input%Conditions, Input%VTK)
+        Structure%BC = Type_BC_Thermal_CRS(Input)
 
         if (Input%Solver_Thermal%useSolver == 1) then
             Structure%Solver = Solver_CRS_LU_Constructor(N=Structure%nsize, &
@@ -139,6 +133,8 @@ contains
                                                                    Preconditioner=Input%Solver_Thermal%usePreconditionerType)
             end if
         end if
+
+        Structure%IC = Type_Condition_IC_CRS(Input, "Thermal")
 
     end function Type_Thermal_3Phase_2D_Construct
 

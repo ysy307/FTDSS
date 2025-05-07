@@ -40,16 +40,16 @@ module Solver_Solve
 
     type, extends(Abstract_Solver_CRS) :: Solver_CRS_BiCGSTAB
         integer(int32) :: N
-        real(real64), dimension(:), pointer :: M
-        real(real64), dimension(:), pointer :: p
-        real(real64), dimension(:), pointer :: phat
-        real(real64), dimension(:), pointer :: s
-        real(real64), dimension(:), pointer :: shat
-        real(real64), dimension(:), pointer :: r
-        real(real64), dimension(:), pointer :: r0
-        real(real64), dimension(:), pointer :: t
-        real(real64), dimension(:), pointer :: v
-        real(real64), dimension(:), pointer :: x
+        real(real64), allocatable :: M(:)
+        real(real64), allocatable :: p(:)
+        real(real64), allocatable :: phat(:)
+        real(real64), allocatable :: s(:)
+        real(real64), allocatable :: shat(:)
+        real(real64), allocatable :: r(:)
+        real(real64), allocatable :: r0(:)
+        real(real64), allocatable :: t(:)
+        real(real64), allocatable :: v(:)
+        real(real64), allocatable :: x(:)
 
         real(real64) :: tol
         integer(int32) :: maxiter

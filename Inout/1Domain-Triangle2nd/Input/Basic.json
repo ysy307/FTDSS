@@ -1,0 +1,87 @@
+    {
+        "Basic": {
+            "DimensionType": 1,
+            "Region": 1,
+            "Time": {
+                "Calculation": {
+                    "Unit": "Second",
+                    "Step": 30.0,
+                    "StepMinimum": 30.0,
+                    "StepMaximum": 30.0
+                },
+                "Input": {
+                    "Unit": "Day",
+                    "StartCalculation": 0.0,
+                    "EndCalculation": 10.0
+                }
+            },
+            "shouldDisplayPrompt": false
+        },
+        "Region1": {
+            "Belong": {
+                "Surface": [
+                    1
+                ],
+                "Edge": [
+                    2,
+                    3,
+                    4,
+                    5
+                ]
+            },
+            "CalculationType": 4,
+            "Modelnumber": 31,
+            "isFrozen": true,
+            "Thermal": {
+                "Porosity": 0.3,
+                "LatentHeat": 334560,
+                "Density": [
+                    2800,
+                    1000,
+                    917
+                ],
+                "SpecificHeat": [
+                    912,
+                    4180,
+                    2100
+                ],
+                "ThermalConductivity": [
+                    3.78,
+                    0.6,
+                    2.2
+                ],
+                "ThermalConductivityDispersity": [
+                    1.0,
+                    0.1
+                ],
+                "Ice": {
+                    "Tf": 0.0,
+                    "QiceType": 2,
+                    "Parameters": {
+                        "Model": 2,
+                        "thetaS": 0.30,
+                        "thetaR": 0.0,
+                        "alpha1": 0.2,
+                        "n1": 1.8
+                    },
+                    "Unit": "m"
+                }
+            }
+        },
+        "Solver": {
+            "Order": 1,
+            "MaxNonlinearIteration": 100,
+            "Thermal": {
+                "useSolver": 2,
+                "Parameters": {
+                    "Solver": 4,
+                    "Preconditioner": 1,
+                    "MaxIteration": 50000,
+                    "Tolerance": 1.0e-15
+                }
+            },
+            "Hydraulic": {
+                "useSolver": 1
+            }
+        }
+    }

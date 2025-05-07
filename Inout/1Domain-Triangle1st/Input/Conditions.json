@@ -4,13 +4,20 @@
             2,
             3,
             4,
-            5,
-            6,
-            7
+            5
+        ],
+        "Time": [
+            0.0,
+            20.0
         ],
         "2": {
             "Thermal": {
-                "Type": "Adiabatic"
+                "Type": "Dirichlet",
+                "Uniform": true,
+                "Value": [
+                    -20.0,
+                    -20.0
+                ]
             },
             "Hydraulic": {
                 "Type": "Impermeable"
@@ -35,32 +42,6 @@
         "5": {
             "Thermal": {
                 "Type": "Adiabatic"
-            },
-            "Hydraulic": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": 0.0
-            }
-        },
-        "6": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": [
-                    -10.0
-                ]
-            },
-            "Hydraulic": {
-                "Type": "Impermeable"
-            }
-        },
-        "7": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": [
-                    -10.0
-                ]
             },
             "Hydraulic": {
                 "Type": "Impermeable"

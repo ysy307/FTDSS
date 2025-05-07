@@ -11,7 +11,8 @@ module Main_Thermal
     use :: Calculate_HeatCapacity
     use :: Matrix_Assemble
     use :: Matrix_CRS
-    use :: Condition_Fix_Boundary_Conditions, only:Type_BC_Thermal
+    use :: Condition_Boundary
+    use :: Condition_Initial
     use :: Solver_Solve
     implicit none
 
@@ -36,10 +37,12 @@ module Main_Thermal
         ! type(DP3d), pointer :: Coordinate
         integer(int32) :: nsize
         integer(int32) :: nElement
+        integer(int32) :: nSide
         integer(int32) :: nRegion
         type(ElementHolder), allocatable :: Elements(:)
         type(SideHolder), allocatable :: Sides(:)
-        type(Type_BC_Thermal) :: BC
+        class(Abstract_Condition_BC), allocatable :: BC
+        class(Abstract_Condition_IC), allocatable :: IC
         !! Thermal properties
         class(Abstract_ThermalConductivity), allocatable :: THC
         class(Abstract_Density), allocatable :: DEN

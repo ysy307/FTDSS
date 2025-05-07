@@ -23,7 +23,7 @@ module Main_FTDSS
         type(Type_Output) :: Output
 
     contains
-        procedure, pass(self) :: Initialize => FDTSS_initialize
+        procedure, pass(self) :: initialize => FDTSS_initialize
     end type Type_FTDSS
 
 contains
@@ -59,6 +59,8 @@ contains
         self%Output = Type_Output(self%Input, Thermal=self%Thermal, Coordinate=self%Coordinate)
 
         call self%phi%allocate(nsize, self%Input%Basic%Order)
+        self%phi%pre = self%Input%Regions(1)%Thermal%Porosity
+        self%phi%old = self%Input%Regions(1)%Thermal%Porosity
 
     end subroutine FDTSS_initialize
 

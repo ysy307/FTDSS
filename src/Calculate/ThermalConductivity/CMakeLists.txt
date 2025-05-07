@@ -1,6 +1,7 @@
 add_library(Calc_THC
-        ThermalConductivity.F90
-        ThermalConductivity_3Phase.F90
+    Interface.F90
+    Base.F90
+    3Phase.F90
 )
 target_link_libraries(Calc_THC PRIVATE 
     Core

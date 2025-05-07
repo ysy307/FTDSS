@@ -1,9 +1,5 @@
 submodule(Solver_Solve) Solver_Solve_BiCGSTAB_Implementation
-    use, intrinsic :: iso_fortran_env, only: int32
-    use :: Matrix_CRS
     implicit none
-    real(real64), allocatable, target :: work(:, :)
-
 contains
     module function Solver_CRS_BiCGSTAB_Constructor(N, tol, maxiter, Preconditioner) result(structure)
         implicit none
@@ -23,25 +19,22 @@ contains
             this%Preconditioner = Preconditioner
 
             ! 配列の確保
-            call Allocate_Array(work, N, 10_int32)
+            call Allocate_Array(this%M, this%N)
+            call Allocate_Array(this%p, this%N)
+            call Allocate_Array(this%phat, this%N)
+            call Allocate_Array(this%s, this%N)
+            call Allocate_Array(this%shat, this%N)
+            call Allocate_Array(this%r, this%N)
+            call Allocate_Array(this%r0, this%N)
+            call Allocate_Array(this%t, this%N)
+            call Allocate_Array(this%v, this%N)
+            call Allocate_Array(this%x, this%N)
 
-            ! ポインタの関連付け
-            this%M => work(:, 1)
-            this%p => work(:, 2)
-            this%phat => work(:, 3)
-            this%s => work(:, 4)
-            this%shat => work(:, 5)
-            this%r => work(:, 6)
-            this%r0 => work(:, 7)
-            this%t => work(:, 8)
-            this%v => work(:, 9)
-            this%x => work(:, 10)
         end select
 
     end function Solver_CRS_BiCGSTAB_Constructor
 
     module subroutine Solve_CRS_BiCGSTAB(self, A, b, x, status)
-        use :: Matrix_CRS
         implicit none
         class(Solver_CRS_BiCGSTAB) :: self
         type(Type_CRS), intent(in) :: A
@@ -159,19 +152,17 @@ contains
         implicit none
         type(Solver_CRS_BiCGSTAB) :: self
 
-        ! ポインタコンポーネントをnullify
-        nullify (self%M)
-        nullify (self%p)
-        nullify (self%phat)
-        nullify (self%s)
-        nullify (self%shat)
-        nullify (self%r)
-        nullify (self%r0)
-        nullify (self%t)
-        nullify (self%v)
-        nullify (self%x)
-
-        if (allocated(work)) deallocate (work)
+        ! ポインタコンポーネントをdeallocate
+        if (allocated(self%M)) deallocate (self%M)
+        if (allocated(self%p)) deallocate (self%p)
+        if (allocated(self%phat)) deallocate (self%phat)
+        if (allocated(self%s)) deallocate (self%s)
+        if (allocated(self%shat)) deallocate (self%shat)
+        if (allocated(self%r)) deallocate (self%r)
+        if (allocated(self%r0)) deallocate (self%r0)
+        if (allocated(self%t)) deallocate (self%t)
+        if (allocated(self%v)) deallocate (self%v)
+        if (allocated(self%x)) deallocate (self%x)
 
     end subroutine Solver_CRS_BiCGSTAB_Destructor
 end submodule Solver_Solve_BiCGSTAB_Implementation

@@ -23,7 +23,17 @@ display: public
 extra_mods: json_module: http://jacobwilliams.github.io/json-fortran/
 graph_maxnodes: 250
 graph_maxdepth: 10
-fpp_extensions: F90 fpp
+# ソース探索対象に .F90/.f90 を両方含める
+extensions:
+  F90
+  f90
+
+# プリプロセッサ対象も F90 と fpp（必要に応じて）
+fpp_extensions:
+  F90
+  fpp
+
+# .F90 はプリプロセスが必要なので true のまま
 preprocess: true
 
 {!./api-docs-index.md!}

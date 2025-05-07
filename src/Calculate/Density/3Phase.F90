@@ -1,10 +1,10 @@
-submodule(Calculate_Density) Calculate_Density_3Phase
+submodule(Calculate_Density) Calc_DEN_3
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function DEN_3Phase_Construct(Input) result(structure)
+    module function DEN_3_Construct(Input) result(structure)
         implicit none
         type(Type_Input), intent(in) :: Input
         class(Abstract_Density), allocatable :: structure
@@ -31,33 +31,9 @@ contains
 
         end select
 
-    end function DEN_3Phase_Construct
+    end function DEN_3_Construct
 
-    function Calc_DEN_3Phase(NodeBelonging, density_soil, phi_soil, &
-                             density_water, phi_water, density_ice, phi_ice) result(density)
-        implicit none
-        type(Belonging), intent(inout) :: NodeBelonging
-        real(real64), intent(in) :: density_soil(:)
-        real(real64), intent(in) :: phi_soil
-        real(real64), intent(in) :: density_water(:)
-        real(real64), intent(in) :: phi_water
-        real(real64), intent(in) :: density_ice(:)
-        real(real64), intent(in) :: phi_ice
-        real(real64) :: density
-
-        real(real64) :: val_density_soil, val_density_water, val_density_ice
-
-        val_density_soil = NodeBelonging%value(density_soil)
-        val_density_water = NodeBelonging%value(density_water)
-        val_density_ice = NodeBelonging%value(density_ice)
-
-        density = val_density_soil * phi_soil &
-                  + val_density_water * phi_water &
-                  + val_density_ice * phi_ice
-
-    end function Calc_DEN_3Phase
-
-    module function Calc_DEN_3Phase_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4) result(density)
+    module function Calc_DEN_3_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4) result(density)
         implicit none
         class(Type_Density_3Phase), intent(in) :: self
         type(Belonging), intent(inout) :: NodeBelonging
@@ -67,10 +43,10 @@ contains
         real(real64), intent(in), optional :: phi4
         real(real64) :: density
 
-        density = Calc_DEN_3Phase(NodeBelonging, self%soil, phi1, self%water, phi2, self%ice, phi3)
-    end function Calc_DEN_3Phase_Wrap
+        density = Calc_DEN_3(NodeBelonging, self%soil, phi1, self%water, phi2, self%ice, phi3)
+    end function Calc_DEN_3_Wrap
 
-    module subroutine Update_DEN_3Phase(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4)
+    module subroutine Update_DEN_3(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4)
         implicit none
         class(Type_Density_3Phase), intent(inout) :: self
         type(Belonging), intent(inout) :: NodeBelonging(:)
@@ -83,15 +59,15 @@ contains
 
         !$omp parallel do private(iN)
         do iN = 1, self%nsize
-            self%value(iN, 1) = Calc_DEN_3Phase(NodeBelonging(iN), &
-                                                self%soil, &
-                                                arr_phi1(iN), &
-                                                self%water, &
-                                                arr_phi2(iN), &
-                                                self%ice, &
-                                                arr_phi3(iN))
+            self%value(iN, 1) = Calc_DEN_3(NodeBelonging(iN), &
+                                           self%soil, &
+                                           arr_phi1(iN), &
+                                           self%water, &
+                                           arr_phi2(iN), &
+                                           self%ice, &
+                                           arr_phi3(iN))
         end do
         !$omp end parallel do
-    end subroutine Update_DEN_3Phase
+    end subroutine Update_DEN_3
 
-end submodule Calculate_Density_3Phase
+end submodule Calc_DEN_3

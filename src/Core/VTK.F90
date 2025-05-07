@@ -45,6 +45,8 @@ module Core_VTK
 
         type(Type_VTK_CELLS), allocatable :: CELLS(:) !! Cell information
         type(VTK_CELL_NAMES) :: Names !! Cell names
+    contains
+        procedure :: Is_In => Core_VTK_IN_CellType
     end type Type_VTK
 
     character(*), parameter :: c_ASCII = "ASCII"
@@ -363,5 +365,35 @@ contains
         end if
 
     end subroutine Core_VTK_Read_Data_CellEntityIds
+
+    function Core_VTK_IN_CellType(self, iCellType, Shape_Dimention) result(isIn)
+        !> Check if cell type is in VTK
+        implicit none
+        class(Type_VTK), intent(in) :: self !! VTK data
+        integer(int32), intent(in) :: iCellType !! Cell type
+        integer(int32), intent(in) :: Shape_Dimention !! Shape dimension
+        logical(4) :: isIn
+        integer(int32) :: i
+
+        isIn = .false.
+        select case (Shape_Dimention)
+        case (1)
+            if (iCellType == self%Names%VTK_LINE .or. &
+                iCellType == self%Names%VTK_QUADRATIC_EDGE &
+                ) then
+                isIn = .true.
+            end if
+        case (2)
+            if (iCellType == self%Names%VTK_TRIANGLE .or. &
+                iCellType == self%Names%VTK_PIXEL .or. &
+                iCellType == self%Names%VTK_QUAD .or. &
+                iCellType == self%Names%VTK_QUADRATIC_TRIANGLE .or. &
+                iCellType == self%Names%VTK_QUADRATIC_QUAD &
+                ) then
+                isIn = .true.
+            end if
+        end select
+
+    end function Core_VTK_IN_CellType
 
 end module Core_VTK
