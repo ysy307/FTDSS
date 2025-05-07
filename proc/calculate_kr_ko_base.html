@@ -1,0 +1,797 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Calculate_kr_KO_Base &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Calculate_kr_KO_Base
+      <small>Module Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">15 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/HCF_KO.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hcf_ko.f90.html'>HCF_KO.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/calculate_hcf_ko_implementation.html'>Calculate_HCF_KO_Implementation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Calculate_kr_KO_Base</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calculate_kr_ko_base.html#src">Calculate_kr_KO_Base</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module function Calculate_kr_KO_Base(alpha1, n1, l, h) result(kr)  
+    <a href="../interface/calculate_kr_ko_base.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha1~67"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha1</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n1~67"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n1</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l~66"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>l</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-h~118"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>h</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-kr~60"></span>
+          real(kind=real64)
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calculate_kr_ko_base~~CalledByGraph Pages: 1 -->
+<svg id="proccalculate_kr_ko_baseCalledByGraph" width="641pt" height="38pt"
+ viewBox="0.00 0.00 641.00 37.57" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph" class="graph" transform="scale(0.24 0.24) rotate(0) translate(4 154)">
+<title>proc~~calculate_kr_ko_base~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-154 2692,-154 2692,4 -4,4"/>
+<!-- proc~calculate_kr_ko_base -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node1" class="node">
+<title>proc~calculate_kr_ko_base</title>
+<polygon fill="none" stroke="black" points="2688,-87 2558,-87 2558,-63 2688,-63 2688,-87"/>
+<text text-anchor="middle" x="2623" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">Calculate_kr_KO_Base</text>
+</g>
+<!-- interface~calculate_kr_ko_base -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node2" class="node">
+<title>interface~calculate_kr_ko_base</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node2"><a xlink:href="../interface/calculate_kr_ko_base.html" xlink:title="Calculate_kr_KO_Base">
+<polygon fill="#a7506f" stroke="#a7506f" points="2522,-87 2392,-87 2392,-63 2522,-63 2522,-87"/>
+<text text-anchor="middle" x="2457" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_kr_KO_Base</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kr_ko_base&#45;&gt;proc~calculate_kr_ko_base -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge1" class="edge">
+<title>interface~calculate_kr_ko_base&#45;&gt;proc~calculate_kr_ko_base</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2522.35,-75C2530.64,-75 2539.19,-75 2547.62,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2547.84,-78.5 2557.84,-75 2547.84,-71.5 2547.84,-78.5"/>
+</g>
+<!-- proc~calculate_kr_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node3" class="node">
+<title>proc~calculate_kr_base_impedance_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node3"><a xlink:href="../proc/calculate_kr_base_impedance_ko.html" xlink:title="Calculate_kr_Base_Impedance_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2330.5,-150 2135.5,-150 2135.5,-126 2330.5,-126 2330.5,-150"/>
+<text text-anchor="middle" x="2233" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_kr_Base_Impedance_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kr_base_impedance_ko&#45;&gt;interface~calculate_kr_ko_base -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge2" class="edge">
+<title>proc~calculate_kr_base_impedance_ko&#45;&gt;interface~calculate_kr_ko_base</title>
+<path fill="none" stroke="#ff0000" d="M2318.9,-125.95C2331.45,-123.43 2344.14,-120.46 2356,-117 2378.73,-110.36 2403.26,-100.11 2422.34,-91.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2423.91,-94.53 2431.5,-87.14 2420.96,-88.18 2423.91,-94.53"/>
+</g>
+<!-- proc~calculate_kr_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node4" class="node">
+<title>proc~calculate_kr_base_impedance_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node4"><a xlink:href="../proc/calculate_kr_base_impedance_viscosity_ko.html" xlink:title="Calculate_kr_Base_Impedance_Viscosity_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2356,-108 2110,-108 2110,-84 2356,-84 2356,-108"/>
+<text text-anchor="middle" x="2233" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_kr_Base_Impedance_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kr_base_impedance_viscosity_ko&#45;&gt;interface~calculate_kr_ko_base -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge3" class="edge">
+<title>proc~calculate_kr_base_impedance_viscosity_ko&#45;&gt;interface~calculate_kr_ko_base</title>
+<path fill="none" stroke="#ff0000" d="M2356.04,-84.46C2364.78,-83.63 2373.43,-82.81 2381.76,-82.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2382.13,-85.5 2391.76,-81.08 2381.47,-78.53 2382.13,-85.5"/>
+</g>
+<!-- proc~calculate_kr_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node5" class="node">
+<title>proc~calculate_kr_base_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node5"><a xlink:href="../proc/calculate_kr_base_ko.html" xlink:title="Calculate_kr_Base_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2298,-66 2168,-66 2168,-42 2298,-42 2298,-66"/>
+<text text-anchor="middle" x="2233" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_kr_Base_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kr_base_ko&#45;&gt;interface~calculate_kr_ko_base -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge4" class="edge">
+<title>proc~calculate_kr_base_ko&#45;&gt;interface~calculate_kr_ko_base</title>
+<path fill="none" stroke="#ff0000" d="M2298.21,-60.07C2324.33,-62.54 2354.67,-65.42 2381.74,-67.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2381.65,-71.48 2391.93,-68.94 2382.31,-64.51 2381.65,-71.48"/>
+</g>
+<!-- proc~calculate_kr_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node6" class="node">
+<title>proc~calculate_kr_base_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node6"><a xlink:href="../proc/calculate_kr_base_viscosity_ko.html" xlink:title="Calculate_kr_Base_Viscosity_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2323.5,-24 2142.5,-24 2142.5,0 2323.5,0 2323.5,-24"/>
+<text text-anchor="middle" x="2233" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_kr_Base_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kr_base_viscosity_ko&#45;&gt;interface~calculate_kr_ko_base -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge5" class="edge">
+<title>proc~calculate_kr_base_viscosity_ko&#45;&gt;interface~calculate_kr_ko_base</title>
+<path fill="none" stroke="#ff0000" d="M2318.9,-24.05C2331.45,-26.57 2344.14,-29.54 2356,-33 2378.73,-39.64 2403.26,-49.89 2422.34,-58.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2420.96,-61.82 2431.5,-62.86 2423.91,-55.47 2420.96,-61.82"/>
+</g>
+<!-- interface~calculate_kr_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node7" class="node">
+<title>interface~calculate_kr_base_impedance_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node7"><a xlink:href="../interface/calculate_kr_base_impedance_ko.html" xlink:title="Type_HCF_Base_Impedance_KO%Calculate_kr_Base_Impedance_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="2023,-150 1651,-150 1651,-126 2023,-126 2023,-150"/>
+<text text-anchor="middle" x="1837" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Impedance_KO%Calculate_kr_Base_Impedance_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kr_base_impedance_ko&#45;&gt;proc~calculate_kr_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge6" class="edge">
+<title>interface~calculate_kr_base_impedance_ko&#45;&gt;proc~calculate_kr_base_impedance_ko</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2023.17,-138C2058.14,-138 2093.61,-138 2125.15,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2125.25,-141.5 2135.25,-138 2125.25,-134.5 2125.25,-141.5"/>
+</g>
+<!-- interface~calculate_kr_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node8" class="node">
+<title>interface~calculate_kr_base_impedance_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node8"><a xlink:href="../interface/calculate_kr_base_impedance_viscosity_ko.html" xlink:title="Type_HCF_Base_Impedance_Viscosity_KO%Calculate_kr_Base_Impedance_Viscosity_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="2074,-108 1600,-108 1600,-84 2074,-84 2074,-108"/>
+<text text-anchor="middle" x="1837" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Impedance_Viscosity_KO%Calculate_kr_Base_Impedance_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kr_base_impedance_viscosity_ko&#45;&gt;proc~calculate_kr_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge7" class="edge">
+<title>interface~calculate_kr_base_impedance_viscosity_ko&#45;&gt;proc~calculate_kr_base_impedance_viscosity_ko</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M2074.02,-96C2082.64,-96 2091.16,-96 2099.5,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="2099.59,-99.5 2109.59,-96 2099.59,-92.5 2099.59,-99.5"/>
+</g>
+<!-- interface~calculate_kr_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node9" class="node">
+<title>interface~calculate_kr_base_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node9"><a xlink:href="../interface/calculate_kr_base_ko.html" xlink:title="Type_HCF_Base_KO%Calculate_kr_Base_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="1957.5,-66 1716.5,-66 1716.5,-42 1957.5,-42 1957.5,-66"/>
+<text text-anchor="middle" x="1837" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_KO%Calculate_kr_Base_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kr_base_ko&#45;&gt;proc~calculate_kr_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge8" class="edge">
+<title>interface~calculate_kr_base_ko&#45;&gt;proc~calculate_kr_base_ko</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1957.55,-54C2022.68,-54 2101.23,-54 2157.58,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2157.84,-57.5 2167.84,-54 2157.84,-50.5 2157.84,-57.5"/>
+</g>
+<!-- interface~calculate_kr_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node10" class="node">
+<title>interface~calculate_kr_base_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node10"><a xlink:href="../interface/calculate_kr_base_viscosity_ko.html" xlink:title="Type_HCF_Base_Viscosity_KO%Calculate_kr_Base_Viscosity_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="2008.5,-24 1665.5,-24 1665.5,0 2008.5,0 2008.5,-24"/>
+<text text-anchor="middle" x="1837" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Viscosity_KO%Calculate_kr_Base_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kr_base_viscosity_ko&#45;&gt;proc~calculate_kr_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge9" class="edge">
+<title>interface~calculate_kr_base_viscosity_ko&#45;&gt;proc~calculate_kr_base_viscosity_ko</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M2008.52,-12C2050.63,-12 2094.38,-12 2131.89,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2132.3,-15.5 2142.3,-12 2132.3,-8.5 2132.3,-15.5"/>
+</g>
+<!-- proc~calculate_kflh_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node11" class="node">
+<title>proc~calculate_kflh_base_impedance_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node11"><a xlink:href="../proc/calculate_kflh_base_impedance_ko.html" xlink:title="Calculate_Kflh_Base_Impedance_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1538.5,-150 1333.5,-150 1333.5,-126 1538.5,-126 1538.5,-150"/>
+<text text-anchor="middle" x="1436" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Kflh_Base_Impedance_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kflh_base_impedance_ko&#45;&gt;interface~calculate_kr_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge10" class="edge">
+<title>proc~calculate_kflh_base_impedance_ko&#45;&gt;interface~calculate_kr_base_impedance_ko</title>
+<path fill="none" stroke="#ff0000" d="M1538.72,-138C1569.82,-138 1605.13,-138 1640.29,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1640.69,-141.5 1650.69,-138 1640.69,-134.5 1640.69,-141.5"/>
+</g>
+<!-- proc~calculate_kflh_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node12" class="node">
+<title>proc~calculate_kflh_base_impedance_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node12"><a xlink:href="../proc/calculate_kflh_base_impedance_viscosity_ko.html" xlink:title="Calculate_Kflh_Base_Impedance_Viscosity_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1564,-108 1308,-108 1308,-84 1564,-84 1564,-108"/>
+<text text-anchor="middle" x="1436" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Kflh_Base_Impedance_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kflh_base_impedance_viscosity_ko&#45;&gt;interface~calculate_kr_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge11" class="edge">
+<title>proc~calculate_kflh_base_impedance_viscosity_ko&#45;&gt;interface~calculate_kr_base_impedance_viscosity_ko</title>
+<path fill="none" stroke="#7fff00" d="M1564.07,-96C1572.43,-96 1580.99,-96 1589.67,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1589.92,-99.5 1599.92,-96 1589.92,-92.5 1589.92,-99.5"/>
+</g>
+<!-- proc~calculate_kflh_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node13" class="node">
+<title>proc~calculate_kflh_base_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node13"><a xlink:href="../proc/calculate_kflh_base_ko.html" xlink:title="Calculate_Kflh_Base_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1505.5,-66 1366.5,-66 1366.5,-42 1505.5,-42 1505.5,-66"/>
+<text text-anchor="middle" x="1436" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Kflh_Base_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kflh_base_ko&#45;&gt;interface~calculate_kr_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge12" class="edge">
+<title>proc~calculate_kflh_base_ko&#45;&gt;interface~calculate_kr_base_ko</title>
+<path fill="none" stroke="#00ffff" d="M1505.59,-54C1560.59,-54 1639.35,-54 1706.18,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1706.37,-57.5 1716.37,-54 1706.37,-50.5 1706.37,-57.5"/>
+</g>
+<!-- proc~calculate_kflh_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node14" class="node">
+<title>proc~calculate_kflh_base_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node14"><a xlink:href="../proc/calculate_kflh_base_viscosity_ko.html" xlink:title="Calculate_Kflh_Base_Viscosity_KO">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1531,-24 1341,-24 1341,0 1531,0 1531,-24"/>
+<text text-anchor="middle" x="1436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calculate_Kflh_Base_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_kflh_base_viscosity_ko&#45;&gt;interface~calculate_kr_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge13" class="edge">
+<title>proc~calculate_kflh_base_viscosity_ko&#45;&gt;interface~calculate_kr_base_viscosity_ko</title>
+<path fill="none" stroke="#7f00ff" d="M1531.05,-12C1568.17,-12 1612.11,-12 1654.92,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1655.19,-15.5 1665.19,-12 1655.19,-8.5 1655.19,-15.5"/>
+</g>
+<!-- interface~calculate_kflh_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node15" class="node">
+<title>interface~calculate_kflh_base_impedance_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node15"><a xlink:href="../interface/calculate_kflh_base_impedance_ko.html" xlink:title="Type_HCF_Base_Impedance_KO%Calculate_Kflh_Base_Impedance_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="1221,-150 839,-150 839,-126 1221,-126 1221,-150"/>
+<text text-anchor="middle" x="1030" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Impedance_KO%Calculate_Kflh_Base_Impedance_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kflh_base_impedance_ko&#45;&gt;proc~calculate_kflh_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge14" class="edge">
+<title>interface~calculate_kflh_base_impedance_ko&#45;&gt;proc~calculate_kflh_base_impedance_ko</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1221.17,-138C1256.07,-138 1291.45,-138 1323.11,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1323.25,-141.5 1333.25,-138 1323.25,-134.5 1323.25,-141.5"/>
+</g>
+<!-- interface~calculate_kflh_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node16" class="node">
+<title>interface~calculate_kflh_base_impedance_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node16"><a xlink:href="../interface/calculate_kflh_base_impedance_viscosity_ko.html" xlink:title="Type_HCF_Base_Impedance_Viscosity_KO%Calculate_Kflh_Base_Impedance_Viscosity_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="1272,-108 788,-108 788,-84 1272,-84 1272,-108"/>
+<text text-anchor="middle" x="1030" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Impedance_Viscosity_KO%Calculate_Kflh_Base_Impedance_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kflh_base_impedance_viscosity_ko&#45;&gt;proc~calculate_kflh_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge15" class="edge">
+<title>interface~calculate_kflh_base_impedance_viscosity_ko&#45;&gt;proc~calculate_kflh_base_impedance_viscosity_ko</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1272.13,-96C1280.77,-96 1289.31,-96 1297.68,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1297.81,-99.5 1307.81,-96 1297.81,-92.5 1297.81,-99.5"/>
+</g>
+<!-- interface~calculate_kflh_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node17" class="node">
+<title>interface~calculate_kflh_base_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node17"><a xlink:href="../interface/calculate_kflh_base_ko.html" xlink:title="Type_HCF_Base_KO%Calculate_Kflh_Base_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="1155.5,-66 904.5,-66 904.5,-42 1155.5,-42 1155.5,-66"/>
+<text text-anchor="middle" x="1030" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_KO%Calculate_Kflh_Base_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kflh_base_ko&#45;&gt;proc~calculate_kflh_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge16" class="edge">
+<title>interface~calculate_kflh_base_ko&#45;&gt;proc~calculate_kflh_base_ko</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1155.51,-54C1221.01,-54 1299.33,-54 1356.38,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1356.41,-57.5 1366.41,-54 1356.41,-50.5 1356.41,-57.5"/>
+</g>
+<!-- interface~calculate_kflh_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node18" class="node">
+<title>interface~calculate_kflh_base_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node18"><a xlink:href="../interface/calculate_kflh_base_viscosity_ko.html" xlink:title="Type_HCF_Base_Viscosity_KO%Calculate_Kflh_Base_Viscosity_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="1206.5,-24 853.5,-24 853.5,0 1206.5,0 1206.5,-24"/>
+<text text-anchor="middle" x="1030" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Viscosity_KO%Calculate_Kflh_Base_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~calculate_kflh_base_viscosity_ko&#45;&gt;proc~calculate_kflh_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge17" class="edge">
+<title>interface~calculate_kflh_base_viscosity_ko&#45;&gt;proc~calculate_kflh_base_viscosity_ko</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1206.73,-12C1249.12,-12 1293.08,-12 1330.97,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1330.97,-15.5 1340.97,-12 1330.97,-8.5 1330.97,-15.5"/>
+</g>
+<!-- proc~update_kflh_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node19" class="node">
+<title>proc~update_kflh_base_impedance_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node19"><a xlink:href="../proc/update_kflh_base_impedance_ko.html" xlink:title="Update_Kflh_Base_Impedance_KO">
+<polygon fill="#d9534f" stroke="#d9534f" points="726.5,-150 533.5,-150 533.5,-126 726.5,-126 726.5,-150"/>
+<text text-anchor="middle" x="630" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Update_Kflh_Base_Impedance_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~update_kflh_base_impedance_ko&#45;&gt;interface~calculate_kflh_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge18" class="edge">
+<title>proc~update_kflh_base_impedance_ko&#45;&gt;interface~calculate_kflh_base_impedance_ko</title>
+<path fill="none" stroke="#ff0000" d="M726.58,-138C757.59,-138 793.24,-138 828.93,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="829,-141.5 839,-138 829,-134.5 829,-141.5"/>
+</g>
+<!-- proc~update_kflh_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node20" class="node">
+<title>proc~update_kflh_base_impedance_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node20"><a xlink:href="../proc/update_kflh_base_impedance_viscosity_ko.html" xlink:title="Update_Kflh_Base_Impedance_Viscosity_KO">
+<polygon fill="#d9534f" stroke="#d9534f" points="752,-108 508,-108 508,-84 752,-84 752,-108"/>
+<text text-anchor="middle" x="630" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Update_Kflh_Base_Impedance_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~update_kflh_base_impedance_viscosity_ko&#45;&gt;interface~calculate_kflh_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge19" class="edge">
+<title>proc~update_kflh_base_impedance_viscosity_ko&#45;&gt;interface~calculate_kflh_base_impedance_viscosity_ko</title>
+<path fill="none" stroke="#7fff00" d="M752.03,-96C760.34,-96 768.85,-96 777.51,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="777.74,-99.5 787.74,-96 777.74,-92.5 777.74,-99.5"/>
+</g>
+<!-- proc~update_kflh_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node21" class="node">
+<title>proc~update_kflh_base_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node21"><a xlink:href="../proc/update_kflh_base_ko.html" xlink:title="Update_Kflh_Base_KO">
+<polygon fill="#d9534f" stroke="#d9534f" points="693.5,-66 566.5,-66 566.5,-42 693.5,-42 693.5,-66"/>
+<text text-anchor="middle" x="630" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Update_Kflh_Base_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~update_kflh_base_ko&#45;&gt;interface~calculate_kflh_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge20" class="edge">
+<title>proc~update_kflh_base_ko&#45;&gt;interface~calculate_kflh_base_ko</title>
+<path fill="none" stroke="#00ffff" d="M693.63,-54C747.14,-54 826,-54 893.81,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="894.16,-57.5 904.16,-54 894.16,-50.5 894.16,-57.5"/>
+</g>
+<!-- proc~update_kflh_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node22" class="node">
+<title>proc~update_kflh_base_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node22"><a xlink:href="../proc/update_kflh_base_viscosity_ko.html" xlink:title="Update_Kflh_Base_Viscosity_KO">
+<polygon fill="#d9534f" stroke="#d9534f" points="719,-24 541,-24 541,0 719,0 719,-24"/>
+<text text-anchor="middle" x="630" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Update_Kflh_Base_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- proc~update_kflh_base_viscosity_ko&#45;&gt;interface~calculate_kflh_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge21" class="edge">
+<title>proc~update_kflh_base_viscosity_ko&#45;&gt;interface~calculate_kflh_base_viscosity_ko</title>
+<path fill="none" stroke="#7f00ff" d="M719.33,-12C755.98,-12 799.97,-12 843.14,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="843.2,-15.5 853.2,-12 843.2,-8.5 843.2,-15.5"/>
+</g>
+<!-- interface~update_kflh_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node23" class="node">
+<title>interface~update_kflh_base_impedance_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node23"><a xlink:href="../interface/update_kflh_base_impedance_ko.html" xlink:title="Type_HCF_Base_Impedance_KO%Update_Kflh_Base_Impedance_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="421,-150 51,-150 51,-126 421,-126 421,-150"/>
+<text text-anchor="middle" x="236" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Impedance_KO%Update_Kflh_Base_Impedance_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~update_kflh_base_impedance_ko&#45;&gt;proc~update_kflh_base_impedance_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge22" class="edge">
+<title>interface~update_kflh_base_impedance_ko&#45;&gt;proc~update_kflh_base_impedance_ko</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M421.23,-138C456.21,-138 491.68,-138 523.18,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="523.26,-141.5 533.26,-138 523.26,-134.5 523.26,-141.5"/>
+</g>
+<!-- interface~update_kflh_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node24" class="node">
+<title>interface~update_kflh_base_impedance_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node24"><a xlink:href="../interface/update_kflh_base_impedance_viscosity_ko.html" xlink:title="Type_HCF_Base_Impedance_Viscosity_KO%Update_Kflh_Base_Impedance_Viscosity_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="472,-108 0,-108 0,-84 472,-84 472,-108"/>
+<text text-anchor="middle" x="236" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Impedance_Viscosity_KO%Update_Kflh_Base_Impedance_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~update_kflh_base_impedance_viscosity_ko&#45;&gt;proc~update_kflh_base_impedance_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge23" class="edge">
+<title>interface~update_kflh_base_impedance_viscosity_ko&#45;&gt;proc~update_kflh_base_impedance_viscosity_ko</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M472.1,-96C480.78,-96 489.36,-96 497.75,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="497.9,-99.5 507.9,-96 497.9,-92.5 497.9,-99.5"/>
+</g>
+<!-- interface~update_kflh_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node25" class="node">
+<title>interface~update_kflh_base_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node25"><a xlink:href="../interface/update_kflh_base_ko.html" xlink:title="Type_HCF_Base_KO%Update_Kflh_Base_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="355.5,-66 116.5,-66 116.5,-42 355.5,-42 355.5,-66"/>
+<text text-anchor="middle" x="236" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_KO%Update_Kflh_Base_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~update_kflh_base_ko&#45;&gt;proc~update_kflh_base_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge24" class="edge">
+<title>interface~update_kflh_base_ko&#45;&gt;proc~update_kflh_base_ko</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M355.68,-54C421.02,-54 500.01,-54 556.23,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="556.46,-57.5 566.46,-54 556.46,-50.5 556.46,-57.5"/>
+</g>
+<!-- interface~update_kflh_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_node26" class="node">
+<title>interface~update_kflh_base_viscosity_ko</title>
+<g id="a_proc~~calculate_kr_ko_base~~CalledByGraph_node26"><a xlink:href="../interface/update_kflh_base_viscosity_ko.html" xlink:title="Type_HCF_Base_Viscosity_KO%Update_Kflh_Base_Viscosity_KO">
+<polygon fill="#a7506f" stroke="#a7506f" points="406.5,-24 65.5,-24 65.5,0 406.5,0 406.5,-24"/>
+<text text-anchor="middle" x="236" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Viscosity_KO%Update_Kflh_Base_Viscosity_KO</text>
+</a>
+</g>
+</g>
+<!-- interface~update_kflh_base_viscosity_ko&#45;&gt;proc~update_kflh_base_viscosity_ko -->
+<g id="proc~~calculate_kr_ko_base~~CalledByGraph_edge25" class="edge">
+<title>interface~update_kflh_base_viscosity_ko&#45;&gt;proc~update_kflh_base_viscosity_ko</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M406.66,-12C448.93,-12 492.87,-12 530.41,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="530.82,-15.5 540.82,-12 530.82,-8.5 530.82,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalculate_kr_ko_baseCalledByGraph = svgPanZoom('#proccalculate_kr_ko_baseCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">Calculate_kr_KO_Base</span><span class="p">(</span><span class="n">alpha1</span><span class="p">,</span><span class="w"> </span><span class="n">n1</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">kr</span><span class="p">)</span>
+<span class="w">        </span><span class="c">!$omp declare simd uniform(alpha1, n1, l, h)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">alpha1</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n1</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">l</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">h</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">kr</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Sw</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">Sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5d0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">erfc</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">alpha1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">n1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="mf">2.0d0</span><span class="p">)))</span>
+<span class="w">            </span><span class="n">kr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sw</span><span class="o">**</span><span class="n">l</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5d0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">erfc</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">alpha1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">n1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="mf">2.0d0</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">n1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="mf">2.0d0</span><span class="p">)))</span><span class="o">**</span><span class="mf">2.0d0</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">kr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    end function </span><span class="n">Calculate_kr_KO_Base</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

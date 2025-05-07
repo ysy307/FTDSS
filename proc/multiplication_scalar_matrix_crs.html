@@ -1,0 +1,1280 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Multiplication_Scalar_Matrix_CRS &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Multiplication_Scalar_Matrix_CRS
+      <small>Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">11 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/CRS.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/crs.f90.html'>CRS.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/matrix_crs.html'>Matrix_CRS</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Multiplication_Scalar_Matrix_CRS</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/multiplication_scalar_matrix_crs.html#src">Multiplication_Scalar_Matrix_CRS</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  function Multiplication_Scalar_Matrix_CRS(A, b) result(C)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~4"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-c~4"></span>
+          type(<a href='../type/type_crs.html'>Type_CRS</a>)
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~multiplication_scalar_matrix_crs~~CallsGraph Pages: 1 -->
+<svg id="procmultiplication_scalar_matrix_crsCallsGraph" width="641pt" height="1068pt"
+ viewBox="0.00 0.00 641.00 1068.33" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph" class="graph" transform="scale(0.73 0.73) rotate(0) translate(4 1456)">
+<title>proc~~multiplication_scalar_matrix_crs~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1456 872,-1456 872,4 -4,4"/>
+<!-- proc~multiplication_scalar_matrix_crs -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node1" class="node">
+<title>proc~multiplication_scalar_matrix_crs</title>
+<polygon fill="none" stroke="black" points="188,-738 0,-738 0,-714 188,-714 188,-738"/>
+<text text-anchor="middle" x="94" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50">Multiplication_Scalar_Matrix_CRS</text>
+</g>
+<!-- proc~copy_crs -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node2" class="node">
+<title>proc~copy_crs</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node2"><a xlink:href="../proc/copy_crs.html" xlink:title="Type_CRS%Copy_CRS">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="351,-738 224,-738 224,-714 351,-714 351,-738"/>
+<text text-anchor="middle" x="287.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_CRS%Copy_CRS</text>
+</a>
+</g>
+</g>
+<!-- proc~multiplication_scalar_matrix_crs&#45;&gt;proc~copy_crs -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge1" class="edge">
+<title>proc~multiplication_scalar_matrix_crs&#45;&gt;proc~copy_crs</title>
+<path fill="none" stroke="#ff0000" d="M188.23,-726C196.81,-726 205.43,-726 213.8,-726"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="213.86,-729.5 223.86,-726 213.86,-722.5 213.86,-729.5"/>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node3" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node3"><a xlink:href="../interface/allocate_array.html" xlink:title="Allocate_Array">
+<polygon fill="#a7506f" stroke="#a7506f" points="478,-738 387,-738 387,-714 478,-714 478,-738"/>
+<text text-anchor="middle" x="432.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Array</text>
+</a>
+</g>
+</g>
+<!-- proc~copy_crs&#45;&gt;interface~allocate_array -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge2" class="edge">
+<title>proc~copy_crs&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M351.22,-726C359.76,-726 368.46,-726 376.84,-726"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="376.87,-729.5 386.87,-726 376.87,-722.5 376.87,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node4" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node4"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="Allocate_Rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="690.5,-1452 563.5,-1452 563.5,-1428 690.5,-1428 690.5,-1452"/>
+<text text-anchor="middle" x="627" y="-1437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge3" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.06,-738.17C438.2,-826.49 465.47,-1366.96 514,-1419 524.4,-1430.16 538.7,-1436.5 553.6,-1439.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="552.98,-1443.35 563.45,-1441.75 554.26,-1436.47 552.98,-1443.35"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node5" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node5"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="Allocate_Rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="690.5,-1410 563.5,-1410 563.5,-1386 690.5,-1386 690.5,-1410"/>
+<text text-anchor="middle" x="627" y="-1395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge4" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.16,-738.25C438.84,-823.66 468.33,-1328.4 514,-1377 524.29,-1387.95 538.34,-1394.25 553,-1397.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="552.74,-1401.21 563.22,-1399.65 554.05,-1394.34 552.74,-1401.21"/>
+</g>
+<!-- proc~allocate_rank1_int32_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node6" class="node">
+<title>proc~allocate_rank1_int32_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node6"><a xlink:href="../proc/allocate_rank1_int32_pointer.html" xlink:title="Allocate_Rank1_int32_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="711.5,-1368 542.5,-1368 542.5,-1344 711.5,-1344 711.5,-1368"/>
+<text text-anchor="middle" x="627" y="-1353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge5" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.25,-738.18C431.95,-816.15 428.73,-1245 514,-1335 519.33,-1340.63 525.66,-1345.02 532.54,-1348.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.67,-1351.86 542.24,-1352.5 534.37,-1345.41 531.67,-1351.86"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node7" class="node">
+<title>proc~allocate_rank1_int32_specify</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node7"><a xlink:href="../proc/allocate_rank1_int32_specify.html" xlink:title="Allocate_Rank1_int32_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="711.5,-1326 542.5,-1326 542.5,-1302 711.5,-1302 711.5,-1326"/>
+<text text-anchor="middle" x="627" y="-1311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.38,-738.3C432.94,-813.42 434.45,-1209.84 514,-1293 519.48,-1298.73 525.99,-1303.18 533.07,-1306.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.74,-1309.85 542.32,-1310.43 534.41,-1303.38 531.74,-1309.85"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node8" class="node">
+<title>proc~allocate_rank1_int32_specify_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node8"><a xlink:href="../proc/allocate_rank1_int32_specify_pointer.html" xlink:title="Allocate_Rank1_int32_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="733,-1284 521,-1284 521,-1260 733,-1260 733,-1284"/>
+<text text-anchor="middle" x="627" y="-1269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.54,-738.32C434.02,-810.16 440.11,-1174.62 514,-1251 514.93,-1251.96 515.89,-1252.88 516.87,-1253.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="514.84,-1256.62 524.9,-1259.93 519.09,-1251.07 514.84,-1256.62"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="Allocate_Rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="690.5,-1242 563.5,-1242 563.5,-1218 690.5,-1218 690.5,-1242"/>
+<text text-anchor="middle" x="627" y="-1227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.71,-738.22C435.17,-806.4 445.72,-1139.33 514,-1209 524.46,-1219.68 538.51,-1225.88 553.11,-1229.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="552.78,-1232.82 563.27,-1231.28 554.11,-1225.95 552.78,-1232.82"/>
+</g>
+<!-- proc~allocate_rank1_int64_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_int64_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_int64_pointer.html" xlink:title="Allocate_Rank1_int64_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="711.5,-1200 542.5,-1200 542.5,-1176 711.5,-1176 711.5,-1200"/>
+<text text-anchor="middle" x="627" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.93,-738.42C436.46,-803.44 451.41,-1104.11 514,-1167 519.42,-1172.45 525.78,-1176.72 532.65,-1180.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.74,-1183.47 542.32,-1184.05 534.41,-1177 531.74,-1183.47"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_int64_specify</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_int64_specify.html" xlink:title="Allocate_Rank1_int64_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="711.5,-1158 542.5,-1158 542.5,-1134 711.5,-1134 711.5,-1158"/>
+<text text-anchor="middle" x="627" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.17,-738.03C437.77,-798.52 456.9,-1068.68 514,-1125 519.47,-1130.4 525.86,-1134.64 532.76,-1137.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.88,-1141.37 542.46,-1141.92 534.53,-1134.89 531.88,-1141.37"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_int64_specify_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_int64_specify_pointer.html" xlink:title="Allocate_Rank1_int64_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="733,-1116 521,-1116 521,-1092 733,-1092 733,-1116"/>
+<text text-anchor="middle" x="627" y="-1101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.49,-738.25C439.35,-795.21 462.55,-1033.39 514,-1083 515.11,-1084.07 516.26,-1085.1 517.44,-1086.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="515.51,-1089.01 525.69,-1091.95 519.57,-1083.3 515.51,-1089.01"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="Allocate_Rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="687,-1074 567,-1074 567,-1050 687,-1050 687,-1074"/>
+<text text-anchor="middle" x="627" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.88,-738.21C441.08,-790.88 468.08,-997.96 514,-1041 525.6,-1051.88 540.97,-1057.99 556.58,-1061.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="556.39,-1064.78 566.84,-1063.03 557.58,-1057.88 556.39,-1064.78"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="Allocate_Rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-1032 556,-1032 556,-1008 698,-1008 698,-1032"/>
+<text text-anchor="middle" x="627" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433,-738.07C431.92,-780.94 434.43,-927.12 514,-999 523,-1007.13 534.12,-1012.57 545.82,-1016.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="545.2,-1019.6 555.75,-1018.73 546.96,-1012.83 545.2,-1019.6"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="Allocate_Rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-990 556,-990 556,-966 698,-966 698,-990"/>
+<text text-anchor="middle" x="627" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.74,-738.1C435.19,-776.7 445.26,-897.87 514,-957 523.14,-964.86 534.27,-970.17 545.94,-973.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="545.27,-977.14 555.82,-976.26 547.02,-970.36 545.27,-977.14"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="Allocate_Rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-948 556,-948 556,-924 698,-924 698,-948"/>
+<text text-anchor="middle" x="627" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.77,-738.05C439.01,-771.89 455.89,-868.32 514,-915 523.28,-922.45 534.38,-927.56 545.94,-931.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="545.16,-934.43 555.72,-933.55 546.92,-927.66 545.16,-934.43"/>
+</g>
+<!-- proc~allocate_rank1_logical_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank1_logical_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank1_logical_pointer.html" xlink:title="Allocate_Rank1_logical_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="716,-906 538,-906 538,-882 716,-882 716,-906"/>
+<text text-anchor="middle" x="627" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M436.38,-738.26C443.81,-766.92 466.42,-838.49 514,-873 518.5,-876.27 523.37,-879.07 528.46,-881.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="527.27,-884.77 537.85,-885.37 529.96,-878.3 527.27,-884.77"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank1_logical_specify</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank1_logical_specify.html" xlink:title="Allocate_Rank1_logical_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="716,-864 538,-864 538,-840 716,-840 716,-864"/>
+<text text-anchor="middle" x="627" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M439.03,-738.08C449.93,-760.39 476.43,-807.91 514,-831 518.47,-833.75 523.21,-836.15 528.13,-838.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="527.17,-841.63 537.76,-841.93 529.66,-835.09 527.17,-841.63"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank1_logical_specify_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank1_logical_specify_pointer.html" xlink:title="Allocate_Rank1_logical_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="737,-822 517,-822 517,-798 737,-798 737,-822"/>
+<text text-anchor="middle" x="627" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M445.09,-738.09C459.72,-752.59 486.35,-776.5 514,-789 518.78,-791.16 523.77,-793.1 528.87,-794.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="528.22,-798.3 538.81,-797.94 530.31,-791.62 528.22,-798.3"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="Allocate_Rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="697,-780 557,-780 557,-756 697,-756 697,-780"/>
+<text text-anchor="middle" x="627" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M477.23,-738C489.12,-741.1 502.02,-744.32 514,-747 524.9,-749.44 536.44,-751.83 547.81,-754.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="547.25,-757.52 557.73,-755.99 548.58,-750.65 547.25,-757.52"/>
+</g>
+<!-- proc~allocate_rank1_real128_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank1_real128_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank1_real128_pointer.html" xlink:title="Allocate_Rank1_real128_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="718.5,-738 535.5,-738 535.5,-714 718.5,-714 718.5,-738"/>
+<text text-anchor="middle" x="627" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M478.15,-726C492.31,-726 508.59,-726 525.06,-726"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="525.32,-729.5 535.32,-726 525.32,-722.5 525.32,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank1_real128_specify</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank1_real128_specify.html" xlink:title="Allocate_Rank1_real128_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="718.5,-696 535.5,-696 535.5,-672 718.5,-672 718.5,-696"/>
+<text text-anchor="middle" x="627" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M477.23,-714C489.12,-710.9 502.02,-707.68 514,-705 524.9,-702.56 536.44,-700.17 547.81,-697.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="548.58,-701.35 557.73,-696.01 547.25,-694.48 548.58,-701.35"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank1_real128_specify_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank1_real128_specify_pointer.html" xlink:title="Allocate_Rank1_real128_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="740,-654 514,-654 514,-630 740,-630 740,-654"/>
+<text text-anchor="middle" x="627" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M445.09,-713.91C459.72,-699.41 486.35,-675.5 514,-663 518.78,-660.84 523.77,-658.9 528.87,-657.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="530.31,-660.38 538.81,-654.06 528.22,-653.7 530.31,-660.38"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="Allocate_Rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="693.5,-612 560.5,-612 560.5,-588 693.5,-588 693.5,-612"/>
+<text text-anchor="middle" x="627" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge23" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M439.03,-713.92C449.93,-691.61 476.43,-644.09 514,-621 525.01,-614.23 537.7,-609.55 550.49,-606.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="551.27,-609.74 560.27,-604.15 549.74,-602.91 551.27,-609.74"/>
+</g>
+<!-- proc~allocate_rank1_real32_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node25" class="node">
+<title>proc~allocate_rank1_real32_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node25"><a xlink:href="../proc/allocate_rank1_real32_pointer.html" xlink:title="Allocate_Rank1_real32_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="715,-570 539,-570 539,-546 715,-546 715,-570"/>
+<text text-anchor="middle" x="627" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge24" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M436.38,-713.74C443.81,-685.08 466.42,-613.51 514,-579 518.82,-575.5 524.06,-572.54 529.55,-570.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.02,-573.21 538.99,-566.22 528.41,-566.71 531.02,-573.21"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node26" class="node">
+<title>proc~allocate_rank1_real32_specify</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node26"><a xlink:href="../proc/allocate_rank1_real32_specify.html" xlink:title="Allocate_Rank1_real32_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="715,-528 539,-528 539,-504 715,-504 715,-528"/>
+<text text-anchor="middle" x="627" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge25" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.77,-713.95C439.01,-680.11 455.89,-583.68 514,-537 518.74,-533.19 523.96,-529.99 529.47,-527.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.15,-530.41 539,-523.28 528.42,-523.96 531.15,-530.41"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node27" class="node">
+<title>proc~allocate_rank1_real32_specify_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node27"><a xlink:href="../proc/allocate_rank1_real32_specify_pointer.html" xlink:title="Allocate_Rank1_real32_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="736.5,-486 517.5,-486 517.5,-462 736.5,-462 736.5,-486"/>
+<text text-anchor="middle" x="627" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge26" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.74,-713.9C435.19,-675.3 445.26,-554.13 514,-495 515.37,-493.82 516.78,-492.71 518.23,-491.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="520.36,-494.44 526.93,-486.13 516.61,-488.52 520.36,-494.44"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node28" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node28"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="Allocate_Rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="693.5,-444 560.5,-444 560.5,-420 693.5,-420 693.5,-444"/>
+<text text-anchor="middle" x="627" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge27" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433,-713.93C431.92,-671.06 434.43,-524.88 514,-453 524.22,-443.77 537.16,-438.01 550.59,-434.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="551.41,-437.91 560.42,-432.34 549.9,-431.07 551.41,-437.91"/>
+</g>
+<!-- proc~allocate_rank1_real64_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node29" class="node">
+<title>proc~allocate_rank1_real64_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node29"><a xlink:href="../proc/allocate_rank1_real64_pointer.html" xlink:title="Allocate_Rank1_real64_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="715,-402 539,-402 539,-378 715,-378 715,-402"/>
+<text text-anchor="middle" x="627" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge28" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.88,-713.79C441.08,-661.12 468.08,-454.04 514,-411 518.69,-406.61 523.99,-402.99 529.68,-400.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.21,-403.17 538.89,-395.88 528.34,-396.79 531.21,-403.17"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node30" class="node">
+<title>proc~allocate_rank1_real64_specify</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node30"><a xlink:href="../proc/allocate_rank1_real64_specify.html" xlink:title="Allocate_Rank1_real64_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="715,-360 539,-360 539,-336 715,-336 715,-360"/>
+<text text-anchor="middle" x="627" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge29" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.49,-713.75C439.35,-656.79 462.55,-418.61 514,-369 518.67,-364.49 523.99,-360.8 529.7,-357.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.32,-360.89 538.98,-353.57 528.43,-354.51 531.32,-360.89"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node31" class="node">
+<title>proc~allocate_rank1_real64_specify_pointer</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node31"><a xlink:href="../proc/allocate_rank1_real64_specify_pointer.html" xlink:title="Allocate_Rank1_real64_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="736.5,-318 517.5,-318 517.5,-294 736.5,-294 736.5,-318"/>
+<text text-anchor="middle" x="627" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify_pointer -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge30" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.17,-713.97C437.77,-653.48 456.9,-383.32 514,-327 514.97,-326.04 515.97,-325.12 517,-324.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="519.35,-326.85 525.35,-318.11 515.21,-321.2 519.35,-326.85"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node32" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node32"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="Allocate_Rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="690.5,-276 563.5,-276 563.5,-252 690.5,-252 690.5,-276"/>
+<text text-anchor="middle" x="627" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge31" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.93,-713.58C436.46,-648.56 451.41,-347.89 514,-285 524.54,-274.4 538.62,-268.23 553.23,-264.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="554.23,-268.17 563.39,-262.84 552.91,-261.3 554.23,-268.17"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node33" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node33"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="Allocate_Rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="690.5,-234 563.5,-234 563.5,-210 690.5,-210 690.5,-234"/>
+<text text-anchor="middle" x="627" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge32" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.71,-713.78C435.17,-645.6 445.72,-312.67 514,-243 524.46,-232.32 538.51,-226.12 553.11,-222.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="554.11,-226.05 563.27,-220.72 552.78,-219.18 554.11,-226.05"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node34" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node34"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="Allocate_Rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="690.5,-192 563.5,-192 563.5,-168 690.5,-168 690.5,-192"/>
+<text text-anchor="middle" x="627" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge33" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.54,-713.68C434.02,-641.84 440.11,-277.38 514,-201 524.45,-190.2 538.56,-183.96 553.24,-180.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="554.29,-183.89 563.45,-178.57 552.97,-177.01 554.29,-183.89"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node35" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node35"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="Allocate_Rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="687,-150 567,-150 567,-126 687,-126 687,-150"/>
+<text text-anchor="middle" x="627" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge34" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.38,-713.7C432.94,-638.58 434.45,-242.16 514,-159 525.27,-147.22 540.89,-140.85 556.89,-137.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="557.55,-141.06 566.86,-136 556.43,-134.15 557.55,-141.06"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node36" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node36"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="Allocate_Rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="697,-108 557,-108 557,-84 697,-84 697,-108"/>
+<text text-anchor="middle" x="627" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge35" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.25,-713.82C431.95,-635.85 428.73,-207 514,-117 522.86,-107.65 534.45,-101.7 546.82,-98.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="548,-101.33 556.87,-95.54 546.32,-94.54 548,-101.33"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node37" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node37"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="Allocate_Rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="693.5,-66 560.5,-66 560.5,-42 693.5,-42 693.5,-66"/>
+<text text-anchor="middle" x="627" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge36" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.16,-713.75C438.84,-628.34 468.33,-123.6 514,-75 523.65,-64.73 536.59,-58.55 550.26,-54.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="551.26,-58.34 560.3,-52.82 549.79,-51.5 551.26,-58.34"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node38" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node38"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="Allocate_Rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="693.5,-24 560.5,-24 560.5,0 693.5,0 693.5,-24"/>
+<text text-anchor="middle" x="627" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge37" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M434.06,-713.83C438.2,-625.51 465.47,-85.04 514,-33 523.61,-22.7 536.54,-16.5 550.2,-12.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="551.2,-16.29 560.24,-10.76 549.72,-9.45 551.2,-16.29"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_node39" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CallsGraph_node39"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="868,-738 776,-738 776,-714 868,-714 868,-738"/>
+<text text-anchor="middle" x="822" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge38" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M690.54,-1441.75C708.84,-1439.04 727.31,-1432.6 740,-1419 786.94,-1368.7 814.36,-861.85 819.94,-748.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="823.45,-748.33 820.43,-738.17 816.45,-747.99 823.45,-748.33"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge39" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff2b00" d="M690.78,-1399.65C708.97,-1396.91 727.33,-1390.48 740,-1377 784.13,-1330.07 813.52,-857.63 819.76,-748.44"/>
+<polygon fill="#ff2b00" stroke="#ff2b00" points="823.27,-748.43 820.33,-738.25 816.28,-748.03 823.27,-748.43"/>
+</g>
+<!-- proc~allocate_rank1_int32_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge40" class="edge">
+<title>proc~allocate_rank1_int32_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff5700" d="M711.75,-1352.49C722.38,-1348.76 732.24,-1343.18 740,-1335 822.15,-1248.37 822.56,-847.52 821.37,-748.27"/>
+<polygon fill="#ff5700" stroke="#ff5700" points="824.87,-748.13 821.23,-738.18 817.87,-748.23 824.87,-748.13"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge41" class="edge">
+<title>proc~allocate_rank1_int32_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff8300" d="M711.68,-1310.42C722.32,-1306.7 732.2,-1301.15 740,-1293 816.49,-1213.11 821.21,-843.92 821.13,-748.54"/>
+<polygon fill="#ff8300" stroke="#ff8300" points="824.63,-748.29 821.1,-738.3 817.63,-748.31 824.63,-748.29"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge42" class="edge">
+<title>proc~allocate_rank1_int32_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffae00" d="M729.09,-1259.92C733.03,-1257.37 736.7,-1254.41 740,-1251 810.97,-1177.7 819.77,-838.89 820.85,-748.32"/>
+<polygon fill="#ffae00" stroke="#ffae00" points="824.35,-748.35 820.95,-738.32 817.35,-748.28 824.35,-748.35"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge43" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffda00" d="M690.73,-1231.27C708.81,-1228.5 727.12,-1222.13 740,-1209 805.39,-1142.34 818.2,-834.53 820.52,-748.43"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="824.02,-748.3 820.77,-738.22 817.03,-748.13 824.02,-748.3"/>
+</g>
+<!-- proc~allocate_rank1_int64_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge44" class="edge">
+<title>proc~allocate_rank1_int64_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f7ff00" d="M711.67,-1184.04C722.25,-1180.36 732.11,-1174.92 740,-1167 799.82,-1106.96 816.48,-829.98 820.12,-748.56"/>
+<polygon fill="#f7ff00" stroke="#f7ff00" points="823.63,-748.56 820.55,-738.42 816.63,-748.26 823.63,-748.56"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge45" class="edge">
+<title>proc~allocate_rank1_int64_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cbff00" d="M711.53,-1141.91C722.13,-1138.25 732.04,-1132.84 740,-1125 794.36,-1071.45 814.64,-824.4 819.66,-748.34"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="823.18,-748.23 820.32,-738.03 816.19,-747.79 823.18,-748.23"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge46" class="edge">
+<title>proc~allocate_rank1_int64_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a0ff00" d="M728.3,-1091.94C732.5,-1089.39 736.44,-1086.43 740,-1083 788.89,-1035.92 812.58,-818.92 819.09,-748.29"/>
+<polygon fill="#a0ff00" stroke="#a0ff00" points="822.58,-748.53 819.99,-738.26 815.61,-747.9 822.58,-748.53"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge47" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#74ff00" d="M687.15,-1063.01C706.11,-1060.43 725.84,-1054.25 740,-1041 783.46,-1000.33 810.27,-813.05 818.38,-748.18"/>
+<polygon fill="#74ff00" stroke="#74ff00" points="821.86,-748.56 819.6,-738.21 814.91,-747.71 821.86,-748.56"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge48" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#48ff00" d="M698.23,-1018.71C713.48,-1015.4 728.47,-1009.4 740,-999 814.22,-932.06 821.73,-800.59 821.61,-748.26"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="825.1,-748.03 821.48,-738.07 818.11,-748.12 825.1,-748.03"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge49" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1dff00" d="M698.16,-976.24C713.32,-972.93 728.29,-967.05 740,-957 803.6,-902.4 817.28,-794.81 820.21,-748.3"/>
+<polygon fill="#1dff00" stroke="#1dff00" points="823.71,-748.27 820.74,-738.1 816.72,-747.9 823.71,-748.27"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge50" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff0e" d="M698.26,-933.53C713.24,-930.22 728.11,-924.53 740,-915 793.22,-872.35 812.12,-788.1 818.28,-748.09"/>
+<polygon fill="#00ff0e" stroke="#00ff0e" points="821.77,-748.45 819.7,-738.05 814.83,-747.47 821.77,-748.45"/>
+</g>
+<!-- proc~allocate_rank1_logical_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge51" class="edge">
+<title>proc~allocate_rank1_logical_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff3a" d="M716.13,-885.35C724.65,-882.25 732.79,-878.22 740,-873 782.85,-842 805.65,-781.08 815.3,-748.24"/>
+<polygon fill="#00ff3a" stroke="#00ff3a" points="818.76,-748.83 818.07,-738.26 812.02,-746.95 818.76,-748.83"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge52" class="edge">
+<title>proc~allocate_rank1_logical_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff66" d="M716.23,-841.9C724.58,-839.07 732.66,-835.49 740,-831 773.13,-810.71 797.78,-771.54 810.73,-747.21"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="813.96,-748.57 815.41,-738.08 807.74,-745.38 813.96,-748.57"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge53" class="edge">
+<title>proc~allocate_rank1_logical_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff91" d="M715.18,-797.92C723.74,-795.47 732.15,-792.53 740,-789 763.65,-778.35 786.61,-759.43 802,-745.1"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="804.52,-747.53 809.33,-738.09 799.68,-742.47 804.52,-747.53"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge54" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffbd" d="M696.26,-755.97C710.74,-753.2 725.9,-750.14 740,-747 748.65,-745.07 757.78,-742.87 766.67,-740.63"/>
+<polygon fill="#00ffbd" stroke="#00ffbd" points="767.75,-743.97 776.57,-738.1 766.01,-737.19 767.75,-743.97"/>
+</g>
+<!-- proc~allocate_rank1_real128_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge55" class="edge">
+<title>proc~allocate_rank1_real128_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffe9" d="M718.57,-726C734.56,-726 750.78,-726 765.45,-726"/>
+<polygon fill="#00ffe9" stroke="#00ffe9" points="765.83,-729.5 775.83,-726 765.83,-722.5 765.83,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge56" class="edge">
+<title>proc~allocate_rank1_real128_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00e9ff" d="M696.26,-696.03C710.74,-698.8 725.9,-701.86 740,-705 748.65,-706.93 757.78,-709.13 766.67,-711.37"/>
+<polygon fill="#00e9ff" stroke="#00e9ff" points="766.01,-714.81 776.57,-713.9 767.75,-708.03 766.01,-714.81"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge57" class="edge">
+<title>proc~allocate_rank1_real128_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00bdff" d="M715.18,-654.08C723.74,-656.53 732.15,-659.47 740,-663 763.65,-673.65 786.61,-692.57 802,-706.9"/>
+<polygon fill="#00bdff" stroke="#00bdff" points="799.68,-709.53 809.33,-713.91 804.52,-704.47 799.68,-709.53"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge58" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0091ff" d="M693.72,-604.17C709.7,-607.33 726.17,-612.53 740,-621 773.13,-641.29 797.78,-680.46 810.73,-704.79"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="807.74,-706.62 815.41,-713.92 813.96,-703.43 807.74,-706.62"/>
+</g>
+<!-- proc~allocate_rank1_real32_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge59" class="edge">
+<title>proc~allocate_rank1_real32_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0066ff" d="M715.28,-566.34C724.11,-569.48 732.55,-573.61 740,-579 782.85,-610 805.65,-670.92 815.3,-703.76"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="812.02,-705.05 818.07,-713.74 818.76,-703.17 812.02,-705.05"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge60" class="edge">
+<title>proc~allocate_rank1_real32_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#003aff" d="M715.27,-523.4C724.2,-526.7 732.67,-531.12 740,-537 793.22,-579.65 812.12,-663.9 818.28,-703.91"/>
+<polygon fill="#003aff" stroke="#003aff" points="814.83,-704.53 819.7,-713.95 821.77,-703.55 814.83,-704.53"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge61" class="edge">
+<title>proc~allocate_rank1_real32_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#000eff" d="M727.06,-486.14C731.67,-488.65 736.02,-491.58 740,-495 803.6,-549.6 817.28,-657.19 820.21,-703.7"/>
+<polygon fill="#000eff" stroke="#000eff" points="816.72,-704.1 820.74,-713.9 823.71,-703.73 816.72,-704.1"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge62" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1d00ff" d="M693.57,-432.35C710.39,-435.43 727.29,-441.54 740,-453 814.22,-519.94 821.73,-651.41 821.61,-703.74"/>
+<polygon fill="#1d00ff" stroke="#1d00ff" points="818.11,-703.88 821.48,-713.93 825.1,-703.97 818.11,-703.88"/>
+</g>
+<!-- proc~allocate_rank1_real64_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge63" class="edge">
+<title>proc~allocate_rank1_real64_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#4800ff" d="M715.1,-395.89C724.28,-399.42 732.85,-404.31 740,-411 783.46,-451.67 810.27,-638.95 818.38,-703.82"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="814.91,-704.29 819.6,-713.79 821.86,-703.44 814.91,-704.29"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge64" class="edge">
+<title>proc~allocate_rank1_real64_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7400ff" d="M715.01,-353.58C724.26,-357.16 732.87,-362.14 740,-369 788.89,-416.08 812.58,-633.08 819.09,-703.71"/>
+<polygon fill="#7400ff" stroke="#7400ff" points="815.61,-704.1 819.99,-713.74 822.58,-703.47 815.61,-704.1"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge65" class="edge">
+<title>proc~allocate_rank1_real64_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a000ff" d="M728.65,-318.11C732.73,-320.66 736.55,-323.6 740,-327 794.36,-380.55 814.64,-627.6 819.66,-703.66"/>
+<polygon fill="#a000ff" stroke="#a000ff" points="816.19,-704.21 820.32,-713.97 823.18,-703.77 816.19,-704.21"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge66" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cc00ff" d="M690.6,-262.85C708.68,-265.63 727.01,-271.97 740,-285 799.82,-345.04 816.48,-622.02 820.12,-703.44"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="816.63,-703.74 820.55,-713.58 823.63,-703.44 816.63,-703.74"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge67" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f700ff" d="M690.73,-220.73C708.81,-223.5 727.12,-229.87 740,-243 805.39,-309.66 818.2,-617.47 820.52,-703.57"/>
+<polygon fill="#f700ff" stroke="#f700ff" points="817.03,-703.87 820.77,-713.78 824.02,-703.7 817.03,-703.87"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge68" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00da" d="M690.54,-178.58C708.72,-181.33 727.13,-187.71 740,-201 810.97,-274.3 819.77,-613.11 820.85,-703.68"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="817.35,-703.72 820.95,-713.68 824.35,-703.65 817.35,-703.72"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge69" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00ae" d="M687.13,-136.01C706.44,-138.44 726.39,-144.78 740,-159 816.49,-238.89 821.21,-608.08 821.13,-703.46"/>
+<polygon fill="#ff00ae" stroke="#ff00ae" points="817.63,-703.69 821.1,-713.7 824.63,-703.71 817.63,-703.69"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge70" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0083" d="M697.13,-95.54C713.15,-98.77 728.77,-105.16 740,-117 822.15,-203.63 822.56,-604.48 821.37,-703.73"/>
+<polygon fill="#ff0083" stroke="#ff0083" points="817.87,-703.77 821.23,-713.82 824.87,-703.87 817.87,-703.77"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge71" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0057" d="M693.7,-52.82C710.92,-55.8 728.01,-62.24 740,-75 784.13,-121.93 813.52,-594.37 819.76,-703.56"/>
+<polygon fill="#ff0057" stroke="#ff0057" points="816.28,-703.97 820.33,-713.75 823.27,-703.57 816.28,-703.97"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CallsGraph_edge72" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff002b" d="M693.76,-10.77C710.98,-13.74 728.05,-20.2 740,-33 786.94,-83.3 814.36,-590.15 819.94,-703.57"/>
+<polygon fill="#ff002b" stroke="#ff002b" points="816.45,-704.01 820.43,-713.83 823.45,-703.67 816.45,-704.01"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocmultiplication_scalar_matrix_crsCallsGraph = svgPanZoom('#procmultiplication_scalar_matrix_crsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~multiplication_scalar_matrix_crs~~CalledByGraph Pages: 1 -->
+<svg id="procmultiplication_scalar_matrix_crsCalledByGraph" width="304pt" height="32pt"
+ viewBox="0.00 0.00 304.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~multiplication_scalar_matrix_crs~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~multiplication_scalar_matrix_crs~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 300,-28 300,4 -4,4"/>
+<!-- proc~multiplication_scalar_matrix_crs -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CalledByGraph_node1" class="node">
+<title>proc~multiplication_scalar_matrix_crs</title>
+<polygon fill="none" stroke="black" points="296,-24 108,-24 108,0 296,0 296,-24"/>
+<text text-anchor="middle" x="202" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Multiplication_Scalar_Matrix_CRS</text>
+</g>
+<!-- interface~operator(ASTERISK) -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CalledByGraph_node2" class="node">
+<title>interface~operator(ASTERISK)</title>
+<g id="a_proc~~multiplication_scalar_matrix_crs~~CalledByGraph_node2"><a xlink:href="../interface/operator(ASTERISK).html" xlink:title="operator(*)">
+<polygon fill="#a7506f" stroke="#a7506f" points="72,-24 0,-24 0,0 72,0 72,-24"/>
+<text text-anchor="middle" x="36" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">operator(*)</text>
+</a>
+</g>
+</g>
+<!-- interface~operator(ASTERISK)&#45;&gt;proc~multiplication_scalar_matrix_crs -->
+<g id="proc~~multiplication_scalar_matrix_crs~~CalledByGraph_edge1" class="edge">
+<title>interface~operator(ASTERISK)&#45;&gt;proc~multiplication_scalar_matrix_crs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M72.18,-12C80.06,-12 88.81,-12 97.93,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="97.95,-15.5 107.95,-12 97.95,-8.5 97.95,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">function </span><span class="n">Multiplication_Scalar_Matrix_CRS</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">b</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">C</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">k</span>
+
+<span class="w">        </span><span class="c">! Assume same sparsity structure</span>
+<span class="w">        </span><span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">Copy</span><span class="p">()</span>
+<span class="w">        </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">nnz</span>
+<span class="w">            </span><span class="n">C</span><span class="p">%</span><span class="n">Val</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">Val</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span>
+<span class="w">        </span><span class="k">end do</span>
+<span class="k">    end function </span><span class="n">Multiplication_Scalar_Matrix_CRS</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

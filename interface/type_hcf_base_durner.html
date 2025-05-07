@@ -1,0 +1,1164 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Type_HCF_Base_Durner &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Type_HCF_Base_Durner
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.0% of total for procedures.</p>Including implementation: 1950 statements,  1.3% of total for procedures.">4 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/HCF.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hcf.f90.html'>HCF.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/calculate_hcf.html'>Calculate_HCF</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Type_HCF_Base_Durner</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modprocs-0"
+         aria-expanded="false" aria-controls="modprocs-0">
+         <h4 class="card-header bg-primary text-white">Module Procedures</h4>
+      </a>
+      <div id="modprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../interface/type_hcf_base_durner.html#moduleprocedure-construct_type_hcf_base_durner">Construct_Type_HCF_Base_Durner</a>
+            <a class="list-group-item" href="../interface/type_hcf_base_durner.html#moduleprocedure-construct_type_hcf_base_durner_minimal">Construct_Type_HCF_Base_Durner_minimal</a>
+        </div>
+      </div>
+    </div>
+
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>public interface Type_HCF_Base_Durner</h2>
+      
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Calls</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~type_hcf_base_durner~~CallsGraph Pages: 1 -->
+<svg id="interfacetype_hcf_base_durnerCallsGraph" width="641pt" height="766pt"
+ viewBox="0.00 0.00 641.00 766.47" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~type_hcf_base_durner~~CallsGraph" class="graph" transform="scale(0.52 0.52) rotate(0) translate(4 1456)">
+<title>interface~~type_hcf_base_durner~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1456 1217,-1456 1217,4 -4,4"/>
+<!-- interface~type_hcf_base_durner -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node1" class="node">
+<title>interface~type_hcf_base_durner</title>
+<polygon fill="none" stroke="black" points="138,-696 0,-696 0,-672 138,-672 138,-696"/>
+<text text-anchor="middle" x="69" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50">Type_HCF_Base_Durner</text>
+</g>
+<!-- interface~construct_type_hcf_base_durner -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node2" class="node">
+<title>interface~construct_type_hcf_base_durner</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node2"><a xlink:href="../interface/construct_type_hcf_base_durner.html" xlink:title="Construct_Type_HCF_Base_Durner">
+<polygon fill="#a7506f" stroke="#a7506f" points="392.5,-717 198.5,-717 198.5,-693 392.5,-693 392.5,-717"/>
+<text text-anchor="middle" x="295.5" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Construct_Type_HCF_Base_Durner</text>
+</a>
+</g>
+</g>
+<!-- interface~type_hcf_base_durner&#45;&gt;interface~construct_type_hcf_base_durner -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge1" class="edge">
+<title>interface~type_hcf_base_durner&#45;&gt;interface~construct_type_hcf_base_durner</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M138.27,-690.39C154.12,-691.87 171.37,-693.48 188.42,-695.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="188.14,-698.57 198.42,-696.01 188.79,-691.6 188.14,-698.57"/>
+</g>
+<!-- interface~construct_type_hcf_base_durner_minimal -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node3" class="node">
+<title>interface~construct_type_hcf_base_durner_minimal</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node3"><a xlink:href="../interface/construct_type_hcf_base_durner_minimal.html" xlink:title="Construct_Type_HCF_Base_Durner_minimal">
+<polygon fill="#a7506f" stroke="#a7506f" points="417,-675 174,-675 174,-651 417,-651 417,-675"/>
+<text text-anchor="middle" x="295.5" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Construct_Type_HCF_Base_Durner_minimal</text>
+</a>
+</g>
+</g>
+<!-- interface~type_hcf_base_durner&#45;&gt;interface~construct_type_hcf_base_durner_minimal -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge2" class="edge">
+<title>interface~type_hcf_base_durner&#45;&gt;interface~construct_type_hcf_base_durner_minimal</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M138.27,-677.61C146.52,-676.84 155.14,-676.04 163.92,-675.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="164.26,-678.7 173.89,-674.28 163.6,-671.73 164.26,-678.7"/>
+</g>
+<!-- proc~construct_type_hcf_base_durner -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node4" class="node">
+<title>proc~construct_type_hcf_base_durner</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node4"><a xlink:href="../proc/construct_type_hcf_base_durner.html" xlink:title="Construct_Type_HCF_Base_Durner">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="671.5,-717 477.5,-717 477.5,-693 671.5,-693 671.5,-717"/>
+<text text-anchor="middle" x="574.5" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Construct_Type_HCF_Base_Durner</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_durner&#45;&gt;proc~construct_type_hcf_base_durner -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge3" class="edge">
+<title>interface~construct_type_hcf_base_durner&#45;&gt;proc~construct_type_hcf_base_durner</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M392.6,-705C416.64,-705 442.56,-705 467.06,-705"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="467.1,-708.5 477.1,-705 467.1,-701.5 467.1,-708.5"/>
+</g>
+<!-- proc~construct_type_hcf_base_durner_minimal -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node5" class="node">
+<title>proc~construct_type_hcf_base_durner_minimal</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node5"><a xlink:href="../proc/construct_type_hcf_base_durner_minimal.html" xlink:title="Construct_Type_HCF_Base_Durner_minimal">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="696,-675 453,-675 453,-651 696,-651 696,-675"/>
+<text text-anchor="middle" x="574.5" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Construct_Type_HCF_Base_Durner_minimal</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_durner_minimal&#45;&gt;proc~construct_type_hcf_base_durner_minimal -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge4" class="edge">
+<title>interface~construct_type_hcf_base_durner_minimal&#45;&gt;proc~construct_type_hcf_base_durner_minimal</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M417.19,-663C425.59,-663 434.07,-663 442.52,-663"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="442.79,-666.5 452.79,-663 442.79,-659.5 442.79,-666.5"/>
+</g>
+<!-- interface~allocate_array -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node6" class="node">
+<title>interface~allocate_array</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node6"><a xlink:href="../interface/allocate_array.html" xlink:title="Allocate_Array">
+<polygon fill="#a7506f" stroke="#a7506f" points="823,-738 732,-738 732,-714 823,-714 823,-738"/>
+<text text-anchor="middle" x="777.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Array</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_type_hcf_base_durner&#45;&gt;interface~allocate_array -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge5" class="edge">
+<title>proc~construct_type_hcf_base_durner&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M671.58,-715.04C688.89,-716.85 706.37,-718.67 721.97,-720.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="721.61,-723.78 731.92,-721.34 722.34,-716.82 721.61,-723.78"/>
+</g>
+<!-- kflh -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node7" class="node">
+<title>kflh</title>
+<polygon fill="#777777" stroke="#777777" points="804.5,-696 750.5,-696 750.5,-672 804.5,-672 804.5,-696"/>
+<text text-anchor="middle" x="777.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">kflh</text>
+</g>
+<!-- proc~construct_type_hcf_base_durner&#45;&gt;kflh -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge6" class="edge">
+<title>proc~construct_type_hcf_base_durner&#45;&gt;kflh</title>
+<path fill="none" stroke="#ff0000" d="M671.58,-694.96C695.94,-692.42 720.64,-689.84 739.96,-687.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="740.51,-691.28 750.09,-686.76 739.78,-684.32 740.51,-691.28"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node8" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node8"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="Allocate_Rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1035.5,-1452 908.5,-1452 908.5,-1428 1035.5,-1428 1035.5,-1452"/>
+<text text-anchor="middle" x="972" y="-1437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M779.06,-738.17C783.2,-826.49 810.47,-1366.96 859,-1419 869.4,-1430.16 883.7,-1436.5 898.6,-1439.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="897.98,-1443.35 908.45,-1441.75 899.26,-1436.47 897.98,-1443.35"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="Allocate_Rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1035.5,-1410 908.5,-1410 908.5,-1386 1035.5,-1386 1035.5,-1410"/>
+<text text-anchor="middle" x="972" y="-1395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M779.16,-738.25C783.84,-823.66 813.33,-1328.4 859,-1377 869.29,-1387.95 883.34,-1394.25 898,-1397.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="897.74,-1401.21 908.22,-1399.65 899.05,-1394.34 897.74,-1401.21"/>
+</g>
+<!-- proc~allocate_rank1_int32_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_int32_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_int32_pointer.html" xlink:title="Allocate_Rank1_int32_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1368 887.5,-1368 887.5,-1344 1056.5,-1344 1056.5,-1368"/>
+<text text-anchor="middle" x="972" y="-1353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M778.25,-738.18C776.95,-816.15 773.73,-1245 859,-1335 864.33,-1340.63 870.66,-1345.02 877.54,-1348.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.67,-1351.86 887.24,-1352.5 879.37,-1345.41 876.67,-1351.86"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_int32_specify</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_int32_specify.html" xlink:title="Allocate_Rank1_int32_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1326 887.5,-1326 887.5,-1302 1056.5,-1302 1056.5,-1326"/>
+<text text-anchor="middle" x="972" y="-1311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M778.38,-738.3C777.94,-813.42 779.45,-1209.84 859,-1293 864.48,-1298.73 870.99,-1303.18 878.07,-1306.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.74,-1309.85 887.32,-1310.43 879.41,-1303.38 876.74,-1309.85"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_int32_specify_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_int32_specify_pointer.html" xlink:title="Allocate_Rank1_int32_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1078,-1284 866,-1284 866,-1260 1078,-1260 1078,-1284"/>
+<text text-anchor="middle" x="972" y="-1269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M778.54,-738.32C779.02,-810.16 785.11,-1174.62 859,-1251 859.93,-1251.96 860.89,-1252.88 861.87,-1253.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="859.84,-1256.62 869.9,-1259.93 864.09,-1251.07 859.84,-1256.62"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="Allocate_Rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1035.5,-1242 908.5,-1242 908.5,-1218 1035.5,-1218 1035.5,-1242"/>
+<text text-anchor="middle" x="972" y="-1227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M778.71,-738.22C780.17,-806.4 790.72,-1139.33 859,-1209 869.46,-1219.68 883.51,-1225.88 898.11,-1229.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="897.78,-1232.82 908.27,-1231.28 899.11,-1225.95 897.78,-1232.82"/>
+</g>
+<!-- proc~allocate_rank1_int64_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank1_int64_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank1_int64_pointer.html" xlink:title="Allocate_Rank1_int64_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1200 887.5,-1200 887.5,-1176 1056.5,-1176 1056.5,-1200"/>
+<text text-anchor="middle" x="972" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M778.93,-738.42C781.46,-803.44 796.41,-1104.11 859,-1167 864.42,-1172.45 870.78,-1176.72 877.65,-1180.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.74,-1183.47 887.32,-1184.05 879.41,-1177 876.74,-1183.47"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank1_int64_specify</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank1_int64_specify.html" xlink:title="Allocate_Rank1_int64_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1158 887.5,-1158 887.5,-1134 1056.5,-1134 1056.5,-1158"/>
+<text text-anchor="middle" x="972" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M779.17,-738.03C782.77,-798.52 801.9,-1068.68 859,-1125 864.47,-1130.4 870.86,-1134.64 877.76,-1137.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.88,-1141.37 887.46,-1141.92 879.53,-1134.89 876.88,-1141.37"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank1_int64_specify_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank1_int64_specify_pointer.html" xlink:title="Allocate_Rank1_int64_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1078,-1116 866,-1116 866,-1092 1078,-1092 1078,-1116"/>
+<text text-anchor="middle" x="972" y="-1101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M779.49,-738.25C784.35,-795.21 807.55,-1033.39 859,-1083 860.11,-1084.07 861.26,-1085.1 862.44,-1086.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="860.51,-1089.01 870.69,-1091.95 864.57,-1083.3 860.51,-1089.01"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="Allocate_Rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1032,-1074 912,-1074 912,-1050 1032,-1050 1032,-1074"/>
+<text text-anchor="middle" x="972" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M779.88,-738.21C786.08,-790.88 813.08,-997.96 859,-1041 870.6,-1051.88 885.97,-1057.99 901.58,-1061.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="901.39,-1064.78 911.84,-1063.03 902.58,-1057.88 901.39,-1064.78"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="Allocate_Rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1043,-1032 901,-1032 901,-1008 1043,-1008 1043,-1032"/>
+<text text-anchor="middle" x="972" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M778,-738.07C776.92,-780.94 779.43,-927.12 859,-999 868,-1007.13 879.12,-1012.57 890.82,-1016.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="890.2,-1019.6 900.75,-1018.73 891.96,-1012.83 890.2,-1019.6"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="Allocate_Rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1043,-990 901,-990 901,-966 1043,-966 1043,-990"/>
+<text text-anchor="middle" x="972" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M778.74,-738.1C780.19,-776.7 790.26,-897.87 859,-957 868.14,-964.86 879.27,-970.17 890.94,-973.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="890.27,-977.14 900.82,-976.26 892.02,-970.36 890.27,-977.14"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="Allocate_Rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1043,-948 901,-948 901,-924 1043,-924 1043,-948"/>
+<text text-anchor="middle" x="972" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M779.77,-738.05C784.01,-771.89 800.89,-868.32 859,-915 868.28,-922.45 879.38,-927.56 890.94,-931.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="890.16,-934.43 900.72,-933.55 891.92,-927.66 890.16,-934.43"/>
+</g>
+<!-- proc~allocate_rank1_logical_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank1_logical_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank1_logical_pointer.html" xlink:title="Allocate_Rank1_logical_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1061,-906 883,-906 883,-882 1061,-882 1061,-906"/>
+<text text-anchor="middle" x="972" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M781.38,-738.26C788.81,-766.92 811.42,-838.49 859,-873 863.5,-876.27 868.37,-879.07 873.46,-881.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="872.27,-884.77 882.85,-885.37 874.96,-878.3 872.27,-884.77"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank1_logical_specify</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank1_logical_specify.html" xlink:title="Allocate_Rank1_logical_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="1061,-864 883,-864 883,-840 1061,-840 1061,-864"/>
+<text text-anchor="middle" x="972" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M784.03,-738.08C794.93,-760.39 821.43,-807.91 859,-831 863.47,-833.75 868.21,-836.15 873.13,-838.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="872.17,-841.63 882.76,-841.93 874.66,-835.09 872.17,-841.63"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank1_logical_specify_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank1_logical_specify_pointer.html" xlink:title="Allocate_Rank1_logical_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1082,-822 862,-822 862,-798 1082,-798 1082,-822"/>
+<text text-anchor="middle" x="972" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M790.09,-738.09C804.72,-752.59 831.35,-776.5 859,-789 863.78,-791.16 868.77,-793.1 873.87,-794.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="873.22,-798.3 883.81,-797.94 875.31,-791.62 873.22,-798.3"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="Allocate_Rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1042,-780 902,-780 902,-756 1042,-756 1042,-780"/>
+<text text-anchor="middle" x="972" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge23" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M822.23,-738C834.12,-741.1 847.02,-744.32 859,-747 869.9,-749.44 881.44,-751.83 892.81,-754.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="892.25,-757.52 902.73,-755.99 893.58,-750.65 892.25,-757.52"/>
+</g>
+<!-- proc~allocate_rank1_real128_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node25" class="node">
+<title>proc~allocate_rank1_real128_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node25"><a xlink:href="../proc/allocate_rank1_real128_pointer.html" xlink:title="Allocate_Rank1_real128_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1063.5,-738 880.5,-738 880.5,-714 1063.5,-714 1063.5,-738"/>
+<text text-anchor="middle" x="972" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge24" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M823.15,-726C837.31,-726 853.59,-726 870.06,-726"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="870.32,-729.5 880.32,-726 870.32,-722.5 870.32,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node26" class="node">
+<title>proc~allocate_rank1_real128_specify</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node26"><a xlink:href="../proc/allocate_rank1_real128_specify.html" xlink:title="Allocate_Rank1_real128_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="1063.5,-696 880.5,-696 880.5,-672 1063.5,-672 1063.5,-696"/>
+<text text-anchor="middle" x="972" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge25" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M822.23,-714C834.12,-710.9 847.02,-707.68 859,-705 869.9,-702.56 881.44,-700.17 892.81,-697.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="893.58,-701.35 902.73,-696.01 892.25,-694.48 893.58,-701.35"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node27" class="node">
+<title>proc~allocate_rank1_real128_specify_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node27"><a xlink:href="../proc/allocate_rank1_real128_specify_pointer.html" xlink:title="Allocate_Rank1_real128_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1085,-654 859,-654 859,-630 1085,-630 1085,-654"/>
+<text text-anchor="middle" x="972" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge26" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M808.71,-713.88C813.7,-711.29 818.65,-708.32 823,-705 842.55,-690.09 837.71,-675.3 859,-663 862.23,-661.13 865.59,-659.43 869.05,-657.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="870.45,-661.08 878.4,-654.08 867.82,-654.59 870.45,-661.08"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node28" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node28"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="Allocate_Rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1038.5,-612 905.5,-612 905.5,-588 1038.5,-588 1038.5,-612"/>
+<text text-anchor="middle" x="972" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge27" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M811.46,-713.88C815.68,-711.38 819.68,-708.44 823,-705 851.2,-675.77 827.31,-646.4 859,-621 869.46,-612.62 882.22,-607.2 895.34,-603.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="896.41,-607.12 905.41,-601.52 894.88,-600.29 896.41,-607.12"/>
+</g>
+<!-- proc~allocate_rank1_real32_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node29" class="node">
+<title>proc~allocate_rank1_real32_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node29"><a xlink:href="../proc/allocate_rank1_real32_pointer.html" xlink:title="Allocate_Rank1_real32_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-570 884,-570 884,-546 1060,-546 1060,-570"/>
+<text text-anchor="middle" x="972" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge28" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M812.32,-713.98C816.31,-711.48 820.01,-708.52 823,-705 860.7,-660.61 815.95,-618.22 859,-579 863.7,-574.72 868.99,-571.18 874.64,-568.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.09,-571.45 883.79,-564.18 873.24,-565.06 876.09,-571.45"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node30" class="node">
+<title>proc~allocate_rank1_real32_specify</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node30"><a xlink:href="../proc/allocate_rank1_real32_specify.html" xlink:title="Allocate_Rank1_real32_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-528 884,-528 884,-504 1060,-504 1060,-528"/>
+<text text-anchor="middle" x="972" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge29" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M812.98,-713.88C816.76,-711.41 820.24,-708.48 823,-705 870.45,-645.17 804.31,-590.3 859,-537 863.65,-532.47 868.95,-528.76 874.65,-525.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.26,-528.83 883.91,-521.5 873.36,-522.46 876.26,-528.83"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node31" class="node">
+<title>proc~allocate_rank1_real32_specify_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node31"><a xlink:href="../proc/allocate_rank1_real32_specify_pointer.html" xlink:title="Allocate_Rank1_real32_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1081.5,-486 862.5,-486 862.5,-462 1081.5,-462 1081.5,-486"/>
+<text text-anchor="middle" x="972" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge30" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.12,-713.99C816.88,-711.5 820.31,-708.54 823,-705 880.29,-629.6 792.56,-562.48 859,-495 859.94,-494.05 860.9,-493.13 861.89,-492.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="864.11,-494.97 869.98,-486.14 859.89,-489.38 864.11,-494.97"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node32" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node32"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="Allocate_Rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1038.5,-444 905.5,-444 905.5,-420 1038.5,-420 1038.5,-444"/>
+<text text-anchor="middle" x="972" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge31" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.64,-713.77C817.22,-711.33 820.46,-708.44 823,-705 890.19,-613.98 780.76,-534.72 859,-453 868.74,-442.82 881.73,-436.68 895.41,-433.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="896.41,-436.49 905.45,-430.96 894.94,-429.64 896.41,-436.49"/>
+</g>
+<!-- proc~allocate_rank1_real64_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node33" class="node">
+<title>proc~allocate_rank1_real64_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node33"><a xlink:href="../proc/allocate_rank1_real64_pointer.html" xlink:title="Allocate_Rank1_real64_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-402 884,-402 884,-378 1060,-378 1060,-402"/>
+<text text-anchor="middle" x="972" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge32" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.71,-713.82C817.28,-711.37 820.5,-708.46 823,-705 900.12,-598.31 768.92,-506.99 859,-411 863.53,-406.17 868.79,-402.25 874.51,-399.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.29,-402.1 883.85,-394.68 873.31,-395.77 876.29,-402.1"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node34" class="node">
+<title>proc~allocate_rank1_real64_specify</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node34"><a xlink:href="../proc/allocate_rank1_real64_specify.html" xlink:title="Allocate_Rank1_real64_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-360 884,-360 884,-336 1060,-336 1060,-360"/>
+<text text-anchor="middle" x="972" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge33" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.76,-713.85C817.32,-711.4 820.52,-708.48 823,-705 866.53,-643.81 808.03,-424.15 859,-369 863.49,-364.14 868.73,-360.19 874.43,-356.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="876.2,-360.03 883.74,-352.58 873.2,-353.7 876.2,-360.03"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node35" class="node">
+<title>proc~allocate_rank1_real64_specify_pointer</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node35"><a xlink:href="../proc/allocate_rank1_real64_specify_pointer.html" xlink:title="Allocate_Rank1_real64_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="1081.5,-318 862.5,-318 862.5,-294 1081.5,-294 1081.5,-318"/>
+<text text-anchor="middle" x="972" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify_pointer -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge34" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.8,-713.88C817.35,-711.43 820.54,-708.5 823,-705 871.51,-635.95 802.09,-389.3 859,-327 859.77,-326.16 860.56,-325.35 861.37,-324.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="863.65,-327.21 869.18,-318.17 859.22,-321.8 863.65,-327.21"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node36" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node36"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="Allocate_Rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1035.5,-276 908.5,-276 908.5,-252 1035.5,-252 1035.5,-276"/>
+<text text-anchor="middle" x="972" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge35" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.83,-713.9C817.38,-711.44 820.56,-708.51 823,-705 876.49,-628.1 796.15,-354.46 859,-285 869.29,-273.63 883.62,-267.22 898.59,-263.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="899.3,-267.24 908.49,-261.98 898.02,-260.35 899.3,-267.24"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node37" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node37"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="Allocate_Rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1035.5,-234 908.5,-234 908.5,-210 1035.5,-210 1035.5,-234"/>
+<text text-anchor="middle" x="972" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge36" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.86,-713.92C817.4,-711.46 820.57,-708.52 823,-705 881.47,-620.23 790.2,-319.63 859,-243 869.25,-231.59 883.56,-225.16 898.53,-221.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="899.23,-225.18 908.43,-219.92 897.96,-218.3 899.23,-225.18"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node38" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node38"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="Allocate_Rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1035.5,-192 908.5,-192 908.5,-168 1035.5,-168 1035.5,-192"/>
+<text text-anchor="middle" x="972" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge37" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.88,-713.94C817.42,-711.47 820.59,-708.52 823,-705 886.46,-612.36 784.26,-284.79 859,-201 869.21,-189.56 883.5,-183.12 898.48,-179.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="899.18,-183.13 908.38,-177.87 897.91,-176.25 899.18,-183.13"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node39" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node39"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="Allocate_Rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1032,-150 912,-150 912,-126 1032,-126 1032,-150"/>
+<text text-anchor="middle" x="972" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge38" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.9,-713.95C817.43,-711.48 820.6,-708.53 823,-705 891.44,-604.49 778.31,-249.96 859,-159 869.93,-146.68 885.59,-140.16 901.75,-136.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="902.5,-140.38 911.84,-135.37 901.41,-133.46 902.5,-140.38"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node40" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node40"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="Allocate_Rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1042,-108 902,-108 902,-84 1042,-84 1042,-108"/>
+<text text-anchor="middle" x="972" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge39" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.92,-713.96C817.45,-711.49 820.6,-708.54 823,-705 896.43,-596.62 772.35,-215.13 859,-117 867.71,-107.13 879.46,-100.98 892.08,-97.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="892.98,-100.65 901.87,-94.89 891.32,-93.85 892.98,-100.65"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node41" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node41"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="Allocate_Rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1038.5,-66 905.5,-66 905.5,-42 1038.5,-42 1038.5,-66"/>
+<text text-anchor="middle" x="972" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge40" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.93,-713.97C817.46,-711.5 820.61,-708.54 823,-705 901.42,-588.75 766.4,-180.31 859,-75 868.41,-64.3 881.39,-57.96 895.18,-54.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="896.28,-57.72 905.33,-52.22 894.83,-50.87 896.28,-57.72"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node42" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node42"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="Allocate_Rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1038.5,-24 905.5,-24 905.5,0 1038.5,0 1038.5,-24"/>
+<text text-anchor="middle" x="972" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge41" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M813.94,-713.98C817.47,-711.51 820.62,-708.55 823,-705 906.41,-580.88 760.45,-145.48 859,-33 868.39,-22.28 881.36,-15.93 895.15,-12.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="896.25,-15.69 905.3,-10.19 894.8,-8.84 896.25,-15.69"/>
+</g>
+<!-- proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_node43" class="node">
+<title>proc~error_message</title>
+<g id="a_interface~~type_hcf_base_durner~~CallsGraph_node43"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="1213,-738 1121,-738 1121,-714 1213,-714 1213,-738"/>
+<text text-anchor="middle" x="1167" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge42" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M1035.54,-1441.75C1053.84,-1439.04 1072.31,-1432.6 1085,-1419 1131.94,-1368.7 1159.36,-861.85 1164.94,-748.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1168.45,-748.33 1165.43,-738.17 1161.45,-747.99 1168.45,-748.33"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge43" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff2b00" d="M1035.78,-1399.65C1053.97,-1396.91 1072.33,-1390.48 1085,-1377 1129.13,-1330.07 1158.52,-857.63 1164.76,-748.44"/>
+<polygon fill="#ff2b00" stroke="#ff2b00" points="1168.27,-748.43 1165.33,-738.25 1161.28,-748.03 1168.27,-748.43"/>
+</g>
+<!-- proc~allocate_rank1_int32_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge44" class="edge">
+<title>proc~allocate_rank1_int32_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff5700" d="M1056.75,-1352.49C1067.38,-1348.76 1077.24,-1343.18 1085,-1335 1167.15,-1248.37 1167.56,-847.52 1166.37,-748.27"/>
+<polygon fill="#ff5700" stroke="#ff5700" points="1169.87,-748.13 1166.23,-738.18 1162.87,-748.23 1169.87,-748.13"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge45" class="edge">
+<title>proc~allocate_rank1_int32_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff8300" d="M1056.68,-1310.42C1067.32,-1306.7 1077.2,-1301.15 1085,-1293 1161.49,-1213.11 1166.21,-843.92 1166.13,-748.54"/>
+<polygon fill="#ff8300" stroke="#ff8300" points="1169.63,-748.29 1166.1,-738.3 1162.63,-748.31 1169.63,-748.29"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge46" class="edge">
+<title>proc~allocate_rank1_int32_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffae00" d="M1074.09,-1259.92C1078.03,-1257.37 1081.7,-1254.41 1085,-1251 1155.97,-1177.7 1164.77,-838.89 1165.85,-748.32"/>
+<polygon fill="#ffae00" stroke="#ffae00" points="1169.35,-748.35 1165.95,-738.32 1162.35,-748.28 1169.35,-748.35"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge47" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffda00" d="M1035.73,-1231.27C1053.81,-1228.5 1072.12,-1222.13 1085,-1209 1150.39,-1142.34 1163.2,-834.53 1165.52,-748.43"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="1169.02,-748.3 1165.77,-738.22 1162.03,-748.13 1169.02,-748.3"/>
+</g>
+<!-- proc~allocate_rank1_int64_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge48" class="edge">
+<title>proc~allocate_rank1_int64_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f7ff00" d="M1056.67,-1184.04C1067.25,-1180.36 1077.11,-1174.92 1085,-1167 1144.82,-1106.96 1161.48,-829.98 1165.12,-748.56"/>
+<polygon fill="#f7ff00" stroke="#f7ff00" points="1168.63,-748.56 1165.55,-738.42 1161.63,-748.26 1168.63,-748.56"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge49" class="edge">
+<title>proc~allocate_rank1_int64_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cbff00" d="M1056.53,-1141.91C1067.13,-1138.25 1077.04,-1132.84 1085,-1125 1139.36,-1071.45 1159.64,-824.4 1164.66,-748.34"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1168.18,-748.23 1165.32,-738.03 1161.19,-747.79 1168.18,-748.23"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge50" class="edge">
+<title>proc~allocate_rank1_int64_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a0ff00" d="M1073.3,-1091.94C1077.5,-1089.39 1081.44,-1086.43 1085,-1083 1133.89,-1035.92 1157.58,-818.92 1164.09,-748.29"/>
+<polygon fill="#a0ff00" stroke="#a0ff00" points="1167.58,-748.53 1164.99,-738.26 1160.61,-747.9 1167.58,-748.53"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge51" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#74ff00" d="M1032.15,-1063.01C1051.11,-1060.43 1070.84,-1054.25 1085,-1041 1128.46,-1000.33 1155.27,-813.05 1163.38,-748.18"/>
+<polygon fill="#74ff00" stroke="#74ff00" points="1166.86,-748.56 1164.6,-738.21 1159.91,-747.71 1166.86,-748.56"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge52" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#48ff00" d="M1043.23,-1018.71C1058.48,-1015.4 1073.47,-1009.4 1085,-999 1159.22,-932.06 1166.73,-800.59 1166.61,-748.26"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1170.1,-748.03 1166.48,-738.07 1163.11,-748.12 1170.1,-748.03"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge53" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1dff00" d="M1043.16,-976.24C1058.32,-972.93 1073.29,-967.05 1085,-957 1148.6,-902.4 1162.28,-794.81 1165.21,-748.3"/>
+<polygon fill="#1dff00" stroke="#1dff00" points="1168.71,-748.27 1165.74,-738.1 1161.72,-747.9 1168.71,-748.27"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge54" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff0e" d="M1043.26,-933.53C1058.24,-930.22 1073.11,-924.53 1085,-915 1138.22,-872.35 1157.12,-788.1 1163.28,-748.09"/>
+<polygon fill="#00ff0e" stroke="#00ff0e" points="1166.77,-748.45 1164.7,-738.05 1159.83,-747.47 1166.77,-748.45"/>
+</g>
+<!-- proc~allocate_rank1_logical_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge55" class="edge">
+<title>proc~allocate_rank1_logical_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff3a" d="M1061.13,-885.35C1069.65,-882.25 1077.79,-878.22 1085,-873 1127.85,-842 1150.65,-781.08 1160.3,-748.24"/>
+<polygon fill="#00ff3a" stroke="#00ff3a" points="1163.76,-748.83 1163.07,-738.26 1157.02,-746.95 1163.76,-748.83"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge56" class="edge">
+<title>proc~allocate_rank1_logical_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff66" d="M1061.23,-841.9C1069.58,-839.07 1077.66,-835.49 1085,-831 1118.13,-810.71 1142.78,-771.54 1155.73,-747.21"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1158.96,-748.57 1160.41,-738.08 1152.74,-745.38 1158.96,-748.57"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge57" class="edge">
+<title>proc~allocate_rank1_logical_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff91" d="M1060.18,-797.92C1068.74,-795.47 1077.15,-792.53 1085,-789 1108.65,-778.35 1131.61,-759.43 1147,-745.1"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1149.52,-747.53 1154.33,-738.09 1144.68,-742.47 1149.52,-747.53"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge58" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffbd" d="M1041.26,-755.97C1055.74,-753.2 1070.9,-750.14 1085,-747 1093.65,-745.07 1102.78,-742.87 1111.67,-740.63"/>
+<polygon fill="#00ffbd" stroke="#00ffbd" points="1112.75,-743.97 1121.57,-738.1 1111.01,-737.19 1112.75,-743.97"/>
+</g>
+<!-- proc~allocate_rank1_real128_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge59" class="edge">
+<title>proc~allocate_rank1_real128_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffe9" d="M1063.57,-726C1079.56,-726 1095.78,-726 1110.45,-726"/>
+<polygon fill="#00ffe9" stroke="#00ffe9" points="1110.83,-729.5 1120.83,-726 1110.83,-722.5 1110.83,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge60" class="edge">
+<title>proc~allocate_rank1_real128_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00e9ff" d="M1041.26,-696.03C1055.74,-698.8 1070.9,-701.86 1085,-705 1093.65,-706.93 1102.78,-709.13 1111.67,-711.37"/>
+<polygon fill="#00e9ff" stroke="#00e9ff" points="1111.01,-714.81 1121.57,-713.9 1112.75,-708.03 1111.01,-714.81"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge61" class="edge">
+<title>proc~allocate_rank1_real128_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00bdff" d="M1060.18,-654.08C1068.74,-656.53 1077.15,-659.47 1085,-663 1108.65,-673.65 1131.61,-692.57 1147,-706.9"/>
+<polygon fill="#00bdff" stroke="#00bdff" points="1144.68,-709.53 1154.33,-713.91 1149.52,-704.47 1144.68,-709.53"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge62" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0091ff" d="M1038.72,-604.17C1054.7,-607.33 1071.17,-612.53 1085,-621 1118.13,-641.29 1142.78,-680.46 1155.73,-704.79"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="1152.74,-706.62 1160.41,-713.92 1158.96,-703.43 1152.74,-706.62"/>
+</g>
+<!-- proc~allocate_rank1_real32_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge63" class="edge">
+<title>proc~allocate_rank1_real32_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0066ff" d="M1060.28,-566.34C1069.11,-569.48 1077.55,-573.61 1085,-579 1127.85,-610 1150.65,-670.92 1160.3,-703.76"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1157.02,-705.05 1163.07,-713.74 1163.76,-703.17 1157.02,-705.05"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge64" class="edge">
+<title>proc~allocate_rank1_real32_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#003aff" d="M1060.27,-523.4C1069.2,-526.7 1077.67,-531.12 1085,-537 1138.22,-579.65 1157.12,-663.9 1163.28,-703.91"/>
+<polygon fill="#003aff" stroke="#003aff" points="1159.83,-704.53 1164.7,-713.95 1166.77,-703.55 1159.83,-704.53"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge65" class="edge">
+<title>proc~allocate_rank1_real32_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#000eff" d="M1072.06,-486.14C1076.67,-488.65 1081.02,-491.58 1085,-495 1148.6,-549.6 1162.28,-657.19 1165.21,-703.7"/>
+<polygon fill="#000eff" stroke="#000eff" points="1161.72,-704.1 1165.74,-713.9 1168.71,-703.73 1161.72,-704.1"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge66" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1d00ff" d="M1038.57,-432.35C1055.39,-435.43 1072.29,-441.54 1085,-453 1159.22,-519.94 1166.73,-651.41 1166.61,-703.74"/>
+<polygon fill="#1d00ff" stroke="#1d00ff" points="1163.11,-703.88 1166.48,-713.93 1170.1,-703.97 1163.11,-703.88"/>
+</g>
+<!-- proc~allocate_rank1_real64_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge67" class="edge">
+<title>proc~allocate_rank1_real64_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#4800ff" d="M1060.1,-395.89C1069.28,-399.42 1077.85,-404.31 1085,-411 1128.46,-451.67 1155.27,-638.95 1163.38,-703.82"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="1159.91,-704.29 1164.6,-713.79 1166.86,-703.44 1159.91,-704.29"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge68" class="edge">
+<title>proc~allocate_rank1_real64_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7400ff" d="M1060.01,-353.58C1069.26,-357.16 1077.87,-362.14 1085,-369 1133.89,-416.08 1157.58,-633.08 1164.09,-703.71"/>
+<polygon fill="#7400ff" stroke="#7400ff" points="1160.61,-704.1 1164.99,-713.74 1167.58,-703.47 1160.61,-704.1"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify_pointer&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge69" class="edge">
+<title>proc~allocate_rank1_real64_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a000ff" d="M1073.65,-318.11C1077.73,-320.66 1081.55,-323.6 1085,-327 1139.36,-380.55 1159.64,-627.6 1164.66,-703.66"/>
+<polygon fill="#a000ff" stroke="#a000ff" points="1161.19,-704.21 1165.32,-713.97 1168.18,-703.77 1161.19,-704.21"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge70" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cc00ff" d="M1035.6,-262.85C1053.68,-265.63 1072.01,-271.97 1085,-285 1144.82,-345.04 1161.48,-622.02 1165.12,-703.44"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1161.63,-703.74 1165.55,-713.58 1168.63,-703.44 1161.63,-703.74"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge71" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f700ff" d="M1035.73,-220.73C1053.81,-223.5 1072.12,-229.87 1085,-243 1150.39,-309.66 1163.2,-617.47 1165.52,-703.57"/>
+<polygon fill="#f700ff" stroke="#f700ff" points="1162.03,-703.87 1165.77,-713.78 1169.02,-703.7 1162.03,-703.87"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge72" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00da" d="M1035.54,-178.58C1053.72,-181.33 1072.13,-187.71 1085,-201 1155.97,-274.3 1164.77,-613.11 1165.85,-703.68"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1162.35,-703.72 1165.95,-713.68 1169.35,-703.65 1162.35,-703.72"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge73" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00ae" d="M1032.13,-136.01C1051.44,-138.44 1071.39,-144.78 1085,-159 1161.49,-238.89 1166.21,-608.08 1166.13,-703.46"/>
+<polygon fill="#ff00ae" stroke="#ff00ae" points="1162.63,-703.69 1166.1,-713.7 1169.63,-703.71 1162.63,-703.69"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge74" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0083" d="M1042.13,-95.54C1058.15,-98.77 1073.77,-105.16 1085,-117 1167.15,-203.63 1167.56,-604.48 1166.37,-703.73"/>
+<polygon fill="#ff0083" stroke="#ff0083" points="1162.87,-703.77 1166.23,-713.82 1169.87,-703.87 1162.87,-703.77"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge75" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0057" d="M1038.7,-52.82C1055.92,-55.8 1073.01,-62.24 1085,-75 1129.13,-121.93 1158.52,-594.37 1164.76,-703.56"/>
+<polygon fill="#ff0057" stroke="#ff0057" points="1161.28,-703.97 1165.33,-713.75 1168.27,-703.57 1161.28,-703.97"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="interface~~type_hcf_base_durner~~CallsGraph_edge76" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff002b" d="M1038.76,-10.77C1055.98,-13.74 1073.05,-20.2 1085,-33 1131.94,-83.3 1159.36,-590.15 1164.94,-703.57"/>
+<polygon fill="#ff002b" stroke="#ff002b" points="1161.45,-704.01 1165.43,-713.83 1168.45,-703.67 1161.45,-704.01"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacetype_hcf_base_durnerCallsGraph = svgPanZoom('#interfacetype_hcf_base_durnerCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+
+
+        <h2>Module Procedures</h2>
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="interface-construct_type_hcf_base_durner"></span> <h3>private  interface <a href='construct_type_hcf_base_durner.html'>Construct_Type_HCF_Base_Durner</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="interface-construct_type_hcf_base_durner_minimal"></span> <h3>private  interface <a href='construct_type_hcf_base_durner_minimal.html'>Construct_Type_HCF_Base_Durner_minimal</a>()  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+    </div>
+  </div>
+
+</div>
+  </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

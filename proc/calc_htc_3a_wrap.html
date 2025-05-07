@@ -1,0 +1,707 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Calc_HTC_3A_Wrap &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Calc_HTC_3A_Wrap
+      <small>Module Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">18 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/3Phase_Apparent.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/3phase_apparent.f90.html'>3Phase_Apparent.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/calc_htc_3a.html'>Calc_HTC_3A</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Calc_HTC_3A_Wrap</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calc_htc_3a_wrap.html#src">Calc_HTC_3A_Wrap</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module function Calc_HTC_3A_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, Ice, Temperature, Density, Pw) result(HeatCapacity)  
+    <a href="../interface/calc_htc_3a_wrap.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~73"></span>
+              class(<a href='../type/type_heatcapacity_3phase_apparent.html'>Type_HeatCapacity_3Phase_Apparent</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nodebelonging~14"></span>
+              type(<a href='../type/belonging.html'>Belonging</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>NodeBelonging</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phi1"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi1</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phi2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi2</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phi3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi3</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phi4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi4</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ice"></span>
+              class(<a href='../type/abstract_ice.html'>Abstract_Ice</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ice</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-temperature~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Temperature</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-density~13"></span>
+              class(<a href='../type/abstract_density.html'>Abstract_Density</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Density</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pw~27"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Pw</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-heatcapacity"></span>
+          real(kind=real64)
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_htc_3a_wrap~~CallsGraph Pages: 1 -->
+<svg id="proccalc_htc_3a_wrapCallsGraph" width="536pt" height="74pt"
+ viewBox="0.00 0.00 536.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~calc_htc_3a_wrap~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 532,-70 532,4 -4,4"/>
+<!-- proc~calc_htc_3a_wrap -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_node1" class="node">
+<title>proc~calc_htc_3a_wrap</title>
+<polygon fill="none" stroke="black" points="115,-45 0,-45 0,-21 115,-21 115,-45"/>
+<text text-anchor="middle" x="57.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">Calc_HTC_3A_Wrap</text>
+</g>
+<!-- interface~calc_htc_3 -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_node2" class="node">
+<title>interface~calc_htc_3</title>
+<g id="a_proc~~calc_htc_3a_wrap~~CallsGraph_node2"><a xlink:href="../interface/calc_htc_3.html" xlink:title="Calc_HTC_3">
+<polygon fill="#a7506f" stroke="#a7506f" points="229.5,-66 154.5,-66 154.5,-42 229.5,-42 229.5,-66"/>
+<text text-anchor="middle" x="192" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calc_HTC_3</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_htc_3a_wrap&#45;&gt;interface~calc_htc_3 -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_edge1" class="edge">
+<title>proc~calc_htc_3a_wrap&#45;&gt;interface~calc_htc_3</title>
+<path fill="none" stroke="#ff0000" d="M115.08,-41.97C124.79,-43.51 134.78,-45.09 144.2,-46.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="143.73,-50.05 154.15,-48.16 144.83,-43.14 143.73,-50.05"/>
+</g>
+<!-- interface~calc_htc_3a -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_node3" class="node">
+<title>interface~calc_htc_3a</title>
+<g id="a_proc~~calc_htc_3a_wrap~~CallsGraph_node3"><a xlink:href="../interface/calc_htc_3a.html" xlink:title="Calc_HTC_3A">
+<polygon fill="#a7506f" stroke="#a7506f" points="233,-24 151,-24 151,0 233,0 233,-24"/>
+<text text-anchor="middle" x="192" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calc_HTC_3A</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_htc_3a_wrap&#45;&gt;interface~calc_htc_3a -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_edge2" class="edge">
+<title>proc~calc_htc_3a_wrap&#45;&gt;interface~calc_htc_3a</title>
+<path fill="none" stroke="#ff0000" d="M115.08,-24.03C123.58,-22.69 132.3,-21.3 140.65,-19.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="141.31,-23.42 150.63,-18.4 140.21,-16.51 141.31,-23.42"/>
+</g>
+<!-- proc~calc_htc_3 -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_node4" class="node">
+<title>proc~calc_htc_3</title>
+<g id="a_proc~~calc_htc_3a_wrap~~CallsGraph_node4"><a xlink:href="../proc/calc_htc_3.html" xlink:title="Calc_HTC_3">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="347.5,-66 272.5,-66 272.5,-42 347.5,-42 347.5,-66"/>
+<text text-anchor="middle" x="310" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calc_HTC_3</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_htc_3&#45;&gt;proc~calc_htc_3 -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_edge3" class="edge">
+<title>interface~calc_htc_3&#45;&gt;proc~calc_htc_3</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M229.7,-54C239.96,-54 251.26,-54 262.03,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="262.14,-57.5 272.14,-54 262.14,-50.5 262.14,-57.5"/>
+</g>
+<!-- proc~calc_htc_3a -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_node5" class="node">
+<title>proc~calc_htc_3a</title>
+<g id="a_proc~~calc_htc_3a_wrap~~CallsGraph_node5"><a xlink:href="../proc/calc_htc_3a.html" xlink:title="Calc_HTC_3A">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="351,-24 269,-24 269,0 351,0 351,-24"/>
+<text text-anchor="middle" x="310" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Calc_HTC_3A</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_htc_3a&#45;&gt;proc~calc_htc_3a -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_edge4" class="edge">
+<title>interface~calc_htc_3a&#45;&gt;proc~calc_htc_3a</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M233.25,-12C241.43,-12 250.14,-12 258.63,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="258.83,-15.5 268.83,-12 258.83,-8.5 258.83,-15.5"/>
+</g>
+<!-- calculate_ice_derivative -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_node6" class="node">
+<title>calculate_ice_derivative</title>
+<polygon fill="#777777" stroke="#777777" points="528,-24 387,-24 387,0 528,0 528,-24"/>
+<text text-anchor="middle" x="457.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calculate_ice_derivative</text>
+</g>
+<!-- proc~calc_htc_3a&#45;&gt;calculate_ice_derivative -->
+<g id="proc~~calc_htc_3a_wrap~~CallsGraph_edge5" class="edge">
+<title>proc~calc_htc_3a&#45;&gt;calculate_ice_derivative</title>
+<path fill="none" stroke="#00ffff" d="M351.14,-12C359.21,-12 367.95,-12 376.83,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="376.89,-15.5 386.89,-12 376.89,-8.5 376.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_htc_3a_wrap~~CalledByGraph Pages: 1 -->
+<svg id="proccalc_htc_3a_wrapCalledByGraph" width="483pt" height="32pt"
+ viewBox="0.00 0.00 483.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_htc_3a_wrap~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~calc_htc_3a_wrap~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 479,-28 479,4 -4,4"/>
+<!-- proc~calc_htc_3a_wrap -->
+<g id="proc~~calc_htc_3a_wrap~~CalledByGraph_node1" class="node">
+<title>proc~calc_htc_3a_wrap</title>
+<polygon fill="none" stroke="black" points="475,-24 360,-24 360,0 475,0 475,-24"/>
+<text text-anchor="middle" x="417.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Calc_HTC_3A_Wrap</text>
+</g>
+<!-- interface~calc_htc_3a_wrap -->
+<g id="proc~~calc_htc_3a_wrap~~CalledByGraph_node2" class="node">
+<title>interface~calc_htc_3a_wrap</title>
+<g id="a_proc~~calc_htc_3a_wrap~~CalledByGraph_node2"><a xlink:href="../interface/calc_htc_3a_wrap.html" xlink:title="Type_HeatCapacity_3Phase_Apparent%Calc_HTC_3A_Wrap">
+<polygon fill="#a7506f" stroke="#a7506f" points="324,-24 0,-24 0,0 324,0 324,-24"/>
+<text text-anchor="middle" x="162" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HeatCapacity_3Phase_Apparent%Calc_HTC_3A_Wrap</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_htc_3a_wrap&#45;&gt;proc~calc_htc_3a_wrap -->
+<g id="proc~~calc_htc_3a_wrap~~CalledByGraph_edge1" class="edge">
+<title>interface~calc_htc_3a_wrap&#45;&gt;proc~calc_htc_3a_wrap</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M324.26,-12C333.05,-12 341.6,-12 349.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="349.77,-15.5 359.77,-12 349.77,-8.5 349.77,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">Calc_HTC_3A_Wrap</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">NodeBelonging</span><span class="p">,</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="n">phi3</span><span class="p">,</span><span class="w"> </span><span class="n">phi4</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                     </span><span class="n">Ice</span><span class="p">,</span><span class="w"> </span><span class="n">Temperature</span><span class="p">,</span><span class="w"> </span><span class="n">Density</span><span class="p">,</span><span class="w"> </span><span class="n">Pw</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">HeatCapacity</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">Type_HeatCapacity_3Phase_Apparent</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Belonging</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">NodeBelonging</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi1</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi2</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi3</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi4</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Ice</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Temperature</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Density</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Density</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Pw</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">HeatCapacity</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Cp</span><span class="p">,</span><span class="w"> </span><span class="n">Lf</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rho_ice</span><span class="p">,</span><span class="w"> </span><span class="n">rho_water</span>
+
+<span class="w">        </span><span class="n">Cp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Calc_HTC_3</span><span class="p">(</span><span class="n">NodeBelonging</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">soil</span><span class="p">,</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">water</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">ice</span><span class="p">,</span><span class="w"> </span><span class="n">phi3</span><span class="p">)</span>
+<span class="w">        </span><span class="n">HeatCapacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Calc_HTC_3A</span><span class="p">(</span><span class="n">NodeBelonging</span><span class="p">,</span><span class="w"> </span><span class="n">Cp</span><span class="p">,</span><span class="w"> </span><span class="n">Ice</span><span class="p">,</span><span class="w"> </span><span class="n">Temperature</span><span class="p">,</span><span class="w"> </span><span class="n">Density</span><span class="p">,</span><span class="w"> </span><span class="n">Pw</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end function </span><span class="n">Calc_HTC_3A_Wrap</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

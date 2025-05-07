@@ -1,0 +1,856 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Output_Process_Observation &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Output_Process_Observation
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">58 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/Observation.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/observation.f90.html'>Observation.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_output_obaservation.html'>Inout_Output_Obaservation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Output_Process_Observation</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/output_process_observation.html#src">Output_Process_Observation</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi)  
+    <a href="../interface/output_process_observation.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Ice content</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~25"></span>
+              class(<a href='../type/type_output.html'>Type_Output</a>)
+            </td>
+<td></td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-temp"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Temp</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-si"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Si</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tc"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>TC</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-c~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>C</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pres"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Pres</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-wflux"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>wFlux</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-k"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>K</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-thermal"></span>
+              class(<a href='../type/abstract_thermal.html'>Abstract_Thermal</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Thermal</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phi~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>phi</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~output_process_observation~~CallsGraph Pages: 1 -->
+<svg id="procoutput_process_observationCallsGraph" width="641pt" height="90pt"
+ viewBox="0.00 0.00 641.00 90.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~output_process_observation~~CallsGraph" class="graph" transform="scale(0.53 0.53) rotate(0) translate(4 166.65)">
+<title>proc~~output_process_observation~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-166.65 1209,-166.65 1209,4 -4,4"/>
+<!-- proc~output_process_observation -->
+<g id="proc~~output_process_observation~~CallsGraph_node1" class="node">
+<title>proc~output_process_observation</title>
+<polygon fill="none" stroke="black" points="163,-99.65 0,-99.65 0,-75.65 163,-75.65 163,-99.65"/>
+<text text-anchor="middle" x="81.5" y="-85.25" font-family="Helvetica,sans-Serif" font-size="10.50">Output_Process_Observation</text>
+</g>
+<!-- calculate_ice -->
+<g id="proc~~output_process_observation~~CallsGraph_node2" class="node">
+<title>calculate_ice</title>
+<polygon fill="#777777" stroke="#777777" points="363.5,-162.65 281.5,-162.65 281.5,-138.65 363.5,-138.65 363.5,-162.65"/>
+<text text-anchor="middle" x="322.5" y="-148.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calculate_ice</text>
+</g>
+<!-- proc~output_process_observation&#45;&gt;calculate_ice -->
+<g id="proc~~output_process_observation~~CallsGraph_edge1" class="edge">
+<title>proc~output_process_observation&#45;&gt;calculate_ice</title>
+<path fill="none" stroke="#ff0000" d="M111.73,-99.82C135.02,-109.11 168.65,-121.65 199,-129.65 222.52,-135.86 249.08,-140.67 271.44,-144.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="270.99,-147.58 281.4,-145.6 272.02,-140.66 270.99,-147.58"/>
+</g>
+<!-- interface~initialize_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_node3" class="node">
+<title>interface~initialize_observation_header</title>
+<g id="a_proc~~output_process_observation~~CallsGraph_node3"><a xlink:href="../interface/initialize_observation_header.html" xlink:title="Type_Output%Initialize_Observation_Header">
+<polygon fill="#a7506f" stroke="#a7506f" points="446,-120.65 199,-120.65 199,-96.65 446,-96.65 446,-120.65"/>
+<text text-anchor="middle" x="322.5" y="-106.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Output%Initialize_Observation_Header</text>
+</a>
+</g>
+</g>
+<!-- proc~output_process_observation&#45;&gt;interface~initialize_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_edge2" class="edge">
+<title>proc~output_process_observation&#45;&gt;interface~initialize_observation_header</title>
+<path fill="none" stroke="#ff0000" d="M163.08,-94.73C171.36,-95.46 179.92,-96.21 188.57,-96.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="188.5,-100.48 198.77,-97.87 189.11,-93.51 188.5,-100.48"/>
+</g>
+<!-- interface~interpolate_obsvalues -->
+<g id="proc~~output_process_observation~~CallsGraph_node4" class="node">
+<title>interface~interpolate_obsvalues</title>
+<g id="a_proc~~output_process_observation~~CallsGraph_node4"><a xlink:href="../interface/interpolate_obsvalues.html" xlink:title="Type_Output%Interpolate_ObsValues">
+<polygon fill="#a7506f" stroke="#a7506f" points="425.5,-78.65 219.5,-78.65 219.5,-54.65 425.5,-54.65 425.5,-78.65"/>
+<text text-anchor="middle" x="322.5" y="-64.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Output%Interpolate_ObsValues</text>
+</a>
+</g>
+</g>
+<!-- proc~output_process_observation&#45;&gt;interface~interpolate_obsvalues -->
+<g id="proc~~output_process_observation~~CallsGraph_edge3" class="edge">
+<title>proc~output_process_observation&#45;&gt;interface~interpolate_obsvalues</title>
+<path fill="none" stroke="#ff0000" d="M163.08,-80.57C177.87,-79.27 193.54,-77.9 209.06,-76.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="209.57,-80 219.23,-75.64 208.96,-73.03 209.57,-80"/>
+</g>
+<!-- proc~output_observation_line -->
+<g id="proc~~output_process_observation~~CallsGraph_node5" class="node">
+<title>proc~output_observation_line</title>
+<g id="a_proc~~output_process_observation~~CallsGraph_node5"><a xlink:href="../proc/output_observation_line.html" xlink:title="Output_Observation_Line">
+<polygon fill="#d9534f" stroke="#d9534f" points="1106.5,-58.65 960.5,-58.65 960.5,-34.65 1106.5,-34.65 1106.5,-58.65"/>
+<text text-anchor="middle" x="1033.5" y="-44.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Output_Observation_Line</text>
+</a>
+</g>
+</g>
+<!-- proc~output_process_observation&#45;&gt;proc~output_observation_line -->
+<g id="proc~~output_process_observation~~CallsGraph_edge4" class="edge">
+<title>proc~output_process_observation&#45;&gt;proc~output_observation_line</title>
+<path fill="none" stroke="#ff0000" d="M108.68,-75.62C131.88,-65.59 166.94,-51.97 199,-45.65 513.54,16.27 600.91,6.25 920,-24.65 936.98,-26.3 955.2,-29.31 971.93,-32.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="971.63,-36.09 982.12,-34.65 973.02,-29.23 971.63,-36.09"/>
+</g>
+<!-- proc~initialize_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_node6" class="node">
+<title>proc~initialize_observation_header</title>
+<g id="a_proc~~output_process_observation~~CallsGraph_node6"><a xlink:href="../proc/initialize_observation_header.html" xlink:title="Initialize_Observation_Header">
+<polygon fill="#d9534f" stroke="#d9534f" points="654,-130.65 482,-130.65 482,-106.65 654,-106.65 654,-130.65"/>
+<text text-anchor="middle" x="568" y="-116.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Initialize_Observation_Header</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_observation_header&#45;&gt;proc~initialize_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_edge5" class="edge">
+<title>interface~initialize_observation_header&#45;&gt;proc~initialize_observation_header</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M446.32,-113.7C454.89,-114.05 463.46,-114.4 471.84,-114.75"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="471.84,-118.25 481.97,-115.16 472.13,-111.25 471.84,-118.25"/>
+</g>
+<!-- proc~interpolate_obsvalues -->
+<g id="proc~~output_process_observation~~CallsGraph_node7" class="node">
+<title>proc~interpolate_obsvalues</title>
+<g id="a_proc~~output_process_observation~~CallsGraph_node7"><a xlink:href="../proc/interpolate_obsvalues.html" xlink:title="Interpolate_ObsValues">
+<polygon fill="#d9534f" stroke="#d9534f" points="633.5,-78.65 502.5,-78.65 502.5,-54.65 633.5,-54.65 633.5,-78.65"/>
+<text text-anchor="middle" x="568" y="-64.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interpolate_ObsValues</text>
+</a>
+</g>
+</g>
+<!-- interface~interpolate_obsvalues&#45;&gt;proc~interpolate_obsvalues -->
+<g id="proc~~output_process_observation~~CallsGraph_edge6" class="edge">
+<title>interface~interpolate_obsvalues&#45;&gt;proc~interpolate_obsvalues</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M425.71,-66.65C447.97,-66.65 471.12,-66.65 492.08,-66.65"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="492.19,-70.15 502.19,-66.65 492.19,-63.15 492.19,-70.15"/>
+</g>
+<!-- to_string -->
+<g id="proc~~output_process_observation~~CallsGraph_node8" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1205,-79.65 1147,-79.65 1147,-55.65 1205,-55.65 1205,-79.65"/>
+<text text-anchor="middle" x="1176" y="-65.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~output_observation_line&#45;&gt;to_string -->
+<g id="proc~~output_process_observation~~CallsGraph_edge7" class="edge">
+<title>proc~output_observation_line&#45;&gt;to_string</title>
+<path fill="none" stroke="#7f00ff" d="M1106.81,-57.46C1117.16,-59.01 1127.46,-60.55 1136.8,-61.94"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1136.47,-65.43 1146.88,-63.45 1137.51,-58.51 1136.47,-65.43"/>
+</g>
+<!-- interface~write_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_node10" class="node">
+<title>interface~write_observation_header</title>
+<g id="a_proc~~output_process_observation~~CallsGraph_node10"><a xlink:href="../interface/write_observation_header.html" xlink:title="Type_Output%Write_Observation_Header">
+<polygon fill="#a7506f" stroke="#a7506f" points="920,-141.65 690,-141.65 690,-117.65 920,-117.65 920,-141.65"/>
+<text text-anchor="middle" x="805" y="-127.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Output%Write_Observation_Header</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_observation_header&#45;&gt;interface~write_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_edge8" class="edge">
+<title>proc~initialize_observation_header&#45;&gt;interface~write_observation_header</title>
+<path fill="none" stroke="#ff0000" d="M654.17,-122.64C662.48,-123.03 671.02,-123.43 679.61,-123.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="679.56,-127.33 689.71,-124.3 679.89,-120.34 679.56,-127.33"/>
+</g>
+<!-- getNumNodes -->
+<g id="proc~~output_process_observation~~CallsGraph_node9" class="node">
+<title>getNumNodes</title>
+<polygon fill="#777777" stroke="#777777" points="849,-99.65 761,-99.65 761,-75.65 849,-75.65 849,-99.65"/>
+<text text-anchor="middle" x="805" y="-85.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">getNumNodes</text>
+</g>
+<!-- proc~interpolate_obsvalues&#45;&gt;getNumNodes -->
+<g id="proc~~output_process_observation~~CallsGraph_edge9" class="edge">
+<title>proc~interpolate_obsvalues&#45;&gt;getNumNodes</title>
+<path fill="none" stroke="#00ff00" d="M633.53,-72.42C670.38,-75.71 716.03,-79.79 750.81,-82.9"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="750.5,-86.39 760.77,-83.79 751.12,-79.41 750.5,-86.39"/>
+</g>
+<!-- psi -->
+<g id="proc~~output_process_observation~~CallsGraph_node11" class="node">
+<title>psi</title>
+<polygon fill="#777777" stroke="#777777" points="832,-57.65 778,-57.65 778,-33.65 832,-33.65 832,-57.65"/>
+<text text-anchor="middle" x="805" y="-43.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psi</text>
+</g>
+<!-- proc~interpolate_obsvalues&#45;&gt;psi -->
+<g id="proc~~output_process_observation~~CallsGraph_edge10" class="edge">
+<title>proc~interpolate_obsvalues&#45;&gt;psi</title>
+<path fill="none" stroke="#00ff00" d="M633.53,-60.89C676.81,-57.02 732.22,-52.07 767.92,-48.88"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="768.23,-52.36 777.88,-47.99 767.61,-45.39 768.23,-52.36"/>
+</g>
+<!-- proc~write_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_node12" class="node">
+<title>proc~write_observation_header</title>
+<g id="a_proc~~output_process_observation~~CallsGraph_node12"><a xlink:href="../proc/write_observation_header.html" xlink:title="Write_Observation_Header">
+<polygon fill="#d9534f" stroke="#d9534f" points="1111,-120.65 956,-120.65 956,-96.65 1111,-96.65 1111,-120.65"/>
+<text text-anchor="middle" x="1033.5" y="-106.25" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Write_Observation_Header</text>
+</a>
+</g>
+</g>
+<!-- interface~write_observation_header&#45;&gt;proc~write_observation_header -->
+<g id="proc~~output_process_observation~~CallsGraph_edge11" class="edge">
+<title>interface~write_observation_header&#45;&gt;proc~write_observation_header</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M920.25,-119.06C928.84,-118.26 937.43,-117.47 945.82,-116.69"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="946.3,-120.16 955.93,-115.75 945.65,-113.19 946.3,-120.16"/>
+</g>
+<!-- proc~write_observation_header&#45;&gt;to_string -->
+<g id="proc~~output_process_observation~~CallsGraph_edge12" class="edge">
+<title>proc~write_observation_header&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M1075.89,-96.57C1095.24,-90.93 1118.13,-84.25 1137.03,-78.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1138.17,-82.05 1146.79,-75.89 1136.21,-75.33 1138.17,-82.05"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocoutput_process_observationCallsGraph = svgPanZoom('#procoutput_process_observationCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~output_process_observation~~CalledByGraph Pages: 1 -->
+<svg id="procoutput_process_observationCalledByGraph" width="445pt" height="32pt"
+ viewBox="0.00 0.00 445.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~output_process_observation~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~output_process_observation~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 441,-28 441,4 -4,4"/>
+<!-- proc~output_process_observation -->
+<g id="proc~~output_process_observation~~CalledByGraph_node1" class="node">
+<title>proc~output_process_observation</title>
+<polygon fill="none" stroke="black" points="437,-24 274,-24 274,0 437,0 437,-24"/>
+<text text-anchor="middle" x="355.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Output_Process_Observation</text>
+</g>
+<!-- interface~output_process_observation -->
+<g id="proc~~output_process_observation~~CalledByGraph_node2" class="node">
+<title>interface~output_process_observation</title>
+<g id="a_proc~~output_process_observation~~CalledByGraph_node2"><a xlink:href="../interface/output_process_observation.html" xlink:title="Type_Output%Output_Process_Observation">
+<polygon fill="#a7506f" stroke="#a7506f" points="238,-24 0,-24 0,0 238,0 238,-24"/>
+<text text-anchor="middle" x="119" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Output%Output_Process_Observation</text>
+</a>
+</g>
+</g>
+<!-- interface~output_process_observation&#45;&gt;proc~output_process_observation -->
+<g id="proc~~output_process_observation~~CalledByGraph_edge1" class="edge">
+<title>interface~output_process_observation&#45;&gt;proc~output_process_observation</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M238.28,-12C246.86,-12 255.43,-12 263.81,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="263.92,-15.5 273.92,-12 263.92,-8.5 263.92,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">Output_Process_Observation</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">Temp</span><span class="p">,</span><span class="w"> </span><span class="n">Si</span><span class="p">,</span><span class="w"> </span><span class="n">TC</span><span class="p">,</span><span class="w"> </span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">Pres</span><span class="p">,</span><span class="w"> </span><span class="n">wFlux</span><span class="p">,</span><span class="w"> </span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">Thermal</span><span class="p">,</span><span class="w"> </span><span class="n">phi</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">Type_Output</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">time</span>
+<span class="nb">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Temp</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Si</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">TC</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">C</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Pres</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wFlux</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">K</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Thermal</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Thermal</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">obsValues</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">NumObservation</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmpValues</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">NumObservation</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">obsValues2d</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">NumObservation</span><span class="p">)</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iObs</span>
+
+<span class="w">        </span><span class="c">!! Temperature</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">doHeat</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">Temperature</span><span class="p">%</span><span class="n">doOutput</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="nb">present</span><span class="p">(</span><span class="n">Temp</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">Initialize_Observation_Header</span><span class="p">(</span><span class="s2">&quot;Temperature&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">ObservationType</span><span class="p">)</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">Output_Observation_Line</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">Temperature</span><span class="p">%</span><span class="n">numUnit</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">Temp</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">ObsNodeID</span><span class="p">(:)))</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">Interpolate_ObsValues</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">Output_Observation_Line</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">Temperature</span><span class="p">%</span><span class="n">numUnit</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end select</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">!! Ice content</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">doHeat</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">Si</span><span class="p">%</span><span class="n">doOutput</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="nb">present</span><span class="p">(</span><span class="n">Si</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">ObservationType</span><span class="p">)</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">Output_Observation_Line</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">Si</span><span class="p">%</span><span class="n">numUnit</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">Si</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">ObsNodeID</span><span class="p">(:)))</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">                </span><span class="n">obsValues</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                </span><span class="n">tmpValues</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">Thermal</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">Temp</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    call </span><span class="n">self</span><span class="p">%</span><span class="n">Interpolate_ObsValues</span><span class="p">(</span><span class="n">Si</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+
+<span class="w">                    </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">Ice</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Thermal</span><span class="p">%</span><span class="n">Ice</span><span class="p">(</span><span class="mi">1</span><span class="p">)%</span><span class="n">f</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">Type_Ice_GCC</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">Interpolate_ObsValues</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span><span class="w"> </span><span class="n">tmpValues</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">Interpolate_ObsValues</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">do </span><span class="n">iObs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">NumObservation</span>
+<span class="w">                            </span><span class="n">obsValues</span><span class="p">(</span><span class="n">iObs</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">Calculate_Ice</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">obsValues</span><span class="p">(</span><span class="n">iObs</span><span class="p">),</span><span class="w"> </span><span class="n">phi</span><span class="o">=</span><span class="n">tmpValues</span><span class="p">(</span><span class="n">iObs</span><span class="p">))</span>
+<span class="w">                        </span><span class="k">end do</span>
+<span class="k">                    type is</span><span class="w"> </span><span class="p">(</span><span class="n">Type_Ice_EXP</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">Interpolate_ObsValues</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span><span class="w"> </span><span class="n">tmpValues</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">Interpolate_ObsValues</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">do </span><span class="n">iObs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">NumObservation</span>
+<span class="w">                            </span><span class="n">obsValues</span><span class="p">(</span><span class="n">iObs</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Ice</span><span class="p">%</span><span class="n">Calculate_Ice</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">obsValues</span><span class="p">(</span><span class="n">iObs</span><span class="p">),</span><span class="w"> </span><span class="n">phi</span><span class="o">=</span><span class="n">tmpValues</span><span class="p">(</span><span class="n">iObs</span><span class="p">))</span>
+<span class="w">                        </span><span class="k">end do</span>
+<span class="k">                    end select</span>
+<span class="w">                    </span><span class="c">! print *, obsValues(:)</span>
+<span class="w">                    </span><span class="c">! stop</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">Output_Observation_Line</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">Si</span><span class="p">%</span><span class="n">numUnit</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+<span class="w">                </span><span class="k">else</span>
+<span class="k">                    call </span><span class="n">self</span><span class="p">%</span><span class="n">Interpolate_ObsValues</span><span class="p">(</span><span class="n">Si</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">call </span><span class="n">Output_Observation_Line</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">Observation</span><span class="p">%</span><span class="n">Si</span><span class="p">%</span><span class="n">numUnit</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">obsValues</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end select</span>
+<span class="k">        end if</span>
+
+<span class="k">    end subroutine </span><span class="n">Output_Process_Observation</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

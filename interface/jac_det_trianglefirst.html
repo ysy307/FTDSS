@@ -1,0 +1,604 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Jac_Det_TriangleFirst &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Jac_Det_TriangleFirst
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">55 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/Element.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/element.f90.html'>Element.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_element.html'>Core_Element</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Jac_Det_TriangleFirst</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~jac_det_trianglefirst~~CallsGraph Pages: 1 -->
+<svg id="interfacejac_det_trianglefirstCallsGraph" width="641pt" height="43pt"
+ viewBox="0.00 0.00 641.00 42.69" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~jac_det_trianglefirst~~CallsGraph" class="graph" transform="scale(0.58 0.58) rotate(0) translate(4 70)">
+<title>interface~~jac_det_trianglefirst~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 1107,-70 1107,4 -4,4"/>
+<!-- interface~jac_det_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node1" class="node">
+<title>interface~jac_det_trianglefirst</title>
+<polygon fill="none" stroke="black" points="195,-45 0,-45 0,-21 195,-21 195,-45"/>
+<text text-anchor="middle" x="97.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">TriangleFirst%Jac_Det_TriangleFirst</text>
+</g>
+<!-- proc~jac_det_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node2" class="node">
+<title>proc~jac_det_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CallsGraph_node2"><a xlink:href="../proc/jac_det_trianglefirst.html" xlink:title="Jac_Det_TriangleFirst">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="352,-45 231,-45 231,-21 352,-21 352,-45"/>
+<text text-anchor="middle" x="291.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Jac_Det_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- interface~jac_det_trianglefirst&#45;&gt;proc~jac_det_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_edge1" class="edge">
+<title>interface~jac_det_trianglefirst&#45;&gt;proc~jac_det_trianglefirst</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M195.06,-33C203.76,-33 212.45,-33 220.85,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.93,-36.5 230.93,-33 220.93,-29.5 220.93,-36.5"/>
+</g>
+<!-- interface~jac_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node3" class="node">
+<title>interface~jac_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CallsGraph_node3"><a xlink:href="../interface/jac_trianglefirst.html" xlink:title="TriangleFirst%Jac_TriangleFirst">
+<polygon fill="#a7506f" stroke="#a7506f" points="559,-45 388,-45 388,-21 559,-21 559,-45"/>
+<text text-anchor="middle" x="473.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleFirst%Jac_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- proc~jac_det_trianglefirst&#45;&gt;interface~jac_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_edge2" class="edge">
+<title>proc~jac_det_trianglefirst&#45;&gt;interface~jac_trianglefirst</title>
+<path fill="none" stroke="#ff0000" d="M352.44,-33C360.6,-33 369.13,-33 377.72,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="377.81,-36.5 387.81,-33 377.81,-29.5 377.81,-36.5"/>
+</g>
+<!-- proc~jac_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node4" class="node">
+<title>proc~jac_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CallsGraph_node4"><a xlink:href="../proc/jac_trianglefirst.html" xlink:title="Jac_TriangleFirst">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="692,-45 595,-45 595,-21 692,-21 692,-45"/>
+<text text-anchor="middle" x="643.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Jac_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- interface~jac_trianglefirst&#45;&gt;proc~jac_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_edge3" class="edge">
+<title>interface~jac_trianglefirst&#45;&gt;proc~jac_trianglefirst</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M559.48,-33C568.07,-33 576.64,-33 584.84,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="584.99,-36.5 594.99,-33 584.99,-29.5 584.99,-36.5"/>
+</g>
+<!-- interface~dpsi_deta_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node5" class="node">
+<title>interface~dpsi_deta_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CallsGraph_node5"><a xlink:href="../interface/dpsi_deta_trianglefirst.html" xlink:title="TriangleFirst%dpsi_deta_TriangleFirst">
+<polygon fill="#a7506f" stroke="#a7506f" points="934,-66 728,-66 728,-42 934,-42 934,-66"/>
+<text text-anchor="middle" x="831" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleFirst%dpsi_deta_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- proc~jac_trianglefirst&#45;&gt;interface~dpsi_deta_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_edge4" class="edge">
+<title>proc~jac_trianglefirst&#45;&gt;interface~dpsi_deta_trianglefirst</title>
+<path fill="none" stroke="#ff0000" d="M692.27,-38.41C700.3,-39.32 708.93,-40.29 717.81,-41.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="717.59,-44.8 727.92,-42.44 718.37,-37.84 717.59,-44.8"/>
+</g>
+<!-- interface~dpsi_dxi_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node6" class="node">
+<title>interface~dpsi_dxi_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CallsGraph_node6"><a xlink:href="../interface/dpsi_dxi_trianglefirst.html" xlink:title="TriangleFirst%dpsi_dxi_TriangleFirst">
+<polygon fill="#a7506f" stroke="#a7506f" points="930,-24 732,-24 732,0 930,0 930,-24"/>
+<text text-anchor="middle" x="831" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleFirst%dpsi_dxi_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- proc~jac_trianglefirst&#45;&gt;interface~dpsi_dxi_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_edge5" class="edge">
+<title>proc~jac_trianglefirst&#45;&gt;interface~dpsi_dxi_trianglefirst</title>
+<path fill="none" stroke="#ff0000" d="M692.27,-27.59C701.54,-26.54 711.61,-25.4 721.94,-24.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="722.36,-27.71 731.9,-23.11 721.57,-20.75 722.36,-27.71"/>
+</g>
+<!-- proc~dpsi_deta_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node7" class="node">
+<title>proc~dpsi_deta_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CallsGraph_node7"><a xlink:href="../proc/dpsi_deta_trianglefirst.html" xlink:title="dpsi_deta_TriangleFirst">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1103,-66 970,-66 970,-42 1103,-42 1103,-66"/>
+<text text-anchor="middle" x="1036.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dpsi_deta_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- interface~dpsi_deta_trianglefirst&#45;&gt;proc~dpsi_deta_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_edge6" class="edge">
+<title>interface~dpsi_deta_trianglefirst&#45;&gt;proc~dpsi_deta_trianglefirst</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M934.05,-54C942.72,-54 951.39,-54 959.8,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="959.92,-57.5 969.92,-54 959.92,-50.5 959.92,-57.5"/>
+</g>
+<!-- proc~dpsi_dxi_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_node8" class="node">
+<title>proc~dpsi_dxi_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CallsGraph_node8"><a xlink:href="../proc/dpsi_dxi_trianglefirst.html" xlink:title="dpsi_dxi_TriangleFirst">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1098.5,-24 974.5,-24 974.5,0 1098.5,0 1098.5,-24"/>
+<text text-anchor="middle" x="1036.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dpsi_dxi_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- interface~dpsi_dxi_trianglefirst&#45;&gt;proc~dpsi_dxi_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CallsGraph_edge7" class="edge">
+<title>interface~dpsi_dxi_trianglefirst&#45;&gt;proc~dpsi_dxi_trianglefirst</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M930.17,-12C941.57,-12 953.03,-12 963.98,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="964.3,-15.5 974.3,-12 964.3,-8.5 964.3,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacejac_det_trianglefirstCallsGraph = svgPanZoom('#interfacejac_det_trianglefirstCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~jac_det_trianglefirst~~CalledByGraph Pages: 1 -->
+<svg id="interfacejac_det_trianglefirstCalledByGraph" width="558pt" height="32pt"
+ viewBox="0.00 0.00 558.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~jac_det_trianglefirst~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~jac_det_trianglefirst~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 554,-28 554,4 -4,4"/>
+<!-- interface~jac_det_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CalledByGraph_node1" class="node">
+<title>interface~jac_det_trianglefirst</title>
+<polygon fill="none" stroke="black" points="550,-24 355,-24 355,0 550,0 550,-24"/>
+<text text-anchor="middle" x="452.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">TriangleFirst%Jac_Det_TriangleFirst</text>
+</g>
+<!-- proc~is_in_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CalledByGraph_node2" class="node">
+<title>proc~is_in_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CalledByGraph_node2"><a xlink:href="../proc/is_in_trianglefirst.html" xlink:title="is_in_TriangleFirst">
+<polygon fill="#d9534f" stroke="#d9534f" points="319,-24 214,-24 214,0 319,0 319,-24"/>
+<text text-anchor="middle" x="266.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_in_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- proc~is_in_trianglefirst&#45;&gt;interface~jac_det_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CalledByGraph_edge1" class="edge">
+<title>proc~is_in_trianglefirst&#45;&gt;interface~jac_det_trianglefirst</title>
+<path fill="none" stroke="#ff0000" d="M319.24,-12C327.35,-12 335.98,-12 344.8,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="344.81,-15.5 354.81,-12 344.81,-8.5 344.81,-15.5"/>
+</g>
+<!-- interface~is_in_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CalledByGraph_node3" class="node">
+<title>interface~is_in_trianglefirst</title>
+<g id="a_interface~~jac_det_trianglefirst~~CalledByGraph_node3"><a xlink:href="../interface/is_in_trianglefirst.html" xlink:title="TriangleFirst%is_in_TriangleFirst">
+<polygon fill="#a7506f" stroke="#a7506f" points="178,-24 0,-24 0,0 178,0 178,-24"/>
+<text text-anchor="middle" x="89" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleFirst%is_in_TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- interface~is_in_trianglefirst&#45;&gt;proc~is_in_trianglefirst -->
+<g id="interface~~jac_det_trianglefirst~~CalledByGraph_edge2" class="edge">
+<title>interface~is_in_trianglefirst&#45;&gt;proc~is_in_trianglefirst</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M178.01,-12C186.76,-12 195.52,-12 203.92,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="203.96,-15.5 213.96,-12 203.96,-8.5 203.96,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module function Jac_Det_TriangleFirst(self, xi, eta) result(J_Det)  
+    <a href="../proc/jac_det_trianglefirst.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~258"></span>
+              class(<a href='../type/trianglefirst.html'>TriangleFirst</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xi~33"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>xi</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-eta~28"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>eta</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value <span class="anchor" id="variable-j_det~5"></span><small>real(kind=real64)</small></h3>
+    
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1318 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>TriangleFirst_Construct &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>TriangleFirst_Construct
+      <small>Module Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">31 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/Element_TriangleFirst.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/element_trianglefirst.f90.html'>Element_TriangleFirst.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_element_trianglefirst.html'>Core_Element_TriangleFirst</a></li>
+            <li class="breadcrumb-item active" aria-current="page">TriangleFirst_Construct</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/trianglefirst_construct.html#src">TriangleFirst_Construct</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)  
+    <a href="../interface/trianglefirst_construct.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ielem~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iElem</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-global_coordinate~5"></span>
+              type(<a href='../type/dp3d.html'>DP3d</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>Global_Coordinate</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-connectivity~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Connectivity</strong>(3)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-structure~14"></span>
+          class(<a href='../type/abstract_elementtype.html'>Abstract_ElementType</a>), allocatable
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~trianglefirst_construct~~CallsGraph Pages: 1 -->
+<svg id="proctrianglefirst_constructCallsGraph" width="641pt" height="1422pt"
+ viewBox="0.00 0.00 641.00 1422.28" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~trianglefirst_construct~~CallsGraph" class="graph" transform="scale(0.97 0.97) rotate(0) translate(4 1456)">
+<title>proc~~trianglefirst_construct~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1456 654,-1456 654,4 -4,4"/>
+<!-- proc~trianglefirst_construct -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node1" class="node">
+<title>proc~trianglefirst_construct</title>
+<polygon fill="none" stroke="black" points="133,-738 0,-738 0,-714 133,-714 133,-738"/>
+<text text-anchor="middle" x="66.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50">TriangleFirst_Construct</text>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node2" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node2"><a xlink:href="../interface/allocate_array.html" xlink:title="Allocate_Array">
+<polygon fill="#a7506f" stroke="#a7506f" points="260,-738 169,-738 169,-714 260,-714 260,-738"/>
+<text text-anchor="middle" x="214.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Array</text>
+</a>
+</g>
+</g>
+<!-- proc~trianglefirst_construct&#45;&gt;interface~allocate_array -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge1" class="edge">
+<title>proc~trianglefirst_construct&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M133.24,-726C141.65,-726 150.19,-726 158.4,-726"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.6,-729.5 168.6,-726 158.6,-722.5 158.6,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node3" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node3"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="Allocate_Rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="472.5,-1452 345.5,-1452 345.5,-1428 472.5,-1428 472.5,-1452"/>
+<text text-anchor="middle" x="409" y="-1437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge2" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.06,-738.17C220.2,-826.49 247.47,-1366.96 296,-1419 306.4,-1430.16 320.7,-1436.5 335.6,-1439.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="334.98,-1443.35 345.45,-1441.75 336.26,-1436.47 334.98,-1443.35"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node4" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node4"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="Allocate_Rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="472.5,-1410 345.5,-1410 345.5,-1386 472.5,-1386 472.5,-1410"/>
+<text text-anchor="middle" x="409" y="-1395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge3" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.16,-738.25C220.84,-823.66 250.33,-1328.4 296,-1377 306.29,-1387.95 320.34,-1394.25 335,-1397.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="334.74,-1401.21 345.22,-1399.65 336.05,-1394.34 334.74,-1401.21"/>
+</g>
+<!-- proc~allocate_rank1_int32_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node5" class="node">
+<title>proc~allocate_rank1_int32_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node5"><a xlink:href="../proc/allocate_rank1_int32_pointer.html" xlink:title="Allocate_Rank1_int32_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="493.5,-1368 324.5,-1368 324.5,-1344 493.5,-1344 493.5,-1368"/>
+<text text-anchor="middle" x="409" y="-1353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge4" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.25,-738.18C213.95,-816.15 210.73,-1245 296,-1335 301.33,-1340.63 307.66,-1345.02 314.54,-1348.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.67,-1351.86 324.24,-1352.5 316.37,-1345.41 313.67,-1351.86"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node6" class="node">
+<title>proc~allocate_rank1_int32_specify</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node6"><a xlink:href="../proc/allocate_rank1_int32_specify.html" xlink:title="Allocate_Rank1_int32_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="493.5,-1326 324.5,-1326 324.5,-1302 493.5,-1302 493.5,-1326"/>
+<text text-anchor="middle" x="409" y="-1311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge5" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.38,-738.3C214.94,-813.42 216.45,-1209.84 296,-1293 301.48,-1298.73 307.99,-1303.18 315.07,-1306.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.74,-1309.85 324.32,-1310.43 316.41,-1303.38 313.74,-1309.85"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node7" class="node">
+<title>proc~allocate_rank1_int32_specify_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node7"><a xlink:href="../proc/allocate_rank1_int32_specify_pointer.html" xlink:title="Allocate_Rank1_int32_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="515,-1284 303,-1284 303,-1260 515,-1260 515,-1284"/>
+<text text-anchor="middle" x="409" y="-1269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int32_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.54,-738.32C216.02,-810.16 222.11,-1174.62 296,-1251 296.93,-1251.96 297.89,-1252.88 298.87,-1253.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="296.84,-1256.62 306.9,-1259.93 301.09,-1251.07 296.84,-1256.62"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node8" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node8"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="Allocate_Rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="472.5,-1242 345.5,-1242 345.5,-1218 472.5,-1218 472.5,-1242"/>
+<text text-anchor="middle" x="409" y="-1227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.71,-738.22C217.17,-806.4 227.72,-1139.33 296,-1209 306.46,-1219.68 320.51,-1225.88 335.11,-1229.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="334.78,-1232.82 345.27,-1231.28 336.11,-1225.95 334.78,-1232.82"/>
+</g>
+<!-- proc~allocate_rank1_int64_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_int64_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_int64_pointer.html" xlink:title="Allocate_Rank1_int64_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="493.5,-1200 324.5,-1200 324.5,-1176 493.5,-1176 493.5,-1200"/>
+<text text-anchor="middle" x="409" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.93,-738.42C218.46,-803.44 233.41,-1104.11 296,-1167 301.42,-1172.45 307.78,-1176.72 314.65,-1180.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.74,-1183.47 324.32,-1184.05 316.41,-1177 313.74,-1183.47"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_int64_specify</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_int64_specify.html" xlink:title="Allocate_Rank1_int64_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="493.5,-1158 324.5,-1158 324.5,-1134 493.5,-1134 493.5,-1158"/>
+<text text-anchor="middle" x="409" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.17,-738.03C219.77,-798.52 238.9,-1068.68 296,-1125 301.47,-1130.4 307.86,-1134.64 314.76,-1137.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.88,-1141.37 324.46,-1141.92 316.53,-1134.89 313.88,-1141.37"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_int64_specify_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_int64_specify_pointer.html" xlink:title="Allocate_Rank1_int64_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="515,-1116 303,-1116 303,-1092 515,-1092 515,-1116"/>
+<text text-anchor="middle" x="409" y="-1101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int64_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.49,-738.25C221.35,-795.21 244.55,-1033.39 296,-1083 297.11,-1084.07 298.26,-1085.1 299.44,-1086.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="297.51,-1089.01 307.69,-1091.95 301.57,-1083.3 297.51,-1089.01"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="Allocate_Rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="469,-1074 349,-1074 349,-1050 469,-1050 469,-1074"/>
+<text text-anchor="middle" x="409" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.88,-738.21C223.08,-790.88 250.08,-997.96 296,-1041 307.6,-1051.88 322.97,-1057.99 338.58,-1061.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="338.39,-1064.78 348.84,-1063.03 339.58,-1057.88 338.39,-1064.78"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="Allocate_Rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="480,-1032 338,-1032 338,-1008 480,-1008 480,-1032"/>
+<text text-anchor="middle" x="409" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215,-738.07C213.92,-780.94 216.43,-927.12 296,-999 305,-1007.13 316.12,-1012.57 327.82,-1016.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="327.2,-1019.6 337.75,-1018.73 328.96,-1012.83 327.2,-1019.6"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="Allocate_Rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="480,-990 338,-990 338,-966 480,-966 480,-990"/>
+<text text-anchor="middle" x="409" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.74,-738.1C217.19,-776.7 227.26,-897.87 296,-957 305.14,-964.86 316.27,-970.17 327.94,-973.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="327.27,-977.14 337.82,-976.26 329.02,-970.36 327.27,-977.14"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="Allocate_Rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="480,-948 338,-948 338,-924 480,-924 480,-948"/>
+<text text-anchor="middle" x="409" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.77,-738.05C221.01,-771.89 237.89,-868.32 296,-915 305.28,-922.45 316.38,-927.56 327.94,-931.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="327.16,-934.43 337.72,-933.55 328.92,-927.66 327.16,-934.43"/>
+</g>
+<!-- proc~allocate_rank1_logical_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank1_logical_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank1_logical_pointer.html" xlink:title="Allocate_Rank1_logical_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="498,-906 320,-906 320,-882 498,-882 498,-906"/>
+<text text-anchor="middle" x="409" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M218.38,-738.26C225.81,-766.92 248.42,-838.49 296,-873 300.5,-876.27 305.37,-879.07 310.46,-881.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="309.27,-884.77 319.85,-885.37 311.96,-878.3 309.27,-884.77"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank1_logical_specify</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank1_logical_specify.html" xlink:title="Allocate_Rank1_logical_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="498,-864 320,-864 320,-840 498,-840 498,-864"/>
+<text text-anchor="middle" x="409" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M221.03,-738.08C231.93,-760.39 258.43,-807.91 296,-831 300.47,-833.75 305.21,-836.15 310.13,-838.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="309.17,-841.63 319.76,-841.93 311.66,-835.09 309.17,-841.63"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank1_logical_specify_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank1_logical_specify_pointer.html" xlink:title="Allocate_Rank1_logical_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="519,-822 299,-822 299,-798 519,-798 519,-822"/>
+<text text-anchor="middle" x="409" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_logical_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M227.09,-738.09C241.72,-752.59 268.35,-776.5 296,-789 300.78,-791.16 305.77,-793.1 310.87,-794.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="310.22,-798.3 320.81,-797.94 312.31,-791.62 310.22,-798.3"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="Allocate_Rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="479,-780 339,-780 339,-756 479,-756 479,-780"/>
+<text text-anchor="middle" x="409" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M259.23,-738C271.12,-741.1 284.02,-744.32 296,-747 306.9,-749.44 318.44,-751.83 329.81,-754.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="329.25,-757.52 339.73,-755.99 330.58,-750.65 329.25,-757.52"/>
+</g>
+<!-- proc~allocate_rank1_real128_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank1_real128_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank1_real128_pointer.html" xlink:title="Allocate_Rank1_real128_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="500.5,-738 317.5,-738 317.5,-714 500.5,-714 500.5,-738"/>
+<text text-anchor="middle" x="409" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M260.15,-726C274.31,-726 290.59,-726 307.06,-726"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="307.32,-729.5 317.32,-726 307.32,-722.5 307.32,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank1_real128_specify</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank1_real128_specify.html" xlink:title="Allocate_Rank1_real128_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="500.5,-696 317.5,-696 317.5,-672 500.5,-672 500.5,-696"/>
+<text text-anchor="middle" x="409" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M259.23,-714C271.12,-710.9 284.02,-707.68 296,-705 306.9,-702.56 318.44,-700.17 329.81,-697.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="330.58,-701.35 339.73,-696.01 329.25,-694.48 330.58,-701.35"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank1_real128_specify_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank1_real128_specify_pointer.html" xlink:title="Allocate_Rank1_real128_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="522,-654 296,-654 296,-630 522,-630 522,-654"/>
+<text text-anchor="middle" x="409" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real128_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M227.09,-713.91C241.72,-699.41 268.35,-675.5 296,-663 300.78,-660.84 305.77,-658.9 310.87,-657.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="312.31,-660.38 320.81,-654.06 310.22,-653.7 312.31,-660.38"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="Allocate_Rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="475.5,-612 342.5,-612 342.5,-588 475.5,-588 475.5,-612"/>
+<text text-anchor="middle" x="409" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M221.03,-713.92C231.93,-691.61 258.43,-644.09 296,-621 307.01,-614.23 319.7,-609.55 332.49,-606.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="333.27,-609.74 342.27,-604.15 331.74,-602.91 333.27,-609.74"/>
+</g>
+<!-- proc~allocate_rank1_real32_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank1_real32_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank1_real32_pointer.html" xlink:title="Allocate_Rank1_real32_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="497,-570 321,-570 321,-546 497,-546 497,-570"/>
+<text text-anchor="middle" x="409" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge23" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M218.38,-713.74C225.81,-685.08 248.42,-613.51 296,-579 300.82,-575.5 306.06,-572.54 311.55,-570.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.02,-573.21 320.99,-566.22 310.41,-566.71 313.02,-573.21"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node25" class="node">
+<title>proc~allocate_rank1_real32_specify</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node25"><a xlink:href="../proc/allocate_rank1_real32_specify.html" xlink:title="Allocate_Rank1_real32_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="497,-528 321,-528 321,-504 497,-504 497,-528"/>
+<text text-anchor="middle" x="409" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge24" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.77,-713.95C221.01,-680.11 237.89,-583.68 296,-537 300.74,-533.19 305.96,-529.99 311.47,-527.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.15,-530.41 321,-523.28 310.42,-523.96 313.15,-530.41"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node26" class="node">
+<title>proc~allocate_rank1_real32_specify_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node26"><a xlink:href="../proc/allocate_rank1_real32_specify_pointer.html" xlink:title="Allocate_Rank1_real32_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="518.5,-486 299.5,-486 299.5,-462 518.5,-462 518.5,-486"/>
+<text text-anchor="middle" x="409" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real32_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge25" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.74,-713.9C217.19,-675.3 227.26,-554.13 296,-495 297.37,-493.82 298.78,-492.71 300.23,-491.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="302.36,-494.44 308.93,-486.13 298.61,-488.52 302.36,-494.44"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node27" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node27"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="Allocate_Rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="475.5,-444 342.5,-444 342.5,-420 475.5,-420 475.5,-444"/>
+<text text-anchor="middle" x="409" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge26" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215,-713.93C213.92,-671.06 216.43,-524.88 296,-453 306.22,-443.77 319.16,-438.01 332.59,-434.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="333.41,-437.91 342.42,-432.34 331.9,-431.07 333.41,-437.91"/>
+</g>
+<!-- proc~allocate_rank1_real64_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node28" class="node">
+<title>proc~allocate_rank1_real64_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node28"><a xlink:href="../proc/allocate_rank1_real64_pointer.html" xlink:title="Allocate_Rank1_real64_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="497,-402 321,-402 321,-378 497,-378 497,-402"/>
+<text text-anchor="middle" x="409" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge27" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.88,-713.79C223.08,-661.12 250.08,-454.04 296,-411 300.69,-406.61 305.99,-402.99 311.68,-400.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.21,-403.17 320.89,-395.88 310.34,-396.79 313.21,-403.17"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node29" class="node">
+<title>proc~allocate_rank1_real64_specify</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node29"><a xlink:href="../proc/allocate_rank1_real64_specify.html" xlink:title="Allocate_Rank1_real64_specify">
+<polygon fill="#d9534f" stroke="#d9534f" points="497,-360 321,-360 321,-336 497,-336 497,-360"/>
+<text text-anchor="middle" x="409" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_specify</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge28" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.49,-713.75C221.35,-656.79 244.55,-418.61 296,-369 300.67,-364.49 305.99,-360.8 311.7,-357.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="313.32,-360.89 320.98,-353.57 310.43,-354.51 313.32,-360.89"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node30" class="node">
+<title>proc~allocate_rank1_real64_specify_pointer</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node30"><a xlink:href="../proc/allocate_rank1_real64_specify_pointer.html" xlink:title="Allocate_Rank1_real64_specify_Pointer">
+<polygon fill="#d9534f" stroke="#d9534f" points="518.5,-318 299.5,-318 299.5,-294 518.5,-294 518.5,-318"/>
+<text text-anchor="middle" x="409" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank1_real64_specify_Pointer</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify_pointer -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge29" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64_specify_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.17,-713.97C219.77,-653.48 238.9,-383.32 296,-327 296.97,-326.04 297.97,-325.12 299,-324.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="301.35,-326.85 307.35,-318.11 297.21,-321.2 301.35,-326.85"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node31" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node31"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="Allocate_Rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="472.5,-276 345.5,-276 345.5,-252 472.5,-252 472.5,-276"/>
+<text text-anchor="middle" x="409" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge30" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.93,-713.58C218.46,-648.56 233.41,-347.89 296,-285 306.54,-274.4 320.62,-268.23 335.23,-264.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="336.23,-268.17 345.39,-262.84 334.91,-261.3 336.23,-268.17"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node32" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node32"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="Allocate_Rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="472.5,-234 345.5,-234 345.5,-210 472.5,-210 472.5,-234"/>
+<text text-anchor="middle" x="409" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge31" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.71,-713.78C217.17,-645.6 227.72,-312.67 296,-243 306.46,-232.32 320.51,-226.12 335.11,-222.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="336.11,-226.05 345.27,-220.72 334.78,-219.18 336.11,-226.05"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node33" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node33"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="Allocate_Rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="472.5,-192 345.5,-192 345.5,-168 472.5,-168 472.5,-192"/>
+<text text-anchor="middle" x="409" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge32" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.54,-713.68C216.02,-641.84 222.11,-277.38 296,-201 306.45,-190.2 320.56,-183.96 335.24,-180.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="336.29,-183.89 345.45,-178.57 334.97,-177.01 336.29,-183.89"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node34" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node34"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="Allocate_Rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="469,-150 349,-150 349,-126 469,-126 469,-150"/>
+<text text-anchor="middle" x="409" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge33" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.38,-713.7C214.94,-638.58 216.45,-242.16 296,-159 307.27,-147.22 322.89,-140.85 338.89,-137.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="339.55,-141.06 348.86,-136 338.43,-134.15 339.55,-141.06"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node35" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node35"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="Allocate_Rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="479,-108 339,-108 339,-84 479,-84 479,-108"/>
+<text text-anchor="middle" x="409" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge34" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M215.25,-713.82C213.95,-635.85 210.73,-207 296,-117 304.86,-107.65 316.45,-101.7 328.82,-98.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="330,-101.33 338.87,-95.54 328.32,-94.54 330,-101.33"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node36" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node36"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="Allocate_Rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="475.5,-66 342.5,-66 342.5,-42 475.5,-42 475.5,-66"/>
+<text text-anchor="middle" x="409" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge35" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.16,-713.75C220.84,-628.34 250.33,-123.6 296,-75 305.65,-64.73 318.59,-58.55 332.26,-54.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="333.26,-58.34 342.3,-52.82 331.79,-51.5 333.26,-58.34"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node37" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node37"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="Allocate_Rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="475.5,-24 342.5,-24 342.5,0 475.5,0 475.5,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Allocate_Rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge36" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M216.06,-713.83C220.2,-625.51 247.47,-85.04 296,-33 305.61,-22.7 318.54,-16.5 332.2,-12.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="333.2,-16.29 342.24,-10.76 331.72,-9.45 333.2,-16.29"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_node38" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~trianglefirst_construct~~CallsGraph_node38"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="650,-738 558,-738 558,-714 650,-714 650,-738"/>
+<text text-anchor="middle" x="604" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge37" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M472.54,-1441.75C490.84,-1439.04 509.31,-1432.6 522,-1419 568.94,-1368.7 596.36,-861.85 601.94,-748.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="605.45,-748.33 602.43,-738.17 598.45,-747.99 605.45,-748.33"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge38" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff2b00" d="M472.78,-1399.65C490.97,-1396.91 509.33,-1390.48 522,-1377 566.13,-1330.07 595.52,-857.63 601.76,-748.44"/>
+<polygon fill="#ff2b00" stroke="#ff2b00" points="605.27,-748.43 602.33,-738.25 598.28,-748.03 605.27,-748.43"/>
+</g>
+<!-- proc~allocate_rank1_int32_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge39" class="edge">
+<title>proc~allocate_rank1_int32_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff5700" d="M493.75,-1352.49C504.38,-1348.76 514.24,-1343.18 522,-1335 604.15,-1248.37 604.56,-847.52 603.37,-748.27"/>
+<polygon fill="#ff5700" stroke="#ff5700" points="606.87,-748.13 603.23,-738.18 599.87,-748.23 606.87,-748.13"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge40" class="edge">
+<title>proc~allocate_rank1_int32_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff8300" d="M493.68,-1310.42C504.32,-1306.7 514.2,-1301.15 522,-1293 598.49,-1213.11 603.21,-843.92 603.13,-748.54"/>
+<polygon fill="#ff8300" stroke="#ff8300" points="606.63,-748.29 603.1,-738.3 599.63,-748.31 606.63,-748.29"/>
+</g>
+<!-- proc~allocate_rank1_int32_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge41" class="edge">
+<title>proc~allocate_rank1_int32_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffae00" d="M511.09,-1259.92C515.03,-1257.37 518.7,-1254.41 522,-1251 592.97,-1177.7 601.77,-838.89 602.85,-748.32"/>
+<polygon fill="#ffae00" stroke="#ffae00" points="606.35,-748.35 602.95,-738.32 599.35,-748.28 606.35,-748.35"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge42" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffda00" d="M472.73,-1231.27C490.81,-1228.5 509.12,-1222.13 522,-1209 587.39,-1142.34 600.2,-834.53 602.52,-748.43"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="606.02,-748.3 602.77,-738.22 599.03,-748.13 606.02,-748.3"/>
+</g>
+<!-- proc~allocate_rank1_int64_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge43" class="edge">
+<title>proc~allocate_rank1_int64_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f7ff00" d="M493.67,-1184.04C504.25,-1180.36 514.11,-1174.92 522,-1167 581.82,-1106.96 598.48,-829.98 602.12,-748.56"/>
+<polygon fill="#f7ff00" stroke="#f7ff00" points="605.63,-748.56 602.55,-738.42 598.63,-748.26 605.63,-748.56"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge44" class="edge">
+<title>proc~allocate_rank1_int64_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cbff00" d="M493.53,-1141.91C504.13,-1138.25 514.04,-1132.84 522,-1125 576.36,-1071.45 596.64,-824.4 601.66,-748.34"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="605.18,-748.23 602.32,-738.03 598.19,-747.79 605.18,-748.23"/>
+</g>
+<!-- proc~allocate_rank1_int64_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge45" class="edge">
+<title>proc~allocate_rank1_int64_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a0ff00" d="M510.3,-1091.94C514.5,-1089.39 518.44,-1086.43 522,-1083 570.89,-1035.92 594.58,-818.92 601.09,-748.29"/>
+<polygon fill="#a0ff00" stroke="#a0ff00" points="604.58,-748.53 601.99,-738.26 597.61,-747.9 604.58,-748.53"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge46" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#74ff00" d="M469.15,-1063.01C488.11,-1060.43 507.84,-1054.25 522,-1041 565.46,-1000.33 592.27,-813.05 600.38,-748.18"/>
+<polygon fill="#74ff00" stroke="#74ff00" points="603.86,-748.56 601.6,-738.21 596.91,-747.71 603.86,-748.56"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge47" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#48ff00" d="M480.23,-1018.71C495.48,-1015.4 510.47,-1009.4 522,-999 596.22,-932.06 603.73,-800.59 603.61,-748.26"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="607.1,-748.03 603.48,-738.07 600.11,-748.12 607.1,-748.03"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge48" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1dff00" d="M480.16,-976.24C495.32,-972.93 510.29,-967.05 522,-957 585.6,-902.4 599.28,-794.81 602.21,-748.3"/>
+<polygon fill="#1dff00" stroke="#1dff00" points="605.71,-748.27 602.74,-738.1 598.72,-747.9 605.71,-748.27"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge49" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff0e" d="M480.26,-933.53C495.24,-930.22 510.11,-924.53 522,-915 575.22,-872.35 594.12,-788.1 600.28,-748.09"/>
+<polygon fill="#00ff0e" stroke="#00ff0e" points="603.77,-748.45 601.7,-738.05 596.83,-747.47 603.77,-748.45"/>
+</g>
+<!-- proc~allocate_rank1_logical_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge50" class="edge">
+<title>proc~allocate_rank1_logical_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff3a" d="M498.13,-885.35C506.65,-882.25 514.79,-878.22 522,-873 564.85,-842 587.65,-781.08 597.3,-748.24"/>
+<polygon fill="#00ff3a" stroke="#00ff3a" points="600.76,-748.83 600.07,-738.26 594.02,-746.95 600.76,-748.83"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge51" class="edge">
+<title>proc~allocate_rank1_logical_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff66" d="M498.23,-841.9C506.58,-839.07 514.66,-835.49 522,-831 555.13,-810.71 579.78,-771.54 592.73,-747.21"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="595.96,-748.57 597.41,-738.08 589.74,-745.38 595.96,-748.57"/>
+</g>
+<!-- proc~allocate_rank1_logical_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge52" class="edge">
+<title>proc~allocate_rank1_logical_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff91" d="M497.18,-797.92C505.74,-795.47 514.15,-792.53 522,-789 545.65,-778.35 568.61,-759.43 584,-745.1"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="586.52,-747.53 591.33,-738.09 581.68,-742.47 586.52,-747.53"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge53" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffbd" d="M478.26,-755.97C492.74,-753.2 507.9,-750.14 522,-747 530.65,-745.07 539.78,-742.87 548.67,-740.63"/>
+<polygon fill="#00ffbd" stroke="#00ffbd" points="549.75,-743.97 558.57,-738.1 548.01,-737.19 549.75,-743.97"/>
+</g>
+<!-- proc~allocate_rank1_real128_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge54" class="edge">
+<title>proc~allocate_rank1_real128_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffe9" d="M500.57,-726C516.56,-726 532.78,-726 547.45,-726"/>
+<polygon fill="#00ffe9" stroke="#00ffe9" points="547.83,-729.5 557.83,-726 547.83,-722.5 547.83,-729.5"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge55" class="edge">
+<title>proc~allocate_rank1_real128_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00e9ff" d="M478.26,-696.03C492.74,-698.8 507.9,-701.86 522,-705 530.65,-706.93 539.78,-709.13 548.67,-711.37"/>
+<polygon fill="#00e9ff" stroke="#00e9ff" points="548.01,-714.81 558.57,-713.9 549.75,-708.03 548.01,-714.81"/>
+</g>
+<!-- proc~allocate_rank1_real128_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge56" class="edge">
+<title>proc~allocate_rank1_real128_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00bdff" d="M497.18,-654.08C505.74,-656.53 514.15,-659.47 522,-663 545.65,-673.65 568.61,-692.57 584,-706.9"/>
+<polygon fill="#00bdff" stroke="#00bdff" points="581.68,-709.53 591.33,-713.91 586.52,-704.47 581.68,-709.53"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge57" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0091ff" d="M475.72,-604.17C491.7,-607.33 508.17,-612.53 522,-621 555.13,-641.29 579.78,-680.46 592.73,-704.79"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="589.74,-706.62 597.41,-713.92 595.96,-703.43 589.74,-706.62"/>
+</g>
+<!-- proc~allocate_rank1_real32_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge58" class="edge">
+<title>proc~allocate_rank1_real32_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0066ff" d="M497.28,-566.34C506.11,-569.48 514.55,-573.61 522,-579 564.85,-610 587.65,-670.92 597.3,-703.76"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="594.02,-705.05 600.07,-713.74 600.76,-703.17 594.02,-705.05"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge59" class="edge">
+<title>proc~allocate_rank1_real32_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#003aff" d="M497.27,-523.4C506.2,-526.7 514.67,-531.12 522,-537 575.22,-579.65 594.12,-663.9 600.28,-703.91"/>
+<polygon fill="#003aff" stroke="#003aff" points="596.83,-704.53 601.7,-713.95 603.77,-703.55 596.83,-704.53"/>
+</g>
+<!-- proc~allocate_rank1_real32_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge60" class="edge">
+<title>proc~allocate_rank1_real32_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#000eff" d="M509.06,-486.14C513.67,-488.65 518.02,-491.58 522,-495 585.6,-549.6 599.28,-657.19 602.21,-703.7"/>
+<polygon fill="#000eff" stroke="#000eff" points="598.72,-704.1 602.74,-713.9 605.71,-703.73 598.72,-704.1"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge61" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1d00ff" d="M475.57,-432.35C492.39,-435.43 509.29,-441.54 522,-453 596.22,-519.94 603.73,-651.41 603.61,-703.74"/>
+<polygon fill="#1d00ff" stroke="#1d00ff" points="600.11,-703.88 603.48,-713.93 607.1,-703.97 600.11,-703.88"/>
+</g>
+<!-- proc~allocate_rank1_real64_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge62" class="edge">
+<title>proc~allocate_rank1_real64_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#4800ff" d="M497.1,-395.89C506.28,-399.42 514.85,-404.31 522,-411 565.46,-451.67 592.27,-638.95 600.38,-703.82"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="596.91,-704.29 601.6,-713.79 603.86,-703.44 596.91,-704.29"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge63" class="edge">
+<title>proc~allocate_rank1_real64_specify&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7400ff" d="M497.01,-353.58C506.26,-357.16 514.87,-362.14 522,-369 570.89,-416.08 594.58,-633.08 601.09,-703.71"/>
+<polygon fill="#7400ff" stroke="#7400ff" points="597.61,-704.1 601.99,-713.74 604.58,-703.47 597.61,-704.1"/>
+</g>
+<!-- proc~allocate_rank1_real64_specify_pointer&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge64" class="edge">
+<title>proc~allocate_rank1_real64_specify_pointer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a000ff" d="M510.65,-318.11C514.73,-320.66 518.55,-323.6 522,-327 576.36,-380.55 596.64,-627.6 601.66,-703.66"/>
+<polygon fill="#a000ff" stroke="#a000ff" points="598.19,-704.21 602.32,-713.97 605.18,-703.77 598.19,-704.21"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge65" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cc00ff" d="M472.6,-262.85C490.68,-265.63 509.01,-271.97 522,-285 581.82,-345.04 598.48,-622.02 602.12,-703.44"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="598.63,-703.74 602.55,-713.58 605.63,-703.44 598.63,-703.74"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge66" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f700ff" d="M472.73,-220.73C490.81,-223.5 509.12,-229.87 522,-243 587.39,-309.66 600.2,-617.47 602.52,-703.57"/>
+<polygon fill="#f700ff" stroke="#f700ff" points="599.03,-703.87 602.77,-713.78 606.02,-703.7 599.03,-703.87"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge67" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00da" d="M472.54,-178.58C490.72,-181.33 509.13,-187.71 522,-201 592.97,-274.3 601.77,-613.11 602.85,-703.68"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="599.35,-703.72 602.95,-713.68 606.35,-703.65 599.35,-703.72"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge68" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00ae" d="M469.13,-136.01C488.44,-138.44 508.39,-144.78 522,-159 598.49,-238.89 603.21,-608.08 603.13,-703.46"/>
+<polygon fill="#ff00ae" stroke="#ff00ae" points="599.63,-703.69 603.1,-713.7 606.63,-703.71 599.63,-703.69"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge69" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0083" d="M479.13,-95.54C495.15,-98.77 510.77,-105.16 522,-117 604.15,-203.63 604.56,-604.48 603.37,-703.73"/>
+<polygon fill="#ff0083" stroke="#ff0083" points="599.87,-703.77 603.23,-713.82 606.87,-703.87 599.87,-703.77"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge70" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0057" d="M475.7,-52.82C492.92,-55.8 510.01,-62.24 522,-75 566.13,-121.93 595.52,-594.37 601.76,-703.56"/>
+<polygon fill="#ff0057" stroke="#ff0057" points="598.28,-703.97 602.33,-713.75 605.27,-703.57 598.28,-703.97"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~trianglefirst_construct~~CallsGraph_edge71" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff002b" d="M475.76,-10.77C492.98,-13.74 510.05,-20.2 522,-33 568.94,-83.3 596.36,-590.15 601.94,-703.57"/>
+<polygon fill="#ff002b" stroke="#ff002b" points="598.45,-704.01 602.43,-713.83 605.45,-703.67 598.45,-704.01"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproctrianglefirst_constructCallsGraph = svgPanZoom('#proctrianglefirst_constructCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~trianglefirst_construct~~CalledByGraph Pages: 1 -->
+<svg id="proctrianglefirst_constructCalledByGraph" width="422pt" height="32pt"
+ viewBox="0.00 0.00 422.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~trianglefirst_construct~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~trianglefirst_construct~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 418,-28 418,4 -4,4"/>
+<!-- proc~trianglefirst_construct -->
+<g id="proc~~trianglefirst_construct~~CalledByGraph_node1" class="node">
+<title>proc~trianglefirst_construct</title>
+<polygon fill="none" stroke="black" points="414,-24 281,-24 281,0 414,0 414,-24"/>
+<text text-anchor="middle" x="347.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">TriangleFirst_Construct</text>
+</g>
+<!-- interface~trianglefirst_construct -->
+<g id="proc~~trianglefirst_construct~~CalledByGraph_node2" class="node">
+<title>interface~trianglefirst_construct</title>
+<g id="a_proc~~trianglefirst_construct~~CalledByGraph_node2"><a xlink:href="../interface/trianglefirst_construct.html" xlink:title="TriangleFirst_Construct">
+<polygon fill="#a7506f" stroke="#a7506f" points="245,-24 112,-24 112,0 245,0 245,-24"/>
+<text text-anchor="middle" x="178.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleFirst_Construct</text>
+</a>
+</g>
+</g>
+<!-- interface~trianglefirst_construct&#45;&gt;proc~trianglefirst_construct -->
+<g id="proc~~trianglefirst_construct~~CalledByGraph_edge1" class="edge">
+<title>interface~trianglefirst_construct&#45;&gt;proc~trianglefirst_construct</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M245.02,-12C253.5,-12 262.23,-12 270.85,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="270.89,-15.5 280.89,-12 270.89,-8.5 270.89,-15.5"/>
+</g>
+<!-- interface~trianglefirst -->
+<g id="proc~~trianglefirst_construct~~CalledByGraph_node3" class="node">
+<title>interface~trianglefirst</title>
+<g id="a_proc~~trianglefirst_construct~~CalledByGraph_node3"><a xlink:href="../interface/trianglefirst.html" xlink:title="TriangleFirst">
+<polygon fill="#a7506f" stroke="#a7506f" points="76,-24 0,-24 0,0 76,0 76,-24"/>
+<text text-anchor="middle" x="38" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleFirst</text>
+</a>
+</g>
+</g>
+<!-- interface~trianglefirst&#45;&gt;interface~trianglefirst_construct -->
+<g id="proc~~trianglefirst_construct~~CalledByGraph_edge2" class="edge">
+<title>interface~trianglefirst&#45;&gt;interface~trianglefirst_construct</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M76.12,-12C84.15,-12 92.93,-12 101.84,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="101.94,-15.5 111.94,-12 101.94,-8.5 101.94,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">TriangleFirst_Construct</span><span class="p">(</span><span class="n">iElem</span><span class="p">,</span><span class="w"> </span><span class="n">Global_Coordinate</span><span class="p">,</span><span class="w"> </span><span class="n">Connectivity</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">Structure</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iElem</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">DP3d</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Global_Coordinate</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Connectivity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_ElementType</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ndim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">TriangleFirst</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Structure</span><span class="p">)</span>
+<span class="w">        </span><span class="n">Structure</span><span class="p">%</span><span class="n">ElementID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iElem</span>
+<span class="w">        </span><span class="n">Structure</span><span class="p">%</span><span class="n">ElementType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+
+<span class="w">        </span><span class="n">Structure</span><span class="p">%</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ndim</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">conn</span><span class="p">(</span><span class="n">ndim</span><span class="p">))</span>
+<span class="w">        </span><span class="n">Structure</span><span class="p">%</span><span class="n">conn</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Connectivity</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">ndim</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">X</span><span class="p">(</span><span class="n">ndim</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">Y</span><span class="p">(</span><span class="n">ndim</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">Z</span><span class="p">(</span><span class="n">ndim</span><span class="p">))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ndim</span>
+<span class="w">            </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">X</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="p">)</span>
+<span class="w">            </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">Y</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="p">)</span>
+<span class="w">            </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">Z</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="p">)</span>
+<span class="w">            </span><span class="n">Structure</span><span class="p">%</span><span class="n">X</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Global_Coordinate</span><span class="p">%</span><span class="n">x</span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">conn</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">            </span><span class="n">Structure</span><span class="p">%</span><span class="n">Y</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Global_Coordinate</span><span class="p">%</span><span class="n">y</span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">conn</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">            </span><span class="n">Structure</span><span class="p">%</span><span class="n">Z</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Global_Coordinate</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">conn</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">        </span><span class="n">Structure</span><span class="p">%</span><span class="n">nGauss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">        </span><span class="k">call </span><span class="n">Allocate_Array</span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">weight</span><span class="p">,</span><span class="w"> </span><span class="n">Structure</span><span class="p">%</span><span class="n">nGauss</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">Allocate_Array</span><span class="p">(</span><span class="n">Structure</span><span class="p">%</span><span class="n">gauss</span><span class="p">,</span><span class="w"> </span><span class="mi">2_int32</span><span class="p">,</span><span class="w"> </span><span class="n">Structure</span><span class="p">%</span><span class="n">nGauss</span><span class="p">)</span>
+<span class="w">        </span><span class="n">Structure</span><span class="p">%</span><span class="n">weight</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.5d0</span><span class="p">]</span>
+<span class="w">        </span><span class="n">Structure</span><span class="p">%</span><span class="n">gauss</span><span class="p">(:,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">3.0d0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">3.0d0</span><span class="p">]</span>
+<span class="w">    </span><span class="k">end function </span><span class="n">TriangleFirst_Construct</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

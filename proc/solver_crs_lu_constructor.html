@@ -1,0 +1,572 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Solver_CRS_LU_Constructor &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Solver_CRS_LU_Constructor
+      <small>Module Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">36 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/Solve_LU.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/solve_lu.f90.html'>Solve_LU.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/solver_solve_lu.html'>Solver_Solve_LU</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Solver_CRS_LU_Constructor</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/solver_crs_lu_constructor.html#src">Solver_CRS_LU_Constructor</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module function Solver_CRS_LU_Constructor(N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV, A) result(structure)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>N</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-maxfct"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>MAXFCT</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mnum"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>MNUM</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mtype"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>MTYPE</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phase"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>PHASE</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nrhs"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>NRHS</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-msgvlv"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>MSGVLV</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~5"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-structure~16"></span>
+          class(Abstract_Solver_CRS), allocatable
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~solver_crs_lu_constructor~~CallsGraph Pages: 1 -->
+<svg id="procsolver_crs_lu_constructorCallsGraph" width="272pt" height="242pt"
+ viewBox="0.00 0.00 272.00 242.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 238)">
+<title>proc~~solver_crs_lu_constructor~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-238 268,-238 268,4 -4,4"/>
+<!-- proc~solver_crs_lu_constructor -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_node1" class="node">
+<title>proc~solver_crs_lu_constructor</title>
+<polygon fill="none" stroke="black" points="159,-129 0,-129 0,-105 159,-105 159,-129"/>
+<text text-anchor="middle" x="79.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50">Solver_CRS_LU_Constructor</text>
+</g>
+<!-- ia -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_node2" class="node">
+<title>ia</title>
+<polygon fill="#777777" stroke="#777777" points="256.5,-234 202.5,-234 202.5,-210 256.5,-210 256.5,-234"/>
+<text text-anchor="middle" x="229.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ia</text>
+</g>
+<!-- proc~solver_crs_lu_constructor&#45;&gt;ia -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_edge1" class="edge">
+<title>proc~solver_crs_lu_constructor&#45;&gt;ia</title>
+<path fill="none" stroke="#ff0000" d="M96.17,-129.06C117.98,-145.72 158.9,-176.49 195,-201 196.62,-202.1 198.29,-203.21 199.99,-204.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="198.2,-207.34 208.51,-209.8 201.98,-201.45 198.2,-207.34"/>
+</g>
+<!-- iparm -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_node3" class="node">
+<title>iparm</title>
+<polygon fill="#777777" stroke="#777777" points="256.5,-192 202.5,-192 202.5,-168 256.5,-168 256.5,-192"/>
+<text text-anchor="middle" x="229.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iparm</text>
+</g>
+<!-- proc~solver_crs_lu_constructor&#45;&gt;iparm -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_edge2" class="edge">
+<title>proc~solver_crs_lu_constructor&#45;&gt;iparm</title>
+<path fill="none" stroke="#ff0000" d="M109.04,-129.15C132.87,-139.29 166.98,-153.81 192.65,-164.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="191.47,-168.04 202.04,-168.74 194.21,-161.6 191.47,-168.04"/>
+</g>
+<!-- ja -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_node4" class="node">
+<title>ja</title>
+<polygon fill="#777777" stroke="#777777" points="256.5,-150 202.5,-150 202.5,-126 256.5,-126 256.5,-150"/>
+<text text-anchor="middle" x="229.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ja</text>
+</g>
+<!-- proc~solver_crs_lu_constructor&#45;&gt;ja -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_edge3" class="edge">
+<title>proc~solver_crs_lu_constructor&#45;&gt;ja</title>
+<path fill="none" stroke="#ff0000" d="M159.27,-128.18C170.85,-129.82 182.27,-131.44 192.39,-132.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="192.04,-136.36 202.43,-134.3 193.02,-129.43 192.04,-136.36"/>
+</g>
+<!-- pardisoinit -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_node5" class="node">
+<title>pardisoinit</title>
+<polygon fill="#777777" stroke="#777777" points="264,-108 195,-108 195,-84 264,-84 264,-108"/>
+<text text-anchor="middle" x="229.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pardisoinit</text>
+</g>
+<!-- proc~solver_crs_lu_constructor&#45;&gt;pardisoinit -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_edge4" class="edge">
+<title>proc~solver_crs_lu_constructor&#45;&gt;pardisoinit</title>
+<path fill="none" stroke="#ff0000" d="M159.27,-105.82C168.1,-104.57 176.84,-103.33 184.99,-102.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="185.54,-105.63 194.95,-100.76 184.56,-98.7 185.54,-105.63"/>
+</g>
+<!-- perm -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_node6" class="node">
+<title>perm</title>
+<polygon fill="#777777" stroke="#777777" points="256.5,-66 202.5,-66 202.5,-42 256.5,-42 256.5,-66"/>
+<text text-anchor="middle" x="229.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">perm</text>
+</g>
+<!-- proc~solver_crs_lu_constructor&#45;&gt;perm -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_edge5" class="edge">
+<title>proc~solver_crs_lu_constructor&#45;&gt;perm</title>
+<path fill="none" stroke="#ff0000" d="M109.04,-104.85C132.87,-94.71 166.98,-80.19 192.65,-69.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="194.21,-72.4 202.04,-65.26 191.47,-65.96 194.21,-72.4"/>
+</g>
+<!-- pt -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_node7" class="node">
+<title>pt</title>
+<polygon fill="#777777" stroke="#777777" points="256.5,-24 202.5,-24 202.5,0 256.5,0 256.5,-24"/>
+<text text-anchor="middle" x="229.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pt</text>
+</g>
+<!-- proc~solver_crs_lu_constructor&#45;&gt;pt -->
+<g id="proc~~solver_crs_lu_constructor~~CallsGraph_edge6" class="edge">
+<title>proc~solver_crs_lu_constructor&#45;&gt;pt</title>
+<path fill="none" stroke="#ff0000" d="M96.17,-104.94C117.98,-88.28 158.9,-57.51 195,-33 196.62,-31.9 198.29,-30.79 199.99,-29.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="201.98,-32.55 208.51,-24.2 198.2,-26.66 201.98,-32.55"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">Solver_CRS_LU_Constructor</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">MAXFCT</span><span class="p">,</span><span class="w"> </span><span class="n">MNUM</span><span class="p">,</span><span class="w"> </span><span class="n">MTYPE</span><span class="p">,</span><span class="w"> </span><span class="n">PHASE</span><span class="p">,</span><span class="w"> </span><span class="n">NRHS</span><span class="p">,</span><span class="w"> </span><span class="n">MSGVLV</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">N</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">MAXFCT</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">MNUM</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">MTYPE</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">PHASE</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">NRHS</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">MSGVLV</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Solver_CRS</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">structure</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Solver_CRS_LU</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">structure</span><span class="p">)</span>
+<span class="w">        </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">structure</span><span class="p">)</span>
+<span class="w">        </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">Solver_CRS_LU</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">N</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">MAXFCT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">MAXFCT</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">MAXFCT</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">MNUM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">MNUM</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">MNUM</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">MTYPE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">MTYPE</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">MTYPE</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">PHASE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">PHASE</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">PHASE</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">NRHS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">NRHS</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">NRHS</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">MSGLVL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">MSGVLV</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">MSGLVL</span><span class="p">)</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">PT</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">IPARM</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">PERM</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">JA</span><span class="p">(</span><span class="n">A</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">IA</span><span class="p">(</span><span class="n">A</span><span class="p">%</span><span class="n">nptr</span><span class="p">))</span>
+
+<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">nnz</span>
+<span class="w">                </span><span class="n">this</span><span class="p">%</span><span class="n">JA</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">A</span><span class="p">%</span><span class="n">Ind</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">JA</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">nptr</span>
+<span class="w">                </span><span class="n">this</span><span class="p">%</span><span class="n">IA</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transfer</span><span class="p">(</span><span class="n">A</span><span class="p">%</span><span class="n">Ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">IA</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">            </span><span class="k">end do</span>
+
+<span class="k">            call </span><span class="n">pardisoinit</span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">pt</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">mtype</span><span class="p">,</span><span class="w"> </span><span class="n">this</span><span class="p">%</span><span class="n">iparm</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end select</span>
+
+<span class="k">    end function </span><span class="n">Solver_CRS_LU_Constructor</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

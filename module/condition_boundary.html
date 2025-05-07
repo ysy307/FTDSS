@@ -1,0 +1,4848 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Condition_Boundary &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Condition_Boundary
+      <small>Module</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 5.6% of total for modules and submodules.">625 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/Interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/interface.f90~4.html'>Interface.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Condition_Boundary</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-dirichlet">Dirichlet</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-neumann">Neumann</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-adiabatic">Adiabatic</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-freeheatdischarge">FreeHeatDischarge</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-robin">Robin</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-heattransfer">HeatTransfer</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-heatradiation">HeatRadiation</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-waterflux">WaterFlux</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#variable-heatflux">HeatFlux</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#inters-0"
+         aria-expanded="false" aria-controls="inters-0">
+         <h4 class="card-header bg-primary text-white">Interfaces</h4>
+      </a>
+      <div id="inters-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-type_bc_thermal_crs_construct">Type_BC_Thermal_CRS_Construct</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-type_bc_thermal_crs_fix_bc_all">Type_BC_Thermal_CRS_Fix_BC_All</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-type_bc_thermal_crs_fix_bc_rhs">Type_BC_Thermal_CRS_Fix_BC_RHS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-type_bc_thermal_crs_dirichlet">Type_BC_Thermal_CRS_Dirichlet</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-type_bc_thermal_crs_dirichlet_nr">Type_BC_Thermal_CRS_Dirichlet_NR</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-fix_bc_crs_dirichlet">Fix_BC_CRS_Dirichlet</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-type_bc_thermal_crs">Type_BC_Thermal_CRS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-assignment%28%3D%29~2">assignment(=)</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#absints-0"
+         aria-expanded="false" aria-controls="absints-0">
+         <h4 class="card-header bg-primary text-white">Abstract Interfaces</h4>
+      </a>
+      <div id="absints-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-abstract_bc_thermal_crs_fix_all">Abstract_BC_Thermal_CRS_Fix_All</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-abstract_bc_thermal_crs_fix_rhs">Abstract_BC_Thermal_CRS_Fix_RHS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-abstract_bc_thermal_crs_dirichlet">Abstract_BC_Thermal_CRS_Dirichlet</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#interface-abstract_bc_thermal_crs_dirichlet_nr">Abstract_BC_Thermal_CRS_Dirichlet_NR</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#types-0"
+         aria-expanded="false" aria-controls="types-0">
+         <h4 class="card-header bg-primary text-white">Derived Types</h4>
+      </a>
+      <div id="types-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/condition_boundary.html#type-type_edge">Type_Edge</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#type-condition_bc_local">Condition_BC_Local</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#type-abstract_condition_bc">Abstract_Condition_BC</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#type-type_bc_thermal">Type_BC_Thermal</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#type-type_bc_thermal_crs">Type_BC_Thermal_CRS</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#funcs-0"
+         aria-expanded="false" aria-controls="funcs-0">
+         <h4 class="card-header bg-primary text-white">Functions</h4>
+      </a>
+      <div id="funcs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-calculate_edge_dinstance">Calculate_Edge_Dinstance</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-calculate_edge_unitnormalvector">Calculate_Edge_UnitNormalVector</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-type_bc_thermal_constructor">Type_BC_Thermal_Constructor</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-condition_bc_local_assignment">Condition_BC_Local_Assignment</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundaryconditions_crs">Fix_BoundaryConditions_CRS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundaryconditions_full">Fix_BoundaryConditions_Full</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_bounday_values_crs">Fix_Bounday_Values_CRS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_bounday_values_full">Fix_Bounday_Values_Full</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_bounday_values_rhs">Fix_Bounday_Values_RHS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_dirichlet_crs">Fix_BoundaryCondition_Dirichlet_CRS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_dirichlet_crs_value">Fix_BoundaryCondition_Dirichlet_CRS_Value</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_dirichlet_crs_initial">Fix_BoundaryCondition_Dirichlet_CRS_Initial</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_dirichlet_full">Fix_BoundaryCondition_Dirichlet_Full</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_neumann">Fix_BoundaryCondition_Neumann</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_flux">Fix_BoundaryCondition_Flux</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_robin_crs">Fix_BoundaryCondition_Robin_CRS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_robin_full">Fix_BoundaryCondition_Robin_Full</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_heattransfer_crs">Fix_BoundaryCondition_HeatTransfer_CRS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_heattransfer_full">Fix_BoundaryCondition_HeatTransfer_Full</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_heatradiation_crs">Fix_BoundaryCondition_HeatRadiation_CRS</a>
+            <a class="list-group-item" href="../module/condition_boundary.html#proc-fix_boundarycondition_heatradiation_full">Fix_BoundaryCondition_HeatRadiation_Full</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                  <li class="list-inline-item"><a href='core_side.html'>Core_Side</a></li>
+                  <li class="list-inline-item"><a href='core_allocate.html'>Core_Allocate</a></li>
+                  <li class="list-inline-item"><a href='core_vtk.html'>Core_VTK</a></li>
+                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
+                  <li class="list-inline-item"><a href='matrix_crs.html'>Matrix_CRS</a></li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
+                  <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~condition_boundary~~UsesGraph Pages: 1 -->
+<svg id="modulecondition_boundaryUsesGraph" width="641pt" height="281pt"
+ viewBox="0.00 0.00 641.00 280.99" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~condition_boundary~~UsesGraph" class="graph" transform="scale(0.74 0.74) rotate(0) translate(4 378.25)">
+<title>module~~condition_boundary~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-378.25 868,-378.25 868,4 -4,4"/>
+<!-- module~condition_boundary -->
+<g id="module~~condition_boundary~~UsesGraph_node1" class="node">
+<title>module~condition_boundary</title>
+<polygon fill="none" stroke="black" points="864,-182 743,-182 743,-158 864,-158 864,-182"/>
+<text text-anchor="middle" x="803.5" y="-167.6" font-family="Helvetica,sans-Serif" font-size="10.50">Condition_Boundary</text>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_node2" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node2"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="95,-89 1,-89 1,-65 95,-65 95,-89"/>
+<text text-anchor="middle" x="48" y="-74.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge1" class="edge">
+<title>module~condition_boundary&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M669.5,-368C621.48,-384.17 605.8,-361.91 555.5,-368"/>
+</g>
+<!-- module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_node3" class="node">
+<title>module~core_allocate</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node3"><a xlink:href="../module/core_allocate.html" xlink:title="Core_Allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="332,-150 246,-150 246,-126 332,-126 332,-150"/>
+<text text-anchor="middle" x="289" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Core_Allocate</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary&#45;&gt;module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_edge2" class="edge">
+<title>module~condition_boundary&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M782.55,-157.79C757.63,-143.31 713.19,-120.02 671.5,-111"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M669.5,-111C600.64,-96.1 580.71,-98.85 511,-109 472.46,-114.61 465.94,-133.03 427,-134"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M425,-134C397.69,-134.19 367.3,-135.03 342.27,-135.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="342.12,-132.4 332.25,-136.25 342.37,-139.39 342.12,-132.4"/>
+</g>
+<!-- module~core_basetypes -->
+<g id="module~~condition_boundary~~UsesGraph_node4" class="node">
+<title>module~core_basetypes</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node4"><a xlink:href="../module/core_basetypes.html" xlink:title="Core_BaseTypes">
+<polygon fill="#337ab7" stroke="#337ab7" points="475,-262 377,-262 377,-238 475,-238 475,-262"/>
+<text text-anchor="middle" x="426" y="-247.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Core_BaseTypes</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary&#45;&gt;module~core_basetypes -->
+<g id="module~~condition_boundary~~UsesGraph_edge3" class="edge">
+<title>module~condition_boundary&#45;&gt;module~core_basetypes</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M799.77,-182.25C790.32,-220.99 754.93,-340.02 671.5,-368"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M669.5,-368C629.9,-381.28 634.37,-327.54 598,-307 562.66,-287.04 519.24,-272.68 484.99,-263.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="485.7,-259.93 475.14,-260.75 483.91,-266.69 485.7,-259.93"/>
+</g>
+<!-- module~core_side -->
+<g id="module~~condition_boundary~~UsesGraph_node5" class="node">
+<title>module~core_side</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node5"><a xlink:href="../module/core_side.html" xlink:title="Core_Side">
+<polygon fill="#337ab7" stroke="#337ab7" points="587.5,-340 521.5,-340 521.5,-316 587.5,-316 587.5,-340"/>
+<text text-anchor="middle" x="554.5" y="-325.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Core_Side</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary&#45;&gt;module~core_side -->
+<g id="module~~condition_boundary~~UsesGraph_edge4" class="edge">
+<title>module~condition_boundary&#45;&gt;module~core_side</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M669.5,-368C654.22,-373.12 616.23,-357.69 588.28,-344.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="589.76,-341.36 579.23,-340.19 586.73,-347.67 589.76,-341.36"/>
+</g>
+<!-- module~core_vtk -->
+<g id="module~~condition_boundary~~UsesGraph_node6" class="node">
+<title>module~core_vtk</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node6"><a xlink:href="../module/core_vtk.html" xlink:title="Core_VTK">
+<polygon fill="#337ab7" stroke="#337ab7" points="586.5,-142 522.5,-142 522.5,-118 586.5,-118 586.5,-142"/>
+<text text-anchor="middle" x="554.5" y="-127.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Core_VTK</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary&#45;&gt;module~core_vtk -->
+<g id="module~~condition_boundary~~UsesGraph_edge5" class="edge">
+<title>module~condition_boundary&#45;&gt;module~core_vtk</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M669.5,-111C645.46,-105.8 618.3,-109.94 596.53,-115.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="595.29,-112.37 586.62,-118.47 597.19,-119.11 595.29,-112.37"/>
+</g>
+<!-- module~inout_input -->
+<g id="module~~condition_boundary~~UsesGraph_node7" class="node">
+<title>module~inout_input</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node7"><a xlink:href="../module/inout_input.html" xlink:title="Inout_Input">
+<polygon fill="#337ab7" stroke="#337ab7" points="706.5,-83 634.5,-83 634.5,-59 706.5,-59 706.5,-83"/>
+<text text-anchor="middle" x="670.5" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Input</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary&#45;&gt;module~inout_input -->
+<g id="module~~condition_boundary~~UsesGraph_edge6" class="edge">
+<title>module~condition_boundary&#45;&gt;module~inout_input</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M786.69,-157.76C767.81,-143.18 735.24,-118.13 707,-97 703.56,-94.43 699.92,-91.73 696.33,-89.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="698.3,-86.19 688.17,-83.1 694.16,-91.84 698.3,-86.19"/>
+</g>
+<!-- module~matrix_crs -->
+<g id="module~~condition_boundary~~UsesGraph_node8" class="node">
+<title>module~matrix_crs</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node8"><a xlink:href="../module/matrix_crs.html" xlink:title="Matrix_CRS">
+<polygon fill="#337ab7" stroke="#337ab7" points="707,-240 634,-240 634,-216 707,-216 707,-240"/>
+<text text-anchor="middle" x="670.5" y="-225.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Matrix_CRS</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary&#45;&gt;module~matrix_crs -->
+<g id="module~~condition_boundary~~UsesGraph_edge7" class="edge">
+<title>module~condition_boundary&#45;&gt;module~matrix_crs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M775.36,-182.02C755.86,-190.65 729.36,-202.38 708.01,-211.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="706.34,-208.75 698.61,-216 709.17,-215.15 706.34,-208.75"/>
+</g>
+<!-- module~core_allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge8" class="edge">
+<title>module~core_allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M282.64,-150.3C268.17,-181.41 225.47,-260.06 167.5,-250"/>
+</g>
+<!-- module~core_error -->
+<g id="module~~condition_boundary~~UsesGraph_node11" class="node">
+<title>module~core_error</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node11"><a xlink:href="../module/core_error.html" xlink:title="Core_Error">
+<polygon fill="#337ab7" stroke="#337ab7" points="201,-68 132,-68 132,-44 201,-44 201,-68"/>
+<text text-anchor="middle" x="166.5" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Core_Error</text>
+</a>
+</g>
+</g>
+<!-- module~core_allocate&#45;&gt;module~core_error -->
+<g id="module~~condition_boundary~~UsesGraph_edge9" class="edge">
+<title>module~core_allocate&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M254.29,-125.98C248.36,-123.34 242.37,-120.33 237,-117 218.07,-105.25 199.24,-88.32 185.97,-75.27"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="188.37,-72.72 178.83,-68.11 183.41,-77.66 188.37,-72.72"/>
+</g>
+<!-- module~core_basetypes&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge10" class="edge">
+<title>module~core_basetypes&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M376.89,-250C351.12,-250 318.83,-250 290,-250"/>
+</g>
+<!-- module~core_basetypes&#45;&gt;module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_edge11" class="edge">
+<title>module~core_basetypes&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M399.27,-237.79C391.82,-233.8 383.85,-229.08 377,-224 350.25,-204.17 323.63,-176.37 307.02,-157.8"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="309.57,-155.4 300.33,-150.22 304.32,-160.03 309.57,-155.4"/>
+</g>
+<!-- module~core_side&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge12" class="edge">
+<title>module~core_side&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M521.41,-331.61C495.61,-333.65 458.59,-334.64 427,-328"/>
+</g>
+<!-- module~core_side&#45;&gt;module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_edge13" class="edge">
+<title>module~core_side&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M521.42,-320.38C477.07,-309.39 399.91,-288.49 377,-271 338.15,-241.35 311.42,-189.06 298.63,-159.66"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="301.79,-158.15 294.69,-150.28 295.33,-160.86 301.79,-158.15"/>
+</g>
+<!-- module~core_side&#45;&gt;module~core_basetypes -->
+<g id="module~~condition_boundary~~UsesGraph_edge14" class="edge">
+<title>module~core_side&#45;&gt;module~core_basetypes</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M532.98,-315.88C525.94,-311.61 518.06,-306.7 511,-302 494.57,-291.06 491.71,-286.5 475,-276 470.19,-272.97 464.99,-269.94 459.86,-267.06"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="461.24,-263.83 450.78,-262.1 457.88,-269.97 461.24,-263.83"/>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge15" class="edge">
+<title>module~core_vtk&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M522.77,-142.05C518.8,-143.68 514.79,-145.36 511,-147 461.27,-168.51 344.18,-250 290,-250"/>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M288,-250C234.46,-248.76 220.27,-259.16 167.5,-250"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_edge16" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M522.31,-131.87C496.71,-133.19 459.51,-134.62 427,-134"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_basetypes -->
+<g id="module~~condition_boundary~~UsesGraph_edge17" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_basetypes</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M531.04,-142.06C524.32,-146.11 517.11,-150.9 511,-156 484.06,-178.47 457.93,-209.65 442.15,-229.83"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="439.19,-227.94 435.86,-238 444.73,-232.21 439.19,-227.94"/>
+</g>
+<!-- module~inout_input&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge18" class="edge">
+<title>module~inout_input&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M634.37,-73.19C587.03,-76.47 500.24,-83.63 427,-96"/>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M425,-96C362.55,-100.03 351.03,-69.84 290,-56"/>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M288,-56C219.77,-40.53 199.53,-16.74 132,-35 114.12,-39.83 112.48,-47.54 96,-56 93.06,-57.51 89.98,-59.02 86.88,-60.5"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="85.16,-57.44 77.57,-64.83 88.11,-63.79 85.16,-57.44"/>
+</g>
+<!-- module~inout_input&#45;&gt;module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_edge20" class="edge">
+<title>module~inout_input&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M425,-96C392.38,-101.51 356.69,-112.86 330.2,-122.37"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="328.71,-119.19 320.52,-125.91 331.12,-125.77 328.71,-119.19"/>
+</g>
+<!-- module~inout_input&#45;&gt;module~core_basetypes -->
+<g id="module~~condition_boundary~~UsesGraph_edge21" class="edge">
+<title>module~inout_input&#45;&gt;module~core_basetypes</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M650.44,-83.09C644.81,-87.14 638.86,-91.92 634,-97 614.06,-117.84 619.03,-131.26 598,-151 558.62,-187.96 503.01,-216.9 466.02,-233.71"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="464.28,-230.65 456.57,-237.92 467.13,-237.05 464.28,-230.65"/>
+</g>
+<!-- module~inout_input&#45;&gt;module~core_vtk -->
+<g id="module~~condition_boundary~~UsesGraph_edge23" class="edge">
+<title>module~inout_input&#45;&gt;module~core_vtk</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M646.16,-83.08C629.33,-91.79 606.4,-103.66 587.81,-113.28"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="586.09,-110.23 578.81,-117.93 589.3,-116.45 586.09,-110.23"/>
+</g>
+<!-- json_module -->
+<g id="module~~condition_boundary~~UsesGraph_node9" class="node">
+<title>json_module</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node9"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="594.5,-24 514.5,-24 514.5,0 594.5,0 594.5,-24"/>
+<text text-anchor="middle" x="554.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
+</g>
+<!-- module~inout_input&#45;&gt;json_module -->
+<g id="module~~condition_boundary~~UsesGraph_edge19" class="edge">
+<title>module~inout_input&#45;&gt;json_module</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M646.16,-58.92C629.33,-50.21 606.4,-38.34 587.81,-28.72"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="589.3,-25.55 578.81,-24.07 586.09,-31.77 589.3,-25.55"/>
+</g>
+<!-- module~inout_input&#45;&gt;module~core_error -->
+<g id="module~~condition_boundary~~UsesGraph_edge22" class="edge">
+<title>module~inout_input&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M288,-56C263.05,-50.34 234.45,-50.09 211.37,-51.37"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="210.93,-47.89 201.19,-52.05 211.4,-54.88 210.93,-47.89"/>
+</g>
+<!-- module~inout_projectpath -->
+<g id="module~~condition_boundary~~UsesGraph_node12" class="node">
+<title>module~inout_projectpath</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node12"><a xlink:href="../module/inout_projectpath.html" xlink:title="Inout_ProjectPath">
+<polygon fill="#337ab7" stroke="#337ab7" points="341,-108 237,-108 237,-84 341,-84 341,-108"/>
+<text text-anchor="middle" x="289" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_ProjectPath</text>
+</a>
+</g>
+</g>
+<!-- module~inout_input&#45;&gt;module~inout_projectpath -->
+<g id="module~~condition_boundary~~UsesGraph_edge24" class="edge">
+<title>module~inout_input&#45;&gt;module~inout_projectpath</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M425,-96C401.14,-100.03 374.58,-100.81 351.37,-100.31"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="351.4,-96.81 341.3,-100 351.19,-103.8 351.4,-96.81"/>
+</g>
+<!-- module~matrix_crs&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge25" class="edge">
+<title>module~matrix_crs&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M665.81,-240.09C655.03,-272.64 620.22,-360.16 555.5,-368"/>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M553.5,-368C494.96,-375.09 484.71,-340.12 427,-328"/>
+</g>
+<!-- module~matrix_crs&#45;&gt;module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_edge26" class="edge">
+<title>module~matrix_crs&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M644.68,-215.84C592.32,-190.62 471.69,-134.85 427,-134"/>
+</g>
+<!-- module~core_element -->
+<g id="module~~condition_boundary~~UsesGraph_node10" class="node">
+<title>module~core_element</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node10"><a xlink:href="../module/core_element.html" xlink:title="Core_Element">
+<polygon fill="#337ab7" stroke="#337ab7" points="598,-260 511,-260 511,-236 598,-236 598,-260"/>
+<text text-anchor="middle" x="554.5" y="-245.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Core_Element</text>
+</a>
+</g>
+</g>
+<!-- module~matrix_crs&#45;&gt;module~core_element -->
+<g id="module~~condition_boundary~~UsesGraph_edge27" class="edge">
+<title>module~matrix_crs&#45;&gt;module~core_element</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M633.74,-234.27C625.67,-235.69 616.93,-237.22 608.33,-238.73"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="607.57,-235.31 598.33,-240.49 608.78,-242.21 607.57,-235.31"/>
+</g>
+<!-- module~core_element&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge28" class="edge">
+<title>module~core_element&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M544.72,-260.09C525.49,-284.94 477.35,-338.58 427,-328"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M425,-328C357.19,-313.75 359.28,-251.6 290,-250"/>
+</g>
+<!-- module~core_element&#45;&gt;module~core_allocate -->
+<g id="module~~condition_boundary~~UsesGraph_edge29" class="edge">
+<title>module~core_element&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M524.55,-235.91C476.85,-216 381.73,-176.29 328.44,-154.05"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="329.58,-150.73 319,-150.11 326.88,-157.19 329.58,-150.73"/>
+</g>
+<!-- module~core_element&#45;&gt;module~core_basetypes -->
+<g id="module~~condition_boundary~~UsesGraph_edge30" class="edge">
+<title>module~core_element&#45;&gt;module~core_basetypes</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M510.67,-248.68C502.43,-248.81 493.67,-248.95 485.04,-249.08"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="484.95,-245.58 475,-249.24 485.06,-252.58 484.95,-245.58"/>
+</g>
+<!-- module~core_error&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge32" class="edge">
+<title>module~core_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M131.8,-62.07C123.41,-63.59 114.19,-65.25 105.04,-66.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="104.41,-63.46 95.19,-68.67 105.65,-70.34 104.41,-63.46"/>
+</g>
+<!-- ieee_arithmetic -->
+<g id="module~~condition_boundary~~UsesGraph_node13" class="node">
+<title>ieee_arithmetic</title>
+<g id="a_module~~condition_boundary~~UsesGraph_node13"><a xlink:href="http://fortranwiki.org/fortran/show/ieee_arithmetic" xlink:title="ieee_arithmetic">
+<polygon fill="#337ab7" stroke="#337ab7" points="96,-47 0,-47 0,-23 96,-23 96,-47"/>
+<text text-anchor="middle" x="48" y="-32.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ieee_arithmetic</text>
+</a>
+</g>
+</g>
+<!-- module~core_error&#45;&gt;ieee_arithmetic -->
+<g id="module~~condition_boundary~~UsesGraph_edge31" class="edge">
+<title>module~core_error&#45;&gt;ieee_arithmetic</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M131.8,-49.93C123.7,-48.46 114.82,-46.86 105.97,-45.27"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="106.51,-41.81 96.05,-43.48 105.27,-48.7 106.51,-41.81"/>
+</g>
+<!-- module~inout_projectpath&#45;&gt;iso_fortran_env -->
+<g id="module~~condition_boundary~~UsesGraph_edge33" class="edge">
+<title>module~inout_projectpath&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M249.98,-108.08C245.3,-110.56 240.82,-113.51 237,-117 187.74,-161.97 233.21,-261.41 167.5,-250"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M165.5,-250C95.61,-237.87 64.46,-143 53.69,-99.12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="57.05,-98.1 51.38,-89.15 50.23,-99.68 57.05,-98.1"/>
+</g>
+<!-- module~inout_projectpath&#45;&gt;module~core_error -->
+<g id="module~~condition_boundary~~UsesGraph_edge34" class="edge">
+<title>module~inout_projectpath&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M251.85,-84C238.9,-79.7 224.19,-74.82 210.71,-70.34"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="211.75,-67 201.16,-67.17 209.54,-73.64 211.75,-67"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulecondition_boundaryUsesGraph = svgPanZoom('#modulecondition_boundaryUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+          <div class="card">
+      <h3 class="card-header card-title bg-light">Used by</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li class="list-inline-item"><h5>Descendants:</h5></li>
+                  <li class="list-inline-item"><a href='condition_boundary_base.html'>Condition_Boundary_Base</a></li>
+                  <li class="list-inline-item"><a href='condition_boundary_thermal_crs.html'>Condition_Boundary_Thermal_CRS</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~condition_boundary~~UsedByGraph Pages: 1 -->
+<svg id="modulecondition_boundaryUsedByGraph" width="641pt" height="158pt"
+ viewBox="0.00 0.00 641.00 157.90" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~condition_boundary~~UsedByGraph" class="graph" transform="scale(0.72 0.72) rotate(0) translate(4 214)">
+<title>module~~condition_boundary~~UsedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-214 881,-214 881,4 -4,4"/>
+<!-- module~condition_boundary -->
+<g id="module~~condition_boundary~~UsedByGraph_node1" class="node">
+<title>module~condition_boundary</title>
+<polygon fill="none" stroke="black" points="121,-128 0,-128 0,-104 121,-104 121,-128"/>
+<text text-anchor="middle" x="60.5" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50">Condition_Boundary</text>
+</g>
+<!-- module~condition_boundary_base -->
+<g id="module~~condition_boundary~~UsedByGraph_node2" class="node">
+<title>module~condition_boundary_base</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node2"><a xlink:href="../module/condition_boundary_base.html" xlink:title="Condition_Boundary_Base">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="332,-210 180,-210 180,-186 332,-186 332,-210"/>
+<text text-anchor="middle" x="256" y="-195.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_Boundary_Base</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary_base&#45;&gt;module~condition_boundary -->
+<g id="module~~condition_boundary~~UsedByGraph_edge4" class="edge">
+<title>module~condition_boundary_base&#45;&gt;module~condition_boundary</title>
+<path fill="none" stroke="#ff0000" d="M183.95,-185.94C174.73,-183.46 165.53,-180.5 157,-177 130.61,-166.16 103.47,-148.02 84.9,-134.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="86.85,-131.43 76.76,-128.22 82.65,-137.02 86.85,-131.43"/>
+</g>
+<!-- module~condition_boundary_thermal_crs -->
+<g id="module~~condition_boundary~~UsedByGraph_node3" class="node">
+<title>module~condition_boundary_thermal_crs</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node3"><a xlink:href="../module/condition_boundary_thermal_crs.html" xlink:title="Condition_Boundary_Thermal_CRS">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="355,-168 157,-168 157,-144 355,-144 355,-168"/>
+<text text-anchor="middle" x="256" y="-153.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_Boundary_Thermal_CRS</text>
+</a>
+</g>
+</g>
+<!-- module~condition_boundary_thermal_crs&#45;&gt;module~condition_boundary -->
+<g id="module~~condition_boundary~~UsedByGraph_edge5" class="edge">
+<title>module~condition_boundary_thermal_crs&#45;&gt;module~condition_boundary</title>
+<path fill="none" stroke="#ff0000" d="M196.94,-144C175.8,-139.63 151.71,-134.65 129.76,-130.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="130.35,-126.66 119.85,-128.06 128.93,-133.51 130.35,-126.66"/>
+</g>
+<!-- module~condition_initial -->
+<g id="module~~condition_boundary~~UsedByGraph_node4" class="node">
+<title>module~condition_initial</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node4"><a xlink:href="../module/condition_initial.html" xlink:title="Condition_Initial">
+<polygon fill="#337ab7" stroke="#337ab7" points="305,-88 207,-88 207,-64 305,-64 305,-88"/>
+<text text-anchor="middle" x="256" y="-73.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_Initial</text>
+</a>
+</g>
+</g>
+<!-- module~condition_initial&#45;&gt;module~condition_boundary -->
+<g id="module~~condition_boundary~~UsedByGraph_edge1" class="edge">
+<title>module~condition_initial&#45;&gt;module~condition_boundary</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M206.67,-85.99C183.45,-90.79 155.21,-96.63 129.83,-101.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="128.98,-98.48 119.9,-103.93 130.4,-105.33 128.98,-98.48"/>
+</g>
+<!-- module~condition_initial_crs -->
+<g id="module~~condition_boundary~~UsedByGraph_node5" class="node">
+<title>module~condition_initial_crs</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node5"><a xlink:href="../module/condition_initial_crs.html" xlink:title="Condition_Initial_CRS">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="516,-118 391,-118 391,-94 516,-94 516,-118"/>
+<text text-anchor="middle" x="453.5" y="-103.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_Initial_CRS</text>
+</a>
+</g>
+</g>
+<!-- module~condition_initial_crs&#45;&gt;module~condition_boundary -->
+<g id="module~~condition_boundary~~UsedByGraph_edge2" class="edge">
+<title>module~condition_initial_crs&#45;&gt;module~condition_boundary</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M390.98,-107.57C320.42,-109.38 205.01,-112.33 131.19,-114.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="130.97,-110.72 121.06,-114.48 131.15,-117.72 130.97,-110.72"/>
+</g>
+<!-- module~condition_initial_crs&#45;&gt;module~condition_initial -->
+<g id="module~~condition_boundary~~UsedByGraph_edge7" class="edge">
+<title>module~condition_initial_crs&#45;&gt;module~condition_initial</title>
+<path fill="none" stroke="#00ff66" d="M390.91,-96.55C366.72,-92.84 339.09,-88.6 315.24,-84.94"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="315.68,-81.46 305.27,-83.41 314.62,-88.38 315.68,-81.46"/>
+</g>
+<!-- module~main_thermal -->
+<g id="module~~condition_boundary~~UsedByGraph_node6" class="node">
+<title>module~main_thermal</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node6"><a xlink:href="../module/main_thermal.html" xlink:title="Main_Thermal">
+<polygon fill="#337ab7" stroke="#337ab7" points="497.5,-67 409.5,-67 409.5,-43 497.5,-43 497.5,-67"/>
+<text text-anchor="middle" x="453.5" y="-52.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Main_Thermal</text>
+</a>
+</g>
+</g>
+<!-- module~main_thermal&#45;&gt;module~condition_boundary -->
+<g id="module~~condition_boundary~~UsedByGraph_edge3" class="edge">
+<title>module~main_thermal&#45;&gt;module~condition_boundary</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M409.36,-47.58C350.84,-39.18 243.67,-29.68 157,-55 128.92,-63.2 101.25,-82.45 82.98,-97.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="80.27,-94.85 74.8,-103.93 84.74,-100.24 80.27,-94.85"/>
+</g>
+<!-- module~main_thermal&#45;&gt;module~condition_initial -->
+<g id="module~~condition_boundary~~UsedByGraph_edge6" class="edge">
+<title>module~main_thermal&#45;&gt;module~condition_initial</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M409.11,-59.66C381.42,-62.64 345.19,-66.53 315.04,-69.77"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="314.64,-66.29 305.07,-70.84 315.38,-73.25 314.64,-66.29"/>
+</g>
+<!-- module~inout_output -->
+<g id="module~~condition_boundary~~UsedByGraph_node7" class="node">
+<title>module~inout_output</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node7"><a xlink:href="../module/inout_output.html" xlink:title="Inout_Output">
+<polygon fill="#337ab7" stroke="#337ab7" points="658.5,-67 577.5,-67 577.5,-43 658.5,-43 658.5,-67"/>
+<text text-anchor="middle" x="618" y="-52.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Output</text>
+</a>
+</g>
+</g>
+<!-- module~inout_output&#45;&gt;module~main_thermal -->
+<g id="module~~condition_boundary~~UsedByGraph_edge8" class="edge">
+<title>module~inout_output&#45;&gt;module~main_thermal</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M577.25,-55C556.31,-55 530.34,-55 507.69,-55"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="507.54,-51.5 497.54,-55 507.54,-58.5 507.54,-51.5"/>
+</g>
+<!-- module~main_ftdss -->
+<g id="module~~condition_boundary~~UsedByGraph_node8" class="node">
+<title>module~main_ftdss</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node8"><a xlink:href="../module/main_ftdss.html" xlink:title="Main_FTDSS">
+<polygon fill="#337ab7" stroke="#337ab7" points="837.5,-108 759.5,-108 759.5,-84 837.5,-84 837.5,-108"/>
+<text text-anchor="middle" x="798.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Main_FTDSS</text>
+</a>
+</g>
+</g>
+<!-- module~main_ftdss&#45;&gt;module~main_thermal -->
+<g id="module~~condition_boundary~~UsedByGraph_edge9" class="edge">
+<title>module~main_ftdss&#45;&gt;module~main_thermal</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M759.47,-94.45C711.07,-92.12 624.97,-86.78 552,-76 537.66,-73.88 522.28,-70.9 508.07,-67.86"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="508.48,-64.36 497.96,-65.63 506.98,-71.2 508.48,-64.36"/>
+</g>
+<!-- module~main_ftdss&#45;&gt;module~inout_output -->
+<g id="module~~condition_boundary~~UsedByGraph_edge11" class="edge">
+<title>module~main_ftdss&#45;&gt;module~inout_output</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M759.21,-87.2C732.72,-81.12 697.24,-72.97 668.6,-66.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="669.3,-62.96 658.78,-64.14 667.74,-69.79 669.3,-62.96"/>
+</g>
+<!-- module~main_thermal_3phase -->
+<g id="module~~condition_boundary~~UsedByGraph_node9" class="node">
+<title>module~main_thermal_3phase</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node9"><a xlink:href="../module/main_thermal_3phase.html" xlink:title="Main_Thermal_3Phase">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="684,-25 552,-25 552,-1 684,-1 684,-25"/>
+<text text-anchor="middle" x="618" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Main_Thermal_3Phase</text>
+</a>
+</g>
+</g>
+<!-- module~main_thermal_3phase&#45;&gt;module~main_thermal -->
+<g id="module~~condition_boundary~~UsedByGraph_edge10" class="edge">
+<title>module~main_thermal_3phase&#45;&gt;module~main_thermal</title>
+<path fill="none" stroke="#cc00ff" d="M570.43,-25.04C550.77,-30.12 527.77,-36.06 507.46,-41.31"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="506.54,-37.94 497.73,-43.83 508.29,-44.71 506.54,-37.94"/>
+</g>
+<!-- module~inout_output_base -->
+<g id="module~~condition_boundary~~UsedByGraph_node10" class="node">
+<title>module~inout_output_base</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node10"><a xlink:href="../module/inout_output_base.html" xlink:title="Inout_Output_Base">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="854.5,-66 742.5,-66 742.5,-42 854.5,-42 854.5,-66"/>
+<text text-anchor="middle" x="798.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Output_Base</text>
+</a>
+</g>
+</g>
+<!-- module~inout_output_base&#45;&gt;module~inout_output -->
+<g id="module~~condition_boundary~~UsedByGraph_edge12" class="edge">
+<title>module~inout_output_base&#45;&gt;module~inout_output</title>
+<path fill="none" stroke="#ff0000" d="M742.49,-54.31C718.95,-54.44 691.66,-54.59 668.73,-54.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="668.52,-51.22 658.54,-54.78 668.56,-58.22 668.52,-51.22"/>
+</g>
+<!-- module~inout_output_obaservation -->
+<g id="module~~condition_boundary~~UsedByGraph_node11" class="node">
+<title>module~inout_output_obaservation</title>
+<g id="a_module~~condition_boundary~~UsedByGraph_node11"><a xlink:href="../module/inout_output_obaservation.html" xlink:title="Inout_Output_Obaservation">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="877,-24 720,-24 720,0 877,0 877,-24"/>
+<text text-anchor="middle" x="798.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Inout_Output_Obaservation</text>
+</a>
+</g>
+</g>
+<!-- module~inout_output_obaservation&#45;&gt;module~inout_output -->
+<g id="module~~condition_boundary~~UsedByGraph_edge13" class="edge">
+<title>module~inout_output_obaservation&#45;&gt;module~inout_output</title>
+<path fill="none" stroke="#ff0000" d="M747.3,-24.09C722.65,-30.03 693.05,-37.16 668.49,-43.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="667.56,-39.7 658.66,-45.45 669.2,-46.51 667.56,-39.7"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulecondition_boundaryUsedByGraph = svgPanZoom('#modulecondition_boundaryUsedByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      <br>
+
+
+        <section>
+          <h2>Variables</h2>
+            <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dirichlet"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>Dirichlet</strong></td>
+<td> =</td>
+                <td>&#34;Dirichlet&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-neumann"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>Neumann</strong></td>
+<td> =</td>
+                <td>&#34;Neumann&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-adiabatic"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>Adiabatic</strong></td>
+<td> =</td>
+                <td>&#34;Adiabatic&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-freeheatdischarge"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>FreeHeatDischarge</strong></td>
+<td> =</td>
+                <td>&#34;FreeHeatDischarge&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-robin"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>Robin</strong></td>
+<td> =</td>
+                <td>&#34;Robin&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-heattransfer"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>HeatTransfer</strong></td>
+<td> =</td>
+                <td>&#34;HeatTransfer&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-heatradiation"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>HeatRadiation</strong></td>
+<td> =</td>
+                <td>&#34;HeatRadiation&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-waterflux"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>WaterFlux</strong></td>
+<td> =</td>
+                <td>&#34;WaterFlux&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-heatflux"></span>
+              character(len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>HeatFlux</strong></td>
+<td> =</td>
+                <td>&#34;HeatFlux&#34;</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+        </section>
+        <br>
+
+
+        <section>
+          <h2>Interfaces</h2>
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-type_bc_thermal_crs_construct"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public module function Type_BC_Thermal_CRS_Construct(Input) result(Structure)  
+    <a href="../proc/type_bc_thermal_crs_construct.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~18"></span>
+              type(<a href='../type/type_input.html'>Type_Input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>class(<a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a>), allocatable</small>
+    </h4>
+    
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-type_bc_thermal_crs_fix_bc_all"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public module subroutine Type_BC_Thermal_CRS_Fix_BC_All(self, A, b, Sides, time)  
+    <a href="../proc/type_bc_thermal_crs_fix_bc_all.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~146"></span>
+              class(<a href='../type/type_bc_thermal_crs.html'>Type_BC_Thermal_CRS</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~11"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sides~6"></span>
+              type(<a href='../type/sideholder.html'>SideHolder</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Sides</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-type_bc_thermal_crs_fix_bc_rhs"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public module subroutine Type_BC_Thermal_CRS_Fix_BC_RHS(self, b, Sides, time)  
+    <a href="../proc/type_bc_thermal_crs_fix_bc_rhs.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~147"></span>
+              class(<a href='../type/type_bc_thermal_crs.html'>Type_BC_Thermal_CRS</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~9"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sides~7"></span>
+              type(<a href='../type/sideholder.html'>SideHolder</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Sides</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-type_bc_thermal_crs_dirichlet"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public module subroutine Type_BC_Thermal_CRS_Dirichlet(self, A, b, Info, Edge, Dval)  
+    <a href="../proc/type_bc_thermal_crs_dirichlet.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~148"></span>
+              class(<a href='../type/type_bc_thermal_crs.html'>Type_BC_Thermal_CRS</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~12"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~10"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~3"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(2)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dval~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Dval</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-type_bc_thermal_crs_dirichlet_nr"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public module subroutine Type_BC_Thermal_CRS_Dirichlet_NR(self, A, b, Info, Edge)  
+    <a href="../proc/type_bc_thermal_crs_dirichlet_nr.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~149"></span>
+              class(<a href='../type/type_bc_thermal_crs.html'>Type_BC_Thermal_CRS</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~13"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~11"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~4"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(2)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-fix_bc_crs_dirichlet"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public module subroutine Fix_BC_CRS_Dirichlet(A, b, Info, Edge, Dval)  
+    <a href="../proc/fix_bc_crs_dirichlet.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~14"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~12"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~5"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(2)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dval~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Dval</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-type_bc_thermal_crs"></span>
+      <h3>public        interface <a href='../interface/type_bc_thermal_crs.html'>Type_BC_Thermal_CRS</a> 
+      </h3>
+    </div>
+    <ul class="list-group">
+          <li class="list-group-item">
+                <h3>
+    public  interface <a href='../interface/type_bc_thermal_crs_construct.html'>Type_BC_Thermal_CRS_Construct</a>()  
+
+    </h3>
+    
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+          </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-assignment%28%3D%29~2"></span>
+      <h3>public        interface <a href='../interface/assignment(=)~2.html'>assignment(=)</a> 
+      </h3>
+    </div>
+    <ul class="list-group">
+          <li class="list-group-item">
+                <h3>
+    public  subroutine <a href='../proc/condition_bc_local_assignment.html'>Condition_BC_Local_Assignment</a>(A, B)  
+
+    </h3>
+    
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~15"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~4"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>B</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+    </ul>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Abstract Interfaces</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="interface-abstract_bc_thermal_crs_fix_all"></span><h3>abstract interface
+        
+    </h3></div>
+    <ul class="list-group">
+      <li class="list-group-item">
+            <h3>
+    public  subroutine Abstract_BC_Thermal_CRS_Fix_All(self, A, b, Sides, time)  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~142"></span>
+              class(<a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~8"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sides~4"></span>
+              type(<a href='../type/sideholder.html'>SideHolder</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Sides</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+      </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="interface-abstract_bc_thermal_crs_fix_rhs"></span><h3>abstract interface
+        
+    </h3></div>
+    <ul class="list-group">
+      <li class="list-group-item">
+            <h3>
+    public  subroutine Abstract_BC_Thermal_CRS_Fix_RHS(self, b, Sides, time)  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~143"></span>
+              class(<a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sides~5"></span>
+              type(<a href='../type/sideholder.html'>SideHolder</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Sides</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+      </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="interface-abstract_bc_thermal_crs_dirichlet"></span><h3>abstract interface
+        
+    </h3></div>
+    <ul class="list-group">
+      <li class="list-group-item">
+            <h3>
+    public  subroutine Abstract_BC_Thermal_CRS_Dirichlet(self, A, b, Info, Edge, Dval)  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~144"></span>
+              class(<a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~9"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(2)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dval"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Dval</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+      </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="interface-abstract_bc_thermal_crs_dirichlet_nr"></span><h3>abstract interface
+        
+    </h3></div>
+    <ul class="list-group">
+      <li class="list-group-item">
+            <h3>
+    public  subroutine Abstract_BC_Thermal_CRS_Dirichlet_NR(self, A, b, Info, Edge)  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~145"></span>
+              class(<a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~10"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-info~2"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Info</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(2)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+      </li>
+    </ul>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Derived Types</h2>
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_edge"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/type_edge.html'>Type_Edge</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edgetype"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>EdgeType</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edgegroup"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>EdgeGroup</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-conn"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Conn</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-distance"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Distance</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unitnormal"></span>
+              type(<a href='../type/vector3d.html'>Vector3D</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>UnitNormal</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-condition_bc_local"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/condition_bc_local.html'>Condition_BC_Local</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-type~4"></span>
+              character(len=:),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>type</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-isuniform"></span>
+              logical(kind=4),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>isUniform</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~8"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-abstract_condition_bc"></span>
+      <h3>
+        type, public, abstract&nbsp;::&nbsp;
+        <a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      <p>Boundary conditions information</p>
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-numbcgroup"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>numBCGroup</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Time</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bcgroup"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>BCGroup</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bcinfo"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>BCInfo</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure(<a href='../interface/abstract_bc_thermal_crs_dirichlet.html'>Abstract_BC_Thermal_CRS_Dirichlet</a>), public, deferred, pass(self) ::
+  <strong><a href='../type/abstract_condition_bc.html#boundprocedure-fix_bc_dirichlet'>Fix_BC_Dirichlet</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure(<a href='../interface/abstract_bc_thermal_crs_dirichlet_nr.html'>Abstract_BC_Thermal_CRS_Dirichlet_NR</a>), public, deferred, pass(self) ::
+  <strong><a href='../type/abstract_condition_bc.html#boundprocedure-fix_bc_dirichlet_nr'>Fix_BC_Dirichlet_NR</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure(<a href='../interface/abstract_bc_thermal_crs_fix_all.html'>Abstract_BC_Thermal_CRS_Fix_All</a>), public, deferred, pass(self) ::
+  <strong><a href='../type/abstract_condition_bc.html#boundprocedure-fix_bc_all'>Fix_BC_All</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure(<a href='../interface/abstract_bc_thermal_crs_fix_rhs.html'>Abstract_BC_Thermal_CRS_Fix_RHS</a>), public, deferred, pass(self) ::
+  <strong><a href='../type/abstract_condition_bc.html#boundprocedure-fix_bc_rhs'>Fix_BC_RHS</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/abstract_condition_bc.html#boundprocedure-fix_bc'>Fix_BC</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal_crs.html#boundprocedure-fix_bc_all~2'>Fix_BC_All</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal_crs.html#boundprocedure-fix_bc_rhs~2'>Fix_BC_RHS</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_bc_thermal"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      <p>Boundary conditions information</p>
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-numbcgroup~2"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>numBCGroup</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Time</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bcgroup~2"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>BCGroup</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+<p>Boundary conditions information of the Edges</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-numedges"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>numEdges</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edgeinfo"></span>
+              type(<a href='../type/type_edge.html'>Type_Edge</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>EdgeInfo</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_bc_thermal.html#boundprocedure-fix_boundaryconditions_crs'>Fix_BoundaryConditions_CRS</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_bc_thermal.html#boundprocedure-fix_boundaryconditions_full'>Fix_BoundaryConditions_Full</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_bc_thermal.html#boundprocedure-fix_boundaryconditions'>Fix_BoundaryConditions</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal.html#boundprocedure-fix_boundaryconditions_crs'>Fix_BoundaryConditions_CRS</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal.html#boundprocedure-fix_boundaryconditions_full'>Fix_BoundaryConditions_Full</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_bc_thermal.html#boundprocedure-fix_bounday_values_crs'>Fix_Bounday_Values_CRS</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_bc_thermal.html#boundprocedure-fix_bounday_values_full'>Fix_Bounday_Values_Full</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_bc_thermal.html#boundprocedure-fix_bounday_values_rhs'>Fix_Bounday_Values_RHS</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_bc_thermal.html#boundprocedure-fix_bounday_values'>Fix_Bounday_Values</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal.html#boundprocedure-fix_bounday_values_crs'>Fix_Bounday_Values_CRS</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal.html#boundprocedure-fix_bounday_values_full'>Fix_Bounday_Values_Full</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal.html#boundprocedure-fix_bounday_values_rhs'>Fix_Bounday_Values_RHS</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_bc_thermal_crs"></span>
+      <h3>
+        type, public, extends(<a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a>)&nbsp;::&nbsp;
+        <a href='../type/type_bc_thermal_crs.html'>Type_BC_Thermal_CRS</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-numbcgroup"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>numBCGroup</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>Time</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bcgroup"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>BCGroup</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bcinfo"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>BCInfo</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        <h4>Constructor</h4>
+          
+        <table class="table table-striped varlist">
+          <tbody>
+                <tr>
+                  <td>
+                        public
+
+                    
+                    interface
+                    <strong><a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/type_bc_thermal_crs_construct.html'>Type_BC_Thermal_CRS_Construct</a></strong>
+                    ()
+                  </td>
+                  <td></td>
+                </tr>
+          </tbody>
+        </table>
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_bc_thermal_crs.html#boundprocedure-fix_bc~2'>Fix_BC</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal_crs.html#boundprocedure-fix_bc_all~2'>Fix_BC_All</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_bc_thermal_crs.html#boundprocedure-fix_bc_rhs~2'>Fix_BC_RHS</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_bc_thermal_crs.html#boundprocedure-fix_bc_dirichlet~2'>Fix_BC_Dirichlet</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/type_bc_thermal_crs_dirichlet.html'>Type_BC_Thermal_CRS_Dirichlet</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_bc_thermal_crs.html#boundprocedure-fix_bc_dirichlet_nr~2'>Fix_BC_Dirichlet_NR</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/type_bc_thermal_crs_dirichlet_nr.html'>Type_BC_Thermal_CRS_Dirichlet_NR</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_bc_thermal_crs.html#boundprocedure-fix_bc_all~2'>Fix_BC_All</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/type_bc_thermal_crs_fix_bc_all.html'>Type_BC_Thermal_CRS_Fix_BC_All</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_bc_thermal_crs.html#boundprocedure-fix_bc_rhs~2'>Fix_BC_RHS</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/type_bc_thermal_crs_fix_bc_rhs.html'>Type_BC_Thermal_CRS_Fix_BC_RHS</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-calculate_edge_dinstance"></span> <h3>public  function <a href='../proc/calculate_edge_dinstance.html'>Calculate_Edge_Dinstance</a>(Edge, Coordinate) result(Edge_Distance)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-coordinate~2"></span>
+              type(<a href='../type/dp3d.html'>DP3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Coordinate</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-calculate_edge_unitnormalvector"></span> <h3>public  function <a href='../proc/calculate_edge_unitnormalvector.html'>Calculate_Edge_UnitNormalVector</a>(Edge, Coordinate, Distance) result(UnitNormalVector)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~7"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-coordinate~3"></span>
+              type(<a href='../type/dp3d.html'>DP3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Coordinate</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-distance~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/vector3d.html'>Vector3D</a>)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-type_bc_thermal_constructor"></span> <h3>public  function <a href='../proc/type_bc_thermal_constructor.html'>Type_BC_Thermal_Constructor</a>(Structure_Input, Input_VTK) result(Structure)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-structure_input"></span>
+              type(<a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Structure_Input</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input_vtk"></span>
+              type(<a href='../type/type_vtk.html'>Type_VTK</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Input_VTK</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-condition_bc_local_assignment"></span> <h3>public  subroutine <a href='../proc/condition_bc_local_assignment.html'>Condition_BC_Local_Assignment</a>(A, B)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~15"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~4"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>B</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundaryconditions_crs"></span> <h3>public  subroutine <a href='../proc/fix_boundaryconditions_crs.html'>Fix_BoundaryConditions_CRS</a>(self, A, b, lambda, Cw, Structure_HeatFlux)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>VTK_LINE</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~150"></span>
+              class(<a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~16"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~13"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-lambda"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>lambda</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cw~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Cw</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-structure_heatflux"></span>
+              type(<a href='../type/dp3d.html'>DP3d</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Structure_HeatFlux</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundaryconditions_full"></span> <h3>public  subroutine <a href='../proc/fix_boundaryconditions_full.html'>Fix_BoundaryConditions_Full</a>(self, A, b, lambda, Cw, Structure_HeatFlux)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~151"></span>
+              class(<a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~17"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~14"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-lambda~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>lambda</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cw~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Cw</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-structure_heatflux~2"></span>
+              type(<a href='../type/dp3d.html'>DP3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Structure_HeatFlux</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_bounday_values_crs"></span> <h3>public  subroutine <a href='../proc/fix_bounday_values_crs.html'>Fix_Bounday_Values_CRS</a>(self, A, b)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~152"></span>
+              class(<a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~18"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~15"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_bounday_values_full"></span> <h3>public  subroutine <a href='../proc/fix_bounday_values_full.html'>Fix_Bounday_Values_Full</a>(self, A, b)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~153"></span>
+              class(<a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~19"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~16"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_bounday_values_rhs"></span> <h3>public  subroutine <a href='../proc/fix_bounday_values_rhs.html'>Fix_Bounday_Values_RHS</a>(self, b)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~154"></span>
+              class(<a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~17"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_dirichlet_crs"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_dirichlet_crs.html'>Fix_BoundaryCondition_Dirichlet_CRS</a>(A, b, BC_Info, Edge)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~20"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~18"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~2"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~8"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_dirichlet_crs_value"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_dirichlet_crs_value.html'>Fix_BoundaryCondition_Dirichlet_CRS_Value</a>(A, b, BC_Info, Edge)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~21"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~19"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~3"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~9"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_dirichlet_crs_initial"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_dirichlet_crs_initial.html'>Fix_BoundaryCondition_Dirichlet_CRS_Initial</a>(A, b, BC_Info, Edge)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~22"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~20"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~4"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~10"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_dirichlet_full"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_dirichlet_full.html'>Fix_BoundaryCondition_Dirichlet_Full</a>(A, b, BC_Info, Edge)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~23"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~21"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~5"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~11"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_neumann"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_neumann.html'>Fix_BoundaryCondition_Neumann</a>(b, BC_Info, Edge, Edge_Distance, c)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~22"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~6"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~12"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-c"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>c</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_flux"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_flux.html'>Fix_BoundaryCondition_Flux</a>(b, BC_Info, Edge, Edge_Distance)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~23"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~7"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~13"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_robin_crs"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_robin_crs.html'>Fix_BoundaryCondition_Robin_CRS</a>(A, b, BC_Info, Edge, Edge_Distance, Edge_UnitNormal, Cw, Flux)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Assemble Robin (Cauthy) Boundary to the Global Matrix</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~24"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~24"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~8"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~14"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_unitnormal"></span>
+              type(<a href='../type/vector3d.html'>Vector3D</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_UnitNormal</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cw~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Cw</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-flux"></span>
+              type(<a href='../type/dp3d.html'>DP3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Flux</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_robin_full"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_robin_full.html'>Fix_BoundaryCondition_Robin_Full</a>(A, b, BC_Info, Edge, Edge_Distance, Edge_UnitNormal, Cw, Flux)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Assemble Robin (Cauthy) Boundary to the Global Matrix</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~25"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~25"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~9"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~15"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_unitnormal~2"></span>
+              type(<a href='../type/vector3d.html'>Vector3D</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_UnitNormal</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cw~9"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Cw</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-flux~2"></span>
+              type(<a href='../type/dp3d.html'>DP3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Flux</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_heattransfer_crs"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_heattransfer_crs.html'>Fix_BoundaryCondition_HeatTransfer_CRS</a>(A, b, BC_Info, Edge, Edge_Distance)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Assemble Heat Transfer Boundary to the Global Matrix</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~26"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~26"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~10"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~16"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_heattransfer_full"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_heattransfer_full.html'>Fix_BoundaryCondition_HeatTransfer_Full</a>(A, b, BC_Info, Edge, Edge_Distance)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Assemble Heat Transfer Boundary to the Global Matrix</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~27"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~27"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~11"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~17"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_heatradiation_crs"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_heatradiation_crs.html'>Fix_BoundaryCondition_HeatRadiation_CRS</a>(A, b, BC_Info, Edge, Edge_Distance)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Assemble Heat Radiation Boundary to the Global Matrix</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~28"></span>
+              type(<a href='../type/type_crs.html'>Type_CRS</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~28"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~12"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~18"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-fix_boundarycondition_heatradiation_full"></span> <h3>public  subroutine <a href='../proc/fix_boundarycondition_heatradiation_full.html'>Fix_BoundaryCondition_HeatRadiation_Full</a>(A, b, BC_Info, Edge, Edge_Distance)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Assemble Heat Radiation Boundary to the Global Matrix</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~29"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~29"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_info~13"></span>
+              type(<a href='../type/condition_bc_local.html'>Condition_BC_Local</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC_Info</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge~19"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-edge_distance~9"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Edge_Distance</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-05-07 12:34 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
