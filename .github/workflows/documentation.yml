@@ -2,9 +2,11 @@ name: Build and Deploy Documentations
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   documentation:
@@ -20,17 +22,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'              # Pin interpreter :contentReference[oaicite:12]{index=12}
-
-      - name: Install Dependencies Ubuntu
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt install -y gfortran-${GCC_V} python3-dev graphviz
+          sudo apt-get install -y gfortran-${GCC_V} python3-dev graphviz
+
+      - name: Upgrade pip & Install Python Dependencies
+        run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade ford markdown==3.3.4
+          # 最新版の Ford を強制的にインストール
+          python3 -m pip install --upgrade ford
+          # Markdown はプロジェクト要件に合わせて固定
+          python3 -m pip install markdown==3.3.4
+
+      - name: Verify Ford Version
+        run: ford --version
 
       - name: Build Developer Documentation
         run: ford api-docs-ford-settings.md
