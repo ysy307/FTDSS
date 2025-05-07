@@ -2,11 +2,9 @@ name: Build and Deploy Documentations
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   documentation:
@@ -14,34 +12,38 @@ jobs:
     permissions:
       contents: write
 
-
     env:
       FC: gfortran
       GCC_V: 12
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Install Dependencies Ubuntu
-      run: |
-        sudo apt-get update
-        sudo apt install -y gfortran-${GCC_V} python3-dev graphviz
-        sudo pip install ford markdown==3.3.4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'              # Pin interpreter :contentReference[oaicite:12]{index=12}
 
-    - name: Build Developer Documentation
-      run: |
-        ford api-docs-ford-settings.md
+      - name: Install Dependencies Ubuntu
+        run: |
+          sudo apt-get update
+          sudo apt install -y gfortran-${GCC_V} python3-dev graphviz
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade ford markdown==3.3.4
 
-    - name: Upload Documentation
-      uses: actions/upload-artifact@v4
-      with:
-        name: documentation
-        path: ./docs/api-docs
-        if-no-files-found: error
+      - name: Build Developer Documentation
+        run: ford api-docs-ford-settings.md
 
-    - name: Deploy API Documentation
-      uses: JamesIves/github-pages-deploy-action@4.1.0
-      with:
-        branch: gh-pages
-        folder: ./docs/api-docs
+      - name: Upload Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: ./docs/api-docs
+          if-no-files-found: error
+
+      - name: Deploy API Documentation
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: gh-pages
+          folder: ./docs/api-docs
