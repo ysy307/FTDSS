@@ -17,6 +17,8 @@ program test
                               Sides=FTDSS%Thermal%Sides, &
                               BC=FTDSS%Thermal%BC)
 
+    ! FTDSS%phi%pre(:)
+
     call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0
@@ -24,6 +26,7 @@ program test
     call FTDSS%Output%Output_All(fc=count, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
     FTDSS%Iteration%step = 0
+    FTDSS%Iteration%max_iter = 100
 
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
@@ -35,6 +38,7 @@ program test
         FTDSS%Iteration%iter = 0
 
         !! Thermal Newton-Raphson FTDSS%Iteration
+
         NR_LOOP_THERMAL: do while (FTDSS%Iteration%iter <= FTDSS%Iteration%max_iter)
             ! print *, FTDSS%Iteration%iter
             if (FTDSS%Iteration%isConverged) then
@@ -42,6 +46,7 @@ program test
                 FTDSS%Iteration%isConverged = .false.
             end if
             FTDSS%Iteration%iter = FTDSS%Iteration%iter + 1
+            ! print *, FTDSS%Iteration%iter
             ! if (FTDSS%Iteration%iter == 1) then
             !     if (FTDSS%Iteration%step >= 2) then
             !         Thermal%T%pre(:) = Thermal%T%old(:, 1) + (Thermal%T%old(:, 1) - Thermal%T%old(:, 2)) * (FTDSS%time%dt / FTDSS%time%dt_old(1))
@@ -92,6 +97,7 @@ program test
             ! norm_new = norm_2(Thermal%nsize, Thermal%T%dif)
             norm_new = maxval(abs(FTDSS%Thermal%T%dif))
 
+            ! print *, FTDSS%Iteration%iter, FTDSS%Iteration%iter >= 2
             !! Convergence check
             if (FTDSS%Iteration%iter >= 1) then
                 ! if (norm_new < 1.0d-5) then

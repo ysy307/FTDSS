@@ -316,16 +316,20 @@ contains
 
                     select type (Ice => Thermal%Ice(1)%f)
                     type is (Type_Ice_GCC)
-                        call self%Interpolate_ObsValues(Temp, tmpValues)
+                        call self%Interpolate_ObsValues(phi, tmpValues)
+                        call self%Interpolate_ObsValues(Temp, obsValues)
                         do iObs = 1, self%Observation%NumObservation
                             obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
                         end do
                     type is (Type_Ice_EXP)
-                        call self%Interpolate_ObsValues(Temp, tmpValues)
+                        call self%Interpolate_ObsValues(phi, tmpValues)
+                        call self%Interpolate_ObsValues(Temp, obsValues)
                         do iObs = 1, self%Observation%NumObservation
                             obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
                         end do
                     end select
+                    ! print *, obsValues(:)
+                    ! stop
                     call Output_Observation_Line(self%Observation%Si%numUnit, time, obsValues)
                 else
                     call self%Interpolate_ObsValues(Si, obsValues)

@@ -59,6 +59,8 @@ contains
         self%Output = Type_Output(self%Input, Thermal=self%Thermal, Coordinate=self%Coordinate)
 
         call self%phi%allocate(nsize, self%Input%Basic%Order)
+        self%phi%pre = self%Input%Regions(1)%Thermal%Porosity
+        self%phi%old = self%Input%Regions(1)%Thermal%Porosity
 
     end subroutine FDTSS_initialize
 

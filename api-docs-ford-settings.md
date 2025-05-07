@@ -23,7 +23,7 @@ display: public
 extra_mods: json_module: http://jacobwilliams.github.io/json-fortran/
 graph_maxnodes: 250
 graph_maxdepth: 10
-fpp_extensions: F90 fpp
+fpp_extensions: F90 f90 fpp
 preprocess: true
 
 {!./api-docs-index.md!}
