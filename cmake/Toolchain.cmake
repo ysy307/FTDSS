@@ -16,7 +16,7 @@ endif()
 
 if(NOT TARGET fortran_stdlib::fortran_stdlib)
     find_package(fortran_stdlib REQUIRED
-        PATHS ${PROJECT_SOURCE_DIR}/third_parth/.local/lib/cmake/fortran_stdlib
+        PATHS ${PROJECT_SOURCE_DIR}/third_party/.local/lib/cmake/fortran_stdlib
     )
 endif()
 
@@ -28,7 +28,7 @@ endif()
 
 # --- 静的ライブラリは一度だけ探索 ---
 if(NOT MY_ALL_LIBRARIES)
-    file(GLOB MY_ALL_LIBRARIES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/lib/*.a)
+    file(GLOB MY_ALL_LIBRARIES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/third_party/.local/VTKFortran/lib/*.a)
 endif()
 
 # --- ターゲットに対してビルドフラグを設定 ---
@@ -72,7 +72,7 @@ endfunction()
 # --- サードパーティのヘッダ・ライブラリを追加 ---
 function(enable_thirdparty target)
     target_include_directories(${target} PUBLIC
-    ${PROJECT_SOURCE_DIR}/include/VTKFortran
+        ${PROJECT_SOURCE_DIR}/third_party/.local/VTKFortran/include
     )
     target_link_libraries(${target} PUBLIC ${MY_ALL_LIBRARIES})
 
