@@ -24,9 +24,6 @@ RUN apt-get update -y && apt-get install -y \
     software-properties-common \
     ninja-build \
     graphviz \
-    tzdata \
-    language-pack-ja \
-    && update-locale LANG=ja_JP.UTF-8 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -46,7 +43,7 @@ RUN pip3 install --upgrade pip && \
     pip3 install --upgrade ford && \
     echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod", "/opt/intel/oneapi/mpi/2021.14/include/mpi","/opt/intel/oneapi/2025.0/include/mpi"] }' > /root/.fortls
 
-ENV TZ Asia/Tokyo
+
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:ja
 ENV LC_ALL ja_JP.UTF-8
