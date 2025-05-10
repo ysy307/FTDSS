@@ -42,7 +42,7 @@ contains
         write (num_unit, '(a)') "Time Information"
         write (num_unit, '(a)') "----------------------------------------------"
         write (num_unit, '(a)') trim(time%start%label)//" Time: "//time%start%date(1:4)//"-"//time%start%date(5:6)//"-"//time%start%date(7:8)//"T"//time%start%time(1:2)//":"//time%start%time(3:4)//":"//time%start%time(5:6)//trim(time%start%zone)
-        write (num_unit, '(a)') trim(time%end%label)//" Time: "//time%end%date(1:4)//"-"//time%end%date(5:6)//"-"//time%end%date(7:8)//"T"//time%end%time(1:2)//":"//time%end%time(3:4)//":"//time%end%time(5:6)//trim(time%end%zone)
+        write (num_unit, '(a)') trim(time%end%label)//" Time  : "//time%end%date(1:4)//"-"//time%end%date(5:6)//"-"//time%end%date(7:8)//"T"//time%end%time(1:2)//":"//time%end%time(3:4)//":"//time%end%time(5:6)//trim(time%end%zone)
         write (num_unit, '(a)') "----------------------------------------------"
 
         close (num_unit)

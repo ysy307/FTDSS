@@ -8,7 +8,6 @@ module Solver_Solve
 #ifdef _OPENMP
     use omp_lib
 #endif
-
     implicit none
     private
 #ifdef _MKL

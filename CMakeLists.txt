@@ -1,9 +1,22 @@
 # CMake Minimum Version
 cmake_minimum_required(VERSION 3.30)
 
+# コンパイラ指定
+if(DEFINED COMPILER)
+    if(COMPILER STREQUAL "intel")
+        set(CMAKE_Fortran_COMPILER ifx CACHE STRING "" FORCE)
+        set(CMAKE_C_COMPILER icx CACHE STRING "" FORCE)
+    elseif(COMPILER STREQUAL "gnu")
+        set(CMAKE_Fortran_COMPILER gfortran CACHE STRING "" FORCE)
+        set(CMAKE_C_COMPILER gcc CACHE STRING "" FORCE)
+    else()
+        message(FATAL_ERROR "Unknown COMPILER specified: ${COMPILER}")
+    endif()
+endif()
+
 # Project Name and Language
 project(YSY_FC LANGUAGES Fortran C)
-enable_language(Fortran)
+enable_language(Fortran C)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -27,18 +40,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_INCLUDE_PATH             ${PROJECT_SOURCE_DIR}/include)
 
-
 # 共通スクリプト読み込み
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
-
-### Compiler Configuration
-if(NOT DEFINED CMAKE_Fortran_COMPILER)
-    set(CMAKE_Fortran_COMPILER ifx)
-endif()
-if(NOT DEFINED CMAKE_C_COMPILER)
-    set(CMAKE_C_COMPILER icx)
-endif()
 
 # Source Files
 add_subdirectory(src/Core)
@@ -90,31 +94,9 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Output
         FTDSS
     )
-    target_link_libraries(ysy_fc PRIVATE ${LINK_LIBRARIES})
-    target_include_directories(ysy_fc PUBLIC ${My_INCLUDE_PATH})
-    
+    enable_build_flags(ysy_fc)
+    enable_thirdparty (ysy_fc)
 
-    # Compilation Flags
-    target_compile_options(ysy_fc PUBLIC -fpp -traceback)
-    target_link_options   (ysy_fc PUBLIC -fpp -traceback)
-
-    # MKL Configuration
-    if(ENABLE_MKL)
-        set(MKL_LINK "static")
-        find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
-        target_compile_options    (ysy_fc PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
-        target_include_directories(ysy_fc PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
-        target_link_libraries     (ysy_fc PUBLIC $<LINK_ONLY:MKL::MKL>)
-        add_definitions(-D_MKL)
-    endif()
-
-    if(ENABLE_DEBUG)
-        target_compile_options(ysy_fc PUBLIC -O0 -g -check all)
-        target_link_options   (ysy_fc PUBLIC -O0 -g -check all)
-    elseif(ENABLE_OPTIMIZE)
-        target_compile_options(ysy_fc PUBLIC -O3 -flto -xCORE-AVX2)
-        target_link_options   (ysy_fc PUBLIC -O3 -flto -xCORE-AVX2)
-    endif()
 
     # Custom Run Target
     add_custom_target(run_ysy_fc
