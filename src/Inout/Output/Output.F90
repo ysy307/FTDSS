@@ -1,5 +1,6 @@
 module Inout_Output
-    use, intrinsic :: iso_fortran_env, only: int8, int32, real64
+    use, intrinsic :: iso_fortran_env
+    use :: iso_c_binding, only:c_int64_t
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
     use :: Core_BaseTypes
     use :: Core_Allocate
@@ -7,6 +8,7 @@ module Inout_Output
     use :: Inout_Input
     use :: Core_Element
     use :: Main_Thermal
+    use :: Solver_Time
 
     use :: stdlib_strings, only:to_string
 
@@ -66,6 +68,8 @@ module Inout_Output
         logical(4) :: doPressure
         logical(4) :: doStress
 
+        character(:), allocatable :: logFileName
+
     contains
         procedure, pass(self) :: Output_All_vtu => Inout_Output_All_vtu
         procedure, pass(self) :: Output_All_vtk => Inout_Output_All_vtk
@@ -77,6 +81,8 @@ module Inout_Output
         procedure, pass(self) :: Initialize_Observation_Header
         procedure, pass(self) :: Interpolate_ObsValues
         procedure, pass(self), public :: Output_Observation => Output_Process_Observation
+
+        procedure, pass(Self), public :: Output_SystemLog
     end type Type_Output
 
     interface Type_Output
@@ -106,6 +112,24 @@ module Inout_Output
             character(:), allocatable :: HostName
 
         end function Get_HostName
+
+        module function Get_CompilerName() result(CompilerName)
+            implicit none
+            character(:), allocatable :: CompilerName
+
+        end function Get_CompilerName
+
+        module function Get_CompilerVersion() result(CompilerVersion)
+            implicit none
+            character(:), allocatable :: CompilerVersion
+
+        end function Get_CompilerVersion
+
+        module function Get_CPUArchitecture() result(architecture)
+            implicit none
+            character(:), allocatable :: architecture
+
+        end function Get_CPUArchitecture
 
     end interface
 
@@ -150,6 +174,22 @@ module Inout_Output
         end subroutine Output_Process_Observation
     end interface
 
+    interface
+        function get_rss_kb() bind(C, name="get_rss_kb")
+            import :: c_int64_t
+            implicit none
+            integer(c_int64_t) :: get_rss_kb
+        end function get_rss_kb
+    end interface
+
+    interface
+        module subroutine Output_SystemLog(self, time)
+            implicit none
+            class(Type_Output) :: self
+            type(Type_Time) :: time
+        end subroutine Output_SystemLog
+    end interface
+
 contains
 
     function Type_Output_Construct(Structure_Input, Thermal, Coordinate) result(Structure)
@@ -179,8 +219,7 @@ contains
         Structure%dir_Output = trim(adjustl(dir_Path))//"Output/"
         call Setup_Directory(Structure%dir_Output, OutputExtentions)
 
-        Structure%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
-        call Setup_Directory(Structure%dir_FileOutput, OutputFileExtentions)
+        Structure%logFileName = trim(adjustl(Structure%dir_Output))//"run.log"
 
         Structure%Observation%Temperature%Filename = trim(adjustl(Structure%dir_Output))//"obsf_T.dat" !&
         Structure%Observation%Si%Filename          = trim(adjustl(Structure%dir_Output))//"obsf_Si.dat" !&
@@ -189,6 +228,9 @@ contains
         Structure%Observation%Pressure%Filename    = trim(adjustl(Structure%dir_Output))//"obsf_P.dat" !&
         Structure%Observation%wFlux%Filename       = trim(adjustl(Structure%dir_Output))//"obsf_Flux.dat" !&
         Structure%Observation%K%Filename           = trim(adjustl(Structure%dir_Output))//"obsf_K.dat" !&
+
+        Structure%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
+        call Setup_Directory(Structure%dir_FileOutput, OutputFileExtentions)
 
         Structure%Observation%Temperature%doOutput = Structure_Input%OutputSettings%outTemp
         Structure%Observation%Si%doOutput = Structure_Input%OutputSettings%outSi

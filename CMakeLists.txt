@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.30)
 
 # Project Name and Language
-project(YSY_FC LANGUAGES Fortran)
+project(YSY_FC LANGUAGES Fortran C)
 enable_language(Fortran)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -35,6 +35,9 @@ include(Toolchain)
 ### Compiler Configuration
 if(NOT DEFINED CMAKE_Fortran_COMPILER)
     set(CMAKE_Fortran_COMPILER ifx)
+endif()
+if(NOT DEFINED CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER icx)
 endif()
 
 # Source Files

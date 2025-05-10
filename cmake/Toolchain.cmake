@@ -33,7 +33,10 @@ endif()
 
 # --- ターゲットに対してビルドフラグを設定 ---
 function(enable_build_flags target)
-    target_compile_options(${target} PUBLIC -fpp)
+    # Fortran のみに -fpp を適用
+    target_compile_options(${target} PUBLIC
+        $<$<COMPILE_LANGUAGE:Fortran>:-fpp>
+    )
 
     if(ENABLE_DEBUG)
         target_compile_options(${target} PUBLIC
@@ -68,6 +71,7 @@ function(enable_build_flags target)
         target_compile_definitions(${target} PUBLIC _MKL)
     endif()
 endfunction()
+
 
 # --- サードパーティのヘッダ・ライブラリを追加 ---
 function(enable_thirdparty target)

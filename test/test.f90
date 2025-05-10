@@ -31,6 +31,7 @@ program test
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
+        exit TIME_LOOP
         FTDSS%time%time_old = FTDSS%time%time
         FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
         FTDSS%time%dt_old(1) = FTDSS%time%dt
@@ -125,6 +126,9 @@ program test
         end if
 
     end do TIME_LOOP
+
+    call FTDSS%time%Record("End")
+    call FTDSS%Output%Output_SystemLog(FTDSS%time)
 
     stop
 

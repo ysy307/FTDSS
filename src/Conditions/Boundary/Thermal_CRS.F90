@@ -71,12 +71,28 @@ contains
             case (Dirichlet)
                 Dval = (self%BCInfo(iGroup)%value(idx) * (1.0d0 - timeCoe) + &
                         self%BCInfo(iGroup)%value(idx + 1) * timeCoe)
-                call self%Fix_BC_Dirichlet( &
-                    A=A, &
-                    b=b, &
-                    Info=self%BCInfo(iGroup), &
-                    Edge=Sides(iEdge)%s%Conn(1:2), &
-                    Dval=Dval)
+
+                if (Sides(iEdge)%s%SideType == 3) then
+                    call self%Fix_BC_Dirichlet( &
+                        A=A, &
+                        b=b, &
+                        Info=self%BCInfo(iGroup), &
+                        Edge=Sides(iEdge)%s%Conn([1, 2]), &
+                        Dval=Dval)
+                else
+                    call self%Fix_BC_Dirichlet( &
+                        A=A, &
+                        b=b, &
+                        Info=self%BCInfo(iGroup), &
+                        Edge=Sides(iEdge)%s%Conn([1, 3]), &
+                        Dval=Dval)
+                    call self%Fix_BC_Dirichlet( &
+                        A=A, &
+                        b=b, &
+                        Info=self%BCInfo(iGroup), &
+                        Edge=Sides(iEdge)%s%Conn([3, 2]), &
+                        Dval=Dval)
+                end if
             end select
         end do
 

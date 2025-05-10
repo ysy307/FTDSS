@@ -173,4 +173,70 @@ contains
 
     end function Get_HostName
 
+    module function Get_CompilerName() result(CompilerName)
+        implicit none
+        character(:), allocatable :: CompilerName
+
+#ifdef __GFORTRAN__
+        CompilerName = "GNU Fortran Compiler"
+#elif defined(__INTEL_COMPILER)
+        CompilerName = "Intel Fortran Compiler"
+#elif defined(__PGI) || defined(__NVCOMPILER)
+        CompilerName = "NVIDIA (PGI) Fortran Compiler"
+#else
+        CompilerName = "Unknown Compiler"
+#endif
+
+    end function Get_CompilerName
+
+    module function Get_CompilerVersion() result(CompilerVersion)
+        use :: stdlib_strings, only:to_string
+        implicit none
+        character(:), allocatable :: CompilerVersion
+        integer(int32) :: year, major, minor
+
+#ifdef __GFORTRAN__
+#ifdef __GNUC__
+        CompilerVersion = to_string(__GNUC__)//"."//to_string(__GNUC_MINOR__)//"."//to_string(__GNUC_PATCHLEVEL__)
+#else
+        CompilerVersion = "Unknown Compiler Version"
+#endif
+#elif defined(__INTEL_COMPILER)
+        year = __INTEL_COMPILER / 10000
+        major = mod(__INTEL_COMPILER / 100, 100)
+        minor = mod(__INTEL_COMPILER, 100)
+
+        CompilerVersion = to_string(year)//"."//to_string(major)//"."//to_string(minor)
+#elif defined(__PGI) || defined(__NVCOMPILER)
+        CompilerVersion = to_string(__NVCOMPILER_MAJOR__)//"."//to_string(__NVCOMPILER_MINOR__)//"."//to_string(__NVCOMPILER_PATCHLEVEL__)
+#else
+        CompilerVersion = "Unknown Compiler Version"
+#endif
+
+    end function Get_CompilerVersion
+
+    module function Get_CPUArchitecture() result(architecture)
+        implicit none
+        character(:), allocatable :: architecture
+        character(64) :: temp_architecture
+        integer(int32) :: unit_num, ios
+
+        ! 一時ファイルにコマンドの出力を保存
+        call execute_command_line('uname -m > architecture_tmp.txt')
+
+        ! 一時ファイルからアーキテクチャ情報を読み取る
+        open (newunit=unit_num, file='architecture_tmp.txt', status='old', action='read')
+        read (unit_num, '(a)', iostat=ios) temp_architecture
+        close (unit_num)
+
+        ! 一時ファイルを削除
+        call execute_command_line('rm -f architecture_tmp.txt')
+
+        if (ios == 0) then
+            architecture = trim(temp_architecture)
+        else
+            architecture = 'Unknown Architecture'
+        end if
+    end function Get_CPUArchitecture
+
 end submodule Inout_Output_Base
