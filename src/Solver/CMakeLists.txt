@@ -1,4 +1,4 @@
-add_library(Solver
+add_library(Solver OBJECT
     Solve.f90
     Solve_BiCGSTAB.F90
     Solve_LU.F90

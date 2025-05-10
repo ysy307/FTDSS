@@ -1,4 +1,4 @@
-add_library(Calc_WRF
+add_library(Calc_WRF OBJECT
     WRF.F90
     WRF_BC.F90
     WRF_VG.F90

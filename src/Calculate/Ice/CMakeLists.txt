@@ -1,4 +1,4 @@
-add_library(Calc_Ice
+add_library(Calc_Ice OBJECT
     Ice.F90
     Ice_TRM.F90
     Ice_GCC.F90

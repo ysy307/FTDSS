@@ -1,4 +1,4 @@
-add_library(Matrix 
+add_library(Matrix OBJECT
     CRS.F90 
     Assemble.F90
 )

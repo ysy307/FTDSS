@@ -1,4 +1,19 @@
 submodule(Main_Thermal) Main_Thermal_3Phase
+    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: Core_BaseTypes
+    use :: Core_Element
+    use :: Core_Side
+    use :: Inout_Input
+    use :: Calculate_Ice
+    use :: Calculate_ThermalConductivity
+    use :: Calculate_Density
+    use :: Calculate_SpecificHeat
+    use :: Calculate_HeatCapacity
+    use :: Matrix_Assemble
+    use :: Matrix_CRS
+    use :: Condition_Boundary
+    use :: Condition_Initial
+    use :: Solver_Solve
     implicit none
 contains
     module function Type_Thermal_3Phase_2D_Construct(Input, Coordinate) result(Structure)

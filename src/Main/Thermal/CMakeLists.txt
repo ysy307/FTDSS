@@ -1,4 +1,4 @@
-add_library(Thermal
+add_library(Thermal OBJECT
     Thermal.F90
     Thermal_3Phase.F90
 )

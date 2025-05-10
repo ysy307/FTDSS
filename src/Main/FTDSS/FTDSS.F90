@@ -36,9 +36,9 @@ contains
 
         ! Initialize the FDTSS module
         ! This is where you would set up any necessary parameters or configurations
-        call self%time%Record("Start")
         self%Input = Type_Input()
         self%time = Type_Time(self%Input)
+        call self%time%Record("Start")
         nsize = self%Input%VTK%numPoints
 
         ! Initialize the Structure

@@ -1,4 +1,4 @@
-add_library(Core
+add_library(Core OBJECT
     Error.F90
     Allocate.F90
     BaseTypes.F90

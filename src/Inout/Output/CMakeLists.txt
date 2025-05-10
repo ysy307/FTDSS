@@ -1,4 +1,4 @@
-add_library(Output
+add_library(Output OBJECT
     RSS.c
     Output.F90
     Base.F90

@@ -1,4 +1,4 @@
-add_library(Calc_VHC
+add_library(Calc_VHC OBJECT
     Interface.F90
     Base.F90
     3Phase_Apparent.F90

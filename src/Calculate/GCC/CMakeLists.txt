@@ -1,4 +1,4 @@
-add_library(Calc_GCC
+add_library(Calc_GCC OBJECT
     GCC.F90
     GCC_NonSegregation_m.F90
     GCC_NonSegregation_Pa.F90

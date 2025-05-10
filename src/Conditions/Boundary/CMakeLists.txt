@@ -1,4 +1,4 @@
-add_library(Boundary
+add_library(Boundary OBJECT
     Interface.F90
     Base.F90
     Thermal_CRS.F90

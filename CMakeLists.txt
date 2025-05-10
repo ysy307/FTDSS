@@ -89,7 +89,6 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Thermal
         Output
         FTDSS
-        ${LINK_LIBRARIES}
     )
     target_link_libraries(ysy_fc PRIVATE ${LINK_LIBRARIES})
     target_include_directories(ysy_fc PUBLIC ${My_INCLUDE_PATH})
@@ -126,11 +125,6 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
-    target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
-    # target_compile_options(test PUBLIC -fpp -traceback)
-    # target_link_options   (test PUBLIC -fpp -traceback)
-
-    # Link core libraries
     target_link_libraries(test PRIVATE
         Core
         Matrix
@@ -145,13 +139,12 @@ elseif(BUILD_APP STREQUAL "test")
         Calc_THC
         Calc_VHC
         Calc_DEN
+        Calc_SPH
         Solver
         Thermal
         Output
         FTDSS
-        ${LINK_LIBRARIES}
     )
-
     enable_build_flags(test)
     enable_thirdparty (test)
 
