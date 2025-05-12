@@ -216,27 +216,35 @@ contains
     end function Get_CompilerVersion
 
     module function Get_CPUArchitecture() result(architecture)
-        implicit none
         character(:), allocatable :: architecture
-        character(64) :: temp_architecture
-        integer(int32) :: unit_num, ios
+        type(c_ptr) :: ptr
 
-        ! 一時ファイルにコマンドの出力を保存
-        call execute_command_line('uname -m > architecture_tmp.txt')
+        ! C 側 get_architecture() を呼び出し
+        ptr = C_Get_Architecture()
 
-        ! 一時ファイルからアーキテクチャ情報を読み取る
-        open (newunit=unit_num, file='architecture_tmp.txt', status='old', action='read')
-        read (unit_num, '(a)', iostat=ios) temp_architecture
-        close (unit_num)
-
-        ! 一時ファイルを削除
-        call execute_command_line('rm -f architecture_tmp.txt')
-
-        if (ios == 0) then
-            architecture = trim(temp_architecture)
+        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+        if (c_associated(ptr)) then
+            architecture = c_ptr_to_string(ptr)
         else
-            architecture = 'Unknown Architecture'
+            allocate (character(len=24) :: architecture)
+            architecture = "Unknown CPU Architecture"
         end if
     end function Get_CPUArchitecture
+
+    module function Get_OS() result(os)
+        character(:), allocatable :: os
+        type(c_ptr) :: ptr
+
+        ! C 側 get_os() を呼び出し
+        ptr = C_Get_OS()
+
+        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+        if (c_associated(ptr)) then
+            os = c_ptr_to_string(ptr)
+        else
+            allocate (character(len=10) :: os)
+            os = "Unknown OS"
+        end if
+    end function Get_OS
 
 end submodule Inout_Output_Base

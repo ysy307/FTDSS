@@ -128,7 +128,7 @@ program test
     end do TIME_LOOP
 
     call FTDSS%time%Record("End")
-    call FTDSS%Output%Output_SystemLog(FTDSS%time)
+    call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)
 
     stop
 

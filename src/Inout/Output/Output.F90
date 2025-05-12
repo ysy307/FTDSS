@@ -1,10 +1,11 @@
 module Inout_Output
     use, intrinsic :: iso_fortran_env
-    use :: iso_c_binding, only:c_int64_t
+    use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
     use :: Core_BaseTypes
     use :: Core_Allocate
     use :: Core_Error
+    use :: Core_C_Util
     use :: Inout_Input
     use :: Core_Element
     use :: Main_Thermal
@@ -131,6 +132,12 @@ module Inout_Output
 
         end function Get_CPUArchitecture
 
+        module function Get_OS() result(os)
+            implicit none
+            character(:), allocatable :: os
+
+        end function Get_OS
+
     end interface
 
     interface
@@ -177,16 +184,26 @@ module Inout_Output
     interface
         function get_rss_kb() bind(C, name="get_rss_kb")
             import :: c_int64_t
-            implicit none
             integer(c_int64_t) :: get_rss_kb
-        end function get_rss_kb
+        end function
+
+        function C_Get_OS() bind(C, name="C_Get_OS")
+            import :: c_ptr
+            type(c_ptr) :: C_Get_OS
+        end function
+
+        function C_Get_Architecture() bind(C, name="C_Get_Architecture")
+            import :: c_ptr
+            type(c_ptr) :: C_Get_Architecture
+        end function
     end interface
 
     interface
-        module subroutine Output_SystemLog(self, time)
+        module subroutine Output_SystemLog(self, time, Matrix)
             implicit none
             class(Type_Output) :: self
-            type(Type_Time) :: time
+            type(Type_Time), intent(in) :: time
+            type(Type_CRS), intent(in) :: Matrix
         end subroutine Output_SystemLog
     end interface
 

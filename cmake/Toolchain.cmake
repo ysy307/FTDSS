@@ -33,21 +33,45 @@ endif()
 
 # --- ターゲットに対してビルドフラグを設定 ---
 function(enable_build_flags target)
-    # Fortran のみに -fpp を適用
     target_compile_options(${target} PUBLIC
-        $<$<COMPILE_LANGUAGE:Fortran>:-fpp>
+        $<$<COMPILE_LANGUAGE:Fortran>:-fpp -traceback>
     )
 
+    # Debug用フラグ（コンパイラ別）
     if(ENABLE_DEBUG)
-        target_compile_options(${target} PUBLIC
-            $<$<CONFIG:Debug>:-g -O0 -check all -traceback>
-        )
+        if(COMPILER STREQUAL "intel")
+            target_compile_options(${target} PUBLIC
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -check all -traceback>
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:-g -O0 -debug all -traceback>
+            )
+        elseif(COMPILER STREQUAL "gnu")
+            target_compile_options(${target} PUBLIC
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -fcheck=all -fbacktrace>
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:
+                    -g -O0 -Wall -Wextra -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer>
+            )
+            target_link_options(${target} PUBLIC
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:
+                    -fsanitize=address -fsanitize=undefined>
+            )
+        else()
+            message(FATAL_ERROR "Unknown COMPILER in ENABLE_DEBUG block: ${COMPILER}")
+        endif()
     endif()
 
+    # Release最適化オプション（コンパイラ別）
     if(ENABLE_OPTIMIZE)
-        target_compile_options(${target} PUBLIC
-            $<$<CONFIG:Release>:-O3 -xCORE-AVX2>
-        )
+        if(COMPILER STREQUAL "intel")
+            target_compile_options(${target} PUBLIC
+                $<$<CONFIG:Release>:-O3 -xCORE-AVX2>
+            )
+        elseif(COMPILER STREQUAL "gnu")
+            target_compile_options(${target} PUBLIC
+                $<$<CONFIG:Release>:-O3 -march=native>
+            )
+        else()
+            message(FATAL_ERROR "Unknown COMPILER in ENABLE_OPTIMIZE block: ${COMPILER}")
+        endif()
     endif()
 
     if(ENABLE_OPENMP)

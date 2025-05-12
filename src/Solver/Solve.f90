@@ -11,8 +11,8 @@ module Solver_Solve
     implicit none
     private
 #ifdef _MKL
-    include "mkl_pardiso.fi"
-    include "mkl_lapack.fi"
+    include "mkl.fi"
+    ! include "mkl_lapack.fi"
 #endif
 
     public :: Abstract_Solver_CRS
@@ -138,8 +138,8 @@ module Solver_Solve
         integer, allocatable :: PERM(:)
         !! Array, size (64). This array is used to pass various parameters to Intel® oneAPI Math Kernel Library PARDISO
         !! and to return some useful information after execution of the solver.
-        integer, allocatable :: IPARM(:)
-        type(MKL_PARDISO_HANDLE), allocatable :: PT(:)
+        integer :: IPARM(64)
+        type(MKL_PARDISO_HANDLE) :: PT(64)
         !! Array with size of 64.
         !! Handle to internal data structure. The entries must be set to zero prior to the first call to pardiso.
         !! Unique for factorization.

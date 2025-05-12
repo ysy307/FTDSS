@@ -136,7 +136,7 @@ contains
                                                          MAXFCT=1, &
                                                          MNUM=1, &
                                                          MTYPE=11, &
-                                                         PHASE=33, &
+                                                         PHASE=13, &
                                                          NRHS=1, &
                                                          MSGVLV=0, &
                                                          a=Structure%KT_star_0)

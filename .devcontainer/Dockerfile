@@ -55,7 +55,35 @@ RUN pip3 install --upgrade pip && \
     pip3 install --upgrade fprettify && \
     pip3 install --upgrade fypp && \
     pip3 install --upgrade ford && \
-    echo '{ "include_dirs": ["/workspaces/FTDSS/CMakeBuild/.mod", "/opt/intel/oneapi/mpi/2021.14/include/mpi","/opt/intel/oneapi/2025.0/include/mpi", "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib","/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.1.1","/workspaces/FTDSS/third_party/.local/VTKFortran/include"] }' > /root/.fortls
+    echo '{' > /root/.fortls && \
+    echo '  "include_dirs": [' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/CMakeBuild/.mod",' >> /root/.fortls && \
+    echo '    "/opt/intel/oneapi/mpi/2021.14/include/mpi",' >> /root/.fortls && \
+    echo '    "/opt/intel/oneapi/2025.0/include/mpi",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.1.1",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/third_party/.local/VTKFortran/include"' >> /root/.fortls && \
+    echo '  ],' >> /root/.fortls && \
+    echo '  "excl_paths": [' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/.git",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/.vscode",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/.devcontainer",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/CMakeBuild/",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/github",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/docs",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/fpm",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/Inout",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/log",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/Scripts"' >> /root/.fortls && \
+    echo '  ],' >> /root/.fortls && \
+    echo '  "incremental_sync": true,' >> /root/.fortls && \
+    echo '  "lowercase_intrinsics": true,' >> /root/.fortls && \
+    echo '  "hover_signature": true,' >> /root/.fortls && \
+    echo '  "use_signature_help": true' >> /root/.fortls && \
+    echo '}' >> /root/.fortls
+
+
+
 
 # ZshとPreztoの設定
 ENV SHELL=/usr/bin/zsh

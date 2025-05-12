@@ -28,11 +28,26 @@ contains
             this%PHASE = transfer(PHASE, this%PHASE)
             this%NRHS = transfer(NRHS, this%NRHS)
             this%MSGLVL = transfer(MSGVLV, this%MSGLVL)
-            allocate (this%PT(64))
-            allocate (this%IPARM(64))
+            ! allocate (this%PT(64))
+            ! allocate (this%IPARM(64))
             allocate (this%PERM(N))
+            print *, "N = ", this%N
+            print *, "MAXFCT = ", this%MAXFCT
+            print *, "MNUM = ", this%MNUM
+            print *, "MTYPE = ", this%MTYPE
+            print *, "PHASE = ", this%PHASE
+            print *, "NRHS = ", this%NRHS
+            print *, "MSGLVL = ", this%MSGLVL
+            print *, "A%nnz = ", A%nnz
+            print *, "A%nptr = ", A%nptr
+            ! print *, "A%Val = ", A%Val
+            ! print *, "A%Ind = ", A%Ind
             allocate (this%JA(A%nnz))
             allocate (this%IA(A%nptr))
+
+            ! allocate (this%PT(64))
+            this%IPARM = 0
+            call PARDISOINIT(this%PT, this%MTYPE, this%IPARM)
 
             do i = 1, A%nnz
                 this%JA(i) = transfer(A%Ind(i), this%JA(i))
@@ -41,7 +56,10 @@ contains
                 this%IA(i) = transfer(A%Ptr(i), this%IA(i))
             end do
 
-            call pardisoinit(this%pt, this%mtype, this%iparm)
+            ! call pardisoinit(this%pt, this%mtype, this%iparm)
+
+            ! print *, "IPARM(1) = ", this%iparm(1)
+            ! ! print *, "IP
         end select
 
     end function Solver_CRS_LU_Constructor
