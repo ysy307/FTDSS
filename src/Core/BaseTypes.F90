@@ -53,8 +53,10 @@ module Core_BaseTypes
         real(real64), allocatable :: old(:, :)
         real(real64), allocatable :: dif(:)
     contains
-        procedure, pass(self) :: Shift => Variables_Shift
+        procedure, pass(self) :: shift => Variables_Shift
         procedure, pass(self) :: allocate => Variables_Allocate
+        procedure, pass(self) :: predict => Variables_Predictor
+        procedure, pass(self) :: set => Variables_Set
     end type Variables
 
     type :: Belonging
@@ -180,6 +182,84 @@ contains
         self%dif(:) = 0.0d0
 
     end subroutine Variables_Allocate
+
+    subroutine Variables_Predictor(self, dt1, dt2, dt3)
+        class(Variables), intent(inout) :: self
+        real(real64), intent(in) :: dt1
+        real(real64), intent(in), optional :: dt2, dt3
+
+        integer(int32) :: i
+        real(real64) :: w0, w1, w2
+        real(real64) :: t0, t1, t2, t3
+        real(real64) :: l0, l1, l2
+
+        select case (self%rank)
+
+            ! --------------------------------------
+        case (1)
+            ! BDF1 → 1次：preをそのまま代入
+            !$omp parallel do
+            do i = 1, self%nsize
+                self%new(i) = self%pre(i)
+            end do
+            !$omp end parallel do
+
+            ! --------------------------------------
+        case (2)
+            if (.not. present(dt2)) stop "BDF2 predictor needs dt2"
+
+            ! Lagrange 外挿：点 (t_n, t_{n-1}) から t_{n+1} を予測
+            w0 = (dt1 + dt2) / dt2
+            w1 = -dt1 / dt2
+
+            !$omp parallel do
+            do i = 1, self%nsize
+                self%new(i) = w0 * self%pre(i) + w1 * self%old(i, 1)
+            end do
+            !$omp end parallel do
+
+            ! --------------------------------------
+        case (3)
+            if (.not. (present(dt2) .and. present(dt3))) stop "BDF3 predictor needs dt2 and dt3"
+
+            ! 時刻：t3 (最古), t2, t1 (現pre), t0 (新step)
+            t3 = 0.0d0
+            t2 = t3 + dt3
+            t1 = t2 + dt2
+            t0 = t1 + dt1
+
+            !$omp parallel do private(l0, l1, l2)
+            do i = 1, self%nsize
+                l0 = (t0 - t1) * (t0 - t2) / ((t3 - t1) * (t3 - t2)) ! old(:,2)
+                l1 = (t0 - t3) * (t0 - t2) / ((t1 - t3) * (t1 - t2)) ! old(:,1)
+                l2 = (t0 - t3) * (t0 - t1) / ((t2 - t3) * (t2 - t1)) ! pre
+
+                self%new(i) = l0 * self%old(i, 2) + l1 * self%old(i, 1) + l2 * self%pre(i)
+            end do
+            !$omp end parallel do
+
+            ! --------------------------------------
+        case default
+            stop "Predictor supports only BDF1 to BDF3"
+        end select
+    end subroutine Variables_Predictor
+
+    subroutine Variables_Set(self, value)
+        implicit none
+        class(Variables), intent(inout) :: self
+        real(real64), intent(in) :: value(:)
+
+        self%new(:) = value(:)
+        self%pre(:) = value(:)
+        self%old(:, 1) = value(:)
+        self%old(:, 2) = value(:)
+        if (self%rank > 2) self%old(:, 3) = value(:)
+        if (self%rank > 3) self%old(:, 4) = value(:)
+        if (self%rank > 4) self%old(:, 5) = value(:)
+        if (self%rank > 5) self%old(:, 6) = value(:)
+        self%dif(:) = 0.0d0
+
+    end subroutine Variables_Set
 
     subroutine DP3d_Allocate(self, nsize)
         class(DP3d), intent(inout) :: self

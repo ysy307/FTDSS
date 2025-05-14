@@ -29,18 +29,20 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(6)
+        integer(int32), intent(in) :: GroupID
         class(Abstract_ElementType), allocatable :: Structure
         integer(int32), parameter :: nsize = 6
         integer(int32) :: i
 
         allocate (TriangleSecond :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 22
+        Structure%id = iElem
+        Structure%type = 22
+        Structure%group = GroupID
 
         Structure%size = nsize
         allocate (Structure%conn(nsize))

@@ -4,7 +4,7 @@ contains
     module function Construct_Type_WRF_MVG(Input) result(structure)
         implicit none
         type(Input_Region), intent(in) :: Input
-        class(Abstract_WRF), allocatable :: structure
+        class(Abst_WRF), allocatable :: structure
 
         if (allocated(structure)) deallocate (structure)
         allocate (Type_WRF_MVG :: structure)

@@ -30,18 +30,20 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), intent(in), pointer :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(4)
+        integer(int32), intent(in) :: GroupID
         class(Abstract_ElementType), allocatable :: Structure
         integer(int32), parameter :: ndim = 4
         integer(int32) :: i
 
         allocate (SquareFirst :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 9
+        Structure%iD = iElem
+        Structure%type = 9
+        Structure%group = GroupID
         Structure%size = ndim
         allocate (Structure%conn(ndim))
         Structure%conn(1:ndim) = Connectivity(1:ndim)

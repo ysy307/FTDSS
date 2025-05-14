@@ -6,7 +6,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     module function HTC_3A_Construct(Input) result(Structure)
         implicit none
-        class(Abstract_HeatCapacity), allocatable :: Structure
+        class(Abst_HeatCapacity), allocatable :: Structure
         type(Type_Input), intent(in) :: Input
 
         integer(int32) :: iRegion
@@ -33,28 +33,78 @@ contains
 
     end function HTC_3A_Construct
 
-    module function Calc_HTC_3A_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, &
-                                     Ice, Temperature, Density, Pw) result(HeatCapacity)
+    ! module function Calc_HTC_3A_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, &
+    !                                  Ice, Temperature, Density, Pw) result(HeatCapacity)
+    !     implicit none
+    !     class(Type_HeatCapacity_3Phase_Apparent), intent(in) :: self
+    !     type(Belonging), intent(inout) :: NodeBelonging
+    !     real(real64), intent(in), optional :: phi1
+    !     real(real64), intent(in), optional :: phi2
+    !     real(real64), intent(in), optional :: phi3
+    !     real(real64), intent(in), optional :: phi4
+    !     class(Abstract_Ice), intent(inout), optional :: Ice
+    !     real(real64), intent(in), optional :: Temperature
+    !     class(Abstract_Density), intent(inout), optional :: Density
+    !     real(real64), intent(in), optional :: Pw
+    !     real(real64) :: HeatCapacity
+
+    !     real(real64) :: Cp, Lf
+    !     real(real64) :: rho_ice, rho_water
+
+    !     Cp = Calc_HTC_3(NodeBelonging, &
+    !                     self%soil, phi1, &
+    !                     self%water, phi2, &
+    !                     self%ice, phi3)
+    !     HeatCapacity = Calc_HTC_3A(NodeBelonging, Cp, Ice, Temperature, Density, Pw)
+
+    ! end function Calc_HTC_3A_Wrap
+
+    module function Calc_HTC_3A_Wrap(self, NodeBelonging, phi, Temperature, Pw, Ice, Density) result(HeatCapacity)
         implicit none
         class(Type_HeatCapacity_3Phase_Apparent), intent(in) :: self
         type(Belonging), intent(inout) :: NodeBelonging
-        real(real64), intent(in), optional :: phi1
-        real(real64), intent(in), optional :: phi2
-        real(real64), intent(in), optional :: phi3
-        real(real64), intent(in), optional :: phi4
-        class(Abstract_Ice), intent(inout), optional :: Ice
-        real(real64), intent(in), optional :: Temperature
-        class(Abstract_Density), intent(inout), optional :: Density
+        real(real64), intent(in) :: phi
+        real(real64), intent(in) :: Temperature
         real(real64), intent(in), optional :: Pw
+        class(Abstract_Ice), intent(inout), optional :: Ice
+        class(Abstract_Density), intent(inout), optional :: Density
         real(real64) :: HeatCapacity
 
         real(real64) :: Cp, Lf
         real(real64) :: rho_ice, rho_water
+        real(real64) :: theta_w, theta_i, theta_s
+        real(real64) :: Cp_w, Cp_i, Cp_s
+
+        theta_s = 1.0d0 - phi
+        select type (Den => Density)
+        type is (Type_Density_3Phase)
+            rho_ice = NodeBelonging%value(Den%ice)
+            rho_water = NodeBelonging%value(Den%water)
+        end select
+
+        select type (this => Ice)
+        type is (Type_Ice_GCC)
+            select type (structure_GCC => this%GCC)
+            type is (Type_GCC_NonSegregation_m)
+                theta_i = this%Calculate_Ice(T=Temperature, phi=phi)
+                theta_w = phi - theta_i
+            type is (Type_GCC_NonSegregation_Pa)
+                theta_i = this%Calculate_Ice(T=Temperature, phi=phi, rhoW=rho_water)
+                theta_w = phi - theta_i
+            type is (Type_GCC_Segregation_m)
+                theta_i = this%Calculate_Ice(Temperature, phi, Pw, rho_water, rho_ice)
+                theta_w = phi - theta_i
+            type is (Type_GCC_Segregation_Pa)
+                theta_i = this%Calculate_Ice(Temperature, phi, Pw, rho_water, rho_ice)
+                theta_w = phi - theta_i
+            end select
+        end select
 
         Cp = Calc_HTC_3(NodeBelonging, &
-                        self%soil, phi1, &
-                        self%water, phi2, &
-                        self%ice, phi3)
+                        self%soil, theta_s, &
+                        self%water, theta_w, &
+                        self%ice, theta_i)
+
         HeatCapacity = Calc_HTC_3A(NodeBelonging, Cp, Ice, Temperature, Density, Pw)
 
     end function Calc_HTC_3A_Wrap
@@ -91,9 +141,7 @@ contains
                                                 Temperature(iN), &
                                                 Density)
             end do
-            ! $omp end parallel do
         else
-            !$omp parallel do private(iN)
             do iN = 1, self%nsize
                 self%value(iN, 1) = Calc_HTC_3(NodeBelonging(iN), &
                                                self%soil, &
@@ -109,7 +157,6 @@ contains
                                                 Density, &
                                                 arr_Pw(iN))
             end do
-            !$omp end parallel do
         end if
 
     end subroutine Update_HTC_3A

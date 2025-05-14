@@ -42,8 +42,8 @@ module Calculate_Ice
     end type
 
     type, extends(Abstract_Ice) :: Type_Ice_GCC
-        class(Abstract_WRF), allocatable :: WRF
-        class(Abstract_GCC), allocatable :: GCC
+        class(Abst_WRF), allocatable :: WRF
+        class(Abst_GCC), allocatable :: GCC
     contains
         procedure :: Calculate_Ice            => Calculate_Ice_GCC !&
         procedure :: Calculate_Ice_Derivative => Calculate_Ice_GCC_Derivative !&

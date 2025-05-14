@@ -34,9 +34,10 @@ module Core_Element
     !   Abstract base type for 2D elements
     !--------------------------------------------------------------------------------------
     type, abstract :: Abstract_ElementType
-        integer(int32) :: ElementID
-        integer(int32) :: ElementType ! Element type (5: triangle 1st, 9: square 1st)
-        integer(int32) :: size ! Number of nodes in the element
+        integer(int32) :: id !! Element ID
+        integer(int32) :: type !! Element type (5: triangle 1st, 9: square 1st)
+        integer(int32) :: size !! Number of nodes in the element
+        integer(int32) :: group !! Element group number
         integer(int32), allocatable :: conn(:) !! connectivity information
         type(RealPointer), allocatable :: X(:) !! X coordinate
         type(RealPointer), allocatable :: Y(:) !! Y coordinate
@@ -188,12 +189,13 @@ module Core_Element
     !   ElementHolder procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module subroutine ElementHolder_allocate(self, iShape_Type, iElem, Global_Coordinate, Connectivity)
+        module subroutine ElementHolder_allocate(self, iShape_Type, iElem, Global_Coordinate, Connectivity, GroupID)
             implicit none
             class(ElementHolder), intent(inout) :: self
             integer(int32), intent(in) :: iShape_Type
             integer(int32), intent(in) :: iElem
             type(DP3d), pointer, intent(in) :: Global_Coordinate
+            integer(int32), intent(in) :: GroupID
             integer(int32), intent(in) :: Connectivity(:)
 
         end subroutine ElementHolder_allocate
@@ -203,11 +205,12 @@ module Core_Element
     !   三角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+        module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(3)
+            integer(int32), intent(in) :: GroupID
             class(Abstract_ElementType), allocatable :: Structure
 
         end function TriangleFirst_Construct
@@ -277,11 +280,12 @@ module Core_Element
     !   四角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+        module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
             type(DP3d), intent(in), pointer :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(4)
+            integer(int32), intent(in) :: GroupID
             class(Abstract_ElementType), allocatable :: Structure
 
         end function SquareFirst_Construct
@@ -351,11 +355,12 @@ module Core_Element
     !   三角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+        module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(6)
+            integer(int32), intent(in) :: GroupID
             class(Abstract_ElementType), allocatable :: Structure
 
         end function TriangleSecond_Construct
@@ -425,11 +430,12 @@ module Core_Element
     !   四角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+        module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
             type(DP3d), intent(in), pointer :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(8)
+            integer(int32), intent(in) :: GroupID
             class(Abstract_ElementType), allocatable :: Structure
 
         end function SquareSecond_Construct

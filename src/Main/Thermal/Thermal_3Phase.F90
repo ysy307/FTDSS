@@ -79,7 +79,8 @@ contains
                     call Structure%Elements(iElem)%allocate(Input%VTK%CELLS(iCell)%CellType, &
                                                             iCell, &
                                                             Coordinate, &
-                                                            Input%VTK%CELLS(iCell)%CONNECTIVITY)
+                                                            Input%VTK%CELLS(iCell)%CONNECTIVITY, &
+                                                            Input%VTK%CELLS(iCell)%CellEntityId)
                     iElem = iElem + 1
                 end if
 
@@ -171,8 +172,13 @@ contains
         call self%THC%Update(NodeBelonging, 1.0d0 - arr_phi(:), self%Qw%pre, self%Qice%pre)
         call self%SPH%Update(NodeBelonging, 1.0d0 - arr_phi(:), self%Qw%pre, self%Qice%pre)
         call self%DEN%Update(NodeBelonging, 1.0d0 - arr_phi(:), self%Qw%pre, self%Qice%pre)
-        call self%HTC%Update(NodeBelonging=NodeBelonging, arr_phi1=1.0d0 - arr_phi(:), arr_phi2=self%Qw%pre, arr_phi3=self%Qice%pre, &
-                             Ice=self%Ice(1)%f, Temperature=self%T%pre(:), Density=self%DEN)
+        call self%HTC%Update(NodeBelonging=NodeBelonging, &
+                             arr_phi1=1.0d0 - arr_phi(:), &
+                             arr_phi2=self%Qw%pre, &
+                             arr_phi3=self%Qice%pre, &
+                             Ice=self%Ice(1)%f, &
+                             Temperature=self%T%pre(:), &
+                             Density=self%DEN)
     end subroutine Type_Thermal_3Phase_2D_Update
 
     module subroutine Type_Thermal_3Phase_2D_Assemble(self, dt, step, iter)

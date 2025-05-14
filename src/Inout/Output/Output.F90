@@ -138,6 +138,12 @@ module Inout_Output
 
         end function Get_OS
 
+        module function Get_OpneMP_Version() result(OpenMPversion)
+            implicit none
+            character(:), allocatable :: OpenMPversion
+
+        end function Get_OpneMP_Version
+
     end interface
 
     interface

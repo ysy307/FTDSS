@@ -18,7 +18,9 @@ program test
                               BC=FTDSS%Thermal%BC)
 
     ! FTDSS%phi%pre(:)
-
+    ! call FTDSS%Thermal%HTC% phi, Temperature, Pw, Ice, Density
+    print *, FTDSS%Thermal%T%pre(1)
+    print *, FTDSS%Thermal%HTC%Calc(NodeBelonging=FTDSS%NodeBelonging(1), phi=FTDSS%phi%pre(1), Temperature=FTDSS%Thermal%T%pre(1), Ice=FTDSS%Thermal%ICE(1)%f, Density=FTDSS%Thermal%DEN)
     call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0

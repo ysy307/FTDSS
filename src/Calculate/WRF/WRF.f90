@@ -8,7 +8,7 @@ module Calculate_WRF
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)
 
-    public :: Abstract_WRF
+    public :: Abst_WRF
     public :: Type_WRF_BC
     public :: Type_WRF_VG
     public :: Type_WRF_KO
@@ -16,50 +16,50 @@ module Calculate_WRF
     public :: Type_WRF_Durner
     public :: Type_WRF_DVGCH
 
-    type, abstract :: Abstract_WRF
+    type, abstract :: Abst_WRF
         real(real64) :: thetaR
         real(real64) :: thetaS
     contains
-        procedure(Abstract_Calculate_WRF), deferred :: Calculate_WRF
-        procedure(Abstract_Calculate_WRF_Derivative), deferred :: Calculate_WRF_Derivative
-    end type Abstract_WRF
+        procedure(Abstract_Calculate_WRF), deferred :: Calc
+        procedure(Abstract_Calculate_WRF_Derivative), deferred :: DERIV
+    end type Abst_WRF
 
-    type, extends(Abstract_WRF) :: Type_WRF_BC
+    type, extends(Abst_WRF) :: Type_WRF_BC
         real(real64) :: alpha1
         real(real64) :: n1
     contains
-        procedure :: Calculate_WRF => Calculate_WRF_BC
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_BC_Derivative
+        procedure :: Calc => Calculate_WRF_BC
+        procedure :: DERIV => Calculate_WRF_BC_Derivative
     end type Type_WRF_BC
 
-    type, extends(Abstract_WRF) :: Type_WRF_VG
+    type, extends(Abst_WRF) :: Type_WRF_VG
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: m1
     contains
-        procedure :: Calculate_WRF => Calculate_WRF_VG
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_VG_Derivative
+        procedure :: Calc => Calculate_WRF_VG
+        procedure :: DERIV => Calculate_WRF_VG_Derivative
     end type Type_WRF_VG
 
-    type, extends(Abstract_WRF) :: Type_WRF_KO
+    type, extends(Abst_WRF) :: Type_WRF_KO
         real(real64) :: alpha1
         real(real64) :: n1
     contains
-        procedure :: Calculate_WRF => Calculate_WRF_KO
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_KO_Derivative
+        procedure :: Calc => Calculate_WRF_KO
+        procedure :: DERIV => Calculate_WRF_KO_Derivative
     end type Type_WRF_KO
 
-    type, extends(Abstract_WRF) :: Type_WRF_MVG
+    type, extends(Abst_WRF) :: Type_WRF_MVG
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: m1
         real(real64) :: hcrit
     contains
-        procedure :: Calculate_WRF => Calculate_WRF_MVG
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_MVG_Derivative
+        procedure :: Calc => Calculate_WRF_MVG
+        procedure :: DERIV => Calculate_WRF_MVG_Derivative
     end type Type_WRF_MVG
 
-    type, extends(Abstract_WRF) :: Type_WRF_Durner
+    type, extends(Abst_WRF) :: Type_WRF_Durner
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: m1
@@ -69,11 +69,11 @@ module Calculate_WRF
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_WRF => Calculate_WRF_Durner
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_Durner_Derivative
+        procedure :: Calc => Calculate_WRF_Durner
+        procedure :: DERIV => Calculate_WRF_Durner_Derivative
     end type Type_WRF_Durner
 
-    type, extends(Abstract_WRF) :: Type_WRF_DVGCH
+    type, extends(Abst_WRF) :: Type_WRF_DVGCH
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: n2
@@ -82,23 +82,23 @@ module Calculate_WRF
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_WRF => Calculate_WRF_DVGCH
-        procedure :: Calculate_WRF_Derivative => Calculate_WRF_DVGCH_Derivative
+        procedure :: Calc => Calculate_WRF_DVGCH
+        procedure :: DERIV => Calculate_WRF_DVGCH_Derivative
     end type Type_WRF_DVGCH
 
     abstract interface
         function Abstract_Calculate_WRF(self, h) result(thetaW)
-            import :: Abstract_WRF, real64
+            import :: Abst_WRF, real64
             implicit none
-            class(Abstract_WRF), intent(in) :: self
+            class(Abst_WRF), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: thetaW
         end function Abstract_Calculate_WRF
 
         function Abstract_Calculate_WRF_Derivative(self, h) result(Cw)
-            import :: Abstract_WRF, real64
+            import :: Abst_WRF, real64
             implicit none
-            class(Abstract_WRF), intent(in) :: self
+            class(Abst_WRF), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: Cw
         end function Abstract_Calculate_WRF_Derivative
@@ -108,7 +108,7 @@ module Calculate_WRF
         module function Construct_Type_WRF_BC(Input) result(structure)
             implicit none
             type(Input_Region), intent(in) :: Input
-            class(Abstract_WRF), allocatable :: structure
+            class(Abst_WRF), allocatable :: structure
 
         end function Construct_Type_WRF_BC
 
@@ -133,7 +133,7 @@ module Calculate_WRF
         module function Type_WRF_VG_Construct(Input) result(structure)
             implicit none
             type(Input_Region), intent(in) :: Input
-            class(Abstract_WRF), allocatable :: structure
+            class(Abst_WRF), allocatable :: structure
 
         end function Type_WRF_VG_Construct
 
@@ -158,7 +158,7 @@ module Calculate_WRF
         module function Construct_Type_WRF_KO(Input) result(structure)
             implicit none
             type(Input_Region), intent(in) :: Input
-            class(Abstract_WRF), allocatable :: structure
+            class(Abst_WRF), allocatable :: structure
 
         end function Construct_Type_WRF_KO
 
@@ -184,7 +184,7 @@ module Calculate_WRF
         module function Construct_Type_WRF_MVG(Input) result(structure)
             implicit none
             type(Input_Region), intent(in) :: Input
-            class(Abstract_WRF), allocatable :: structure
+            class(Abst_WRF), allocatable :: structure
 
         end function Construct_Type_WRF_MVG
 
@@ -209,7 +209,7 @@ module Calculate_WRF
         module function Construct_Type_WRF_Durner(Input) result(structure)
             implicit none
             type(Input_Region), intent(in) :: Input
-            class(Abstract_WRF), allocatable :: structure
+            class(Abst_WRF), allocatable :: structure
 
         end function Construct_Type_WRF_Durner
 
@@ -234,7 +234,7 @@ module Calculate_WRF
         module function Construct_Type_WRF_DVGCH(Input) result(structure)
             implicit none
             type(Input_Region), intent(in) :: Input
-            class(Abstract_WRF), allocatable :: structure
+            class(Abst_WRF), allocatable :: structure
 
         end function Construct_Type_WRF_DVGCH
 

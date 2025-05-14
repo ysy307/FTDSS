@@ -247,4 +247,39 @@ contains
         end if
     end function Get_OS
 
+    module function Get_OpneMP_Version() result(OpenMPversion)
+        implicit none
+        character(:), allocatable :: OpenMPversion
+
+#ifdef _OPENMP
+        select case (_OPENMP)
+        case (199911)
+            OpenMPversion = '1.0'
+        case (200203)
+            OpenMPversion = '2.0'
+        case (200505)
+            OpenMPversion = '2.5'
+        case (200805)
+            OpenMPversion = '3.0'
+        case (201107)
+            OpenMPversion = '3.1'
+        case (201307)
+            OpenMPversion = '4.0'
+        case (201511)
+            OpenMPversion = '4.5'
+        case (201811)
+            OpenMPversion = '5.0'
+        case (202011)
+            OpenMPversion = '5.1'
+        case (202111)
+            OpenMPversion = '5.2'
+        case default
+            OpenMPversion = 'unknown'
+        end select
+#else
+        OpenMPversion = 'not defined'
+#endif
+
+    end function Get_OpneMP_Version
+
 end submodule Inout_Output_Base

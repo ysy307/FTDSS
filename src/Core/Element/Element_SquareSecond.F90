@@ -30,19 +30,22 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), intent(in), pointer :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(8)
+        integer(int32), intent(in) :: GroupID
         class(Abstract_ElementType), allocatable :: Structure
 
         integer(int32), parameter :: nsize = 8
         integer(int32) :: i
 
         allocate (SquareSecond :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 23
+        Structure%id = iElem
+        Structure%type = 23
+        Structure%group = GroupID
+
         Structure%size = nsize
         allocate (Structure%conn(nsize))
         Structure%conn(1:nsize) = Connectivity(1:nsize)

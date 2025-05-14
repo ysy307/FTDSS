@@ -44,6 +44,7 @@ contains
         write (num_unit, '(a)') "Compiler Version   : "//trim(compiler_version)
         write (num_unit, '(a,f'//to_string(int(log10(rss_mb) + 6))//'.4,a)') "RSS Memory Usage   : ", rss_mb, " MB"
 #ifdef _OPENMP
+        write (num_unit, '(2a)') "OpenMP Version     : ", Get_OpneMP_Version()
         write (num_unit, '(a,i0)') "OpenMP Max Threads : ", omp_get_num_procs()
         write (num_unit, '(a,i0)') "OpenMP Threads     : ", omp_get_max_threads()
 #endif

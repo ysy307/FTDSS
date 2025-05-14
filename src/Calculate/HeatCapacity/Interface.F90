@@ -14,56 +14,52 @@ module Calculate_HeatCapacity
     !----------------------------------------------------------------------------------------------------
     ! Public abstract types
     !----------------------------------------------------------------------------------------------------
-    public :: Abstract_HeatCapacity
+    public :: Abst_HeatCapacity
     !----------------------------------------------------------------------------------------------------
     ! Public types
     !----------------------------------------------------------------------------------------------------
     public :: Type_HeatCapacity_3Phase_Apparent
     !----------------------------------------------------------------------------------------------------
 
-    type, abstract :: Abstract_HeatCapacity
+    type, abstract :: Abst_HeatCapacity
         integer(int32) :: nsize
         integer(int32) :: nRegion
         real(real64), allocatable :: value(:, :)
     contains
-        procedure(Abstract_Calculate_HeatCapacity), pass(self), deferred :: Calculate
+        procedure(Abstract_Calculate_HeatCapacity), pass(self), deferred :: Calc
         procedure(Abstract_Update_HeatCapacity), pass(self), deferred :: Update
-    end type Abstract_HeatCapacity
+    end type Abst_HeatCapacity
 
-    type, extends(Abstract_HeatCapacity) :: Type_HeatCapacity_3Phase_Apparent
+    type, extends(Abst_HeatCapacity) :: Type_HeatCapacity_3Phase_Apparent
         real(real64), allocatable :: soil(:)
         real(real64), allocatable :: water(:)
         real(real64), allocatable :: ice(:)
     contains
-        procedure, pass(self) :: Calculate => Calc_HTC_3A_Wrap
+        procedure, pass(self) :: Calc => Calc_HTC_3A_Wrap
         procedure, pass(self) :: Update => Update_HTC_3A
     end type Type_HeatCapacity_3Phase_Apparent
     !----------------------------------------------------------------------------------------------------
 
     abstract interface
-        function Abstract_Calculate_HeatCapacity(self, NodeBelonging, phi1, phi2, phi3, phi4, &
-                                                 Ice, Temperature, Density, Pw) result(HeatCapacity)
-            import :: Abstract_HeatCapacity, Abstract_Ice, Belonging, real64, Abstract_Density
+        function Abstract_Calculate_HeatCapacity(self, NodeBelonging, phi, Temperature, Pw, Ice, Density) result(HeatCapacity)
+            import :: Abst_HeatCapacity, Abstract_Ice, Belonging, real64, Abstract_Density
             implicit none
-            class(Abstract_HeatCapacity), intent(in) :: self
+            class(Abst_HeatCapacity), intent(in) :: self
             type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in), optional :: phi1
-            real(real64), intent(in), optional :: phi2
-            real(real64), intent(in), optional :: phi3
-            real(real64), intent(in), optional :: phi4
-            class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature
-            class(Abstract_Density), intent(inout), optional :: Density
+            real(real64), intent(in) :: phi
+            real(real64), intent(in) :: Temperature
             real(real64), intent(in), optional :: Pw
+            class(Abstract_Ice), intent(inout), optional :: Ice
+            class(Abstract_Density), intent(inout), optional :: Density
             real(real64) :: HeatCapacity
 
         end function Abstract_Calculate_HeatCapacity
 
         subroutine Abstract_Update_HeatCapacity(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, &
                                                 Ice, Temperature, Density, arr_Pw)
-            import :: Abstract_HeatCapacity, Abstract_Ice, Belonging, real64, Abstract_Density
+            import :: Abst_HeatCapacity, Abstract_Ice, Belonging, real64, Abstract_Density
             implicit none
-            class(Abstract_HeatCapacity), intent(inout) :: self
+            class(Abst_HeatCapacity), intent(inout) :: self
             type(Belonging), intent(inout) :: NodeBelonging(:)
             real(real64), intent(in), optional :: arr_phi1(:)
             real(real64), intent(in), optional :: arr_phi2(:)
@@ -109,24 +105,20 @@ module Calculate_HeatCapacity
     interface
         module function HTC_3A_Construct(Input) result(Structure)
             implicit none
-            class(Abstract_HeatCapacity), allocatable :: Structure
+            class(Abst_HeatCapacity), allocatable :: Structure
             type(Type_Input), intent(in) :: Input
 
         end function HTC_3A_Construct
 
-        module function Calc_HTC_3A_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, &
-                                         Ice, Temperature, Density, Pw) result(HeatCapacity)
+        module function Calc_HTC_3A_Wrap(self, NodeBelonging, phi, Temperature, Pw, Ice, Density) result(HeatCapacity)
             implicit none
             class(Type_HeatCapacity_3Phase_Apparent), intent(in) :: self
             type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in), optional :: phi1
-            real(real64), intent(in), optional :: phi2
-            real(real64), intent(in), optional :: phi3
-            real(real64), intent(in), optional :: phi4
-            class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature
-            class(Abstract_Density), intent(inout), optional :: Density
+            real(real64), intent(in) :: phi
+            real(real64), intent(in) :: Temperature
             real(real64), intent(in), optional :: Pw
+            class(Abstract_Ice), intent(inout), optional :: Ice
+            class(Abstract_Density), intent(inout), optional :: Density
             real(real64) :: HeatCapacity
 
         end function Calc_HTC_3A_Wrap

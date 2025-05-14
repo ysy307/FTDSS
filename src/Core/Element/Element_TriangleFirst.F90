@@ -29,18 +29,20 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(3)
+        integer(int32), intent(in) :: GroupID
         class(Abstract_ElementType), allocatable :: Structure
         integer(int32), parameter :: ndim = 3
         integer(int32) :: i
 
         allocate (TriangleFirst :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 5
+        Structure%id = iElem
+        Structure%type = 5
+        Structure%group = GroupID
 
         Structure%size = ndim
         allocate (Structure%conn(ndim))
