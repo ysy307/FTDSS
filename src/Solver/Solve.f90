@@ -54,9 +54,9 @@ module Solver_Solve
         integer(int32) :: maxiter
 
         integer(int32) :: Preconditioner
-        !! 0: No Preconditioner (No implemented)
-        !! 1: Jacobi Preconditioner
-        !! 2: ILU Preconditioner (No implemented)
+        ! 0: No Preconditioner (No implemented)
+        ! 1: Jacobi Preconditioner
+        ! 2: ILU Preconditioner (No implemented)
     contains
         procedure :: Solve => Solve_CRS_BiCGSTAB
         procedure :: Check => Check_CRS_BiCGSTAB

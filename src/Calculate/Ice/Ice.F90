@@ -7,7 +7,7 @@ module Calculate_Ice
     use :: Calculate_GCC
     use :: Calculate_Density
 #ifdef _OPENMP
-    use omp_lib
+    use :: omp_lib
 #endif
     implicit none
     private

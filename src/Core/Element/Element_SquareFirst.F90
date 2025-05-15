@@ -36,7 +36,7 @@ contains
         type(DP3d), intent(in), pointer :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(4)
         integer(int32), intent(in) :: GroupID
-        class(Abstract_ElementType), allocatable :: Structure
+        class(Abst_ElementType), allocatable :: Structure
         integer(int32), parameter :: ndim = 4
         integer(int32) :: i
 
@@ -503,6 +503,21 @@ contains
             peta = eta
         end if
     end subroutine is_in_SquareFirst
+
+    module function Interpolate_SquareFirst(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%size
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%conn(i))
+        end do
+
+    end function Interpolate_SquareFirst
 
 end submodule Core_Element_SquareFirst
 

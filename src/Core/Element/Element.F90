@@ -1,12 +1,12 @@
 module Core_Element
-    !---------------------------------------------------------------------------------------
-    !  Module: Core_Element
-    !  Purpose: Define 2D finite element types (square and triangle) and their
-    !           associated operations (shape functions, Jacobian, Gauss points).
-    !  Ford Coding Standard:
-    !    - Use ISO_FORTRAN_ENV for portable kinds
-    !    - Maintain explicit interfaces and consistent indentation
-    !    - Preserve original function and type names
+    !*---------------------------------------------------------------------------------------<br>
+    !  Module: Core_Element<br>
+    !  Purpose: Define 2D finite element types (square and triangle) and their<br>
+    !           associated operations (shape functions, Jacobian, Gauss points).<br>
+    !  Ford Coding Standard:<br>
+    !    - Use ISO_FORTRAN_ENV for portable kinds<br>
+    !    - Maintain explicit interfaces and consistent indentation<br>
+    !    - Preserve original function and type names<br>
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_BaseTypes, only:DP3d, RealPointer
@@ -14,7 +14,7 @@ module Core_Element
     implicit none
     private
 
-    public :: Abstract_ElementType
+    public :: Abst_ElementType
     public :: SquareFirst
     public :: SquareSecond
     public :: TriangleFirst
@@ -25,7 +25,7 @@ module Core_Element
     ! Holder for polymorphic element objects
     !--------------------------------------------------------------------------------------
     type :: ElementHolder
-        class(Abstract_ElementType), allocatable :: e
+        class(Abst_ElementType), allocatable :: e
     contains
         procedure, pass(self) :: allocate => ElementHolder_allocate
     end type ElementHolder
@@ -33,7 +33,7 @@ module Core_Element
     !--------------------------------------------------------------------------------------
     !   Abstract base type for 2D elements
     !--------------------------------------------------------------------------------------
-    type, abstract :: Abstract_ElementType
+    type, abstract :: Abst_ElementType
         integer(int32) :: id !! Element ID
         integer(int32) :: type !! Element type (5: triangle 1st, 9: square 1st)
         integer(int32) :: size !! Number of nodes in the element
@@ -54,19 +54,20 @@ module Core_Element
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
     contains
-        procedure(Abstract_getNmNodes), pass(self), deferred :: getNumNodes !&
-        procedure(Abstract_psi),        pass(self), deferred :: psi !&
-        procedure(Abstract_dpsi_dxi),   pass(self), deferred :: dpsi_dxi !&
-        procedure(Abstract_dpsi_deta),  pass(self), deferred :: dpsi_deta !&
-        procedure(Abstract_Jac),        pass(self), deferred :: Jac !&
-        procedure(Abstract_Jac_Det),    pass(self), deferred :: Jac_Det !&
-        procedure(Abstract_is_inside),  pass(self), deferred :: is_inside !&
-    end type Abstract_ElementType
+        procedure(Abst_getNmNodes),  pass(self), deferred :: getNumNodes !&
+        procedure(Abst_psi),         pass(self), deferred :: psi !&
+        procedure(Abst_dpsi_dxi),    pass(self), deferred :: dpsi_dxi !&
+        procedure(Abst_dpsi_deta),   pass(self), deferred :: dpsi_deta !&
+        procedure(Abst_Jac),         pass(self), deferred :: Jac !&
+        procedure(Abst_Jac_Det),     pass(self), deferred :: Jac_Det !&
+        procedure(Abst_is_inside),   pass(self), deferred :: is_inside !&
+        procedure(Abst_Interpolate), pass(self), deferred :: Interpolate !&
+    end type Abst_ElementType
 
     !--------------------------------------------------------------------------------------
     !   Triangle First Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abstract_ElementType) :: TriangleFirst
+    type, extends(Abst_ElementType) :: TriangleFirst
     contains
         procedure, pass(self) :: getNumNodes => getNumNodes_TriangleFirst !&
         procedure, pass(self) :: psi         => psi_TriangleFirst !&
@@ -75,12 +76,13 @@ module Core_Element
         procedure, pass(self) :: Jac         => Jac_TriangleFirst !&
         procedure, pass(self) :: Jac_Det     => Jac_Det_TriangleFirst !&
         procedure, pass(self) :: is_inside   => is_in_TriangleFirst !&
+        procedure, pass(self) :: Interpolate => Interpolate_TriangleFirst !&
     end type TriangleFirst
 
     !--------------------------------------------------------------------------------------
     !   Square First Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abstract_ElementType) :: SquareFirst
+    type, extends(Abst_ElementType) :: SquareFirst
     contains
         procedure, pass(self) :: getNumNodes => getNumNodes_SquareFirst !&
         procedure, pass(self) :: psi         => psi_SquareFirst !&
@@ -89,12 +91,13 @@ module Core_Element
         procedure, pass(self) :: Jac         => Jac_SquareFirst !&
         procedure, pass(self) :: Jac_Det     => Jac_Det_SquareFirst !&
         procedure, pass(self) :: is_inside   => is_in_SquareFirst !&
+        procedure, pass(self) :: Interpolate => Interpolate_SquareFirst !&
     end type SquareFirst
 
     !--------------------------------------------------------------------------------------
     !   Triangle Second Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abstract_ElementType) :: TriangleSecond
+    type, extends(Abst_ElementType) :: TriangleSecond
     contains
         procedure, pass(self) :: getNumNodes => getNumNodes_TriangleSecond !&
         procedure, pass(self) :: psi         => psi_TriangleSecond !&
@@ -103,12 +106,13 @@ module Core_Element
         procedure, pass(self) :: Jac         => Jac_TriangleSecond !&
         procedure, pass(self) :: Jac_Det     => Jac_Det_TriangleSecond !&
         procedure, pass(self) :: is_inside   => is_in_TriangleSecond !&
+        procedure, pass(self) :: Interpolate => Interpolate_TriangleSecond !&
     end type TriangleSecond
 
     !--------------------------------------------------------------------------------------
     !   Square Second Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abstract_ElementType) :: SquareSecond
+    type, extends(Abst_ElementType) :: SquareSecond
     contains
         procedure, pass(self) :: getNumNodes => getNumNodes_SquareSecond !&
         procedure, pass(self) :: psi         => psi_SquareSecond !&
@@ -117,71 +121,81 @@ module Core_Element
         procedure, pass(self) :: Jac         => Jac_SquareSecond !&
         procedure, pass(self) :: Jac_Det     => Jac_Det_SquareSecond !&
         procedure, pass(self) :: is_inside   => is_in_SquareSecond !&
+        procedure, pass(self) :: Interpolate => Interpolate_SquareSecond !&
     end type SquareSecond
 
     !
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
-        function Abstract_getNmNodes(self) result(n)
-            import :: Abstract_ElementType, int32
+        function Abst_getNmNodes(self) result(n)
+            import :: Abst_ElementType, int32
             implicit none
-            class(Abstract_ElementType), intent(in) :: self
+            class(Abst_ElementType), intent(in) :: self
             integer(int32) :: n
-        end function Abstract_getNmNodes
+        end function Abst_getNmNodes
 
-        function Abstract_psi(self, i, xi, eta) result(psi)
-            import :: Abstract_ElementType, int32, real64
+        function Abst_psi(self, i, xi, eta) result(psi)
+            import :: Abst_ElementType, int32, real64
             implicit none
-            class(Abstract_ElementType), intent(in) :: self
+            class(Abst_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: psi
-        end function Abstract_psi
+        end function Abst_psi
 
-        function Abstract_dpsi_dxi(self, i, xi, eta) result(dpsi)
-            import :: Abstract_ElementType, int32, real64
+        function Abst_dpsi_dxi(self, i, xi, eta) result(dpsi)
+            import :: Abst_ElementType, int32, real64
             implicit none
-            class(Abstract_ElementType), intent(in) :: self
+            class(Abst_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
-        end function Abstract_dpsi_dxi
+        end function Abst_dpsi_dxi
 
-        function Abstract_dpsi_deta(self, i, xi, eta) result(dpsi)
-            import :: Abstract_ElementType, int32, real64
+        function Abst_dpsi_deta(self, i, xi, eta) result(dpsi)
+            import :: Abst_ElementType, int32, real64
             implicit none
-            class(Abstract_ElementType), intent(in) :: self
+            class(Abst_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
-        end function Abstract_dpsi_deta
+        end function Abst_dpsi_deta
 
-        function Abstract_Jac(self, i, j, xi, eta) result(Jval)
-            import :: Abstract_ElementType, int32, real64
+        function Abst_Jac(self, i, j, xi, eta) result(Jval)
+            import :: Abst_ElementType, int32, real64
             implicit none
-            class(Abstract_ElementType), intent(in) :: self
+            class(Abst_ElementType), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
             real(real64) :: Jval
-        end function Abstract_Jac
+        end function Abst_Jac
 
-        function Abstract_Jac_Det(self, xi, eta) result(J_Det)
-            import :: Abstract_ElementType, int32, real64
+        function Abst_Jac_Det(self, xi, eta) result(J_Det)
+            import :: Abst_ElementType, int32, real64
             implicit none
-            class(Abstract_ElementType), intent(in) :: self
+            class(Abst_ElementType), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
-        end function Abstract_Jac_Det
+        end function Abst_Jac_Det
 
-        subroutine Abstract_is_inside(self, px, py, pxi, peta, is_in)
-            import Abstract_ElementType, real64
+        subroutine Abst_is_inside(self, px, py, pxi, peta, is_in)
+            import Abst_ElementType, real64
             implicit none
-            class(Abstract_ElementType), intent(in) :: self
+            class(Abst_ElementType), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
             logical(4) :: is_in
-        end subroutine Abstract_is_inside
+        end subroutine Abst_is_inside
+
+        function Abst_Interpolate(self, xi, eta, value) result(interpolated_value)
+            import :: Abst_ElementType, real64
+            implicit none
+            class(Abst_ElementType), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+        end function Abst_Interpolate
 
     end interface
 
@@ -195,8 +209,8 @@ module Core_Element
             integer(int32), intent(in) :: iShape_Type
             integer(int32), intent(in) :: iElem
             type(DP3d), pointer, intent(in) :: Global_Coordinate
-            integer(int32), intent(in) :: GroupID
             integer(int32), intent(in) :: Connectivity(:)
+            integer(int32), intent(in) :: GroupID
 
         end subroutine ElementHolder_allocate
     end interface
@@ -211,7 +225,7 @@ module Core_Element
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(3)
             integer(int32), intent(in) :: GroupID
-            class(Abstract_ElementType), allocatable :: Structure
+            class(Abst_ElementType), allocatable :: Structure
 
         end function TriangleFirst_Construct
 
@@ -274,6 +288,15 @@ module Core_Element
             logical(4) :: is_in
 
         end subroutine is_in_TriangleFirst
+
+        module function Interpolate_TriangleFirst(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function Interpolate_TriangleFirst
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -286,7 +309,7 @@ module Core_Element
             type(DP3d), intent(in), pointer :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(4)
             integer(int32), intent(in) :: GroupID
-            class(Abstract_ElementType), allocatable :: Structure
+            class(Abst_ElementType), allocatable :: Structure
 
         end function SquareFirst_Construct
 
@@ -349,6 +372,15 @@ module Core_Element
             logical(4) :: is_in
 
         end subroutine is_in_SquareFirst
+
+        module function Interpolate_SquareFirst(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function Interpolate_SquareFirst
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -361,7 +393,7 @@ module Core_Element
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(6)
             integer(int32), intent(in) :: GroupID
-            class(Abstract_ElementType), allocatable :: Structure
+            class(Abst_ElementType), allocatable :: Structure
 
         end function TriangleSecond_Construct
 
@@ -424,6 +456,15 @@ module Core_Element
             logical(4) :: is_in
 
         end subroutine is_in_TriangleSecond
+
+        module function Interpolate_TriangleSecond(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(TriangleSecond), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function Interpolate_TriangleSecond
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -436,7 +477,7 @@ module Core_Element
             type(DP3d), intent(in), pointer :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(8)
             integer(int32), intent(in) :: GroupID
-            class(Abstract_ElementType), allocatable :: Structure
+            class(Abst_ElementType), allocatable :: Structure
 
         end function SquareSecond_Construct
 
@@ -499,6 +540,15 @@ module Core_Element
             logical(4) :: is_in
 
         end subroutine is_in_SquareSecond
+
+        module function Interpolate_SquareSecond(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(SquareSecond), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function Interpolate_SquareSecond
     end interface
 
     interface TriangleFirst

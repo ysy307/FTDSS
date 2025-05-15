@@ -1,4 +1,4 @@
-submodule(Solver_Solve) Solver_Solve_LU
+submodule(Solver_Solve) Solve_LU
     use, intrinsic :: iso_fortran_env, only: int32, int64, real64
     use :: Matrix_CRS
     implicit none
@@ -140,4 +140,4 @@ contains
 
     end subroutine Check_Full_LU
 
-end submodule Solver_Solve_LU
+end submodule Solve_LU
