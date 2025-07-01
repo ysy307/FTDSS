@@ -15,7 +15,7 @@ contains
         real(real64), intent(in) :: Porosity(:)
 
         integer(int32) :: index, nNodes, nGauss
-        integer(int32) :: il, jl, iG, iS
+        integer(int32) :: il, jl, iG
         real(real64) :: val
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: T_g, phi_g
@@ -36,10 +36,9 @@ contains
                         detJ = Domain%Elements(iE)%e%Jac_Det(xi, eta)
                         T_g = 0.0d0
                         phi_g = 0.0d0
-                        do iS = 1, nGauss
-                            T_g = Domain%Elements(iE)%e%psi(iS, xi, eta) * Temperature(Domain%Elements(iE)%e%conn(iS))
-                            phi_g = Domain%Elements(iE)%e%psi(iS, xi, eta) * Porosity(Domain%Elements(iE)%e%conn(iS))
-                        end do
+
+                        T_g = Domain%Elements(iE)%e%Interpolate(xi, eta, Temperature)
+                        phi_g = Domain%Elements(iE)%e%Interpolate(xi, eta, Porosity)
                         ! val = val + (Domain%Elements(iE)%e%psi(il, xi, eta) * &
                         !              Domain%Elements(iE)%e%psi(jl, xi, eta) * &
                         !              Domain%Elements(iE)%e%Jac_Det(xi, eta) * &

@@ -88,13 +88,38 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_TriangleSecond(self) result(n)
+
+    module function get_id_TriangleSecond(self) result(id)
         implicit none
         class(TriangleSecond), intent(in) :: self
-        integer(int32) :: n
+        integer(int32) :: id
 
-        n = self%size
-    end function getNumNodes_TriangleSecond
+        id = self%id
+    end function get_id_TriangleSecond
+
+    module function get_type_TriangleSecond(self) result(type)
+        implicit none
+        class(TriangleSecond), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_TriangleSecond
+
+    module function get_size_TriangleSecond(self) result(size)
+        implicit none
+        class(TriangleSecond), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
+    end function get_size_TriangleSecond
+
+    module function get_group_TriangleSecond(self) result(group)
+        implicit none
+        class(TriangleSecond), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_TriangleSecond
 
     !----------------------------------------------------------------------!
     ! psi_TriangleSecond:

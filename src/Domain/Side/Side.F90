@@ -50,9 +50,13 @@ module Domain_Side
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:) !! Gauss Quadrature points Coordinate
     contains
-        procedure(Abst_getNmNodes), pass(self), deferred :: getNumNodes !&
-        procedure(Abst_psi),        pass(self), deferred :: psi !&
-        procedure(Abst_dpsi_dxi),   pass(self), deferred :: dpsi_dxi !&
+        procedure(Abst_get_id),    pass(self), deferred :: get_id !&
+        procedure(Abst_get_type),  pass(self), deferred :: get_type !&
+        procedure(Abst_get_size),  pass(self), deferred :: get_size !&
+        procedure(Abst_get_group), pass(self), deferred :: get_group !&
+        !----------------------------------------------------------------------------------
+        procedure(Abst_psi),       pass(self), deferred :: psi !&
+        procedure(Abst_dpsi_dxi),  pass(self), deferred :: dpsi_dxi !&
     end type Abst_SideType
 
     !--------------------------------------------------------------------------------------
@@ -60,9 +64,13 @@ module Domain_Side
     !--------------------------------------------------------------------------------------
     type, extends(Abst_SideType) :: SideFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SideFirst !&
-        procedure, pass(self) :: psi         => psi_SideFirst !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SideFirst !&
+        procedure, pass(self) :: get_id    => get_id_SideFirst !&
+        procedure, pass(self) :: get_type  => get_type_SideFirst !&
+        procedure, pass(self) :: get_size  => get_size_SideFirst !&
+        procedure, pass(self) :: get_group => get_group_SideFirst !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi       => psi_SideFirst !&
+        procedure, pass(self) :: dpsi_dxi  => dpsi_dxi_SideFirst !&
     end type SideFirst
 
     !--------------------------------------------------------------------------------------
@@ -70,21 +78,46 @@ module Domain_Side
     !--------------------------------------------------------------------------------------
     type, extends(Abst_SideType) :: SideSecond
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SideSecond !&
-        procedure, pass(self) :: psi         => psi_SideSecond !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SideSecond !&
+        procedure, pass(self) :: get_id    => get_id_SideSecond !&
+        procedure, pass(self) :: get_type  => get_type_SideSecond !&
+        procedure, pass(self) :: get_size  => get_size_SideSecond !&
+        procedure, pass(self) :: get_group => get_group_SideSecond !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi       => psi_SideSecond !&
+        procedure, pass(self) :: dpsi_dxi  => dpsi_dxi_SideSecond !&
     end type SideSecond
 
     !--------------------------------------------------------------------------------------
     !  Abstract interface for the 1D element
     !--------------------------------------------------------------------------------------
     abstract interface
-        function Abst_getNmNodes(self) result(n)
+        function Abst_get_id(self) result(id)
+            import :: Abst_SideType, int32
+            implicit none
+            class(Abst_SideType), intent(in) :: self
+            integer(int32) :: id
+        end function Abst_get_id
+
+        function Abst_get_type(self) result(type)
+            import :: Abst_SideType, int32
+            implicit none
+            class(Abst_SideType), intent(in) :: self
+            integer(int32) :: type
+        end function Abst_get_type
+
+        function Abst_get_size(self) result(n)
             import :: Abst_SideType, int32
             implicit none
             class(Abst_SideType), intent(in) :: self
             integer(int32) :: n
-        end function Abst_getNmNodes
+        end function Abst_get_size
+
+        function Abst_get_group(self) result(group)
+            import :: Abst_SideType, int32
+            implicit none
+            class(Abst_SideType), intent(in) :: self
+            integer(int32) :: group
+        end function Abst_get_group
 
         function Abst_psi(self, i, xi) result(psi)
             import :: Abst_SideType, int32, real64
@@ -117,11 +150,29 @@ module Domain_Side
 
         end function SideFirst_Construct
 
-        module function getNumNodes_SideFirst(self) result(n)
+        module function get_id_SideFirst(self) result(id)
+            implicit none
+            class(SideFirst), intent(in) :: self
+            integer(int32) :: id
+        end function get_id_SideFirst
+
+        module function get_type_SideFirst(self) result(type)
+            implicit none
+            class(SideFirst), intent(in) :: self
+            integer(int32) :: type
+        end function get_type_SideFirst
+
+        module function get_size_SideFirst(self) result(n)
             implicit none
             class(SideFirst), intent(in) :: self
             integer(int32) :: n
-        end function getNumNodes_SideFirst
+        end function get_size_SideFirst
+
+        module function get_group_SideFirst(self) result(group)
+            implicit none
+            class(SideFirst), intent(in) :: self
+            integer(int32) :: group
+        end function get_group_SideFirst
 
         module function psi_SideFirst(self, i, xi) result(psi)
             implicit none
@@ -153,11 +204,29 @@ module Domain_Side
 
         end function SideSecond_Construct
 
-        module function getNumNodes_SideSecond(self) result(n)
+        module function get_id_SideSecond(self) result(id)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32) :: id
+        end function get_id_SideSecond
+
+        module function get_type_SideSecond(self) result(type)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32) :: type
+        end function get_type_SideSecond
+
+        module function get_size_SideSecond(self) result(n)
             implicit none
             class(SideSecond), intent(in) :: self
             integer(int32) :: n
-        end function getNumNodes_SideSecond
+        end function get_size_SideSecond
+
+        module function get_group_SideSecond(self) result(group)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32) :: group
+        end function get_group_SideSecond
 
         module function psi_SideSecond(self, i, xi) result(psi)
             implicit none

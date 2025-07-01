@@ -86,13 +86,37 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_TriangleFirst(self) result(n)
+    module function get_id_TriangleFirst(self) result(id)
+        implicit none
+        class(TriangleFirst), intent(in) :: self
+        integer(int32) :: id
+
+        id = self%id
+    end function get_id_TriangleFirst
+
+    module function get_type_TriangleFirst(self) result(type)
+        implicit none
+        class(TriangleFirst), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_TriangleFirst
+
+    module function get_size_TriangleFirst(self) result(n)
         implicit none
         class(TriangleFirst), intent(in) :: self
         integer(int32) :: n
 
         n = self%size
-    end function getNumNodes_TriangleFirst
+    end function get_size_TriangleFirst
+
+    module function get_group_TriangleFirst(self) result(group)
+        implicit none
+        class(TriangleFirst), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_TriangleFirst
 
     !----------------------------------------------------------------------!
     ! psi_TriangleFirst:

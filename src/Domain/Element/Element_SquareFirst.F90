@@ -73,7 +73,7 @@ contains
     end function SquareFirst_Construct
 
     !----------------------------------------------------------------------!
-    ! getNumNodes_SquareFirst:
+    ! get_id_SquareFirst:
     !----------------------------------------------------------------------!
     ! This function returns the number of nodes associated with a
     ! SquareFirst element.
@@ -91,13 +91,37 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_SquareFirst(self) result(n)
+    module function get_id_SquareFirst(self) result(id)
         implicit none
         class(SquareFirst), intent(in) :: self
-        integer(int32) :: n
+        integer(int32) :: id
 
-        n = self%size
-    end function getNumNodes_SquareFirst
+        id = self%id
+    end function get_id_SquareFirst
+
+    module function get_type_SquareFirst(self) result(type)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_SquareFirst
+
+    module function get_size_SquareFirst(self) result(size)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
+    end function get_size_SquareFirst
+
+    module function get_group_SquareFirst(self) result(group)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_SquareFirst
 
     !----------------------------------------------------------------------!
     ! psi_SquareFirst:

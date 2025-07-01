@@ -100,13 +100,37 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_SquareSecond(self) result(n)
+    module function get_id_SquareSecond(self) result(id)
+        implicit none
+        class(SquareSecond), intent(in) :: self
+        integer(int32) :: id
+
+        id = self%id
+    end function get_id_SquareSecond
+
+    module function get_type_SquareSecond(self) result(type)
+        implicit none
+        class(SquareSecond), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_SquareSecond
+
+    module function get_size_SquareSecond(self) result(n)
         implicit none
         class(SquareSecond), intent(in) :: self
         integer(int32) :: n
 
         n = self%size
-    end function getNumNodes_SquareSecond
+    end function get_size_SquareSecond
+
+    module function get_group_SquareSecond(self) result(group)
+        implicit none
+        class(SquareSecond), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_SquareSecond
 
     !----------------------------------------------------------------------!
     ! psi_SquareSecond:

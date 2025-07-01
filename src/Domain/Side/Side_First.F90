@@ -41,13 +41,37 @@ contains
         Structure%gauss(:) = [2.0d0]
     end function SideFirst_Construct
 
-    module function getNumNodes_SideFirst(self) result(n)
+    module function get_id_SideFirst(self) result(id)
         implicit none
         class(SideFirst), intent(in) :: self
-        integer(int32) :: n
+        integer(int32) :: id
 
-        n = self%size
-    end function getNumNodes_SideFirst
+        id = self%id
+    end function get_id_SideFirst
+
+    module function get_type_SideFirst(self) result(type)
+        implicit none
+        class(SideFirst), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_SideFirst
+
+    module function get_size_SideFirst(self) result(size)
+        implicit none
+        class(SideFirst), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
+    end function get_size_SideFirst
+
+    module function get_group_SideFirst(self) result(group)
+        implicit none
+        class(SideFirst), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_SideFirst
 
     module function psi_SideFirst(self, i, xi) result(psi)
         implicit none

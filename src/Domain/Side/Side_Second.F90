@@ -41,13 +41,37 @@ contains
         Structure%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
     end function SideSecond_Construct
 
-    module function getNumNodes_SideSecond(self) result(n)
+    module function get_id_SideSecond(self) result(id)
         implicit none
         class(SideSecond), intent(in) :: self
-        integer(int32) :: n
+        integer(int32) :: id
 
-        n = self%size
-    end function getNumNodes_SideSecond
+        id = self%id
+    end function get_id_SideSecond
+
+    module function get_type_SideSecond(self) result(type)
+        implicit none
+        class(SideSecond), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_SideSecond
+
+    module function get_size_SideSecond(self) result(size)
+        implicit none
+        class(SideSecond), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
+    end function get_size_SideSecond
+
+    module function get_group_SideSecond(self) result(group)
+        implicit none
+        class(SideSecond), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_SideSecond
 
     module function psi_SideSecond(self, i, xi) result(psi)
         implicit none

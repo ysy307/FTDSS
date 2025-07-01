@@ -32,10 +32,10 @@ module Domain_Element
     !   Abstract base type for 2D elements
     !--------------------------------------------------------------------------------------
     type, abstract :: Abst_ElementType
-        integer(int32) :: id !! Element ID
-        integer(int32) :: type !! Element type (5: triangle 1st, 9: square 1st)
-        integer(int32) :: size !! Number of nodes in the element
-        integer(int32) :: group !! Element group number
+        integer(int32), private :: id !! Element ID
+        integer(int32), private :: type !! Element type (5: triangle 1st, 9: square 1st)
+        integer(int32), private :: size !! Number of nodes in the element
+        integer(int32), private :: group !! Element group number
         integer(int32), allocatable :: conn(:) !! connectivity information
         type(RealPointer), allocatable :: X(:) !! X coordinate
         type(RealPointer), allocatable :: Y(:) !! Y coordinate
@@ -53,7 +53,10 @@ module Domain_Element
         real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
         !----------------------------------------------------------------------------------
     contains
-        procedure(Abst_getNmNodes),  pass(self), deferred :: getNumNodes !&
+        procedure(Abst_get_id),      pass(self), deferred :: get_id !&
+        procedure(Abst_get_type),    pass(self), deferred :: get_type !&
+        procedure(Abst_get_size),    pass(self), deferred :: get_size !&
+        procedure(Abst_get_group),   pass(self), deferred :: get_group !&
         procedure(Abst_psi),         pass(self), deferred :: psi !&
         procedure(Abst_dpsi_dxi),    pass(self), deferred :: dpsi_dxi !&
         procedure(Abst_dpsi_deta),   pass(self), deferred :: dpsi_deta !&
@@ -68,7 +71,10 @@ module Domain_Element
     !--------------------------------------------------------------------------------------
     type, extends(Abst_ElementType) :: TriangleFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_TriangleFirst !&
+        procedure, pass(self) :: get_id      => get_id_TriangleFirst !&
+        procedure, pass(self) :: get_type    => get_type_TriangleFirst !&
+        procedure, pass(self) :: get_size    => get_size_TriangleFirst !&
+        procedure, pass(self) :: get_group   => get_group_TriangleFirst !&
         procedure, pass(self) :: psi         => psi_TriangleFirst !&
         procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_TriangleFirst !&
         procedure, pass(self) :: dpsi_deta   => dpsi_deta_TriangleFirst !&
@@ -83,7 +89,10 @@ module Domain_Element
     !--------------------------------------------------------------------------------------
     type, extends(Abst_ElementType) :: SquareFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SquareFirst !&
+        procedure, pass(self) :: get_id      => get_id_SquareFirst !&
+        procedure, pass(self) :: get_type    => get_type_SquareFirst !&
+        procedure, pass(self) :: get_size    => get_size_SquareFirst !&
+        procedure, pass(self) :: get_group   => get_group_SquareFirst !&
         procedure, pass(self) :: psi         => psi_SquareFirst !&
         procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SquareFirst !&
         procedure, pass(self) :: dpsi_deta   => dpsi_deta_SquareFirst !&
@@ -98,7 +107,10 @@ module Domain_Element
     !--------------------------------------------------------------------------------------
     type, extends(Abst_ElementType) :: TriangleSecond
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_TriangleSecond !&
+        procedure, pass(self) :: get_id      => get_id_TriangleSecond !&
+        procedure, pass(self) :: get_type    => get_type_TriangleSecond !&
+        procedure, pass(self) :: get_size    => get_size_TriangleSecond !&
+        procedure, pass(self) :: get_group   => get_group_TriangleSecond !&
         procedure, pass(self) :: psi         => psi_TriangleSecond !&
         procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_TriangleSecond !&
         procedure, pass(self) :: dpsi_deta   => dpsi_deta_TriangleSecond !&
@@ -113,7 +125,10 @@ module Domain_Element
     !--------------------------------------------------------------------------------------
     type, extends(Abst_ElementType) :: SquareSecond
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SquareSecond !&
+        procedure, pass(self) :: get_id      => get_id_SquareSecond !&
+        procedure, pass(self) :: get_type    => get_type_SquareSecond !&
+        procedure, pass(self) :: get_size    => get_size_SquareSecond !&
+        procedure, pass(self) :: get_group   => get_group_SquareSecond !&
         procedure, pass(self) :: psi         => psi_SquareSecond !&
         procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SquareSecond !&
         procedure, pass(self) :: dpsi_deta   => dpsi_deta_SquareSecond !&
@@ -127,12 +142,33 @@ module Domain_Element
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
-        function Abst_getNmNodes(self) result(n)
+        function Abst_get_id(self) result(id)
             import :: Abst_ElementType, int32
             implicit none
             class(Abst_ElementType), intent(in) :: self
-            integer(int32) :: n
-        end function Abst_getNmNodes
+            integer(int32) :: id
+        end function Abst_get_id
+
+        function Abst_get_type(self) result(type)
+            import :: Abst_ElementType, int32
+            implicit none
+            class(Abst_ElementType), intent(in) :: self
+            integer(int32) :: type
+        end function Abst_get_type
+
+        function Abst_get_size(self) result(size)
+            import :: Abst_ElementType, int32
+            implicit none
+            class(Abst_ElementType), intent(in) :: self
+            integer(int32) :: size
+        end function Abst_get_size
+
+        function Abst_get_group(self) result(group)
+            import :: Abst_ElementType, int32
+            implicit none
+            class(Abst_ElementType), intent(in) :: self
+            integer(int32) :: group
+        end function Abst_get_group
 
         function Abst_psi(self, i, xi, eta) result(psi)
             import :: Abst_ElementType, int32, real64
@@ -212,12 +248,33 @@ module Domain_Element
 
         end function TriangleFirst_Construct
 
-        module function getNumNodes_TriangleFirst(self) result(n)
+        module function get_id_TriangleFirst(self) result(id)
             implicit none
             class(TriangleFirst), intent(in) :: self
-            integer(int32) :: n
+            integer(int32) :: id
 
-        end function getNumNodes_TriangleFirst
+        end function get_id_TriangleFirst
+
+        module function get_type_TriangleFirst(self) result(type)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32) :: type
+
+        end function get_type_TriangleFirst
+
+        module function get_size_TriangleFirst(self) result(size)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32) :: size
+
+        end function get_size_TriangleFirst
+
+        module function get_group_TriangleFirst(self) result(group)
+            implicit none
+            class(TriangleFirst), intent(in) :: self
+            integer(int32) :: group
+
+        end function get_group_TriangleFirst
 
         module function psi_TriangleFirst(self, i, xi, eta) result(N)
             implicit none
@@ -296,12 +353,33 @@ module Domain_Element
 
         end function SquareFirst_Construct
 
-        module function getNumNodes_SquareFirst(self) result(n)
+        module function get_id_SquareFirst(self) result(id)
             implicit none
             class(SquareFirst), intent(in) :: self
-            integer(int32) :: n
+            integer(int32) :: id
 
-        end function getNumNodes_SquareFirst
+        end function get_id_SquareFirst
+
+        module function get_type_SquareFirst(self) result(type)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32) :: type
+
+        end function get_type_SquareFirst
+
+        module function get_size_SquareFirst(self) result(size)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32) :: size
+
+        end function get_size_SquareFirst
+
+        module function get_group_SquareFirst(self) result(group)
+            implicit none
+            class(SquareFirst), intent(in) :: self
+            integer(int32) :: group
+
+        end function get_group_SquareFirst
 
         module function psi_SquareFirst(self, i, xi, eta) result(psi)
             implicit none
@@ -380,12 +458,33 @@ module Domain_Element
 
         end function TriangleSecond_Construct
 
-        module function getNumNodes_TriangleSecond(self) result(n)
+        module function get_id_TriangleSecond(self) result(id)
             implicit none
             class(TriangleSecond), intent(in) :: self
-            integer(int32) :: n
+            integer(int32) :: id
 
-        end function getNumNodes_TriangleSecond
+        end function get_id_TriangleSecond
+
+        module function get_type_TriangleSecond(self) result(type)
+            implicit none
+            class(TriangleSecond), intent(in) :: self
+            integer(int32) :: type
+
+        end function get_type_TriangleSecond
+
+        module function get_size_TriangleSecond(self) result(size)
+            implicit none
+            class(TriangleSecond), intent(in) :: self
+            integer(int32) :: size
+
+        end function get_size_TriangleSecond
+
+        module function get_group_TriangleSecond(self) result(group)
+            implicit none
+            class(TriangleSecond), intent(in) :: self
+            integer(int32) :: group
+
+        end function get_group_TriangleSecond
 
         module function psi_TriangleSecond(self, i, xi, eta) result(N)
             implicit none
@@ -464,12 +563,33 @@ module Domain_Element
 
         end function SquareSecond_Construct
 
-        module function getNumNodes_SquareSecond(self) result(n)
+        module function get_id_SquareSecond(self) result(id)
             implicit none
             class(SquareSecond), intent(in) :: self
-            integer(int32) :: n
+            integer(int32) :: id
 
-        end function getNumNodes_SquareSecond
+        end function get_id_SquareSecond
+
+        module function get_type_SquareSecond(self) result(type)
+            implicit none
+            class(SquareSecond), intent(in) :: self
+            integer(int32) :: type
+
+        end function get_type_SquareSecond
+
+        module function get_size_SquareSecond(self) result(size)
+            implicit none
+            class(SquareSecond), intent(in) :: self
+            integer(int32) :: size
+
+        end function get_size_SquareSecond
+
+        module function get_group_SquareSecond(self) result(group)
+            implicit none
+            class(SquareSecond), intent(in) :: self
+            integer(int32) :: group
+
+        end function get_group_SquareSecond
 
         module function psi_SquareSecond(self, i, xi, eta) result(psi)
             implicit none
