@@ -46,8 +46,9 @@ include(Toolchain)
 
 # Source Files
 add_subdirectory(src/Core)
-add_subdirectory(src/Matrix)
 add_subdirectory(src/Inout/Input)
+add_subdirectory(src/Domain)
+add_subdirectory(src/Matrix)
 add_subdirectory(src/Conditions/Boundary)
 add_subdirectory(src/Conditions/Initial)
 add_subdirectory(src/Calculate/BLAS)

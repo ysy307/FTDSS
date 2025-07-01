@@ -1,4 +1,4 @@
-submodule(Core_Element) Core_Element_SquareSecond
+submodule(Domain_Element) Domain_Element_SquareSecond
     implicit none
 contains
 
@@ -567,5 +567,5 @@ contains
 
     end function Interpolate_SquareSecond
 
-end submodule Core_Element_SquareSecond
+end submodule Domain_Element_SquareSecond
 

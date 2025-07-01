@@ -1,4 +1,4 @@
-submodule(Core_Side) Core_Side_First
+submodule(Domain_Side) Domain_Side_First
     implicit none
 contains
 
@@ -8,15 +8,15 @@ contains
         type(DP3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(2)
         integer(int32), intent(in) :: GroupID
-        class(Abstract_SideType), allocatable :: Structure
+        class(Abst_SideType), allocatable :: Structure
 
         integer(int32), parameter :: nsize = 2
         integer(int32) :: i
 
         allocate (SideFirst :: Structure)
-        Structure%SideID = iSide
-        Structure%SideType = 3
-        Structure%SideGroup = GroupID
+        Structure%id = iSide
+        Structure%type = 3
+        Structure%group = GroupID
 
         Structure%size = nsize
         allocate (Structure%conn(nsize))
@@ -82,4 +82,4 @@ contains
         end select
     end function dpsi_dxi_SideFirst
 
-end submodule Core_Side_First
+end submodule Domain_Side_First

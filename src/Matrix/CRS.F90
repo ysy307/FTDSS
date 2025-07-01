@@ -1,7 +1,7 @@
 module Matrix_CRS
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_Allocate, only:Allocate_Array
-    use :: Core_Element
+    use :: Domain_Module, only:Domain_t
     implicit none
     private
 
@@ -37,10 +37,9 @@ module Matrix_CRS
 
 contains
 
-    function Initialize_CRS(Elements, nNode) result(A)
+    function Initialize_CRS(Domain) result(A)
         implicit none
-        type(ElementHolder), intent(in) :: Elements(:)
-        integer(int32), intent(in) :: nNode
+        type(Domain_t), intent(in) :: Domain
         type(Type_CRS) :: A
         integer(int32) :: iTop
 
@@ -48,32 +47,32 @@ contains
         integer(int32), allocatable :: rowCount(:), tmpInd(:)
 
         ! Set dimensions
-        A%nrow = nNode
-        A%nptr = nNode + 1
+        A%nrow = Domain%nNode
+        A%nptr = Domain%nNode + 1
 
         ! Allocate temp arrays
         call Allocate_Array(A%Ptr, A%nptr)
-        call Allocate_Array(rowCount, nNode)
-        call Allocate_Array(tmpInd, 30_int32 * nNode)
+        call Allocate_Array(rowCount, Domain%nNode)
+        call Allocate_Array(tmpInd, 30_int32 * Domain%nNode)
 
         A%Ptr(1) = 1
         A%nnz = 0
-        do iN = 1, nNode
+        do iN = 1, Domain%nNode
             rowCount = 0
             row_nnz = 0
             ! Scan elements to build sparsity row
-            do iE = 1, size(Elements)
-                do iT = 1, Elements(iE)%e%size
-                    if (Elements(iE)%e%conn(iT) == iN) then
-                        do irT = 1, Elements(iE)%e%size
-                            rowCount(Elements(iE)%e%conn(irT)) = 1
+            do iE = 1, Domain%nElement
+                do iT = 1, Domain%Elements(iE)%e%size
+                    if (Domain%Elements(iE)%e%conn(iT) == iN) then
+                        do irT = 1, Domain%Elements(iE)%e%size
+                            rowCount(Domain%Elements(iE)%e%conn(irT)) = 1
                         end do
                         exit
                     end if
                 end do
             end do
             ! Collect indices
-            do iNC = 1, nNode
+            do iNC = 1, Domain%nNode
                 if (rowCount(iNC) >= 1) then
                     row_nnz = row_nnz + 1
                     tmpInd(A%nnz + row_nnz) = iNC
@@ -188,53 +187,5 @@ contains
         B%Ind(:) = self%Ind(:)
         B%Val(:) = self%Val(:)
     end function Copy_CRS
-
-    ! function Transpose_CRS(self) result(AT)
-    !     implicit none
-    !     class(Type_CRS) :: self
-    !     type(Type_CRS) :: AT
-    !     integer(int32) :: i, j, row, col, dst
-    !     integer(int32), allocatable :: col_count(:), next_pos(:)
-
-    !     ! Setup AT dimensions
-    !     AT%nrow = self%ncol + 1
-    !     AT%ncol = self%nrow - 1
-    !     AT%nnz = self%nnz
-
-    !     ! Count entries per column in A
-    !     call Allocate_Array(col_count, self%ncol)
-    !     col_count(:) = 0
-    !     do row = 1, self%nrow - 1
-    !         do i = self%Ptr(row), self%Ptr(row + 1) - 1
-    !             col_count(self%Ind(i)) = col_count(self%Ind(i)) + 1
-    !         end do
-    !     end do
-
-    !     ! Build AT%Ptr
-    !     call Allocate_Array(AT%Ptr, AT%nrow)
-    !     AT%Ptr(1) = 1
-    !     do i = 1, AT%nrow - 1
-    !         AT%Ptr(i + 1) = AT%Ptr(i) + col_count(i)
-    !     end do
-
-    !     ! Allocate Ind, Val and next_pos
-    !     call Allocate_Array(AT%Ind, AT%nnz)
-    !     call Allocate_Array(AT%Val, AT%nnz)
-    !     allocate (next_pos(self%ncol))
-    !     next_pos = AT%Ptr(1:AT%nrow - 1)
-
-    !     ! Fill AT
-    !     do row = 1, self%nrow - 1
-    !         do i = self%Ptr(row), self%Ptr(row + 1) - 1
-    !             col = self%Ind(i)
-    !             dst = next_pos(col)
-    !             AT%Ind(dst) = row
-    !             AT%Val(dst) = self%Val(i)
-    !             next_pos(col) = dst + 1
-    !         end do
-    !     end do
-
-    !     deallocate (col_count, next_pos)
-    ! end function Transpose_CRS
 
 end module Matrix_CRS

@@ -1,19 +1,20 @@
 module Main_Thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_BaseTypes
-    use :: Core_Element
-    use :: Core_Side
+    use :: Domain_Module, only:Domain_t
+    ! use :: Core_Element
+    ! use :: Core_Side
     use :: Inout_Input
-    use :: Calculate_Ice
-    use :: Calculate_ThermalConductivity
-    use :: Calculate_Density
-    use :: Calculate_SpecificHeat
-    use :: Calculate_HeatCapacity
-    use :: Matrix_Assemble
+    ! use :: Calculate_Ice
+    ! use :: Calculate_ThermalConductivity
+    ! use :: Calculate_Density
+    ! use :: Calculate_SpecificHeat
+    ! use :: Calculate_HeatCapacity
+    ! use :: Matrix_Assemble
     use :: Matrix_CRS
-    use :: Condition_Boundary
-    use :: Condition_Initial
-    use :: Solver_Solve
+    ! use :: Condition_Boundary
+    ! use :: Condition_Initial
+    ! use :: Solver_Solve
     implicit none
 
     type, abstract :: Abstract_Thermal
@@ -34,24 +35,25 @@ module Main_Thermal
         real(real64), allocatable :: PHIT(:)
         real(real64), allocatable :: PHIT_old(:)
 
-        ! type(DP3d), pointer :: Coordinate
-        integer(int32) :: nsize
-        integer(int32) :: nElement
-        integer(int32) :: nSide
-        integer(int32) :: nRegion
-        type(ElementHolder), allocatable :: Elements(:)
-        type(SideHolder), allocatable :: Sides(:)
-        class(Abstract_Condition_BC), allocatable :: BC
-        class(Abstract_Condition_IC), allocatable :: IC
+        ! ! type(DP3d), pointer :: Coordinate
+        ! integer(int32) :: nsize
+        ! integer(int32) :: nElement
+        ! integer(int32) :: nSide
+        ! integer(int32) :: nRegion
+        type(Domain_t) :: Domain
+        ! type(ElementHolder), allocatable :: Elements(:)
+        ! type(SideHolder), allocatable :: Sides(:)
+        ! class(Abstract_Condition_BC), allocatable :: BC
+        ! class(Abstract_Condition_IC), allocatable :: IC
         !! Thermal properties
-        class(Abstract_ThermalConductivity), allocatable :: THC
-        class(Abstract_Density), allocatable :: DEN
-        class(Abstract_SpecificHeat), allocatable :: SPH
-        type(HTCHolder), allocatable :: HTC(:)
-        type(IceHolder), allocatable :: ICE(:)
+        ! class(Abstract_ThermalConductivity), allocatable :: THC
+        ! class(Abstract_Density), allocatable :: DEN
+        ! class(Abstract_SpecificHeat), allocatable :: SPH
+        ! type(HTCHolder), allocatable :: HTC(:)
+        ! type(IceHolder), allocatable :: ICE(:)
 
         !! Solver
-        class(Abstract_Solver_CRS), allocatable :: Solver
+        ! class(Abstract_Solver_CRS), allocatable :: Solver
         integer(int32) :: Order
     contains
         procedure(Abstract_Update), pass(self), deferred :: Update

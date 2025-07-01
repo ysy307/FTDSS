@@ -1,4 +1,4 @@
-submodule(Core_Element) Core_Element_SquareFirst
+submodule(Domain_Element) Domain_Element_SquareFirst
     implicit none
 contains
 
@@ -519,5 +519,5 @@ contains
 
     end function Interpolate_SquareFirst
 
-end submodule Core_Element_SquareFirst
+end submodule Domain_Element_SquareFirst
 

@@ -1,6 +1,6 @@
-module Core_Element
+module Domain_Element
     !*---------------------------------------------------------------------------------------<br>
-    !  Module: Core_Element<br>
+    !  Module: Domain_Element<br>
     !  Purpose: Define 2D finite element types (square and triangle) and their<br>
     !           associated operations (shape functions, Jacobian, Gauss points).<br>
     !  Ford Coding Standard:<br>
@@ -26,8 +26,6 @@ module Core_Element
     !--------------------------------------------------------------------------------------
     type :: ElementHolder
         class(Abst_ElementType), allocatable :: e
-    contains
-        procedure, pass(self) :: allocate => ElementHolder_allocate
     end type ElementHolder
 
     !--------------------------------------------------------------------------------------
@@ -53,6 +51,7 @@ module Core_Element
         integer(int32) :: nGauss !! Number of Gauss Quadrature points
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
+        !----------------------------------------------------------------------------------
     contains
         procedure(Abst_getNmNodes),  pass(self), deferred :: getNumNodes !&
         procedure(Abst_psi),         pass(self), deferred :: psi !&
@@ -197,22 +196,6 @@ module Core_Element
             real(real64) :: interpolated_value
         end function Abst_Interpolate
 
-    end interface
-
-    !--------------------------------------------------------------------------------------
-    !   ElementHolder procedures interface
-    !--------------------------------------------------------------------------------------
-    interface
-        module subroutine ElementHolder_allocate(self, iShape_Type, iElem, Global_Coordinate, Connectivity, GroupID)
-            implicit none
-            class(ElementHolder), intent(inout) :: self
-            integer(int32), intent(in) :: iShape_Type
-            integer(int32), intent(in) :: iElem
-            type(DP3d), pointer, intent(in) :: Global_Coordinate
-            integer(int32), intent(in) :: Connectivity(:)
-            integer(int32), intent(in) :: GroupID
-
-        end subroutine ElementHolder_allocate
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -567,4 +550,4 @@ module Core_Element
         module procedure :: SquareSecond_Construct
     end interface
 
-end module Core_Element
+end module Domain_Element
