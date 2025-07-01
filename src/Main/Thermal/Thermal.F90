@@ -47,8 +47,8 @@ module Main_Thermal
         class(Abstract_ThermalConductivity), allocatable :: THC
         class(Abstract_Density), allocatable :: DEN
         class(Abstract_SpecificHeat), allocatable :: SPH
-        class(Abst_HeatCapacity), allocatable :: HTC
-        type(IceHolder), allocatable :: Ice(:)
+        type(HTCHolder), allocatable :: HTC(:)
+        type(IceHolder), allocatable :: ICE(:)
 
         !! Solver
         class(Abstract_Solver_CRS), allocatable :: Solver

@@ -61,8 +61,6 @@ contains
         real(real64), intent(in), optional :: rhoI
         real(real64) :: Qice
 
-        real(real64) :: tmpT, tmpPw, tmpRhoW, tmpRhoI
-
         select type (GCC => self%GCC)
         type is (Type_GCC_NonSegregation_m)
             Qice = phi - self%WRF%Calc(-GCC%Calc(T=T))
@@ -86,8 +84,20 @@ contains
         real(real64), intent(in), optional :: rhoI
         real(real64) :: D_Qice
 
-        D_Qice = self%WRF%DERIV(-self%GCC%Calc(T, Pw, rhoW, rhoI)) &
-                 * self%GCC%DERIV(T, Pw, rhoW, rhoI)
+        select type (GCC => self%GCC)
+        type is (Type_GCC_NonSegregation_m)
+            D_Qice = -self%WRF%DERIV(-self%GCC%Calc(T=T)) &
+                     * self%GCC%DERIV(T=T)
+        type is (Type_GCC_NonSegregation_Pa)
+            D_Qice = -self%WRF%DERIV(-self%GCC%Calc(T=T, rhoW=rhoW)) &
+                     * self%GCC%DERIV(T=T, rhoW=rhoW)
+        type is (Type_GCC_Segregation_m)
+            D_Qice = -self%WRF%DERIV(-self%GCC%Calc(T=T, Pw=Pw, rhoW=rhoW, rhoI=rhoI)) &
+                     * self%GCC%DERIV(T=T, Pw=Pw, rhoW=rhoW, rhoI=rhoI)
+        type is (Type_GCC_Segregation_Pa)
+            D_Qice = self%WRF%DERIV(-self%GCC%Calc(T=T, Pw=Pw, rhoW=rhoW, rhoI=rhoI)) &
+                     * self%GCC%DERIV(T=T, Pw=Pw, rhoW=rhoW, rhoI=rhoI)
+        end select
 
     end function Calculate_Ice_GCC_Derivative
 
