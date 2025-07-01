@@ -1,6 +1,17 @@
 submodule(Calculate_ThermalConductivity) Calc_THC_Base
 
 contains
+    module subroutine THCHolder_initialize(self, iRegion, Input)
+        implicit none
+        class(THCHolder), intent(inout) :: self
+        integer(int32), intent(in) :: iRegion
+        type(Type_Input), intent(in) :: Input
+
+        if (Input%Regions(iRegion)%Flag%is3Phase) then
+            self%l = Type_THC_3Phase(iRegion, Input)
+        end if
+
+    end subroutine THCHolder_initialize
 
     module function Calc_THC_3(lambda_soil, phi_soil, &
                                lambda_water, phi_water, &

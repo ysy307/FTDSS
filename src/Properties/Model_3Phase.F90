@@ -1,15 +1,14 @@
-module Properties_Thermal_Model_3Phase
+module Properties_Model_3Phase
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_BaseTypes, only:GaussPointState_t
-    use :: Properties_Thermal_Model_Base, only:ThermalModel_Base_t
-    use :: Properties_Thermal_Material_Manager, only:ThermalMaterialManager_t
+    use :: Properties_Model_Base, only:ThermalModel_Base_t
+    use :: Properties_Material_Manager, only:MaterialManager_t
     use Calculate_ThermalConductivity, only: THCHolder
     implicit none
 
     type, extends(ThermalModel_Base_t) :: ThermalModel_3Phase_t
         private
-        ! 3相の熱伝導率を計算するためのホルダー
-        type(ThermalMaterialManager_t) :: Materials
+        type(MaterialManager_t) :: Materials
 
     contains
         procedure :: get_lambda => calculate_THC
@@ -25,7 +24,7 @@ contains
         real(real64) :: lambda
         type(THCHolder) :: THC_holder
 
-        THC_holder = self%Materials%get_thc_model(region_id)
+        THC_holder = self%Materials%get_THC(region_id)
         lambda = THC_holder%l%Calc_GaussPoint(state)
 
     end function
@@ -43,4 +42,4 @@ contains
         real(real64) :: dCa_dT
         ! ... 熱容量の温度微分を計算 ...
     end function
-end module Properties_Thermal_Model_3Phase
+end module Properties_Model_3Phase

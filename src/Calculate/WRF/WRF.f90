@@ -8,13 +8,21 @@ module Calculate_WRF
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)
 
-    public :: Abst_WRF
-    public :: Type_WRF_BC
-    public :: Type_WRF_VG
-    public :: Type_WRF_KO
-    public :: Type_WRF_MVG
-    public :: Type_WRF_Durner
-    public :: Type_WRF_DVGCH
+    ! public :: Abst_WRF
+    ! public :: Type_WRF_BC
+    ! public :: Type_WRF_VG
+    ! public :: Type_WRF_KO
+    ! public :: Type_WRF_MVG
+    ! public :: Type_WRF_Durner
+    ! public :: Type_WRF_DVGCH
+
+    public :: WRFHolder
+
+    type :: WRFHolder
+        class(Abst_WRF), allocatable :: w
+    contains
+        procedure, pass(self) :: initialize => WRFHolder_initialize
+    end type WRFHolder
 
     type, abstract :: Abst_WRF
         real(real64) :: thetaR
@@ -102,6 +110,16 @@ module Calculate_WRF
             real(real64), intent(in) :: h
             real(real64) :: Cw
         end function Abstract_Calculate_WRF_Derivative
+    end interface
+
+    interface
+        module subroutine WRFHolder_initialize(self, iRegion, Input)
+            implicit none
+            class(WRFHolder), intent(inout) :: self
+            integer(int32), intent(in) :: iRegion
+            type(Type_Input), intent(in) :: Input
+
+        end subroutine WRFHolder_initialize
     end interface
 
     interface

@@ -49,18 +49,18 @@ add_subdirectory(src/Core)
 add_subdirectory(src/Inout/Input)
 add_subdirectory(src/Domain)
 add_subdirectory(src/Matrix)
-add_subdirectory(src/Conditions/Boundary)
-add_subdirectory(src/Conditions/Initial)
 add_subdirectory(src/Calculate/BLAS)
 add_subdirectory(src/Calculate/WRF)
 add_subdirectory(src/Calculate/HCF)
 add_subdirectory(src/Calculate/GCC)
 add_subdirectory(src/Calculate/ThermalConductivity)
-add_subdirectory(src/Properties/Thermal)
+add_subdirectory(src/Properties)
 add_subdirectory(src/Calculate/Density)
 add_subdirectory(src/Calculate/SpecificHeat)
 add_subdirectory(src/Calculate/HeatCapacity)
-add_subdirectory(src/Calculate/Ice)
+add_subdirectory(src/Conditions/Boundary)
+add_subdirectory(src/Conditions/Initial)
+# add_subdirectory(src/Calculate/Ice)
 add_subdirectory(src/Solver)
 add_subdirectory(src/Main/Thermal)
 add_subdirectory(src/Inout/Output)
@@ -88,7 +88,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Calc_WRF
         Calc_HCF
         Calc_GCC
-        Calc_Ice
+        # Calc_Ice
         Calc_THC
         Calc_VHC
         Calc_DEN
@@ -123,7 +123,7 @@ elseif(BUILD_APP STREQUAL "test")
         Calc_WRF
         Calc_HCF
         Calc_GCC
-        Calc_Ice
+        # Calc_Ice
         Calc_THC
         Calc_VHC
         Calc_DEN

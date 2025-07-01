@@ -1,4 +1,4 @@
-module Properties_Thermal_Model_Base
+module Properties_Model_Base
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_BaseTypes, only:GaussPointState_t
 
@@ -37,4 +37,4 @@ module Properties_Thermal_Model_Base
             real(real64) :: Ca_Derivative
         end function Abst_get_Ca_Derivative
     end interface
-end module Properties_Thermal_Model_Base
+end module Properties_Model_Base

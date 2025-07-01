@@ -4,31 +4,24 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of heat conductivity
     !----------------------------------------------------------------------------------------------------
-    module function THC_3_Construct(region_id, lambda1, lambda2, lambda3, lambda4) result(structure)
+    module function THC_3_Construct(iRegion, Input) result(Structure)
         implicit none
-        integer(int32), intent(in) :: region_id
-        real(real64), intent(in), optional :: lambda1
-        real(real64), intent(in), optional :: lambda2
-        real(real64), intent(in), optional :: lambda3
-        real(real64), intent(in), optional :: lambda4
-        class(Abst_ThermalConductivity), allocatable :: structure
+        class(Abst_THC), allocatable :: Structure
+        integer(int32), intent(in) :: iRegion
+        type(Type_Input), intent(in) :: Input
 
-        integer(int32) :: iRegion
+        if (allocated(Structure)) deallocate (Structure)
+        allocate (Type_THC_3Phase :: Structure)
 
-        allocate (Type_THC_3Phase :: structure)
-        select type (this => structure)
-        type is (Type_THC_3Phase)
-            this%region_id = region_id
-            if (present(lambda1)) this%Material1 = lambda1
-            if (present(lambda2)) this%Material2 = lambda2
-            if (present(lambda3)) this%Material3 = lambda3
-            if (present(lambda4)) this%Material4 = lambda4
+        Structure%region_id = iRegion
 
-        end select
+        Structure%Material1 = Input%Regions(iRegion)%Thermal%rho(1)
+        Structure%Material2 = Input%Regions(iRegion)%Thermal%rho(2)
+        Structure%Material3 = Input%Regions(iRegion)%Thermal%rho(3)
 
     end function THC_3_Construct
 
-    module function Calc_GaussPoint_3Phase(self, state) result(lambda)
+    module function Calc_THC_GaussPoint_3Phase(self, state) result(lambda)
         implicit none
         class(Type_THC_3Phase), intent(in) :: self
         type(GaussPointState_t), intent(in) :: state
@@ -42,7 +35,7 @@ contains
 
         lambda = Calc_THC_3(self%Material1, phi1, self%Material2, phi2, self%Material3, phi3)
 
-    end function Calc_GaussPoint_3Phase
+    end function Calc_THC_GaussPoint_3Phase
 
     ! module function Calc_THC_3_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, waterFlux) result(lambda)
     !     implicit none

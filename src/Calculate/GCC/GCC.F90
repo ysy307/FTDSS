@@ -1,16 +1,25 @@
 module Calculate_GCC
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: Inout_Input, only:Type_Input
 #ifdef _OPENMP
     use omp_lib
 #endif
     implicit none
     private
 
-    public :: Abst_GCC
-    public :: Type_GCC_NonSegregation_m
-    public :: Type_GCC_NonSegregation_Pa
-    public :: Type_GCC_Segregation_m
-    public :: Type_GCC_Segregation_Pa
+    ! public :: Abst_GCC
+    ! public :: Type_GCC_NonSegregation_m
+    ! public :: Type_GCC_NonSegregation_Pa
+    ! public :: Type_GCC_Segregation_m
+    ! public :: Type_GCC_Segregation_Pa
+
+    public :: GCCHolder
+
+    type :: GCCHolder
+        class(Abst_GCC), allocatable :: g
+    contains
+        procedure, pass(self) :: initialize => GCCHolder_initialize
+    end type GCCHolder
 
     type, abstract :: Abst_GCC
         real(real64) :: Tf !! Freezing point
@@ -75,6 +84,16 @@ module Calculate_GCC
             real(real64) :: Suction_Derivative
 
         end function Abst_GCC_Calc_Derivative
+    end interface
+
+    interface
+        module subroutine GCCHolder_initialize(self, iRegion, Input)
+            implicit none
+            class(GCCHolder), intent(inout) :: self
+            integer(int32), intent(in) :: iRegion
+            type(Type_Input), intent(in) :: Input
+
+        end subroutine GCCHolder_initialize
     end interface
 
     interface

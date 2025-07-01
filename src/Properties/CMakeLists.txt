@@ -6,6 +6,10 @@ add_library(Prop_Thermal OBJECT
 target_link_libraries(Prop_Thermal PRIVATE
     Core
     Calc_THC
-    # Domain
+    Calc_DEN
+    Calc_SPH
+    Calc_VHC
+    Calc_GCC
+    Calc_WRF
 )
 enable_build_flags(Prop_Thermal)

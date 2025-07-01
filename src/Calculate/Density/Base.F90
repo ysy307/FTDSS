@@ -3,17 +3,17 @@ submodule(Calculate_Density) Calc_DEN_Base
 
 contains
 
-    module subroutine DENHolder_allocate(self, iRegion, Input)
+    module subroutine DENHolder_initialize(self, iRegion, Input)
         implicit none
         class(DENHolder), intent(inout) :: self
         integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
 
         if (Input%Regions(iRegion)%Flag%is3Phase) then
-            self%d = Type_Density_3Phase(iRegion, Input)
+            self%d = Type_DEN_3Phase(iRegion, Input)
         end if
 
-    end subroutine DENHolder_allocate
+    end subroutine DENHolder_initialize
 
     module function Calc_DEN_3(density_soil, phi_soil, &
                                density_water, phi_water, &

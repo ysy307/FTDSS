@@ -6,6 +6,7 @@ add_library(Calc_WRF OBJECT
     WRF_MVG.F90
     WRF_Durner.F90
     WRF_DVGCH.F90
+    WRF_Base.F90
 )
 target_link_libraries(Calc_WRF PRIVATE
     Input
