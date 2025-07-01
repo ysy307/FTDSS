@@ -5,6 +5,7 @@ add_library(Thermal OBJECT
 target_link_libraries(Thermal PRIVATE
     Core
     Input
+    Domain
     Calc_Ice
     Calc_THC
     Calc_VHC
