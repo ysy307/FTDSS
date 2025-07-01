@@ -56,6 +56,7 @@ add_subdirectory(src/Calculate/WRF)
 add_subdirectory(src/Calculate/HCF)
 add_subdirectory(src/Calculate/GCC)
 add_subdirectory(src/Calculate/ThermalConductivity)
+add_subdirectory(src/Properties/Thermal)
 add_subdirectory(src/Calculate/Density)
 add_subdirectory(src/Calculate/SpecificHeat)
 add_subdirectory(src/Calculate/HeatCapacity)
@@ -77,9 +78,11 @@ if(BUILD_APP STREQUAL "ysy_fc")
     add_executable(ysy_fc ${MAIN_FILE})
     target_link_libraries(ysy_fc PRIVATE
         Core
+        Input
+        Domain
+        Prop_Thermal
         Matrix
         Calc_BLAS
-        Input
         Boundary
         Initial
         Calc_WRF
@@ -110,9 +113,11 @@ elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
     target_link_libraries(test PRIVATE
         Core
+        Input
+        Domain
+        Prop_Thermal
         Matrix
         Calc_BLAS
-        Input
         Boundary
         Initial
         Calc_WRF

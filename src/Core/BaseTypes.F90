@@ -15,6 +15,8 @@ module Core_BaseTypes
     public :: Type_Iteration
     public :: Belonging
 
+    public :: GaussPointState_t
+
     public :: assignment(=)
 
     type :: Vector2D
@@ -44,6 +46,14 @@ module Core_BaseTypes
     type :: INT3d
         integer(int32), allocatable :: x(:), y(:), z(:)
     end type INT3d
+
+    type :: GaussPointState_t
+        real(real64) :: temperature
+        real(real64) :: pressure
+        real(real64) :: water_content
+        real(real64) :: porosity
+        ! ... 必要に応じて他の状態変数を追加 ...
+    end type GaussPointState_t
 
     type :: Variables
         integer(int32) :: rank

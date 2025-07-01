@@ -20,11 +20,12 @@ module Domain_Module
         type(SideHolder), allocatable :: Sides(:)
         ! ...
     contains
-        procedure :: initialize
+        procedure, pass(self) :: initialize
     end type Domain_t
 
 contains
     subroutine initialize(self, Input, Coordinate, ierr)
+        implicit none
         class(Domain_t), intent(inout) :: self
         type(Type_Input), intent(in) :: Input ! Inputモジュールからデータを受け取る
         type(DP3d), intent(inout), pointer :: Coordinate

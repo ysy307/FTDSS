@@ -23,10 +23,10 @@ contains
         type(Type_Input), intent(inout) :: Input
         type(DP3d), intent(inout), pointer :: Coordinate
 
-        integer(int32) :: CountElements, CountSides
-        integer(int32) :: iCell, iElem, iSide, idx
+        ! integer(int32) :: CountElements, CountSides
+        ! integer(int32) :: iCell, iElem, iSide, idx
         integer(int32) :: i
-        integer(int32) :: iRegion
+        ! integer(int32) :: iRegion
 
         integer(int32) :: ierr
 
@@ -34,6 +34,10 @@ contains
         allocate (Type_Thermal_3Phase_2D :: Structure)
 
         call Structure%Domain%initialize(Input, Coordinate, ierr)
+        if (ierr /= 0) then
+            print *, "Error initializing domain in Type_Thermal_3Phase_2D_Construct"
+            return
+        end if
 
         Structure%KT_star_0 = Type_CRS(Structure%Domain)
         Structure%KT_l = Structure%KT_star_0%Copy()

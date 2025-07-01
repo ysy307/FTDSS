@@ -43,7 +43,7 @@ contains
         type(Type_CRS) :: A
         integer(int32) :: iTop
 
-        integer(int32) :: iN, iE, iT, irT, iNC, iNNZ, row_nnz
+        integer(int32) :: iN, iE, iT, irT, iNC, iNNZ, row_nnz, nsize
         integer(int32), allocatable :: rowCount(:), tmpInd(:)
 
         ! Set dimensions
@@ -62,9 +62,10 @@ contains
             row_nnz = 0
             ! Scan elements to build sparsity row
             do iE = 1, Domain%nElement
-                do iT = 1, Domain%Elements(iE)%e%size
+                nsize = Domain%Elements(iE)%e%get_size()
+                do iT = 1, nsize
                     if (Domain%Elements(iE)%e%conn(iT) == iN) then
-                        do irT = 1, Domain%Elements(iE)%e%size
+                        do irT = 1, nsize
                             rowCount(Domain%Elements(iE)%e%conn(irT)) = 1
                         end do
                         exit

@@ -23,7 +23,7 @@ contains
         integer(int32) :: iE
 
         do iE = 1, Domain%nElement
-            nNodes = Domain%Elements(iE)%e%getNumNodes()
+            nNodes = Domain%Elements(iE)%e%get_size()
             do il = 1, nNodes
                 do jl = 1, nNodes
                     val = 0.0d0
@@ -68,7 +68,7 @@ contains
         do iE = 1, Domain%nElement
 
             ! 節点数取得
-            nNodes = Domain%Elements(iE)%e%getNumNodes()
+            nNodes = Domain%Elements(iE)%e%get_size()
             ! 要素内での平均拡散係数
             mean_lambda = sum(lambda(Domain%Elements(iE)%e%conn(:))) / dble(nNodes)
             do il = 1, nNodes
