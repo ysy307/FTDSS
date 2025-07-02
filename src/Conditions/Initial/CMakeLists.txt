@@ -7,6 +7,7 @@ target_link_libraries(Initial PRIVATE
     Core
     # Matrix
     Input
+    Domain
     Boundary
 )
 enable_build_flags(Initial)

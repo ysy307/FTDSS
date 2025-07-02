@@ -2,8 +2,9 @@ module Condition_Boundary
     use, intrinsic :: iso_fortran_env
     use :: Core_BaseTypes
     use :: Core_Allocate
-    use :: Core_Side
+    use :: Domain_Side, only:SideHolder
     use :: Core_VTK
+    use :: Core_VTK_Constants
     use :: Matrix_CRS
     use :: Inout_Input
     implicit none
@@ -267,8 +268,8 @@ contains
 
         CounterEdge = 0
         do iCell = 1, Input_VTK%numTotalCells
-            if (Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_LINE .or. &
-                Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_QUADRATIC_EDGE) then
+            if (Input_VTK%CELLS(iCell)%CellType == VTK_LINE .or. &
+                Input_VTK%CELLS(iCell)%CellType == VTK_QUADRATIC_EDGE) then
                 CounterEdge = CounterEdge + 1
             end if
         end do
@@ -277,9 +278,9 @@ contains
 
         idx = 0
         do iCell = 1, Input_VTK%numTotalCells
-            if (Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_LINE) then
+            if (Input_VTK%CELLS(iCell)%CellType == VTK_LINE) then
                 idx = idx + 1
-                Structure%EdgeInfo(idx)%EdgeType = Input_VTK%Names%VTK_LINE
+                Structure%EdgeInfo(idx)%EdgeType = VTK_LINE
                 Structure%EdgeInfo(idx)%EdgeGroup = Input_VTK%CELLS(iCell)%CellEntityId
                 allocate (Structure%EdgeInfo(idx)%Conn, source=Input_VTK%CELLS(iCell)%Connectivity)
                 allocate (Structure%EdgeInfo(idx)%Distance(1))
@@ -288,9 +289,9 @@ contains
                 tmpEdge = [Structure%EdgeInfo(idx)%Conn(1), Structure%EdgeInfo(idx)%Conn(2)]
                 Structure%EdgeInfo(idx)%Distance(1) = Calculate_Edge_Dinstance(tmpEdge, Input_VTK%POINTS)
                 Structure%EdgeInfo(idx)%UnitNormal(1) = Calculate_Edge_UnitNormalVector(tmpEdge, Input_VTK%POINTS, Structure%EdgeInfo(idx)%Distance(1))
-            else if (Input_VTK%CELLS(iCell)%CellType == Input_VTK%Names%VTK_QUADRATIC_EDGE) then
+            else if (Input_VTK%CELLS(iCell)%CellType == VTK_QUADRATIC_EDGE) then
                 idx = idx + 1
-                Structure%EdgeInfo(idx)%EdgeType = Input_VTK%Names%VTK_QUADRATIC_EDGE
+                Structure%EdgeInfo(idx)%EdgeType = VTK_QUADRATIC_EDGE
                 Structure%EdgeInfo(idx)%EdgeGroup = Input_VTK%CELLS(iCell)%CellEntityId
                 allocate (Structure%EdgeInfo(idx)%Conn, source=Input_VTK%CELLS(iCell)%Connectivity)
                 allocate (Structure%EdgeInfo(idx)%Distance(2))

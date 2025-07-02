@@ -8,14 +8,6 @@ module Calculate_WRF
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)
 
-    ! public :: Abst_WRF
-    ! public :: Type_WRF_BC
-    ! public :: Type_WRF_VG
-    ! public :: Type_WRF_KO
-    ! public :: Type_WRF_MVG
-    ! public :: Type_WRF_Durner
-    ! public :: Type_WRF_DVGCH
-
     public :: WRFHolder
 
     type :: WRFHolder

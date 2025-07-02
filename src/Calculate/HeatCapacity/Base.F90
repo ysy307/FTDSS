@@ -10,7 +10,11 @@ contains
         type(Type_Input), intent(in) :: Input
 
         if (Input%Regions(iRegion)%Flag%is3Phase) then
-            self%c = Type_VHC_3Phase(iRegion, Input)
+            if (Input%Regions(iRegion)%Flag%isFrozen) then
+                self%c = Type_VHC_3Phase_Apparent(iRegion, input)
+            else
+                self%c = Type_VHC_3Phase(iRegion, Input)
+            end if
         end if
 
     end subroutine VHCHolder_initialize

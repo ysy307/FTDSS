@@ -80,19 +80,18 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Core
         Input
         Domain
-        Prop_Thermal
-        Matrix
-        Calc_BLAS
-        Boundary
-        Initial
         Calc_WRF
         Calc_HCF
         Calc_GCC
-        # Calc_Ice
         Calc_THC
         Calc_VHC
         Calc_DEN
         Calc_SPH
+        Properties
+        Matrix
+        Calc_BLAS
+        Boundary
+        Initial
         Solver
         Thermal
         Output
@@ -115,19 +114,18 @@ elseif(BUILD_APP STREQUAL "test")
         Core
         Input
         Domain
-        Prop_Thermal
-        Matrix
-        Calc_BLAS
-        Boundary
-        Initial
         Calc_WRF
         Calc_HCF
         Calc_GCC
-        # Calc_Ice
         Calc_THC
         Calc_VHC
         Calc_DEN
         Calc_SPH
+        Properties
+        Matrix
+        Calc_BLAS
+        Boundary
+        Initial
         Solver
         Thermal
         Output

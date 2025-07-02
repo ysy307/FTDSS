@@ -44,24 +44,27 @@ contains
         integer(int32) :: iTop
 
         integer(int32) :: iN, iE, iT, irT, iNC, iNNZ, row_nnz, nsize
+        integer(int32) :: nNode, nElement
         integer(int32), allocatable :: rowCount(:), tmpInd(:)
 
         ! Set dimensions
-        A%nrow = Domain%nNode
-        A%nptr = Domain%nNode + 1
+        nNode = Domain%get_numNode()
+        nElement = Domain%get_numElement()
+        A%nrow = nNode
+        A%nptr = nNode + 1
 
         ! Allocate temp arrays
         call Allocate_Array(A%Ptr, A%nptr)
-        call Allocate_Array(rowCount, Domain%nNode)
-        call Allocate_Array(tmpInd, 30_int32 * Domain%nNode)
+        call Allocate_Array(rowCount, nNode)
+        call Allocate_Array(tmpInd, 30_int32 * nNode)
 
         A%Ptr(1) = 1
         A%nnz = 0
-        do iN = 1, Domain%nNode
+        do iN = 1, nNode
             rowCount = 0
             row_nnz = 0
             ! Scan elements to build sparsity row
-            do iE = 1, Domain%nElement
+            do iE = 1, nElement
                 nsize = Domain%Elements(iE)%e%get_size()
                 do iT = 1, nsize
                     if (Domain%Elements(iE)%e%conn(iT) == iN) then
@@ -73,7 +76,7 @@ contains
                 end do
             end do
             ! Collect indices
-            do iNC = 1, Domain%nNode
+            do iNC = 1, nNode
                 if (rowCount(iNC) >= 1) then
                     row_nnz = row_nnz + 1
                     tmpInd(A%nnz + row_nnz) = iNC

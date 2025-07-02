@@ -1,7 +1,7 @@
 module Condition_Initial
     use, intrinsic :: iso_fortran_env
     use :: Core_BaseTypes
-    use :: Core_Side
+    use :: Domain_Side, only:SideHolder
     use :: Condition_Boundary
     use :: Inout_Input
     implicit none

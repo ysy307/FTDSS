@@ -66,13 +66,13 @@ contains
         numEdges = size(Sides)
 
         do iEdge = 1, numEdges
-            iGroup = Sides(iEdge)%s%SideGroup
+            iGroup = Sides(iEdge)%s%group
             select case (self%BCInfo(iGroup)%type)
             case (Dirichlet)
                 Dval = (self%BCInfo(iGroup)%value(idx) * (1.0d0 - timeCoe) + &
                         self%BCInfo(iGroup)%value(idx + 1) * timeCoe)
 
-                if (Sides(iEdge)%s%SideType == 3) then
+                if (Sides(iEdge)%s%type == 3) then
                     call self%Fix_BC_Dirichlet( &
                         A=A, &
                         b=b, &
@@ -122,7 +122,7 @@ contains
             end do
 
             do iEdge = 1, numEdges
-                iGroup = Sides(iEdge)%s%SideGroup
+                iGroup = Sides(iEdge)%s%group
                 select case (self%BCInfo(iGroup)%type)
                 case (Dirichlet)
                     Dval = (self%BCInfo(iGroup)%value(idx) * (1.0d0 - timeCoe) + &
@@ -136,7 +136,7 @@ contains
             end do
         else
             do iEdge = 1, numEdges
-                iGroup = Sides(iEdge)%s%SideGroup
+                iGroup = Sides(iEdge)%s%group
                 select case (self%BCInfo(iGroup)%type)
                 case (Dirichlet)
                     Dval = self%BCInfo(iGroup)%value(1)

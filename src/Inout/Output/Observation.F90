@@ -35,6 +35,7 @@ contains
         integer(int32), intent(inout) :: num_unit
 
         integer(int32) :: iObs, nObs
+        integer(int32) :: local_id
 
         nObs = self%Observation%NumObservation
 
@@ -51,16 +52,15 @@ contains
             end do
         case (2)
             write (num_unit, '(a)') "# Observation Coordinate (x,y,z)"
-            ! print *, self%Observation%Element(iObs)%e%ElementID
-            ! stop
             do iObs = 1, nObs
+                local_id = self%Observation%Element(iObs)%e%get_id()
                 write (num_unit, '(a,x,i0,a,3(x,es18.11,a),a,i0)') &
                     "#    Point", iObs, ": (", &
                     self%Observation%Cood_Obs%x(iObs), ",", &
                     self%Observation%Cood_Obs%y(iObs), ",", &
                     self%Observation%Cood_Obs%z(iObs), ")", &
                     " => Element ID: ", &
-                    self%Observation%Element(iObs)%e%ElementID
+                    local_id
             end do
         end select
 
@@ -195,7 +195,7 @@ contains
 
         ! Perform interpolation
         do iObs = 1, self%Observation%NumObservation
-            nNodes = self%Observation%Element(iObs)%e%getNumNodes()
+            nNodes = self%Observation%Element(iObs)%e%get_size()
             do iN = 1, nNodes
                 obs_values(iObs) = obs_values(iObs) + &
                                    nodal_values(self%Observation%Element(iObs)%e%conn(iN)) * &
@@ -265,79 +265,79 @@ contains
     !   - Supports extensibility by checking optional arguments and types (e.g., GCC, EXP models).
     !
     !----------------------------------------------------------------------!
-    module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi)
-        implicit none
-        class(Type_Output) :: self
-        real(real64), intent(in) :: time
-        real(real64), intent(in), optional :: Temp(:)
-        real(real64), intent(in), optional :: Si(:)
-        real(real64), intent(in), optional :: TC(:)
-        real(real64), intent(in), optional :: C(:)
-        real(real64), intent(in), optional :: Pres(:)
-        real(real64), intent(in), optional :: wFlux(:)
-        real(real64), intent(in), optional :: K(:)
-        class(Abstract_Thermal), intent(inout), optional :: Thermal
-        real(real64), intent(in), optional :: phi(:)
+    ! module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi)
+    !     implicit none
+    !     class(Type_Output) :: self
+    !     real(real64), intent(in) :: time
+    !     real(real64), intent(in), optional :: Temp(:)
+    !     real(real64), intent(in), optional :: Si(:)
+    !     real(real64), intent(in), optional :: TC(:)
+    !     real(real64), intent(in), optional :: C(:)
+    !     real(real64), intent(in), optional :: Pres(:)
+    !     real(real64), intent(in), optional :: wFlux(:)
+    !     real(real64), intent(in), optional :: K(:)
+    !     class(Abstract_Thermal), intent(inout), optional :: Thermal
+    !     real(real64), intent(in), optional :: phi(:)
 
-        real(real64) :: obsValues(self%Observation%NumObservation)
-        real(real64) :: tmpValues(self%Observation%NumObservation)
-        real(real64) :: obsValues2d(2 * self%Observation%NumObservation)
+    !     real(real64) :: obsValues(self%Observation%NumObservation)
+    !     real(real64) :: tmpValues(self%Observation%NumObservation)
+    !     real(real64) :: obsValues2d(2 * self%Observation%NumObservation)
 
-        integer(int32) :: iObs
+    !     integer(int32) :: iObs
 
-        !! Temperature
-        if (self%doHeat .and. &
-            self%Observation%Temperature%doOutput .and. &
-            present(Temp) &
-            ) then
-            call self%Initialize_Observation_Header("Temperature")
-            select case (self%Observation%ObservationType)
-            case (1)
-                call Output_Observation_Line(self%Observation%Temperature%numUnit, time, Temp(self%Observation%ObsNodeID(:)))
-            case (2)
-                call self%Interpolate_ObsValues(Temp, obsValues)
-                call Output_Observation_Line(self%Observation%Temperature%numUnit, time, obsValues)
-            end select
-        end if
+    !     !! Temperature
+    !     if (self%doHeat .and. &
+    !         self%Observation%Temperature%doOutput .and. &
+    !         present(Temp) &
+    !         ) then
+    !         call self%Initialize_Observation_Header("Temperature")
+    !         select case (self%Observation%ObservationType)
+    !         case (1)
+    !             call Output_Observation_Line(self%Observation%Temperature%numUnit, time, Temp(self%Observation%ObsNodeID(:)))
+    !         case (2)
+    !             call self%Interpolate_ObsValues(Temp, obsValues)
+    !             call Output_Observation_Line(self%Observation%Temperature%numUnit, time, obsValues)
+    !         end select
+    !     end if
 
-        !! Ice content
-        if (self%doHeat .and. &
-            self%Observation%Si%doOutput .and. &
-            present(Si) &
-            ) then
-            select case (self%Observation%ObservationType)
-            case (1)
-                call Output_Observation_Line(self%Observation%Si%numUnit, time, Si(self%Observation%ObsNodeID(:)))
-            case (2)
-                obsValues(:) = 0.0d0
-                tmpValues(:) = 0.0d0
-                if (present(Thermal) .and. present(Temp) .and. present(phi)) then
-                    call self%Interpolate_ObsValues(Si, obsValues)
+    !     !! Ice content
+    !     if (self%doHeat .and. &
+    !         self%Observation%Si%doOutput .and. &
+    !         present(Si) &
+    !         ) then
+    !         select case (self%Observation%ObservationType)
+    !         case (1)
+    !             call Output_Observation_Line(self%Observation%Si%numUnit, time, Si(self%Observation%ObsNodeID(:)))
+    !         case (2)
+    !             obsValues(:) = 0.0d0
+    !             tmpValues(:) = 0.0d0
+    !             if (present(Thermal) .and. present(Temp) .and. present(phi)) then
+    !                 call self%Interpolate_ObsValues(Si, obsValues)
 
-                    select type (Ice => Thermal%Ice(1)%f)
-                    type is (Type_Ice_GCC)
-                        call self%Interpolate_ObsValues(phi, tmpValues)
-                        call self%Interpolate_ObsValues(Temp, obsValues)
-                        do iObs = 1, self%Observation%NumObservation
-                            obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
-                        end do
-                    type is (Type_Ice_EXP)
-                        call self%Interpolate_ObsValues(phi, tmpValues)
-                        call self%Interpolate_ObsValues(Temp, obsValues)
-                        do iObs = 1, self%Observation%NumObservation
-                            obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
-                        end do
-                    end select
-                    ! print *, obsValues(:)
-                    ! stop
-                    call Output_Observation_Line(self%Observation%Si%numUnit, time, obsValues)
-                else
-                    call self%Interpolate_ObsValues(Si, obsValues)
-                    call Output_Observation_Line(self%Observation%Si%numUnit, time, obsValues)
-                end if
-            end select
-        end if
+    !                 select type (Ice => Thermal%Ice(1)%f)
+    !                 type is (Type_Ice_GCC)
+    !                     call self%Interpolate_ObsValues(phi, tmpValues)
+    !                     call self%Interpolate_ObsValues(Temp, obsValues)
+    !                     do iObs = 1, self%Observation%NumObservation
+    !                         obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
+    !                     end do
+    !                 type is (Type_Ice_EXP)
+    !                     call self%Interpolate_ObsValues(phi, tmpValues)
+    !                     call self%Interpolate_ObsValues(Temp, obsValues)
+    !                     do iObs = 1, self%Observation%NumObservation
+    !                         obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
+    !                     end do
+    !                 end select
+    !                 ! print *, obsValues(:)
+    !                 ! stop
+    !                 call Output_Observation_Line(self%Observation%Si%numUnit, time, obsValues)
+    !             else
+    !                 call self%Interpolate_ObsValues(Si, obsValues)
+    !                 call Output_Observation_Line(self%Observation%Si%numUnit, time, obsValues)
+    !             end if
+    !         end select
+    !     end if
 
-    end subroutine Output_Process_Observation
+    ! end subroutine Output_Process_Observation
 
 end submodule Inout_Output_Obaservation

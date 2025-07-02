@@ -12,15 +12,20 @@ module Domain_Module
 
     type :: Domain_t
         ! private
-        integer(int32) :: nElement
-        integer(int32) :: nSide
-        integer(int32) :: nNode
-        integer(int32) :: nRegion
+        integer(int32), private :: nElement
+        integer(int32), private :: nSide
+        integer(int32), private :: nNode
+        integer(int32), private :: nRegion
         type(ElementHolder), allocatable :: Elements(:)
         type(SideHolder), allocatable :: Sides(:)
         ! ...
     contains
         procedure, pass(self) :: initialize
+
+        procedure, pass(self) :: get_numElement
+        procedure, pass(self) :: get_numSide
+        procedure, pass(self) :: get_numNode
+        procedure, pass(self) :: get_numRegion
     end type Domain_t
 
 contains
@@ -93,5 +98,41 @@ contains
             end if
         end do
     end subroutine initialize
+
+    function get_numElement(self) result(numElement)
+        implicit none
+        class(Domain_t), intent(in) :: self
+        integer(int32) :: numElement
+
+        numElement = self%nElement
+
+    end function get_numElement
+
+    function get_numSide(self) result(numSide)
+        implicit none
+        class(Domain_t), intent(in) :: self
+        integer(int32) :: numSide
+
+        numSide = self%nSide
+
+    end function get_numSide
+
+    function get_numNode(self) result(numNode)
+        implicit none
+        class(Domain_t), intent(in) :: self
+        integer(int32) :: numNode
+
+        numNode = self%nNode
+
+    end function get_numNode
+
+    function get_numRegion(self) result(numRegion)
+        implicit none
+        class(Domain_t), intent(in) :: self
+        integer(int32) :: numRegion
+
+        numRegion = self%nRegion
+
+    end function get_numRegion
 
 end module Domain_Module

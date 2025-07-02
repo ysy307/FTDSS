@@ -1,13 +1,14 @@
 module Inout_Output
     use, intrinsic :: iso_fortran_env
-    use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char
+    use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
     use :: Core_BaseTypes
     use :: Core_Allocate
     use :: Core_Error
     use :: Core_C_Util
     use :: Inout_Input
-    use :: Core_Element
+    use :: Domain_Element, only:ElementHolder
+    use :: Domain_Element_Factory, only:Create_Element
     use :: Main_Thermal
     use :: Solver_Time
 
@@ -232,6 +233,9 @@ contains
         logical(4) :: is_inside
 
         integer(int32) :: iObs, iElem
+        integer(int32) :: nElements
+        integer(int32) :: local_id, local_type
+        integer(int32) :: ierr
 
         character(len=256) :: OutputExtentions(2) = [".dat", ".csv"]
         character(len=256) :: OutputFileExtentions(4) = [".dat", ".csv", ".vtk", ".vtu"]
@@ -370,17 +374,24 @@ contains
             else
                 if (Structure_Input%Basic%DimensionType == 1) then
                     do iObs = 1, Structure%Observation%NumObservation
-                        do iElem = 1, Thermal%nElement
-                            call Thermal%Elements(iElem)%e%is_inside(Structure%Observation%Cood_Obs%x(iObs), &
-                                                                     Structure%Observation%Cood_Obs%y(iObs), &
-                                                                     tmp_xi, &
-                                                                     tmp_eta, &
-                                                                     is_inside)
+                        nElements = Thermal%Domain%get_numElement()
+                        do iElem = 1, nElements
+                            call Thermal%Domain%Elements(iElem)%e%is_inside(Structure%Observation%Cood_Obs%x(iObs), &
+                                                                            Structure%Observation%Cood_Obs%y(iObs), &
+                                                                            tmp_xi, &
+                                                                            tmp_eta, &
+                                                                            is_inside)
                             if (is_inside) then
-                                call Structure%Observation%Element(iObs)%allocate(Thermal%Elements(iElem)%e%ElementType, &
-                                                                                  Thermal%Elements(iElem)%e%ElementID, &
-                                                                                  Coordinate, &
-                                                                                  Thermal%Elements(iElem)%e%conn)
+                                ! new_element, shape_type, ierr, iElem, Global_Coordinate, Connectivity, GroupID
+                                local_id = Thermal%Domain%Elements(iElem)%e%get_id()
+                                local_type = Thermal%Domain%Elements(iElem)%e%get_type()
+                                call Create_Element(new_element=Structure%Observation%Element(iObs)%e, &
+                                                    shape_type=local_type, &
+                                                    ierr=ierr, &
+                                                    iElem=iElem, &
+                                                    Global_Coordinate=Coordinate, &
+                                                    Connectivity=Thermal%Domain%Elements(iElem)%e%conn, &
+                                                    GroupID=local_id)
                                 Structure%Observation%obs_xi(iObs) = tmp_xi
                                 Structure%Observation%obs_eta(iObs) = tmp_eta
                                 exit
@@ -389,19 +400,27 @@ contains
                     end do
                 else if (Structure_Input%Basic%DimensionType == 2) then
                     do iObs = 1, Structure%Observation%NumObservation
-                        do iElem = 1, Thermal%nElement
-                            call Thermal%Elements(iElem)%e%is_inside(Structure%Observation%Cood_Obs%x(iObs), &
-                                                                     Structure%Observation%Cood_Obs%z(iObs), &
-                                                                     tmp_xi, &
-                                                                     tmp_eta, &
-                                                                     is_inside)
+                        nElements = Thermal%Domain%get_numElement()
+                        do iElem = 1, nElements
+                            call Thermal%Domain%Elements(iElem)%e%is_inside(Structure%Observation%Cood_Obs%x(iObs), &
+                                                                            Structure%Observation%Cood_Obs%z(iObs), &
+                                                                            tmp_xi, &
+                                                                            tmp_eta, &
+                                                                            is_inside)
                             if (is_inside) then
-                                call Structure%Observation%Element(iObs)%allocate(Thermal%Elements(iElem)%e%ElementType, &
-                                                                                  Thermal%Elements(iElem)%e%ElementID, &
-                                                                                  Coordinate, &
-                                                                                  Thermal%Elements(iElem)%e%conn)
+                                ! new_element, shape_type, ierr, iElem, Global_Coordinate, Connectivity, GroupID
+                                local_id = Thermal%Domain%Elements(iElem)%e%get_id()
+                                local_type = Thermal%Domain%Elements(iElem)%e%get_type()
+                                call Create_Element(new_element=Structure%Observation%Element(iObs)%e, &
+                                                    shape_type=local_type, &
+                                                    ierr=ierr, &
+                                                    iElem=iElem, &
+                                                    Global_Coordinate=Coordinate, &
+                                                    Connectivity=Thermal%Domain%Elements(iElem)%e%conn, &
+                                                    GroupID=local_id)
                                 Structure%Observation%obs_xi(iObs) = tmp_xi
                                 Structure%Observation%obs_eta(iObs) = tmp_eta
+
                                 exit
                             end if
                         end do

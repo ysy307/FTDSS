@@ -7,8 +7,6 @@ add_library(Calc_VHC OBJECT
 target_link_libraries(Calc_VHC PRIVATE
     Core
     Input
-    Calc_GCC
-    Calc_WRF
     Calc_DEN
 )
 enable_build_flags(Calc_VHC)

@@ -15,7 +15,7 @@ module Domain_Element_Factory
     public :: Create_Element
 contains
     ! 要素オブジェクトを生成して返す、独立したファクトリサブルーチン
-    subroutine create_element(new_element, shape_type, ierr, iElem, Global_Coordinate, Connectivity, GroupID)
+    subroutine Create_Element(new_element, shape_type, ierr, iElem, Global_Coordinate, Connectivity, GroupID)
         class(Abst_ElementType), allocatable, intent(inout) :: new_element
         integer(int32), intent(in) :: shape_type
         integer, intent(inout) :: ierr

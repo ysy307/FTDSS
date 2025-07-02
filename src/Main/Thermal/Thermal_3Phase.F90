@@ -1,20 +1,4 @@
 submodule(Main_Thermal) Main_Thermal_3Phase
-    use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes
-    use :: Domain_Module, only:Domain_t
-    ! use :: Core_Element
-    ! use :: Core_Side
-    use :: Inout_Input
-    ! use :: Calculate_Ice
-    ! use :: Calculate_ThermalConductivity
-    ! use :: Calculate_Density
-    ! use :: Calculate_SpecificHeat
-    ! use :: Calculate_HeatCapacity
-    ! use :: Matrix_Assemble
-    use :: Matrix_CRS
-    ! use :: Condition_Boundary
-    ! use :: Condition_Initial
-    ! use :: Solver_Solve
     implicit none
 contains
     module function Type_Thermal_3Phase_2D_Construct(Input, Coordinate) result(Structure)
@@ -26,6 +10,7 @@ contains
         ! integer(int32) :: CountElements, CountSides
         ! integer(int32) :: iCell, iElem, iSide, idx
         integer(int32) :: i
+        integer(int32) :: nNode
         ! integer(int32) :: iRegion
 
         integer(int32) :: ierr
@@ -49,23 +34,26 @@ contains
             Structure%CT_old(i) = Structure%KT_star_0%Copy()
         end do
 
-        call Allocate_Array(Structure%FT, Structure%Domain%nNode)
-        call Allocate_Array(Structure%FT_old, Structure%Domain%nNode)
-        call Allocate_Array(Structure%PHIT, Structure%Domain%nNode)
-        call Allocate_Array(Structure%PHIT_old, Structure%Domain%nNode)
+        nNode = Structure%Domain%get_numNode()
 
-        call Structure%T%allocate(Structure%Domain%nNode, Input%Basic%Order)
+        call Allocate_Array(Structure%FT, nNode)
+        call Allocate_Array(Structure%FT_old, nNode)
+        call Allocate_Array(Structure%PHIT, nNode)
+        call Allocate_Array(Structure%PHIT_old, nNode)
+
+        call Structure%T%allocate(nNode, Input%Basic%Order)
 
         ! allocate (Structure%Ice(Input%Basic%numRegion))
+        call Structure%Property%Materials%initialize(Input, ierr)
 
         ! do iRegion = 1, Input%Basic%numRegion
         !     select case (Input%Regions(iRegion)%Ice%QiceType)
         !     case (1)
-        !         Structure%Ice(iRegion)%f = Type_Ice_TRM(Input%Regions(iRegion), Structure%nsize)
+        !         Structure%Ice(iRegion)%f = Type_Ice_TRM(Input%Regions(iRegion), nNode)
         !     case (2)
-        !         Structure%Ice(iRegion)%f = Type_Ice_GCC(Input%Regions(iRegion), Structure%nsize)
+        !         Structure%Ice(iRegion)%f = Type_Ice_GCC(Input%Regions(iRegion), nNode)
         !     case (3)
-        !         Structure%Ice(iRegion)%f = Type_Ice_EXP(Input%Regions(iRegion), Structure%nsize)
+        !         Structure%Ice(iRegion)%f = Type_Ice_EXP(Input%Regions(iRegion), nNode)
         !     end select
         ! end do
 
@@ -76,32 +64,31 @@ contains
 
         ! Structure%HTC = Type_HeatCapacity_3Phase_Apparent(Input)
 
-        ! call Structure%Qw%allocate(Structure%nsize, Input%Basic%Order)
-        ! call Structure%Qice%allocate(Structure%nsize, Input%Basic%Order)
-        ! call Structure%D_Qice%allocate(Structure%nsize, Input%Basic%Order)
-        ! call Structure%Si%allocate(Structure%nsize, Input%Basic%Order)
+        ! call Structure%Qw%allocate(nNode, Input%Basic%Order)
+        ! call Structure%Qice%allocate(nNode, Input%Basic%Order)
+        ! call Structure%D_Qice%allocate(nNode, Input%Basic%Order)
+        ! call Structure%Si%allocate(nNode, Input%Basic%Order)
 
-        ! Structure%BC = Type_BC_Thermal_CRS(Input)
+        Structure%BC = Type_BC_Thermal_CRS(Input)
+        Structure%IC = Type_Condition_IC_CRS(Input, "Thermal")
 
-        ! if (Input%Solver_Thermal%useSolver == 1) then
-        !     Structure%Solver = Solver_CRS_LU_Constructor(N=Structure%nsize, &
-        !                                                  MAXFCT=1, &
-        !                                                  MNUM=1, &
-        !                                                  MTYPE=11, &
-        !                                                  PHASE=13, &
-        !                                                  NRHS=1, &
-        !                                                  MSGVLV=0, &
-        !                                                  a=Structure%KT_star_0)
-        ! else if (Input%Solver_Thermal%useSolver == 2) then
-        !     if (Input%Solver_Thermal%useSolverType == 4) then
-        !         Structure%Solver = Solver_CRS_BiCGSTAB_Constructor(N=Structure%nsize, &
-        !                                                            tol=Input%Solver_Thermal%tolerance, &
-        !                                                            maxiter=Input%Solver_Thermal%maxIteration, &
-        !                                                            Preconditioner=Input%Solver_Thermal%usePreconditionerType)
-        !     end if
-        ! end if
-
-        ! Structure%IC = Type_Condition_IC_CRS(Input, "Thermal")
+        if (Input%Solver_Thermal%useSolver == 1) then
+            Structure%Solver = Solver_CRS_LU_Constructor(N=nNode, &
+                                                         MAXFCT=1, &
+                                                         MNUM=1, &
+                                                         MTYPE=11, &
+                                                         PHASE=13, &
+                                                         NRHS=1, &
+                                                         MSGVLV=0, &
+                                                         a=Structure%KT_star_0)
+        else if (Input%Solver_Thermal%useSolver == 2) then
+            if (Input%Solver_Thermal%useSolverType == 4) then
+                Structure%Solver = Solver_CRS_BiCGSTAB_Constructor(N=nNode, &
+                                                                   tol=Input%Solver_Thermal%tolerance, &
+                                                                   maxiter=Input%Solver_Thermal%maxIteration, &
+                                                                   Preconditioner=Input%Solver_Thermal%usePreconditionerType)
+            end if
+        end if
 
     end function Type_Thermal_3Phase_2D_Construct
 

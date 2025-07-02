@@ -3,6 +3,7 @@ module Properties_Material_Manager
     use :: Calculate_ThermalConductivity, only:THCHolder
     use :: Calculate_Density, only:DENHolder
     use :: Calculate_SpecificHeat, only:SPHHolder
+    use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
     use :: Calculate_GCC, only:GCCHolder
     use :: Calculate_WRF, only:WRFHolder
     use :: Inout_Input, only:Type_Input
@@ -16,6 +17,7 @@ module Properties_Material_Manager
         type(THCHolder), allocatable :: THC(:)
         type(DENHolder), allocatable :: DEN(:)
         type(SPHHolder), allocatable :: SPH(:)
+        type(VHCHolder), allocatable :: VHC(:)
         type(GCCHolder), allocatable :: GCC(:)
         type(WRFHolder), allocatable :: WRF(:)
         ! region_idを配列インデックスに変換するマッピング配列
@@ -25,6 +27,9 @@ module Properties_Material_Manager
         procedure, pass(self) :: get_THC
         procedure, pass(self) :: get_DEN
         procedure, pass(self) :: get_SPH
+        procedure, pass(self) :: get_VHC
+        procedure, pass(self) :: get_GCC
+        procedure, pass(self) :: get_WRF
     end type
 
 contains
@@ -56,6 +61,7 @@ contains
             call self%THC(model_idx)%initialize(iRegion=current_region_id, Input=Input)
             call self%DEN(model_idx)%initialize(iRegion=current_region_id, Input=Input)
             call self%SPH(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%VHC(model_idx)%initialize(iRegion=current_region_id, Input=Input)
             call self%GCC(model_idx)%initialize(iRegion=current_region_id, Input=Input)
             call self%WRF(model_idx)%initialize(iRegion=current_region_id, Input=Input)
 
@@ -125,6 +131,27 @@ contains
         model_holder = self%SPH(model_index)
 
     end function get_SPH
+
+    function get_VHC(self, region_id) result(model_holder)
+        class(MaterialManager_t), intent(in) :: self
+        integer, intent(in) :: region_id
+        ! 返り値から POINTER 属性を削除
+        type(VHCHolder) :: model_holder
+        integer :: model_index
+
+        ! マッピング配列を使って、正しいインデックスをO(1)で取得
+        model_index = self%region_id_map(region_id)
+
+        ! エラーチェック
+        if (model_index == 0) then
+            print *, "Error: Invalid region_id in get_VHC:", region_id
+            call exit(-1)
+        end if
+
+        ! ポインタ結合( => )ではなく、代入( = )でコピーを返す
+        model_holder = self%VHC(model_index)
+
+    end function get_VHC
 
     ! ここで、GCCHolderとWRFHolderのget関数も同様に実装することができます。
     ! 例えば、get_GCC(self, region_id) と get_WRF(self, region_id) を追加します。

@@ -10,6 +10,7 @@ module Calculate_VolumetricHeatCapacity
     public :: VHCHolder
     public :: Abst_VHC
     public :: Type_VHC_3Phase
+    public :: Type_VHC_3Phase_Apparent
 
     ! --- ポリモーフィックなコンテナ ---
     type :: VHCHolder
@@ -135,6 +136,10 @@ module Calculate_VolumetricHeatCapacity
 
     interface Type_VHC_3Phase
         module procedure VHC_3_Construct
+    end interface
+
+    interface Type_VHC_3Phase_Apparent
+        module procedure VHC_3A_Construct
     end interface
 
 end module Calculate_VolumetricHeatCapacity

@@ -5,6 +5,7 @@ add_library(Boundary OBJECT
 )
 target_link_libraries(Boundary PRIVATE
     Core
+    Domain
     Matrix
     Input
 )

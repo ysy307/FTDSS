@@ -216,6 +216,7 @@ contains
     end function Get_CompilerVersion
 
     module function Get_CPUArchitecture() result(architecture)
+        implicit none
         character(:), allocatable :: architecture
         type(c_ptr) :: ptr
 
@@ -232,6 +233,7 @@ contains
     end function Get_CPUArchitecture
 
     module function Get_OS() result(os)
+        implicit none
         character(:), allocatable :: os
         type(c_ptr) :: ptr
 

@@ -2,6 +2,7 @@ module Main_Thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_BaseTypes
     use :: Domain_Module, only:Domain_t
+    use :: Properties_Model_Base, only:Proereties_Model_t
     ! use :: Core_Element
     ! use :: Core_Side
     use :: Inout_Input
@@ -12,9 +13,9 @@ module Main_Thermal
     ! use :: Calculate_HeatCapacity
     ! use :: Matrix_Assemble
     use :: Matrix_CRS
-    ! use :: Condition_Boundary
-    ! use :: Condition_Initial
-    ! use :: Solver_Solve
+    use :: Condition_Initial
+    use :: Condition_Boundary
+    use :: Solver_Solve
     implicit none
 
     type, abstract :: Abstract_Thermal
@@ -43,9 +44,10 @@ module Main_Thermal
         type(Domain_t) :: Domain
         ! type(ElementHolder), allocatable :: Elements(:)
         ! type(SideHolder), allocatable :: Sides(:)
-        ! class(Abstract_Condition_BC), allocatable :: BC
-        ! class(Abstract_Condition_IC), allocatable :: IC
+        class(Abstract_Condition_BC), allocatable :: BC
+        class(Abstract_Condition_IC), allocatable :: IC
         !! Thermal properties
+        type(Proereties_Model_t) :: Property
         ! class(Abstract_ThermalConductivity), allocatable :: THC
         ! class(Abstract_Density), allocatable :: DEN
         ! class(Abstract_SpecificHeat), allocatable :: SPH
@@ -53,7 +55,7 @@ module Main_Thermal
         ! type(IceHolder), allocatable :: ICE(:)
 
         !! Solver
-        ! class(Abstract_Solver_CRS), allocatable :: Solver
+        class(Abstract_Solver_CRS), allocatable :: Solver
         integer(int32) :: Order
     contains
         procedure(Abstract_Update), pass(self), deferred :: Update

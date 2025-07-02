@@ -1,9 +1,9 @@
 submodule(Condition_Initial) Condition_Initial_CRS
     use, intrinsic :: iso_fortran_env
-    use :: Core_BaseTypes
-    use :: Core_Side
-    use :: Condition_Boundary
-    use :: Inout_Input
+    ! use :: Core_BaseTypes
+    ! use :: Core_Side
+    ! use :: Condition_Boundary
+    ! use :: Inout_Input
     implicit none
 contains
 
