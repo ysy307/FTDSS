@@ -60,8 +60,8 @@ add_subdirectory(src/Calculate/SpecificHeat)
 add_subdirectory(src/Calculate/HeatCapacity)
 add_subdirectory(src/Conditions/Boundary)
 add_subdirectory(src/Conditions/Initial)
-# add_subdirectory(src/Calculate/Ice)
 add_subdirectory(src/Solver)
+add_subdirectory(src/Time)
 add_subdirectory(src/Main/Thermal)
 add_subdirectory(src/Inout/Output)
 add_subdirectory(src/Main/FTDSS)
@@ -84,15 +84,16 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Calc_HCF
         Calc_GCC
         Calc_THC
-        Calc_VHC
         Calc_DEN
         Calc_SPH
+        Calc_VHC
         Properties
         Matrix
         Calc_BLAS
         Boundary
         Initial
         Solver
+        Time
         Thermal
         Output
         FTDSS
@@ -118,15 +119,16 @@ elseif(BUILD_APP STREQUAL "test")
         Calc_HCF
         Calc_GCC
         Calc_THC
-        Calc_VHC
         Calc_DEN
         Calc_SPH
+        Calc_VHC
         Properties
         Matrix
         Calc_BLAS
         Boundary
         Initial
         Solver
+        Time
         Thermal
         Output
         FTDSS
