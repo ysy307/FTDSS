@@ -9,7 +9,10 @@ target_link_libraries(Output PRIVATE
     Input
     Core
     Thermal
+    Domain
+    Properties
     Solver
+    Time
 )
 enable_build_flags(Output)
 enable_thirdparty (Output)

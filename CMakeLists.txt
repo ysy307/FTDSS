@@ -6,17 +6,19 @@ if(DEFINED COMPILER)
     if(COMPILER STREQUAL "intel")
         set(CMAKE_Fortran_COMPILER ifx CACHE STRING "" FORCE)
         set(CMAKE_C_COMPILER icx CACHE STRING "" FORCE)
+        set(CMAKE_CXX_COMPILER icpx CACHE STRING "" FORCE)
     elseif(COMPILER STREQUAL "gnu")
         set(CMAKE_Fortran_COMPILER gfortran CACHE STRING "" FORCE)
         set(CMAKE_C_COMPILER gcc CACHE STRING "" FORCE)
+        set(CMAKE_CXX_COMPILER g++ CACHE STRING "" FORCE)
     else()
         message(FATAL_ERROR "Unknown COMPILER specified: ${COMPILER}")
     endif()
 endif()
 
 # Project Name and Language
-project(YSY_FC LANGUAGES Fortran C)
-enable_language(Fortran C)
+project(YSY_FC LANGUAGES Fortran C CXX)
+enable_language(Fortran C CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING

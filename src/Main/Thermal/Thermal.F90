@@ -11,11 +11,12 @@ module Main_Thermal
     ! use :: Calculate_Density
     ! use :: Calculate_SpecificHeat
     ! use :: Calculate_HeatCapacity
-    ! use :: Matrix_Assemble
+    use :: Matrix_Assemble
     use :: Matrix_CRS
     use :: Condition_Initial
     use :: Condition_Boundary
     use :: Solver_Solve
+    use :: Time_Time
     implicit none
 
     type, abstract :: Abstract_Thermal
@@ -58,13 +59,13 @@ module Main_Thermal
         class(Abstract_Solver_CRS), allocatable :: Solver
         integer(int32) :: Order
     contains
-        procedure(Abstract_Update), pass(self), deferred :: Update
+        ! procedure(Abstract_Update), pass(self), deferred :: Update
         procedure(Abstract_Assemble), pass(self), deferred :: Assemble
     end type Abstract_Thermal
 
     type, extends(Abstract_Thermal) :: Type_Thermal_3Phase_2D
     contains
-        procedure :: Update => Type_Thermal_3Phase_2D_Update
+        ! procedure :: Update => Type_Thermal_3Phase_2D_Update
         procedure :: Assemble => Type_Thermal_3Phase_2D_Assemble
     end type Type_Thermal_3Phase_2D
 
@@ -78,10 +79,11 @@ module Main_Thermal
 
         end subroutine Abstract_Update
 
-        subroutine Abstract_Assemble(self, dt, step, iter)
+        subroutine Abstract_Assemble(self, Porosity, dt, step, iter)
             import :: Abstract_Thermal, int32, real64
             implicit none
             class(Abstract_Thermal), intent(inout) :: self
+            real(real64), intent(in) :: Porosity(:)
             real(real64), intent(in) :: dt
             integer(int32), intent(in) :: step
             integer(int32), intent(in) :: iter
@@ -98,17 +100,18 @@ module Main_Thermal
 
         end function Type_Thermal_3Phase_2D_Construct
 
-        module subroutine Type_Thermal_3Phase_2D_Update(self, NodeBelonging, arr_phi)
+        ! module subroutine Type_Thermal_3Phase_2D_Update(self, NodeBelonging, arr_phi)
+        !     implicit none
+        !     class(Type_Thermal_3Phase_2D), intent(inout) :: self
+        !     type(Belonging), intent(inout), optional :: NodeBelonging(:)
+        !     real(real64), intent(inout) :: arr_phi(:)
+
+        ! end subroutine Type_Thermal_3Phase_2D_Update
+
+        module subroutine Type_Thermal_3Phase_2D_Assemble(self, Porosity, dt, step, iter)
             implicit none
             class(Type_Thermal_3Phase_2D), intent(inout) :: self
-            type(Belonging), intent(inout), optional :: NodeBelonging(:)
-            real(real64), intent(inout) :: arr_phi(:)
-
-        end subroutine Type_Thermal_3Phase_2D_Update
-
-        module subroutine Type_Thermal_3Phase_2D_Assemble(self, dt, step, iter)
-            implicit none
-            class(Type_Thermal_3Phase_2D), intent(inout) :: self
+            real(real64), intent(in) :: Porosity(:)
             real(real64), intent(in) :: dt
             integer(int32), intent(in) :: step
             integer(int32), intent(in) :: iter

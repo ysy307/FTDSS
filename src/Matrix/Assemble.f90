@@ -8,6 +8,10 @@ module Matrix_Assemble
     use omp_lib
 #endif
     implicit none
+    private
+
+    public :: Assemble_Mass_Heat_1, Assemble_Diffusion_Heat_1
+
 contains
     subroutine Assemble_Mass_Heat_1(A, Domain, Temperature, Porosity, Propeties)
         implicit none
@@ -24,10 +28,12 @@ contains
         real(real64) :: val
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: Ca
+        logical, parameter :: enable_debug_print = .false.
 
         integer(int32) :: nElements
 
         ! integer(int32) ::
+        ! print *, Temperature(:)
 
         State%porosity = 0.0d0
         State%temperature = 0.0d0
@@ -52,8 +58,20 @@ contains
                         State%temperature = Domain%Elements(iE)%e%Interpolate(xi, eta, Temperature)
                         State%porosity = Domain%Elements(iE)%e%Interpolate(xi, eta, Porosity)
                         State%water_content = Propeties%get_Qw(State, iRegion)
+                        ! print *, xi, eta, State%temperature
+
+                        ! print *, State%water_content
+                        ! print *, "Temperature:", State%temperature
+                        ! print *, "Porosity:", State%porosity
+                        ! print *, "Water content:", State%water_content
 
                         Ca = Propeties%get_Ca(State, iRegion)
+
+                        if (enable_debug_print .and. il == 1 .and. jl == 1) then
+                            print '(A, I5, A, I2, A, F8.3, A, ES12.4)', &
+                                '[DEBUG Mass] Elem:', iE, ' G-Pt:', iG, &
+                                ' Temp:', State%temperature, ' Ca:', Ca
+                        end if
 
                         val = val + (Domain%Elements(iE)%e%psi(il, xi, eta) * &
                                      Domain%Elements(iE)%e%psi(jl, xi, eta) * &
@@ -61,32 +79,46 @@ contains
                     end do
                     A%Val(index) = A%Val(index) + val
                 end do
+
             end do
         end do
 
+        ! stop
     end subroutine Assemble_Mass_Heat_1
 
-    subroutine Assemble_Diffusion_1_Isotropic(A, Domain, lambda)
+    subroutine Assemble_Diffusion_Heat_1(A, Domain, Temperature, Porosity, Propeties)
         implicit none
+        ! --- 引数 ---
         type(Type_CRS), intent(inout) :: A
         type(Domain_t), intent(in) :: Domain
-        real(real64), intent(in) :: lambda(:)
+        real(real64), intent(in) :: Temperature(:)
+        real(real64), intent(in) :: Porosity(:)
+        type(Proereties_Model_t), intent(inout) :: Propeties ! MaterialManagerに相当
 
-        integer(int32) :: iE, il, jl, iG
-        integer(int32) :: index, nNodes
-        real(real64) :: val, mean_lambda
+        ! --- ローカル変数 ---
+        type(GaussPointState_t) :: State ! 状態の運び屋
+        integer(int32) :: index, nNodes, nGauss, nElements
+        integer(int32) :: iE, il, jl, iG, iRegion
+        real(real64) :: val
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
-        integer(int32) :: nElements
+        real(real64) :: lambda_gp ! Gauss Pointでの熱伝導率
+        logical, parameter :: enable_debug_print = .false.
 
         nElements = Domain%get_numElement()
+
+        State%porosity = 0.0d0
+        State%temperature = 0.0d0
+        State%pressure = 101325.0d0
+        State%water_content = 0.0d0
 
         do iE = 1, nElements
 
             ! 節点数取得
             nNodes = Domain%Elements(iE)%e%get_size()
+            iRegion = Domain%Elements(iE)%e%get_group()
             ! 要素内での平均拡散係数
-            mean_lambda = sum(lambda(Domain%Elements(iE)%e%conn(:))) / dble(nNodes)
+            ! mean_lambda = sum(lambda(Domain%Elements(iE)%e%conn(:))) / dble(nNodes)
             do il = 1, nNodes
                 do jl = 1, nNodes
                     val = 0.0d0
@@ -120,13 +152,27 @@ contains
                                   Domain%Elements(iE)%e%dpsi_deta(jl, xi, eta) &
                                   ) / detJ
 
-                        val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * weight * detJ
+                        ! (1) このガウス点での「状態」を計算する (質量行列と同じ)
+                        State%temperature = Domain%Elements(iE)%e%Interpolate(xi, eta, Temperature)
+                        State%porosity = Domain%Elements(iE)%e%Interpolate(xi, eta, Porosity)
+                        State%water_content = Propeties%get_Qw(State, iRegion) ! 必要なら
+
+                        ! (2) その「状態」を使って、このガウス点での熱伝導率を取得する
+                        lambda_gp = Propeties%get_lambda(State, iRegion)
+
+                        if (enable_debug_print .and. il == 1 .and. jl == 1) then
+                            print '(A, I5, A, I2, A, F8.3, A, ES12.4)', &
+                                '[DEBUG Diff] Elem:', iE, ' G-Pt:', iG, &
+                                ' Temp:', State%temperature, ' Lambda:', lambda_gp
+                        end if
+
+                        val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda_gp * weight * detJ
                     end do
                     call A%Find(Domain%Elements(iE)%e%conn(il), Domain%Elements(iE)%e%conn(jl), index)
-                    A%Val(index) = A%Val(index) + val * mean_lambda
+                    A%Val(index) = A%Val(index) + val
                 end do
             end do
         end do
 
-    end subroutine Assemble_Diffusion_1_Isotropic
+    end subroutine Assemble_Diffusion_Heat_1
 end module Matrix_Assemble

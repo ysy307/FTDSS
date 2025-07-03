@@ -119,50 +119,52 @@ contains
     !                          Density=self%DEN)
     ! end subroutine Type_Thermal_3Phase_2D_Update
 
-    ! module subroutine Type_Thermal_3Phase_2D_Assemble(self, dt, step, iter)
-    !     implicit none
-    !     class(Type_Thermal_3Phase_2D), intent(inout) :: self
-    !     real(real64), intent(in) :: dt
-    !     integer(int32), intent(in) :: step
-    !     integer(int32), intent(in) :: iter
+    module subroutine Type_Thermal_3Phase_2D_Assemble(self, Porosity, dt, step, iter)
+        implicit none
+        class(Type_Thermal_3Phase_2D), intent(inout) :: self
+        real(real64), intent(in) :: Porosity(:)
+        real(real64), intent(in) :: dt
+        integer(int32), intent(in) :: step
+        integer(int32), intent(in) :: iter
 
-    !     ! if (step >= 2) then
-    !     !     self%CT_old(2)%Val(:) = self%CT_old(1)%Val(:)
-    !     !     self%CT_old(1)%Val(:) = self%CT_l%Val(:)
-    !     ! end if
+        ! if (step >= 2) then
+        !     self%CT_old(2)%Val(:) = self%CT_old(1)%Val(:)
+        !     self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+        ! end if
 
-    !     self%CT_l%Val(:) = 0.0d0
-    !     self%KT_l%Val(:) = 0.0d0
-    !     self%KT_star_0%Val(:) = 0.0d0
-    !     ! ! if (step == 1) then
+        self%CT_l%Val(:) = 0.0d0
+        self%KT_l%Val(:) = 0.0d0
+        self%KT_star_0%Val(:) = 0.0d0
+        ! ! if (step == 1) then
 
-    !     ! ! end if
-    !     !!!-----------------------------------------------------------------------
-    !     call Assemble_Mass_1(self%CT_l, self%Elements, self%HTC%value(:, 2))
-    !     !
-    !     call Assemble_Diffusion_1_Isotropic(self%KT_l, self%Elements, self%THC%value(:, 1))
-    !      !!!-----------------------------------------------------------------------
-    !     ! if (step == 1) then
-    !     self%KT_star_0 = dt * self%KT_l + self%CT_l
-    !     !     if (iter == 1) then
-    !     ! self%CT_old(1)%Val(:) = self%CT_l%Val(:)
-    !     !         self%KT_old%Val(:) = self%KT_l%Val(:)
-    !     !         self%PHIT(:) = 0.0d0
-    !     ! self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
-    !     !     end if
-    !     ! print *, size(self%T%old(:, 1))
-    !     self%PHIT(:) = self%CT_l * self%T%old(:, 1)
-    !     ! stop
-    !     ! self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
-    !     ! self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
-    !     ! else
-    !     !     self%KT_star_0%Val(:) = 2.0d0 * dt * self%KT_l%Val(:) + 3.0d0 * self%CT_l%Val(:)
-    !     !     if (iter == 1) then
-    !     !         self%PHIT_old(:) = -4.0d0 * (self%CT_old(1) * self%T%old(:, 1)) + self%CT_old(2) * self%T%old(:, 2)
-    !     !     end if
-    !     !     self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
-    !     ! end if
-    !     ! self%PHIT(:) = self%PHIT_old(:)
-    ! end subroutine Type_Thermal_3Phase_2D_Assemble
+        ! ! end if
+        !!!-----------------------------------------------------------------------
+        ! (A, Domain, Temperature, Porosity, Propeties)
+        call Assemble_Mass_Heat_1(self%CT_l, self%Domain, self%T%new, Porosity, self%Property)
+        !
+        call Assemble_Diffusion_Heat_1(self%KT_l, self%Domain, self%T%new, Porosity, self%Property)
+         !!!-----------------------------------------------------------------------
+        ! if (step == 1) then
+        self%KT_star_0 = dt * self%KT_l + self%CT_l
+        !     if (iter == 1) then
+        ! self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+        !         self%KT_old%Val(:) = self%KT_l%Val(:)
+        !         self%PHIT(:) = 0.0d0
+        ! self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
+        !     end if
+        ! print *, size(self%T%old(:, 1))
+        self%PHIT(:) = self%CT_l * self%T%old(:, 1)
+        ! stop
+        ! self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
+        ! self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
+        ! else
+        !     self%KT_star_0%Val(:) = 2.0d0 * dt * self%KT_l%Val(:) + 3.0d0 * self%CT_l%Val(:)
+        !     if (iter == 1) then
+        !         self%PHIT_old(:) = -4.0d0 * (self%CT_old(1) * self%T%old(:, 1)) + self%CT_old(2) * self%T%old(:, 2)
+        !     end if
+        !     self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
+        ! end if
+        ! self%PHIT(:) = self%PHIT_old(:)
+    end subroutine Type_Thermal_3Phase_2D_Assemble
 
 end submodule Main_Thermal_3Phase

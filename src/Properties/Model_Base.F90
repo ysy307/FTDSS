@@ -20,7 +20,7 @@ module Properties_Model_Base
     contains
         procedure, pass(self) :: get_lambda => calculate_THC
         procedure, pass(self) :: get_Ca => calculate_heat_capacity
-        procedure, pass(self) :: get_dCa_dT => calculate_dcdt
+        ! procedure, pass(self) :: get_dCa_dT => calculate_dcdt
         procedure, pass(self) :: get_Qw => calculate_water_content
     end type
 
@@ -58,10 +58,10 @@ contains
         WRF_holder = self%Materials%get_WRF(region_id)
 
         Lf = GCC_holder%g%Lf
-        dQi_dT = WRF_holder%w%DERIV(GCC_holder%g%Calc(T=state%temperature, &
-                                                      Pw=state%pressure, &
-                                                      rhoW=DEN_holder%d%Material2, &
-                                                      rhoI=DEN_holder%d%Material3)) &
+        dQi_dT = WRF_holder%w%DERIV(-GCC_holder%g%Calc(T=state%temperature, &
+                                                       Pw=state%pressure, &
+                                                       rhoW=DEN_holder%d%Material2, &
+                                                       rhoI=DEN_holder%d%Material3)) &
                  * GCC_holder%g%DERIV(T=state%temperature, &
                                       Pw=state%pressure, &
                                       rhoW=DEN_holder%d%Material2, &
@@ -75,14 +75,14 @@ contains
 
     end function
 
-    function calculate_dcdt(self, state, region_id) result(dCa_dT)
-        implicit none
-        class(Proereties_Model_t), intent(in) :: self
-        type(GaussPointState_t), intent(in) :: state
-        integer(int32), intent(in) :: region_id
-        real(real64) :: dCa_dT
-        ! ... 熱容量の温度微分を計算 ...
-    end function
+    ! function calculate_dcdt(self, state, region_id) result(dCa_dT)
+    !     implicit none
+    !     class(Proereties_Model_t), intent(in) :: self
+    !     type(GaussPointState_t), intent(in) :: state
+    !     integer(int32), intent(in) :: region_id
+    !     real(real64) :: dCa_dT
+    !     ! ... 熱容量の温度微分を計算 ...
+    ! end function
 
     function calculate_water_content(self, state, region_id) result(water_content)
         implicit none
@@ -100,10 +100,15 @@ contains
         DEN_holder = self%Materials%get_DEN(region_id)
 
         ! ... 水分量の計算ロジックをここに追加 ...
-        water_content = WRF_holder%w%Calc(GCC_holder%g%Calc(T=state%temperature, &
-                                                            Pw=state%pressure, &
-                                                            rhoW=DEN_holder%d%Material2, &
-                                                            rhoI=DEN_holder%d%Material3))
+        ! print *, GCC_holder%g%Calc(T=-10.0d0, &
+        !                            Pw=state%pressure, &
+        !                            rhoW=DEN_holder%d%Material2, &
+        !                            rhoI=DEN_holder%d%Material3)
+        water_content = WRF_holder%w%Calc(-GCC_holder%g%Calc(T=state%temperature, &
+                                                             Pw=state%pressure, &
+                                                             rhoW=DEN_holder%d%Material2, &
+                                                             rhoI=DEN_holder%d%Material3))
+        ! print *, state%temperature, water_content, DEN_holder%d%Material2
 
     end function
 

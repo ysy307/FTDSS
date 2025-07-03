@@ -1,4 +1,4 @@
-module Solver_Time
+module Time_Time
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Inout_Input
     use :: Core_Allocate, only:Allocate_Array
@@ -115,4 +115,4 @@ contains
 
     end subroutine Record_Timestamp
 
-end module Solver_Time
+end module Time_Time

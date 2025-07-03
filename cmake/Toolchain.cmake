@@ -43,15 +43,22 @@ function(enable_build_flags target)
             target_compile_options(${target} PUBLIC
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -check all -traceback>
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:-g -O0 -debug all -traceback>
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:-g -O0 -debug all -traceback>
             )
+            target_compile_definitions(${target} PUBLIC _DEBUG)
+
         elseif(COMPILER STREQUAL "gnu")
             target_compile_options(${target} PUBLIC
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -fcheck=all -fbacktrace>
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:
                     -g -O0 -Wall -Wextra -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer>
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:
+                -g -O0 -Wall -Wextra -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer>
             )
             target_link_options(${target} PUBLIC
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:
+                    -fsanitize=address -fsanitize=undefined>
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:
                     -fsanitize=address -fsanitize=undefined>
             )
         else()

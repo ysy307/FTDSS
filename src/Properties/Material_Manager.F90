@@ -51,8 +51,15 @@ contains
 
         ! ステップ2: 配列を確保
         allocate (self%THC(num_unique_regions))
-        allocate (self%region_id_map(num_id))
-        self%region_id_map = 0 ! 0は無効なインデックスとする
+        allocate (self%DEN(num_unique_regions))
+        allocate (self%SPH(num_unique_regions))
+        allocate (self%VHC(num_unique_regions))
+        allocate (self%GCC(num_unique_regions))
+        allocate (self%WRF(num_unique_regions))
+
+        ! allocate (self%region_id_map(num_unique_regions))
+        allocate (self%region_id_map, source=unique_region_ids)
+        ! self%region_id_map = 0 ! 0は無効なインデックスとする
 
         ! ステップ3: 事前にあなたのFactoryを呼び出してモデルを生成し、マッピングする
         do model_idx = 1, num_unique_regions
@@ -163,6 +170,7 @@ contains
         integer :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
+
         model_index = self%region_id_map(region_id)
 
         ! エラーチェック

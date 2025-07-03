@@ -7,4 +7,4 @@ target_link_libraries(Matrix PRIVATE
     Domain
     Properties
 )
-enable_build_flags(Core)
+enable_build_flags(Matrix)

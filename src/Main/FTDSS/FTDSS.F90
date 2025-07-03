@@ -3,7 +3,7 @@ module Main_FTDSS
 
     use :: Core_BaseTypes
     use :: Inout_Input
-    use :: Solver_Time
+    use :: Time_Time
     use :: Inout_Output
 
     use :: Main_Thermal
@@ -13,7 +13,7 @@ module Main_FTDSS
         type(Type_Input) :: Input
 
         type(DP3d), pointer :: Coordinate
-        type(Belonging), allocatable :: NodeBelonging(:)
+        ! type(Belonging), allocatable :: NodeBelonging(:)
         class(Abstract_Thermal), allocatable :: Thermal
 
         type(Variables) :: phi
@@ -46,17 +46,17 @@ contains
         call self%Coordinate%allocate(nsize)
         self%Coordinate = self%Input%VTK%POINTS
 
-        allocate (self%NodeBelonging(nsize))
-        do iN = 1, nsize
-            ! The details are to be implemented
-            call self%NodeBelonging(iN)%allocate(1_int32)
-            self%NodeBelonging(iN)%group(1) = 1
-            self%NodeBelonging(iN)%nsize = 1
-        end do
+        ! allocate (self%NodeBelonging(nsize))
+        ! do iN = 1, nsize
+        !     ! The details are to be implemented
+        !     call self%NodeBelonging(iN)%allocate(1_int32)
+        !     self%NodeBelonging(iN)%group(1) = 1
+        !     self%NodeBelonging(iN)%nsize = 1
+        ! end do
 
         self%Thermal = Type_Thermal_3Phase_2D(self%Input, self%Coordinate)
 
-        self%Output = Type_Output(self%Input, Thermal=self%Thermal, Coordinate=self%Coordinate)
+        self%Output = Type_Output(Input=self%Input, Domain=self%Thermal%Domain, Coordinate=self%Coordinate)
 
         call self%phi%allocate(nsize, self%Input%Basic%Order)
         self%phi%pre = self%Input%Regions(1)%Thermal%Porosity

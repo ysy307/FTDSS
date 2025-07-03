@@ -14,14 +14,14 @@ program test
 
     call FTDSS%initialize()
     call FTDSS%Thermal%IC%Fix(value=FTDSS%Thermal%T, &
-                              Sides=FTDSS%Thermal%Sides, &
+                              Sides=FTDSS%Thermal%Domain%Sides, &
                               BC=FTDSS%Thermal%BC)
 
     ! FTDSS%phi%pre(:)
     ! call FTDSS%Thermal%HTC% phi, Temperature, Pw, Ice, Density
-    print *, FTDSS%Thermal%T%pre(1)
-    print *, FTDSS%Thermal%HTC%Calc(NodeBelonging=FTDSS%NodeBelonging(1), phi=FTDSS%phi%pre(1), Temperature=FTDSS%Thermal%T%pre(1), Ice=FTDSS%Thermal%ICE(1)%f, Density=FTDSS%Thermal%DEN)
-    call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
+    ! print *, FTDSS%Thermal%T%pre(1)
+    ! print *, FTDSS%Thermal%HTC%Calc(NodeBelonging=FTDSS%NodeBelonging(1), phi=FTDSS%phi%pre(1), Temperature=FTDSS%Thermal%T%pre(1), Ice=FTDSS%Thermal%ICE(1)%f, Density=FTDSS%Thermal%DEN)
+    ! call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0
 
@@ -33,7 +33,7 @@ program test
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
-        exit TIME_LOOP
+        ! exit TIME_LOOP
         FTDSS%time%time_old = FTDSS%time%time
         FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
         FTDSS%time%dt_old(1) = FTDSS%time%dt
@@ -62,13 +62,13 @@ program test
             ! print *, Thermal%KT_star_0%ind(:)
             ! stop
 
-            call FTDSS%Thermal%Assemble(FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
+            call FTDSS%Thermal%Assemble(FTDSS%phi%pre, FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
             ! call FTDSS%Thermal%BC%
             call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
                                          b=FTDSS%Thermal%PHIT, &
-                                         Sides=FTDSS%Thermal%Sides, &
+                                         Sides=FTDSS%Thermal%Domain%Sides, &
                                          time=FTDSS%time%time)
 
             ! open (unit=10, file='log/debug4.txt', status='replace')
@@ -111,7 +111,7 @@ program test
             end if
 
             FTDSS%Thermal%T%pre(:) = FTDSS%Thermal%T%new(:)
-            call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
+            ! call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
         end do NR_LOOP_THERMAL
 
         ! if (FTDSS%Iteration%iter >= FTDSS%Iteration%max_iter) then
@@ -131,6 +131,7 @@ program test
 
     call FTDSS%time%Record("End")
     call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)
+    ! call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)/
 
     stop
 

@@ -15,9 +15,9 @@ contains
 
         Structure%region_id = iRegion
 
-        Structure%Material1 = Input%Regions(iRegion)%Thermal%rho(1)
-        Structure%Material2 = Input%Regions(iRegion)%Thermal%rho(2)
-        Structure%Material3 = Input%Regions(iRegion)%Thermal%rho(3)
+        Structure%Material1 = Input%Regions(iRegion)%Thermal%lambda(1)
+        Structure%Material2 = Input%Regions(iRegion)%Thermal%lambda(2)
+        Structure%Material3 = Input%Regions(iRegion)%Thermal%lambda(3)
 
     end function THC_3_Construct
 

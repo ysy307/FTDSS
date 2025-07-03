@@ -13,9 +13,9 @@ contains
         if (allocated(Structure)) deallocate (Structure)
         allocate (Type_VHC_3Phase_Apparent :: Structure)
 
-        Structure%Material1 = Input%Regions(iRegion)%Thermal%c(1)
-        Structure%Material2 = Input%Regions(iRegion)%Thermal%c(2)
-        Structure%Material3 = Input%Regions(iRegion)%Thermal%c(3)
+        Structure%Material1 = Input%Regions(iRegion)%Thermal%Cp(1)
+        Structure%Material2 = Input%Regions(iRegion)%Thermal%Cp(2)
+        Structure%Material3 = Input%Regions(iRegion)%Thermal%Cp(3)
 
     end function VHC_3A_Construct
 
@@ -33,6 +33,8 @@ contains
         phi1 = 1.0d0 - state%porosity
         phi2 = state%water_content
         phi3 = 1.0d0 - phi1 - phi2
+        ! print '(4es16.4)', phi1, phi2, phi3, dQi_dT
+        ! stop
 
         VHC = Calc_VHC_3A(self%Material1, phi1, self%Material2, phi2, self%Material3, phi3, &
                           LatentHeat, DEN%d%Material3, dQi_dT)

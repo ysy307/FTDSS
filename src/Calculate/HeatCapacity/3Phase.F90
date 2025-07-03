@@ -13,9 +13,9 @@ contains
         if (allocated(Structure)) deallocate (Structure)
         allocate (Type_VHC_3Phase :: Structure)
 
-        Structure%Material1 = Input%Regions(iRegion)%Thermal%c(1)
-        Structure%Material2 = Input%Regions(iRegion)%Thermal%c(2)
-        Structure%Material3 = Input%Regions(iRegion)%Thermal%c(3)
+        Structure%Material1 = Input%Regions(iRegion)%Thermal%Cp(1)
+        Structure%Material2 = Input%Regions(iRegion)%Thermal%Cp(2)
+        Structure%Material3 = Input%Regions(iRegion)%Thermal%Cp(3)
 
     end function VHC_3_Construct
 
