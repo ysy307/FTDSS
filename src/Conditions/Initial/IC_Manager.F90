@@ -34,7 +34,6 @@ contains
         ! --- Setup Thermal Initial Condition ---
         ! if (Input%IC%has_Heat) then
         ic_type = Input%IC%Heat%type
-        print *, "Setting up Thermal IC of type: ", trim(adjustl(ic_type))
         select case (trim(adjustl(ic_type)))
         case ("Constant")
             allocate (IC_Uniform :: self%T)

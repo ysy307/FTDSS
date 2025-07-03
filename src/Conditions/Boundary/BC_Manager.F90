@@ -66,6 +66,7 @@ contains
         ! 3. 各グループをループして、対応するBCオブジェクトを生成・セットアップ
         do i = 1, n_groups
             iGroup = Input%Conditions%Groups(i)
+
             self%groups(i)%id = iGroup
             ! -- 熱BCの初期化 --
             select case (Input%Conditions%Heat(iGroup)%type)

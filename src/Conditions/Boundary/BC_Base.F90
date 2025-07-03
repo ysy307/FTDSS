@@ -45,7 +45,7 @@ contains
             ! Check if the polymorphic component 's' is allocated before using it
             if (allocated(Domain%Sides(i)%s)) then
                 Side_Group = Domain%Sides(i)%s%get_group() ! CORRECT: Use the public 'get_group' function
-                if (Side_Group == Input_BC%Groups(iGroup)) then
+                if (Side_Group == iGroup) then
                     Side_type = Domain%Sides(i)%s%get_type() ! CORRECT: Use the 'get_type' function
                     if (Side_type == VTK_LINE) then
                         num_total_segments = num_total_segments + 1
@@ -67,7 +67,7 @@ contains
         do i = 1, num_Sides
             if (allocated(Domain%Sides(i)%s)) then
                 Side_Group = Domain%Sides(i)%s%get_group()
-                if (Side_Group == Input_BC%Groups(iGroup)) then
+                if (Side_Group == iGroup) then
                     Side_type = Domain%Sides(i)%s%get_type()
                     if (Side_type == VTK_LINE) then
                         current_segment_idx = current_segment_idx + 1

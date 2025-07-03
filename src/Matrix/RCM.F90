@@ -1,5 +1,5 @@
 module Matrix_RCM
-    use, intrinsic :: iso_fortran_env, only: int32, logical32
+    use, intrinsic :: iso_fortran_env, only: int32, real64, logical32
     use :: stdlib_sorting, only:sort_index
     use :: Core_Allocate, only:Allocate_Array
     use :: Domain_Module, only:Domain_t
@@ -8,6 +8,7 @@ module Matrix_RCM
     private
 
     public :: RCM_Reorder
+    public :: Reorder_to_Original
 
 contains
 
@@ -82,7 +83,8 @@ contains
         istat = 0
         call Allocate_Array(degree, num_nodes)
         call Allocate_Array(adj_matrix, num_nodes, num_nodes)
-        degree = 0; adj_matrix = .false.
+        degree = 0
+        adj_matrix = .false.
 
         ! --- 1. 領域要素 (Element) から隣接関係を構築 ---
         num_items = domain%get_numElement()
@@ -93,8 +95,10 @@ contains
                     n1 = domain%Elements(i)%e%conn(j)
                     n2 = domain%Elements(i)%e%conn(k)
                     if (.not. adj_matrix(n1, n2)) then
-                        adj_matrix(n1, n2) = .true.; adj_matrix(n2, n1) = .true.
-                        degree(n1) = degree(n1) + 1; degree(n2) = degree(n2) + 1
+                        adj_matrix(n1, n2) = .true.
+                        adj_matrix(n2, n1) = .true.
+                        degree(n1) = degree(n1) + 1
+                        degree(n2) = degree(n2) + 1
                     end if
                 end do
             end do
@@ -109,8 +113,10 @@ contains
                     n1 = domain%Sides(i)%s%conn(j)
                     n2 = domain%Sides(i)%s%conn(k)
                     if (.not. adj_matrix(n1, n2)) then
-                        adj_matrix(n1, n2) = .true.; adj_matrix(n2, n1) = .true.
-                        degree(n1) = degree(n1) + 1; degree(n2) = degree(n2) + 1
+                        adj_matrix(n1, n2) = .true.
+                        adj_matrix(n2, n1) = .true.
+                        degree(n1) = degree(n1) + 1
+                        degree(n2) = degree(n2) + 1
                     end if
                 end do
             end do
@@ -219,5 +225,67 @@ contains
         deallocate (neighbor_degrees)
         deallocate (sorted_indices)
     end subroutine sort_and_enqueue_neighbors
+
+    !=======================================================================
+    ! RCMで得られた順方向の並べ替え配列(perm)から、
+    ! 元の順序に戻すための逆方向の配列(iperm)を作成する。
+    ! iperm は一度計算すれば、メッシュが変わらない限り再利用可能。
+    !-----------------------------------------------------------------------
+    subroutine Create_Inverse_Permutation(perm, iperm, istat)
+        implicit none
+        integer(int32), intent(in) :: perm(:)
+        integer(int32), allocatable, intent(out) :: iperm(:)
+        integer(int32), intent(out) :: istat
+
+        integer(int32) :: i, n
+        istat = 0
+        n = size(perm)
+
+        if (allocated(iperm)) deallocate (iperm)
+        allocate (iperm(n), stat=istat)
+        if (istat /= 0) return
+
+        do i = 1, n
+            ! perm(元のIndex) = RCM後のIndex
+            ! iperm(RCM後のIndex) = 元のIndex
+            iperm(perm(i)) = i
+        end do
+    end subroutine Create_Inverse_Permutation
+
+    !=======================================================================
+    ! RCM順序のベクトルを受け取り、元の節点順序に並べ替えたベクトルを返す。
+    ! ファイル出力などの後処理で利用する。
+    !-----------------------------------------------------------------------
+    subroutine Reorder_to_Original(vector_rcm, perm, vector_original, istat)
+        implicit none
+        real(real64), intent(in) :: vector_rcm(:)
+        integer(int32), intent(in) :: perm(:)
+        real(real64), intent(inout) :: vector_original(:)
+        integer(int32), intent(out) :: istat
+
+        integer(int32) :: i, n, local_istat
+        integer(int32), allocatable :: iperm(:)
+
+        istat = 0
+        n = size(vector_rcm)
+        if (size(perm) /= n .or. size(vector_original) /= n) then
+            istat = -1 ! Error: size mismatch
+            return
+        end if
+
+        ! 1. 逆並べ替え配列を作成
+        call create_inverse_permutation(perm, iperm, local_istat)
+        if (local_istat /= 0) then
+            istat = local_istat
+            return
+        end if
+
+        ! 2. 逆並べ替えを適用して元の順序のベクトルを作成
+        do i = 1, n
+            vector_original(iperm(i)) = vector_rcm(i)
+        end do
+
+        deallocate (iperm)
+    end subroutine Reorder_to_Original
 
 end module Matrix_RCM

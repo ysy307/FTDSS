@@ -10,6 +10,7 @@ module Inout_Output
     use :: Domain_Element, only:ElementHolder
     use :: Domain_Element_Factory, only:Create_Element
     use :: Properties_Model_Base, only:Proereties_Model_t
+    use :: Matrix_RCM, only:Reorder_to_Original
     use :: domain_module, only:Domain_t
     use :: Main_Thermal
     use :: Time_Time
@@ -48,22 +49,14 @@ module Inout_Output
 
     end interface
 
-    type :: Output_Config
-        logical(4) :: doOutput
-        character(:), allocatable :: Filename
-        character(:), allocatable :: VariableUnit
-        integer(int32) :: numUnit
-    end type
+    ! type :: Output_Config
+    !     logical(4) :: doOutput
+    !     character(:), allocatable :: Filename
+    !     character(:), allocatable :: VariableUnit
+    !     integer(int32) :: numUnit
+    ! end type
 
     type :: Output_Observation
-        ! type(ObservationVariable_t) :: Temperature
-        ! type(ObservationVariable_t) :: Si
-        ! type(ObservationVariable_t) :: TC
-        ! type(ObservationVariable_t) :: C
-        ! type(ObservationVariable_t) :: Pressure
-        ! type(ObservationVariable_t) :: wFlux
-        ! type(ObservationVariable_t) :: K
-        ! ]
         type(ObservationVariable_t), allocatable :: Variables(:)
 
         integer(int32) :: ObservationType
@@ -207,16 +200,124 @@ module Inout_Output
         integer(int8), allocatable :: CellType(:)
     end type
 
-    type :: Type_Output
+    type :: Output_Overall
         private
+        ! Output format
+        character(:), allocatable :: dir_FileOutput
+        character(:), allocatable :: format_output
         character(:), allocatable :: fextend
+        ! DATA
+        type(Output_VTK_Series) :: VTK
+    contains
+        procedure, pass(self), public :: initialize => Inout_Output_Overall_initialize
+        procedure, pass(self) :: initialize_vtk => Inout_Output_Overall_initialize_vtk
+        procedure, pass(self) :: initialize_vtu => Inout_Output_Overall_initialize_vtu
+        procedure, pass(self), public :: Output => Inout_Output_Overall_Output
+        procedure, pass(self) :: Output_vtu => Inout_Output_Overall_Output_vtu
+        procedure, pass(self) :: Output_vtk => Inout_Output_Overall_Output_vtk
+        procedure, pass(self) :: Output_vtk_scalar => Inout_Output_Overall_Output_vtk_scalar
+        procedure, pass(self) :: Output_vtk_vector => Inout_Output_Overall_Output_vtk_vector
+
+    end type
+
+    interface
+        module subroutine Inout_Output_Overall_initialize(self, Input, Coordinate, Domain)
+            implicit none
+            class(Output_Overall), intent(inout) :: self
+            type(Type_Input), intent(in) :: Input
+            type(DP3d), intent(in) :: Coordinate
+            type(Domain_t), intent(in) :: Domain
+
+        end subroutine Inout_Output_Overall_initialize
+
+        module subroutine Inout_Output_Overall_initialize_vtk(self, Input, Coordinate, Domain)
+            implicit none
+            class(Output_Overall), intent(inout) :: self
+            type(Type_Input), intent(in) :: Input
+            type(DP3d), intent(in) :: Coordinate
+            type(Domain_t), intent(in) :: Domain
+
+        end subroutine Inout_Output_Overall_initialize_vtk
+
+        module subroutine Inout_Output_Overall_initialize_vtu(self, Input, Coordinate, Domain)
+            implicit none
+            class(Output_Overall), intent(inout) :: self
+            type(Type_Input), intent(in) :: Input
+            type(DP3d), intent(in) :: Coordinate
+            type(Domain_t), intent(in) :: Domain
+
+        end subroutine Inout_Output_Overall_initialize_vtu
+
+        module subroutine Inout_Output_Overall_Output(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+            implicit none
+            class(Output_Overall) :: self
+            integer(int32), intent(in) :: fc
+            integer(int32), intent(in), optional :: RCM_Perm(:)
+            real(real64), intent(in), optional :: Temp(:)
+            real(real64), intent(in), optional :: Si(:)
+            real(real64), intent(in), optional :: Pres(:)
+            type(DP3d), intent(in), optional :: wFlux
+
+        end subroutine Inout_Output_Overall_Output
+
+        module subroutine Inout_Output_Overall_Output_vtk(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+            implicit none
+            class(Output_Overall), intent(inout) :: self
+            integer(int32), intent(in) :: fc
+            integer(int32), intent(in), optional :: RCM_Perm(:)
+            real(real64), intent(in), optional :: Temp(:)
+            real(real64), intent(in), optional :: Si(:)
+            real(real64), intent(in), optional :: Pres(:)
+            type(DP3d), intent(in), optional :: wFlux
+
+        end subroutine Inout_Output_Overall_Output_vtk
+
+        module subroutine Inout_Output_Overall_Output_vtk_scalar(self, RCM_Perm, unit_num, data_name, x)
+            implicit none
+            class(Output_Overall) :: self
+            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in) :: unit_num
+            character(*), intent(in) :: data_name
+            real(real64), intent(in) :: x(:)
+
+        end subroutine Inout_Output_Overall_Output_vtk_scalar
+
+        module subroutine Inout_Output_Overall_Output_vtk_vector(self, RCM_Perm, unit_num, data_name, x, y, z)
+            implicit none
+            class(Output_Overall) :: self
+            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in) :: unit_num
+            character(*), intent(in) :: data_name
+            real(real64), intent(in) :: x(:), y(:), z(:)
+
+        end subroutine Inout_Output_Overall_Output_vtk_vector
+
+        module subroutine Inout_Output_Overall_Output_vtu(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+            implicit none
+            class(Output_Overall), intent(inout) :: self
+            integer(int32), intent(in) :: fc
+            integer(int32), intent(in), optional :: RCM_Perm(:)
+            real(real64), intent(in), optional :: Temp(:)
+            real(real64), intent(in), optional :: Si(:)
+            real(real64), intent(in), optional :: Pres(:)
+            type(DP3d), intent(in), optional :: wFlux
+
+        end subroutine Inout_Output_Overall_Output_vtu
+
+    end interface
+
+    type :: Type_Output
+        ! private
+        ! character(:), allocatable :: fextend
         type(Output_Observation) :: Observation
+
+        type(Output_Overall) :: Overall
 
         logical(4) :: doOutput_stdout
 
         character(:), allocatable :: dir_Output
-        character(:), allocatable :: dir_FileOutput
-        character(:), allocatable :: format_output
+        ! character(:), allocatable :: dir_FileOutput
+        ! character(:), allocatable :: format_output
 
         type(Output_VTK_Series) :: VTKInfo
         character(:), allocatable :: Output_TimeUnit
@@ -229,11 +330,11 @@ module Inout_Output
         character(:), allocatable :: logFileName
 
     contains
-        procedure, pass(self) :: Output_All_vtu => Inout_Output_All_vtu
-        procedure, pass(self) :: Output_All_vtk => Inout_Output_All_vtk
-        procedure, pass(self) :: Output_All_vtk_Scalar => Inout_Output_All_vtk_Scalar_Field
-        procedure, pass(self) :: Output_All_vtk_Vector => Inout_Output_All_vtk_Vector_Field
-        procedure, pass(self), public :: Output_All => Inout_Output_All
+        ! procedure, pass(self) :: Output_All_vtu => Inout_Output_All_vtu
+        ! procedure, pass(self) :: Output_All_vtk => Inout_Output_All_vtk
+        ! procedure, pass(self) :: Output_All_vtk_Scalar => Inout_Output_All_vtk_Scalar_Field
+        ! procedure, pass(self) :: Output_All_vtk_Vector => Inout_Output_All_vtk_Vector_Field
+        ! procedure, pass(self), public :: Output_All => Inout_Output_All
 
         ! procedure, pass(self) :: Write_Observation_Header
         ! procedure, pass(self) :: Initialize_Observation_Header
@@ -388,8 +489,8 @@ contains
 
         Structure%dir_Output = trim(adjustl(dir_Path))//"Output/"
         call Setup_Directory(Structure%dir_Output, OutputExtentions)
-        Structure%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
-        call Setup_Directory(Structure%dir_FileOutput, OutputFileExtentions)
+        Structure%Overall%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
+        call Setup_Directory(Structure%Overall%dir_FileOutput, OutputFileExtentions)
 
         Structure%logFileName = trim(adjustl(Structure%dir_Output))//"run.log"
 
@@ -398,7 +499,7 @@ contains
         Structure%doHeat = any(Input%Regions(:)%Flag%isHeat)
         Structure%doPressure = any(Input%Regions(:)%Flag%isWater)
         Structure%doStress = any(Input%Regions(:)%Flag%isStress)
-        Structure%fextend = "."//trim(adjustl(Input%OutputSettings%FileFormat))
+        Structure%Overall%fextend = "."//trim(adjustl(Input%OutputSettings%FileFormat))
         Structure%doOutput_stdout = Input%Basic%shouldDisplayPrompt
 
         call Structure%Observation%initialize(Input, Coordinate, Domain)
@@ -446,247 +547,10 @@ contains
             call Structure%Observation%Write_Header(Structure%Observation%Variables(7), Structure%Output_TimeUnit)
         end if
 
-        Structure%format_output = '(a,a,i5.5,a)'
+        Structure%Overall%format_output = '(a,a,i5.5,a)'
 
-        select case (Structure%fextend)
-        case (".vtk")
-            Structure%VTKInfo%nPoints = Input%VTK%numPoints
-            Structure%VTKInfo%nCell = Input%VTK%numTotalCells
-            call Structure%VTKInfo%Coordinates%allocate(Structure%VTKInfo%nPoints)
-            Structure%VTKInfo%Coordinates = Input%VTK%POINTS
-
-            call Allocate_Array(Structure%VTKInfo%offset, Structure%VTKInfo%nCell)
-            call Allocate_Array(Structure%VTKInfo%CellType, Structure%VTKInfo%nCell)
-
-            do i = 1, Structure%VTKInfo%nCell
-                Structure%VTKInfo%offset(i) = Input%VTK%CELLS(i)%offset
-                Structure%VTKInfo%CellType(i) = Input%VTK%CELLS(i)%CellType
-            end do
-            total = sum(Structure%VTKInfo%offset(:))
-
-            call Allocate_Array(Structure%VTKInfo%connectivity, total)
-            idx = 0
-            do i = 1, Structure%VTKInfo%nCell
-                do j = 1, Input%VTK%CELLS(i)%offset
-                    idx = idx + 1
-                    Structure%VTKInfo%connectivity(idx) = &
-                        Input%VTK%CELLS(i)%connectivity(j) - 1
-                end do
-            end do
-        case (".vtu")
-            Structure%VTKInfo%nPoints = Input%VTK%numPoints
-            Structure%VTKInfo%nCell = Input%VTK%numTotalCells
-            call Structure%VTKInfo%Coordinates%allocate(Structure%VTKInfo%nPoints)
-            Structure%VTKInfo%Coordinates = Input%VTK%POINTS
-
-            call Allocate_Array(Structure%VTKInfo%offset, Structure%VTKInfo%nCell)
-            call Allocate_Array(Structure%VTKInfo%CellType, Structure%VTKInfo%nCell)
-
-            do i = 1, Structure%VTKInfo%nCell
-                if (i == 1) then
-                    Structure%VTKInfo%offset(i) = Input%VTK%CELLS(i)%offset
-                else
-                    Structure%VTKInfo%offset(i) = Structure%VTKInfo%offset(i - 1) + &
-                                                  Input%VTK%CELLS(i)%offset
-                end if
-                Structure%VTKInfo%CellType(i) = Input%VTK%CELLS(i)%CellType
-            end do
-            total = Structure%VTKInfo%offset(Structure%VTKInfo%nCell)
-
-            call Allocate_Array(Structure%VTKInfo%connectivity, total)
-            do i = 1, Structure%VTKInfo%nCell
-                if (i == 1) then
-                    do j = 1, Input%VTK%CELLS(i)%offset
-                        Structure%VTKInfo%connectivity(j) = Input%VTK%CELLS(i)%connectivity(j) - 1
-                    end do
-                else
-                    do j = 1, Input%VTK%CELLS(i)%offset
-                        Structure%VTKInfo%connectivity(Structure%VTKInfo%offset(i - 1) + j) = &
-                            Input%VTK%CELLS(i)%connectivity(j) - 1
-                    end do
-                end if
-            end do
-        end select
+        call Structure%Overall%initialize(Input, Coordinate, Domain)
 
     end function Type_Output_Construct
-
-    subroutine Inout_Output_All(self, fc, Temp, Si, Pres, wFlux)
-        implicit none
-        class(Type_Output) :: self
-        integer(int32), intent(in) :: fc
-
-        real(real64), intent(in), optional :: Temp(:)
-        real(real64), intent(in), optional :: Si(:)
-        real(real64), intent(in), optional :: Pres(:)
-        type(DP3d), intent(in), optional :: wFlux
-
-        select case (trim(adjustl(self%fextend)))
-        case (".vtk")
-            call self%Output_All_vtk(fc=fc, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
-        case (".vtu")
-            call self%Output_All_vtu(fc=fc, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
-        end select
-
-    end subroutine Inout_Output_All
-
-    subroutine Inout_Output_All_vtk(self, fc, Temp, Si, Pres, wFlux)
-        implicit none
-        class(Type_Output) :: self
-        integer(int32), intent(in) :: fc
-
-        real(real64), intent(in), optional :: Temp(:)
-        real(real64), intent(in), optional :: Si(:)
-        real(real64), intent(in), optional :: Pres(:)
-        type(DP3d), intent(in), optional :: wFlux
-
-        integer(int32) :: status
-        integer(int32) :: unit_num
-        integer(int32) :: iN, iE, idx
-
-        character(256) :: outName
-
-        ! Initialize VTK file
-        write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
-        open (newunit=unit_num, file=outName, status='replace', action='write', iostat=status)
-        if (status /= 0) call error_message(931)
-
-        write (unit_num, '(a)') "# vtk DataFile Version 2.0"
-        write (unit_num, '(a)') "Analysis ASCII VTK file"
-        write (unit_num, '(a)') "ASCII"
-        write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
-        write (unit_num, '(a,i0,a)') "POINTS ", self%VTKInfo%nPoints, " double"
-
-        do iN = 1, self%VTKInfo%nPoints
-            write (unit_num, '(3(es22.15,x))') self%VTKInfo%Coordinates%x(iN), self%VTKInfo%Coordinates%y(iN), self%VTKInfo%Coordinates%z(iN)
-        end do
-        write (unit_num, '(a)') ""
-
-        write (unit_num, '(a,i0,x,i0,a)') "CELLS ", self%VTKInfo%nCell, sum(self%VTKInfo%offset(:)) + self%VTKInfo%nCell
-        idx = 1
-        do iE = 1, self%VTKInfo%nCell
-            write (unit_num, '(i0,'//to_string(self%VTKInfo%offset(iE))//'(x,i0))') self%VTKInfo%offset(iE), self%VTKInfo%connectivity(idx:idx + self%VTKInfo%offset(iE) - 1)
-            idx = idx + self%VTKInfo%offset(iE)
-        end do
-        write (unit_num, '(a)') ""
-
-        write (unit_num, '(a,i0)') "CELL_TYPES ", self%VTKInfo%nCell
-        do iE = 1, self%VTKInfo%nCell
-            write (unit_num, '(i0)') self%VTKInfo%CellType(iE)
-        end do
-        write (unit_num, '(a)') ""
-
-        write (unit_num, '(a, i0)') "POINT_DATA ", self%VTKInfo%nPoints
-        if (present(Temp)) then
-            call self%Output_All_vtk_Scalar(unit_num=unit_num, &
-                                            data_name='Temperature', &
-                                            x=Temp)
-        end if
-        if (present(Si)) then
-            call self%Output_All_vtk_Scalar(unit_num=unit_num, &
-                                            data_name='Si', &
-                                            x=Si)
-        end if
-        if (present(Pres)) then
-            call self%Output_All_vtk_Scalar(unit_num=unit_num, &
-                                            data_name='Pressure', &
-                                            x=Pres)
-        end if
-        if (present(wFlux)) then
-            call self%Output_All_vtk_Vector(unit_num=unit_num, &
-                                            data_name='waterFlux', &
-                                            x=wFlux%x, &
-                                            y=wFlux%y, &
-                                            z=wFlux%z)
-        end if
-
-    end subroutine Inout_Output_All_vtk
-
-    subroutine Inout_Output_All_vtk_Scalar_Field(self, unit_num, data_name, x)
-        implicit none
-        class(Type_Output) :: self
-        integer(int32), intent(in) :: unit_num
-        character(*), intent(in) :: data_name
-        real(real64), intent(in) :: x(:)
-
-        write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
-        write (unit_num, '(a)') "LOOKUP_TABLE default"
-        write (unit_num, '(es22.15)') x(:)
-        write (unit_num, '(a)') ""
-
-    end subroutine Inout_Output_All_vtk_Scalar_Field
-
-    subroutine Inout_Output_All_vtk_Vector_Field(self, unit_num, data_name, x, y, z)
-        implicit none
-        class(Type_Output) :: self
-        integer(int32), intent(in) :: unit_num
-        character(*), intent(in) :: data_name
-        real(real64), intent(in) :: x(:), y(:), z(:)
-        integer(int32) :: i
-
-        write (unit_num, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
-        do i = 1, size(x)
-            write (unit_num, '(3(es22.15,x))') x(i), y(i), z(i)
-        end do
-        write (unit_num, '(a)') ""
-    end subroutine
-
-    subroutine Inout_Output_All_vtu(self, fc, Temp, Si, Pres, wFlux)
-        use :: vtk_fortran, only:vtk_file
-        implicit none
-        class(Type_Output) :: self
-        integer(int32), intent(in) :: fc
-
-        real(real64), intent(in), optional :: Temp(:)
-        real(real64), intent(in), optional :: Si(:)
-        real(real64), intent(in), optional :: Pres(:)
-        type(DP3d), intent(in), optional :: wFlux
-
-        type(vtk_file) :: vtu
-        integer(int32) :: status
-
-        character(256) :: outName
-
-        ! Initialize VTK file
-        write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
-        status = vtu%initialize(format='ascii', filename=trim(outName), mesh_topology='UnstructuredGrid')
-
-        ! Write data
-        status = vtu%xml_writer%write_piece(np=self%VTKInfo%nPoints, &
-                                            nc=self%VTKInfo%nCell)
-        status = vtu%xml_writer%write_geo(np=self%VTKInfo%nPoints, &
-                                          nc=self%VTKInfo%nCell, &
-                                          x=self%VTKInfo%Coordinates%x, &
-                                          y=self%VTKInfo%Coordinates%y, &
-                                          z=self%VTKInfo%Coordinates%z)
-        status = vtu%xml_writer%write_connectivity(nc=self%VTKInfo%nCell, &
-                                                   connectivity=self%VTKInfo%connectivity, &
-                                                   offset=self%VTKInfo%offset, &
-                                                   cell_type=self%VTKInfo%CellType)
-        status = vtu%xml_writer%write_dataarray(location='node', action='open')
-        if (present(Temp)) then
-            status = vtu%xml_writer%write_dataarray(data_name='Temperature', &
-                                                    x=Temp)
-        end if
-        if (present(Si)) then
-            status = vtu%xml_writer%write_dataarray(data_name='Si', &
-                                                    x=Si)
-        end if
-        if (present(Pres)) then
-            status = vtu%xml_writer%write_dataarray(data_name='Pressure', &
-                                                    x=Pres)
-        end if
-        if (present(wFlux)) then
-            status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
-                                                    x=wFlux%x, &
-                                                    y=wFlux%y, &
-                                                    z=wFlux%z)
-        end if
-        status = vtu%xml_writer%write_dataarray(location='node', action='close')
-        status = vtu%xml_writer%write_piece()
-
-        ! Finalize VTK file
-        status = vtu%finalize()
-
-    end subroutine Inout_Output_All_vtu
 
 end module Inout_Output
