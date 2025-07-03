@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
-    <meta name="author" content="Kikuchi Shun" >
+      <meta name="description" content="Documentation for FTDSS">
+    <meta name="author" content="" >
     <link rel="icon" href="./favicon.png">
 
     <title> FTDSS </title>
@@ -52,7 +52,6 @@
 
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="page/index.html">Read Me</a></li>
                   <li class="nav-item">
                     <a class="nav-link" href="./lists/files.html">Source Files</a>
                   </li>
@@ -81,28 +80,33 @@
 
     <div class="container">
   <!-- Main component for a primary marketing message or call to action -->
-    <div class="p-5 mb-4 bg-light border rounded-3" id="jumbotron">
-      <p>This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.</p>
-        <p> Find us on&hellip;</p>
-      <p>
-        <a class="btn btn-lg btn-primary" href="https://github.com/ysy307/FTDSS.git" role="button">GitHub</a>
-        
-        
-        
-        
-      </p>
-    </div>
 
       <div class="row" id='text'>
-        <div class=col-md-8>
+        <div class=col-md-12>
           <h1>FTDSS</h1>
-          <p>F90
-  f90
-fpp_extensions:
-  F90
-  fpp
-preprocess: true</p>
-<p>土壌凍結融解過程における数値計算ソルバーへの実装</p>
+          <p>/opt/intel/oneapi/mpi/latest/include
+  /opt/intel/oneapi/mkl/latest/include
+extensions:F90
+summary: This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.
+author: Kikuchi Shun
+email: shungiku1012@gmail.com
+project_github: https://github.com/ysy307/FTDSS.git
+page_dir: ./docs
+graph: true
+coloured_edges: true
+print_creation_date: true
+creation_date: %Y-%m-%d %H:%M %z
+predocmark_alt: &gt;
+predocmark: &lt;
+docmark_alt: *
+docmark: !
+display:public protected private
+extra_mods:json_module: http://jacobwilliams.github.io/json-fortran/
+graph_maxnodes: 250
+graph_maxdepth: 10
+preprocess: true
+fpp_extensions: fpp FPP
+土壌凍結融解過程における数値計算ソルバーへの実装</p>
 <div class="alert alert-warning">
 <p class="alert-title h4">Warning</p>
 <p>Work in progress</p>
@@ -126,31 +130,13 @@ preprocess: true</p>
 <p>現在の所バグは見つかっていない．</p>
 </div>
         </div>
-          <div class="col-md-4">
-            <div class="card card-body bg-light">
-              <h2 class="card-title">Developer Info</h2>
-              <h4 class="card-text">Kikuchi Shun</h4>
-              <p class="card-text"></p>
-                <div class="text-center"><div class="btn-group" role="group">
-                      <a class="btn btn-lg btn-primary" href="mailto:shungiku1012@gmail.com"><i class="fa fa-envelope fa-lg"></i></a>
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                </div></div>
-            </div>
-          </div>
       </div>
         <div class="row">
           <hr>
           <div class="col-xs-6 col-sm-3">
             <div>
               <h3>Source Files</h3>
-              <ul><li><a href='sourcefile/3phase.f90.html'>3Phase.F90</a></li><li><a href='sourcefile/3phase.f90~2.html'>3Phase.F90</a></li><li><a href='sourcefile/3phase.f90~3.html'>3Phase.F90</a></li><li><a href='sourcefile/3phase_apparent.f90.html'>3Phase_Apparent.F90</a></li><li><a href='sourcefile/allocate.f90.html'>Allocate.F90</a></li><li><a href='sourcefile/base.f90.html'>Base.F90</a></li><li><a href='sourcefile/base.f90~2.html'>Base.F90</a></li><li><a href='sourcefile/base.f90~3.html'>Base.F90</a></li><li><a href='sourcefile/base.f90~4.html'>Base.F90</a></li><li><a href='sourcefile/base.f90~5.html'>Base.F90</a></li></ul>
+              <ul><li><a href='sourcefile/3phase.f90.html'>3Phase.F90</a></li><li><a href='sourcefile/3phase.f90~2.html'>3Phase.F90</a></li><li><a href='sourcefile/3phase.f90~3.html'>3Phase.F90</a></li><li><a href='sourcefile/3phase_apparent.f90.html'>3Phase_Apparent.F90</a></li><li><a href='sourcefile/allocate.f90.html'>Allocate.F90</a></li><li><a href='sourcefile/assemble.f90.html'>Assemble.f90</a></li><li><a href='sourcefile/base.f90.html'>Base.F90</a></li><li><a href='sourcefile/base.f90~2.html'>Base.F90</a></li><li><a href='sourcefile/base.f90~3.html'>Base.F90</a></li><li><a href='sourcefile/base.f90~4.html'>Base.F90</a></li></ul>
             </div>
             <div>
               <ul>
@@ -161,7 +147,7 @@ preprocess: true</p>
           <div class="col-xs-6 col-sm-3">
             <div>
               <h3>Modules</h3>
-              <ul><li><a href='module/calculate_density.html'>Calculate_Density</a></li><li><a href='module/calculate_gcc.html'>Calculate_GCC</a></li><li><a href='module/calculate_hcf.html'>Calculate_HCF</a></li><li><a href='module/calculate_heatcapacity.html'>Calculate_HeatCapacity</a></li><li><a href='module/calculate_ice.html'>Calculate_Ice</a></li><li><a href='module/calculate_specificheat.html'>Calculate_SpecificHeat</a></li><li><a href='module/calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></li><li><a href='module/condition_boundary.html'>Condition_Boundary</a></li><li><a href='module/condition_initial.html'>Condition_Initial</a></li><li><a href='module/core_allocate.html'>Core_Allocate</a></li></ul>
+              <ul><li><a href='module/calculate_density.html'>Calculate_Density</a></li><li><a href='module/calculate_gcc.html'>Calculate_GCC</a></li><li><a href='module/calculate_hcf.html'>Calculate_HCF</a></li><li><a href='module/calculate_heatcapacity.html'>Calculate_HeatCapacity</a></li><li><a href='module/calculate_ice.html'>Calculate_Ice</a></li><li><a href='module/calculate_specificheat.html'>Calculate_SpecificHeat</a></li><li><a href='module/calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></li><li><a href='module/calculate_wrf.html'>Calculate_WRF</a></li><li><a href='module/condition_boundary.html'>Condition_Boundary</a></li><li><a href='module/condition_initial.html'>Condition_Initial</a></li></ul>
             </div>
             <div>
               <ul>
@@ -172,7 +158,7 @@ preprocess: true</p>
           <div class="col-xs-6 col-sm-3">
             <div>
               <h3>Procedures</h3>
-              <ul><li><a href='interface/allocate_array.html'>Allocate_Array</a></li><li><a href='interface/allocate_pointer.html'>Allocate_Pointer</a></li><li><a href='proc/allocate_pointer_int32.html'>Allocate_Pointer_int32</a></li><li><a href='proc/allocate_pointer_int64.html'>Allocate_Pointer_int64</a></li><li><a href='proc/allocate_pointer_real128.html'>Allocate_Pointer_real128</a></li><li><a href='proc/allocate_pointer_real32.html'>Allocate_Pointer_real32</a></li><li><a href='proc/allocate_pointer_real64.html'>Allocate_Pointer_real64</a></li><li><a href='proc/allocate_rank1_int16.html'>Allocate_Rank1_int16</a></li><li><a href='proc/allocate_rank1_int32.html'>Allocate_Rank1_int32</a></li><li><a href='proc/allocate_rank1_int32_pointer.html'>Allocate_Rank1_int32_Pointer</a></li></ul>
+              <ul><li><a href='interface/allocate_array.html'>Allocate_Array</a></li><li><a href='interface/allocate_pointer.html'>Allocate_Pointer</a></li><li><a href='proc/assemble_diffusion_1_isotropic.html'>Assemble_Diffusion_1_Isotropic</a></li><li><a href='proc/assemble_mass_1.html'>Assemble_Mass_1</a></li><li><a href='interface/assignment(=).html'>assignment(=)</a></li><li><a href='interface/assignment(=)~2.html'>assignment(=)</a></li><li><a href='proc/calculate_edge_dinstance.html'>Calculate_Edge_Dinstance</a></li><li><a href='proc/calculate_edge_unitnormalvector.html'>Calculate_Edge_UnitNormalVector</a></li><li><a href='proc/condition_bc_local_assignment.html'>Condition_BC_Local_Assignment</a></li><li><a href='interface/connect_dot.html'>Connect_dot</a></li></ul>
             </div>
             <div>
               <ul>
@@ -183,7 +169,7 @@ preprocess: true</p>
           <div class="col-xs-6 col-sm-3">
             <div>
               <h3>Derived Types</h3>
-              <ul><li><a href='type/abstract_condition_bc.html'>Abstract_Condition_BC</a></li><li><a href='type/abstract_condition_ic.html'>Abstract_Condition_IC</a></li><li><a href='type/abstract_density.html'>Abstract_Density</a></li><li><a href='type/abstract_elementtype.html'>Abstract_ElementType</a></li><li><a href='type/abstract_gcc.html'>Abstract_GCC</a></li><li><a href='type/abstract_hcf.html'>Abstract_HCF</a></li><li><a href='type/abstract_hcf_base.html'>Abstract_HCF_Base</a></li><li><a href='type/abstract_hcf_base_impedance.html'>Abstract_HCF_Base_Impedance</a></li><li><a href='type/abstract_hcf_base_impedance_viscosity.html'>Abstract_HCF_Base_Impedance_Viscosity</a></li><li><a href='type/abstract_hcf_base_viscosity.html'>Abstract_HCF_Base_Viscosity</a></li></ul>
+              <ul><li><a href='type/abstract_condition_bc.html'>Abstract_Condition_BC</a></li><li><a href='type/abstract_condition_ic.html'>Abstract_Condition_IC</a></li><li><a href='type/abstract_density.html'>Abstract_Density</a></li><li><a href='type/abstract_elementtype.html'>Abstract_ElementType</a></li><li><a href='type/abstract_gcc.html'>Abstract_GCC</a></li><li><a href='type/abstract_hcf.html'>Abstract_HCF</a></li><li><a href='type/abstract_heatcapacity.html'>Abstract_HeatCapacity</a></li><li><a href='type/abstract_ice.html'>Abstract_Ice</a></li><li><a href='type/abstract_sidetype.html'>Abstract_SideType</a></li><li><a href='type/abstract_specificheat.html'>Abstract_SpecificHeat</a></li></ul>
             </div>
             <div>
               <ul>
@@ -200,14 +186,14 @@ preprocess: true</p>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+              &copy; 2025 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-05-07 12:34 +0000             </p>
+            </p>
           </div>
         </div>
         <br>

@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
-    <meta name="author" content="Kikuchi Shun" >
+      <meta name="description" content="Documentation for FTDSS">
+    <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
     <title>Abstract_ElementType &ndash; FTDSS </title>
@@ -52,7 +52,6 @@
 
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
                   <li class="nav-item">
                     <a class="nav-link" href="../lists/files.html">Source Files</a>
                   </li>
@@ -92,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.7% of total for derived types.</p>Including implementation: 20 statements,  1.3% of total for derived types.">20 statements</a>
+                 title="<p> 1.8% of total for derived types.</p>Including implementation: 20 statements,  1.4% of total for derived types.">20 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -136,14 +135,14 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/abstract_elementtype.html#variable-elementid">ElementID</a>
             <a class="list-group-item" href="../type/abstract_elementtype.html#variable-elementtype">ElementType</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-size~18">size</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-conn~2">conn</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-x~3">X</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-y~3">Y</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-z~2">Z</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-ngauss~2">nGauss</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-weight~2">weight</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-gauss~2">gauss</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-size">size</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-conn">conn</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-x">X</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-y">Y</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-z">Z</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-ngauss">nGauss</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-weight">weight</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#variable-gauss">gauss</a>
         </div>
       </div>
     </div>
@@ -170,25 +169,19 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-getnumnodes~4">getNumNodes</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-psi~12">psi</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-dpsi_dxi~4">dpsi_dxi</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-getnumnodes">getNumNodes</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-psi~4">psi</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-dpsi_dxi">dpsi_dxi</a>
             <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-dpsi_deta">dpsi_deta</a>
             <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-jac">Jac</a>
             <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-jac_det">Jac_Det</a>
-            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-is_inside~2">is_inside</a>
+            <a class="list-group-item" href="../type/abstract_elementtype.html#boundprocedure-is_inside">is_inside</a>
         </div>
       </div>
     </div>
 
   
   
-    <div class="card card-primary">
-      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../type/abstract_elementtype.html#src">Abstract_ElementType</a>
-      </div>
-    </div>
 
 
   </div>
@@ -199,336 +192,6 @@
       <h2 id="type-def-statement">
         type, public, abstract :: Abstract_ElementType</h2>
     
-<br>      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Inherits</h3>
-        </div>
-        <div class="card-body">
-          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: type~~abstract_elementtype~~InheritsGraph Pages: 1 -->
-<svg id="typeabstract_elementtypeInheritsGraph" width="279pt" height="32pt"
- viewBox="0.00 0.00 279.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~abstract_elementtype~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>type~~abstract_elementtype~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 275,-28 275,4 -4,4"/>
-<!-- type~abstract_elementtype -->
-<g id="type~~abstract_elementtype~~InheritsGraph_node1" class="node">
-<title>type~abstract_elementtype</title>
-<polygon fill="none" stroke="black" points="271,-24 141,-24 141,0 271,0 271,-24"/>
-<text text-anchor="middle" x="206" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Abstract_ElementType</text>
-</g>
-<!-- type~realpointer -->
-<g id="type~~abstract_elementtype~~InheritsGraph_node2" class="node">
-<title>type~realpointer</title>
-<g id="a_type~~abstract_elementtype~~InheritsGraph_node2"><a xlink:href="../type/realpointer.html" xlink:title="RealPointer">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="73,-24 0,-24 0,0 73,0 73,-24"/>
-<text text-anchor="middle" x="36.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RealPointer</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_elementtype&#45;&gt;type~realpointer -->
-<g id="type~~abstract_elementtype~~InheritsGraph_edge1" class="edge">
-<title>type~abstract_elementtype&#45;&gt;type~realpointer</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M140.72,-12C121.59,-12 101.03,-12 83.34,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="83.28,-8.5 73.28,-12 83.28,-15.5 83.28,-8.5"/>
-<text text-anchor="middle" x="107" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">X, Y, Z</text>
-</g>
-</g>
-</svg>
-</div>          <div>
-            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
-          </div>
-          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-<p>Nodes of different colours represent the following: </p>
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: Graph Key Pages: 1 -->
-<svg width="186pt" height="32pt"
- viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
-<!-- Type -->
-<g id="node1" class="node">
-<title>Type</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
-<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
-</g>
-<!-- This Page&#39;s Entity -->
-<g id="node2" class="node">
-<title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
-<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
-</g>
-</g>
-</svg>
-
-<p>Solid arrows point from a derived type to the parent type which it
-extends. Dashed arrows point from a derived type to the other
-types it contains as a components, with a label listing the name(s) of
-said component(s).
-</p>
- Where possible, edges connecting nodes are
-given different colours to make them easier to distinguish in
-large graphs.</div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Inherited by</h3>
-        </div>
-        <div class="card-body">
-          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: type~~abstract_elementtype~~InheritedByGraph Pages: 1 -->
-<svg id="typeabstract_elementtypeInheritedByGraph" width="641pt" height="159pt"
- viewBox="0.00 0.00 641.00 159.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~abstract_elementtype~~InheritedByGraph" class="graph" transform="scale(0.71 0.71) rotate(0) translate(4 219)">
-<title>type~~abstract_elementtype~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-219 894,-219 894,4 -4,4"/>
-<!-- type~abstract_elementtype -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node1" class="node">
-<title>type~abstract_elementtype</title>
-<polygon fill="none" stroke="black" points="130,-124 0,-124 0,-100 130,-100 130,-124"/>
-<text text-anchor="middle" x="65" y="-109.6" font-family="Helvetica,sans-Serif" font-size="10.50">Abstract_ElementType</text>
-</g>
-<!-- type~elementholder -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node2" class="node">
-<title>type~elementholder</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node2"><a xlink:href="../type/elementholder.html" xlink:title="ElementHolder">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="266.5,-192 173.5,-192 173.5,-168 266.5,-168 266.5,-192"/>
-<text text-anchor="middle" x="220" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ElementHolder</text>
-</a>
-</g>
-</g>
-<!-- type~elementholder&#45;&gt;type~abstract_elementtype -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge1" class="edge">
-<title>type~elementholder&#45;&gt;type~abstract_elementtype</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M192,-168C167.14,-156.95 130.05,-140.46 102.54,-128.24"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="103.81,-124.97 93.25,-124.11 100.96,-131.37 103.81,-124.97"/>
-<text text-anchor="middle" x="151.5" y="-152.4" font-family="Helvetica,sans-Serif" font-size="9.50">e</text>
-</g>
-<!-- type~squarefirst -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node3" class="node">
-<title>type~squarefirst</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node3"><a xlink:href="../type/squarefirst.html" xlink:title="SquareFirst">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="256,-150 184,-150 184,-126 256,-126 256,-150"/>
-<text text-anchor="middle" x="220" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SquareFirst</text>
-</a>
-</g>
-</g>
-<!-- type~squarefirst&#45;&gt;type~abstract_elementtype -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge5" class="edge">
-<title>type~squarefirst&#45;&gt;type~abstract_elementtype</title>
-<path fill="none" stroke="#ff0000" d="M188.43,-125.98C183.09,-123.34 177.74,-120.33 173,-117 162.33,-109.5 165.17,-92.9 152.5,-96"/>
-</g>
-<!-- type~squaresecond -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node4" class="node">
-<title>type~squaresecond</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node4"><a xlink:href="../type/squaresecond.html" xlink:title="SquareSecond">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="265,-108 175,-108 175,-84 265,-84 265,-108"/>
-<text text-anchor="middle" x="220" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SquareSecond</text>
-</a>
-</g>
-</g>
-<!-- type~squaresecond&#45;&gt;type~abstract_elementtype -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge2" class="edge">
-<title>type~squaresecond&#45;&gt;type~abstract_elementtype</title>
-<path fill="none" stroke="#ff0000" d="M174.65,-93.05C167.18,-93.39 159.56,-94.27 152.5,-96"/>
-</g>
-<!-- type~trianglefirst -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node5" class="node">
-<title>type~trianglefirst</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node5"><a xlink:href="../type/trianglefirst.html" xlink:title="TriangleFirst">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="258,-66 182,-66 182,-42 258,-42 258,-66"/>
-<text text-anchor="middle" x="220" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleFirst</text>
-</a>
-</g>
-</g>
-<!-- type~trianglefirst&#45;&gt;type~abstract_elementtype -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge4" class="edge">
-<title>type~trianglefirst&#45;&gt;type~abstract_elementtype</title>
-<path fill="none" stroke="#ff0000" d="M188.43,-66.02C183.09,-68.66 177.74,-71.67 173,-75 162.33,-82.5 165.17,-92.9 152.5,-96"/>
-</g>
-<!-- type~trianglesecond -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node6" class="node">
-<title>type~trianglesecond</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node6"><a xlink:href="../type/trianglesecond.html" xlink:title="TriangleSecond">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="267,-24 173,-24 173,0 267,0 267,-24"/>
-<text text-anchor="middle" x="220" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">TriangleSecond</text>
-</a>
-</g>
-</g>
-<!-- type~trianglesecond&#45;&gt;type~abstract_elementtype -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge3" class="edge">
-<title>type~trianglesecond&#45;&gt;type~abstract_elementtype</title>
-<path fill="none" stroke="#ff0000" d="M183.71,-24.26C179.74,-26.71 176.04,-29.59 173,-33 153.4,-54.97 181.1,-89 152.5,-96"/>
-<path fill="none" stroke="#ff0000" d="M150.5,-96C147.14,-96.82 143.69,-97.63 140.2,-98.42"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="139.31,-95.02 130.28,-100.57 140.8,-101.87 139.31,-95.02"/>
-</g>
-<!-- type~abstract_thermal -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node7" class="node">
-<title>type~abstract_thermal</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node7"><a xlink:href="../type/abstract_thermal.html" xlink:title="Abstract_Thermal">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="663,-173 556,-173 556,-149 663,-149 663,-173"/>
-<text text-anchor="middle" x="609.5" y="-158.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Thermal</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~elementholder -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge6" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~elementholder</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M555.58,-162.43C501.98,-164.02 416.69,-166.9 343,-171 321.41,-172.2 297.7,-173.87 276.97,-175.45"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="276.44,-171.98 266.74,-176.23 276.98,-178.96 276.44,-171.98"/>
-<text text-anchor="middle" x="402" y="-173.4" font-family="Helvetica,sans-Serif" font-size="9.50">Elements</text>
-</g>
-<!-- type~output_observation -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node8" class="node">
-<title>type~output_observation</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node8"><a xlink:href="../type/output_observation.html" xlink:title="Output_Observation">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="461,-214 343,-214 343,-190 461,-190 461,-214"/>
-<text text-anchor="middle" x="402" y="-199.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Output_Observation</text>
-</a>
-</g>
-</g>
-<!-- type~output_observation&#45;&gt;type~elementholder -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge7" class="edge">
-<title>type~output_observation&#45;&gt;type~elementholder</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M342.56,-194.86C321.39,-192.27 297.55,-189.36 276.62,-186.8"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="276.96,-183.31 266.61,-185.57 276.11,-190.26 276.96,-183.31"/>
-<text text-anchor="middle" x="305" y="-194.4" font-family="Helvetica,sans-Serif" font-size="9.50">Element</text>
-</g>
-<!-- type~type_ftdss -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node9" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node9"><a xlink:href="../type/type_ftdss.html" xlink:title="Type_FTDSS">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="852.5,-203 776.5,-203 776.5,-179 852.5,-179 852.5,-203"/>
-<text text-anchor="middle" x="814.5" y="-188.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_FTDSS</text>
-</a>
-</g>
-</g>
-<!-- type~type_ftdss&#45;&gt;type~abstract_thermal -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge8" class="edge">
-<title>type~type_ftdss&#45;&gt;type~abstract_thermal</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M776.27,-185.5C747.53,-181.25 707.13,-175.28 673.4,-170.3"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="673.57,-166.78 663.17,-168.78 672.55,-173.71 673.57,-166.78"/>
-<text text-anchor="middle" x="701" y="-178.4" font-family="Helvetica,sans-Serif" font-size="9.50">Thermal</text>
-</g>
-<!-- type~type_output -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node10" class="node">
-<title>type~type_output</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node10"><a xlink:href="../type/type_output.html" xlink:title="Type_Output">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="648.5,-215 570.5,-215 570.5,-191 648.5,-191 648.5,-215"/>
-<text text-anchor="middle" x="609.5" y="-200.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Output</text>
-</a>
-</g>
-</g>
-<!-- type~type_ftdss&#45;&gt;type~type_output -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge11" class="edge">
-<title>type~type_ftdss&#45;&gt;type~type_output</title>
-<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M776.27,-193.2C743.24,-195.15 694.8,-198.02 658.8,-200.14"/>
-<polygon fill="#00ff00" stroke="#00ff00" points="658.31,-196.67 648.53,-200.75 658.72,-203.66 658.31,-196.67"/>
-<text text-anchor="middle" x="701" y="-200.4" font-family="Helvetica,sans-Serif" font-size="9.50">Output</text>
-</g>
-<!-- type~type_output&#45;&gt;type~output_observation -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge10" class="edge">
-<title>type~type_output&#45;&gt;type~output_observation</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M570.33,-202.81C542.56,-202.68 504.2,-202.49 471.22,-202.33"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="471.19,-198.83 461.18,-202.28 471.16,-205.83 471.19,-198.83"/>
-<text text-anchor="middle" x="508.5" y="-204.4" font-family="Helvetica,sans-Serif" font-size="9.50">Observation</text>
-</g>
-<!-- type~type_thermal_3phase_2d -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_node11" class="node">
-<title>type~type_thermal_3phase_2d</title>
-<g id="a_type~~abstract_elementtype~~InheritedByGraph_node11"><a xlink:href="../type/type_thermal_3phase_2d.html" xlink:title="Type_Thermal_3Phase_2D">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="890,-149 739,-149 739,-125 890,-125 890,-149"/>
-<text text-anchor="middle" x="814.5" y="-134.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Thermal_3Phase_2D</text>
-</a>
-</g>
-</g>
-<!-- type~type_thermal_3phase_2d&#45;&gt;type~abstract_thermal -->
-<g id="type~~abstract_elementtype~~InheritedByGraph_edge9" class="edge">
-<title>type~type_thermal_3phase_2d&#45;&gt;type~abstract_thermal</title>
-<path fill="none" stroke="#ff0000" d="M738.82,-144.42C719.94,-146.43 699.71,-148.69 681,-151 678.48,-151.31 675.9,-151.64 673.31,-151.98"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="672.67,-148.53 663.21,-153.31 673.59,-155.47 672.67,-148.53"/>
-</g>
-</g>
-</svg>
-</div>                <script>
-                  var pantypeabstract_elementtypeInheritedByGraph = svgPanZoom('#typeabstract_elementtypeInheritedByGraph',
-                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
-                  );
-                </script>          <div>
-            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
-          </div>
-          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-<p>Nodes of different colours represent the following: </p>
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: Graph Key Pages: 1 -->
-<svg width="186pt" height="32pt"
- viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
-<!-- Type -->
-<g id="node1" class="node">
-<title>Type</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
-<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
-</g>
-<!-- This Page&#39;s Entity -->
-<g id="node2" class="node">
-<title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
-<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
-</g>
-</g>
-</svg>
-
-<p>Solid arrows point from a derived type to the parent type which it
-extends. Dashed arrows point from a derived type to the other
-types it contains as a components, with a label listing the name(s) of
-said component(s).
-</p>
- Where possible, edges connecting nodes are
-given different colours to make them easier to distinguish in
-large graphs.</div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
     <br>
 
     <section>
@@ -579,7 +242,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-size~18"></span>
+              <span class="anchor" id="variable-size"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -596,7 +259,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-conn~2"></span>
+              <span class="anchor" id="variable-conn"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -613,7 +276,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-x~3"></span>
+              <span class="anchor" id="variable-x"></span>
               type(<a href='realpointer.html'>RealPointer</a>),
             </td>
               <td>public,</td>
@@ -630,7 +293,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-y~3"></span>
+              <span class="anchor" id="variable-y"></span>
               type(<a href='realpointer.html'>RealPointer</a>),
             </td>
               <td>public,</td>
@@ -647,7 +310,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-z~2"></span>
+              <span class="anchor" id="variable-z"></span>
               type(<a href='realpointer.html'>RealPointer</a>),
             </td>
               <td>public,</td>
@@ -664,7 +327,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ngauss~2"></span>
+              <span class="anchor" id="variable-ngauss"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -681,7 +344,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-weight~2"></span>
+              <span class="anchor" id="variable-weight"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -698,7 +361,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-gauss~2"></span>
+              <span class="anchor" id="variable-gauss"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -726,9 +389,9 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-getnumnodes~4"></span>
+      <span class="anchor" id="boundprocedure-getnumnodes"></span>
       <h3>
-          procedure(<a href='../interface/abstract_getnmnodes~2.html'>Abstract_getNmNodes</a>), public, deferred, pass(self) ::
+          procedure(Abstract_getNmNodes), public, deferred, pass(self) ::
   <strong>getNumNodes</strong>
         
       </h3>
@@ -784,9 +447,9 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-psi~12"></span>
+      <span class="anchor" id="boundprocedure-psi~4"></span>
       <h3>
-          procedure(<a href='../interface/abstract_psi~2.html'>Abstract_psi</a>), public, deferred, pass(self) ::
+          procedure(Abstract_psi), public, deferred, pass(self) ::
   <strong>psi</strong>
         
       </h3>
@@ -887,9 +550,9 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-dpsi_dxi~4"></span>
+      <span class="anchor" id="boundprocedure-dpsi_dxi"></span>
       <h3>
-          procedure(<a href='../interface/abstract_dpsi_dxi~2.html'>Abstract_dpsi_dxi</a>), public, deferred, pass(self) ::
+          procedure(Abstract_dpsi_dxi), public, deferred, pass(self) ::
   <strong>dpsi_dxi</strong>
         
       </h3>
@@ -992,7 +655,7 @@ large graphs.</div>
     <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-dpsi_deta"></span>
       <h3>
-          procedure(<a href='../interface/abstract_dpsi_deta.html'>Abstract_dpsi_deta</a>), public, deferred, pass(self) ::
+          procedure(Abstract_dpsi_deta), public, deferred, pass(self) ::
   <strong>dpsi_deta</strong>
         
       </h3>
@@ -1095,7 +758,7 @@ large graphs.</div>
     <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-jac"></span>
       <h3>
-          procedure(<a href='../interface/abstract_jac.html'>Abstract_Jac</a>), public, deferred, pass(self) ::
+          procedure(Abstract_Jac), public, deferred, pass(self) ::
   <strong>Jac</strong>
         
       </h3>
@@ -1213,7 +876,7 @@ large graphs.</div>
     <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-jac_det"></span>
       <h3>
-          procedure(<a href='../interface/abstract_jac_det.html'>Abstract_Jac_Det</a>), public, deferred, pass(self) ::
+          procedure(Abstract_Jac_Det), public, deferred, pass(self) ::
   <strong>Jac_Det</strong>
         
       </h3>
@@ -1299,9 +962,9 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_inside~2"></span>
+      <span class="anchor" id="boundprocedure-is_inside"></span>
       <h3>
-          procedure(<a href='../interface/abstract_is_inside.html'>Abstract_is_inside</a>), public, deferred, pass(self) ::
+          procedure(Abstract_is_inside), public, deferred, pass(self) ::
   <strong>is_inside</strong>
         
       </h3>
@@ -1426,39 +1089,6 @@ large graphs.</div>
           </div>
       </section>
 
-    <section>
-    <h3><span class="anchor" id="src"></span>Source Code</h3>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Abstract_ElementType</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ElementID</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ElementType</span><span class="w"> </span><span class="c">! Element type (5: triangle 1st, 9: square 1st)</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="c">! Number of nodes in the element</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">conn</span><span class="p">(:)</span><span class="w"> </span><span class="c">!! connectivity information</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">RealPointer</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">X</span><span class="p">(:)</span><span class="w"> </span><span class="c">!! X coordinate</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">RealPointer</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Y</span><span class="p">(:)</span><span class="w"> </span><span class="c">!! Y coordinate</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">RealPointer</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Z</span><span class="p">(:)</span><span class="w"> </span><span class="c">!! Z coordinate</span>
-
-<span class="w">        </span><span class="c">!----------------------------------------------------------------------------------</span>
-<span class="w">        </span><span class="c">! Gauss Quadrature points and weights</span>
-<span class="w">        </span><span class="c">!  - Gauss Quadrature points are defined in the local coordinate system</span>
-<span class="w">        </span><span class="c">!  - The number of Gauss points is determined by the element type</span>
-<span class="w">        </span><span class="c">!  - The weights are used for numerical integration over the element</span>
-<span class="w">        </span><span class="c">!  - The Gauss points are used to evaluate the shape functions and their derivatives</span>
-<span class="w">        </span><span class="c">!----------------------------------------------------------------------------------</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nGauss</span><span class="w"> </span><span class="c">!! Number of Gauss Quadrature points</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">weight</span><span class="p">(:)</span><span class="w"> </span><span class="c">!! Gauss weight</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gauss</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="c">!! Gauss Quadrature points Coordinate</span>
-<span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">(</span><span class="n">Abstract_getNmNodes</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">getNumNodes</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">Abstract_psi</span><span class="p">),</span><span class="w">        </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">psi</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">Abstract_dpsi_dxi</span><span class="p">),</span><span class="w">   </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dpsi_dxi</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">Abstract_dpsi_deta</span><span class="p">),</span><span class="w">  </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dpsi_deta</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">Abstract_Jac</span><span class="p">),</span><span class="w">        </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Jac</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">Abstract_Jac_Det</span><span class="p">),</span><span class="w">    </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Jac_Det</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">Abstract_is_inside</span><span class="p">),</span><span class="w">  </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_inside</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">    </span><span class="k">end type </span><span class="n">Abstract_ElementType</span>
-</pre></div>
-
-    </section>
     
     </div>
   </div>
@@ -1471,14 +1101,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+              &copy; 2025 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-05-07 12:34 +0000             </p>
+            </p>
           </div>
         </div>
         <br>

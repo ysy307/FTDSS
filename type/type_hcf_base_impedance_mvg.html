@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
-    <meta name="author" content="Kikuchi Shun" >
+      <meta name="description" content="Documentation for FTDSS">
+    <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
     <title>Type_HCF_Base_Impedance_MVG &ndash; FTDSS </title>
@@ -52,7 +52,6 @@
 
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
                   <li class="nav-item">
                     <a class="nav-link" href="../lists/files.html">Source Files</a>
                   </li>
@@ -92,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.1% of total for derived types.</p>Including implementation: 9 statements,  0.6% of total for derived types.">13 statements</a>
+                 title="<p> 1.2% of total for derived types.</p>Including implementation: 9 statements,  0.6% of total for derived types.">13 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,17 +133,17 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-ks~24">Ks</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-nsize~44">nsize</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-kflh~24">Kflh</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-thetas~8">thetaS</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-thetar~8">thetaR</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-alpha1~28">alpha1</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-n1~28">n1</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-l~27">l</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-omega~15">Omega</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-m1~10">m1</a>
-            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-hcrit~8">hcrit</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-ks~15">Ks</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-nsize~24">nsize</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-kflh~15">Kflh</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-thetas~7">thetaS</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-thetar~7">thetaR</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-alpha1~17">alpha1</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-n1~17">n1</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-l~17">l</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-omega~11">Omega</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-m1~7">m1</a>
+            <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#variable-hcrit~7">hcrit</a>
         </div>
       </div>
     </div>
@@ -192,12 +191,6 @@
 
   
   
-    <div class="card card-primary">
-      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../type/type_hcf_base_impedance_mvg.html#src">Type_HCF_Base_Impedance_MVG</a>
-      </div>
-    </div>
 
 
   </div>
@@ -206,113 +199,8 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public, extends(<a href='abstract_hcf_base_impedance.html'>Abstract_HCF_Base_Impedance</a>) :: Type_HCF_Base_Impedance_MVG</h2>
+        type, public, extends(../../../Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_MVG</h2>
     
-<br>      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Inherits</h3>
-        </div>
-        <div class="card-body">
-          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: type~~type_hcf_base_impedance_mvg~~InheritsGraph Pages: 1 -->
-<svg id="typetype_hcf_base_impedance_mvgInheritsGraph" width="535pt" height="32pt"
- viewBox="0.00 0.00 535.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_hcf_base_impedance_mvg~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>type~~type_hcf_base_impedance_mvg~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 531,-28 531,4 -4,4"/>
-<!-- type~type_hcf_base_impedance_mvg -->
-<g id="type~~type_hcf_base_impedance_mvg~~InheritsGraph_node1" class="node">
-<title>type~type_hcf_base_impedance_mvg</title>
-<polygon fill="none" stroke="black" points="527,-24 337,-24 337,0 527,0 527,-24"/>
-<text text-anchor="middle" x="432" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Type_HCF_Base_Impedance_MVG</text>
-</g>
-<!-- type~abstract_hcf_base_impedance -->
-<g id="type~~type_hcf_base_impedance_mvg~~InheritsGraph_node2" class="node">
-<title>type~abstract_hcf_base_impedance</title>
-<g id="a_type~~type_hcf_base_impedance_mvg~~InheritsGraph_node2"><a xlink:href="../type/abstract_hcf_base_impedance.html" xlink:title="Abstract_HCF_Base_Impedance">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="301,-24 120,-24 120,0 301,0 301,-24"/>
-<text text-anchor="middle" x="210.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_HCF_Base_Impedance</text>
-</a>
-</g>
-</g>
-<!-- type~type_hcf_base_impedance_mvg&#45;&gt;type~abstract_hcf_base_impedance -->
-<g id="type~~type_hcf_base_impedance_mvg~~InheritsGraph_edge1" class="edge">
-<title>type~type_hcf_base_impedance_mvg&#45;&gt;type~abstract_hcf_base_impedance</title>
-<path fill="none" stroke="#ff0000" d="M336.96,-12C328.43,-12 319.77,-12 311.19,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="311.17,-8.5 301.17,-12 311.17,-15.5 311.17,-8.5"/>
-</g>
-<!-- type~abstract_hcf -->
-<g id="type~~type_hcf_base_impedance_mvg~~InheritsGraph_node3" class="node">
-<title>type~abstract_hcf</title>
-<g id="a_type~~type_hcf_base_impedance_mvg~~InheritsGraph_node3"><a xlink:href="../type/abstract_hcf.html" xlink:title="Abstract_HCF">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="84,-24 0,-24 0,0 84,0 84,-24"/>
-<text text-anchor="middle" x="42" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_HCF</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_hcf_base_impedance&#45;&gt;type~abstract_hcf -->
-<g id="type~~type_hcf_base_impedance_mvg~~InheritsGraph_edge2" class="edge">
-<title>type~abstract_hcf_base_impedance&#45;&gt;type~abstract_hcf</title>
-<path fill="none" stroke="#ff0000" d="M119.91,-12C111.15,-12 102.47,-12 94.29,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="94.21,-8.5 84.21,-12 94.21,-15.5 94.21,-8.5"/>
-</g>
-</g>
-</svg>
-</div>          <div>
-            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
-          </div>
-          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-<p>Nodes of different colours represent the following: </p>
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: Graph Key Pages: 1 -->
-<svg width="186pt" height="32pt"
- viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
-<!-- Type -->
-<g id="node1" class="node">
-<title>Type</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
-<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
-</g>
-<!-- This Page&#39;s Entity -->
-<g id="node2" class="node">
-<title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
-<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
-</g>
-</g>
-</svg>
-
-<p>Solid arrows point from a derived type to the parent type which it
-extends. Dashed arrows point from a derived type to the other
-types it contains as a components, with a label listing the name(s) of
-said component(s).
-</p>
- Where possible, edges connecting nodes are
-given different colours to make them easier to distinguish in
-large graphs.</div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
     <br>
 
     <section>
@@ -329,7 +217,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-ks~24"></span>
+              <span class="anchor" id="variable-ks~15"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -346,7 +234,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nsize~44"></span>
+              <span class="anchor" id="variable-nsize~24"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -363,7 +251,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-kflh~24"></span>
+              <span class="anchor" id="variable-kflh~15"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -380,7 +268,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-thetas~8"></span>
+              <span class="anchor" id="variable-thetas~7"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -397,7 +285,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-thetar~8"></span>
+              <span class="anchor" id="variable-thetar~7"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -414,7 +302,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-alpha1~28"></span>
+              <span class="anchor" id="variable-alpha1~17"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -431,7 +319,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-n1~28"></span>
+              <span class="anchor" id="variable-n1~17"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -448,7 +336,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-l~27"></span>
+              <span class="anchor" id="variable-l~17"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -465,7 +353,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-omega~15"></span>
+              <span class="anchor" id="variable-omega~11"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -482,7 +370,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-m1~10"></span>
+              <span class="anchor" id="variable-m1~7"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -499,7 +387,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-hcrit~8"></span>
+              <span class="anchor" id="variable-hcrit~7"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -531,10 +419,9 @@ large graphs.</div>
     <ul class="list-group">
           <li class="list-group-item">
                 <h3>
-    private  interface <a href='../interface/construct_type_hcf_base_impedance_mvg.html'>Construct_Type_HCF_Base_Impedance_MVG</a>()  
+    private  interface Construct_Type_HCF_Base_Impedance_MVG()  
 
     </h3>
-    
   
 
   <h4>Arguments</h4>
@@ -543,10 +430,9 @@ large graphs.</div>
           </li>
           <li class="list-group-item">
                 <h3>
-    private  interface <a href='../interface/construct_type_hcf_base_impedance_mvg_minimal.html'>Construct_Type_HCF_Base_Impedance_MVG_minimal</a>()  
+    private  interface Construct_Type_HCF_Base_Impedance_MVG_minimal()  
 
     </h3>
-    
   
 
   <h4>Arguments</h4>
@@ -568,7 +454,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calculate_kr~18"></span>
       <h3>
           procedure, public ::
-  <strong>Calculate_kr</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calculate_kr_base_impedance_mvg.html'>Calculate_kr_Base_Impedance_MVG</a>
+  <strong>Calculate_kr</strong> => Calculate_kr_Base_Impedance_MVG
         
       </h3>
     </div>
@@ -577,7 +463,6 @@ large graphs.</div>
                 <h3>interface </h3>
                     <h3>
     private module function Calculate_kr_Base_Impedance_MVG(self, h) result(kr)  
-    <a href="../proc/calculate_kr_base_impedance_mvg.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -643,7 +528,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calculate_impedance~11"></span>
       <h3>
           procedure, public, nopass ::
-  <strong>Calculate_Impedance</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calculate_impedance_base.html'>Calculate_Impedance_Base</a>
+  <strong>Calculate_Impedance</strong> => Calculate_Impedance_Base
         
       </h3>
     </div>
@@ -652,7 +537,6 @@ large graphs.</div>
                 <h3>interface </h3>
                     <h3>
     private module function Calculate_Impedance_Base(Omega, thetaI) result(Impedance)  
-    <a href="../proc/calculate_impedance_base.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -718,7 +602,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-calculate_kflh~21"></span>
       <h3>
           procedure, public ::
-  <strong>Calculate_Kflh</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calculate_kflh_base_impedance_mvg.html'>Calculate_Kflh_Base_Impedance_MVG</a>
+  <strong>Calculate_Kflh</strong> => Calculate_Kflh_Base_Impedance_MVG
         
       </h3>
     </div>
@@ -727,7 +611,6 @@ large graphs.</div>
                 <h3>interface </h3>
                     <h3>
     private module function Calculate_Kflh_Base_Impedance_MVG(self, h, thetaI) result(Kflh)  
-    <a href="../proc/calculate_kflh_base_impedance_mvg.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -808,7 +691,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-update_kflh~21"></span>
       <h3>
           procedure, public ::
-  <strong>Update_Kflh</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/update_kflh_base_impedance_mvg.html'>Update_Kflh_Base_Impedance_MVG</a>
+  <strong>Update_Kflh</strong> => Update_Kflh_Base_Impedance_MVG
         
       </h3>
     </div>
@@ -817,7 +700,6 @@ large graphs.</div>
                 <h3>interface </h3>
                     <h3>
     private module subroutine Update_Kflh_Base_Impedance_MVG(self, arr_h, arr_thetaI)  
-    <a href="../proc/update_kflh_base_impedance_mvg.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -889,20 +771,6 @@ large graphs.</div>
           </div>
       </section>
 
-    <section>
-    <h3><span class="anchor" id="src"></span>Source Code</h3>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">Abstract_HCF_Base_Impedance</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Type_HCF_Base_Impedance_MVG</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">m1</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcrit</span>
-<span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Calculate_kr</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Calculate_kr_Base_Impedance_MVG</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">nopass</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Calculate_Impedance</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Calculate_Impedance_Base</span>
-<span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Calculate_Kflh</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Calculate_Kflh_Base_Impedance_MVG</span>
-<span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Update_Kflh</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Update_Kflh_Base_Impedance_MVG</span>
-<span class="w">    </span><span class="k">end type </span><span class="n">Type_HCF_Base_Impedance_MVG</span>
-</pre></div>
-
-    </section>
     
     </div>
   </div>
@@ -915,14 +783,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+              &copy; 2025 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-05-07 12:34 +0000             </p>
+            </p>
           </div>
         </div>
         <br>

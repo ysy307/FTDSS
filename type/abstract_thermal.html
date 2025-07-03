@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
-    <meta name="author" content="Kikuchi Shun" >
+      <meta name="description" content="Documentation for FTDSS">
+    <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
     <title>Abstract_Thermal &ndash; FTDSS </title>
@@ -52,7 +52,6 @@
 
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
                   <li class="nav-item">
                     <a class="nav-link" href="../lists/files.html">Source Files</a>
                   </li>
@@ -92,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 2.9% of total for derived types.</p>Including implementation: 34 statements,  2.3% of total for derived types.">34 statements</a>
+                 title="<p> 3.1% of total for derived types.</p>Including implementation: 34 statements,  2.4% of total for derived types.">34 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,11 +133,11 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-t~33">T</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-t">T</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-qw">Qw</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-qice~8">Qice</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-d_qice~8">D_Qice</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-si~7">Si</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-qice">Qice</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-d_qice">D_Qice</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-si">Si</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-kt_star_0">KT_star_0</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-kt_l">KT_l</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-kt_old">KT_old</a>
@@ -148,21 +147,21 @@
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-ft_old">FT_old</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-phit">PHIT</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-phit_old">PHIT_old</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-nsize~77">nsize</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-nsize~23">nsize</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-nelement">nElement</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-nside">nSide</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-nregion~4">nRegion</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-elements~2">Elements</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-sides~10">Sides</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-bc~4">BC</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-ic~2">IC</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-sides">Sides</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-bc">BC</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-ic">IC</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-thc">THC</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-den">DEN</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-sph">SPH</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-htc">HTC</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-ice~10">Ice</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-ice~8">Ice</a>
             <a class="list-group-item" href="../type/abstract_thermal.html#variable-solver">Solver</a>
-            <a class="list-group-item" href="../type/abstract_thermal.html#variable-order~2">Order</a>
+            <a class="list-group-item" href="../type/abstract_thermal.html#variable-order">Order</a>
         </div>
       </div>
     </div>
@@ -197,12 +196,6 @@
 
   
   
-    <div class="card card-primary">
-      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../type/abstract_thermal.html#src">Abstract_Thermal</a>
-      </div>
-    </div>
 
 
   </div>
@@ -213,467 +206,6 @@
       <h2 id="type-def-statement">
         type, public, abstract :: Abstract_Thermal</h2>
     
-<br>      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Inherits</h3>
-        </div>
-        <div class="card-body">
-          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: type~~abstract_thermal~~InheritsGraph Pages: 1 -->
-<svg id="typeabstract_thermalInheritsGraph" width="641pt" height="401pt"
- viewBox="0.00 0.00 641.00 401.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~abstract_thermal~~InheritsGraph" class="graph" transform="scale(0.77 0.77) rotate(0) translate(4 517.74)">
-<title>type~~abstract_thermal~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-517.74 830,-517.74 830,4 -4,4"/>
-<!-- type~abstract_thermal -->
-<g id="type~~abstract_thermal~~InheritsGraph_node1" class="node">
-<title>type~abstract_thermal</title>
-<polygon fill="none" stroke="black" points="826,-270.74 719,-270.74 719,-246.74 826,-246.74 826,-270.74"/>
-<text text-anchor="middle" x="772.5" y="-256.34" font-family="Helvetica,sans-Serif" font-size="10.50">Abstract_Thermal</text>
-</g>
-<!-- Abstract_Solver_CRS -->
-<g id="type~~abstract_thermal~~InheritsGraph_node2" class="node">
-<title>Abstract_Solver_CRS</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="486,-501.74 363,-501.74 363,-477.74 486,-477.74 486,-501.74"/>
-<text text-anchor="middle" x="424.5" y="-487.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Solver_CRS</text>
-</g>
-<!-- type~abstract_thermal&#45;&gt;Abstract_Solver_CRS -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge12" class="edge">
-<title>type~abstract_thermal&#45;&gt;Abstract_Solver_CRS</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M771.43,-270.76C770.49,-306.41 762.43,-412.08 701,-460.74 643.62,-506.19 557.1,-507.85 496.36,-501.73"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="496.41,-498.21 486.08,-500.59 495.64,-505.17 496.41,-498.21"/>
-<text text-anchor="middle" x="615" y="-506.14" font-family="Helvetica,sans-Serif" font-size="9.50">Solver</text>
-</g>
-<!-- type~abstract_condition_bc -->
-<g id="type~~abstract_thermal~~InheritsGraph_node3" class="node">
-<title>type~abstract_condition_bc</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node3"><a xlink:href="../type/abstract_condition_bc.html" xlink:title="Abstract_Condition_BC">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="491,-459.74 358,-459.74 358,-435.74 491,-435.74 491,-459.74"/>
-<text text-anchor="middle" x="424.5" y="-445.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Condition_BC</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~abstract_condition_bc -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge5" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~abstract_condition_bc</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M770.21,-270.9C766.24,-301.53 751.27,-382.07 701,-418.74 670.17,-441.24 571.7,-446.99 501.29,-448.11"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="501.07,-444.61 491.12,-448.24 501.16,-451.61 501.07,-444.61"/>
-<text text-anchor="middle" x="615" y="-449.14" font-family="Helvetica,sans-Serif" font-size="9.50">BC</text>
-</g>
-<!-- type~abstract_condition_ic -->
-<g id="type~~abstract_thermal~~InheritsGraph_node4" class="node">
-<title>type~abstract_condition_ic</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node4"><a xlink:href="../type/abstract_condition_ic.html" xlink:title="Abstract_Condition_IC">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="489,-417.74 360,-417.74 360,-393.74 489,-393.74 489,-417.74"/>
-<text text-anchor="middle" x="424.5" y="-403.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Condition_IC</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~abstract_condition_ic -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge6" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~abstract_condition_ic</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M768.38,-270.84C761.24,-295.87 741.11,-353.11 701,-378.74 668.63,-399.43 569.23,-404.81 499.15,-405.93"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="498.99,-402.43 489.04,-406.07 499.08,-409.43 498.99,-402.43"/>
-<text text-anchor="middle" x="615" y="-407.14" font-family="Helvetica,sans-Serif" font-size="9.50">IC</text>
-</g>
-<!-- type~abstract_density -->
-<g id="type~~abstract_thermal~~InheritsGraph_node5" class="node">
-<title>type~abstract_density</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node5"><a xlink:href="../type/abstract_density.html" xlink:title="Abstract_Density">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="475.5,-375.74 373.5,-375.74 373.5,-351.74 475.5,-351.74 475.5,-375.74"/>
-<text text-anchor="middle" x="424.5" y="-361.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Density</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~abstract_density -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge8" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~abstract_density</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M763.09,-270.89C751.27,-286.9 728.11,-314.57 701,-327.74 632.55,-361 543.82,-366.94 485.82,-366.6"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="485.76,-363.1 475.71,-366.48 485.67,-370.1 485.76,-363.1"/>
-<text text-anchor="middle" x="615" y="-367.14" font-family="Helvetica,sans-Serif" font-size="9.50">DEN</text>
-</g>
-<!-- type~abstract_heatcapacity -->
-<g id="type~~abstract_thermal~~InheritsGraph_node6" class="node">
-<title>type~abstract_heatcapacity</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node6"><a xlink:href="../type/abstract_heatcapacity.html" xlink:title="Abstract_HeatCapacity">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="491.5,-333.74 357.5,-333.74 357.5,-309.74 491.5,-309.74 491.5,-333.74"/>
-<text text-anchor="middle" x="424.5" y="-319.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_HeatCapacity</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~abstract_heatcapacity -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge10" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~abstract_heatcapacity</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M745.58,-270.86C732.48,-276.51 716.18,-282.83 701,-286.74 634.85,-303.79 557.54,-312.69 501.68,-317.24"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="501.2,-313.76 491.5,-318.04 501.75,-320.74 501.2,-313.76"/>
-<text text-anchor="middle" x="615" y="-316.14" font-family="Helvetica,sans-Serif" font-size="9.50">HTC</text>
-</g>
-<!-- type~abstract_specificheat -->
-<g id="type~~abstract_thermal~~InheritsGraph_node7" class="node">
-<title>type~abstract_specificheat</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node7"><a xlink:href="../type/abstract_specificheat.html" xlink:title="Abstract_SpecificHeat">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="489.5,-291.74 359.5,-291.74 359.5,-267.74 489.5,-267.74 489.5,-291.74"/>
-<text text-anchor="middle" x="424.5" y="-277.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_SpecificHeat</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~abstract_specificheat -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge9" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~abstract_specificheat</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M718.95,-261.93C660.63,-265.47 566.05,-271.21 500.09,-275.22"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="499.52,-271.74 489.75,-275.84 499.95,-278.73 499.52,-271.74"/>
-<text text-anchor="middle" x="615" y="-275.14" font-family="Helvetica,sans-Serif" font-size="9.50">SPH</text>
-</g>
-<!-- type~abstract_thermalconductivity -->
-<g id="type~~abstract_thermal~~InheritsGraph_node8" class="node">
-<title>type~abstract_thermalconductivity</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node8"><a xlink:href="../type/abstract_thermalconductivity.html" xlink:title="Abstract_ThermalConductivity">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="511,-249.74 338,-249.74 338,-225.74 511,-225.74 511,-249.74"/>
-<text text-anchor="middle" x="424.5" y="-235.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_ThermalConductivity</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~abstract_thermalconductivity -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge7" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~abstract_thermalconductivity</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M718.85,-249.83C712.84,-249.02 706.8,-248.3 701,-247.74 641.47,-242.04 574.42,-239.52 521.38,-238.44"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="521.36,-234.94 511.3,-238.25 521.23,-241.94 521.36,-234.94"/>
-<text text-anchor="middle" x="615" y="-250.14" font-family="Helvetica,sans-Serif" font-size="9.50">THC</text>
-</g>
-<!-- type~elementholder -->
-<g id="type~~abstract_thermal~~InheritsGraph_node9" class="node">
-<title>type~elementholder</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node9"><a xlink:href="../type/elementholder.html" xlink:title="ElementHolder">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="471,-207.74 378,-207.74 378,-183.74 471,-183.74 471,-207.74"/>
-<text text-anchor="middle" x="424.5" y="-193.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ElementHolder</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~elementholder -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge3" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~elementholder</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M751.92,-246.62C738.19,-238.74 719.12,-228.97 701,-223.74 627.08,-202.4 537.91,-196.8 481.45,-195.6"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="481.36,-192.1 471.3,-195.43 481.24,-199.1 481.36,-192.1"/>
-<text text-anchor="middle" x="615" y="-226.14" font-family="Helvetica,sans-Serif" font-size="9.50">Elements</text>
-</g>
-<!-- type~iceholder -->
-<g id="type~~abstract_thermal~~InheritsGraph_node10" class="node">
-<title>type~iceholder</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node10"><a xlink:href="../type/iceholder.html" xlink:title="IceHolder">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="456.5,-165.74 392.5,-165.74 392.5,-141.74 456.5,-141.74 456.5,-165.74"/>
-<text text-anchor="middle" x="424.5" y="-151.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">IceHolder</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~iceholder -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge11" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~iceholder</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M764.21,-246.46C753.06,-228.92 729.97,-197.24 701,-182.74 625.24,-144.84 523.3,-145.37 467.08,-149.38"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="466.49,-145.92 456.8,-150.2 467.04,-152.9 466.49,-145.92"/>
-<text text-anchor="middle" x="615" y="-185.14" font-family="Helvetica,sans-Serif" font-size="9.50">Ice</text>
-</g>
-<!-- type~sideholder -->
-<g id="type~~abstract_thermal~~InheritsGraph_node11" class="node">
-<title>type~sideholder</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node11"><a xlink:href="../type/sideholder.html" xlink:title="SideHolder">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="460.5,-123.74 388.5,-123.74 388.5,-99.74 460.5,-99.74 460.5,-123.74"/>
-<text text-anchor="middle" x="424.5" y="-109.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SideHolder</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~sideholder -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge4" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~sideholder</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M768.69,-246.49C762.01,-220.55 742.57,-160.3 701,-133.74 630.62,-88.79 528.59,-94.79 470.48,-103.24"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="469.86,-99.8 460.51,-104.78 470.93,-106.72 469.86,-99.8"/>
-<text text-anchor="middle" x="615" y="-136.14" font-family="Helvetica,sans-Serif" font-size="9.50">Sides</text>
-</g>
-<!-- type~type_crs -->
-<g id="type~~abstract_thermal~~InheritsGraph_node12" class="node">
-<title>type~type_crs</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node12"><a xlink:href="../type/type_crs.html" xlink:title="Type_CRS">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="456.5,-81.74 392.5,-81.74 392.5,-57.74 456.5,-57.74 456.5,-81.74"/>
-<text text-anchor="middle" x="424.5" y="-67.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_CRS</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~type_crs -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge2" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~type_crs</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M770.81,-246.29C768.23,-213.23 756.21,-123.1 701,-83.74 631.29,-34.05 524.59,-46.93 466.56,-59.23"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="465.66,-55.84 456.65,-61.42 467.17,-62.68 465.66,-55.84"/>
-<text text-anchor="middle" x="615" y="-86.14" font-family="Helvetica,sans-Serif" font-size="9.50">KT_star_0, KT_l, KT_old, CT_l, CT_old</text>
-</g>
-<!-- type~variables -->
-<g id="type~~abstract_thermal~~InheritsGraph_node13" class="node">
-<title>type~variables</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node13"><a xlink:href="../type/variables.html" xlink:title="Variables">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="455,-39.74 394,-39.74 394,-15.74 455,-15.74 455,-39.74"/>
-<text text-anchor="middle" x="424.5" y="-25.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Variables</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_thermal&#45;&gt;type~variables -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge1" class="edge">
-<title>type~abstract_thermal&#45;&gt;type~variables</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M772.06,-246.6C773.12,-207.93 770.52,-87.12 701,-34.74 631.96,17.26 523.17,-0.64 465.11,-15.69"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="463.96,-12.37 455.22,-18.35 465.78,-19.13 463.96,-12.37"/>
-<text text-anchor="middle" x="615" y="-37.14" font-family="Helvetica,sans-Serif" font-size="9.50">T, Qw, Qice, D_Qice, Si</text>
-</g>
-<!-- type~condition_bc_local -->
-<g id="type~~abstract_thermal~~InheritsGraph_node17" class="node">
-<title>type~condition_bc_local</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node17"><a xlink:href="../type/condition_bc_local.html" xlink:title="Condition_BC_Local">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="264.5,-459.74 147.5,-459.74 147.5,-435.74 264.5,-435.74 264.5,-459.74"/>
-<text text-anchor="middle" x="206" y="-445.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Condition_BC_Local</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_condition_bc&#45;&gt;type~condition_bc_local -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge13" class="edge">
-<title>type~abstract_condition_bc&#45;&gt;type~condition_bc_local</title>
-<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M357.96,-447.74C331.7,-447.74 301.44,-447.74 274.95,-447.74"/>
-<polygon fill="#ff7f00" stroke="#ff7f00" points="274.61,-444.24 264.61,-447.74 274.61,-451.24 274.61,-444.24"/>
-<text text-anchor="middle" x="304.5" y="-450.14" font-family="Helvetica,sans-Serif" font-size="9.50">BCInfo</text>
-</g>
-<!-- type~abstract_elementtype -->
-<g id="type~~abstract_thermal~~InheritsGraph_node14" class="node">
-<title>type~abstract_elementtype</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node14"><a xlink:href="../type/abstract_elementtype.html" xlink:title="Abstract_ElementType">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="271,-207.74 141,-207.74 141,-183.74 271,-183.74 271,-207.74"/>
-<text text-anchor="middle" x="206" y="-193.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_ElementType</text>
-</a>
-</g>
-</g>
-<!-- type~elementholder&#45;&gt;type~abstract_elementtype -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge14" class="edge">
-<title>type~elementholder&#45;&gt;type~abstract_elementtype</title>
-<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M377.85,-195.74C349.86,-195.74 313.37,-195.74 281.3,-195.74"/>
-<polygon fill="#007fff" stroke="#007fff" points="281.06,-192.24 271.06,-195.74 281.06,-199.24 281.06,-192.24"/>
-<text text-anchor="middle" x="304.5" y="-198.14" font-family="Helvetica,sans-Serif" font-size="9.50">e</text>
-</g>
-<!-- type~abstract_ice -->
-<g id="type~~abstract_thermal~~InheritsGraph_node15" class="node">
-<title>type~abstract_ice</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node15"><a xlink:href="../type/abstract_ice.html" xlink:title="Abstract_Ice">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="245,-165.74 167,-165.74 167,-141.74 245,-141.74 245,-165.74"/>
-<text text-anchor="middle" x="206" y="-151.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Ice</text>
-</a>
-</g>
-</g>
-<!-- type~iceholder&#45;&gt;type~abstract_ice -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge15" class="edge">
-<title>type~iceholder&#45;&gt;type~abstract_ice</title>
-<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M392.48,-153.74C356.7,-153.74 297.41,-153.74 255.51,-153.74"/>
-<polygon fill="#0000ff" stroke="#0000ff" points="255.26,-150.24 245.26,-153.74 255.26,-157.24 255.26,-150.24"/>
-<text text-anchor="middle" x="304.5" y="-156.14" font-family="Helvetica,sans-Serif" font-size="9.50">f</text>
-</g>
-<!-- type~abstract_sidetype -->
-<g id="type~~abstract_thermal~~InheritsGraph_node16" class="node">
-<title>type~abstract_sidetype</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node16"><a xlink:href="../type/abstract_sidetype.html" xlink:title="Abstract_SideType">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="260.5,-123.74 151.5,-123.74 151.5,-99.74 260.5,-99.74 260.5,-123.74"/>
-<text text-anchor="middle" x="206" y="-109.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_SideType</text>
-</a>
-</g>
-</g>
-<!-- type~sideholder&#45;&gt;type~abstract_sidetype -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge16" class="edge">
-<title>type~sideholder&#45;&gt;type~abstract_sidetype</title>
-<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M388.23,-111.74C356.56,-111.74 309.27,-111.74 270.94,-111.74"/>
-<polygon fill="#7f00ff" stroke="#7f00ff" points="270.9,-108.24 260.9,-111.74 270.9,-115.24 270.9,-108.24"/>
-<text text-anchor="middle" x="304.5" y="-114.14" font-family="Helvetica,sans-Serif" font-size="9.50">s</text>
-</g>
-<!-- type~realpointer -->
-<g id="type~~abstract_thermal~~InheritsGraph_node18" class="node">
-<title>type~realpointer</title>
-<g id="a_type~~abstract_thermal~~InheritsGraph_node18"><a xlink:href="../type/realpointer.html" xlink:title="RealPointer">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="73,-164.74 0,-164.74 0,-140.74 73,-140.74 73,-164.74"/>
-<text text-anchor="middle" x="36.5" y="-150.34" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RealPointer</text>
-</a>
-</g>
-</g>
-<!-- type~abstract_elementtype&#45;&gt;type~realpointer -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge17" class="edge">
-<title>type~abstract_elementtype&#45;&gt;type~realpointer</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M157.9,-183.65C134.46,-177.64 106.26,-170.4 83.05,-164.44"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="83.66,-160.98 73.1,-161.88 81.92,-167.76 83.66,-160.98"/>
-<text text-anchor="middle" x="107" y="-176.14" font-family="Helvetica,sans-Serif" font-size="9.50">X, Y, Z</text>
-</g>
-<!-- type~abstract_sidetype&#45;&gt;type~realpointer -->
-<g id="type~~abstract_thermal~~InheritsGraph_edge18" class="edge">
-<title>type~abstract_sidetype&#45;&gt;type~realpointer</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M155.65,-123.82C132.72,-129.44 105.63,-136.07 83.17,-141.56"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="82.1,-138.22 73.21,-144 83.76,-145.02 82.1,-138.22"/>
-<text text-anchor="middle" x="107" y="-141.14" font-family="Helvetica,sans-Serif" font-size="9.50">X, Y, Z</text>
-</g>
-</g>
-</svg>
-</div>                <script>
-                  var pantypeabstract_thermalInheritsGraph = svgPanZoom('#typeabstract_thermalInheritsGraph',
-                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
-                  );
-                </script>          <div>
-            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
-          </div>
-          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-<p>Nodes of different colours represent the following: </p>
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: Graph Key Pages: 1 -->
-<svg width="186pt" height="32pt"
- viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
-<!-- Type -->
-<g id="node1" class="node">
-<title>Type</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
-<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
-</g>
-<!-- This Page&#39;s Entity -->
-<g id="node2" class="node">
-<title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
-<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
-</g>
-</g>
-</svg>
-
-<p>Solid arrows point from a derived type to the parent type which it
-extends. Dashed arrows point from a derived type to the other
-types it contains as a components, with a label listing the name(s) of
-said component(s).
-</p>
- Where possible, edges connecting nodes are
-given different colours to make them easier to distinguish in
-large graphs.</div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Inherited by</h3>
-        </div>
-        <div class="card-body">
-          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: type~~abstract_thermal~~InheritedByGraph Pages: 1 -->
-<svg id="typeabstract_thermalInheritedByGraph" width="342pt" height="74pt"
- viewBox="0.00 0.00 342.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~abstract_thermal~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
-<title>type~~abstract_thermal~~InheritedByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 338,-70 338,4 -4,4"/>
-<!-- type~abstract_thermal -->
-<g id="type~~abstract_thermal~~InheritedByGraph_node1" class="node">
-<title>type~abstract_thermal</title>
-<polygon fill="none" stroke="black" points="107,-45 0,-45 0,-21 107,-21 107,-45"/>
-<text text-anchor="middle" x="53.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">Abstract_Thermal</text>
-</g>
-<!-- type~type_ftdss -->
-<g id="type~~abstract_thermal~~InheritedByGraph_node2" class="node">
-<title>type~type_ftdss</title>
-<g id="a_type~~abstract_thermal~~InheritedByGraph_node2"><a xlink:href="../type/type_ftdss.html" xlink:title="Type_FTDSS">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="296.5,-66 220.5,-66 220.5,-42 296.5,-42 296.5,-66"/>
-<text text-anchor="middle" x="258.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_FTDSS</text>
-</a>
-</g>
-</g>
-<!-- type~type_ftdss&#45;&gt;type~abstract_thermal -->
-<g id="type~~abstract_thermal~~InheritedByGraph_edge1" class="edge">
-<title>type~type_ftdss&#45;&gt;type~abstract_thermal</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M220.27,-50.15C191.53,-47.18 151.13,-43 117.4,-39.51"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="117.48,-36 107.17,-38.45 116.76,-42.96 117.48,-36"/>
-<text text-anchor="middle" x="145" y="-46.4" font-family="Helvetica,sans-Serif" font-size="9.50">Thermal</text>
-</g>
-<!-- type~type_thermal_3phase_2d -->
-<g id="type~~abstract_thermal~~InheritedByGraph_node3" class="node">
-<title>type~type_thermal_3phase_2d</title>
-<g id="a_type~~abstract_thermal~~InheritedByGraph_node3"><a xlink:href="../type/type_thermal_3phase_2d.html" xlink:title="Type_Thermal_3Phase_2D">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="334,-24 183,-24 183,0 334,0 334,-24"/>
-<text text-anchor="middle" x="258.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_Thermal_3Phase_2D</text>
-</a>
-</g>
-</g>
-<!-- type~type_thermal_3phase_2d&#45;&gt;type~abstract_thermal -->
-<g id="type~~abstract_thermal~~InheritedByGraph_edge2" class="edge">
-<title>type~type_thermal_3phase_2d&#45;&gt;type~abstract_thermal</title>
-<path fill="none" stroke="#ff0000" d="M182.78,-19.73C161.21,-21.96 137.9,-24.37 117.15,-26.52"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="116.77,-23.04 107.19,-27.55 117.49,-30 116.77,-23.04"/>
-</g>
-</g>
-</svg>
-</div>          <div>
-            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
-          </div>
-          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-<p>Nodes of different colours represent the following: </p>
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.43.0 (0)
- -->
-<!-- Title: Graph Key Pages: 1 -->
-<svg width="186pt" height="32pt"
- viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
-<!-- Type -->
-<g id="node1" class="node">
-<title>Type</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
-<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
-</g>
-<!-- This Page&#39;s Entity -->
-<g id="node2" class="node">
-<title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
-<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
-</g>
-</g>
-</svg>
-
-<p>Solid arrows point from a derived type to the parent type which it
-extends. Dashed arrows point from a derived type to the other
-types it contains as a components, with a label listing the name(s) of
-said component(s).
-</p>
- Where possible, edges connecting nodes are
-given different colours to make them easier to distinguish in
-large graphs.</div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
     <br>
 
     <section>
@@ -690,7 +222,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-t~33"></span>
+              <span class="anchor" id="variable-t"></span>
               type(<a href='variables.html'>Variables</a>),
             </td>
               <td>public</td>
@@ -724,7 +256,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-qice~8"></span>
+              <span class="anchor" id="variable-qice"></span>
               type(<a href='variables.html'>Variables</a>),
             </td>
               <td>public</td>
@@ -741,7 +273,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-d_qice~8"></span>
+              <span class="anchor" id="variable-d_qice"></span>
               type(<a href='variables.html'>Variables</a>),
             </td>
               <td>public</td>
@@ -758,7 +290,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-si~7"></span>
+              <span class="anchor" id="variable-si"></span>
               type(<a href='variables.html'>Variables</a>),
             </td>
               <td>public</td>
@@ -928,7 +460,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nsize~77"></span>
+              <span class="anchor" id="variable-nsize~23"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -1013,7 +545,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-sides~10"></span>
+              <span class="anchor" id="variable-sides"></span>
               type(<a href='sideholder.html'>SideHolder</a>),
             </td>
               <td>public,</td>
@@ -1030,7 +562,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-bc~4"></span>
+              <span class="anchor" id="variable-bc"></span>
               class(<a href='abstract_condition_bc.html'>Abstract_Condition_BC</a>),
             </td>
               <td>public,</td>
@@ -1047,7 +579,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ic~2"></span>
+              <span class="anchor" id="variable-ic"></span>
               class(<a href='abstract_condition_ic.html'>Abstract_Condition_IC</a>),
             </td>
               <td>public,</td>
@@ -1132,7 +664,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ice~10"></span>
+              <span class="anchor" id="variable-ice~8"></span>
               type(<a href='iceholder.html'>IceHolder</a>),
             </td>
               <td>public,</td>
@@ -1166,7 +698,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-order~2"></span>
+              <span class="anchor" id="variable-order"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -1374,52 +906,6 @@ large graphs.</div>
           </div>
       </section>
 
-    <section>
-    <h3><span class="anchor" id="src"></span>Source Code</h3>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Abstract_Thermal</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Variables</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">T</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Variables</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Qw</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Variables</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Qice</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Variables</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">D_Qice</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Variables</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Si</span>
-
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">KT_star_0</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">KT_l</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">KT_old</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">CT_l</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">Type_CRS</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">CT_old</span><span class="p">(:)</span>
-
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">FT</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">FT_old</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">PHIT</span><span class="p">(:)</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">PHIT_old</span><span class="p">(:)</span>
-
-<span class="w">        </span><span class="c">! type(DP3d), pointer :: Coordinate</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nsize</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nElement</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nSide</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nRegion</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">ElementHolder</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Elements</span><span class="p">(:)</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">SideHolder</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Sides</span><span class="p">(:)</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Condition_BC</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">BC</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Condition_IC</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">IC</span>
-<span class="w">        </span><span class="c">!! Thermal properties</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_ThermalConductivity</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">THC</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Density</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">DEN</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_SpecificHeat</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">SPH</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_HeatCapacity</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">HTC</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">IceHolder</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ice</span><span class="p">(:)</span>
-
-<span class="w">        </span><span class="c">!! Solver</span>
-<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_Solver_CRS</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Solver</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Order</span>
-<span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">(</span><span class="n">Abstract_Update</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Update</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">Abstract_Assemble</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Assemble</span>
-<span class="w">    </span><span class="k">end type </span><span class="n">Abstract_Thermal</span>
-</pre></div>
-
-    </section>
     
     </div>
   </div>
@@ -1432,14 +918,14 @@ large graphs.</div>
           <div class="col">
             <p>
               FTDSS
- was developed by Kikuchi Shun<br>              &copy; 2025 
+              &copy; 2025 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-05-07 12:34 +0000             </p>
+            </p>
           </div>
         </div>
         <br>
