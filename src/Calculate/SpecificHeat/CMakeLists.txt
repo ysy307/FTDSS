@@ -1,4 +1,4 @@
-add_library(Calc_SPH
+add_library(Calc_SPH OBJECT
     Interface.F90
     Base.F90
     3Phase.F90

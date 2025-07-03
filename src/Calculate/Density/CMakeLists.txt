@@ -1,4 +1,4 @@
-add_library(Calc_DEN
+add_library(Calc_DEN OBJECT
     Interface.F90
     Base.F90
     3Phase.F90

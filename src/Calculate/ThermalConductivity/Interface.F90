@@ -1,118 +1,88 @@
 module Calculate_ThermalConductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes
-    use :: Core_Allocate, only:Allocate_Array
+    use :: Core_BaseTypes, only:GaussPointState_t
     use :: Inout_Input
     implicit none
     private
 
-    public :: Abstract_ThermalConductivity
-    public :: Type_ThermalConductivity_3Phase
+    public :: THCHolder, Abst_THC, Type_THC_3Phase
 
-    type, abstract :: Abstract_ThermalConductivity
-        integer(int32) :: nsize
-        integer(int32) :: nRegion
-        real(real64), allocatable :: value(:, :)
+    type :: THCHolder
+        class(Abst_THC), allocatable :: l
     contains
-        procedure(Abstract_Calculate_ThermalConductivity), pass(self), deferred :: Calculate !&
-        procedure(Abstract_Update_ThermalConductivity),    pass(self), deferred :: Update !&
-    end type Abstract_ThermalConductivity
+        procedure, pass(self) :: initialize => THCHolder_initialize
+    end type THCHolder
 
-    type, extends(Abstract_ThermalConductivity) :: Type_ThermalConductivity_3Phase
-        real(real64), allocatable :: soil(:)
-        real(real64), allocatable :: water(:)
-        real(real64), allocatable :: ice(:)
+    type, abstract :: Abst_THC
+        integer(int32) :: region_id
+        real(real64) :: Material1 !! like a soil or a rock, a concrete
+        real(real64) :: Material2 !! like a water
+        real(real64) :: Material3 !! like a ice
+        real(real64) :: Material4 !! like a gas
     contains
-        procedure :: Calculate => Calc_THC_3_Wrap !&
-        procedure :: Update    => Update_THC_3 !&
-    end type Type_ThermalConductivity_3Phase
+        procedure(Abst_Calc_THC_GaussPoint), pass(self), deferred :: Calc_GaussPoint !&
+    end type Abst_THC
+
+    !--------------------------------------------------------------------------------
+    type, extends(Abst_THC) :: Type_THC_3Phase
+    contains
+        procedure, pass(self) :: Calc_GaussPoint => Calc_THC_GaussPoint_3Phase !&
+    end type Type_THC_3Phase
 
     abstract interface
-        function Abstract_Calculate_ThermalConductivity(self, NodeBelonging, phi1, phi2, phi3, phi4, waterFlux) result(lambda)
-            import :: Abstract_ThermalConductivity, Belonging, real64
+        function Abst_Calc_THC_GaussPoint(self, state) result(lambda)
+            import :: Abst_THC, GaussPointState_t, real64
             implicit none
-            class(Abstract_ThermalConductivity), intent(in) :: self
-            type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in), optional :: phi1
-            real(real64), intent(in), optional :: phi2
-            real(real64), intent(in), optional :: phi3
-            real(real64), intent(in), optional :: phi4
-            real(real64), intent(in), optional :: waterFlux(:)
+            class(Abst_THC), intent(in) :: self
+            type(GaussPointState_t), intent(in) :: state
             real(real64) :: lambda
 
-        end function Abstract_Calculate_ThermalConductivity
-
-        subroutine Abstract_Update_ThermalConductivity(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, waterFlux)
-            import :: Abstract_ThermalConductivity, Belonging, DP3d, real64
-            implicit none
-            class(Abstract_ThermalConductivity), intent(inout) :: self
-            type(Belonging), intent(inout) :: NodeBelonging(:)
-            real(real64), intent(in), optional :: arr_phi1(:)
-            real(real64), intent(in), optional :: arr_phi2(:)
-            real(real64), intent(in), optional :: arr_phi3(:)
-            real(real64), intent(in), optional :: arr_phi4(:)
-            type(DP3d), intent(in), optional :: waterFlux
-
-        end subroutine Abstract_Update_ThermalConductivity
-
+        end function Abst_Calc_THC_GaussPoint
     end interface
 
     interface
-        module function Calc_THC_3(NodeBelonging, lambda_soil, phi_soil, &
-                                   lambda_water, phi_water, lambda_ice, phi_ice) result(lambda)
+        module subroutine THCHolder_initialize(self, iRegion, Input)
             implicit none
-            type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in) :: lambda_soil(:)
+            class(THCHolder), intent(inout) :: self
+            integer(int32), intent(in) :: iRegion
+            type(Type_Input), intent(in) :: Input
+
+        end subroutine THCHolder_initialize
+
+        module function Calc_THC_GaussPoint_3Phase(self, state) result(lambda)
+            implicit none
+            class(Type_THC_3Phase), intent(in) :: self
+            type(GaussPointState_t), intent(in) :: state
+            real(real64) :: lambda
+
+        end function Calc_THC_GaussPoint_3Phase
+
+        module function THC_3_Construct(iRegion, Input) result(Structure)
+            implicit none
+            class(Abst_THC), allocatable :: Structure
+            integer(int32), intent(in) :: iRegion
+            type(Type_Input), intent(in) :: Input
+
+        end function THC_3_Construct
+    end interface
+
+    interface
+        module function Calc_THC_3(lambda_soil, phi_soil, &
+                                   lambda_water, phi_water, &
+                                   lambda_ice, phi_ice) result(lambda)
+            implicit none
+            real(real64), intent(in) :: lambda_soil
             real(real64), intent(in) :: phi_soil
-            real(real64), intent(in) :: lambda_water(:)
+            real(real64), intent(in) :: lambda_water
             real(real64), intent(in) :: phi_water
-            real(real64), intent(in) :: lambda_ice(:)
+            real(real64), intent(in) :: lambda_ice
             real(real64), intent(in) :: phi_ice
             real(real64) :: lambda
 
         end function Calc_THC_3
     end interface
 
-    !--------------------------------------------------------------------------------
-    ! 3-phase thermal conductivity calculation interface
-    !--------------------------------------------------------------------------------
-    interface
-        module function THC_3_Construct(Input) result(Structure)
-            implicit none
-            type(Type_Input), intent(in) :: Input
-            class(Abstract_ThermalConductivity), allocatable :: Structure
-
-        end function THC_3_Construct
-
-        module function Calc_THC_3_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, waterFlux) result(lambda)
-            implicit none
-            class(Type_ThermalConductivity_3Phase), intent(in) :: self
-            type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in), optional :: phi1
-            real(real64), intent(in), optional :: phi2
-            real(real64), intent(in), optional :: phi3
-            real(real64), intent(in), optional :: phi4
-            real(real64), intent(in), optional :: waterFlux(:)
-            real(real64) :: lambda
-
-        end function Calc_THC_3_Wrap
-
-        module subroutine Update_THC_3(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, waterFlux)
-            implicit none
-            class(Type_ThermalConductivity_3Phase), intent(inout) :: self
-            type(Belonging), intent(inout) :: NodeBelonging(:)
-            real(real64), intent(in), optional :: arr_phi1(:)
-            real(real64), intent(in), optional :: arr_phi2(:)
-            real(real64), intent(in), optional :: arr_phi3(:)
-            real(real64), intent(in), optional :: arr_phi4(:)
-            type(DP3d), intent(in), optional :: waterFlux
-
-        end subroutine Update_THC_3
-
+    interface Type_THC_3Phase
+        module procedure THC_3_Construct
     end interface
-
-    interface Type_ThermalConductivity_3Phase
-        module procedure :: THC_3_Construct
-    end interface
-
 end module Calculate_ThermalConductivity

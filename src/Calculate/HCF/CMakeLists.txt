@@ -1,4 +1,4 @@
-add_library(Calc_HCF
+add_library(Calc_HCF OBJECT
     HCF.F90
     HCF_BC.F90
     HCF_VG.F90

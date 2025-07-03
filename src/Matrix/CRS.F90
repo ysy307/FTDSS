@@ -1,7 +1,8 @@
 module Matrix_CRS
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64, logical32
+    use :: stdlib_sorting, only:sort
     use :: Core_Allocate, only:Allocate_Array
-    use :: Core_Element
+    use :: Domain_Module, only:Domain_t
     implicit none
     private
 
@@ -37,53 +38,121 @@ module Matrix_CRS
 
 contains
 
-    function Initialize_CRS(Elements, nNode) result(A)
+    function Initialize_CRS(Domain, perm) result(A)
         implicit none
-        type(ElementHolder), intent(in) :: Elements(:)
-        integer(int32), intent(in) :: nNode
+        class(Domain_t), intent(in) :: Domain
+        integer(int32), optional, intent(in) :: perm(:)
         type(Type_CRS) :: A
-        integer(int32) :: iTop
 
-        integer(int32) :: iN, iE, iT, irT, iNC, iNNZ, row_nnz
-        integer(int32), allocatable :: rowCount(:), tmpInd(:)
+        ! --- ローカル変数宣言 ---
+        integer(int32) :: iN, iE, iT, irT, iNC, iNNZ, row_nnz, nsize
+        integer(int32) :: nNode, nElement
+        ! ★★★★★ 修正点1: rowCountをintegerからlogicalに変更 ★★★★★
+        logical(logical32), allocatable :: rowCount(:)
+        integer(int32), allocatable :: tmpInd(:)
 
-        ! Set dimensions
+        ! --- RCM適用時専用の変数 ---
+        integer(int32), allocatable :: inv_perm(:)
+        integer(int32), allocatable :: cols_for_this_row(:)
+        integer(int32) :: old_iN, col_count
+
+        ! --- 初期設定 ---
+        nNode = Domain%get_numNode()
+        nElement = Domain%get_numElement()
         A%nrow = nNode
         A%nptr = nNode + 1
 
-        ! Allocate temp arrays
         call Allocate_Array(A%Ptr, A%nptr)
         call Allocate_Array(rowCount, nNode)
-        call Allocate_Array(tmpInd, 30_int32 * nNode)
+        call Allocate_Array(tmpInd, 30_int32 * nNode) ! 十分なサイズを確保
 
         A%Ptr(1) = 1
         A%nnz = 0
-        do iN = 1, nNode
-            rowCount = 0
-            row_nnz = 0
-            ! Scan elements to build sparsity row
-            do iE = 1, size(Elements)
-                do iT = 1, Elements(iE)%e%size
-                    if (Elements(iE)%e%conn(iT) == iN) then
-                        do irT = 1, Elements(iE)%e%size
-                            rowCount(Elements(iE)%e%conn(irT)) = 1
-                        end do
-                        exit
-                    end if
-                end do
-            end do
-            ! Collect indices
-            do iNC = 1, nNode
-                if (rowCount(iNC) >= 1) then
-                    row_nnz = row_nnz + 1
-                    tmpInd(A%nnz + row_nnz) = iNC
-                end if
+
+        if (present(perm)) then
+            !----------------------------------
+            ! RCM適用時の処理 (perm がある場合)
+            !----------------------------------
+
+            call Allocate_Array(inv_perm, nNode)
+            do iN = 1, nNode
+                inv_perm(perm(iN)) = iN
             end do
 
-            A%nnz = A%nnz + row_nnz
-            A%Ptr(iN + 1) = A%nnz + 1
-        end do
-        ! Allocate CRS arrays
+            do iN = 1, nNode
+                rowCount(:) = .false.
+                row_nnz = 0
+
+                old_iN = inv_perm(iN)
+
+                do iE = 1, nElement
+                    nsize = Domain%Elements(iE)%e%get_size()
+                    do iT = 1, nsize
+                        if (Domain%Elements(iE)%e%conn(iT) == old_iN) then
+                            do irT = 1, nsize
+                                rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
+                            end do
+                            exit
+                        end if
+                    end do
+                end do
+
+                ! count()はlogical配列を引数に取るため、これで正しく動作する
+                col_count = count(rowCount)
+                call Allocate_Array(cols_for_this_row, col_count)
+
+                row_nnz = 0
+                do iNC = 1, nNode
+                    ! ★★★★★ 修正点3: .true.かどうかをチェック ★★★★★
+                    if (rowCount(iNC)) then
+                        row_nnz = row_nnz + 1
+                        cols_for_this_row(row_nnz) = perm(iNC)
+                    end if
+                end do
+
+                call sort(cols_for_this_row)
+
+                tmpInd(A%nnz + 1:A%nnz + row_nnz) = cols_for_this_row
+                deallocate (cols_for_this_row)
+
+                A%nnz = A%nnz + row_nnz
+                A%Ptr(iN + 1) = A%nnz + 1
+            end do
+            deallocate (inv_perm)
+
+        else
+            !--------------------------------------
+            ! 通常の処理 (perm がない場合)
+            !--------------------------------------
+            do iN = 1, nNode
+                rowCount(:) = .false. ! logical配列として初期化
+                row_nnz = 0
+
+                do iE = 1, nElement
+                    nsize = Domain%Elements(iE)%e%get_size()
+                    do iT = 1, nsize
+                        if (Domain%Elements(iE)%e%conn(iT) == iN) then
+                            do irT = 1, nsize
+                                rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
+                            end do
+                            exit
+                        end if
+                    end do
+                end do
+
+                do iNC = 1, nNode
+                    if (rowCount(iNC)) then
+                        row_nnz = row_nnz + 1
+                        tmpInd(A%nnz + row_nnz) = iNC
+                    end if
+                end do
+
+                A%nnz = A%nnz + row_nnz
+                A%Ptr(iN + 1) = A%nnz + 1
+            end do
+        end if
+
+        ! --- 最終的なCRS配列を確保・コピー ---
         call Allocate_Array(A%Ind, A%nnz)
         call Allocate_Array(A%Val, A%nnz)
         do iNNZ = 1, A%nnz
@@ -92,6 +161,7 @@ contains
         end do
 
         deallocate (rowCount, tmpInd)
+
     end function Initialize_CRS
 
     function Matrix_Vector_Product_CRS(A, x) result(y)
@@ -188,53 +258,5 @@ contains
         B%Ind(:) = self%Ind(:)
         B%Val(:) = self%Val(:)
     end function Copy_CRS
-
-    ! function Transpose_CRS(self) result(AT)
-    !     implicit none
-    !     class(Type_CRS) :: self
-    !     type(Type_CRS) :: AT
-    !     integer(int32) :: i, j, row, col, dst
-    !     integer(int32), allocatable :: col_count(:), next_pos(:)
-
-    !     ! Setup AT dimensions
-    !     AT%nrow = self%ncol + 1
-    !     AT%ncol = self%nrow - 1
-    !     AT%nnz = self%nnz
-
-    !     ! Count entries per column in A
-    !     call Allocate_Array(col_count, self%ncol)
-    !     col_count(:) = 0
-    !     do row = 1, self%nrow - 1
-    !         do i = self%Ptr(row), self%Ptr(row + 1) - 1
-    !             col_count(self%Ind(i)) = col_count(self%Ind(i)) + 1
-    !         end do
-    !     end do
-
-    !     ! Build AT%Ptr
-    !     call Allocate_Array(AT%Ptr, AT%nrow)
-    !     AT%Ptr(1) = 1
-    !     do i = 1, AT%nrow - 1
-    !         AT%Ptr(i + 1) = AT%Ptr(i) + col_count(i)
-    !     end do
-
-    !     ! Allocate Ind, Val and next_pos
-    !     call Allocate_Array(AT%Ind, AT%nnz)
-    !     call Allocate_Array(AT%Val, AT%nnz)
-    !     allocate (next_pos(self%ncol))
-    !     next_pos = AT%Ptr(1:AT%nrow - 1)
-
-    !     ! Fill AT
-    !     do row = 1, self%nrow - 1
-    !         do i = self%Ptr(row), self%Ptr(row + 1) - 1
-    !             col = self%Ind(i)
-    !             dst = next_pos(col)
-    !             AT%Ind(dst) = row
-    !             AT%Val(dst) = self%Val(i)
-    !             next_pos(col) = dst + 1
-    !         end do
-    !     end do
-
-    !     deallocate (col_count, next_pos)
-    ! end function Transpose_CRS
 
 end module Matrix_CRS

@@ -2,30 +2,33 @@ module Core_VTK
     use, intrinsic :: iso_fortran_env
     use :: Core_BaseTypes, only:DP3d
     use :: Core_Allocate, only:Allocate_Array
+    use :: Core_VTK_Constants
+    use :: Core_Unique, only:Unique
+    use :: stdlib_sorting, only:sort
     implicit none
     private
 
-    type :: VTK_CELL_NAMES
-        integer(int32) :: VTK_VERTEX = 1
-        integer(int32) :: VTK_POLY_VERTEX = 2
-        integer(int32) :: VTK_LINE = 3
-        integer(int32) :: VTK_POLY_LINE = 4
-        integer(int32) :: VTK_TRIANGLE = 5
-        integer(int32) :: VTK_TRIANGLE_STRIP = 6
-        integer(int32) :: VTK_POLYGON = 7
-        integer(int32) :: VTK_PIXEL = 8
-        integer(int32) :: VTK_QUAD = 9
-        integer(int32) :: VTK_TETRA = 10
-        integer(int32) :: VTK_VOXEL = 11
-        integer(int32) :: VTK_HEXAHEDRON = 12
-        integer(int32) :: VTK_WEDGE = 13
-        integer(int32) :: VTK_PYRAMID = 14
-        integer(int32) :: VTK_QUADRATIC_EDGE = 21
-        integer(int32) :: VTK_QUADRATIC_TRIANGLE = 22
-        integer(int32) :: VTK_QUADRATIC_QUAD = 23
-        integer(int32) :: VTK_QUADRATIC_TETRA = 24
-        integer(int32) :: VTK_QUADRATIC_HEXAHEDRON = 25
-    end type VTK_CELL_NAMES
+    ! type :: VTK_CELL_NAMES
+    !     integer(int32) :: VTK_VERTEX = 1
+    !     integer(int32) :: VTK_POLY_VERTEX = 2
+    !     integer(int32) :: VTK_LINE = 3
+    !     integer(int32) :: VTK_POLY_LINE = 4
+    !     integer(int32) :: VTK_TRIANGLE = 5
+    !     integer(int32) :: VTK_TRIANGLE_STRIP = 6
+    !     integer(int32) :: VTK_POLYGON = 7
+    !     integer(int32) :: VTK_PIXEL = 8
+    !     integer(int32) :: VTK_QUAD = 9
+    !     integer(int32) :: VTK_TETRA = 10
+    !     integer(int32) :: VTK_VOXEL = 11
+    !     integer(int32) :: VTK_HEXAHEDRON = 12
+    !     integer(int32) :: VTK_WEDGE = 13
+    !     integer(int32) :: VTK_PYRAMID = 14
+    !     integer(int32) :: VTK_QUADRATIC_EDGE = 21
+    !     integer(int32) :: VTK_QUADRATIC_TRIANGLE = 22
+    !     integer(int32) :: VTK_QUADRATIC_QUAD = 23
+    !     integer(int32) :: VTK_QUADRATIC_TETRA = 24
+    !     integer(int32) :: VTK_QUADRATIC_HEXAHEDRON = 25
+    ! end type VTK_CELL_NAMES
 
     type :: Type_VTK_CELLS
         integer(int8) :: offset
@@ -44,9 +47,10 @@ module Core_VTK
         integer(int32) :: numCellTypes !! Number of cell types
 
         type(Type_VTK_CELLS), allocatable :: CELLS(:) !! Cell information
-        type(VTK_CELL_NAMES) :: Names !! Cell names
+        ! type(VTK_CELL_NAMES) :: Names !! Cell names
     contains
         procedure :: Is_In => Core_VTK_IN_CellType
+        procedure :: get_active_region_info
     end type Type_VTK
 
     character(*), parameter :: c_ASCII = "ASCII"
@@ -378,22 +382,95 @@ contains
         isIn = .false.
         select case (Shape_Dimention)
         case (1)
-            if (iCellType == self%Names%VTK_LINE .or. &
-                iCellType == self%Names%VTK_QUADRATIC_EDGE &
+            if (iCellType == VTK_LINE .or. &
+                iCellType == VTK_QUADRATIC_EDGE &
                 ) then
                 isIn = .true.
             end if
         case (2)
-            if (iCellType == self%Names%VTK_TRIANGLE .or. &
-                iCellType == self%Names%VTK_PIXEL .or. &
-                iCellType == self%Names%VTK_QUAD .or. &
-                iCellType == self%Names%VTK_QUADRATIC_TRIANGLE .or. &
-                iCellType == self%Names%VTK_QUADRATIC_QUAD &
+            if (iCellType == VTK_TRIANGLE .or. &
+                iCellType == VTK_PIXEL .or. &
+                iCellType == VTK_QUAD .or. &
+                iCellType == VTK_QUADRATIC_TRIANGLE .or. &
+                iCellType == VTK_QUADRATIC_QUAD &
                 ) then
                 isIn = .true.
             end if
         end select
 
     end function Core_VTK_IN_CellType
+
+    subroutine get_active_region_info(self, unique_ids, ierr)
+        ! --- 引数 ---
+        implicit none
+        class(Type_VTK), intent(in) :: self !! VTK data
+        integer(int32), allocatable, intent(inout) :: unique_ids(:)
+        integer(int32), intent(out) :: ierr
+
+        ! --- ローカル変数 ---
+        integer(int32) :: max_dim
+        integer(int32), allocatable :: collected_ids(:)
+        integer(int32) :: i_cell, count
+        logical(4) :: is_max_dim_element
+
+        max_dim = 0
+        ierr = 0
+
+        ! --- ステップ1: メッシュ内の最大次元を判定 ---
+        do i_cell = 1, self%numTotalCells
+            select case (self%CELLS(i_cell)%CellType)
+            case (VTK_TETRA, VTK_HEXAHEDRON, &
+                  VTK_WEDGE, VTK_PYRAMID, &
+                  VTK_QUADRATIC_TETRA, VTK_QUADRATIC_HEXAHEDRON)
+                max_dim = 3
+                exit ! 3Dが見つかったら、それ以上探す必要はない
+            case (VTK_TRIANGLE, VTK_PIXEL, &
+                  VTK_QUAD, VTK_QUADRATIC_TRIANGLE, &
+                  VTK_QUADRATIC_QUAD)
+                max_dim = max(max_dim, 2)
+            case (VTK_LINE, VTK_QUADRATIC_EDGE)
+                max_dim = max(max_dim, 1)
+            end select
+        end do
+
+        if (max_dim == 0) then
+            ierr = -1
+            return ! アクティブな要素がない
+        end if
+
+        ! --- ステップ2: 最大次元を持つ要素から、すべてのCellEntityIdを収集 ---
+        allocate (collected_ids(self%numTotalCells))
+        count = 0
+        do i_cell = 1, self%numTotalCells
+            is_max_dim_element = .false.
+            select case (self%CELLS(i_cell)%CellType)
+            case (VTK_TETRA, VTK_HEXAHEDRON, &
+                  VTK_WEDGE, VTK_PYRAMID, &
+                  VTK_QUADRATIC_TETRA, VTK_QUADRATIC_HEXAHEDRON)
+                if (max_dim == 3) is_max_dim_element = .true.
+            case (VTK_TRIANGLE, VTK_PIXEL, &
+                  VTK_QUAD, VTK_QUADRATIC_TRIANGLE, &
+                  VTK_QUADRATIC_QUAD)
+                if (max_dim == 2) is_max_dim_element = .true.
+            case (VTK_LINE, VTK_QUADRATIC_EDGE)
+                if (max_dim == 1) is_max_dim_element = .true.
+            end select
+
+            if (is_max_dim_element) then
+                count = count + 1
+                collected_ids(count) = self%CELLS(i_cell)%CellEntityId
+            end if
+        end do
+
+        ! --- ステップ3: 収集したIDリストから、ユニークなものだけを抽出 ---
+        ! (これはFortranの標準的なユニーク化のアルゴリズム)
+        if (count > 0) then
+            call sort(collected_ids(1:count))
+            call Unique(collected_ids(1:count), unique_ids)
+        else
+            allocate (unique_ids(0))
+        end if
+
+    end subroutine get_active_region_info
 
 end module Core_VTK

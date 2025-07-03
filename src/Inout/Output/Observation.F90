@@ -1,6 +1,106 @@
 submodule(Inout_Output) Inout_Output_Obaservation
     implicit none
 contains
+
+    module subroutine ObservationVariable_Initialize(self, dir_Output, VariableName, FileName, VariableUnitName, doOutput)
+        implicit none
+        class(ObservationVariable_t), intent(inout) :: self
+        character(*), intent(in) :: dir_Output
+        character(*), intent(in) :: VariableName
+        character(*), intent(in) :: FileName
+        character(*), intent(in) :: VariableUnitName
+        logical(4), intent(in) :: doOutput
+
+        self%VariableName = trim(adjustl(VariableName))
+        self%FileName = trim(adjustl(dir_Output))//trim(adjustl(FileName))
+        self%num_unit = 99999999
+        self%VariableUnitName = trim(adjustl(VariableUnitName))
+        self%doOutput = doOutput
+
+    end subroutine ObservationVariable_Initialize
+
+    module subroutine Output_Observation_Initialize(self, Input, Coordinate, Domain)
+        implicit none
+        class(Output_Observation), intent(inout) :: self
+        type(Type_Input), intent(in) :: Input
+        type(DP3d), intent(inout), pointer :: Coordinate
+        type(Domain_t), intent(in), optional :: Domain
+
+        integer(int32) :: iObs, iElem, nElements
+        integer(int32) :: local_id, local_type, ierr
+        real(real64) :: tmp_xi, tmp_eta
+        logical(4) :: is_inside
+
+        self%ObservationType = Input%OutputSettings%ObservationType
+        self%NumObservation = Input%OutputSettings%NumObservation
+        select case (self%ObservationType)
+        case (1)
+            allocate (self%ObsNodeID, source=Input%OutputSettings%ObsID)
+        case (2)
+            call self%Cood_Obs%allocate(self%NumObservation)
+            self%Cood_Obs = Input%OutputSettings%Cood_Obs
+            allocate (self%Element(self%NumObservation))
+            allocate (self%obs_xi(self%NumObservation))
+            allocate (self%obs_eta(self%NumObservation))
+            if (.not. present(Domain)) then
+                stop "need Elements"
+            else
+                if (Input%Basic%DimensionType == 1) then
+                    do iObs = 1, self%NumObservation
+                        nElements = Domain%get_numElement()
+                        do iElem = 1, nElements
+                            call Domain%Elements(iElem)%e%is_inside(self%Cood_Obs%x(iObs), &
+                                                                    self%Cood_Obs%y(iObs), &
+                                                                    tmp_xi, &
+                                                                    tmp_eta, &
+                                                                    is_inside)
+                            if (is_inside) then
+                                local_id = Domain%Elements(iElem)%e%get_id()
+                                local_type = Domain%Elements(iElem)%e%get_type()
+                                call Create_Element(new_element=self%Element(iObs)%e, &
+                                                    shape_type=local_type, &
+                                                    ierr=ierr, &
+                                                    iElem=iElem, &
+                                                    Global_Coordinate=Coordinate, &
+                                                    Connectivity=Domain%Elements(iElem)%e%conn, &
+                                                    GroupID=local_id)
+                                self%obs_xi(iObs) = tmp_xi
+                                self%obs_eta(iObs) = tmp_eta
+                                exit
+                            end if
+                        end do
+                    end do
+                else if (Input%Basic%DimensionType == 2) then
+                    do iObs = 1, self%NumObservation
+                        nElements = Domain%get_numElement()
+                        do iElem = 1, nElements
+                            call Domain%Elements(iElem)%e%is_inside(self%Cood_Obs%x(iObs), &
+                                                                    self%Cood_Obs%z(iObs), &
+                                                                    tmp_xi, &
+                                                                    tmp_eta, &
+                                                                    is_inside)
+                            if (is_inside) then
+                                local_id = Domain%Elements(iElem)%e%get_id()
+                                local_type = Domain%Elements(iElem)%e%get_type()
+                                call Create_Element(new_element=self%Element(iObs)%e, &
+                                                    shape_type=local_type, &
+                                                    ierr=ierr, &
+                                                    iElem=iElem, &
+                                                    Global_Coordinate=Coordinate, &
+                                                    Connectivity=Domain%Elements(iElem)%e%conn, &
+                                                    GroupID=local_id)
+                                self%obs_xi(iObs) = tmp_xi
+                                self%obs_eta(iObs) = tmp_eta
+                                exit
+                            end if
+                        end do
+                    end do
+                end if
+            end if
+        end select
+
+    end subroutine Output_Observation_Initialize
+
     !----------------------------------------------------------------------!
     ! Write_Observation_Header:
     !----------------------------------------------------------------------!
@@ -25,140 +125,52 @@ contains
     !   - Uses the `to_string` procedure from stdlib_strings to build output format.
     !
     !----------------------------------------------------------------------!
-    module subroutine Write_Observation_Header(self, data_label, var_unit, num_unit, filename)
+    module subroutine Output_Observation_Write_Header(self, ObsVar, TimeUnit)
         use stdlib_strings, only: to_string
         implicit none
-        class(Type_Output) :: self
-        character(*), intent(in) :: data_label
-        character(*), intent(in) :: var_unit
-        character(*), intent(in) :: filename
-        integer(int32), intent(inout) :: num_unit
+        class(Output_Observation), intent(inout) :: self
+        class(ObservationVariable_t), intent(inout) :: ObsVar
+        character(*), intent(in) :: TimeUnit
 
         integer(int32) :: iObs, nObs
+        integer(int32) :: local_id
 
-        nObs = self%Observation%NumObservation
+        if (.not. ObsVar%doOutput) return
 
-        open (newunit=num_unit, file=trim(adjustl(filename)), status='replace', action='write')
+        nObs = self%NumObservation
 
-        write (num_unit, '(a)') "# "//trim(data_label)//" time variation"
-        write (num_unit, '(a)') "#"
+        open (newunit=ObsVar%num_unit, file=trim(adjustl(ObsVar%FileName)), status='replace', action='write')
 
-        select case (self%Observation%ObservationType)
+        write (ObsVar%num_unit, '(a)') "# "//trim(ObsVar%VariableName)//" time variation"
+        write (ObsVar%num_unit, '(a)') "#"
+
+        select case (self%ObservationType)
         case (1)
-            write (num_unit, '(a)') "# Observation Node ID"
+            write (ObsVar%num_unit, '(a)') "# Observation Node ID"
             do iObs = 1, nObs
-                write (num_unit, '(a,i0,a,x,i0)') "# Node ID ", iObs, ":", self%Observation%ObsNodeID(iObs)
+                write (ObsVar%num_unit, '(a,i0,a,x,i0)') "# Node ID ", iObs, ":", self%ObsNodeID(iObs)
             end do
         case (2)
-            write (num_unit, '(a)') "# Observation Coordinate (x,y,z)"
-            ! print *, self%Observation%Element(iObs)%e%ElementID
-            ! stop
+            write (ObsVar%num_unit, '(a)') "# Observation Coordinate (x,y,z)"
             do iObs = 1, nObs
-                write (num_unit, '(a,x,i0,a,3(x,es18.11,a),a,i0)') &
+                local_id = self%Element(iObs)%e%get_id()
+                write (ObsVar%num_unit, '(a,x,i0,a,3(x,es18.11,a),a,i0)') &
                     "#    Point", iObs, ": (", &
-                    self%Observation%Cood_Obs%x(iObs), ",", &
-                    self%Observation%Cood_Obs%y(iObs), ",", &
-                    self%Observation%Cood_Obs%z(iObs), ")", &
+                    self%Cood_Obs%x(iObs), ",", &
+                    self%Cood_Obs%y(iObs), ",", &
+                    self%Cood_Obs%z(iObs), ")", &
                     " => Element ID: ", &
-                    self%Observation%Element(iObs)%e%ElementID
+                    local_id
             end do
         end select
 
-        write (num_unit, '(a)') "#"
-        write (num_unit, '(a)') "# Output Unit: Time ["//trim(adjustl(self%Output_TimeUnit))//"], "//trim(data_label)//" ["//trim(var_unit)//"]"
-        write (num_unit, '(a)') "#"
-        write (num_unit, '(a,'//to_string(nObs)//'(2x,a))') "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
-    end subroutine Write_Observation_Header
+        write (ObsVar%num_unit, '(a)') "#"
+        write (ObsVar%num_unit, '(a)') "# Output Unit: Time ["//trim(adjustl(TimeUnit))//"], " & !&
+                                        //trim(ObsVar%VariableName)//" ["//trim(ObsVar%VariableUnitName)//"]" !&
+        write (ObsVar%num_unit, '(a)') "#"
+        write (ObsVar%num_unit, '(a,'//to_string(nObs)//'(2x,a))') "Time", ("Obs"//to_string(iObs), iObs=1, nObs)
 
-    !----------------------------------------------------------------------!
-    ! Initialize_Observation_Header:
-    !----------------------------------------------------------------------!
-    ! This subroutine initializes the header section for a specific type of
-    ! observation data by calling the appropriate Write_Observation_Header
-    ! routine with relevant parameters.
-    !
-    ! Arguments:
-    !   self      : Object of Type_Output class containing observation data.
-    !   data_name : String indicating the type of observation to process.
-    !               Supported values include:
-    !                 - "Temperature"
-    !                 - "Si" (Ice content)
-    !                 - "TC" (Thermal conductivity)
-    !                 - "C" (Volumetric Heat Capacity)
-    !                 - "Pressure"
-    !                 - "wFlux" (Water flux)
-    !                 - "K" (Hydraulic conductivity)
-    !
-    ! Subroutine Details:
-    !   - Based on the value of `data_name`, selects the corresponding
-    !     observation property in the object.
-    !   - Calls Write_Observation_Header with the appropriate label,
-    !     unit, output file name, and unit number (if it is valid).
-    !   - If an unknown observation type is passed, an error message is
-    !     printed and the program is terminated.
-    !
-    !----------------------------------------------------------------------!
-    module subroutine Initialize_Observation_Header(self, data_name)
-        implicit none
-        class(Type_Output) :: self
-        character(*), intent(in) :: data_name
-
-        select case (data_name)
-        case ("Temperature")
-            if (self%Observation%Temperature%numUnit >= 0) then
-                call self%Write_Observation_Header(data_label="Temperature", &
-                                                   var_unit=self%Observation%Temperature%VariableUnit, &
-                                                   num_unit=self%Observation%Temperature%numUnit, &
-                                                   filename=self%Observation%Temperature%Filename)
-            end if
-        case ("Si")
-            if (self%Observation%Si%numUnit >= 0) then
-                call self%Write_Observation_Header(data_label="Ice content", &
-                                                   var_unit=self%Observation%Si%VariableUnit, &
-                                                   num_unit=self%Observation%Si%numUnit, &
-                                                   filename=self%Observation%Si%Filename)
-            end if
-        case ("TC")
-            if (self%Observation%TC%numUnit >= 0) then
-                call self%Write_Observation_Header(data_label="Thermal conductivity", &
-                                                   var_unit=self%Observation%TC%VariableUnit, &
-                                                   num_unit=self%Observation%TC%numUnit, &
-                                                   filename=self%Observation%TC%Filename)
-            end if
-        case ("C")
-            if (self%Observation%C%numUnit >= 0) then
-                call self%Write_Observation_Header(data_label="Volumetric Heat Capacity", &
-                                                   var_unit=self%Observation%C%VariableUnit, &
-                                                   num_unit=self%Observation%C%numUnit, &
-                                                   filename=self%Observation%C%Filename)
-            end if
-        case ("Pressure")
-            if (self%Observation%Pressure%numUnit >= 0) then
-                call self%Write_Observation_Header(data_label="Pressure", &
-                                                   var_unit=self%Observation%Pressure%VariableUnit, &
-                                                   num_unit=self%Observation%Pressure%numUnit, &
-                                                   filename=self%Observation%Pressure%Filename)
-            end if
-        case ("wFlux")
-            if (self%Observation%wFlux%numUnit >= 0) then
-                call self%Write_Observation_Header(data_label="Water flux", &
-                                                   var_unit=self%Observation%wFlux%VariableUnit, &
-                                                   num_unit=self%Observation%wFlux%numUnit, &
-                                                   filename=self%Observation%wFlux%Filename)
-            end if
-        case ("K")
-            if (self%Observation%K%numUnit >= 0) then
-                call self%Write_Observation_Header(data_label="Hydraulic conductivity", &
-                                                   var_unit=self%Observation%K%VariableUnit, &
-                                                   num_unit=self%Observation%K%numUnit, &
-                                                   filename=self%Observation%K%Filename)
-            end if
-        case default
-            write (*, *) "Error: Unknown observation type: ", trim(adjustl(data_name))
-            stop
-        end select
-
-    end subroutine Initialize_Observation_Header
+    end subroutine Output_Observation_Write_Header
 
     !----------------------------------------------------------------------!
     ! Interpolate_ObsValues:
@@ -182,29 +194,146 @@ contains
     !     coordinates (xi, eta).
     !
     !----------------------------------------------------------------------!
-    module subroutine Interpolate_ObsValues(self, nodal_values, obs_values)
+    module subroutine Interpolate_ObsValues_Temperature(obs_values, observation_data, nodal_temperature, &
+                                                        nodal_porosity, nodal_Pw, Properties)
         implicit none
-        class(Type_Output), intent(in) :: self
-        real(real64), intent(in) :: nodal_values(:)
-        real(real64), intent(inout) :: obs_values(:)
+        real(real64), intent(out) :: obs_values(:)
+        type(Output_Observation), intent(in) :: observation_data
+        real(real64), intent(in), optional :: nodal_temperature(:)
+        real(real64), intent(in), optional :: nodal_porosity(:)
+        real(real64), intent(in), optional :: nodal_Pw(:)
+        type(Proereties_Model_t), intent(in), optional :: Properties
 
-        integer(int32) :: iObs, iN, nNodes
+        integer(int32) :: iObs
 
         ! Initialize to zero
-        obs_values = 0.0d0
+        obs_values(:) = 0.0d0
+        if (.not. present(nodal_temperature)) return
 
-        ! Perform interpolation
-        do iObs = 1, self%Observation%NumObservation
-            nNodes = self%Observation%Element(iObs)%e%getNumNodes()
-            do iN = 1, nNodes
-                obs_values(iObs) = obs_values(iObs) + &
-                                   nodal_values(self%Observation%Element(iObs)%e%conn(iN)) * &
-                                   self%Observation%Element(iObs)%e%psi(iN, &
-                                                                        self%Observation%obs_xi(iObs), &
-                                                                        self%Observation%obs_eta(iObs))
-            end do
+        do iObs = 1, observation_data%NumObservation
+            obs_values(iObs) = observation_data%Element(iObs)%e%Interpolate( &
+                               observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
         end do
-    end subroutine Interpolate_ObsValues
+    end subroutine Interpolate_ObsValues_Temperature
+
+    module subroutine Interpolate_ObsValues_Si(obs_values, observation_data, nodal_temperature, &
+                                               nodal_porosity, nodal_Pw, Properties)
+        implicit none
+        real(real64), intent(out) :: obs_values(:)
+        type(Output_Observation), intent(in) :: observation_data
+        real(real64), intent(in), optional :: nodal_temperature(:)
+        real(real64), intent(in), optional :: nodal_porosity(:)
+        real(real64), intent(in), optional :: nodal_Pw(:)
+        type(Proereties_Model_t), intent(in), optional :: Properties
+
+        type(GaussPointState_t) :: state
+        integer(int32) :: iObs
+
+        ! Initialize to zero
+        obs_values(:) = 0.0d0
+        if (.not. present(nodal_temperature)) return
+        if (.not. present(nodal_porosity)) return
+        if (.not. present(nodal_Pw)) state%pressure = 101325.0d0
+        if (.not. present(Properties)) return
+
+        do iObs = 1, observation_data%NumObservation
+            state%temperature = observation_data%Element(iObs)%e%Interpolate( &
+                                observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
+            state%porosity = observation_data%Element(iObs)%e%Interpolate( &
+                             observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_porosity(:))
+            state%water_content = Properties%get_Qw(state, observation_data%Element(iObs)%e%get_group())
+            obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
+        end do
+    end subroutine Interpolate_ObsValues_Si
+
+    module subroutine Interpolate_ObsValues_THC(obs_values, observation_data, nodal_temperature, &
+                                                nodal_porosity, nodal_Pw, Properties)
+        implicit none
+        real(real64), intent(out) :: obs_values(:)
+        type(Output_Observation), intent(in) :: observation_data
+        real(real64), intent(in), optional :: nodal_temperature(:)
+        real(real64), intent(in), optional :: nodal_porosity(:)
+        real(real64), intent(in), optional :: nodal_Pw(:)
+        type(Proereties_Model_t), intent(in), optional :: Properties
+
+        type(GaussPointState_t) :: state
+        integer(int32) :: iObs, group_id
+
+        ! Initialize to zero
+        obs_values(:) = 0.0d0
+        if (.not. present(nodal_temperature)) return
+        if (.not. present(nodal_porosity)) return
+        if (.not. present(Properties)) return
+        if (.not. present(nodal_Pw)) then
+            state%pressure = 101325.0d0
+
+            do iObs = 1, observation_data%NumObservation
+                state%temperature = observation_data%Element(iObs)%e%Interpolate( &
+                                    observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
+                state%porosity = observation_data%Element(iObs)%e%Interpolate( &
+                                 observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_porosity(:))
+                group_id = observation_data%Element(iObs)%e%get_group()
+                state%water_content = Properties%get_Qw(state, group_id)
+                obs_values(iObs) = Properties%get_lambda(state, group_id)
+            end do
+        end if
+    end subroutine Interpolate_ObsValues_THC
+
+    module subroutine Interpolate_ObsValues_VHC(obs_values, observation_data, nodal_temperature, &
+                                                nodal_porosity, nodal_Pw, Properties)
+        implicit none
+        real(real64), intent(out) :: obs_values(:)
+        type(Output_Observation), intent(in) :: observation_data
+        real(real64), intent(in), optional :: nodal_temperature(:)
+        real(real64), intent(in), optional :: nodal_porosity(:)
+        real(real64), intent(in), optional :: nodal_Pw(:)
+        type(Proereties_Model_t), intent(in), optional :: Properties
+
+        type(GaussPointState_t) :: state
+        integer(int32) :: iObs, group_id
+
+        ! Initialize to zero
+        obs_values(:) = 0.0d0
+        if (.not. present(nodal_temperature)) return
+        if (.not. present(nodal_porosity)) return
+        if (.not. present(Properties)) return
+        if (.not. present(nodal_Pw)) then
+            state%pressure = 101325.0d0
+
+            do iObs = 1, observation_data%NumObservation
+                state%temperature = observation_data%Element(iObs)%e%Interpolate( &
+                                    observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
+                state%porosity = observation_data%Element(iObs)%e%Interpolate( &
+                                 observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_porosity(:))
+                group_id = observation_data%Element(iObs)%e%get_group()
+                state%water_content = Properties%get_Qw(state, group_id)
+                obs_values(iObs) = Properties%get_Ca(state, group_id)
+            end do
+        end if
+    end subroutine Interpolate_ObsValues_VHC
+
+    module subroutine Interpolate_ObsValues_Pw(obs_values, observation_data, nodal_temperature, &
+                                               nodal_porosity, nodal_Pw, Properties)
+        implicit none
+        real(real64), intent(out) :: obs_values(:)
+        type(Output_Observation), intent(in) :: observation_data
+        real(real64), intent(in), optional :: nodal_temperature(:)
+        real(real64), intent(in), optional :: nodal_porosity(:)
+        real(real64), intent(in), optional :: nodal_Pw(:)
+        type(Proereties_Model_t), intent(in), optional :: Properties
+
+        type(GaussPointState_t) :: state
+        integer(int32) :: iObs, group_id
+
+        ! Initialize to zero
+        obs_values(:) = 0.0d0
+        if (.not. present(nodal_Pw)) return
+
+        do iObs = 1, observation_data%NumObservation
+            obs_values(iObs) = observation_data%Element(iObs)%e%Interpolate( &
+                               observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_Pw(:))
+        end do
+    end subroutine Interpolate_ObsValues_Pw
 
     !----------------------------------------------------------------------!
     ! Output_Observation_Line:
@@ -265,7 +394,7 @@ contains
     !   - Supports extensibility by checking optional arguments and types (e.g., GCC, EXP models).
     !
     !----------------------------------------------------------------------!
-    module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi)
+    module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi, Propeties)
         implicit none
         class(Type_Output) :: self
         real(real64), intent(in) :: time
@@ -278,6 +407,7 @@ contains
         real(real64), intent(in), optional :: K(:)
         class(Abstract_Thermal), intent(inout), optional :: Thermal
         real(real64), intent(in), optional :: phi(:)
+        type(Proereties_Model_t), intent(inout), optional :: Propeties
 
         real(real64) :: obsValues(self%Observation%NumObservation)
         real(real64) :: tmpValues(self%Observation%NumObservation)
@@ -286,57 +416,23 @@ contains
         integer(int32) :: iObs
 
         !! Temperature
-        if (self%doHeat .and. &
-            self%Observation%Temperature%doOutput .and. &
-            present(Temp) &
-            ) then
-            call self%Initialize_Observation_Header("Temperature")
-            select case (self%Observation%ObservationType)
-            case (1)
-                call Output_Observation_Line(self%Observation%Temperature%numUnit, time, Temp(self%Observation%ObsNodeID(:)))
-            case (2)
-                call self%Interpolate_ObsValues(Temp, obsValues)
-                call Output_Observation_Line(self%Observation%Temperature%numUnit, time, obsValues)
-            end select
-        end if
+        do iObs = 1, size(self%Observation%Variables)
+            if (self%Observation%Variables(iObs)%doOutput) then
+                select case (self%Observation%ObservationType)
+                case (1)
+                    call Output_Observation_Line(self%Observation%Variables(iObs)%num_unit, time, Temp(self%Observation%ObsNodeID(:)))
+                case (2)
+                    call self%Observation%Variables(iObs)%get_values(obs_values=obsValues, &
+                                                                     observation_data=self%Observation, &
+                                                                     nodal_temperature=Temp, &
+                                                                     nodal_porosity=phi, &
+                                                                     properties=Propeties &
+                                                                     )
 
-        !! Ice content
-        if (self%doHeat .and. &
-            self%Observation%Si%doOutput .and. &
-            present(Si) &
-            ) then
-            select case (self%Observation%ObservationType)
-            case (1)
-                call Output_Observation_Line(self%Observation%Si%numUnit, time, Si(self%Observation%ObsNodeID(:)))
-            case (2)
-                obsValues(:) = 0.0d0
-                tmpValues(:) = 0.0d0
-                if (present(Thermal) .and. present(Temp) .and. present(phi)) then
-                    call self%Interpolate_ObsValues(Si, obsValues)
-
-                    select type (Ice => Thermal%Ice(1)%f)
-                    type is (Type_Ice_GCC)
-                        call self%Interpolate_ObsValues(phi, tmpValues)
-                        call self%Interpolate_ObsValues(Temp, obsValues)
-                        do iObs = 1, self%Observation%NumObservation
-                            obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
-                        end do
-                    type is (Type_Ice_EXP)
-                        call self%Interpolate_ObsValues(phi, tmpValues)
-                        call self%Interpolate_ObsValues(Temp, obsValues)
-                        do iObs = 1, self%Observation%NumObservation
-                            obsValues(iObs) = Ice%Calculate_Ice(T=obsValues(iObs), phi=tmpValues(iObs))
-                        end do
-                    end select
-                    ! print *, obsValues(:)
-                    ! stop
-                    call Output_Observation_Line(self%Observation%Si%numUnit, time, obsValues)
-                else
-                    call self%Interpolate_ObsValues(Si, obsValues)
-                    call Output_Observation_Line(self%Observation%Si%numUnit, time, obsValues)
-                end if
-            end select
-        end if
+                    call Output_Observation_Line(self%Observation%Variables(iObs)%num_unit, time, obsValues)
+                end select
+            end if
+        end do
 
     end subroutine Output_Process_Observation
 

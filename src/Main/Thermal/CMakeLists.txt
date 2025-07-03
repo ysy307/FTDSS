@@ -1,15 +1,16 @@
-add_library(Thermal
+add_library(Thermal OBJECT
     Thermal.F90
     Thermal_3Phase.F90
 )
 target_link_libraries(Thermal PRIVATE
     Core
     Input
-    Calc_Ice
+    Domain
     Calc_THC
     Calc_VHC
     Calc_DEN
     Calc_SPH
+    Properties
     Matrix
     Boundary
     Initial

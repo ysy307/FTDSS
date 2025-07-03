@@ -1,155 +1,145 @@
-module Calculate_HeatCapacity
+module Calculate_VolumetricHeatCapacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes
-    use :: Core_Allocate, only:Allocate_Array
-    use :: Inout_Input
-    use :: Calculate_Ice
-    use :: Calculate_GCC
-    use :: Calculate_Density
+    use :: Core_BaseTypes, only:GaussPointState_t
+    use :: Inout_Input, only:Type_Input
+    use :: Calculate_Density, only:DENHolder
     implicit none
-    !----------------------------------------------------------------------------------------------------
-    ! Access settings
-    !----------------------------------------------------------------------------------------------------
     private
-    !----------------------------------------------------------------------------------------------------
-    ! Public abstract types
-    !----------------------------------------------------------------------------------------------------
-    public :: Abstract_HeatCapacity
-    !----------------------------------------------------------------------------------------------------
-    ! Public types
-    !----------------------------------------------------------------------------------------------------
-    public :: Type_HeatCapacity_3Phase_Apparent
-    !----------------------------------------------------------------------------------------------------
 
-    type, abstract :: Abstract_HeatCapacity
-        integer(int32) :: nsize
-        integer(int32) :: nRegion
-        real(real64), allocatable :: value(:, :)
+    ! --- 公開する型定義 ---
+    public :: VHCHolder
+    public :: Abst_VHC
+    public :: Type_VHC_3Phase
+    public :: Type_VHC_3Phase_Apparent
+
+    ! --- ポリモーフィックなコンテナ ---
+    type :: VHCHolder
+        class(Abst_VHC), allocatable :: c
     contains
-        procedure(Abstract_Calculate_HeatCapacity), pass(self), deferred :: Calculate
-        procedure(Abstract_Update_HeatCapacity), pass(self), deferred :: Update
-    end type Abstract_HeatCapacity
+        procedure, pass(self) :: initialize => VHCHolder_initialize
+    end type VHCHolder
 
-    type, extends(Abstract_HeatCapacity) :: Type_HeatCapacity_3Phase_Apparent
-        real(real64), allocatable :: soil(:)
-        real(real64), allocatable :: water(:)
-        real(real64), allocatable :: ice(:)
+    ! --- 密度の抽象基底クラス (インターフェースの契約) ---
+    type, abstract :: Abst_VHC
+        integer(int32) :: region_id
+        real(real64) :: Material1 !! soil, rock, concrete
+        real(real64) :: Material2 !! water
+        real(real64) :: Material3 !! ice
+        real(real64) :: Material4 !! gas
     contains
-        procedure, pass(self) :: Calculate => Calc_HTC_3A_Wrap
-        procedure, pass(self) :: Update => Update_HTC_3A
-    end type Type_HeatCapacity_3Phase_Apparent
-    !----------------------------------------------------------------------------------------------------
+        procedure(Abst_Calc_VHC_GaussPoint), pass(self), deferred :: Calc_GaussPoint
+    end type Abst_VHC
 
+    ! --- 3相モデルの具象クラス ---
+    type, extends(Abst_VHC) :: Type_VHC_3Phase
+    contains
+        ! Calcの具体的な実装としてCalc_VHC_3_Wrapをバインドする
+        procedure :: Calc_GaussPoint => Calc_VHC_GaussPoint_3Phase
+    end type Type_VHC_3Phase
+    type, extends(Abst_VHC) :: Type_VHC_3Phase_Apparent
+    contains
+        ! Calcの具体的な実装としてCalc_VHC_3_Wrapをバインドする
+        procedure :: Calc_GaussPoint => Calc_VHC_GaussPoint_3Phase_Apparent
+    end type Type_VHC_3Phase_Apparent
+
+    ! --- 手続きのインターフェース宣言 ---
     abstract interface
-        function Abstract_Calculate_HeatCapacity(self, NodeBelonging, phi1, phi2, phi3, phi4, &
-                                                 Ice, Temperature, Density, Pw) result(HeatCapacity)
-            import :: Abstract_HeatCapacity, Abstract_Ice, Belonging, real64, Abstract_Density
+        function Abst_Calc_VHC_GaussPoint(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+            import :: Abst_VHC, GaussPointState_t, real64, DENHolder
             implicit none
-            class(Abstract_HeatCapacity), intent(in) :: self
-            type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in), optional :: phi1
-            real(real64), intent(in), optional :: phi2
-            real(real64), intent(in), optional :: phi3
-            real(real64), intent(in), optional :: phi4
-            class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature
-            class(Abstract_Density), intent(inout), optional :: Density
-            real(real64), intent(in), optional :: Pw
-            real(real64) :: HeatCapacity
-
-        end function Abstract_Calculate_HeatCapacity
-
-        subroutine Abstract_Update_HeatCapacity(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, &
-                                                Ice, Temperature, Density, arr_Pw)
-            import :: Abstract_HeatCapacity, Abstract_Ice, Belonging, real64, Abstract_Density
-            implicit none
-            class(Abstract_HeatCapacity), intent(inout) :: self
-            type(Belonging), intent(inout) :: NodeBelonging(:)
-            real(real64), intent(in), optional :: arr_phi1(:)
-            real(real64), intent(in), optional :: arr_phi2(:)
-            real(real64), intent(in), optional :: arr_phi3(:)
-            real(real64), intent(in), optional :: arr_phi4(:)
-            class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature(:)
-            class(Abstract_Density), intent(inout), optional :: Density
-            real(real64), intent(in), optional :: arr_Pw(:)
-
-        end subroutine Abstract_Update_HeatCapacity
-
+            class(Abst_VHC), intent(in) :: self
+            type(GaussPointState_t), intent(in) :: state
+            type(DENHolder), intent(in), optional :: DEN
+            real(real64), intent(in), optional :: LatentHeat
+            real(real64), intent(in), optional :: dQi_dT
+            real(real64) :: VHC
+        end function Abst_Calc_VHC_GaussPoint
     end interface
 
     interface
-        module function Calc_HTC_3(NodeBelonging, HeatCapacity_soil, phi_soil, &
-                                   HeatCapacity_water, phi_water, HeatCapacity_ice, phi_ice) result(HeatCapacity)
+        module subroutine VHCHolder_initialize(self, iRegion, Input)
             implicit none
-            type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in) :: HeatCapacity_soil(:)
-            real(real64), intent(in) :: phi_soil
-            real(real64), intent(in) :: HeatCapacity_water(:)
-            real(real64), intent(in) :: phi_water
-            real(real64), intent(in) :: HeatCapacity_ice(:)
-            real(real64), intent(in) :: phi_ice
-            real(real64) :: HeatCapacity
-
-        end function Calc_HTC_3
-
-        module function Calc_HTC_3A(NodeBelonging, Cp, Ice, Temperature, Density, Pw) result(HeatCapacity)
-            implicit none
-            type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in) :: Cp
-            class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature
-            class(Abstract_Density), intent(inout), optional :: Density
-            real(real64), intent(in), optional :: Pw
-            real(real64) :: HeatCapacity
-
-        end function Calc_HTC_3A
-    end interface
-
-    interface
-        module function HTC_3A_Construct(Input) result(Structure)
-            implicit none
-            class(Abstract_HeatCapacity), allocatable :: Structure
+            class(VHCHolder), intent(inout) :: self
+            integer(int32), intent(in) :: iRegion
             type(Type_Input), intent(in) :: Input
+        end subroutine VHCHolder_initialize
 
-        end function HTC_3A_Construct
-
-        module function Calc_HTC_3A_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4, &
-                                         Ice, Temperature, Density, Pw) result(HeatCapacity)
+        module function VHC_3_Construct(iRegion, Input) result(Structure)
+            import :: Abst_VHC, Type_Input
             implicit none
-            class(Type_HeatCapacity_3Phase_Apparent), intent(in) :: self
-            type(Belonging), intent(inout) :: NodeBelonging
-            real(real64), intent(in), optional :: phi1
-            real(real64), intent(in), optional :: phi2
-            real(real64), intent(in), optional :: phi3
-            real(real64), intent(in), optional :: phi4
-            class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature
-            class(Abstract_Density), intent(inout), optional :: Density
-            real(real64), intent(in), optional :: Pw
-            real(real64) :: HeatCapacity
+            class(Abst_VHC), allocatable :: Structure
+            integer(int32), intent(in) :: iRegion
+            type(Type_Input), intent(in) :: Input
+        end function VHC_3_Construct
 
-        end function Calc_HTC_3A_Wrap
-
-        module subroutine Update_HTC_3A(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4, &
-                                        Ice, Temperature, Density, arr_Pw)
+        module function Calc_VHC_GaussPoint_3Phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+            ! import :: Type_VHC_3Phase, GaussPointState_t
             implicit none
-            class(Type_HeatCapacity_3Phase_Apparent), intent(inout) :: self
-            type(Belonging), intent(inout) :: NodeBelonging(:)
-            real(real64), intent(in), optional :: arr_phi1(:)
-            real(real64), intent(in), optional :: arr_phi2(:)
-            real(real64), intent(in), optional :: arr_phi3(:)
-            real(real64), intent(in), optional :: arr_phi4(:)
-            class(Abstract_Ice), intent(inout), optional :: Ice
-            real(real64), intent(in), optional :: Temperature(:)
-            class(Abstract_Density), intent(inout), optional :: Density
-            real(real64), intent(in), optional :: arr_Pw(:)
+            class(Type_VHC_3Phase), intent(in) :: self
+            type(GaussPointState_t), intent(in) :: state
+            type(DENHolder), intent(in), optional :: DEN
+            real(real64), intent(in), optional :: LatentHeat
+            real(real64), intent(in), optional :: dQi_dT
+            real(real64) :: VHC
+        end function Calc_VHC_GaussPoint_3Phase
 
-        end subroutine Update_HTC_3A
+        module function VHC_3A_Construct(iRegion, Input) result(Structure)
+            import :: Abst_VHC, Type_Input
+            implicit none
+            class(Abst_VHC), allocatable :: Structure
+            integer(int32), intent(in) :: iRegion
+            type(Type_Input), intent(in) :: Input
+        end function VHC_3A_Construct
+
+        module function Calc_VHC_GaussPoint_3Phase_Apparent(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+            implicit none
+            class(Type_VHC_3Phase_Apparent), intent(in) :: self
+            type(GaussPointState_t), intent(in) :: state
+            type(DENHolder), intent(in), optional :: DEN
+            real(real64), intent(in), optional :: LatentHeat
+            real(real64), intent(in), optional :: dQi_dT
+            real(real64) :: VHC
+        end function Calc_VHC_GaussPoint_3Phase_Apparent
     end interface
 
-    interface Type_HeatCapacity_3Phase_Apparent
-        module procedure :: HTC_3A_Construct
+    interface
+
+        module function Calc_VHC_3(VHC_soil, phi_soil, &
+                                   VHC_water, phi_water, &
+                                   VHC_ice, phi_ice) result(VHC)
+            implicit none
+            real(real64), intent(in) :: VHC_soil
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: VHC_water
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(in) :: VHC_ice
+            real(real64), intent(in) :: phi_ice
+            real(real64) :: VHC
+        end function Calc_VHC_3
+
+        module function Calc_VHC_3A(VHC_soil, phi_soil, VHC_water, phi_water, &
+                                    VHC_ice, phi_ice, Lf, DEN_ice, dQi_dT) result(VHC)
+            implicit none
+            real(real64), intent(in) :: VHC_soil
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: VHC_water
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(in) :: VHC_ice
+            real(real64), intent(in) :: phi_ice
+            real(real64), intent(in) :: Lf
+            real(real64), intent(in) :: DEN_ice
+            real(real64), intent(in) :: dQi_dT
+            real(real64) :: VHC
+
+        end function Calc_VHC_3A
     end interface
 
-end module Calculate_HeatCapacity
+    interface Type_VHC_3Phase
+        module procedure VHC_3_Construct
+    end interface
+
+    interface Type_VHC_3Phase_Apparent
+        module procedure VHC_3A_Construct
+    end interface
+
+end module Calculate_VolumetricHeatCapacity

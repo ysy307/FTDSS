@@ -1,9 +1,24 @@
 # CMake Minimum Version
 cmake_minimum_required(VERSION 3.30)
 
+# コンパイラ指定
+if(DEFINED COMPILER)
+    if(COMPILER STREQUAL "intel")
+        set(CMAKE_Fortran_COMPILER ifx CACHE STRING "" FORCE)
+        set(CMAKE_C_COMPILER icx CACHE STRING "" FORCE)
+        set(CMAKE_CXX_COMPILER icpx CACHE STRING "" FORCE)
+    elseif(COMPILER STREQUAL "gnu")
+        set(CMAKE_Fortran_COMPILER gfortran CACHE STRING "" FORCE)
+        set(CMAKE_C_COMPILER gcc CACHE STRING "" FORCE)
+        set(CMAKE_CXX_COMPILER g++ CACHE STRING "" FORCE)
+    else()
+        message(FATAL_ERROR "Unknown COMPILER specified: ${COMPILER}")
+    endif()
+endif()
+
 # Project Name and Language
-project(YSY_FC LANGUAGES Fortran)
-enable_language(Fortran)
+project(YSY_FC LANGUAGES Fortran C CXX)
+enable_language(Fortran C CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -27,32 +42,28 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_INCLUDE_PATH             ${PROJECT_SOURCE_DIR}/include)
 
-
 # 共通スクリプト読み込み
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
 
-### Compiler Configuration
-if(NOT DEFINED CMAKE_Fortran_COMPILER)
-    set(CMAKE_Fortran_COMPILER ifx)
-endif()
-
 # Source Files
 add_subdirectory(src/Core)
-add_subdirectory(src/Matrix)
 add_subdirectory(src/Inout/Input)
-add_subdirectory(src/Conditions/Boundary)
-add_subdirectory(src/Conditions/Initial)
+add_subdirectory(src/Domain)
+add_subdirectory(src/Matrix)
 add_subdirectory(src/Calculate/BLAS)
 add_subdirectory(src/Calculate/WRF)
 add_subdirectory(src/Calculate/HCF)
 add_subdirectory(src/Calculate/GCC)
 add_subdirectory(src/Calculate/ThermalConductivity)
+add_subdirectory(src/Properties)
 add_subdirectory(src/Calculate/Density)
 add_subdirectory(src/Calculate/SpecificHeat)
 add_subdirectory(src/Calculate/HeatCapacity)
-add_subdirectory(src/Calculate/Ice)
+add_subdirectory(src/Conditions/Boundary)
+add_subdirectory(src/Conditions/Initial)
 add_subdirectory(src/Solver)
+add_subdirectory(src/Time)
 add_subdirectory(src/Main/Thermal)
 add_subdirectory(src/Inout/Output)
 add_subdirectory(src/Main/FTDSS)
@@ -69,50 +80,29 @@ if(BUILD_APP STREQUAL "ysy_fc")
     add_executable(ysy_fc ${MAIN_FILE})
     target_link_libraries(ysy_fc PRIVATE
         Core
-        Matrix
-        Calc_BLAS
         Input
-        Boundary
-        Initial
+        Domain
         Calc_WRF
         Calc_HCF
         Calc_GCC
-        Calc_Ice
         Calc_THC
-        Calc_VHC
         Calc_DEN
         Calc_SPH
+        Calc_VHC
+        Properties
+        Matrix
+        Calc_BLAS
+        Boundary
+        Initial
         Solver
+        Time
         Thermal
         Output
         FTDSS
-        ${LINK_LIBRARIES}
     )
-    target_link_libraries(ysy_fc PRIVATE ${LINK_LIBRARIES})
-    target_include_directories(ysy_fc PUBLIC ${My_INCLUDE_PATH})
-    
+    enable_build_flags(ysy_fc)
+    enable_thirdparty (ysy_fc)
 
-    # Compilation Flags
-    target_compile_options(ysy_fc PUBLIC -fpp -traceback)
-    target_link_options   (ysy_fc PUBLIC -fpp -traceback)
-
-    # MKL Configuration
-    if(ENABLE_MKL)
-        set(MKL_LINK "static")
-        find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
-        target_compile_options    (ysy_fc PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
-        target_include_directories(ysy_fc PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
-        target_link_libraries     (ysy_fc PUBLIC $<LINK_ONLY:MKL::MKL>)
-        add_definitions(-D_MKL)
-    endif()
-
-    if(ENABLE_DEBUG)
-        target_compile_options(ysy_fc PUBLIC -O0 -g -check all)
-        target_link_options   (ysy_fc PUBLIC -O0 -g -check all)
-    elseif(ENABLE_OPTIMIZE)
-        target_compile_options(ysy_fc PUBLIC -O3 -flto -xCORE-AVX2)
-        target_link_options   (ysy_fc PUBLIC -O3 -flto -xCORE-AVX2)
-    endif()
 
     # Custom Run Target
     add_custom_target(run_ysy_fc
@@ -123,32 +113,28 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
-    target_include_directories(test PUBLIC ${My_INCLUDE_PATH})
-    # target_compile_options(test PUBLIC -fpp -traceback)
-    # target_link_options   (test PUBLIC -fpp -traceback)
-
-    # Link core libraries
     target_link_libraries(test PRIVATE
         Core
-        Matrix
-        Calc_BLAS
         Input
-        Boundary
-        Initial
+        Domain
         Calc_WRF
         Calc_HCF
         Calc_GCC
-        Calc_Ice
         Calc_THC
-        Calc_VHC
         Calc_DEN
+        Calc_SPH
+        Calc_VHC
+        Properties
+        Matrix
+        Calc_BLAS
+        Boundary
+        Initial
         Solver
+        Time
         Thermal
         Output
         FTDSS
-        ${LINK_LIBRARIES}
     )
-
     enable_build_flags(test)
     enable_thirdparty (test)
 

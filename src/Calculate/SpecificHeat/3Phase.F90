@@ -1,73 +1,61 @@
-submodule(Calculate_SpecificHeat) Calculate_SpecificHeat_3Phase
+submodule(Calculate_SpecificHeat) Calc_SPH_3
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
-    ! Construct each type of SpecificHeat
+    ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function SPH_3_Construct(Input) result(structure)
+    module function SPH_3_Construct(iRegion, Input) result(Structure)
         implicit none
+        class(Abst_SPH), allocatable :: Structure
+        integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
-        class(Abstract_SpecificHeat), allocatable :: structure
 
-        integer(int32) :: iRegion
+        if (allocated(Structure)) deallocate (Structure)
+        allocate (Type_SPH_3Phase :: Structure)
 
-        allocate (Type_SpecificHeat_3Phase :: structure)
-        select type (this => structure)
-        type is (Type_SpecificHeat_3Phase)
-            this%nRegion = Input%Basic%numRegion
-            call Allocate_Array(this%soil, this%nRegion)
-            call Allocate_Array(this%water, this%nRegion)
-            call Allocate_Array(this%ice, this%nRegion)
-
-            do iRegion = 1, this%nRegion
-                this%soil(iRegion) = Input%Regions(iRegion)%Thermal%c(1)
-                this%water(iRegion) = Input%Regions(iRegion)%Thermal%c(2)
-                this%ice(iRegion) = Input%Regions(iRegion)%Thermal%c(3)
-            end do
-
-            this%nsize = Input%VTK%numPoints
-            call Allocate_Array(this%value, this%nsize, 1_int32)
-            this%value(:, :) = 0.0d0
-
-        end select
+        Structure%Material1 = Input%Regions(iRegion)%Thermal%c(1)
+        Structure%Material2 = Input%Regions(iRegion)%Thermal%c(2)
+        Structure%Material3 = Input%Regions(iRegion)%Thermal%c(3)
 
     end function SPH_3_Construct
 
-    module function Calc_SPH_3_Wrap(self, NodeBelonging, phi1, phi2, phi3, phi4) result(SpecificHeat)
+    module function Calc_SPH_GaussPoint_3Phase(self, state) result(SPH)
         implicit none
-        class(Type_SpecificHeat_3Phase), intent(in) :: self
-        type(Belonging), intent(inout) :: NodeBelonging
-        real(real64), intent(in), optional :: phi1
-        real(real64), intent(in), optional :: phi2
-        real(real64), intent(in), optional :: phi3
-        real(real64), intent(in), optional :: phi4
-        real(real64) :: SpecificHeat
+        class(Type_SPH_3Phase), intent(in) :: self
+        type(GaussPointState_t), intent(in) :: state
+        real(real64) :: SPH
 
-        SpecificHeat = Calc_SPH_3(NodeBelonging, self%soil, phi1, self%water, phi2, self%ice, phi3)
-    end function Calc_SPH_3_Wrap
+        real(real64) :: phi1, phi2, phi3
 
-    module subroutine Update_SPH_3(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4)
-        implicit none
-        class(Type_SpecificHeat_3Phase), intent(inout) :: self
-        type(Belonging), intent(inout) :: NodeBelonging(:)
-        real(real64), intent(in), optional :: arr_phi1(:)
-        real(real64), intent(in), optional :: arr_phi2(:)
-        real(real64), intent(in), optional :: arr_phi3(:)
-        real(real64), intent(in), optional :: arr_phi4(:)
-        integer(int32) :: iN
-        real(real64) :: SpecificHeat_soil, SpecificHeat_water, SpecificHeat_ice
+        phi1 = 1.0d0 - state%porosity
+        phi2 = state%water_content
+        phi3 = 1.0d0 - phi1 - phi2
 
-        !$omp parallel do private(iN)
-        do iN = 1, self%nsize
-            self%value(iN, 1) = Calc_SPH_3(NodeBelonging(iN), &
-                                           self%soil(:), &
-                                           arr_phi1(iN), &
-                                           self%water(:), &
-                                           arr_phi2(iN), &
-                                           self%ice(:), &
-                                           arr_phi3(iN))
-        end do
-        !$omp end parallel do
-    end subroutine Update_SPH_3
+        SPH = Calc_SPH_3(self%Material1, phi1, self%Material2, phi2, self%Material3, phi3)
+    end function Calc_SPH_GaussPoint_3Phase
 
-end submodule Calculate_SpecificHeat_3Phase
+    ! module subroutine Update_SPH_3(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4)
+    !     implicit none
+    !     class(Type_SPH_3Phase), intent(inout) :: self
+    !     type(Belonging), intent(inout) :: NodeBelonging(:)
+    !     real(real64), intent(in), optional :: arr_phi1(:)
+    !     real(real64), intent(in), optional :: arr_phi2(:)
+    !     real(real64), intent(in), optional :: arr_phi3(:)
+    !     real(real64), intent(in), optional :: arr_phi4(:)
+    !     integer(int32) :: iN
+    !     real(real64) :: density_soil, density_water, density_ice
+
+    !     !$omp parallel do private(iN)
+    !     do iN = 1, self%nsize
+    !         self%value(iN, 1) = Calc_SPH_3(NodeBelonging(iN), &
+    !                                        self%soil, &
+    !                                        arr_phi1(iN), &
+    !                                        self%water, &
+    !                                        arr_phi2(iN), &
+    !                                        self%ice, &
+    !                                        arr_phi3(iN))
+    !     end do
+    !     !$omp end parallel do
+    ! end subroutine Update_SPH_3
+
+end submodule Calc_SPH_3

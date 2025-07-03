@@ -1,4 +1,4 @@
-submodule(Solver_Solve) Solver_Solve_LU
+submodule(Solver_Solve) Solve_LU
     use, intrinsic :: iso_fortran_env, only: int32, int64, real64
     use :: Matrix_CRS
     implicit none
@@ -28,11 +28,12 @@ contains
             this%PHASE = transfer(PHASE, this%PHASE)
             this%NRHS = transfer(NRHS, this%NRHS)
             this%MSGLVL = transfer(MSGVLV, this%MSGLVL)
-            allocate (this%PT(64))
-            allocate (this%IPARM(64))
             allocate (this%PERM(N))
             allocate (this%JA(A%nnz))
             allocate (this%IA(A%nptr))
+
+            this%IPARM = 0
+            call PARDISOINIT(this%PT, this%MTYPE, this%IPARM)
 
             do i = 1, A%nnz
                 this%JA(i) = transfer(A%Ind(i), this%JA(i))
@@ -40,8 +41,6 @@ contains
             do i = 1, A%nptr
                 this%IA(i) = transfer(A%Ptr(i), this%IA(i))
             end do
-
-            call pardisoinit(this%pt, this%mtype, this%iparm)
         end select
 
     end function Solver_CRS_LU_Constructor
@@ -66,7 +65,7 @@ contains
         real(real64), intent(in) :: time
 
         if (status /= 0) then
-            print *, 'PARDISO 解法エラー'
+            print *, 'PARDISO '
             stop
         end if
 
@@ -122,4 +121,4 @@ contains
 
     end subroutine Check_Full_LU
 
-end submodule Solver_Solve_LU
+end submodule Solve_LU

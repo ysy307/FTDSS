@@ -173,4 +173,115 @@ contains
 
     end function Get_HostName
 
+    module function Get_CompilerName() result(CompilerName)
+        implicit none
+        character(:), allocatable :: CompilerName
+
+#ifdef __GFORTRAN__
+        CompilerName = "GNU Fortran Compiler"
+#elif defined(__INTEL_COMPILER)
+        CompilerName = "Intel Fortran Compiler"
+#elif defined(__PGI) || defined(__NVCOMPILER)
+        CompilerName = "NVIDIA (PGI) Fortran Compiler"
+#else
+        CompilerName = "Unknown Compiler"
+#endif
+
+    end function Get_CompilerName
+
+    module function Get_CompilerVersion() result(CompilerVersion)
+        use :: stdlib_strings, only:to_string
+        implicit none
+        character(:), allocatable :: CompilerVersion
+        integer(int32) :: year, major, minor
+
+#ifdef __GFORTRAN__
+#ifdef __GNUC__
+        CompilerVersion = to_string(__GNUC__)//"."//to_string(__GNUC_MINOR__)//"."//to_string(__GNUC_PATCHLEVEL__)
+#else
+        CompilerVersion = "Unknown Compiler Version"
+#endif
+#elif defined(__INTEL_COMPILER)
+        year = __INTEL_COMPILER / 10000
+        major = mod(__INTEL_COMPILER / 100, 100)
+        minor = mod(__INTEL_COMPILER, 100)
+
+        CompilerVersion = to_string(year)//"."//to_string(major)//"."//to_string(minor)
+#elif defined(__PGI) || defined(__NVCOMPILER)
+        CompilerVersion = to_string(__NVCOMPILER_MAJOR__)//"."//to_string(__NVCOMPILER_MINOR__)//"."//to_string(__NVCOMPILER_PATCHLEVEL__)
+#else
+        CompilerVersion = "Unknown Compiler Version"
+#endif
+
+    end function Get_CompilerVersion
+
+    module function Get_CPUArchitecture() result(architecture)
+        implicit none
+        character(:), allocatable :: architecture
+        type(c_ptr) :: ptr
+
+        ! C 側 get_architecture() を呼び出し
+        ptr = C_Get_Architecture()
+
+        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+        if (c_associated(ptr)) then
+            architecture = c_ptr_to_string(ptr)
+        else
+            allocate (character(len=24) :: architecture)
+            architecture = "Unknown CPU Architecture"
+        end if
+    end function Get_CPUArchitecture
+
+    module function Get_OS() result(os)
+        implicit none
+        character(:), allocatable :: os
+        type(c_ptr) :: ptr
+
+        ! C 側 get_os() を呼び出し
+        ptr = C_Get_OS()
+
+        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+        if (c_associated(ptr)) then
+            os = c_ptr_to_string(ptr)
+        else
+            allocate (character(len=10) :: os)
+            os = "Unknown OS"
+        end if
+    end function Get_OS
+
+    module function Get_OpneMP_Version() result(OpenMPversion)
+        implicit none
+        character(:), allocatable :: OpenMPversion
+
+#ifdef _OPENMP
+        select case (_OPENMP)
+        case (199911)
+            OpenMPversion = '1.0'
+        case (200203)
+            OpenMPversion = '2.0'
+        case (200505)
+            OpenMPversion = '2.5'
+        case (200805)
+            OpenMPversion = '3.0'
+        case (201107)
+            OpenMPversion = '3.1'
+        case (201307)
+            OpenMPversion = '4.0'
+        case (201511)
+            OpenMPversion = '4.5'
+        case (201811)
+            OpenMPversion = '5.0'
+        case (202011)
+            OpenMPversion = '5.1'
+        case (202111)
+            OpenMPversion = '5.2'
+        case default
+            OpenMPversion = 'unknown'
+        end select
+#else
+        OpenMPversion = 'not defined'
+#endif
+
+    end function Get_OpneMP_Version
+
 end submodule Inout_Output_Base

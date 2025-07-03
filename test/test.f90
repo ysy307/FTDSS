@@ -11,26 +11,36 @@ program test
     real(real64) :: norm_old, norm_new
     integer(int32) :: stat, count
     integer(int32) :: i, j
+    character(1) :: BC_Type
 
     call FTDSS%initialize()
-    call FTDSS%Thermal%IC%Fix(value=FTDSS%Thermal%T, &
-                              Sides=FTDSS%Thermal%Sides, &
-                              BC=FTDSS%Thermal%BC)
-
+    call FTDSS%IC%apply(physics="Thermal", &
+                        domain=FTDSS%Domain, &
+                        var=FTDSS%Thermal%T)
+    call FTDSS%BC%apply_CRS(BC_Type='T', &
+                            current_time=0.0d0, &
+                            b=FTDSS%Thermal%T%new, &
+                            Domain=FTDSS%Domain, &
+                            mode=2) ! mode=2 for initial conditions
     ! FTDSS%phi%pre(:)
-
-    call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
+    ! call FTDSS%Thermal%HTC% phi, Temperature, Pw, Ice, Density
+    ! print *, FTDSS%Thermal%T%pre(1)
+    ! print *, FTDSS%Thermal%HTC%Calc(NodeBelonging=FTDSS%NodeBelonging(1), phi=FTDSS%phi%pre(1), Temperature=FTDSS%Thermal%T%pre(1), Ice=FTDSS%Thermal%ICE(1)%f, Density=FTDSS%Thermal%DEN)
+    ! call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0
 
-    call FTDSS%Output%Output_All(fc=count, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
+    call FTDSS%Output%Overall%Output(fc=count, RCM_Perm=FTDSS%Domain%RCM_perm, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
     FTDSS%Iteration%step = 0
     FTDSS%Iteration%max_iter = 100
 
+    stop
+
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
+        ! exit TIME_LOOP
         FTDSS%time%time_old = FTDSS%time%time
         FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
         FTDSS%time%dt_old(1) = FTDSS%time%dt
@@ -59,14 +69,21 @@ program test
             ! print *, Thermal%KT_star_0%ind(:)
             ! stop
 
-            call FTDSS%Thermal%Assemble(FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
+            call FTDSS%Thermal%Assemble(FTDSS%Domain, FTDSS%Property, FTDSS%phi%pre, FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
             ! call FTDSS%Thermal%BC%
-            call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
-                                         b=FTDSS%Thermal%PHIT, &
-                                         Sides=FTDSS%Thermal%Sides, &
-                                         time=FTDSS%time%time)
+            BC_Type = 'T'
+            call FTDSS%BC%apply_CRS(BC_Type=BC_Type, &
+                                    current_time=FTDSS%time%time, &
+                                    A=FTDSS%Thermal%KT_star_0, &
+                                    b=FTDSS%Thermal%PHIT, &
+                                    Domain=FTDSS%Domain, &
+                                    mode=0)
+            ! call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
+            !                              b=FTDSS%Thermal%PHIT, &
+            !                              Sides=FTDSS%Thermal%Domain%Sides, &
+            !                              time=FTDSS%time%time)
 
             ! open (unit=10, file='log/debug4.txt', status='replace')
             ! do i = 1, FTDSS%Thermal%nsize
@@ -108,7 +125,7 @@ program test
             end if
 
             FTDSS%Thermal%T%pre(:) = FTDSS%Thermal%T%new(:)
-            call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
+            ! call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
         end do NR_LOOP_THERMAL
 
         ! if (FTDSS%Iteration%iter >= FTDSS%Iteration%max_iter) then
@@ -121,10 +138,14 @@ program test
         ! print *, mod(FTDSS%Iteration%step, 100)
         if (mod(FTDSS%Iteration%step, 10) == 0) then
             count = count + 1
-            call FTDSS%Output%Output_All(fc=count, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
+            call FTDSS%Output%Overall%Output(fc=count, RCM_Perm=FTDSS%Domain%RCM_perm, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
         end if
 
     end do TIME_LOOP
+
+    call FTDSS%time%Record("End")
+    call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)
+    ! call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)/
 
     stop
 

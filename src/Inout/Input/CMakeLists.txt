@@ -1,4 +1,4 @@
-add_library(Input
+add_library(Input OBJECT
     SetProjectPath.F90
     Input.F90
 )

@@ -1,4 +1,4 @@
-add_library(Calc_THC
+add_library(Calc_THC OBJECT
     Interface.F90
     Base.F90
     3Phase.F90

@@ -8,12 +8,11 @@ module Solver_Solve
 #ifdef _OPENMP
     use omp_lib
 #endif
-
     implicit none
     private
 #ifdef _MKL
-    include "mkl_pardiso.fi"
-    include "mkl_lapack.fi"
+    include "mkl.fi"
+    ! include "mkl_lapack.fi"
 #endif
 
     public :: Abstract_Solver_CRS
@@ -55,9 +54,9 @@ module Solver_Solve
         integer(int32) :: maxiter
 
         integer(int32) :: Preconditioner
-        !! 0: No Preconditioner (No implemented)
-        !! 1: Jacobi Preconditioner
-        !! 2: ILU Preconditioner (No implemented)
+        ! 0: No Preconditioner (No implemented)
+        ! 1: Jacobi Preconditioner
+        ! 2: ILU Preconditioner (No implemented)
     contains
         procedure :: Solve => Solve_CRS_BiCGSTAB
         procedure :: Check => Check_CRS_BiCGSTAB
@@ -139,8 +138,8 @@ module Solver_Solve
         integer, allocatable :: PERM(:)
         !! Array, size (64). This array is used to pass various parameters to Intel® oneAPI Math Kernel Library PARDISO
         !! and to return some useful information after execution of the solver.
-        integer, allocatable :: IPARM(:)
-        type(MKL_PARDISO_HANDLE), allocatable :: PT(:)
+        integer :: IPARM(64)
+        type(MKL_PARDISO_HANDLE) :: PT(64)
         !! Array with size of 64.
         !! Handle to internal data structure. The entries must be set to zero prior to the first call to pardiso.
         !! Unique for factorization.

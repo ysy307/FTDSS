@@ -33,7 +33,21 @@ RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PR
     apt-get update && \
     apt-get install -y intel-oneapi-compiler-fortran intel-oneapi-hpc-toolkit && \
     touch /root/.zprofile && \
-    echo 'source /opt/intel/oneapi/setvars.sh' >> /root/.zprofile
+    curl https://developer.download.nvidia.com/hpc-sdk/ubuntu/DEB-GPG-KEY-NVIDIA-HPC-SDK | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-hpcsdk-archive-keyring.gpg && \
+    echo 'deb [signed-by=/usr/share/keyrings/nvidia-hpcsdk-archive-keyring.gpg] https://developer.download.nvidia.com/hpc-sdk/ubuntu/amd64 /' | sudo tee /etc/apt/sources.list.d/nvhpc.list && \
+    sudo apt-get update -y && \
+    sudo apt-get install -y nvhpc-25-3 && \
+    echo 'export NVARCH=$(uname -s)_$(uname -m)' > /etc/profile.d/nvhpc.sh && \
+    echo 'export NVCOMPILERS=/opt/nvidia/hpc_sdk' >> /etc/profile.d/nvhpc.sh && \
+    echo 'export PATH=$NVCOMPILERS/$NVARCH/25.3/compilers/bin:$PATH' >> /etc/profile.d/nvhpc.sh && \
+    echo 'export MANPATH=$MANPATH:$NVCOMPILERS/$NVARCH/25.3/compilers/man' >> /etc/profile.d/nvhpc.sh && \
+    echo 'export PATH=$NVCOMPILERS/$NVARCH/25.3/comm_libs/mpi/bin:$PATH' >> /etc/profile.d/nvhpc.sh && \
+    echo 'export MANPATH=$MANPATH:$NVCOMPILERS/$NVARCH/25.3/comm_libs/mpi/man' >> /etc/profile.d/nvhpc.sh &&\
+    echo '[ -f /opt/intel/oneapi/setvars.sh ] && source /opt/intel/oneapi/setvars.sh' >> /root/.zprofile && \
+    echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> /root/.zshrc
+
+
+
 
 # Pythonツールをインストール
 RUN pip3 install --upgrade pip && \
@@ -41,7 +55,35 @@ RUN pip3 install --upgrade pip && \
     pip3 install --upgrade fprettify && \
     pip3 install --upgrade fypp && \
     pip3 install --upgrade ford && \
-    echo '{ "include_dirs": ["/workspaces/FTDSS/build/mod", "/opt/intel/oneapi/mpi/2021.14/include/mpi","/opt/intel/oneapi/2025.0/include/mpi"] }' > /root/.fortls
+    echo '{' > /root/.fortls && \
+    echo '  "include_dirs": [' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/CMakeBuild/.mod",' >> /root/.fortls && \
+    echo '    "/opt/intel/oneapi/mpi/2021.14/include/mpi",' >> /root/.fortls && \
+    echo '    "/opt/intel/oneapi/2025.0/include/mpi",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.1.1",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/third_party/.local/VTKFortran/include"' >> /root/.fortls && \
+    echo '  ],' >> /root/.fortls && \
+    echo '  "excl_paths": [' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/.git",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/.vscode",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/.devcontainer",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/CMakeBuild/",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/github",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/docs",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/fpm",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/Inout",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/log",' >> /root/.fortls && \
+    echo '    "/workspaces/FTDSS/Scripts"' >> /root/.fortls && \
+    echo '  ],' >> /root/.fortls && \
+    echo '  "incremental_sync": true,' >> /root/.fortls && \
+    echo '  "lowercase_intrinsics": true,' >> /root/.fortls && \
+    echo '  "hover_signature": true,' >> /root/.fortls && \
+    echo '  "use_signature_help": true' >> /root/.fortls && \
+    echo '}' >> /root/.fortls
+
+
+
 
 # ZshとPreztoの設定
 ENV SHELL=/usr/bin/zsh
