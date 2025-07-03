@@ -91,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.8% of total for modules and submodules.">95 statements</a>
+                 title=" 0.6% of total for modules and submodules.">70 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -139,7 +139,7 @@
       </a>
       <div id="inters-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/calculate_thermalconductivity.html#interface-type_thermalconductivity_3phase">Type_ThermalConductivity_3Phase</a>
+            <a class="list-group-item" href="../module/calculate_thermalconductivity.html#interface-type_thc_3phase">Type_THC_3Phase</a>
         </div>
       </div>
     </div>
@@ -152,8 +152,9 @@
       </a>
       <div id="types-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/calculate_thermalconductivity.html#type-abstract_thermalconductivity">Abstract_ThermalConductivity</a>
-            <a class="list-group-item" href="../module/calculate_thermalconductivity.html#type-type_thermalconductivity_3phase">Type_ThermalConductivity_3Phase</a>
+            <a class="list-group-item" href="../module/calculate_thermalconductivity.html#type-thcholder">THCHolder</a>
+            <a class="list-group-item" href="../module/calculate_thermalconductivity.html#type-abst_thc">Abst_THC</a>
+            <a class="list-group-item" href="../module/calculate_thermalconductivity.html#type-type_thc_3phase">Type_THC_3Phase</a>
         </div>
       </div>
     </div>
@@ -182,7 +183,6 @@
             <li class="list-group-item">
               <ul class="list-inline">
                   <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
-                  <li class="list-inline-item"><a href='core_allocate.html'>Core_Allocate</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
                   <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
               </ul>
@@ -215,8 +215,8 @@
           <h2>Interfaces</h2>
               <div class="card">
     <div class="card-header bg-light codesum">
-      <span class="anchor" id="interface-type_thermalconductivity_3phase"></span>
-      <h3>public        interface <a href='../interface/type_thermalconductivity_3phase.html'>Type_ThermalConductivity_3Phase</a> 
+      <span class="anchor" id="interface-type_thc_3phase"></span>
+      <h3>public        interface <a href='../interface/type_thc_3phase.html'>Type_THC_3Phase</a> 
       </h3>
     </div>
     <ul class="list-group">
@@ -242,10 +242,10 @@
           <h2>Derived Types</h2>
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-abstract_thermalconductivity"></span>
+      <span class="anchor" id="type-thcholder"></span>
       <h3>
-        type, public, abstract&nbsp;::&nbsp;
-        <a href='../type/abstract_thermalconductivity.html'>Abstract_ThermalConductivity</a>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/thcholder.html'>THCHolder</a>
         
       </h3>
     </div>
@@ -265,49 +265,15 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-nsize~5"></span>
-              integer(kind=int32),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>nsize</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-nregion"></span>
-              integer(kind=int32),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>nRegion</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-value"></span>
-              real(kind=real64),
+              <span class="anchor" id="variable-l~52"></span>
+              class(<a href='../type/abst_thc.html'>Abst_THC</a>),
             </td>
               <td>public,</td>
             <td>
               allocatable
             </td>
             <td>::</td>
-            <td><strong>value</strong>(:,:)</td>
+            <td><strong>l</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -324,13 +290,8 @@
         <table class="table table-striped varlist">
           <tbody>
               <tr>
-                <td>  procedure(Abstract_Calculate_ThermalConductivity), public, deferred, pass(self) ::
-  <strong><a href='../type/abstract_thermalconductivity.html#boundprocedure-calculate'>Calculate</a></strong></td>
-                  <td></td>
-              </tr>
-              <tr>
-                <td>  procedure(Abstract_Update_ThermalConductivity), public, deferred, pass(self) ::
-  <strong><a href='../type/abstract_thermalconductivity.html#boundprocedure-update'>Update</a></strong></td>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/thcholder.html#boundprocedure-initialize~8'>initialize</a></strong> => THCHolder_initialize</td>
                   <td></td>
               </tr>
           </tbody>
@@ -340,10 +301,10 @@
 
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-type_thermalconductivity_3phase"></span>
+      <span class="anchor" id="type-abst_thc"></span>
       <h3>
-        type, public, extends(<a href='../type/abstract_thermalconductivity.html'>Abstract_ThermalConductivity</a>)&nbsp;::&nbsp;
-        <a href='../type/type_thermalconductivity_3phase.html'>Type_ThermalConductivity_3Phase</a>
+        type, public, abstract&nbsp;::&nbsp;
+        <a href='../type/abst_thc.html'>Abst_THC</a>
         
       </h3>
     </div>
@@ -363,7 +324,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-nsize~5"></span>
+              <span class="anchor" id="variable-region_id"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -371,7 +332,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>nsize</strong></td>
+            <td><strong>region_id</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -380,7 +341,117 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nregion"></span>
+              <span class="anchor" id="variable-material1"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Material1</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+<p>like a soil or a rock, a concrete</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Material2</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+<p>like a water</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material3"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Material3</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+<p>like a ice</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material4"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Material4</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+<p>like a gas</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure(Abst_Calc_THC_GaussPoint), public, deferred, pass(self) ::
+  <strong><a href='../type/abst_thc.html#boundprocedure-calc_gausspoint'>Calc_GaussPoint</a></strong></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_thc_3phase"></span>
+      <h3>
+        type, public, extends(<a href='../type/abst_thc.html'>Abst_THC</a>)&nbsp;::&nbsp;
+        <a href='../type/type_thc_3phase.html'>Type_THC_3Phase</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -388,7 +459,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>nRegion</strong></td>
+            <td><strong>region_id</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -397,70 +468,70 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-value"></span>
+              <span class="anchor" id="variable-material1"></span>
               real(kind=real64),
             </td>
-              <td>public,</td>
+              <td>public</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>value</strong>(:,:)</td>
+            <td><strong>Material1</strong></td>
                 <td></td>
                 <td></td>
             <td>
-
+<p>like a soil or a rock, a concrete</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-soil"></span>
+              <span class="anchor" id="variable-material2"></span>
               real(kind=real64),
             </td>
-              <td>public,</td>
+              <td>public</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>soil</strong>(:)</td>
+            <td><strong>Material2</strong></td>
                 <td></td>
                 <td></td>
             <td>
-
+<p>like a water</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-water"></span>
+              <span class="anchor" id="variable-material3"></span>
               real(kind=real64),
             </td>
-              <td>public,</td>
+              <td>public</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>water</strong>(:)</td>
+            <td><strong>Material3</strong></td>
                 <td></td>
                 <td></td>
             <td>
-
+<p>like a ice</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ice"></span>
+              <span class="anchor" id="variable-material4"></span>
               real(kind=real64),
             </td>
-              <td>public,</td>
+              <td>public</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>ice</strong>(:)</td>
+            <td><strong>Material4</strong></td>
                 <td></td>
                 <td></td>
             <td>
-
+<p>like a gas</p>
             </td>
         </tr>
     </tbody>
@@ -490,13 +561,8 @@
         <table class="table table-striped varlist">
           <tbody>
               <tr>
-                <td>  procedure, public ::
-  <strong><a href='../type/type_thermalconductivity_3phase.html#boundprocedure-calculate~2'>Calculate</a></strong> => Calc_THC_3_Wrap</td>
-                  <td></td>
-              </tr>
-              <tr>
-                <td>  procedure, public ::
-  <strong><a href='../type/type_thermalconductivity_3phase.html#boundprocedure-update~2'>Update</a></strong> => Update_THC_3</td>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_thc_3phase.html#boundprocedure-calc_gausspoint~2'>Calc_GaussPoint</a></strong> => Calc_THC_GaussPoint_3Phase</td>
                   <td></td>
               </tr>
           </tbody>

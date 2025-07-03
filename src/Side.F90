@@ -1,6 +1,6 @@
-module Core_Side
+module Domain_Side
     !---------------------------------------------------------------------------------------
-    !  Module: Core_Side
+    !  Module: Domain_Side
     !  Purpose: Define 1D finite element types (square and triangle) and their
     !           associated operations (shape functions, Jacobian, Gauss points).
     !  Ford Coding Standard:
@@ -14,28 +14,26 @@ module Core_Side
     implicit none
     private
 
-    public :: SideHolder
-    public :: Abstract_SideType
+    public :: Abst_SideType
     public :: SideFirst
     public :: SideSecond
+    public :: SideHolder
 
     !--------------------------------------------------------------------------------------
     ! Holder for polymorphic element objects
     !--------------------------------------------------------------------------------------
     type :: SideHolder
-        class(Abstract_SideType), allocatable :: s
-    contains
-        procedure, pass(self) :: allocate => SideHolder_Allocate
+        class(Abst_SideType), allocatable :: s
     end type SideHolder
 
     !--------------------------------------------------------------------------------------
     !   Abstract base type for 1D elements
     !--------------------------------------------------------------------------------------
-    type, abstract :: Abstract_SideType
-        integer(int32) :: SideID
-        integer(int32) :: SideType ! Edge type
-        integer(int32) :: SideGroup ! Group ID
-        integer(int32) :: size ! Number of nodes in the Edge
+    type, abstract :: Abst_SideType
+        integer(int32), private :: id
+        integer(int32), private :: type ! Edge type
+        integer(int32), private :: size ! Number of nodes in the Edge
+        integer(int32), private :: group ! Group ID
         integer(int32), allocatable :: conn(:) !! connectivity information
         type(RealPointer), allocatable :: X(:) !! X coordinate
         type(RealPointer), allocatable :: Y(:) !! Y coordinate
@@ -52,79 +50,92 @@ module Core_Side
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:) !! Gauss Quadrature points Coordinate
     contains
-        procedure(Abstract_getNmNodes), pass(self), deferred :: getNumNodes !&
-        procedure(Abstract_psi),        pass(self), deferred :: psi !&
-        procedure(Abstract_dpsi_dxi),   pass(self), deferred :: dpsi_dxi !&
-        ! procedure(Jacobian_Components_if), pass(self), deferred :: Jac
-        ! procedure(Jacobian_Det_if), pass(self), deferred :: Jac_Det
-    end type Abstract_SideType
+        procedure(Abst_get_id),    pass(self), deferred :: get_id !&
+        procedure(Abst_get_type),  pass(self), deferred :: get_type !&
+        procedure(Abst_get_size),  pass(self), deferred :: get_size !&
+        procedure(Abst_get_group), pass(self), deferred :: get_group !&
+        !----------------------------------------------------------------------------------
+        procedure(Abst_psi),       pass(self), deferred :: psi !&
+        procedure(Abst_dpsi_dxi),  pass(self), deferred :: dpsi_dxi !&
+    end type Abst_SideType
 
     !--------------------------------------------------------------------------------------
     !   Triangle First Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abstract_SideType) :: SideFirst
+    type, extends(Abst_SideType) :: SideFirst
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SideFirst !&
-        procedure, pass(self) :: psi         => psi_SideFirst !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SideFirst !&
+        procedure, pass(self) :: get_id    => get_id_SideFirst !&
+        procedure, pass(self) :: get_type  => get_type_SideFirst !&
+        procedure, pass(self) :: get_size  => get_size_SideFirst !&
+        procedure, pass(self) :: get_group => get_group_SideFirst !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi       => psi_SideFirst !&
+        procedure, pass(self) :: dpsi_dxi  => dpsi_dxi_SideFirst !&
     end type SideFirst
 
     !--------------------------------------------------------------------------------------
     !   Triangle Second Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abstract_SideType) :: SideSecond
+    type, extends(Abst_SideType) :: SideSecond
     contains
-        procedure, pass(self) :: getNumNodes => getNumNodes_SideSecond !&
-        procedure, pass(self) :: psi         => psi_SideSecond !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SideSecond !&
+        procedure, pass(self) :: get_id    => get_id_SideSecond !&
+        procedure, pass(self) :: get_type  => get_type_SideSecond !&
+        procedure, pass(self) :: get_size  => get_size_SideSecond !&
+        procedure, pass(self) :: get_group => get_group_SideSecond !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi       => psi_SideSecond !&
+        procedure, pass(self) :: dpsi_dxi  => dpsi_dxi_SideSecond !&
     end type SideSecond
 
     !--------------------------------------------------------------------------------------
     !  Abstract interface for the 1D element
     !--------------------------------------------------------------------------------------
     abstract interface
-        function Abstract_getNmNodes(self) result(n)
-            import :: Abstract_SideType, int32
+        function Abst_get_id(self) result(id)
+            import :: Abst_SideType, int32
             implicit none
-            class(Abstract_SideType), intent(in) :: self
-            integer(int32) :: n
-        end function Abstract_getNmNodes
+            class(Abst_SideType), intent(in) :: self
+            integer(int32) :: id
+        end function Abst_get_id
 
-        function Abstract_psi(self, i, xi) result(psi)
-            import :: Abstract_SideType, int32, real64
+        function Abst_get_type(self) result(type)
+            import :: Abst_SideType, int32
             implicit none
-            class(Abstract_SideType), intent(in) :: self
+            class(Abst_SideType), intent(in) :: self
+            integer(int32) :: type
+        end function Abst_get_type
+
+        function Abst_get_size(self) result(n)
+            import :: Abst_SideType, int32
+            implicit none
+            class(Abst_SideType), intent(in) :: self
+            integer(int32) :: n
+        end function Abst_get_size
+
+        function Abst_get_group(self) result(group)
+            import :: Abst_SideType, int32
+            implicit none
+            class(Abst_SideType), intent(in) :: self
+            integer(int32) :: group
+        end function Abst_get_group
+
+        function Abst_psi(self, i, xi) result(psi)
+            import :: Abst_SideType, int32, real64
+            implicit none
+            class(Abst_SideType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi
             real(real64) :: psi
-        end function Abstract_psi
+        end function Abst_psi
 
-        function Abstract_dpsi_dxi(self, i) result(dpsi)
-            import :: Abstract_SideType, int32, real64
+        function Abst_dpsi_dxi(self, i) result(dpsi)
+            import :: Abst_SideType, int32, real64
             implicit none
-            class(Abstract_SideType), intent(in) :: self
+            class(Abst_SideType), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64) :: dpsi
-        end function Abstract_dpsi_dxi
+        end function Abst_dpsi_dxi
     end interface
-
-    !--------------------------------------------------------------------------------------
-    !   SideHolder procedures interface
-    !--------------------------------------------------------------------------------------
-    interface
-        module subroutine SideHolder_Allocate(self, iShape_Type, iSide, Global_Coordinate, Connectivity, GroupID)
-            implicit none
-            class(SideHolder), intent(inout) :: self
-            integer(int32), intent(in) :: iShape_Type
-            integer(int32), intent(in) :: iSide
-            type(DP3d), pointer, intent(in) :: Global_Coordinate
-            integer(int32), intent(in) :: Connectivity(:)
-            integer(int32), intent(in) :: GroupID
-            class(Abstract_SideType), allocatable :: Structure
-
-        end subroutine SideHolder_Allocate
-    end interface
-
     !--------------------------------------------------------------------------------------
     !   Edge first order procedures interface
     !--------------------------------------------------------------------------------------
@@ -135,15 +146,33 @@ module Core_Side
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(2)
             integer(int32), intent(in) :: GroupID
-            class(Abstract_SideType), allocatable :: Structure
+            class(Abst_SideType), allocatable :: Structure
 
         end function SideFirst_Construct
 
-        module function getNumNodes_SideFirst(self) result(n)
+        module function get_id_SideFirst(self) result(id)
+            implicit none
+            class(SideFirst), intent(in) :: self
+            integer(int32) :: id
+        end function get_id_SideFirst
+
+        module function get_type_SideFirst(self) result(type)
+            implicit none
+            class(SideFirst), intent(in) :: self
+            integer(int32) :: type
+        end function get_type_SideFirst
+
+        module function get_size_SideFirst(self) result(n)
             implicit none
             class(SideFirst), intent(in) :: self
             integer(int32) :: n
-        end function getNumNodes_SideFirst
+        end function get_size_SideFirst
+
+        module function get_group_SideFirst(self) result(group)
+            implicit none
+            class(SideFirst), intent(in) :: self
+            integer(int32) :: group
+        end function get_group_SideFirst
 
         module function psi_SideFirst(self, i, xi) result(psi)
             implicit none
@@ -171,15 +200,33 @@ module Core_Side
             type(DP3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(3)
             integer(int32), intent(in) :: GroupID
-            class(Abstract_SideType), allocatable :: Structure
+            class(Abst_SideType), allocatable :: Structure
 
         end function SideSecond_Construct
 
-        module function getNumNodes_SideSecond(self) result(n)
+        module function get_id_SideSecond(self) result(id)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32) :: id
+        end function get_id_SideSecond
+
+        module function get_type_SideSecond(self) result(type)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32) :: type
+        end function get_type_SideSecond
+
+        module function get_size_SideSecond(self) result(n)
             implicit none
             class(SideSecond), intent(in) :: self
             integer(int32) :: n
-        end function getNumNodes_SideSecond
+        end function get_size_SideSecond
+
+        module function get_group_SideSecond(self) result(group)
+            implicit none
+            class(SideSecond), intent(in) :: self
+            integer(int32) :: group
+        end function get_group_SideSecond
 
         module function psi_SideSecond(self, i, xi) result(psi)
             implicit none
@@ -205,4 +252,4 @@ module Core_Side
         procedure :: SideSecond_Construct
     end interface
 
-end module Core_Side
+end module Domain_Side

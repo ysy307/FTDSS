@@ -1,4 +1,4 @@
-submodule(Core_Side) Core_Side_Second
+submodule(Domain_Side) Domain_Side_Second
     implicit none
 contains
 
@@ -8,15 +8,15 @@ contains
         type(DP3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(3)
         integer(int32), intent(in) :: GroupID
-        class(Abstract_SideType), allocatable :: Structure
+        class(Abst_SideType), allocatable :: Structure
 
         integer(int32), parameter :: nsize = 3
         integer(int32) :: i
 
         allocate (SideSecond :: Structure)
-        Structure%SideID = iSide
-        Structure%SideType = 21
-        Structure%SideGroup = GroupID
+        Structure%id = iSide
+        Structure%type = 21
+        Structure%group = GroupID
 
         Structure%size = nsize
         allocate (Structure%conn(nsize))
@@ -41,13 +41,37 @@ contains
         Structure%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
     end function SideSecond_Construct
 
-    module function getNumNodes_SideSecond(self) result(n)
+    module function get_id_SideSecond(self) result(id)
         implicit none
         class(SideSecond), intent(in) :: self
-        integer(int32) :: n
+        integer(int32) :: id
 
-        n = self%size
-    end function getNumNodes_SideSecond
+        id = self%id
+    end function get_id_SideSecond
+
+    module function get_type_SideSecond(self) result(type)
+        implicit none
+        class(SideSecond), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_SideSecond
+
+    module function get_size_SideSecond(self) result(size)
+        implicit none
+        class(SideSecond), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
+    end function get_size_SideSecond
+
+    module function get_group_SideSecond(self) result(group)
+        implicit none
+        class(SideSecond), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_SideSecond
 
     module function psi_SideSecond(self, i, xi) result(psi)
         implicit none
@@ -82,4 +106,4 @@ contains
         end select
     end function dpsi_dxi_SideSecond
 
-end submodule Core_Side_Second
+end submodule Domain_Side_Second

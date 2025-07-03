@@ -1,4 +1,4 @@
-submodule(Core_Element) Core_Element_TriangleFirst
+submodule(Domain_Element) Domain_Element_TriangleFirst
     implicit none
 contains
     !----------------------------------------------------------------------!
@@ -29,18 +29,20 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(3)
-        class(Abstract_ElementType), allocatable :: Structure
+        integer(int32), intent(in) :: GroupID
+        class(Abst_ElementType), allocatable :: Structure
         integer(int32), parameter :: ndim = 3
         integer(int32) :: i
 
         allocate (TriangleFirst :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 5
+        Structure%id = iElem
+        Structure%type = 5
+        Structure%group = GroupID
 
         Structure%size = ndim
         allocate (Structure%conn(ndim))
@@ -84,13 +86,37 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_TriangleFirst(self) result(n)
+    module function get_id_TriangleFirst(self) result(id)
+        implicit none
+        class(TriangleFirst), intent(in) :: self
+        integer(int32) :: id
+
+        id = self%id
+    end function get_id_TriangleFirst
+
+    module function get_type_TriangleFirst(self) result(type)
+        implicit none
+        class(TriangleFirst), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_TriangleFirst
+
+    module function get_size_TriangleFirst(self) result(n)
         implicit none
         class(TriangleFirst), intent(in) :: self
         integer(int32) :: n
 
         n = self%size
-    end function getNumNodes_TriangleFirst
+    end function get_size_TriangleFirst
+
+    module function get_group_TriangleFirst(self) result(group)
+        implicit none
+        class(TriangleFirst), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_TriangleFirst
 
     !----------------------------------------------------------------------!
     ! psi_TriangleFirst:
@@ -482,4 +508,19 @@ contains
         end if
     end subroutine is_in_TriangleFirst
 
-end submodule Core_Element_TriangleFirst
+    module function Interpolate_TriangleFirst(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(TriangleFirst), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%size
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%conn(i))
+        end do
+
+    end function Interpolate_TriangleFirst
+
+end submodule Domain_Element_TriangleFirst

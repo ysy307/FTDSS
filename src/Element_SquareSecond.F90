@@ -1,4 +1,4 @@
-submodule(Core_Element) Core_Element_SquareSecond
+submodule(Domain_Element) Domain_Element_SquareSecond
     implicit none
 contains
 
@@ -30,19 +30,22 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), intent(in), pointer :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(8)
-        class(Abstract_ElementType), allocatable :: Structure
+        integer(int32), intent(in) :: GroupID
+        class(Abst_ElementType), allocatable :: Structure
 
         integer(int32), parameter :: nsize = 8
         integer(int32) :: i
 
         allocate (SquareSecond :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 23
+        Structure%id = iElem
+        Structure%type = 23
+        Structure%group = GroupID
+
         Structure%size = nsize
         allocate (Structure%conn(nsize))
         Structure%conn(1:nsize) = Connectivity(1:nsize)
@@ -97,13 +100,37 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_SquareSecond(self) result(n)
+    module function get_id_SquareSecond(self) result(id)
+        implicit none
+        class(SquareSecond), intent(in) :: self
+        integer(int32) :: id
+
+        id = self%id
+    end function get_id_SquareSecond
+
+    module function get_type_SquareSecond(self) result(type)
+        implicit none
+        class(SquareSecond), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_SquareSecond
+
+    module function get_size_SquareSecond(self) result(n)
         implicit none
         class(SquareSecond), intent(in) :: self
         integer(int32) :: n
 
         n = self%size
-    end function getNumNodes_SquareSecond
+    end function get_size_SquareSecond
+
+    module function get_group_SquareSecond(self) result(group)
+        implicit none
+        class(SquareSecond), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_SquareSecond
 
     !----------------------------------------------------------------------!
     ! psi_SquareSecond:
@@ -549,5 +576,20 @@ contains
         end if
     end subroutine is_in_SquareSecond
 
-end submodule Core_Element_SquareSecond
+    module function Interpolate_SquareSecond(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(SquareSecond), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%size
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%conn(i))
+        end do
+
+    end function Interpolate_SquareSecond
+
+end submodule Domain_Element_SquareSecond
 

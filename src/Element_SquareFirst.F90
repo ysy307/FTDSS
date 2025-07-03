@@ -1,4 +1,4 @@
-submodule(Core_Element) Core_Element_SquareFirst
+submodule(Domain_Element) Domain_Element_SquareFirst
     implicit none
 contains
 
@@ -30,18 +30,20 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), intent(in), pointer :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(4)
-        class(Abstract_ElementType), allocatable :: Structure
+        integer(int32), intent(in) :: GroupID
+        class(Abst_ElementType), allocatable :: Structure
         integer(int32), parameter :: ndim = 4
         integer(int32) :: i
 
         allocate (SquareFirst :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 9
+        Structure%iD = iElem
+        Structure%type = 9
+        Structure%group = GroupID
         Structure%size = ndim
         allocate (Structure%conn(ndim))
         Structure%conn(1:ndim) = Connectivity(1:ndim)
@@ -71,7 +73,7 @@ contains
     end function SquareFirst_Construct
 
     !----------------------------------------------------------------------!
-    ! getNumNodes_SquareFirst:
+    ! get_id_SquareFirst:
     !----------------------------------------------------------------------!
     ! This function returns the number of nodes associated with a
     ! SquareFirst element.
@@ -89,13 +91,37 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_SquareFirst(self) result(n)
+    module function get_id_SquareFirst(self) result(id)
         implicit none
         class(SquareFirst), intent(in) :: self
-        integer(int32) :: n
+        integer(int32) :: id
 
-        n = self%size
-    end function getNumNodes_SquareFirst
+        id = self%id
+    end function get_id_SquareFirst
+
+    module function get_type_SquareFirst(self) result(type)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_SquareFirst
+
+    module function get_size_SquareFirst(self) result(size)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
+    end function get_size_SquareFirst
+
+    module function get_group_SquareFirst(self) result(group)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_SquareFirst
 
     !----------------------------------------------------------------------!
     ! psi_SquareFirst:
@@ -502,5 +528,20 @@ contains
         end if
     end subroutine is_in_SquareFirst
 
-end submodule Core_Element_SquareFirst
+    module function Interpolate_SquareFirst(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(SquareFirst), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%size
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%conn(i))
+        end do
+
+    end function Interpolate_SquareFirst
+
+end submodule Domain_Element_SquareFirst
 

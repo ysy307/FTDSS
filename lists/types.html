@@ -88,32 +88,44 @@
 			 <tr><th>Type</th><th>Location</th><th>Extends</th><th>Description</th></tr>
 			 </thead><tbody>
 			   <tr>
-                 <td><a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a></td>
+                 <td><a href='../type/abst_bc_thermal.html'>Abst_BC_Thermal</a></td>
                  <td><a href='../module/condition_boundary.html'>Condition_Boundary</a></td>
-                 <td>None</td>
-                 <td><p>Boundary conditions information</p></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/abstract_condition_ic.html'>Abstract_Condition_IC</a></td>
-                 <td><a href='../module/condition_initial.html'>Condition_Initial</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/abstract_density.html'>Abstract_Density</a></td>
+                 <td><a href='../type/abst_den.html'>Abst_DEN</a></td>
                  <td><a href='../module/calculate_density.html'>Calculate_Density</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/abstract_elementtype.html'>Abstract_ElementType</a></td>
-                 <td><a href='../module/core_element.html'>Core_Element</a></td>
+                 <td><a href='../type/abst_elementtype.html'>Abst_ElementType</a></td>
+                 <td><a href='../module/domain_element.html'>Domain_Element</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/abstract_gcc.html'>Abstract_GCC</a></td>
-                 <td><a href='../module/calculate_gcc.html'>Calculate_GCC</a></td>
+                 <td><a href='../type/abst_sidetype.html'>Abst_SideType</a></td>
+                 <td><a href='../module/domain_side.html'>Domain_Side</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/abst_sph.html'>Abst_SPH</a></td>
+                 <td><a href='../module/calculate_specificheat.html'>Calculate_SpecificHeat</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/abst_thc.html'>Abst_THC</a></td>
+                 <td><a href='../module/calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/abst_vhc.html'>Abst_VHC</a></td>
+                 <td><a href='../module/calculate_volumetricheatcapacity.html'>Calculate_VolumetricHeatCapacity</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
@@ -124,26 +136,8 @@
                  <td><p>get/set</p></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/abstract_heatcapacity.html'>Abstract_HeatCapacity</a></td>
-                 <td><a href='../module/calculate_heatcapacity.html'>Calculate_HeatCapacity</a></td>
-                 <td>None</td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/abstract_ice.html'>Abstract_Ice</a></td>
-                 <td><a href='../module/calculate_ice.html'>Calculate_Ice</a></td>
-                 <td>None</td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/abstract_sidetype.html'>Abstract_SideType</a></td>
-                 <td><a href='../module/core_side.html'>Core_Side</a></td>
-                 <td>None</td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/abstract_specificheat.html'>Abstract_SpecificHeat</a></td>
-                 <td><a href='../module/calculate_specificheat.html'>Calculate_SpecificHeat</a></td>
+                 <td><a href='../type/abstract_ic.html'>Abstract_IC</a></td>
+                 <td><a href='../module/condition_initial.html'>Condition_Initial</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
@@ -154,14 +148,20 @@
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/abstract_thermalconductivity.html'>Abstract_ThermalConductivity</a></td>
-                 <td><a href='../module/calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></td>
-                 <td>None</td>
+                 <td><a href='../type/bc_thermal_adiabatic.html'>BC_Thermal_Adiabatic</a></td>
+                 <td><a href='../module/condition_boundary.html'>Condition_Boundary</a></td>
+                 <td><a href='../type/bc_thermal_dirichlet.html'>BC_Thermal_Dirichlet</a></td>
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/abstract_wrf.html'>Abstract_WRF</a></td>
-                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
+                 <td><a href='../type/bc_thermal_dirichlet.html'>BC_Thermal_Dirichlet</a></td>
+                 <td><a href='../module/condition_boundary.html'>Condition_Boundary</a></td>
+                 <td><a href='../type/abst_bc_thermal.html'>Abst_BC_Thermal</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/bcmanager.html'>BCManager</a></td>
+                 <td><a href='../module/conditions_boundary_manager.html'>Conditions_Boundary_Manager</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
@@ -172,8 +172,14 @@
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/condition_bc_local.html'>Condition_BC_Local</a></td>
-                 <td><a href='../module/condition_boundary.html'>Condition_Boundary</a></td>
+                 <td><a href='../type/denholder.html'>DENHolder</a></td>
+                 <td><a href='../module/calculate_density.html'>Calculate_Density</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/domain_t.html'>Domain_t</a></td>
+                 <td><a href='../module/domain_module.html'>Domain_Module</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
@@ -191,13 +197,37 @@
                </tr>
 			   <tr>
                  <td><a href='../type/elementholder.html'>ElementHolder</a></td>
-                 <td><a href='../module/core_element.html'>Core_Element</a></td>
+                 <td><a href='../module/domain_element.html'>Domain_Element</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/iceholder.html'>IceHolder</a></td>
-                 <td><a href='../module/calculate_ice.html'>Calculate_Ice</a></td>
+                 <td><a href='../type/gausspointstate_t.html'>GaussPointState_t</a></td>
+                 <td><a href='../module/core_basetypes.html'>Core_BaseTypes</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/gccholder.html'>GCCHolder</a></td>
+                 <td><a href='../module/calculate_gcc.html'>Calculate_GCC</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/ic_laplace.html'>IC_Laplace</a></td>
+                 <td><a href='../module/condition_initial.html'>Condition_Initial</a></td>
+                 <td><a href='../type/abstract_ic.html'>Abstract_IC</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/ic_uniform.html'>IC_Uniform</a></td>
+                 <td><a href='../module/condition_initial.html'>Condition_Initial</a></td>
+                 <td><a href='../type/abstract_ic.html'>Abstract_IC</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/icmanager.html'>ICManager</a></td>
+                 <td><a href='../module/conditions_initial_manager.html'>Conditions_Initial_Manager</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
@@ -280,6 +310,18 @@
                  <td></td>
                </tr>
 			   <tr>
+                 <td><a href='../type/materialmanager_t.html'>MaterialManager_t</a></td>
+                 <td><a href='../module/properties_material_manager.html'>Properties_Material_Manager</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/proereties_model_t.html'>Proereties_Model_t</a></td>
+                 <td><a href='../module/properties_model_base.html'>Properties_Model_Base</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
                  <td><a href='../type/realpointer.html'>RealPointer</a></td>
                  <td><a href='../module/core_basetypes.html'>Core_BaseTypes</a></td>
                  <td>None</td>
@@ -287,62 +329,56 @@
                </tr>
 			   <tr>
                  <td><a href='../type/sidefirst.html'>SideFirst</a></td>
-                 <td><a href='../module/core_side.html'>Core_Side</a></td>
-                 <td><a href='../type/abstract_sidetype.html'>Abstract_SideType</a></td>
+                 <td><a href='../module/domain_side.html'>Domain_Side</a></td>
+                 <td><a href='../type/abst_sidetype.html'>Abst_SideType</a></td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/sideholder.html'>SideHolder</a></td>
-                 <td><a href='../module/core_side.html'>Core_Side</a></td>
+                 <td><a href='../module/domain_side.html'>Domain_Side</a></td>
                  <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/sidesecond.html'>SideSecond</a></td>
-                 <td><a href='../module/core_side.html'>Core_Side</a></td>
-                 <td><a href='../type/abstract_sidetype.html'>Abstract_SideType</a></td>
+                 <td><a href='../module/domain_side.html'>Domain_Side</a></td>
+                 <td><a href='../type/abst_sidetype.html'>Abst_SideType</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/sphholder.html'>SPHHolder</a></td>
+                 <td><a href='../module/calculate_specificheat.html'>Calculate_SpecificHeat</a></td>
+                 <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/squarefirst.html'>SquareFirst</a></td>
-                 <td><a href='../module/core_element.html'>Core_Element</a></td>
-                 <td><a href='../type/abstract_elementtype.html'>Abstract_ElementType</a></td>
+                 <td><a href='../module/domain_element.html'>Domain_Element</a></td>
+                 <td><a href='../type/abst_elementtype.html'>Abst_ElementType</a></td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/squaresecond.html'>SquareSecond</a></td>
-                 <td><a href='../module/core_element.html'>Core_Element</a></td>
-                 <td><a href='../type/abstract_elementtype.html'>Abstract_ElementType</a></td>
+                 <td><a href='../module/domain_element.html'>Domain_Element</a></td>
+                 <td><a href='../type/abst_elementtype.html'>Abst_ElementType</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/thcholder.html'>THCHolder</a></td>
+                 <td><a href='../module/calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></td>
+                 <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/trianglefirst.html'>TriangleFirst</a></td>
-                 <td><a href='../module/core_element.html'>Core_Element</a></td>
-                 <td><a href='../type/abstract_elementtype.html'>Abstract_ElementType</a></td>
+                 <td><a href='../module/domain_element.html'>Domain_Element</a></td>
+                 <td><a href='../type/abst_elementtype.html'>Abst_ElementType</a></td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/trianglesecond.html'>TriangleSecond</a></td>
-                 <td><a href='../module/core_element.html'>Core_Element</a></td>
-                 <td><a href='../type/abstract_elementtype.html'>Abstract_ElementType</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_bc_thermal.html'>Type_BC_Thermal</a></td>
-                 <td><a href='../module/condition_boundary.html'>Condition_Boundary</a></td>
-                 <td>None</td>
-                 <td><p>Boundary conditions information</p></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_bc_thermal_crs.html'>Type_BC_Thermal_CRS</a></td>
-                 <td><a href='../module/condition_boundary.html'>Condition_Boundary</a></td>
-                 <td><a href='../type/abstract_condition_bc.html'>Abstract_Condition_BC</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_condition_ic_crs.html'>Type_Condition_IC_CRS</a></td>
-                 <td><a href='../module/condition_initial.html'>Condition_Initial</a></td>
-                 <td><a href='../type/abstract_condition_ic.html'>Abstract_Condition_IC</a></td>
+                 <td><a href='../module/domain_element.html'>Domain_Element</a></td>
+                 <td><a href='../type/abst_elementtype.html'>Abst_ElementType</a></td>
                  <td></td>
                </tr>
 			   <tr>
@@ -352,45 +388,15 @@
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/type_density_3phase.html'>Type_Density_3Phase</a></td>
+                 <td><a href='../type/type_den_3phase.html'>Type_DEN_3Phase</a></td>
                  <td><a href='../module/calculate_density.html'>Calculate_Density</a></td>
-                 <td><a href='../type/abstract_density.html'>Abstract_Density</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_edge.html'>Type_Edge</a></td>
-                 <td><a href='../module/condition_boundary.html'>Condition_Boundary</a></td>
-                 <td>None</td>
+                 <td><a href='../type/abst_den.html'>Abst_DEN</a></td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/type_ftdss.html'>Type_FTDSS</a></td>
                  <td><a href='../module/main_ftdss.html'>Main_FTDSS</a></td>
                  <td>None</td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_gcc_nonsegregation_m.html'>Type_GCC_NonSegregation_m</a></td>
-                 <td><a href='../module/calculate_gcc.html'>Calculate_GCC</a></td>
-                 <td><a href='../type/abstract_gcc.html'>Abstract_GCC</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_gcc_nonsegregation_pa.html'>Type_GCC_NonSegregation_Pa</a></td>
-                 <td><a href='../module/calculate_gcc.html'>Calculate_GCC</a></td>
-                 <td><a href='../type/abstract_gcc.html'>Abstract_GCC</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_gcc_segregation_m.html'>Type_GCC_Segregation_m</a></td>
-                 <td><a href='../module/calculate_gcc.html'>Calculate_GCC</a></td>
-                 <td><a href='../type/abstract_gcc.html'>Abstract_GCC</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_gcc_segregation_pa.html'>Type_GCC_Segregation_Pa</a></td>
-                 <td><a href='../module/calculate_gcc.html'>Calculate_GCC</a></td>
-                 <td><a href='../type/abstract_gcc.html'>Abstract_GCC</a></td>
                  <td></td>
                </tr>
 			   <tr>
@@ -556,30 +562,6 @@
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/type_heatcapacity_3phase_apparent.html'>Type_HeatCapacity_3Phase_Apparent</a></td>
-                 <td><a href='../module/calculate_heatcapacity.html'>Calculate_HeatCapacity</a></td>
-                 <td><a href='../type/abstract_heatcapacity.html'>Abstract_HeatCapacity</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_ice_exp.html'>Type_Ice_EXP</a></td>
-                 <td><a href='../module/calculate_ice.html'>Calculate_Ice</a></td>
-                 <td><a href='../type/abstract_ice.html'>Abstract_Ice</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_ice_gcc.html'>Type_Ice_GCC</a></td>
-                 <td><a href='../module/calculate_ice.html'>Calculate_Ice</a></td>
-                 <td><a href='../type/abstract_ice.html'>Abstract_Ice</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_ice_trm.html'>Type_Ice_TRM</a></td>
-                 <td><a href='../module/calculate_ice.html'>Calculate_Ice</a></td>
-                 <td><a href='../type/abstract_ice.html'>Abstract_Ice</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
                  <td><a href='../type/type_input.html'>Type_Input</a></td>
                  <td><a href='../module/inout_input.html'>Inout_Input</a></td>
                  <td>None</td>
@@ -598,9 +580,15 @@
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/type_specificheat_3phase.html'>Type_SpecificHeat_3Phase</a></td>
+                 <td><a href='../type/type_sph_3phase.html'>Type_SPH_3Phase</a></td>
                  <td><a href='../module/calculate_specificheat.html'>Calculate_SpecificHeat</a></td>
-                 <td><a href='../type/abstract_specificheat.html'>Abstract_SpecificHeat</a></td>
+                 <td><a href='../type/abst_sph.html'>Abst_SPH</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/type_thc_3phase.html'>Type_THC_3Phase</a></td>
+                 <td><a href='../module/calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></td>
+                 <td><a href='../type/abst_thc.html'>Abst_THC</a></td>
                  <td></td>
                </tr>
 			   <tr>
@@ -610,57 +598,27 @@
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/type_thermalconductivity_3phase.html'>Type_ThermalConductivity_3Phase</a></td>
-                 <td><a href='../module/calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></td>
-                 <td><a href='../type/abstract_thermalconductivity.html'>Abstract_ThermalConductivity</a></td>
+                 <td><a href='../type/type_time.html'>Type_Time</a></td>
+                 <td><a href='../module/time_time.html'>Time_Time</a></td>
+                 <td>None</td>
                  <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../type/type_time.html'>Type_Time</a></td>
-                 <td><a href='../module/solver_time.html'>Solver_Time</a></td>
-                 <td>None</td>
+                 <td><a href='../type/type_vhc_3phase.html'>Type_VHC_3Phase</a></td>
+                 <td><a href='../module/calculate_volumetricheatcapacity.html'>Calculate_VolumetricHeatCapacity</a></td>
+                 <td><a href='../type/abst_vhc.html'>Abst_VHC</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/type_vhc_3phase_apparent.html'>Type_VHC_3Phase_Apparent</a></td>
+                 <td><a href='../module/calculate_volumetricheatcapacity.html'>Calculate_VolumetricHeatCapacity</a></td>
+                 <td><a href='../type/abst_vhc.html'>Abst_VHC</a></td>
                  <td></td>
                </tr>
 			   <tr>
                  <td><a href='../type/type_vtk.html'>Type_VTK</a></td>
                  <td><a href='../module/core_vtk.html'>Core_VTK</a></td>
                  <td>None</td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_wrf_bc.html'>Type_WRF_BC</a></td>
-                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
-                 <td><a href='../type/abstract_wrf.html'>Abstract_WRF</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_wrf_durner.html'>Type_WRF_Durner</a></td>
-                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
-                 <td><a href='../type/abstract_wrf.html'>Abstract_WRF</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_wrf_dvgch.html'>Type_WRF_DVGCH</a></td>
-                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
-                 <td><a href='../type/abstract_wrf.html'>Abstract_WRF</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_wrf_ko.html'>Type_WRF_KO</a></td>
-                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
-                 <td><a href='../type/abstract_wrf.html'>Abstract_WRF</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_wrf_mvg.html'>Type_WRF_MVG</a></td>
-                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
-                 <td><a href='../type/abstract_wrf.html'>Abstract_WRF</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../type/type_wrf_vg.html'>Type_WRF_VG</a></td>
-                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
-                 <td><a href='../type/abstract_wrf.html'>Abstract_WRF</a></td>
                  <td></td>
                </tr>
 			   <tr>
@@ -678,6 +636,18 @@
 			   <tr>
                  <td><a href='../type/vector3d.html'>Vector3D</a></td>
                  <td><a href='../module/core_basetypes.html'>Core_BaseTypes</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/vhcholder.html'>VHCHolder</a></td>
+                 <td><a href='../module/calculate_volumetricheatcapacity.html'>Calculate_VolumetricHeatCapacity</a></td>
+                 <td>None</td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../type/wrfholder.html'>WRFHolder</a></td>
+                 <td><a href='../module/calculate_wrf.html'>Calculate_WRF</a></td>
                  <td>None</td>
                  <td></td>
                </tr>

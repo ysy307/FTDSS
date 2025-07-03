@@ -1,4 +1,4 @@
-submodule(Solver_Solve) Solver_Solve_BiCGSTAB_Implementation
+submodule(Solver_Solve) Solve_BiCGSTAB
     implicit none
 contains
     module function Solver_CRS_BiCGSTAB_Constructor(N, tol, maxiter, Preconditioner) result(structure)
@@ -165,4 +165,4 @@ contains
         if (allocated(self%x)) deallocate (self%x)
 
     end subroutine Solver_CRS_BiCGSTAB_Destructor
-end submodule Solver_Solve_BiCGSTAB_Implementation
+end submodule Solve_BiCGSTAB

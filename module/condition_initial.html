@@ -91,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.4% of total for modules and submodules.">50 statements</a>
+                 title=" 0.5% of total for modules and submodules.">62 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -132,18 +132,7 @@
   
   
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#inters-0"
-         aria-expanded="false" aria-controls="inters-0">
-         <h4 class="card-header bg-primary text-white">Interfaces</h4>
-      </a>
-      <div id="inters-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/condition_initial.html#interface-type_condition_ic_crs">Type_Condition_IC_CRS</a>
-        </div>
-      </div>
-    </div>
-
+  
   
       <div class="card mb-4">
       <a data-bs-toggle="collapse" href="#types-0"
@@ -152,8 +141,9 @@
       </a>
       <div id="types-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/condition_initial.html#type-abstract_condition_ic">Abstract_Condition_IC</a>
-            <a class="list-group-item" href="../module/condition_initial.html#type-type_condition_ic_crs">Type_Condition_IC_CRS</a>
+            <a class="list-group-item" href="../module/condition_initial.html#type-abstract_ic">Abstract_IC</a>
+            <a class="list-group-item" href="../module/condition_initial.html#type-ic_uniform">IC_Uniform</a>
+            <a class="list-group-item" href="../module/condition_initial.html#type-ic_laplace">IC_Laplace</a>
         </div>
       </div>
     </div>
@@ -181,11 +171,10 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='core_side.html'>Core_Side</a></li>
                   <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
-                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='condition_boundary.html'>Condition_Boundary</a></li>
+                  <li class="list-inline-item"><a href='domain_module.html'>Domain_Module</a></li>
+                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
               </ul>
             </li>
         </ul>
@@ -199,7 +188,8 @@
             <li class="list-group-item">
               <ul class="list-inline">
                 <li class="list-inline-item"><h5>Descendants:</h5></li>
-                  <li class="list-inline-item"><a href='condition_initial_crs.html'>Condition_Initial_CRS</a></li>
+                  <li class="list-inline-item"><a href='condition_initial_laplace.html'>Condition_Initial_Laplace</a></li>
+                  <li class="list-inline-item"><a href='condition_initial_uniform.html'>Condition_Initial_Uniform</a></li>
               </ul>
             </li>
         </ul>
@@ -211,41 +201,16 @@
 
 
 
-        <section>
-          <h2>Interfaces</h2>
-              <div class="card">
-    <div class="card-header bg-light codesum">
-      <span class="anchor" id="interface-type_condition_ic_crs"></span>
-      <h3>public        interface <a href='../interface/type_condition_ic_crs.html'>Type_Condition_IC_CRS</a> 
-      </h3>
-    </div>
-    <ul class="list-group">
-          <li class="list-group-item">
-                <h3>
-    private  interface Type_Condition_IC_CRS_Construct()  
-
-    </h3>
-  
-
-  <h4>Arguments</h4>
-    <em>None</em>
-
-          </li>
-    </ul>
-  </div>
-
-        </section>
-        <br>
 
 
         <section>
           <h2>Derived Types</h2>
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-abstract_condition_ic"></span>
+      <span class="anchor" id="type-abstract_ic"></span>
       <h3>
         type, public, abstract&nbsp;::&nbsp;
-        <a href='../type/abstract_condition_ic.html'>Abstract_Condition_IC</a>
+        <a href='../type/abstract_ic.html'>Abstract_IC</a>
         
       </h3>
     </div>
@@ -265,7 +230,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-type~4"></span>
+              <span class="anchor" id="variable-type~18"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -274,23 +239,6 @@
             </td>
             <td>::</td>
             <td><strong>type</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-value~9"></span>
-              real(kind=real64),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>value</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -307,8 +255,13 @@
         <table class="table table-striped varlist">
           <tbody>
               <tr>
-                <td>  procedure(Abstract_Fix_IC), public, deferred, pass(self) ::
-  <strong><a href='../type/abstract_condition_ic.html#boundprocedure-fix'>Fix</a></strong></td>
+                <td>  procedure(setup_ic_abstract), public, deferred, pass(self) ::
+  <strong><a href='../type/abstract_ic.html#boundprocedure-setup~6'>setup</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure(apply_ic_abstract), public, deferred, pass(self) ::
+  <strong><a href='../type/abstract_ic.html#boundprocedure-apply~2'>apply</a></strong></td>
                   <td></td>
               </tr>
           </tbody>
@@ -318,10 +271,10 @@
 
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-type_condition_ic_crs"></span>
+      <span class="anchor" id="type-ic_uniform"></span>
       <h3>
-        type, public, extends(<a href='../type/abstract_condition_ic.html'>Abstract_Condition_IC</a>)&nbsp;::&nbsp;
-        <a href='../type/type_condition_ic_crs.html'>Type_Condition_IC_CRS</a>
+        type, public, extends(<a href='../type/abstract_ic.html'>Abstract_IC</a>)&nbsp;::&nbsp;
+        <a href='../type/ic_uniform.html'>IC_Uniform</a>
         
       </h3>
     </div>
@@ -341,7 +294,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-type~4"></span>
+              <span class="anchor" id="variable-type~18"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -358,7 +311,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-value~9"></span>
+              <span class="anchor" id="variable-value~15"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -367,6 +320,70 @@
             </td>
             <td>::</td>
             <td><strong>value</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/ic_uniform.html#boundprocedure-setup~7'>setup</a></strong> => setup_uniform</td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/ic_uniform.html#boundprocedure-apply~3'>apply</a></strong> => apply_uniform</td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-ic_laplace"></span>
+      <h3>
+        type, public, extends(<a href='../type/abstract_ic.html'>Abstract_IC</a>)&nbsp;::&nbsp;
+        <a href='../type/ic_laplace.html'>IC_Laplace</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-type~18"></span>
+              character(len=:),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>type</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -377,23 +394,6 @@
   </table>
 
 
-        <h4>Constructor</h4>
-          
-        <table class="table table-striped varlist">
-          <tbody>
-                <tr>
-                  <td>
-                        private
-
-                    
-                    interface
-                    <strong>Type_Condition_IC_CRS_Construct</strong>
-                    ()
-                  </td>
-                  <td></td>
-                </tr>
-          </tbody>
-        </table>
 
 
         <h4>Type-Bound Procedures</h4>
@@ -401,7 +401,12 @@
           <tbody>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_condition_ic_crs.html#boundprocedure-fix~2'>Fix</a></strong> => Fix_IC_CRS</td>
+  <strong><a href='../type/ic_laplace.html#boundprocedure-setup~8'>setup</a></strong> => setup_laplace</td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/ic_laplace.html#boundprocedure-apply~4'>apply</a></strong> => apply_laplace</td>
                   <td></td>
               </tr>
           </tbody>

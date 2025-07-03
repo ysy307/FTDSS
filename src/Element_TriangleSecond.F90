@@ -1,4 +1,4 @@
-submodule(Core_Element) Core_Element_TriangleSecond
+submodule(Domain_Element) Domain_Element_TriangleSecond
     implicit none
 contains
     !----------------------------------------------------------------------!
@@ -29,18 +29,20 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity) result(Structure)
+    module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
         type(DP3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(6)
-        class(Abstract_ElementType), allocatable :: Structure
+        integer(int32), intent(in) :: GroupID
+        class(Abst_ElementType), allocatable :: Structure
         integer(int32), parameter :: nsize = 6
         integer(int32) :: i
 
         allocate (TriangleSecond :: Structure)
-        Structure%ElementID = iElem
-        Structure%ElementType = 22
+        Structure%id = iElem
+        Structure%type = 22
+        Structure%group = GroupID
 
         Structure%size = nsize
         allocate (Structure%conn(nsize))
@@ -86,13 +88,38 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function getNumNodes_TriangleSecond(self) result(n)
+
+    module function get_id_TriangleSecond(self) result(id)
         implicit none
         class(TriangleSecond), intent(in) :: self
-        integer(int32) :: n
+        integer(int32) :: id
 
-        n = self%size
-    end function getNumNodes_TriangleSecond
+        id = self%id
+    end function get_id_TriangleSecond
+
+    module function get_type_TriangleSecond(self) result(type)
+        implicit none
+        class(TriangleSecond), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type_TriangleSecond
+
+    module function get_size_TriangleSecond(self) result(size)
+        implicit none
+        class(TriangleSecond), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
+    end function get_size_TriangleSecond
+
+    module function get_group_TriangleSecond(self) result(group)
+        implicit none
+        class(TriangleSecond), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group_TriangleSecond
 
     !----------------------------------------------------------------------!
     ! psi_TriangleSecond:
@@ -508,4 +535,19 @@ contains
         end if
     end subroutine is_in_TriangleSecond
 
-end submodule Core_Element_TriangleSecond
+    module function Interpolate_TriangleSecond(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(TriangleSecond), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%size
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%conn(i))
+        end do
+
+    end function Interpolate_TriangleSecond
+
+end submodule Domain_Element_TriangleSecond

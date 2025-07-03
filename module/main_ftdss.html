@@ -91,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.4% of total for modules and submodules.">45 statements</a>
+                 title=" 0.5% of total for modules and submodules.">56 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -180,12 +180,16 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
-                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
-                  <li class="list-inline-item"><a href='solver_time.html'>Solver_Time</a></li>
-                  <li class="list-inline-item"><a href='main_thermal.html'>Main_Thermal</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
                   <li class="list-inline-item"><a href='inout_output.html'>Inout_Output</a></li>
+                  <li class="list-inline-item"><a href='properties_model_base.html'>Properties_Model_Base</a></li>
+                  <li class="list-inline-item"><a href='conditions_initial_manager.html'>Conditions_Initial_Manager</a></li>
+                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
+                  <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
+                  <li class="list-inline-item"><a href='main_thermal.html'>Main_Thermal</a></li>
+                  <li class="list-inline-item"><a href='time_time.html'>Time_Time</a></li>
+                  <li class="list-inline-item"><a href='conditions_boundary_manager.html'>Conditions_Boundary_Manager</a></li>
+                  <li class="list-inline-item"><a href='domain_module.html'>Domain_Module</a></li>
               </ul>
             </li>
         </ul>
@@ -227,7 +231,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-input~8"></span>
+              <span class="anchor" id="variable-input~28"></span>
               type(<a href='../type/type_input.html'>Type_Input</a>),
             </td>
               <td>public</td>
@@ -244,7 +248,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-coordinate"></span>
+              <span class="anchor" id="variable-coordinate~9"></span>
               type(<a href='../type/dp3d.html'>DP3d</a>),
             </td>
               <td>public,</td>
@@ -261,15 +265,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nodebelonging~24"></span>
-              type(<a href='../type/belonging.html'>Belonging</a>),
+              <span class="anchor" id="variable-domain~17"></span>
+              type(<a href='../type/domain_t.html'>Domain_t</a>),
             </td>
-              <td>public,</td>
+              <td>public</td>
             <td>
-              allocatable
+              
             </td>
             <td>::</td>
-            <td><strong>NodeBelonging</strong>(:)</td>
+            <td><strong>Domain</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -278,7 +282,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-thermal"></span>
+              <span class="anchor" id="variable-thermal~4"></span>
               class(<a href='../type/abstract_thermal.html'>Abstract_Thermal</a>),
             </td>
               <td>public,</td>
@@ -295,7 +299,58 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-phi"></span>
+              <span class="anchor" id="variable-property~2"></span>
+              type(<a href='../type/proereties_model_t.html'>Proereties_Model_t</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Property</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc"></span>
+              type(<a href='../type/bcmanager.html'>BCManager</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>BC</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ic~2"></span>
+              type(<a href='../type/icmanager.html'>ICManager</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>IC</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phi~4"></span>
               type(<a href='../type/variables.html'>Variables</a>),
             </td>
               <td>public</td>
@@ -312,7 +367,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-time~5"></span>
+              <span class="anchor" id="variable-time~9"></span>
               type(<a href='../type/type_time.html'>Type_Time</a>),
             </td>
               <td>public</td>
@@ -346,7 +401,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-output"></span>
+              <span class="anchor" id="variable-output~2"></span>
               type(<a href='../type/type_output.html'>Type_Output</a>),
             </td>
               <td>public</td>
@@ -372,7 +427,7 @@
           <tbody>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_ftdss.html#boundprocedure-initialize'>initialize</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/fdtss_initialize.html'>FDTSS_initialize</a></td>
+  <strong><a href='../type/type_ftdss.html#boundprocedure-initialize~6'>initialize</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/fdtss_initialize.html'>FDTSS_initialize</a></td>
                   <td></td>
               </tr>
           </tbody>
@@ -406,7 +461,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~70"></span>
+              <span class="anchor" id="variable-self~294"></span>
               class(<a href='../type/type_ftdss.html'>Type_FTDSS</a>),
             </td>
 <td>intent(inout)</td>

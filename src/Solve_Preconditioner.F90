@@ -1,4 +1,4 @@
-submodule(Solver_Solve) Solver_Solve_Preconditioner_Implementation
+submodule(Solver_Solve) Solve_Preconditioner
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Matrix_CRS
     implicit none
@@ -76,5 +76,5 @@ contains
         end select
 
     end subroutine Apply_Preconditioner_CRS_BiCGSTAB
-end submodule Solver_Solve_Preconditioner_Implementation
+end submodule Solve_Preconditioner
 

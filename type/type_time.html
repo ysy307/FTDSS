@@ -91,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.9% of total for derived types.</p>Including implementation: 24 statements,  1.7% of total for derived types.">21 statements</a>
+                 title="<p> 1.7% of total for derived types.</p>Including implementation: 30 statements,  1.9% of total for derived types.">17 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -104,7 +104,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/time.f90.html'>Time.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/solver_time.html'>Solver_Time</a></li>
+                <li class="breadcrumb-item"><a href='../module/time_time.html'>Time_Time</a></li>
             <li class="breadcrumb-item active" aria-current="page">Type_Time</li>
           </ol>
         </nav>
@@ -135,22 +135,14 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_time.html#variable-start_time">start_time</a>
             <a class="list-group-item" href="../type/type_time.html#variable-end_time">end_time</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-time">time</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-time~11">time</a>
             <a class="list-group-item" href="../type/type_time.html#variable-time_old">time_old</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-dt">dt</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-dt~2">dt</a>
             <a class="list-group-item" href="../type/type_time.html#variable-dt_old">dt_old</a>
             <a class="list-group-item" href="../type/type_time.html#variable-dt_max">dt_max</a>
             <a class="list-group-item" href="../type/type_time.html#variable-dt_min">dt_min</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-start_rdate">start_Rdate</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-start_rtime">start_Rtime</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-start_rzone">start_Rzone</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-end_rdate">end_Rdate</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-end_rtime">end_Rtime</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-end_rzone">end_Rzone</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-username">UserName</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-hostname">HostName</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-version">Version</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-compiler">Compiler</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-start~2">start</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-end">end</a>
         </div>
       </div>
     </div>
@@ -188,7 +180,7 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_realtime">Get_RealTime</a>
+            <a class="list-group-item" href="../type/type_time.html#boundprocedure-record">Record</a>
         </div>
       </div>
     </div>
@@ -255,7 +247,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-time"></span>
+              <span class="anchor" id="variable-time~11"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -289,7 +281,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt"></span>
+              <span class="anchor" id="variable-dt~2"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -357,15 +349,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-start_rdate"></span>
-              character(len=10),
+              <span class="anchor" id="variable-start~2"></span>
+              type(Type_Time_Record),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>start_Rdate</strong></td>
+            <td><strong>start</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -374,151 +366,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-start_rtime"></span>
-              character(len=10),
+              <span class="anchor" id="variable-end"></span>
+              type(Type_Time_Record),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>start_Rtime</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-start_rzone"></span>
-              character(len=10),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>start_Rzone</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-end_rdate"></span>
-              character(len=10),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>end_Rdate</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-end_rtime"></span>
-              character(len=10),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>end_Rtime</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-end_rzone"></span>
-              character(len=10),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>end_Rzone</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-username"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>UserName</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-hostname"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>HostName</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-version"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>Version</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-compiler"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>Compiler</strong></td>
+            <td><strong>end</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -595,17 +451,17 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_realtime"></span>
+      <span class="anchor" id="boundprocedure-record"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>Get_RealTime</strong>
+  <strong>Record</strong> => Record_Timestamp
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine Get_RealTime(self, date, time, zone)  
+    private  subroutine Record_Timestamp(self, label)  
 </h3>
 
   
@@ -624,9 +480,9 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_time.html'>Type_Time</a>),
+              class(<a href='type_time.html'>Type_Time</a>)
             </td>
-<td>intent(inout)</td>
+<td></td>
               <td></td>            <td>
               
             </td>
@@ -639,44 +495,14 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              character(len=10)
+              character(len=*),
             </td>
-<td></td>
+<td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>date</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              character(len=10)
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>time</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              character(len=10)
-            </td>
-<td></td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>zone</strong></td>
+            <td><strong>label</strong></td>
             <td>
                 
             </td>

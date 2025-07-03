@@ -91,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.0% of total for derived types.</p>Including implementation: 97 statements,  6.8% of total for derived types.">11 statements</a>
+                 title="<p> 1.3% of total for derived types.</p>Including implementation: 149 statements,  9.5% of total for derived types.">13 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,7 +134,7 @@
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/variables.html#variable-rank">rank</a>
-            <a class="list-group-item" href="../type/variables.html#variable-nsize~68">nsize</a>
+            <a class="list-group-item" href="../type/variables.html#variable-nsize~9">nsize</a>
             <a class="list-group-item" href="../type/variables.html#variable-new">new</a>
             <a class="list-group-item" href="../type/variables.html#variable-pre">pre</a>
             <a class="list-group-item" href="../type/variables.html#variable-old">old</a>
@@ -165,8 +165,10 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/variables.html#boundprocedure-shift">Shift</a>
-            <a class="list-group-item" href="../type/variables.html#boundprocedure-allocate~4">allocate</a>
+            <a class="list-group-item" href="../type/variables.html#boundprocedure-shift">shift</a>
+            <a class="list-group-item" href="../type/variables.html#boundprocedure-allocate~2">allocate</a>
+            <a class="list-group-item" href="../type/variables.html#boundprocedure-predict">predict</a>
+            <a class="list-group-item" href="../type/variables.html#boundprocedure-set">set</a>
         </div>
       </div>
     </div>
@@ -216,7 +218,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nsize~68"></span>
+              <span class="anchor" id="variable-nsize~9"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -315,7 +317,7 @@
       <span class="anchor" id="boundprocedure-shift"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>Shift</strong> => Variables_Shift
+  <strong>shift</strong> => Variables_Shift
         
       </h3>
     </div>
@@ -380,7 +382,7 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-allocate~4"></span>
+      <span class="anchor" id="boundprocedure-allocate~2"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>allocate</strong> => Variables_Allocate
@@ -447,6 +449,172 @@
             </td>
             <td>::</td>
             <td><strong>rank</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-predict"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>predict</strong> => Variables_Predictor
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine Variables_Predictor(self, dt1, dt2, dt3)  
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='variables.html'>Variables</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt1</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt2</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt3</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set</strong> => Variables_Set
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine Variables_Set(self, value)  
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='variables.html'>Variables</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:)</td>
             <td>
                 
             </td>

@@ -1,4 +1,4 @@
-module Solver_Time
+module Time_Time
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Inout_Input
     use :: Core_Allocate, only:Allocate_Array
@@ -6,6 +6,14 @@ module Solver_Time
     private
 
     public :: Type_Time
+
+    type :: Type_Time_Record
+        character(10) :: label
+        character(10) :: date
+        character(10) :: time
+        character(10) :: zone
+
+    end type Type_Time_Record
 
     type :: Type_Time
         real(real64) :: start_time
@@ -17,16 +25,10 @@ module Solver_Time
         real(real64) :: dt_max
         real(real64) :: dt_min
 
-        character(10) :: start_Rdate, start_Rtime, start_Rzone
-        character(10) :: end_Rdate, end_Rtime, end_Rzone
-
-        character(:), allocatable :: UserName
-        character(:), allocatable :: HostName
-        character(:), allocatable :: Version
-        character(:), allocatable :: Compiler
-
+        type(Type_Time_Record) :: start
+        type(Type_Time_Record) :: end
     contains
-        procedure, public, pass(self) :: Get_RealTime
+        procedure, public, pass(self) :: Record => Record_Timestamp
     end type Type_Time
 
     interface Type_Time
@@ -90,65 +92,27 @@ contains
         call Allocate_Array(time%dt_old, Structure_Input%Basic%Order)
     end function Time_Construct
 
-    subroutine Get_RealTime(self, date, time, zone)
+    subroutine Record_Timestamp(self, label)
         implicit none
-        class(Type_Time), intent(inout) :: self
-        character(10) :: date, time, zone
+        class(Type_Time) :: self
+        character(*), intent(in) :: label
 
-        call date_and_time(date=date, time=time, zone=zone)
+        select case (label)
+        case ("Start")
+            self%start%Label = label
+            call date_and_time(date=self%start%date, &
+                               time=self%start%time, &
+                               zone=self%start%zone)
+        case ("End")
+            self%end%Label = label
+            call date_and_time(date=self%end%date, &
+                               time=self%end%time, &
+                               zone=self%end%zone)
+        case default
+            write (*, *) "Error: Unknown time label"
+            stop
+        end select
 
-    end subroutine Get_RealTime
+    end subroutine Record_Timestamp
 
-    function Get_UserName() result(UserName)
-        implicit none
-        character(:), allocatable :: UserName
-
-        character(64) :: tmpUserName
-        integer(int32) :: len, status
-        integer(int32) :: i
-
-        character(64) :: UserNameLists(4) = &
-                         ["LOGNAME", "USER", "LNAME", "USERNAME"]
-
-        do i = 1, size(UserNameLists)
-            call get_environment_variable(UserNameLists(i), &
-                                          tmpUserName, &
-                                          len, &
-                                          status)
-            if (status == 0 .and. len > 0) then
-                UserName = trim(adjustl(tmpUserName))
-                return
-            end if
-        end do
-
-        UserName = "Unknown"
-
-    end function Get_UserName
-
-    function Get_HostName() result(HostName)
-        implicit none
-        character(:), allocatable :: HostName
-
-        character(64) :: tmpHostName
-        integer(int32) :: len, status
-        integer(int32) :: i
-
-        character(64) :: HostNameLists(2) = &
-                         ["HostName", "COMPUTERNAME"]
-
-        do i = 1, size(HostNameLists)
-            call get_environment_variable(HostNameLists(i), &
-                                          tmpHostName, &
-                                          len, &
-                                          status)
-            if (status == 0 .and. len > 0) then
-                HostName = trim(adjustl(tmpHostName))
-                return
-            end if
-        end do
-
-        HostName = "Unknown"
-
-    end function Get_HostName
-
-end module Solver_Time
+end module Time_Time
