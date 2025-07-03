@@ -1,62 +1,96 @@
+! =============================================================================
+! module Condition_Initial
+! Purpose: Defines the abstract IC types and the interfaces for their methods.
+!          Implementations are delegated to a submodule.
+! =============================================================================
 module Condition_Initial
     use, intrinsic :: iso_fortran_env
-    use :: Core_BaseTypes
-    use :: Domain_Side, only:SideHolder
-    use :: Condition_Boundary
-    use :: Inout_Input
+    use :: Core_BaseTypes, only:Variables
+    use :: Domain_Module, only:Domain_t
+    use :: Inout_Input, only:Type_Input
     implicit none
     private
 
-    public :: Abstract_Condition_IC
-    public :: Type_Condition_IC_CRS
+    public :: Abstract_IC, IC_Uniform, IC_Laplace
 
-    type, abstract :: Abstract_Condition_IC
-        character(:), allocatable :: type
-        real(real64) :: value
+    !
+    ! Abstract Base Class
+    !
+    type, abstract :: Abstract_IC
+        character(:), allocatable :: type ! Type of IC, e.g., "Uniform", "Laplace"
     contains
-        procedure(Abstract_Fix_IC), pass(self), deferred :: Fix
-    end type Abstract_Condition_IC
+        procedure(setup_ic_abstract), pass(self), deferred :: setup
+        procedure(apply_ic_abstract), pass(self), deferred :: apply
+    end type Abstract_IC
 
-    type, extends(Abstract_Condition_IC) :: Type_Condition_IC_CRS
+    !
+    ! Concrete Type: Uniform
+    !
+    type, extends(Abstract_IC) :: IC_Uniform
+
+        real(real64) :: value = 0.0d0
     contains
-        procedure, pass(self) :: Fix => Fix_IC_CRS
-    end type Type_Condition_IC_CRS
+        procedure, pass(self) :: setup => setup_uniform
+        procedure, pass(self) :: apply => apply_uniform
+    end type
 
+    !
+    ! Concrete Type: Laplace
+    !
+    type, extends(Abstract_IC) :: IC_Laplace
+        ! Member variables for Laplace would be defined here
+    contains
+        procedure, pass(self) :: setup => setup_laplace
+        procedure, pass(self) :: apply => apply_laplace
+    end type
+
+    !
+    ! Abstract Interfaces (required for deferred procedures)
+    !
     abstract interface
-        subroutine Abstract_Fix_IC(self, value, Sides, BC)
-            import :: Abstract_Condition_IC, Variables, SideHolder, Abstract_Condition_BC
-            implicit none
-            class(Abstract_Condition_IC), intent(inout) :: self
-            type(Variables), intent(inout) :: value
-            type(SideHolder), intent(inout) :: Sides(:)
-            class(Abstract_Condition_BC), intent(inout) :: BC
-
-        end subroutine Abstract_Fix_IC
-    end interface
-
-    interface
-        module function Type_Condition_IC_CRS_Construct(Input, type) result(Structure)
-            implicit none
+        subroutine setup_ic_abstract(self, Input, IC_target)
+            import :: Abstract_IC, Type_Input
+            class(Abstract_IC), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
-            class(Abstract_Condition_IC), allocatable :: Structure
-            character(*), intent(in) :: type
+            character(1), intent(in) :: IC_target ! Target for the IC, e.g., 'T' for Thermal
 
-        end function Type_Condition_IC_CRS_Construct
+        end subroutine
 
-        module subroutine Fix_IC_CRS(self, value, Sides, BC)
-            implicit none
-            class(Type_Condition_IC_CRS), intent(inout) :: self
-            type(Variables), intent(inout) :: value
-            type(SideHolder), intent(inout) :: Sides(:)
-            class(Abstract_Condition_BC), intent(inout) :: BC
-
-        end subroutine Fix_IC_CRS
+        subroutine apply_ic_abstract(self, domain, var)
+            import :: Abstract_IC, Domain_t, Variables
+            class(Abstract_IC), intent(in) :: self
+            type(Domain_t), intent(in) :: domain
+            type(Variables), intent(inout) :: var
+        end subroutine
     end interface
 
-    interface Type_Condition_IC_CRS
-        module procedure :: Type_Condition_IC_CRS_Construct
-    end interface
+    !
+    ! Interfaces for Submodule Procedures
+    !
+    interface
+        module subroutine setup_uniform(self, Input, IC_target)
+            class(IC_Uniform), intent(inout) :: self
+            type(Type_Input), intent(in) :: Input
+            character(1), intent(in) :: IC_target
+        end subroutine
 
-contains
+        module subroutine apply_uniform(self, domain, var)
+            class(IC_Uniform), intent(in) :: self
+            type(Domain_t), intent(in) :: domain
+            type(Variables), intent(inout) :: var
+        end subroutine
+
+        module subroutine setup_laplace(self, Input, IC_target)
+            class(IC_Laplace), intent(inout) :: self
+            type(Type_Input), intent(in) :: Input
+            character(1), intent(in) :: IC_target
+        end subroutine
+
+        module subroutine apply_laplace(self, domain, var)
+            class(IC_Laplace), intent(in) :: self
+            type(Domain_t), intent(in) :: domain
+            type(Variables), intent(inout) :: var
+        end subroutine
+    end interface
 
 end module Condition_Initial

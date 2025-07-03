@@ -5,6 +5,10 @@ module Main_FTDSS
     use :: Inout_Input
     use :: Time_Time
     use :: Inout_Output
+    use :: Domain_Module, only:Domain_t
+    use :: Properties_Model_Base, only:Proereties_Model_t
+    use :: Conditions_Boundary_Manager, only:BCManager
+    use :: Conditions_Initial_Manager, only:ICManager
 
     use :: Main_Thermal
     implicit none
@@ -13,8 +17,13 @@ module Main_FTDSS
         type(Type_Input) :: Input
 
         type(DP3d), pointer :: Coordinate
+        type(Domain_t) :: Domain
         ! type(Belonging), allocatable :: NodeBelonging(:)
         class(Abstract_Thermal), allocatable :: Thermal
+
+        type(Proereties_Model_t) :: Property
+        type(BCManager) :: BC
+        type(ICManager) :: IC
 
         type(Variables) :: phi
 
@@ -34,6 +43,8 @@ contains
         integer(int32) :: nsize
         integer(int32) :: iN
 
+        integer(int32) :: ierr
+
         ! Initialize the FDTSS module
         ! This is where you would set up any necessary parameters or configurations
         self%Input = Type_Input()
@@ -46,6 +57,15 @@ contains
         call self%Coordinate%allocate(nsize)
         self%Coordinate = self%Input%VTK%POINTS
 
+        call self%Domain%initialize(self%Input, self%Coordinate, ierr)
+        if (ierr /= 0) then
+            print *, "Error initializing domain in Type_Thermal_3Phase_2D_Construct"
+            return
+        end if
+
+        call self%BC%setup(self%Input, self%Domain)
+        call self%IC%setup(self%Input)
+
         ! allocate (self%NodeBelonging(nsize))
         ! do iN = 1, nsize
         !     ! The details are to be implemented
@@ -54,9 +74,11 @@ contains
         !     self%NodeBelonging(iN)%nsize = 1
         ! end do
 
-        self%Thermal = Type_Thermal_3Phase_2D(self%Input, self%Coordinate)
+        self%Thermal = Type_Thermal_3Phase_2D(self%Input, self%Coordinate, self%Domain)
 
-        self%Output = Type_Output(Input=self%Input, Domain=self%Thermal%Domain, Coordinate=self%Coordinate)
+        call self%Property%Materials%initialize(self%Input, ierr)
+
+        self%Output = Type_Output(Input=self%Input, Domain=self%Domain, Coordinate=self%Coordinate)
 
         call self%phi%allocate(nsize, self%Input%Basic%Order)
         self%phi%pre = self%Input%Regions(1)%Thermal%Porosity

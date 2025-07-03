@@ -1,11 +1,12 @@
 submodule(Main_Thermal) Main_Thermal_3Phase
     implicit none
 contains
-    module function Type_Thermal_3Phase_2D_Construct(Input, Coordinate) result(Structure)
+    module function Type_Thermal_3Phase_2D_Construct(Input, Coordinate, Domain) result(Structure)
         implicit none
         class(Abstract_Thermal), allocatable :: Structure
         type(Type_Input), intent(inout) :: Input
         type(DP3d), intent(inout), pointer :: Coordinate
+        type(Domain_t), intent(inout) :: Domain
 
         ! integer(int32) :: CountElements, CountSides
         ! integer(int32) :: iCell, iElem, iSide, idx
@@ -19,20 +20,14 @@ contains
         if (allocated(Structure)) deallocate (Structure)
         allocate (Type_Thermal_3Phase_2D :: Structure)
 
-        call Structure%Domain%initialize(Input, Coordinate, ierr)
-        if (ierr /= 0) then
-            print *, "Error initializing domain in Type_Thermal_3Phase_2D_Construct"
-            return
-        end if
-
-        nNode = Structure%Domain%get_numNode()
-        call RCM_Reorder(Structure%Domain, Structure%Domain%RCM_perm, ierr)
+        nNode = Domain%get_numNode()
+        call RCM_Reorder(Domain, Domain%RCM_perm, ierr)
         if (ierr /= 0) then
             print *, "Error in RCM_Reorder in Type_Thermal_3Phase_2D_Construct"
             return
         end if
 
-        Structure%KT_star_0 = Type_CRS(Structure%Domain)
+        Structure%KT_star_0 = Type_CRS(Domain)
 
         Structure%KT_l = Structure%KT_star_0%Copy()
         Structure%KT_old = Structure%KT_star_0%Copy()
@@ -51,7 +46,6 @@ contains
         call Structure%T%allocate(nNode, Input%Basic%Order)
 
         ! allocate (Structure%Ice(Input%Basic%numRegion))
-        call Structure%Property%Materials%initialize(Input, ierr)
 
         ! do iRegion = 1, Input%Basic%numRegion
         !     select case (Input%Regions(iRegion)%Ice%QiceType)
@@ -76,8 +70,8 @@ contains
         ! call Structure%D_Qice%allocate(nNode, Input%Basic%Order)
         ! call Structure%Si%allocate(nNode, Input%Basic%Order)
 
-        Structure%BC = Type_BC_Thermal_CRS(Input)
-        Structure%IC = Type_Condition_IC_CRS(Input, "Thermal")
+        ! Structure%BC = Type_BC_Thermal_CRS(Input)
+        ! Structure%IC = Type_Condition_IC_CRS(Input, "Thermal")
 
         if (Input%Solver_Thermal%useSolver == 1) then
             Structure%Solver = Solver_CRS_LU_Constructor(N=nNode, &
@@ -126,9 +120,11 @@ contains
     !                          Density=self%DEN)
     ! end subroutine Type_Thermal_3Phase_2D_Update
 
-    module subroutine Type_Thermal_3Phase_2D_Assemble(self, Porosity, dt, step, iter)
+    module subroutine Type_Thermal_3Phase_2D_Assemble(self, Domain, Property, Porosity, dt, step, iter)
         implicit none
         class(Type_Thermal_3Phase_2D), intent(inout) :: self
+        type(Domain_t), intent(in) :: Domain
+        type(Proereties_Model_t), intent(inout) :: Property
         real(real64), intent(in) :: Porosity(:)
         real(real64), intent(in) :: dt
         integer(int32), intent(in) :: step
@@ -147,9 +143,9 @@ contains
         ! ! end if
         !!!-----------------------------------------------------------------------
         ! (A, Domain, Temperature, Porosity, Propeties)
-        call Assemble_Mass_Heat_1(self%CT_l, self%Domain, self%T%new, Porosity, self%Property)
+        call Assemble_Mass_Heat_1(self%CT_l, Domain, self%T%new, Porosity, Property)
         !
-        call Assemble_Diffusion_Heat_1(self%KT_l, self%Domain, self%T%new, Porosity, self%Property)
+        call Assemble_Diffusion_Heat_1(self%KT_l, Domain, self%T%new, Porosity, Property)
          !!!-----------------------------------------------------------------------
         ! if (step == 1) then
         self%KT_star_0 = dt * self%KT_l + self%CT_l

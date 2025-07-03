@@ -30,10 +30,10 @@ module Domain_Side
     !   Abstract base type for 1D elements
     !--------------------------------------------------------------------------------------
     type, abstract :: Abst_SideType
-        integer(int32) :: id
-        integer(int32) :: type ! Edge type
-        integer(int32) :: size ! Number of nodes in the Edge
-        integer(int32) :: group ! Group ID
+        integer(int32), private :: id
+        integer(int32), private :: type ! Edge type
+        integer(int32), private :: size ! Number of nodes in the Edge
+        integer(int32), private :: group ! Group ID
         integer(int32), allocatable :: conn(:) !! connectivity information
         type(RealPointer), allocatable :: X(:) !! X coordinate
         type(RealPointer), allocatable :: Y(:) !! Y coordinate

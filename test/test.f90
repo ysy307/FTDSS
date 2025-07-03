@@ -11,12 +11,17 @@ program test
     real(real64) :: norm_old, norm_new
     integer(int32) :: stat, count
     integer(int32) :: i, j
+    character(1) :: BC_Type
 
     call FTDSS%initialize()
-    call FTDSS%Thermal%IC%Fix(value=FTDSS%Thermal%T, &
-                              Sides=FTDSS%Thermal%Domain%Sides, &
-                              BC=FTDSS%Thermal%BC)
-
+    call FTDSS%IC%apply(physics="Thermal", &
+                        domain=FTDSS%Domain, &
+                        var=FTDSS%Thermal%T)
+    call FTDSS%BC%apply_CRS(BC_Type='T', &
+                            current_time=0.0d0, &
+                            b=FTDSS%Thermal%T%new, &
+                            Domain=FTDSS%Domain, &
+                            mode=2) ! mode=2 for initial conditions
     ! FTDSS%phi%pre(:)
     ! call FTDSS%Thermal%HTC% phi, Temperature, Pw, Ice, Density
     ! print *, FTDSS%Thermal%T%pre(1)
@@ -29,6 +34,8 @@ program test
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
     FTDSS%Iteration%step = 0
     FTDSS%Iteration%max_iter = 100
+
+    stop
 
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
@@ -62,14 +69,21 @@ program test
             ! print *, Thermal%KT_star_0%ind(:)
             ! stop
 
-            call FTDSS%Thermal%Assemble(FTDSS%phi%pre, FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
+            call FTDSS%Thermal%Assemble(FTDSS%Domain, FTDSS%Property, FTDSS%phi%pre, FTDSS%time%dt, FTDSS%Iteration%step, FTDSS%Iteration%iter)
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
             ! call FTDSS%Thermal%BC%
-            call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
-                                         b=FTDSS%Thermal%PHIT, &
-                                         Sides=FTDSS%Thermal%Domain%Sides, &
-                                         time=FTDSS%time%time)
+            BC_Type = 'T'
+            call FTDSS%BC%apply_CRS(BC_Type=BC_Type, &
+                                    current_time=FTDSS%time%time, &
+                                    A=FTDSS%Thermal%KT_star_0, &
+                                    b=FTDSS%Thermal%PHIT, &
+                                    Domain=FTDSS%Domain, &
+                                    mode=0)
+            ! call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
+            !                              b=FTDSS%Thermal%PHIT, &
+            !                              Sides=FTDSS%Thermal%Domain%Sides, &
+            !                              time=FTDSS%time%time)
 
             ! open (unit=10, file='log/debug4.txt', status='replace')
             ! do i = 1, FTDSS%Thermal%nsize
