@@ -28,12 +28,8 @@ contains
         real(real64) :: val
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: Ca
-        logical, parameter :: enable_debug_print = .false.
 
         integer(int32) :: nElements
-
-        ! integer(int32) ::
-        ! print *, Temperature(:)
 
         State%porosity = 0.0d0
         State%temperature = 0.0d0
@@ -47,7 +43,6 @@ contains
             do il = 1, nNodes
                 do jl = 1, nNodes
                     val = 0.0d0
-                    call A%Find(Domain%Elements(iE)%e%conn(il), Domain%Elements(iE)%e%conn(jl), index)
                     nGauss = Domain%Elements(iE)%e%nGauss
                     do iG = 1, nGauss
                         xi = Domain%Elements(iE)%e%gauss(1, iG)
@@ -58,25 +53,14 @@ contains
                         State%temperature = Domain%Elements(iE)%e%Interpolate(xi, eta, Temperature)
                         State%porosity = Domain%Elements(iE)%e%Interpolate(xi, eta, Porosity)
                         State%water_content = Propeties%get_Qw(State, iRegion)
-                        ! print *, xi, eta, State%temperature
-
-                        ! print *, State%water_content
-                        ! print *, "Temperature:", State%temperature
-                        ! print *, "Porosity:", State%porosity
-                        ! print *, "Water content:", State%water_content
 
                         Ca = Propeties%get_Ca(State, iRegion)
-
-                        if (enable_debug_print .and. il == 1 .and. jl == 1) then
-                            print '(A, I5, A, I2, A, F8.3, A, ES12.4)', &
-                                '[DEBUG Mass] Elem:', iE, ' G-Pt:', iG, &
-                                ' Temp:', State%temperature, ' Ca:', Ca
-                        end if
 
                         val = val + (Domain%Elements(iE)%e%psi(il, xi, eta) * &
                                      Domain%Elements(iE)%e%psi(jl, xi, eta) * &
                                      detJ * weight * Ca)
                     end do
+                    call A%Find(Domain%RCM_perm(Domain%Elements(iE)%e%conn(il)), Domain%RCM_perm(Domain%Elements(iE)%e%conn(jl)), index)
                     A%Val(index) = A%Val(index) + val
                 end do
 
@@ -103,7 +87,6 @@ contains
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
         real(real64) :: lambda_gp ! Gauss Pointでの熱伝導率
-        logical, parameter :: enable_debug_print = .false.
 
         nElements = Domain%get_numElement()
 
@@ -159,12 +142,6 @@ contains
 
                         ! (2) その「状態」を使って、このガウス点での熱伝導率を取得する
                         lambda_gp = Propeties%get_lambda(State, iRegion)
-
-                        if (enable_debug_print .and. il == 1 .and. jl == 1) then
-                            print '(A, I5, A, I2, A, F8.3, A, ES12.4)', &
-                                '[DEBUG Diff] Elem:', iE, ' G-Pt:', iG, &
-                                ' Temp:', State%temperature, ' Lambda:', lambda_gp
-                        end if
 
                         val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda_gp * weight * detJ
                     end do

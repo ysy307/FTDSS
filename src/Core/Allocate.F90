@@ -31,6 +31,9 @@ module Core_Allocate
         module procedure :: Allocate_Rank2_real32
         module procedure :: Allocate_Rank2_real64
         module procedure :: Allocate_Rank2_real128
+        module procedure :: Allocate_Rank2_logical1
+        module procedure :: Allocate_Rank2_logical4
+        module procedure :: Allocate_Rank2_logical8
         module procedure :: Allocate_Rank1_int32_Pointer
         module procedure :: Allocate_Rank1_int64_Pointer
         module procedure :: Allocate_Rank1_real32_Pointer
@@ -512,6 +515,45 @@ contains
             call error_message(954)
         end if
     end subroutine Allocate_Rank2_real128
+
+    subroutine Allocate_Rank2_logical1(array, size1, size2)
+        implicit none
+        logical(logical8), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: size1, size2
+
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
+        else
+            call error_message(954)
+        end if
+    end subroutine Allocate_Rank2_logical1
+
+    subroutine Allocate_Rank2_logical4(array, size1, size2)
+        implicit none
+        logical(logical32), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: size1, size2
+
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
+        else
+            call error_message(954)
+        end if
+    end subroutine Allocate_Rank2_logical4
+
+    subroutine Allocate_Rank2_logical8(array, size1, size2)
+        implicit none
+        logical(logical64), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: size1, size2
+
+        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
+        if (.not. allocated(array)) then
+            allocate (array(size1, size2))
+        else
+            call error_message(954)
+        end if
+    end subroutine Allocate_Rank2_logical8
 
     ! ポインタ用の割り当て
     subroutine Allocate_Pointer_int32(iptr)

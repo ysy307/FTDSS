@@ -12,6 +12,7 @@ contains
         integer(int32) :: i
         integer(int32) :: nNode
         ! integer(int32) :: iRegion
+        integer(int32), allocatable :: RCM_perm(:)
 
         integer(int32) :: ierr
 
@@ -24,7 +25,15 @@ contains
             return
         end if
 
+        nNode = Structure%Domain%get_numNode()
+        call RCM_Reorder(Structure%Domain, Structure%Domain%RCM_perm, ierr)
+        if (ierr /= 0) then
+            print *, "Error in RCM_Reorder in Type_Thermal_3Phase_2D_Construct"
+            return
+        end if
+
         Structure%KT_star_0 = Type_CRS(Structure%Domain)
+
         Structure%KT_l = Structure%KT_star_0%Copy()
         Structure%KT_old = Structure%KT_star_0%Copy()
         Structure%CT_l = Structure%KT_star_0%Copy()
@@ -33,8 +42,6 @@ contains
         do i = 1, Input%Basic%Order
             Structure%CT_old(i) = Structure%KT_star_0%Copy()
         end do
-
-        nNode = Structure%Domain%get_numNode()
 
         call Allocate_Array(Structure%FT, nNode)
         call Allocate_Array(Structure%FT_old, nNode)

@@ -1,5 +1,6 @@
 add_library(Matrix OBJECT
-    CRS.F90 
+    CRS.F90
+    RCM.F90
     Assemble.F90
 )
 target_link_libraries(Matrix PRIVATE
@@ -8,3 +9,4 @@ target_link_libraries(Matrix PRIVATE
     Properties
 )
 enable_build_flags(Matrix)
+enable_thirdparty (Matrix)

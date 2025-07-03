@@ -1,6 +1,7 @@
 module Main_Thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: Core_BaseTypes
+    use :: Core_Allocate, only:Allocate_Array
     use :: Domain_Module, only:Domain_t
     use :: Properties_Model_Base, only:Proereties_Model_t
     ! use :: Core_Element
@@ -17,6 +18,7 @@ module Main_Thermal
     use :: Condition_Boundary
     use :: Solver_Solve
     use :: Time_Time
+    use Matrix_RCM, only: RCM_Reorder
     implicit none
 
     type, abstract :: Abstract_Thermal
