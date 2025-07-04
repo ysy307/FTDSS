@@ -31,6 +31,13 @@ if(NOT MY_ALL_LIBRARIES)
     file(GLOB MY_ALL_LIBRARIES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/third_party/.local/VTKFortran/lib/*.a)
 endif()
 
+if(NOT TARGET VTK::CommonCore)
+    find_package(VTK REQUIRED
+        PATHS ${PROJECT_SOURCE_DIR}/third_party/.local/lib/cmake/VTK-9.5
+    )
+endif()
+
+
 # --- ターゲットに対してビルドフラグを設定 ---
 function(enable_build_flags target)
     target_compile_options(${target} PUBLIC

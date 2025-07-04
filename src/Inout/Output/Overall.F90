@@ -100,11 +100,11 @@ contains
 
     end subroutine Inout_Output_Overall_initialize_vtu
 
-    module subroutine Inout_Output_Overall_Output(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+    module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in) :: fc
-        integer(int32), intent(in), optional :: RCM_Perm(:)
+        integer(int32), intent(in), optional :: iperm(:)
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
@@ -112,19 +112,19 @@ contains
 
         select case (trim(adjustl(self%fextend)))
         case (".vtk")
-            call self%Output_vtk(fc=fc, RCM_Perm=RCM_Perm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+            call self%Output_vtk(fc=fc, iperm=iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
         case (".vtu")
-            call self%Output_vtu(fc=fc, RCM_Perm=RCM_Perm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+            call self%Output_vtu(fc=fc, iperm=iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
         end select
 
     end subroutine Inout_Output_Overall_Output
 
-    module subroutine Inout_Output_Overall_Output_vtk(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+    module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux)
         use :: stdlib_strings, only:to_string
         implicit none
         class(Output_Overall), intent(inout) :: self
         integer(int32), intent(in) :: fc
-        integer(int32), intent(in), optional :: RCM_Perm(:)
+        integer(int32), intent(in), optional :: iperm(:)
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
@@ -168,25 +168,25 @@ contains
 
         write (unit_num, '(a, i0)') "POINT_DATA ", self%VTK%nPoints
         if (present(Temp)) then
-            call self%Output_vtk_scalar(RCM_Perm=RCM_Perm, &
+            call self%Output_vtk_scalar(iperm=iperm, &
                                         unit_num=unit_num, &
                                         data_name='Temperature', &
                                         x=Temp)
         end if
         if (present(Si)) then
-            call self%Output_vtk_scalar(RCM_Perm=RCM_Perm, &
+            call self%Output_vtk_scalar(iperm=iperm, &
                                         unit_num=unit_num, &
                                         data_name='Si', &
                                         x=Si)
         end if
         if (present(Pres)) then
-            call self%Output_vtk_scalar(RCM_Perm=RCM_Perm, &
+            call self%Output_vtk_scalar(iperm=iperm, &
                                         unit_num=unit_num, &
                                         data_name='Pressure', &
                                         x=Pres)
         end if
         if (present(wFlux)) then
-            call self%Output_vtk_vector(RCM_Perm=RCM_Perm, &
+            call self%Output_vtk_vector(iperm=iperm, &
                                         unit_num=unit_num, &
                                         data_name='waterFlux', &
                                         x=wFlux%x, &
@@ -196,63 +196,63 @@ contains
 
     end subroutine Inout_Output_Overall_Output_vtk
 
-    module subroutine Inout_Output_Overall_Output_vtk_scalar(self, RCM_Perm, unit_num, data_name, x)
+    module subroutine Inout_Output_Overall_Output_vtk_scalar(self, iperm, unit_num, data_name, x)
         implicit none
         class(Output_Overall) :: self
-        integer(int32), intent(in), optional :: RCM_Perm(:)
+        integer(int32), intent(in), optional :: iperm(:)
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
         real(real64), intent(in) :: x(:)
 
-        real(real64), allocatable :: tmp(:)
+        real(real64), allocatable :: Original(:)
         integer(int32) :: status
 
-        call Allocate_Array(tmp, self%VTK%nPoints)
-        call reorder_to_original(x, RCM_Perm, tmp, status)
+        call Allocate_Array(Original, self%VTK%nPoints)
+        call Reorder_to_Original(x, Original, iperm, status)
 
         write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
         write (unit_num, '(a)') "LOOKUP_TABLE default"
-        write (unit_num, '(es22.15)') tmp(:)
+        write (unit_num, '(es22.15)') Original(:)
         write (unit_num, '(a)') ""
 
-        deallocate (tmp)
+        deallocate (Original)
 
     end subroutine Inout_Output_Overall_Output_vtk_scalar
 
-    module subroutine Inout_Output_Overall_Output_vtk_vector(self, RCM_Perm, unit_num, data_name, x, y, z)
+    module subroutine Inout_Output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
         implicit none
         class(Output_Overall) :: self
-        integer(int32), intent(in), optional :: RCM_Perm(:)
+        integer(int32), intent(in), optional :: iperm(:)
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
         real(real64), intent(in) :: x(:), y(:), z(:)
 
-        real(real64), allocatable :: tmp_x(:), tmp_y(:), tmp_z(:)
+        real(real64), allocatable :: Original_x(:), Original_y(:), Original_z(:)
         integer(int32) :: i
         integer(int32) :: status
 
-        call Allocate_Array(tmp_x, self%VTK%nPoints)
-        call Allocate_Array(tmp_y, self%VTK%nPoints)
-        call Allocate_Array(tmp_z, self%VTK%nPoints)
+        call Allocate_Array(Original_x, self%VTK%nPoints)
+        call Allocate_Array(Original_y, self%VTK%nPoints)
+        call Allocate_Array(Original_z, self%VTK%nPoints)
 
-        call reorder_to_original(x, RCM_Perm, tmp_x, status)
-        call reorder_to_original(y, RCM_Perm, tmp_y, status)
-        call reorder_to_original(z, RCM_Perm, tmp_z, status)
+        call Reorder_to_Original(x, Original_x, iperm, status)
+        call Reorder_to_Original(y, Original_y, iperm, status)
+        call Reorder_to_Original(z, Original_z, iperm, status)
 
         write (unit_num, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
         do i = 1, self%VTK%nPoints
-            write (unit_num, '(3(es22.15,x))') tmp_x(i), tmp_y(i), tmp_z(i)
+            write (unit_num, '(3(es22.15,x))') Original_x(i), Original_y(i), Original_z(i)
         end do
         write (unit_num, '(a)') ""
 
     end subroutine Inout_Output_Overall_Output_vtk_vector
 
-    module subroutine Inout_Output_Overall_Output_vtu(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+    module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux)
         use :: vtk_fortran, only:vtk_file
         implicit none
         class(Output_Overall), intent(inout) :: self
         integer(int32), intent(in) :: fc
-        integer(int32), intent(in), optional :: RCM_Perm(:)
+        integer(int32), intent(in), optional :: iperm(:)
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
@@ -261,16 +261,16 @@ contains
         type(vtk_file) :: vtu
         integer(int32) :: status
 
-        real(real64), allocatable :: tmp(:), tmp_vector(:, :)
+        real(real64), allocatable :: Original(:), Original_vector(:, :)
 
         character(256) :: outName
 
-        call Allocate_Array(tmp, self%VTK%nPoints)
-        call Allocate_Array(tmp_vector, 3_int32, self%VTK%nPoints)
+        call Allocate_Array(Original, self%VTK%nPoints)
+        call Allocate_Array(Original_vector, 3_int32, self%VTK%nPoints)
 
         ! Initialize VTK file
         write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
-        status = vtu%initialize(format='binary', filename=trim(outName), mesh_topology='UnstructuredGrid')
+        status = vtu%initialize(format='ascii', filename=trim(outName), mesh_topology='UnstructuredGrid')
 
         ! Write data
         status = vtu%xml_writer%write_piece(np=self%VTK%nPoints, &
@@ -286,28 +286,32 @@ contains
                                                    cell_type=self%VTK%CellType)
         status = vtu%xml_writer%write_dataarray(location='node', action='open')
         if (present(Temp)) then
-            call reorder_to_original(Temp, RCM_Perm, tmp, status)
+            if (present(iperm)) then
+                call Reorder_to_Original(Temp, Original, iperm, status)
+            else
+                Original = Temp
+            end if
             status = vtu%xml_writer%write_dataarray(data_name='Temperature', &
-                                                    x=tmp)
+                                                    x=Original)
         end if
         if (present(Si)) then
-            call reorder_to_original(Si, RCM_Perm, tmp, status)
+            call Reorder_to_Original(Si, Original, iperm, status)
             status = vtu%xml_writer%write_dataarray(data_name='Si', &
-                                                    x=tmp)
+                                                    x=Original)
         end if
         if (present(Pres)) then
-            call reorder_to_original(Pres, RCM_Perm, tmp, status)
+            call Reorder_to_Original(Pres, Original, iperm, status)
             status = vtu%xml_writer%write_dataarray(data_name='Pressure', &
-                                                    x=tmp)
+                                                    x=Original)
         end if
         if (present(wFlux)) then
-            call reorder_to_original(wFlux%x, RCM_Perm, tmp_vector(:, 1), status)
-            call reorder_to_original(wFlux%y, RCM_Perm, tmp_vector(:, 2), status)
-            call reorder_to_original(wFlux%z, RCM_Perm, tmp_vector(:, 3), status)
+            call Reorder_to_Original(wFlux%x, Original_vector(:, 1), iperm, status)
+            call Reorder_to_Original(wFlux%y, Original_vector(:, 2), iperm, status)
+            call Reorder_to_Original(wFlux%z, Original_vector(:, 3), iperm, status)
             status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
-                                                    x=tmp_vector(:, 1), &
-                                                    y=tmp_vector(:, 2), &
-                                                    z=tmp_vector(:, 3))
+                                                    x=Original_vector(:, 1), &
+                                                    y=Original_vector(:, 2), &
+                                                    z=Original_vector(:, 3))
         end if
         status = vtu%xml_writer%write_dataarray(location='node', action='close')
         status = vtu%xml_writer%write_piece()

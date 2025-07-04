@@ -248,11 +248,11 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_initialize_vtu
 
-        module subroutine Inout_Output_Overall_Output(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in) :: fc
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
@@ -260,11 +260,11 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_Output
 
-        module subroutine Inout_Output_Overall_Output_vtk(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
@@ -272,31 +272,31 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_Output_vtk
 
-        module subroutine Inout_Output_Overall_Output_vtk_scalar(self, RCM_Perm, unit_num, data_name, x)
+        module subroutine Inout_Output_Overall_Output_vtk_scalar(self, iperm, unit_num, data_name, x)
             implicit none
             class(Output_Overall) :: self
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             integer(int32), intent(in) :: unit_num
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:)
 
         end subroutine Inout_Output_Overall_Output_vtk_scalar
 
-        module subroutine Inout_Output_Overall_Output_vtk_vector(self, RCM_Perm, unit_num, data_name, x, y, z)
+        module subroutine Inout_Output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
             implicit none
             class(Output_Overall) :: self
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             integer(int32), intent(in) :: unit_num
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:), y(:), z(:)
 
         end subroutine Inout_Output_Overall_Output_vtk_vector
 
-        module subroutine Inout_Output_Overall_Output_vtu(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)

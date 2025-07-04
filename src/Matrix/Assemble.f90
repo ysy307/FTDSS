@@ -4,6 +4,7 @@ module Matrix_Assemble
     use :: Properties_Model_Base, only:Proereties_Model_t
     use :: Matrix_CRS
     use :: Domain_Module, only:Domain_t
+    use :: Matrix_RCM, only:Reorder_to_Original
 #ifdef _OPENMP
     use omp_lib
 #endif
@@ -25,11 +26,22 @@ contains
 
         integer(int32) :: index, nNodes, nGauss
         integer(int32) :: iE, il, jl, iG, iRegion
+        integer(int32) :: r_il, r_jl
+        integer(int32) :: istat
         real(real64) :: val
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: Ca
 
+        real(real64), allocatable :: Original_Temperature(:)
+        real(real64), allocatable :: Original_Porosity(:)
+
         integer(int32) :: nElements
+
+        allocate (Original_Temperature, mold=Temperature)
+        allocate (Original_Porosity, mold=Porosity)
+
+        call Reorder_to_Original(Temperature, Original_Temperature, Domain%RCM_perm, istat)
+        call Reorder_to_Original(Porosity, Original_Porosity, Domain%RCM_perm, istat)
 
         State%porosity = 0.0d0
         State%temperature = 0.0d0
@@ -44,14 +56,16 @@ contains
                 do jl = 1, nNodes
                     val = 0.0d0
                     nGauss = Domain%Elements(iE)%e%nGauss
+                    r_il = Domain%RCM_inv_perm(Domain%Elements(iE)%e%conn(il))
+                    r_jl = Domain%RCM_inv_perm(Domain%Elements(iE)%e%conn(jl))
                     do iG = 1, nGauss
                         xi = Domain%Elements(iE)%e%gauss(1, iG)
                         eta = Domain%Elements(iE)%e%gauss(2, iG)
                         weight = Domain%Elements(iE)%e%weight(iG)
                         detJ = Domain%Elements(iE)%e%Jac_Det(xi, eta)
 
-                        State%temperature = Domain%Elements(iE)%e%Interpolate(xi, eta, Temperature)
-                        State%porosity = Domain%Elements(iE)%e%Interpolate(xi, eta, Porosity)
+                        State%temperature = Domain%Elements(iE)%e%Interpolate(xi, eta, Original_Temperature)
+                        State%porosity = Domain%Elements(iE)%e%Interpolate(xi, eta, Original_Porosity)
                         State%water_content = Propeties%get_Qw(State, iRegion)
 
                         Ca = Propeties%get_Ca(State, iRegion)
@@ -60,12 +74,14 @@ contains
                                      Domain%Elements(iE)%e%psi(jl, xi, eta) * &
                                      detJ * weight * Ca)
                     end do
-                    call A%Find(Domain%RCM_perm(Domain%Elements(iE)%e%conn(il)), Domain%RCM_perm(Domain%Elements(iE)%e%conn(jl)), index)
+                    call A%Find(r_il, r_jl, index)
                     A%Val(index) = A%Val(index) + val
                 end do
-
             end do
         end do
+
+        deallocate (Original_Temperature)
+        deallocate (Original_Porosity)
 
         ! stop
     end subroutine Assemble_Mass_Heat_1
@@ -83,12 +99,23 @@ contains
         type(GaussPointState_t) :: State ! 状態の運び屋
         integer(int32) :: index, nNodes, nGauss, nElements
         integer(int32) :: iE, il, jl, iG, iRegion
+        integer(int32) :: r_il, r_jl
+        integer(int32) :: istat
         real(real64) :: val
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
         real(real64) :: lambda_gp ! Gauss Pointでの熱伝導率
 
+        real(real64), allocatable :: Original_Temperature(:)
+        real(real64), allocatable :: Original_Porosity(:)
+
         nElements = Domain%get_numElement()
+
+        allocate (Original_Temperature, mold=Temperature)
+        allocate (Original_Porosity, mold=Porosity)
+
+        call Reorder_to_Original(Temperature, Original_Temperature, Domain%RCM_perm, istat)
+        call Reorder_to_Original(Porosity, Original_Porosity, Domain%RCM_perm, istat)
 
         State%porosity = 0.0d0
         State%temperature = 0.0d0
@@ -100,11 +127,12 @@ contains
             ! 節点数取得
             nNodes = Domain%Elements(iE)%e%get_size()
             iRegion = Domain%Elements(iE)%e%get_group()
-            ! 要素内での平均拡散係数
-            ! mean_lambda = sum(lambda(Domain%Elements(iE)%e%conn(:))) / dble(nNodes)
             do il = 1, nNodes
                 do jl = 1, nNodes
                     val = 0.0d0
+
+                    r_il = Domain%RCM_inv_perm(Domain%Elements(iE)%e%conn(il))
+                    r_jl = Domain%RCM_inv_perm(Domain%Elements(iE)%e%conn(jl))
                     do iG = 1, Domain%Elements(iE)%e%nGauss
                         xi = Domain%Elements(iE)%e%gauss(1, iG)
                         eta = Domain%Elements(iE)%e%gauss(2, iG)
@@ -136,8 +164,8 @@ contains
                                   ) / detJ
 
                         ! (1) このガウス点での「状態」を計算する (質量行列と同じ)
-                        State%temperature = Domain%Elements(iE)%e%Interpolate(xi, eta, Temperature)
-                        State%porosity = Domain%Elements(iE)%e%Interpolate(xi, eta, Porosity)
+                        State%temperature = Domain%Elements(iE)%e%Interpolate(xi, eta, Original_Temperature)
+                        State%porosity = Domain%Elements(iE)%e%Interpolate(xi, eta, Original_Porosity)
                         State%water_content = Propeties%get_Qw(State, iRegion) ! 必要なら
 
                         ! (2) その「状態」を使って、このガウス点での熱伝導率を取得する
@@ -145,11 +173,14 @@ contains
 
                         val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda_gp * weight * detJ
                     end do
-                    call A%Find(Domain%Elements(iE)%e%conn(il), Domain%Elements(iE)%e%conn(jl), index)
+                    call A%Find(r_il, r_jl, index)
                     A%Val(index) = A%Val(index) + val
                 end do
             end do
         end do
+
+        deallocate (Original_Temperature)
+        deallocate (Original_Porosity)
 
     end subroutine Assemble_Diffusion_Heat_1
 end module Matrix_Assemble
