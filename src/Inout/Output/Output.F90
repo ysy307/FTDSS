@@ -221,7 +221,10 @@ module Inout_Output
         procedure, pass(self), public :: Output => Inout_Output_Overall_Output
         procedure, pass(self) :: Output_vtu => Inout_Output_Overall_Output_vtu
         procedure, pass(self) :: Output_vtk => Inout_Output_Overall_Output_vtk
-        procedure, pass(self) :: Output_vtk_scalar => Inout_Output_Overall_Output_vtk_scalar
+        procedure, pass(self) :: Output_vtk_scalar_int32 => Inout_Output_Overall_Output_vtk_scalar_int32
+        procedure, pass(self) :: Output_vtk_scalar_real64 => Inout_Output_Overall_Output_vtk_scalar_real64
+        generic :: Output_vtk_scalar => Output_vtk_scalar_int32, & !&
+                                        Output_vtk_scalar_real64 !&
         procedure, pass(self) :: Output_vtk_vector => Inout_Output_Overall_Output_vtk_vector
 
     end type
@@ -254,7 +257,7 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_initialize_vtu
 
-        module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in) :: fc
@@ -263,10 +266,11 @@ module Inout_Output
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
             type(DP3d), intent(in), optional :: wFlux
+            integer(int32), intent(in), optional :: Colors(:)
 
         end subroutine Inout_Output_Overall_Output
 
-        module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
@@ -275,10 +279,11 @@ module Inout_Output
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
             type(DP3d), intent(in), optional :: wFlux
+            integer(int32), intent(in), optional :: Colors(:)
 
         end subroutine Inout_Output_Overall_Output_vtk
 
-        module subroutine Inout_Output_Overall_Output_vtk_scalar(self, iperm, unit_num, data_name, x)
+        module subroutine Inout_Output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in), optional :: iperm(:)
@@ -286,7 +291,17 @@ module Inout_Output
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:)
 
-        end subroutine Inout_Output_Overall_Output_vtk_scalar
+        end subroutine Inout_Output_Overall_Output_vtk_scalar_real64
+
+        module subroutine Inout_Output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
+            implicit none
+            class(Output_Overall) :: self
+            integer(int32), intent(in), optional :: iperm(:)
+            integer(int32), intent(in) :: unit_num
+            character(*), intent(in) :: data_name
+            integer(int32), intent(in) :: x(:)
+
+        end subroutine Inout_Output_Overall_Output_vtk_scalar_int32
 
         module subroutine Inout_Output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
             implicit none
@@ -298,7 +313,7 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_Output_vtk_vector
 
-        module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
@@ -307,6 +322,7 @@ module Inout_Output
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
             type(DP3d), intent(in), optional :: wFlux
+            integer(int32), intent(in), optional :: Colors(:)
 
         end subroutine Inout_Output_Overall_Output_vtu
 
@@ -488,8 +504,8 @@ contains
         integer(int32) :: local_id, local_type
         integer(int32) :: ierr
 
-        character(len=256) :: OutputExtentions(2) = [".dat", ".csv"]
-        character(len=256) :: OutputFileExtentions(5) = [".dat", ".csv", ".vtk", ".vtu", "log"]
+        character(len=256) :: OutputExtentions(3) = [".dat", ".csv", ".log"]
+        character(len=256) :: OutputFileExtentions(5) = [".dat", ".csv", ".vtk", ".vtu", ".log"]
 
         ! Path settings
         dir_Path = GetProjectPath()

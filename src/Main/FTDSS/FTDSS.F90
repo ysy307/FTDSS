@@ -10,6 +10,9 @@ module Main_FTDSS
     use :: Conditions_Boundary_Manager, only:BCManager
     use :: Conditions_Initial_Manager, only:ICManager
 
+    use :: Matrix_RCM, only:RCM_Reorder, RCM_Reorder_Inverse
+    use :: Matrix_Multicoloring, only:Multicoloring
+
     use :: Main_Thermal
     implicit none
 
@@ -58,6 +61,10 @@ contains
         self%Coordinate = self%Input%VTK%POINTS
 
         call self%Domain%initialize(self%Input, self%Coordinate, ierr)
+        call RCM_Reorder(self%Domain, self%Domain%RCM_perm, ierr)
+        call RCM_Reorder_Inverse(self%Domain%RCM_perm, self%Domain%RCM_inv_perm, ierr)
+        call Multicoloring(self%Domain)
+
         if (ierr /= 0) then
             print *, "Error initializing domain in Type_Thermal_3Phase_2D_Construct"
             return
@@ -83,6 +90,10 @@ contains
         call self%phi%allocate(nsize, self%Input%Basic%Order)
         self%phi%pre = self%Input%Regions(1)%Thermal%Porosity
         self%phi%old = self%Input%Regions(1)%Thermal%Porosity
+
+        call self%Output%Overall%Output_vtu(fc=0, &
+                                            iperm=self%Domain%RCM_perm, &
+                                            Colors=self%Domain%Colors%Color)
 
     end subroutine FDTSS_initialize
 

@@ -10,6 +10,17 @@ module Domain_Module
     private
     public :: Domain_t
 
+    type :: Colored_info_t
+        integer(int32) :: numElements
+        integer(int32), allocatable :: Elements(:) ! 各要素のインデックス
+    end type Colored_info_t
+
+    type :: Coloring_t
+        integer(int32) :: nColor
+        integer(int32), allocatable :: Color(:)
+        type(Colored_info_t), allocatable :: Colored(:) ! 各色に属する要素の情報
+    end type Coloring_t
+
     type :: Domain_t
         ! private
         integer(int32), private :: nElement
@@ -20,6 +31,7 @@ module Domain_Module
         type(SideHolder), allocatable :: Sides(:)
         integer(int32), allocatable :: RCM_perm(:)
         integer(int32), allocatable :: RCM_inv_perm(:)
+        type(Coloring_t) :: Colors ! マルチカラーリング用の情報
         ! ...
     contains
         procedure, pass(self) :: initialize
@@ -99,6 +111,7 @@ contains
                 iElem = iElem + 1
             end if
         end do
+
     end subroutine initialize
 
     function get_numElement(self) result(numElement)

@@ -21,8 +21,7 @@ contains
         allocate (Type_Thermal_3Phase_2D :: Structure)
 
         nNode = Domain%get_numNode()
-        call RCM_Reorder(Domain, Domain%RCM_perm, ierr)
-        call RCM_Reorder_Inverse(Domain%RCM_perm, Domain%RCM_inv_perm, ierr)
+
         ! print *, "RCM inverse permutation:"
         ! print *, Domain%RCM_inv_perm(:)
         ! stop

@@ -1,6 +1,8 @@
 add_library(Matrix OBJECT
     CRS.F90
     RCM.F90
+    Adjacency.F90
+    Multicoloring.F90
     Assemble.F90
 )
 target_link_libraries(Matrix PRIVATE

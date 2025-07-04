@@ -100,7 +100,7 @@ contains
 
     end subroutine Inout_Output_Overall_initialize_vtu
 
-    module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux)
+    module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in) :: fc
@@ -109,17 +109,22 @@ contains
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
         type(DP3d), intent(in), optional :: wFlux
+        integer(int32), intent(in), optional :: Colors(:)
 
         select case (trim(adjustl(self%fextend)))
         case (".vtk")
             call self%Output_vtk(fc=fc, iperm=iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
         case (".vtu")
-            call self%Output_vtu(fc=fc, iperm=iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+            if (present(Colors)) then
+                call self%Output_vtu(fc=fc, iperm=iperm, Colors=Colors)
+            else
+                call self%Output_vtu(fc=fc, iperm=iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+            end if
         end select
 
     end subroutine Inout_Output_Overall_Output
 
-    module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux)
+    module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
         use :: stdlib_strings, only:to_string
         implicit none
         class(Output_Overall), intent(inout) :: self
@@ -129,6 +134,7 @@ contains
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
         type(DP3d), intent(in), optional :: wFlux
+        integer(int32), intent(in), optional :: Colors(:)
 
         integer(int32) :: status
         integer(int32) :: unit_num
@@ -196,7 +202,7 @@ contains
 
     end subroutine Inout_Output_Overall_Output_vtk
 
-    module subroutine Inout_Output_Overall_Output_vtk_scalar(self, iperm, unit_num, data_name, x)
+    module subroutine Inout_Output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in), optional :: iperm(:)
@@ -217,7 +223,30 @@ contains
 
         deallocate (Original)
 
-    end subroutine Inout_Output_Overall_Output_vtk_scalar
+    end subroutine Inout_Output_Overall_Output_vtk_scalar_real64
+
+    module subroutine Inout_Output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
+        implicit none
+        class(Output_Overall) :: self
+        integer(int32), intent(in), optional :: iperm(:)
+        integer(int32), intent(in) :: unit_num
+        character(*), intent(in) :: data_name
+        integer(int32), intent(in) :: x(:)
+
+        integer(int32), allocatable :: Original(:)
+        integer(int32) :: status
+
+        call Allocate_Array(Original, self%VTK%nPoints)
+        ! call Reorder_to_Original(x, Original, iperm, status)
+
+        write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " int 1"
+        write (unit_num, '(a)') "LOOKUP_TABLE default"
+        write (unit_num, '(es22.15)') Original(:)
+        write (unit_num, '(a)') ""
+
+        deallocate (Original)
+
+    end subroutine Inout_Output_Overall_Output_vtk_scalar_int32
 
     module subroutine Inout_Output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
         implicit none
@@ -247,7 +276,7 @@ contains
 
     end subroutine Inout_Output_Overall_Output_vtk_vector
 
-    module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux)
+    module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
         use :: vtk_fortran, only:vtk_file
         implicit none
         class(Output_Overall), intent(inout) :: self
@@ -257,11 +286,14 @@ contains
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
         type(DP3d), intent(in), optional :: wFlux
+        integer(int32), intent(in), optional :: Colors(:)
 
         type(vtk_file) :: vtu
         integer(int32) :: status
 
         real(real64), allocatable :: Original(:), Original_vector(:, :)
+        integer(int32), allocatable :: Cell_add_Colors(:)
+        integer(int32) :: nsize
 
         character(256) :: outName
 
@@ -269,8 +301,12 @@ contains
         call Allocate_Array(Original_vector, 3_int32, self%VTK%nPoints)
 
         ! Initialize VTK file
-        write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
-        status = vtu%initialize(format='ascii', filename=trim(outName), mesh_topology='UnstructuredGrid')
+        if (present(Colors)) then
+            write (outName, '(3a)') trim(self%dir_FileOutput), "Coloring", self%fextend
+        else
+            write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
+        end if
+        status = vtu%initialize(format='binary', filename=trim(outName), mesh_topology='UnstructuredGrid')
 
         ! Write data
         status = vtu%xml_writer%write_piece(np=self%VTK%nPoints, &
@@ -284,36 +320,50 @@ contains
                                                    connectivity=self%VTK%connectivity, &
                                                    offset=self%VTK%offset, &
                                                    cell_type=self%VTK%CellType)
-        status = vtu%xml_writer%write_dataarray(location='node', action='open')
-        if (present(Temp)) then
-            if (present(iperm)) then
-                call Reorder_to_Original(Temp, Original, iperm, status)
-            else
-                Original = Temp
+
+        ! --- データセクション ---
+        if (present(Colors)) then
+            call Allocate_Array(Cell_add_Colors, self%VTK%nCell)
+            nsize = size(Colors)
+            Cell_add_Colors(:) = 0
+            Cell_add_Colors(1:self%VTK%nCell - nsize) = 0
+            Cell_add_Colors(self%VTK%nCell - nsize + 1:self%VTK%nCell) = Colors(:)
+            status = vtu%xml_writer%write_dataarray(location='cell', action='open')
+            status = vtu%xml_writer%write_dataarray(data_name='Colors', x=Cell_add_Colors)
+            status = vtu%xml_writer%write_dataarray(location='cell', action='close')
+            deallocate (Cell_add_Colors)
+        else
+            status = vtu%xml_writer%write_dataarray(location='node', action='open')
+            if (present(Temp)) then
+                if (present(iperm)) then
+                    call Reorder_to_Original(Temp, Original, iperm, status)
+                else
+                    Original = Temp
+                end if
+                status = vtu%xml_writer%write_dataarray(data_name='Temperature', &
+                                                        x=Original)
             end if
-            status = vtu%xml_writer%write_dataarray(data_name='Temperature', &
-                                                    x=Original)
+            if (present(Si)) then
+                call Reorder_to_Original(Si, Original, iperm, status)
+                status = vtu%xml_writer%write_dataarray(data_name='Si', &
+                                                        x=Original)
+            end if
+            if (present(Pres)) then
+                call Reorder_to_Original(Pres, Original, iperm, status)
+                status = vtu%xml_writer%write_dataarray(data_name='Pressure', &
+                                                        x=Original)
+            end if
+            if (present(wFlux)) then
+                call Reorder_to_Original(wFlux%x, Original_vector(:, 1), iperm, status)
+                call Reorder_to_Original(wFlux%y, Original_vector(:, 2), iperm, status)
+                call Reorder_to_Original(wFlux%z, Original_vector(:, 3), iperm, status)
+                status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
+                                                        x=Original_vector(:, 1), &
+                                                        y=Original_vector(:, 2), &
+                                                        z=Original_vector(:, 3))
+            end if
+            status = vtu%xml_writer%write_dataarray(location='node', action='close')
         end if
-        if (present(Si)) then
-            call Reorder_to_Original(Si, Original, iperm, status)
-            status = vtu%xml_writer%write_dataarray(data_name='Si', &
-                                                    x=Original)
-        end if
-        if (present(Pres)) then
-            call Reorder_to_Original(Pres, Original, iperm, status)
-            status = vtu%xml_writer%write_dataarray(data_name='Pressure', &
-                                                    x=Original)
-        end if
-        if (present(wFlux)) then
-            call Reorder_to_Original(wFlux%x, Original_vector(:, 1), iperm, status)
-            call Reorder_to_Original(wFlux%y, Original_vector(:, 2), iperm, status)
-            call Reorder_to_Original(wFlux%z, Original_vector(:, 3), iperm, status)
-            status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
-                                                    x=Original_vector(:, 1), &
-                                                    y=Original_vector(:, 2), &
-                                                    z=Original_vector(:, 3))
-        end if
-        status = vtu%xml_writer%write_dataarray(location='node', action='close')
         status = vtu%xml_writer%write_piece()
 
         ! Finalize VTK file
