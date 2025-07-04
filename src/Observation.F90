@@ -27,7 +27,7 @@ contains
         type(Domain_t), intent(in), optional :: Domain
 
         integer(int32) :: iObs, iElem, nElements
-        integer(int32) :: local_id, local_type, ierr
+        integer(int32) :: local_group_id, local_type, ierr
         real(real64) :: tmp_xi, tmp_eta
         logical(4) :: is_inside
 
@@ -55,7 +55,7 @@ contains
                                                                     tmp_eta, &
                                                                     is_inside)
                             if (is_inside) then
-                                local_id = Domain%Elements(iElem)%e%get_id()
+                                local_group_id = Domain%Elements(iElem)%e%get_group()
                                 local_type = Domain%Elements(iElem)%e%get_type()
                                 call Create_Element(new_element=self%Element(iObs)%e, &
                                                     shape_type=local_type, &
@@ -63,7 +63,7 @@ contains
                                                     iElem=iElem, &
                                                     Global_Coordinate=Coordinate, &
                                                     Connectivity=Domain%Elements(iElem)%e%conn, &
-                                                    GroupID=local_id)
+                                                    GroupID=local_group_id)
                                 self%obs_xi(iObs) = tmp_xi
                                 self%obs_eta(iObs) = tmp_eta
                                 exit
@@ -80,7 +80,7 @@ contains
                                                                     tmp_eta, &
                                                                     is_inside)
                             if (is_inside) then
-                                local_id = Domain%Elements(iElem)%e%get_id()
+                                local_group_id = Domain%Elements(iElem)%e%get_group()
                                 local_type = Domain%Elements(iElem)%e%get_type()
                                 call Create_Element(new_element=self%Element(iObs)%e, &
                                                     shape_type=local_type, &
@@ -88,7 +88,7 @@ contains
                                                     iElem=iElem, &
                                                     Global_Coordinate=Coordinate, &
                                                     Connectivity=Domain%Elements(iElem)%e%conn, &
-                                                    GroupID=local_id)
+                                                    GroupID=local_group_id)
                                 self%obs_xi(iObs) = tmp_xi
                                 self%obs_eta(iObs) = tmp_eta
                                 exit
@@ -195,7 +195,7 @@ contains
     !
     !----------------------------------------------------------------------!
     module subroutine Interpolate_ObsValues_Temperature(obs_values, observation_data, nodal_temperature, &
-                                                        nodal_porosity, nodal_Pw, Properties)
+                                                        nodal_porosity, nodal_Pw, Properties, Domain)
         implicit none
         real(real64), intent(out) :: obs_values(:)
         type(Output_Observation), intent(in) :: observation_data
@@ -203,21 +203,29 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
+        type(Domain_t), intent(in), optional :: Domain
 
         integer(int32) :: iObs
+        real(real64), allocatable :: Original_Temperature(:)
+        integer(int32) :: istat
 
         ! Initialize to zero
         obs_values(:) = 0.0d0
         if (.not. present(nodal_temperature)) return
 
+        allocate (Original_Temperature, mold=nodal_temperature)
+        call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
+
         do iObs = 1, observation_data%NumObservation
             obs_values(iObs) = observation_data%Element(iObs)%e%Interpolate( &
-                               observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
+                               observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Temperature(:))
         end do
+
+        deallocate (Original_Temperature)
     end subroutine Interpolate_ObsValues_Temperature
 
     module subroutine Interpolate_ObsValues_Si(obs_values, observation_data, nodal_temperature, &
-                                               nodal_porosity, nodal_Pw, Properties)
+                                               nodal_porosity, nodal_Pw, Properties, Domain)
         implicit none
         real(real64), intent(out) :: obs_values(:)
         type(Output_Observation), intent(in) :: observation_data
@@ -225,9 +233,14 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
+        type(Domain_t), intent(in), optional :: Domain
 
         type(GaussPointState_t) :: state
-        integer(int32) :: iObs
+        integer(int32) :: iObs, group_id
+
+        real(real64), allocatable :: Original_Temperature(:)
+        real(real64), allocatable :: Original_Porosity(:)
+        integer(int32) :: istat
 
         ! Initialize to zero
         obs_values(:) = 0.0d0
@@ -236,18 +249,28 @@ contains
         if (.not. present(nodal_Pw)) state%pressure = 101325.0d0
         if (.not. present(Properties)) return
 
+        allocate (Original_Temperature, mold=nodal_temperature)
+        allocate (Original_Porosity, mold=nodal_porosity)
+
+        call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
+        call Reorder_to_Original(nodal_porosity, Original_Porosity, Domain%RCM_perm, istat)
+
         do iObs = 1, observation_data%NumObservation
             state%temperature = observation_data%Element(iObs)%e%Interpolate( &
-                                observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
+                                observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Temperature(:))
             state%porosity = observation_data%Element(iObs)%e%Interpolate( &
-                             observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_porosity(:))
-            state%water_content = Properties%get_Qw(state, observation_data%Element(iObs)%e%get_group())
+                             observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Porosity(:))
+            group_id = observation_data%Element(iObs)%e%get_group()
+            state%water_content = Properties%get_Qw(state, group_id)
             obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
         end do
+
+        deallocate (Original_Temperature)
+        deallocate (Original_Porosity)
     end subroutine Interpolate_ObsValues_Si
 
     module subroutine Interpolate_ObsValues_THC(obs_values, observation_data, nodal_temperature, &
-                                                nodal_porosity, nodal_Pw, Properties)
+                                                nodal_porosity, nodal_Pw, Properties, Domain)
         implicit none
         real(real64), intent(out) :: obs_values(:)
         type(Output_Observation), intent(in) :: observation_data
@@ -255,9 +278,13 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
+        type(Domain_t), intent(in), optional :: Domain
 
         type(GaussPointState_t) :: state
         integer(int32) :: iObs, group_id
+        real(real64), allocatable :: Original_Temperature(:)
+        real(real64), allocatable :: Original_Porosity(:)
+        integer(int32) :: istat
 
         ! Initialize to zero
         obs_values(:) = 0.0d0
@@ -267,20 +294,29 @@ contains
         if (.not. present(nodal_Pw)) then
             state%pressure = 101325.0d0
 
+            allocate (Original_Temperature, mold=nodal_temperature)
+            allocate (Original_Porosity, mold=nodal_porosity)
+            call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
+            call Reorder_to_Original(nodal_porosity, Original_Porosity, Domain%RCM_perm, istat)
+
             do iObs = 1, observation_data%NumObservation
                 state%temperature = observation_data%Element(iObs)%e%Interpolate( &
-                                    observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
+                                    observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Temperature(:))
                 state%porosity = observation_data%Element(iObs)%e%Interpolate( &
-                                 observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_porosity(:))
+                                 observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Porosity(:))
                 group_id = observation_data%Element(iObs)%e%get_group()
                 state%water_content = Properties%get_Qw(state, group_id)
                 obs_values(iObs) = Properties%get_lambda(state, group_id)
             end do
+
+            deallocate (Original_Temperature)
+            deallocate (Original_Porosity)
         end if
+
     end subroutine Interpolate_ObsValues_THC
 
     module subroutine Interpolate_ObsValues_VHC(obs_values, observation_data, nodal_temperature, &
-                                                nodal_porosity, nodal_Pw, Properties)
+                                                nodal_porosity, nodal_Pw, Properties, Domain)
         implicit none
         real(real64), intent(out) :: obs_values(:)
         type(Output_Observation), intent(in) :: observation_data
@@ -288,9 +324,14 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
+        type(Domain_t), intent(in), optional :: Domain
 
         type(GaussPointState_t) :: state
         integer(int32) :: iObs, group_id
+
+        real(real64), allocatable :: Original_Temperature(:)
+        real(real64), allocatable :: Original_Porosity(:)
+        integer(int32) :: istat
 
         ! Initialize to zero
         obs_values(:) = 0.0d0
@@ -300,20 +341,28 @@ contains
         if (.not. present(nodal_Pw)) then
             state%pressure = 101325.0d0
 
+            allocate (Original_Temperature, mold=nodal_temperature)
+            allocate (Original_Porosity, mold=nodal_porosity)
+            call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
+            call Reorder_to_Original(nodal_porosity, Original_Porosity, Domain%RCM_perm, istat)
+
             do iObs = 1, observation_data%NumObservation
                 state%temperature = observation_data%Element(iObs)%e%Interpolate( &
-                                    observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_temperature(:))
+                                    observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_temperature(:))
                 state%porosity = observation_data%Element(iObs)%e%Interpolate( &
-                                 observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_porosity(:))
+                                 observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_porosity(:))
                 group_id = observation_data%Element(iObs)%e%get_group()
                 state%water_content = Properties%get_Qw(state, group_id)
                 obs_values(iObs) = Properties%get_Ca(state, group_id)
             end do
+
+            deallocate (Original_Temperature)
+            deallocate (Original_Porosity)
         end if
     end subroutine Interpolate_ObsValues_VHC
 
     module subroutine Interpolate_ObsValues_Pw(obs_values, observation_data, nodal_temperature, &
-                                               nodal_porosity, nodal_Pw, Properties)
+                                               nodal_porosity, nodal_Pw, Properties, Domain)
         implicit none
         real(real64), intent(out) :: obs_values(:)
         type(Output_Observation), intent(in) :: observation_data
@@ -321,18 +370,27 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
+        type(Domain_t), intent(in), optional :: Domain
+        ! Note: nodal_Pw is optional, if not present, pressure is assumed to be 101325.0d0
 
         type(GaussPointState_t) :: state
         integer(int32) :: iObs, group_id
+        real(real64), allocatable :: Original_Pressure(:)
+        integer(int32) :: istat
 
         ! Initialize to zero
         obs_values(:) = 0.0d0
         if (.not. present(nodal_Pw)) return
 
+        allocate (Original_Pressure, mold=nodal_Pw)
+        call Reorder_to_Original(nodal_Pw, Original_Pressure, Domain%RCM_perm, istat)
+
         do iObs = 1, observation_data%NumObservation
             obs_values(iObs) = observation_data%Element(iObs)%e%Interpolate( &
-                               observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), nodal_Pw(:))
+                               observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Pressure(:))
         end do
+
+        deallocate (Original_Pressure)
     end subroutine Interpolate_ObsValues_Pw
 
     !----------------------------------------------------------------------!
@@ -394,7 +452,7 @@ contains
     !   - Supports extensibility by checking optional arguments and types (e.g., GCC, EXP models).
     !
     !----------------------------------------------------------------------!
-    module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi, Propeties)
+    module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi, Propeties, Domain)
         implicit none
         class(Type_Output) :: self
         real(real64), intent(in) :: time
@@ -408,6 +466,7 @@ contains
         class(Abstract_Thermal), intent(inout), optional :: Thermal
         real(real64), intent(in), optional :: phi(:)
         type(Proereties_Model_t), intent(inout), optional :: Propeties
+        type(Domain_t), intent(in), optional :: Domain
 
         real(real64) :: obsValues(self%Observation%NumObservation)
         real(real64) :: tmpValues(self%Observation%NumObservation)
@@ -426,8 +485,8 @@ contains
                                                                      observation_data=self%Observation, &
                                                                      nodal_temperature=Temp, &
                                                                      nodal_porosity=phi, &
-                                                                     properties=Propeties &
-                                                                     )
+                                                                     properties=Propeties, &
+                                                                     Domain=Domain)
 
                     call Output_Observation_Line(self%Observation%Variables(iObs)%num_unit, time, obsValues)
                 end select

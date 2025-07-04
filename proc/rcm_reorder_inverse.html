@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>TriangleFirst &ndash; FTDSS</title>
+    <title>RCM_Reorder_Inverse &ndash; FTDSS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -80,8 +80,8 @@
 
     <div class="container">
   <div class="row">
-    <h1>TriangleFirst
-      <small>Interface</small>
+    <h1>RCM_Reorder_Inverse
+      <small>Subroutine</small>
       
     </h1>
       <div class="container p-2 mb-4 bg-light border rounded-3">
@@ -91,21 +91,21 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for procedures.</p>Including implementation: 81 statements,  5.5% of total for procedures.">3 statements</a>
+                 title=" 1.1% of total for procedures.">17 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/Element.F90"> Source File</a>
+              <a href="../src/RCM.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/element.f90.html'>Element.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/domain_element.html'>Domain_Element</a></li>
-            <li class="breadcrumb-item active" aria-current="page">TriangleFirst</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/rcm.f90.html'>RCM.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/matrix_rcm.html'>Matrix_RCM</a></li>
+            <li class="breadcrumb-item active" aria-current="page">RCM_Reorder_Inverse</li>
           </ol>
         </nav>
       </div>
@@ -120,10 +120,10 @@
   </script>
 
   </div>
-
+  
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-        <div id="sidebar">
+      <div id="sidebar">
       <h3>Contents</h3>
   
   
@@ -143,46 +143,96 @@
   
   
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#modprocs-0"
-         aria-expanded="false" aria-controls="modprocs-0">
-         <h4 class="card-header bg-primary text-white">Module Procedures</h4>
-      </a>
-      <div id="modprocs-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../interface/trianglefirst.html#moduleprocedure-trianglefirst_construct">TriangleFirst_Construct</a>
-        </div>
-      </div>
-    </div>
-
+  
   
 
 
   </div>
 
     </div>
-
+    
     <div class="col-md-9" id='text'>
-      <h2>public interface TriangleFirst</h2>
-      
+    <h2>public  subroutine RCM_Reorder_Inverse(perm, iperm, istat)  
+</h2>
+    
 
 
 
-        <h2>Module Procedures</h2>
-            <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="interface-trianglefirst_construct"></span> <h3>private  interface TriangleFirst_Construct()  
-</h3></div>
-    <div class="card-body">
-        
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-perm~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>perm</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iperm"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>iperm</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-istat~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>istat</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
-  <h4>Arguments</h4>
-    <em>None</em>
+    <br>
 
+
+    
+    
+
+    
+    
+
+
+
+    
+    
     </div>
   </div>
 
-</div>
-  </div>
       <hr>
     </div> <!-- /container -->
     <footer>

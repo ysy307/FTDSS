@@ -22,6 +22,11 @@ contains
 
         nNode = Domain%get_numNode()
         call RCM_Reorder(Domain, Domain%RCM_perm, ierr)
+        call RCM_Reorder_Inverse(Domain%RCM_perm, Domain%RCM_inv_perm, ierr)
+        ! print *, "RCM inverse permutation:"
+        ! print *, Domain%RCM_inv_perm(:)
+        ! stop
+
         if (ierr /= 0) then
             print *, "Error in RCM_Reorder in Type_Thermal_3Phase_2D_Construct"
             return

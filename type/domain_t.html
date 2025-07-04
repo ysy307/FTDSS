@@ -91,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.5% of total for derived types.</p>Including implementation: 86 statements,  5.5% of total for derived types.">15 statements</a>
+                 title="<p> 1.6% of total for derived types.</p>Including implementation: 87 statements,  5.6% of total for derived types.">16 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -135,7 +135,8 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/domain_t.html#variable-elements">Elements</a>
             <a class="list-group-item" href="../type/domain_t.html#variable-sides">Sides</a>
-            <a class="list-group-item" href="../type/domain_t.html#variable-rcm_perm">RCM_perm</a>
+            <a class="list-group-item" href="../type/domain_t.html#variable-rcm_perm~2">RCM_perm</a>
+            <a class="list-group-item" href="../type/domain_t.html#variable-rcm_inv_perm">RCM_inv_perm</a>
         </div>
       </div>
     </div>
@@ -162,7 +163,7 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/domain_t.html#boundprocedure-initialize">initialize</a>
+            <a class="list-group-item" href="../type/domain_t.html#boundprocedure-initialize~12">initialize</a>
             <a class="list-group-item" href="../type/domain_t.html#boundprocedure-get_numelement">get_numElement</a>
             <a class="list-group-item" href="../type/domain_t.html#boundprocedure-get_numside">get_numSide</a>
             <a class="list-group-item" href="../type/domain_t.html#boundprocedure-get_numnode">get_numNode</a>
@@ -233,7 +234,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-rcm_perm"></span>
+              <span class="anchor" id="variable-rcm_perm~2"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -242,6 +243,23 @@
             </td>
             <td>::</td>
             <td><strong>RCM_perm</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rcm_inv_perm"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>RCM_inv_perm</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -261,7 +279,7 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize"></span>
+      <span class="anchor" id="boundprocedure-initialize~12"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong>

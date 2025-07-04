@@ -91,7 +91,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 1.8% of total for modules and submodules.">221 statements</a>
+                 title=" 2.4% of total for modules and submodules.">295 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -144,6 +144,7 @@
       <div id="subs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../module/matrix_rcm.html#proc-rcm_reorder">RCM_Reorder</a>
+            <a class="list-group-item" href="../module/matrix_rcm.html#proc-rcm_reorder_inverse">RCM_Reorder_Inverse</a>
             <a class="list-group-item" href="../module/matrix_rcm.html#proc-reorder_to_original">Reorder_to_Original</a>
         </div>
       </div>
@@ -170,10 +171,10 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='core_allocate.html'>Core_Allocate</a></li>
-                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
                   <li class="list-inline-item">stdlib_sorting</li>
+                  <li class="list-inline-item"><a href='core_allocate.html'>Core_Allocate</a></li>
                   <li class="list-inline-item"><a href='domain_module.html'>Domain_Module</a></li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
               </ul>
             </li>
         </ul>
@@ -212,7 +213,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-domain~4"></span>
+              <span class="anchor" id="variable-domain"></span>
               class(<a href='../type/domain_t.html'>Domain_t</a>),
             </td>
 <td>intent(in)</td>
@@ -227,7 +228,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-perm~6"></span>
+              <span class="anchor" id="variable-perm~3"></span>
               integer(kind=int32),
             </td>
 <td>intent(inout),</td>
@@ -263,7 +264,77 @@
   </div>
 
               <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-reorder_to_original"></span> <h3>public  subroutine <a href='../proc/reorder_to_original.html'>Reorder_to_Original</a>(vector_rcm, perm, vector_original, istat)  
+    <div class="card-header codesum"><span class="anchor" id="proc-rcm_reorder_inverse"></span> <h3>public  subroutine <a href='../proc/rcm_reorder_inverse.html'>RCM_Reorder_Inverse</a>(perm, iperm, istat)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-perm~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>perm</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iperm"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>iperm</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-istat~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>istat</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-reorder_to_original"></span> <h3>public  subroutine <a href='../proc/reorder_to_original.html'>Reorder_to_Original</a>(vector_rcm, vector_original, perm, istat)  
 </h3></div>
     <div class="card-body">
           
@@ -297,21 +368,6 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-perm~8"></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>perm</strong>(:)</td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
               <span class="anchor" id="variable-vector_original"></span>
               real(kind=real64),
             </td>
@@ -327,10 +383,25 @@
         </tr>
         <tr>
             <td>
+              <span class="anchor" id="variable-perm~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>perm</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
               <span class="anchor" id="variable-istat~5"></span>
               integer(kind=int32),
             </td>
-<td>intent(out)</td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>

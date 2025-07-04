@@ -91,7 +91,7 @@ module Inout_Output
         end subroutine Output_Observation_Write_Header
 
         module subroutine Interpolate_ObsValues_Temperature(obs_values, observation_data, nodal_temperature, &
-                                                            nodal_porosity, nodal_Pw, Properties)
+                                                            nodal_porosity, nodal_Pw, Properties, Domain)
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
@@ -99,11 +99,12 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
+            type(Domain_t), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Temperature
 
         module subroutine Interpolate_ObsValues_Si(obs_values, observation_data, nodal_temperature, &
-                                                   nodal_porosity, nodal_Pw, Properties)
+                                                   nodal_porosity, nodal_Pw, Properties, Domain)
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
@@ -111,11 +112,12 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
+            type(Domain_t), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Si
 
         module subroutine Interpolate_ObsValues_THC(obs_values, observation_data, nodal_temperature, &
-                                                    nodal_porosity, nodal_Pw, Properties)
+                                                    nodal_porosity, nodal_Pw, Properties, Domain)
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
@@ -123,11 +125,12 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
+            type(Domain_t), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_THC
 
         module subroutine Interpolate_ObsValues_VHC(obs_values, observation_data, nodal_temperature, &
-                                                    nodal_porosity, nodal_Pw, Properties)
+                                                    nodal_porosity, nodal_Pw, Properties, Domain)
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
@@ -135,11 +138,12 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
+            type(Domain_t), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_VHC
 
         module subroutine Interpolate_ObsValues_Pw(obs_values, observation_data, nodal_temperature, &
-                                                   nodal_porosity, nodal_Pw, Properties)
+                                                   nodal_porosity, nodal_Pw, Properties, Domain)
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
@@ -147,6 +151,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
+            type(Domain_t), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Pw
 
@@ -179,8 +184,8 @@ module Inout_Output
     abstract interface
         ! This is the "contract" for the procedure pointer.
         subroutine Abst_Calculate_obs_values(obs_values, observation_data, nodal_temperature, &
-                                             nodal_porosity, nodal_Pw, Properties)
-            import :: real64, Proereties_Model_t, Output_Observation
+                                             nodal_porosity, nodal_Pw, Properties, Domain)
+            import :: real64, Proereties_Model_t, Output_Observation, Domain_t
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
@@ -188,6 +193,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
+            type(Domain_t), intent(in), optional :: Domain
         end subroutine Abst_Calculate_obs_values
     end interface
 
@@ -248,11 +254,11 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_initialize_vtu
 
-        module subroutine Inout_Output_Overall_Output(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in) :: fc
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
@@ -260,11 +266,11 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_Output
 
-        module subroutine Inout_Output_Overall_Output_vtk(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
@@ -272,31 +278,31 @@ module Inout_Output
 
         end subroutine Inout_Output_Overall_Output_vtk
 
-        module subroutine Inout_Output_Overall_Output_vtk_scalar(self, RCM_Perm, unit_num, data_name, x)
+        module subroutine Inout_Output_Overall_Output_vtk_scalar(self, iperm, unit_num, data_name, x)
             implicit none
             class(Output_Overall) :: self
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             integer(int32), intent(in) :: unit_num
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:)
 
         end subroutine Inout_Output_Overall_Output_vtk_scalar
 
-        module subroutine Inout_Output_Overall_Output_vtk_vector(self, RCM_Perm, unit_num, data_name, x, y, z)
+        module subroutine Inout_Output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
             implicit none
             class(Output_Overall) :: self
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             integer(int32), intent(in) :: unit_num
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:), y(:), z(:)
 
         end subroutine Inout_Output_Overall_Output_vtk_vector
 
-        module subroutine Inout_Output_Overall_Output_vtu(self, fc, RCM_Perm, Temp, Si, Pres, wFlux)
+        module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
-            integer(int32), intent(in), optional :: RCM_Perm(:)
+            integer(int32), intent(in), optional :: iperm(:)
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
@@ -413,7 +419,7 @@ module Inout_Output
 
         ! end subroutine Initialize_Observation_Header
 
-        module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi, Propeties)
+        module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi, Propeties, Domain)
             implicit none
             class(Type_Output) :: self
             real(real64), intent(in) :: time
@@ -427,6 +433,7 @@ module Inout_Output
             class(Abstract_Thermal), intent(inout), optional :: Thermal
             real(real64), intent(in), optional :: phi(:)
             type(Proereties_Model_t), intent(inout), optional :: Propeties
+            type(Domain_t), intent(in), optional :: Domain
 
         end subroutine Output_Process_Observation
     end interface
