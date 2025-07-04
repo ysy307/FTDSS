@@ -19,6 +19,7 @@ module Domain_Module
         type(ElementHolder), allocatable :: Elements(:)
         type(SideHolder), allocatable :: Sides(:)
         integer(int32), allocatable :: RCM_perm(:)
+        integer(int32), allocatable :: RCM_inv_perm(:)
         ! ...
     contains
         procedure, pass(self) :: initialize

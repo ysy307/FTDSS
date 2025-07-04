@@ -30,12 +30,15 @@ program test
     call FTDSS%Thermal%T%Shift()
     count = 0
 
-    call FTDSS%Output%Overall%Output(fc=count, RCM_Perm=FTDSS%Domain%RCM_perm, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
-    call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
+    call FTDSS%Output%Overall%Output(fc=count, &
+                                     iperm=FTDSS%Domain%RCM_perm, &
+                                     Temp=FTDSS%Thermal%T%pre, &
+                                     Si=FTDSS%Thermal%Qice%pre)
+    call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
     FTDSS%Iteration%step = 0
     FTDSS%Iteration%max_iter = 100
 
-    stop
+    ! stop
 
     FTDSS%Iteration%isConverged = .true.
     print *, "Starting time loop"
@@ -134,11 +137,14 @@ program test
         !     call FTDSS%Thermal%T%Shift(reverse=.true.)
         ! end if
 
-        call FTDSS%Output%Output_Observation(time=FTDSS%time%time / 86400.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre)
+        call FTDSS%Output%Output_Observation(time=FTDSS%time%time / 86400.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
         ! print *, mod(FTDSS%Iteration%step, 100)
         if (mod(FTDSS%Iteration%step, 10) == 0) then
             count = count + 1
-            call FTDSS%Output%Overall%Output(fc=count, RCM_Perm=FTDSS%Domain%RCM_perm, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre)
+            call FTDSS%Output%Overall%Output(fc=count, &
+                                             iperm=FTDSS%Domain%RCM_perm, &
+                                             Temp=FTDSS%Thermal%T%pre, &
+                                             Si=FTDSS%Thermal%Qice%pre)
         end if
 
     end do TIME_LOOP

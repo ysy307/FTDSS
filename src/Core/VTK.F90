@@ -8,28 +8,6 @@ module Core_VTK
     implicit none
     private
 
-    ! type :: VTK_CELL_NAMES
-    !     integer(int32) :: VTK_VERTEX = 1
-    !     integer(int32) :: VTK_POLY_VERTEX = 2
-    !     integer(int32) :: VTK_LINE = 3
-    !     integer(int32) :: VTK_POLY_LINE = 4
-    !     integer(int32) :: VTK_TRIANGLE = 5
-    !     integer(int32) :: VTK_TRIANGLE_STRIP = 6
-    !     integer(int32) :: VTK_POLYGON = 7
-    !     integer(int32) :: VTK_PIXEL = 8
-    !     integer(int32) :: VTK_QUAD = 9
-    !     integer(int32) :: VTK_TETRA = 10
-    !     integer(int32) :: VTK_VOXEL = 11
-    !     integer(int32) :: VTK_HEXAHEDRON = 12
-    !     integer(int32) :: VTK_WEDGE = 13
-    !     integer(int32) :: VTK_PYRAMID = 14
-    !     integer(int32) :: VTK_QUADRATIC_EDGE = 21
-    !     integer(int32) :: VTK_QUADRATIC_TRIANGLE = 22
-    !     integer(int32) :: VTK_QUADRATIC_QUAD = 23
-    !     integer(int32) :: VTK_QUADRATIC_TETRA = 24
-    !     integer(int32) :: VTK_QUADRATIC_HEXAHEDRON = 25
-    ! end type VTK_CELL_NAMES
-
     type :: Type_VTK_CELLS
         integer(int8) :: offset
         integer(int32) :: CellEntityId

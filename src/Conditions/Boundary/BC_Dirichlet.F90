@@ -58,7 +58,7 @@ contains
                                               isUniform=self%is_uniform, &
                                               Edge=self%target_edges(:, iEdge), &
                                               Dval=Dval, &
-                                              perm=Domain%RCM_perm)
+                                              perm=Domain%RCM_inv_perm)
             end do
         else
             select case (mode)
@@ -79,7 +79,7 @@ contains
                                               isUniform=self%is_uniform, &
                                               Edge=self%target_edges(:, iEdge), &
                                               Dval=Dval, &
-                                              perm=Domain%RCM_perm)
+                                              perm=Domain%RCM_inv_perm)
             end do
         end if
         else
@@ -92,7 +92,7 @@ contains
                                                 isUniform=self%is_uniform, &
                                                 Edge=self%target_edges(:, iEdge), &
                                                 Dval=Dval, &
-                                                perm=Domain%RCM_perm)
+                                                perm=Domain%RCM_inv_perm)
             end do
         else
             select case (mode)
@@ -112,7 +112,7 @@ contains
                                                 isUniform=self%is_uniform, &
                                                 Edge=self%target_edges(:, iEdge), &
                                                 Dval=Dval, &
-                                                perm=Domain%RCM_perm)
+                                                perm=Domain%RCM_inv_perm)
             end do
         end if
         end if
@@ -168,6 +168,14 @@ contains
         integer(int32) :: p1, p2
 
         if (isUniform) then
+            ! ! --- ここからデバッグ用コード ---
+            ! print *, 'Debug: Edge = ', Edge(1), Edge(2)
+            ! print *, 'Debug: size(perm) = ', size(perm)
+            ! if (present(A)) then
+            !     print *, 'Debug: shape(A) = ', shape(A)
+            ! end if
+            ! print *, 'Debug: size(b) = ', size(b)
+            ! ! --- ここまでデバッグ用コード ---
             p1 = perm(Edge(1))
             p2 = perm(Edge(2))
 

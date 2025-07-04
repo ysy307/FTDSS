@@ -1,5 +1,5 @@
 module Matrix_RCM
-    use, intrinsic :: iso_fortran_env, only: int32, real64, logical32
+    use, intrinsic :: iso_fortran_env, only: int32, real64, logical32, int64
     use :: stdlib_sorting, only:sort_index
     use :: Core_Allocate, only:Allocate_Array
     use :: Domain_Module, only:Domain_t
@@ -8,6 +8,8 @@ module Matrix_RCM
     private
 
     public :: RCM_Reorder
+    public :: RCM_Reorder_Inverse
+
     public :: Reorder_to_Original
 
 contains
@@ -16,6 +18,7 @@ contains
     ! メインサブルーチン: RCM法による節点の並べ替え
     !=======================================================================
     subroutine RCM_Reorder(domain, perm, istat)
+        implicit none
         ! --- 引数宣言 ---
         class(Domain_t), intent(in) :: domain
         integer(int32), allocatable, intent(inout) :: perm(:)
@@ -23,20 +26,25 @@ contains
 
         ! --- ローカル変数宣言 ---
         integer(int32) :: num_nodes
-        integer(int32), allocatable :: adj_ptr(:), adj_data(:), degree(:)
-        integer(int32), allocatable :: R(:), Q(:)
+        integer(int32), allocatable :: adj_ptr(:)
+        integer(int32), allocatable :: adj_data(:)
+        integer(int32), allocatable :: degree(:)
+        integer(int32), allocatable :: R(:)
+        integer(int32), allocatable :: Q(:)
         logical(logical32), allocatable :: visited(:)
-        integer(int32) :: R_count, start_node
+        integer(int32) :: R_count
+        integer(int32) :: start_node
+        integer(int32) :: i
 
         ! --- 処理開始 ---
         istat = 0
         num_nodes = domain%get_numNode()
 
+        ! 隣接関係を効率的な方法で構築
         call build_node_adjacency(domain, num_nodes, adj_ptr, adj_data, degree, istat)
         if (istat /= 0) return
 
-        ! --- RCM本体ロジックは変更なし ---
-
+        ! --- RCM本体で利用する配列を確保 ---
         call Allocate_Array(perm, num_nodes)
         call Allocate_Array(R, num_nodes)
         call Allocate_Array(Q, num_nodes)
@@ -53,10 +61,11 @@ contains
                                      visited, Q, R, R_count)
         end do
 
-        do R_count = 1, num_nodes
-            perm(R(R_count)) = num_nodes - R_count + 1
+        ! Cuthill-McKee順序(R)を逆順にしてReverse Cuthill-McKee順序(perm)を作成
+        do i = 1, num_nodes
+            perm(i) = R(num_nodes - i + 1)
         end do
-
+        ! --- メモリ解放 ---
         deallocate (adj_ptr)
         deallocate (adj_data)
         deallocate (degree)
@@ -70,86 +79,164 @@ contains
     ! 内部サブルーチン群
     !=======================================================================
 
+    !
+    ! [修正箇所] 密行列を使わずに、スケーラブルな方法で隣接リストを構築する
+    !
     subroutine build_node_adjacency(domain, num_nodes, adj_ptr, adj_data, degree, istat)
+        implicit none
+        ! --- 引数宣言 ---
         class(Domain_t), intent(in) :: domain
         integer(int32), intent(in) :: num_nodes
-        integer(int32), allocatable, intent(inout) :: adj_ptr(:), adj_data(:), degree(:)
+        integer(int32), allocatable, intent(inout) :: adj_ptr(:)
+        integer(int32), allocatable, intent(inout) :: adj_data(:)
+        integer(int32), allocatable, intent(inout) :: degree(:)
         integer(int32), intent(inout) :: istat
 
-        logical(logical32), allocatable :: adj_matrix(:, :)
-        integer(int32) :: i, j, k, n1, n2, num_adj
-        integer(int32) :: num_items, nodes_per_item
+        ! --- ローカル変数宣言 ---
+        integer(int32) :: i
+        integer(int32) :: j
+        integer(int32) :: k
+        integer(int32) :: n1
+        integer(int32) :: n2
+        integer(int32) :: num_items
+        integer(int32) :: nodes_per_item
+        integer(int32) :: edge_count
+        integer(int32) :: max_edges
+        integer(int32) :: unique_edge_count
+        integer(int32), allocatable :: edge_i(:)
+        integer(int32), allocatable :: edge_j(:)
+        integer(int64), allocatable :: sort_keys(:)
+        integer(int32), allocatable :: p(:)
+        integer(int32), allocatable :: temp_counters(:)
+        integer(int32) :: num_adj
+
+        integer(int64) :: conv = 1_int64
 
         istat = 0
-        call Allocate_Array(degree, num_nodes)
-        call Allocate_Array(adj_matrix, num_nodes, num_nodes)
-        degree = 0
-        adj_matrix = .false.
 
-        ! --- 1. 領域要素 (Element) から隣接関係を構築 ---
+        ! --- 1. 全てのエッジを一時配列 (COO形式) に格納する ---
+        ! 最大エッジ数を多めに見積もる (三角要素:3辺, 四角要素:6辺(対角線含む))
+        max_edges = domain%get_numElement() * 30 + domain%get_numSide() * 20
+        call Allocate_Array(edge_i, max_edges)
+        call Allocate_Array(edge_j, max_edges)
+
+        edge_count = 0
+
+        ! 領域要素 (Element) からエッジを抽出
         num_items = domain%get_numElement()
         do i = 1, num_items
             nodes_per_item = domain%Elements(i)%e%get_size()
             do j = 1, nodes_per_item
                 do k = j + 1, nodes_per_item
+                    edge_count = edge_count + 1
+                    if (edge_count > max_edges) then
+                        istat = -1 ! Error: max_edges exceeded
+                        return
+                    end if
                     n1 = domain%Elements(i)%e%conn(j)
                     n2 = domain%Elements(i)%e%conn(k)
-                    if (.not. adj_matrix(n1, n2)) then
-                        adj_matrix(n1, n2) = .true.
-                        adj_matrix(n2, n1) = .true.
-                        degree(n1) = degree(n1) + 1
-                        degree(n2) = degree(n2) + 1
+                    ! 小さい方をi, 大きい方をjに格納し、ソートを容易にする
+                    if (n1 < n2) then
+                        edge_i(edge_count) = n1
+                        edge_j(edge_count) = n2
+                    else
+                        edge_i(edge_count) = n2
+                        edge_j(edge_count) = n1
                     end if
                 end do
             end do
         end do
 
-        ! --- 2. 境界要素 (Side) から隣接関係を構築 ---
+        ! 境界要素 (Side) からエッジを抽出
         num_items = domain%get_numSide()
         do i = 1, num_items
             nodes_per_item = domain%Sides(i)%s%get_size()
             do j = 1, nodes_per_item
                 do k = j + 1, nodes_per_item
+                    edge_count = edge_count + 1
+                    if (edge_count > max_edges) then
+                        istat = -1 ! Error: max_edges exceeded
+                        return
+                    end if
                     n1 = domain%Sides(i)%s%conn(j)
                     n2 = domain%Sides(i)%s%conn(k)
-                    if (.not. adj_matrix(n1, n2)) then
-                        adj_matrix(n1, n2) = .true.
-                        adj_matrix(n2, n1) = .true.
-                        degree(n1) = degree(n1) + 1
-                        degree(n2) = degree(n2) + 1
+                    if (n1 < n2) then
+                        edge_i(edge_count) = n1
+                        edge_j(edge_count) = n2
+                    else
+                        edge_i(edge_count) = n2
+                        edge_j(edge_count) = n1
                     end if
                 end do
             end do
         end do
 
-        ! --- 3. adj_matrixからCSR形式の隣接リストを作成 (この部分は変更なし) ---
+        ! --- 2. エッジをソートして重複を削除する ---
+        call Allocate_Array(sort_keys, transfer(edge_count, conv))
+        call Allocate_Array(p, edge_count)
+
+        ! (i, j) のペアをソートするため、64bit整数の一意なキーを作成
+        sort_keys = int(edge_i(1:edge_count), int64) * int(num_nodes, int64) + int(edge_j(1:edge_count), int64)
+        call sort_index(sort_keys, p)
+
+        ! ソートされたインデックスを使って、重複のないエッジリストを再構築
+        unique_edge_count = 0
+        if (edge_count > 0) then
+            unique_edge_count = 1
+            edge_i(1) = edge_i(p(1))
+            edge_j(1) = edge_j(p(1))
+            do i = 2, edge_count
+                if (edge_i(p(i)) /= edge_i(p(i - 1)) .or. edge_j(p(i)) /= edge_j(p(i - 1))) then
+                    unique_edge_count = unique_edge_count + 1
+                    edge_i(unique_edge_count) = edge_i(p(i))
+                    edge_j(unique_edge_count) = edge_j(p(i))
+                end if
+            end do
+        end if
+        deallocate (sort_keys)
+        deallocate (p)
+
+        ! --- 3. 次数(degree)を計算し、CSR形式を構築する ---
+        call Allocate_Array(degree, num_nodes)
+        degree = 0
+        do i = 1, unique_edge_count
+            degree(edge_i(i)) = degree(edge_i(i)) + 1
+            degree(edge_j(i)) = degree(edge_j(i)) + 1
+        end do
+
         num_adj = sum(degree)
-        call Allocate_Array(adj_ptr, num_nodes + 1_int32)
+        call Allocate_Array(adj_ptr, num_nodes + 1)
         call Allocate_Array(adj_data, num_adj)
+
         adj_ptr(1) = 1
         do i = 1, num_nodes
             adj_ptr(i + 1) = adj_ptr(i) + degree(i)
         end do
 
-        degree = 0
-        do i = 1, num_nodes
-            do j = i + 1, num_nodes
-                if (adj_matrix(i, j)) then
-                    adj_data(adj_ptr(i) + degree(i)) = j
-                    adj_data(adj_ptr(j) + degree(j)) = i
-                    degree(i) = degree(i) + 1
-                    degree(j) = degree(j) + 1
-                end if
-            end do
+        ! CSRのadj_dataを埋めるためのカウンタを準備
+        call Allocate_Array(temp_counters, num_nodes)
+        temp_counters = 0
+        do i = 1, unique_edge_count
+            n1 = edge_i(i)
+            n2 = edge_j(i)
+            adj_data(adj_ptr(n1) + temp_counters(n1)) = n2
+            temp_counters(n1) = temp_counters(n1) + 1
+            adj_data(adj_ptr(n2) + temp_counters(n2)) = n1
+            temp_counters(n2) = temp_counters(n2) + 1
         end do
-        deallocate (adj_matrix)
 
+        ! --- 一時配列を解放 ---
+        deallocate (edge_i)
+        deallocate (edge_j)
+        deallocate (temp_counters)
+
+        ! RCM本体で次数が必要なので、ここで再計算しておく
         do i = 1, num_nodes
             degree(i) = adj_ptr(i + 1) - adj_ptr(i)
         end do
     end subroutine build_node_adjacency
 
-    ! --- ここから下の内部サブルーチンは変更なし ---
+    ! --- ここから下の内部サブルーチンは変更なし (引数intentのみ修正) ---
     subroutine find_start_node(num_nodes, degree, visited, start_node, istat)
         integer(int32), intent(in) :: num_nodes
         integer(int32), intent(in) :: degree(:)
@@ -157,7 +244,8 @@ contains
         integer(int32), intent(inout) :: start_node
         integer(int32), intent(inout) :: istat
 
-        integer(int32) :: i, min_deg
+        integer(int32) :: i
+        integer(int32) :: min_deg
         istat = 0
         min_deg = num_nodes + 1
         start_node = -1
@@ -167,17 +255,25 @@ contains
                 start_node = i
             end if
         end do
-        if (start_node == -1) istat = 1
+        if (start_node == -1) then
+            istat = 1
+        end if
     end subroutine find_start_node
 
     subroutine execute_cm_ordering(start_node, adj_ptr, adj_data, degree, &
                                    visited, Q, R, R_count)
         integer(int32), intent(in) :: start_node
-        integer(int32), intent(in) :: adj_ptr(:), adj_data(:), degree(:)
+        integer(int32), intent(in) :: adj_ptr(:)
+        integer(int32), intent(in) :: adj_data(:)
+        integer(int32), intent(in) :: degree(:)
         logical(logical32), intent(inout) :: visited(:)
-        integer(int32), intent(inout) :: Q(:), R(:), R_count
+        integer(int32), intent(inout) :: Q(:)
+        integer(int32), intent(inout) :: R(:)
+        integer(int32), intent(inout) :: R_count
 
-        integer(int32) :: q_head, q_tail, current_node
+        integer(int32) :: q_head
+        integer(int32) :: q_tail
+        integer(int32) :: current_node
         q_head = 1
         q_tail = 1
         Q(1) = start_node
@@ -193,14 +289,21 @@ contains
 
     subroutine sort_and_enqueue_neighbors(node, adj_ptr, adj_data, degree, visited, Q, q_tail)
         integer(int32), intent(in) :: node
-        integer(int32), intent(in) :: adj_ptr(:), adj_data(:), degree(:)
+        integer(int32), intent(in) :: adj_ptr(:)
+        integer(int32), intent(in) :: adj_data(:)
+        integer(int32), intent(in) :: degree(:)
         logical(logical32), intent(inout) :: visited(:)
-        integer(int32), intent(inout) :: Q(:), q_tail
+        integer(int32), intent(inout) :: Q(:)
+        integer(int32), intent(inout) :: q_tail
 
         integer(int32), allocatable :: neighbors(:)
         integer(int32), allocatable :: neighbor_degrees(:)
         integer(int32), allocatable :: sorted_indices(:)
-        integer(int32) :: i, p, neighbor_count, start_idx, end_idx
+        integer(int32) :: i
+        integer(int32) :: p
+        integer(int32) :: neighbor_count
+        integer(int32) :: start_idx
+        integer(int32) :: end_idx
         start_idx = adj_ptr(node)
         end_idx = adj_ptr(node + 1) - 1
         neighbor_count = end_idx - start_idx + 1
@@ -231,61 +334,62 @@ contains
     ! 元の順序に戻すための逆方向の配列(iperm)を作成する。
     ! iperm は一度計算すれば、メッシュが変わらない限り再利用可能。
     !-----------------------------------------------------------------------
-    subroutine Create_Inverse_Permutation(perm, iperm, istat)
+    subroutine RCM_Reorder_Inverse(perm, iperm, istat)
         implicit none
         integer(int32), intent(in) :: perm(:)
-        integer(int32), allocatable, intent(out) :: iperm(:)
-        integer(int32), intent(out) :: istat
+        integer(int32), allocatable, intent(inout) :: iperm(:)
+        integer(int32), intent(inout) :: istat
 
-        integer(int32) :: i, n
+        integer(int32) :: i
+        integer(int32) :: n
         istat = 0
         n = size(perm)
 
-        if (allocated(iperm)) deallocate (iperm)
-        allocate (iperm(n), stat=istat)
-        if (istat /= 0) return
+        if (allocated(iperm)) then
+            deallocate (iperm)
+        end if
+        call Allocate_Array(iperm, n)
 
         do i = 1, n
-            ! perm(元のIndex) = RCM後のIndex
-            ! iperm(RCM後のIndex) = 元のIndex
+            ! [修正] コメントを現実に即したものに修正
+            ! perm(RCM後のIndex) = 元のIndex
+            ! iperm(元のIndex)  = RCM後のIndex
             iperm(perm(i)) = i
         end do
-    end subroutine Create_Inverse_Permutation
+    end subroutine RCM_Reorder_Inverse
 
     !=======================================================================
     ! RCM順序のベクトルを受け取り、元の節点順序に並べ替えたベクトルを返す。
     ! ファイル出力などの後処理で利用する。
     !-----------------------------------------------------------------------
-    subroutine Reorder_to_Original(vector_rcm, perm, vector_original, istat)
+    subroutine Reorder_to_Original(vector_rcm, vector_original, perm, istat)
         implicit none
         real(real64), intent(in) :: vector_rcm(:)
-        integer(int32), intent(in) :: perm(:)
         real(real64), intent(inout) :: vector_original(:)
-        integer(int32), intent(out) :: istat
+        integer(int32), intent(in) :: perm(:) ! <--- ipermではなくpermを受け取る
+        integer(int32), intent(inout) :: istat
 
-        integer(int32) :: i, n, local_istat
-        integer(int32), allocatable :: iperm(:)
+        integer(int32) :: n
+        integer(int32) :: i
 
         istat = 0
         n = size(vector_rcm)
+
+        ! サイズチェック
         if (size(perm) /= n .or. size(vector_original) /= n) then
-            istat = -1 ! Error: size mismatch
+            istat = -1
             return
         end if
 
-        ! 1. 逆並べ替え配列を作成
-        call create_inverse_permutation(perm, iperm, local_istat)
-        if (local_istat /= 0) then
-            istat = local_istat
-            return
-        end if
-
-        ! 2. 逆並べ替えを適用して元の順序のベクトルを作成
+        ! =========================================================
+        ! ▼▼▼ ここが正しいロジックです ▼▼▼
+        ! =========================================================
         do i = 1, n
-            vector_original(iperm(i)) = vector_rcm(i)
+            ! 「RCM順でi番目の値」は、「元の節点番号perm(i)番目の場所」に入る
+            vector_original(perm(i)) = vector_rcm(i)
         end do
+        ! =========================================================
 
-        deallocate (iperm)
     end subroutine Reorder_to_Original
 
 end module Matrix_RCM

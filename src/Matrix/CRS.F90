@@ -38,10 +38,9 @@ module Matrix_CRS
 
 contains
 
-    function Initialize_CRS(Domain, perm) result(A)
+    function Initialize_CRS(Domain) result(A)
         implicit none
         class(Domain_t), intent(in) :: Domain
-        integer(int32), optional, intent(in) :: perm(:)
         type(Type_CRS) :: A
 
         ! --- ローカル変数宣言 ---
@@ -52,7 +51,7 @@ contains
         integer(int32), allocatable :: tmpInd(:)
 
         ! --- RCM適用時専用の変数 ---
-        integer(int32), allocatable :: inv_perm(:)
+        ! integer(int32), allocatable :: inv_perm(:)
         integer(int32), allocatable :: cols_for_this_row(:)
         integer(int32) :: old_iN, col_count
 
@@ -69,88 +68,92 @@ contains
         A%Ptr(1) = 1
         A%nnz = 0
 
-        if (present(perm)) then
-            !----------------------------------
-            ! RCM適用時の処理 (perm がある場合)
-            !----------------------------------
+        ! if (present(perm)) then
+        !----------------------------------
+        ! RCM適用時の処理 (perm がある場合)
+        !----------------------------------
 
-            call Allocate_Array(inv_perm, nNode)
-            do iN = 1, nNode
-                inv_perm(perm(iN)) = iN
-            end do
+        ! call Allocate_Array(inv_perm, nNode)
+        ! do iN = 1, nNode
+        !     inv_perm(perm(iN)) = iN
+        ! end do
 
-            do iN = 1, nNode
-                rowCount(:) = .false.
-                row_nnz = 0
+        !--- RCM 適用時 ---
+        ! 1) inv_perm / perm は Domain に既に格納されている想定
+        do iN = 1, nNode
+            ! iN は「RCM順での行番号」
+            old_iN = Domain%RCM_perm(iN) ! 元ノード番号
 
-                old_iN = inv_perm(iN)
-
-                do iE = 1, nElement
-                    nsize = Domain%Elements(iE)%e%get_size()
-                    do iT = 1, nsize
-                        if (Domain%Elements(iE)%e%conn(iT) == old_iN) then
-                            do irT = 1, nsize
-                                rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
-                            end do
-                            exit
-                        end if
-                    end do
-                end do
-
-                ! count()はlogical配列を引数に取るため、これで正しく動作する
-                col_count = count(rowCount)
-                call Allocate_Array(cols_for_this_row, col_count)
-
-                row_nnz = 0
-                do iNC = 1, nNode
-                    ! ★★★★★ 修正点3: .true.かどうかをチェック ★★★★★
-                    if (rowCount(iNC)) then
-                        row_nnz = row_nnz + 1
-                        cols_for_this_row(row_nnz) = perm(iNC)
+            rowCount = .false.
+            ! ツブし：その元ノード old_iN が属する要素を探し、
+            !  隣接ノード群を rowCount(:) = .true. にする
+            do iE = 1, nElement
+                nsize = Domain%Elements(iE)%e%get_size()
+                ! old_iN がこの要素のどこに入っているか探索
+                do iT = 1, nsize
+                    if (Domain%Elements(iE)%e%conn(iT) == old_iN) then
+                        do irT = 1, nsize
+                            rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
+                        end do
+                        exit
                     end if
                 end do
-
-                call sort(cols_for_this_row)
-
-                tmpInd(A%nnz + 1:A%nnz + row_nnz) = cols_for_this_row
-                deallocate (cols_for_this_row)
-
-                A%nnz = A%nnz + row_nnz
-                A%Ptr(iN + 1) = A%nnz + 1
             end do
-            deallocate (inv_perm)
 
-        else
-            !--------------------------------------
-            ! 通常の処理 (perm がない場合)
-            !--------------------------------------
-            do iN = 1, nNode
-                rowCount(:) = .false. ! logical配列として初期化
-                row_nnz = 0
-
-                do iE = 1, nElement
-                    nsize = Domain%Elements(iE)%e%get_size()
-                    do iT = 1, nsize
-                        if (Domain%Elements(iE)%e%conn(iT) == iN) then
-                            do irT = 1, nsize
-                                rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
-                            end do
-                            exit
-                        end if
-                    end do
-                end do
-
-                do iNC = 1, nNode
-                    if (rowCount(iNC)) then
-                        row_nnz = row_nnz + 1
-                        tmpInd(A%nnz + row_nnz) = iNC
-                    end if
-                end do
-
-                A%nnz = A%nnz + row_nnz
-                A%Ptr(iN + 1) = A%nnz + 1
+            ! 2) 列数をカウント & RCMノード番号配列を作成
+            col_count = count(rowCount)
+            allocate (cols_for_this_row(col_count))
+            row_nnz = 0
+            do iNC = 1, nNode
+                if (rowCount(iNC)) then
+                    row_nnz = row_nnz + 1
+                    ! iNC（元ノード） → RCM順ノード
+                    cols_for_this_row(row_nnz) = Domain%RCM_inv_perm(iNC)
+                end if
             end do
-        end if
+
+            call sort(cols_for_this_row) ! RCM順の列をソート
+
+            ! 3) 一時バッファに格納
+            tmpInd(A%nnz + 1:A%nnz + row_nnz) = cols_for_this_row
+            A%nnz = A%nnz + row_nnz
+            A%Ptr(iN + 1) = A%nnz + 1
+
+            deallocate (cols_for_this_row)
+        end do
+        ! deallocate (inv_perm)
+
+        ! else
+        !     !--------------------------------------
+        !     ! 通常の処理 (perm がない場合)
+        !     !--------------------------------------
+        !     do iN = 1, nNode
+        !         rowCount(:) = .false. ! logical配列として初期化
+        !         row_nnz = 0
+
+        !         do iE = 1, nElement
+        !             nsize = Domain%Elements(iE)%e%get_size()
+        !             do iT = 1, nsize
+        !                 if (Domain%Elements(iE)%e%conn(iT) == iN) then
+        !                     do irT = 1, nsize
+        !                         rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
+        !                     end do
+        !                     exit
+        !                 end if
+        !             end do
+        !         end do
+
+        !         do iNC = 1, nNode
+        !             if (rowCount(iNC)) then
+        !                 row_nnz = row_nnz + 1
+        !                 tmpInd(A%nnz + row_nnz) = iNC
+        !             end if
+        !         end do
+
+        !         A%nnz = A%nnz + row_nnz
+        !         A%Ptr(iN + 1) = A%nnz + 1
+        !     end do
+        ! end if
 
         ! --- 最終的なCRS配列を確保・コピー ---
         call Allocate_Array(A%Ind, A%nnz)
