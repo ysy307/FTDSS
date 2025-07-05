@@ -1,34 +1,47 @@
 module Time_Time
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64, int64
     use :: Inout_Input
     use :: Core_Allocate, only:Allocate_Array
+
+#ifdef _OPENMP
+    use omp_lib
+#endif
+
     implicit none
     private
 
-    public :: Type_Time
+    public :: Type_Time, Type_Profiler_Section
 
     type :: Type_Time_Record
-        character(10) :: label
-        character(10) :: date
-        character(10) :: time
-        character(10) :: zone
-
+        character(len=10) :: label
+        character(len=10) :: date
+        character(len=10) :: time
+        character(len=10) :: zone
     end type Type_Time_Record
 
-    type :: Type_Time
-        real(real64) :: start_time
-        real(real64) :: end_time
-        real(real64) :: time
-        real(real64) :: time_old
-        real(real64) :: dt
-        real(real64), allocatable :: dt_old(:)
-        real(real64) :: dt_max
-        real(real64) :: dt_min
+    type :: Type_Profiler_Section
+        character(len=20) :: label
+        real(real64) :: total_time = 0.0d0
+#ifdef _OPENMP
+        real(real64) :: start_time_wtime = 0.0d0
+#else
+        integer(kind=int64) :: start_tick = 0
+#endif
+    end type Type_Profiler_Section
 
-        type(Type_Time_Record) :: start
-        type(Type_Time_Record) :: end
+    type :: Type_Time
+        real(real64) :: start_time, end_time, time, time_old, dt
+        real(real64), allocatable :: dt_old(:)
+        real(real64) :: dt_max, dt_min
+        type(Type_Time_Record) :: start, end
+        type(Type_Profiler_Section), allocatable, public :: sections(:)
+#ifndef _OPENMP
+        integer :: tick_rate = 0
+#endif
     contains
         procedure, public, pass(self) :: Record => Record_Timestamp
+        procedure, public, pass(self) :: Profile_Start => Profile_Start_Timer
+        procedure, public, pass(self) :: Profile_Stop => Profile_Stop_Timer
     end type Type_Time
 
     interface Type_Time
@@ -37,12 +50,14 @@ module Time_Time
 
 contains
 
-    function Time_Construct(Structure_Input) result(time)
-        implicit none
+    function Time_Construct(Structure_Input, profiler_sections) result(time)
         type(Type_Input), intent(in) :: Structure_Input
+        character(len=*), intent(in), optional :: profiler_sections(:)
         type(Type_Time) :: time
+        integer :: i
+        integer :: dummy
 
-        select case (Structure_Input%Basic%Calculation_TimeUnit)
+        select case (trim(Structure_Input%Basic%Calculation_TimeUnit))
         case ("Second")
             time%dt = Structure_Input%Basic%Calculation_Step
             time%dt_max = Structure_Input%Basic%Calculation_StepMaximum
@@ -64,11 +79,11 @@ contains
             time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 31557600.0d0
             time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 31557600.0d0
         case default
-            write (*, *) "Error: Unknown time unit"
+            write (*, *) "Error: Unknown time unit in Calculation_TimeUnit"
             stop
         end select
 
-        select case (Structure_Input%Basic%Input_TimeUnit)
+        select case (trim(Structure_Input%Basic%Input_TimeUnit))
         case ("Second")
             time%start_time = Structure_Input%Basic%StartCalculation
             time%end_time = Structure_Input%Basic%EndCalculation
@@ -85,34 +100,87 @@ contains
             time%start_time = Structure_Input%Basic%StartCalculation * 31557600.0d0
             time%end_time = Structure_Input%Basic%EndCalculation * 31557600.0d0
         case default
-            write (*, *) "Error: Unknown time unit"
+            write (*, *) "Error: Unknown time unit in Input_TimeUnit"
             stop
         end select
 
         call Allocate_Array(time%dt_old, Structure_Input%Basic%Order)
+
+        if (present(profiler_sections)) then
+            if (size(profiler_sections) > 0) then
+#ifndef _OPENMP
+                call system_clock(dummy, time%tick_rate)
+#endif
+                allocate (time%sections(size(profiler_sections)))
+                do i = 1, size(profiler_sections)
+                    time%sections(i)%label = trim(profiler_sections(i))
+                end do
+            end if
+        end if
     end function Time_Construct
 
     subroutine Record_Timestamp(self, label)
-        implicit none
-        class(Type_Time) :: self
-        character(*), intent(in) :: label
+        class(Type_Time), intent(inout) :: self
+        character(len=*), intent(in) :: label
 
-        select case (label)
+        select case (trim(label))
         case ("Start")
-            self%start%Label = label
-            call date_and_time(date=self%start%date, &
-                               time=self%start%time, &
-                               zone=self%start%zone)
+            call date_and_time(date=self%start%date, time=self%start%time, zone=self%start%zone)
+            self%start%label = label
         case ("End")
-            self%end%Label = label
-            call date_and_time(date=self%end%date, &
-                               time=self%end%time, &
-                               zone=self%end%zone)
+            call date_and_time(date=self%end%date, time=self%end%time, zone=self%end%zone)
+            self%end%label = label
         case default
             write (*, *) "Error: Unknown time label"
             stop
         end select
-
     end subroutine Record_Timestamp
+
+    subroutine Profile_Start_Timer(self, label)
+        class(Type_Time), intent(inout) :: self
+        character(len=*), intent(in) :: label
+        integer :: i
+        do i = 1, size(self%sections)
+            if (trim(self%sections(i)%label) == trim(label)) then
+#ifdef _OPENMP
+                self%sections(i)%start_time_wtime = omp_get_wtime()
+#else
+                call system_clock(count=self%sections(i)%start_tick)
+#endif
+                return
+            end if
+        end do
+        write (*, '(A,A,A)') "Error: Profiling section '", trim(label), "' not found. Timer not started."
+    end subroutine Profile_Start_Timer
+
+    subroutine Profile_Stop_Timer(self, label)
+        class(Type_Time), intent(inout) :: self
+        character(len=*), intent(in) :: label
+        integer :: i
+        real(real64) :: duration
+#ifdef _OPENMP
+        real(real64) :: end_time_wtime
+        end_time_wtime = omp_get_wtime()
+#else
+        integer(kind=int64) :: end_tick
+        call system_clock(count=end_tick)
+#endif
+        do i = 1, size(self%sections)
+            if (trim(self%sections(i)%label) == trim(label)) then
+#ifdef _OPENMP
+                duration = end_time_wtime - self%sections(i)%start_time_wtime
+#else
+                if (self%tick_rate > 0) then
+                    duration = real(end_tick - self%sections(i)%start_tick, real64) / real(self%tick_rate, real64)
+                else
+                    duration = 0.0d0
+                end if
+#endif
+                self%sections(i)%total_time = self%sections(i)%total_time + duration
+                return
+            end if
+        end do
+        write (*, '(A,A,A)') "Error: Profiling section '", trim(label), "' not found. Timer not stopped."
+    end subroutine Profile_Stop_Timer
 
 end module Time_Time

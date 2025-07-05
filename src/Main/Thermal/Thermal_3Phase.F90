@@ -127,7 +127,7 @@ contains
     module subroutine Type_Thermal_3Phase_2D_Assemble(self, Domain, Property, Porosity, dt, step, iter)
         implicit none
         class(Type_Thermal_3Phase_2D), intent(inout) :: self
-        type(Domain_t), intent(in) :: Domain
+        type(Domain_t), intent(inout) :: Domain
         type(Proereties_Model_t), intent(inout) :: Property
         real(real64), intent(in) :: Porosity(:)
         real(real64), intent(in) :: dt
@@ -147,9 +147,9 @@ contains
         ! ! end if
         !!!-----------------------------------------------------------------------
         ! (A, Domain, Temperature, Porosity, Propeties)
-        call Assemble_Mass_Heat_1(self%CT_l, Domain, self%T%new, Porosity, Property)
+        call Assemble_Mass_Heat_1_Parallel(self%CT_l, Domain, self%T%new, Porosity, Property)
         !
-        call Assemble_Diffusion_Heat_1(self%KT_l, Domain, self%T%new, Porosity, Property)
+        call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, Domain, self%T%new, Porosity, Property)
          !!!-----------------------------------------------------------------------
         ! if (step == 1) then
         self%KT_star_0 = dt * self%KT_l + self%CT_l

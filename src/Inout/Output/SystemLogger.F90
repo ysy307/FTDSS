@@ -18,6 +18,9 @@ contains
         integer(int64) :: rss_kb
         real(real64) :: rss_mb
 
+        integer(int32) :: i
+        real(real64) :: total_measured_time
+
         username = Get_Username()
         hostname = Get_Hostname()
         compiler = Get_CompilerName()
@@ -53,6 +56,30 @@ contains
         write (num_unit, '(a)') "----------------------------------------------"
         write (num_unit, '(a)') trim(time%start%label)//" Time : "//time%start%date(1:4)//"-"//time%start%date(5:6)//"-"//time%start%date(7:8)//"T"//time%start%time(1:2)//":"//time%start%time(3:4)//":"//time%start%time(5:6)//trim(time%start%zone)
         write (num_unit, '(a)') trim(time%end%label)//" Time   : "//time%end%date(1:4)//"-"//time%end%date(5:6)//"-"//time%end%date(7:8)//"T"//time%end%time(1:2)//":"//time%end%time(3:4)//":"//time%end%time(5:6)//trim(time%end%zone)
+
+        total_measured_time = 0.0d0
+        do i = 1, size(time%sections)
+            total_measured_time = total_measured_time + time%sections(i)%total_time
+        end do
+
+        write (num_unit, *)
+        write (num_unit, '(A)') "----------------------------------------------"
+        write (num_unit, '(A)') "Performance Profiling Report"
+        write (num_unit, '(A)') "----------------------------------------------"
+        write (num_unit, '(A20, A15, A12)') "Section", "Time (sec)", "Percentage"
+        write (num_unit, '(A47)') repeat('-', 47)
+
+        do i = 1, size(time%sections)
+            if (total_measured_time > 0.0d0) then
+                write (num_unit, '(A20, F15.4, F11.2, A)') trim(time%sections(i)%label), &
+                    time%sections(i)%total_time, &
+                    (time%sections(i)%total_time / total_measured_time) * 100.0d0, " %"
+            else
+                write (num_unit, '(A20, F15.4, A)') trim(time%sections(i)%label), time%sections(i)%total_time, " (N/A %)"
+            end if
+        end do
+        write (num_unit, '(a)') repeat('-', 47)
+        write (num_unit, '(a, f15.4, a)') "Total Measured", total_measured_time, ""
         write (num_unit, '(a)') "----------------------------------------------"
         write (num_unit, '(a)') "Matrix Information"
         write (num_unit, '(a)') "----------------------------------------------"

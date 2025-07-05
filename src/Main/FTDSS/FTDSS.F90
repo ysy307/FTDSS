@@ -48,11 +48,18 @@ contains
 
         integer(int32) :: ierr
 
+        character(len=20), allocatable :: profiler_labels(:)
+
+        ! ★ 計測したいセクション名を定義
+        profiler_labels = [character(len=20) :: "IO", "Setup", "Assemble", "Solve", "Total"]
+
         ! Initialize the FDTSS module
         ! This is where you would set up any necessary parameters or configurations
         self%Input = Type_Input()
-        self%time = Type_Time(self%Input)
+        self%time = Type_Time(self%Input, profiler_labels)
         call self%time%Record("Start")
+        call self%time%Profile_Start("Total")
+        call self%time%Profile_Start("IO")
         nsize = self%Input%VTK%numPoints
 
         ! Initialize the Structure
@@ -95,6 +102,7 @@ contains
                                             iperm=self%Domain%RCM_perm, &
                                             Colors=self%Domain%Colors%Color)
 
+        call self%time%Profile_Stop("IO")
     end subroutine FDTSS_initialize
 
 end module Main_FTDSS

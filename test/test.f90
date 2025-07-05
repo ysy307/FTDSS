@@ -14,6 +14,7 @@ program test
     character(1) :: BC_Type
 
     call FTDSS%initialize()
+    call FTDSS%time%Profile_Start("Setup")
     call FTDSS%IC%apply(physics="Thermal", &
                         domain=FTDSS%Domain, &
                         var=FTDSS%Thermal%T)
@@ -23,18 +24,22 @@ program test
                             Domain=FTDSS%Domain, &
                             mode=2) ! mode=2 for initial conditions
     ! FTDSS%phi%pre(:)
+
     ! call FTDSS%Thermal%HTC% phi, Temperature, Pw, Ice, Density
     ! print *, FTDSS%Thermal%T%pre(1)
     ! print *, FTDSS%Thermal%HTC%Calc(NodeBelonging=FTDSS%NodeBelonging(1), phi=FTDSS%phi%pre(1), Temperature=FTDSS%Thermal%T%pre(1), Ice=FTDSS%Thermal%ICE(1)%f, Density=FTDSS%Thermal%DEN)
     ! call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0
+    call FTDSS%time%Profile_Stop("Setup")
 
+    call FTDSS%time%Profile_Start("IO")
     call FTDSS%Output%Overall%Output(fc=count, &
                                      iperm=FTDSS%Domain%RCM_perm, &
                                      Temp=FTDSS%Thermal%T%pre, &
                                      Si=FTDSS%Thermal%Qice%pre)
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
+    call FTDSS%time%Profile_Stop("IO")
     FTDSS%Iteration%step = 0
     FTDSS%Iteration%max_iter = 100
 
@@ -53,6 +58,7 @@ program test
         !! Thermal Newton-Raphson FTDSS%Iteration
 
         NR_LOOP_THERMAL: do while (FTDSS%Iteration%iter <= FTDSS%Iteration%max_iter)
+            call FTDSS%time%Profile_Start("Assemble")
             ! print *, FTDSS%Iteration%iter
             if (FTDSS%Iteration%isConverged) then
                 FTDSS%Iteration%step = FTDSS%Iteration%step + 1
@@ -76,6 +82,8 @@ program test
             ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
             ! Thermal%PHIT(:) = -Thermal%PHIT(:)
             ! call FTDSS%Thermal%BC%
+            call FTDSS%time%Profile_Stop("Assemble")
+            call FTDSS%time%Profile_Start("Setup")
             BC_Type = 'T'
             call FTDSS%BC%apply_CRS(BC_Type=BC_Type, &
                                     current_time=FTDSS%time%time, &
@@ -102,8 +110,12 @@ program test
             ! close (20)
             ! stop
             ! call FTDSS%Thermal%BC%Fix_Bounday_Values(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT)
-            call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
+            call FTDSS%time%Profile_Stop("Setup")
+
+            call FTDSS%time%Profile_Start("Solve")
+            call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
+            call FTDSS%time%Profile_Stop("Solve")
             ! open (unit=30, file='log/debug3.txt', status='replace')
             ! do i = 1, FTDSS%Thermal%nsize
             !     write (30, '( i0,2x,f16.7)') i, FTDSS%Thermal%T%new(i)
@@ -137,6 +149,7 @@ program test
         !     call FTDSS%Thermal%T%Shift(reverse=.true.)
         ! end if
 
+        call FTDSS%time%Profile_Start("IO")
         call FTDSS%Output%Output_Observation(time=FTDSS%time%time / 86400.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
         ! print *, mod(FTDSS%Iteration%step, 100)
         if (mod(FTDSS%Iteration%step, 10) == 0) then
@@ -146,9 +159,11 @@ program test
                                              Temp=FTDSS%Thermal%T%pre, &
                                              Si=FTDSS%Thermal%Qice%pre)
         end if
+        call FTDSS%time%Profile_Stop("IO")
 
     end do TIME_LOOP
 
+    call FTDSS%time%Profile_Stop("Total")
     call FTDSS%time%Record("End")
     call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)
     ! call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)/
