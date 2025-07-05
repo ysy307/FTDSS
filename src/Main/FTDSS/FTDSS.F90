@@ -2,6 +2,7 @@ module Main_FTDSS
     use, intrinsic :: iso_fortran_env
 
     use :: Core_BaseTypes
+    use :: Core_Signal
     use :: Inout_Input
     use :: Time_Time
     use :: Inout_Output
@@ -60,6 +61,8 @@ contains
         call self%time%Record("Start")
         call self%time%Profile_Start("Total")
         call self%time%Profile_Start("IO")
+
+        call setup_handler()
         nsize = self%Input%VTK%numPoints
 
         ! Initialize the Structure

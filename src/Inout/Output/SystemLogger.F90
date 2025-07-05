@@ -2,12 +2,14 @@ submodule(Inout_Output) Inout_Output_SystemLogger
     use, intrinsic :: iso_fortran_env
     implicit none
 contains
-    module subroutine Output_SystemLog(self, time, Matrix)
+    module subroutine Output_SystemLog(self, time, Matrix, Domain)
         use :: stdlib_strings, only:to_string
         implicit none
         class(Type_Output) :: self
         type(Type_Time), intent(in) :: time
         type(Type_CRS), intent(in) :: Matrix
+        type(Domain_t), intent(in) :: Domain
+
         character(:), allocatable :: username
         character(:), allocatable :: hostname
         character(:), allocatable :: compiler
@@ -107,6 +109,8 @@ contains
         write (num_unit, '(a)') "Matrix type : CRS"
         write (num_unit, '(a,i0)') "Matrix size : ", Matrix%nrow
         write (num_unit, '(a,i0)') "Matrix nnz  : ", Matrix%nnz
+        write (num_unit, '(a)') repeat('-', nRepeat)
+        write (num_unit, '(a,i0)') "Coloring Count : ", Domain%Colors%nColor
         write (num_unit, '(a)') repeat('=', nRepeat)
 
         close (num_unit)

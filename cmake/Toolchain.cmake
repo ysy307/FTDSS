@@ -52,7 +52,7 @@ function(enable_build_flags target)
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:-g -O0 -debug all -traceback>
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:-g -O0 -debug all -traceback>
             )
-            target_compile_definitions(${target} PUBLIC _DEBUG)
+            target_compile_definitions(${target} PUBLIC USE_DEBUG)
 
         elseif(COMPILER STREQUAL "gnu")
             target_compile_options(${target} PUBLIC

@@ -2,7 +2,14 @@
     "name": "FTDSS",
     "dockerFile": "Dockerfile",
     "runArgs": [
-        "--hostname=ftdss-dev"
+        "--hostname=ftdss-dev",
+        "--privileged",
+        "--cap-add=SYS_ADMIN",
+        "--cap-add=SYS_PTRACE",
+        "-v",
+        "/sys/kernel/debug:/sys/kernel/debug",
+        "-v",
+        "${localEnv:USERPROFILE}/.gitconfig:/root/.gitconfig"
     ],
     "customizations": {
         "vscode": {

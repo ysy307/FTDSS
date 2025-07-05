@@ -14,6 +14,10 @@ program test
     character(1) :: BC_Type
 
     call FTDSS%initialize()
+    if (was_interrupted()) then
+        print *, "Program interrupted by user."
+        stop
+    end if
     call FTDSS%time%Profile_Start("Setup")
     call FTDSS%IC%apply(physics="Thermal", &
                         domain=FTDSS%Domain, &
@@ -161,12 +165,16 @@ program test
         end if
         call FTDSS%time%Profile_Stop("IO")
 
+        if (was_interrupted()) then
+            print *, "Program interrupted by user."
+            stop
+        end if
+
     end do TIME_LOOP
 
     call FTDSS%time%Profile_Stop("Total")
     call FTDSS%time%Record("End")
-    call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)
-    ! call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0)/
+    call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0, FTDSS%Domain)
 
     stop
 

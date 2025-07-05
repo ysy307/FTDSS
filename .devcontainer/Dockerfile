@@ -24,6 +24,9 @@ RUN apt-get update -y && apt-get install -y \
     software-properties-common \
     ninja-build \
     graphviz \
+    linux-tools-common linux-tools-generic \
+    libx11-dev libxext-dev libxrender-dev libxt-dev \
+    valgrind kcachegrind \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

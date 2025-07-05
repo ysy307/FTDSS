@@ -48,73 +48,73 @@ contains
         integer(int32) :: idx, iEdge
 
         if (present(A)) then
-        if (.not. present(mode)) then
-            call Calc_Time_Coefficients(current_time, self%time_points, timeCoe, idx)
-            Dval = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
-
-            do iEdge = 1, self%num_target_edges
-                call apply_CRS_Dirichlet_base(A=A, &
-                                              b=b, &
-                                              isUniform=self%is_uniform, &
-                                              Edge=self%target_edges(:, iEdge), &
-                                              Dval=Dval, &
-                                              perm=Domain%RCM_inv_perm)
-            end do
-        else
-            select case (mode)
-            case (0)
+            if (.not. present(mode)) then
                 call Calc_Time_Coefficients(current_time, self%time_points, timeCoe, idx)
                 Dval = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
-            case (1)
-                !! Newton-Raphson step
-                Dval = 0.0d0
-            case (2)
-                !! initial condition
-                Dval = self%values(1)
-            end select
 
-            do iEdge = 1, self%num_target_edges
-                call apply_CRS_Dirichlet_base(A=A, &
-                                              b=b, &
-                                              isUniform=self%is_uniform, &
-                                              Edge=self%target_edges(:, iEdge), &
-                                              Dval=Dval, &
-                                              perm=Domain%RCM_inv_perm)
-            end do
-        end if
-        else
-        if (.not. present(mode)) then
-            call Calc_Time_Coefficients(current_time, self%time_points, timeCoe, idx)
-            Dval = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
+                do iEdge = 1, self%num_target_edges
+                    call apply_CRS_Dirichlet_base(A=A, &
+                                                  b=b, &
+                                                  isUniform=self%is_uniform, &
+                                                  Edge=self%target_edges(:, iEdge), &
+                                                  Dval=Dval, &
+                                                  perm=Domain%RCM_inv_perm)
+                end do
+            else
+                select case (mode)
+                case (0)
+                    call Calc_Time_Coefficients(current_time, self%time_points, timeCoe, idx)
+                    Dval = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
+                case (1)
+                    !! Newton-Raphson step
+                    Dval = 0.0d0
+                case (2)
+                    !! initial condition
+                    Dval = self%values(1)
+                end select
 
-            do iEdge = 1, self%num_target_edges
-                call apply_Dense_Dirichlet_base(b=b, &
-                                                isUniform=self%is_uniform, &
-                                                Edge=self%target_edges(:, iEdge), &
-                                                Dval=Dval, &
-                                                perm=Domain%RCM_inv_perm)
-            end do
+                do iEdge = 1, self%num_target_edges
+                    call apply_CRS_Dirichlet_base(A=A, &
+                                                  b=b, &
+                                                  isUniform=self%is_uniform, &
+                                                  Edge=self%target_edges(:, iEdge), &
+                                                  Dval=Dval, &
+                                                  perm=Domain%RCM_inv_perm)
+                end do
+            end if
         else
-            select case (mode)
-            case (0)
+            if (.not. present(mode)) then
                 call Calc_Time_Coefficients(current_time, self%time_points, timeCoe, idx)
                 Dval = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
-            case (1)
-                !! Newton-Raphson step
-                Dval = 0.0d0
-            case (2)
-                !! initial condition
-                Dval = self%values(1)
-            end select
 
-            do iEdge = 1, self%num_target_edges
-                call apply_Dense_Dirichlet_base(b=b, &
-                                                isUniform=self%is_uniform, &
-                                                Edge=self%target_edges(:, iEdge), &
-                                                Dval=Dval, &
-                                                perm=Domain%RCM_inv_perm)
-            end do
-        end if
+                do iEdge = 1, self%num_target_edges
+                    call apply_CRS_Dirichlet_base(b=b, &
+                                                  isUniform=self%is_uniform, &
+                                                  Edge=self%target_edges(:, iEdge), &
+                                                  Dval=Dval, &
+                                                  perm=Domain%RCM_inv_perm)
+                end do
+            else
+                select case (mode)
+                case (0)
+                    call Calc_Time_Coefficients(current_time, self%time_points, timeCoe, idx)
+                    Dval = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
+                case (1)
+                !! Newton-Raphson step
+                    Dval = 0.0d0
+                case (2)
+                !! initial condition
+                    Dval = self%values(1)
+                end select
+
+                do iEdge = 1, self%num_target_edges
+                    call apply_CRS_Dirichlet_base(b=b, &
+                                                  isUniform=self%is_uniform, &
+                                                  Edge=self%target_edges(:, iEdge), &
+                                                  Dval=Dval, &
+                                                  perm=Domain%RCM_inv_perm)
+                end do
+            end if
         end if
 
     end subroutine apply_CRS_Thermal_Dirichlet
@@ -167,29 +167,29 @@ contains
         integer(int32) :: i, ind, ps, pe
         integer(int32) :: p1, p2
 
-        if (isUniform) then
-            ! ! --- ここからデバッグ用コード ---
-            ! print *, 'Debug: Edge = ', Edge(1), Edge(2)
-            ! print *, 'Debug: size(perm) = ', size(perm)
-            ! if (present(A)) then
-            !     print *, 'Debug: shape(A) = ', shape(A)
-            ! end if
-            ! print *, 'Debug: size(b) = ', size(b)
-            ! ! --- ここまでデバッグ用コード ---
-            p1 = perm(Edge(1))
-            p2 = perm(Edge(2))
+        ! if (isUniform) then
+        !     ! ! --- ここからデバッグ用コード ---
+        !     ! print *, 'Debug: Edge = ', Edge(1), Edge(2)
+        !     ! print *, 'Debug: size(perm) = ', size(perm)
+        !     ! if (present(A)) then
+        !     !     print *, 'Debug: shape(A) = ', shape(A)
+        !     ! end if
+        !     ! print *, 'Debug: size(b) = ', size(b)
+        !     ! ! --- ここまでデバッグ用コード ---
+        !     p1 = perm(Edge(1))
+        !     p2 = perm(Edge(2))
 
-            if (present(A)) then
-                A(p1, :) = 0.0d0
-                A(p1, p1) = 1.0d0
+        !     if (present(A)) then
+        !         A(p1, :) = 0.0d0
+        !         A(p1, p1) = 1.0d0
 
-                A(p2, :) = 0.0d0
-                A(p2, p2) = 1.0d0
-            end if
+        !         A(p2, :) = 0.0d0
+        !         A(p2, p2) = 1.0d0
+        !     end if
 
-            b(p1) = Dval
-            b(p2) = Dval
-        end if
+        !     b(p1) = Dval
+        !     b(p2) = Dval
+        ! end if
 
     end subroutine apply_Dense_Dirichlet_base
 

@@ -13,7 +13,6 @@ contains
         integer(int32) :: i
         integer(int32) :: nNode
         ! integer(int32) :: iRegion
-        integer(int32), allocatable :: RCM_perm(:)
 
         integer(int32) :: ierr
 
@@ -26,10 +25,10 @@ contains
         ! print *, Domain%RCM_inv_perm(:)
         ! stop
 
-        if (ierr /= 0) then
-            print *, "Error in RCM_Reorder in Type_Thermal_3Phase_2D_Construct"
-            return
-        end if
+        ! if (ierr /= 0) then
+        !     print *, "Error in RCM_Reorder in Type_Thermal_3Phase_2D_Construct"
+        !     return
+        ! end if
 
         Structure%KT_star_0 = Type_CRS(Domain)
 

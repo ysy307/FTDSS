@@ -11,7 +11,7 @@ module Inout_Output
     use :: Domain_Element_Factory, only:Create_Element
     use :: Properties_Model_Base, only:Proereties_Model_t
     use :: Matrix_RCM, only:Reorder_to_Original
-    use :: domain_module, only:Domain_t
+    use :: Domain_module, only:Domain_t
     use :: Main_Thermal
     use :: Time_Time
     use :: stdlib_strings, only:to_string
@@ -472,11 +472,12 @@ module Inout_Output
     end interface
 
     interface
-        module subroutine Output_SystemLog(self, time, Matrix)
+        module subroutine Output_SystemLog(self, time, Matrix, Domain)
             implicit none
             class(Type_Output) :: self
             type(Type_Time), intent(in) :: time
             type(Type_CRS), intent(in) :: Matrix
+            type(Domain_t), intent(in) :: Domain
         end subroutine Output_SystemLog
     end interface
 
