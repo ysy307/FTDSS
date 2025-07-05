@@ -48,10 +48,10 @@ contains
 
         integer(int32) :: ierr
 
-        character(len=20), allocatable :: profiler_labels(:)
+        character(len=10), allocatable :: profiler_labels(:)
 
         ! ★ 計測したいセクション名を定義
-        profiler_labels = [character(len=20) :: "IO", "Setup", "Assemble", "Solve", "Total"]
+        profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
 
         ! Initialize the FDTSS module
         ! This is where you would set up any necessary parameters or configurations

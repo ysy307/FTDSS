@@ -19,7 +19,9 @@ contains
         real(real64) :: rss_mb
 
         integer(int32) :: i
-        real(real64) :: total_measured_time
+        real(real64) :: component_total_time ! 「Total」を除いた合計時間
+        real(real64) :: total_section_time ! 「Total」セクションの時間
+        integer(int32), parameter :: nRepeat = 50
 
         username = Get_Username()
         hostname = Get_Hostname()
@@ -36,9 +38,9 @@ contains
             write (*, *) "Error opening log file: ", self%logFileName
             stop
         end if
-        write (num_unit, '(a)') "----------------------------------------------"
+        write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') "FTDSS System Log"
-        write (num_unit, '(a)') "----------------------------------------------"
+        write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') "Username           : "//trim(username)
         write (num_unit, '(a)') "Hostname           : "//trim(hostname)
         write (num_unit, '(a)') "OS                 : "//trim(os)
@@ -51,41 +53,61 @@ contains
         write (num_unit, '(a,i0)') "OpenMP Max Threads : ", omp_get_num_procs()
         write (num_unit, '(a,i0)') "OpenMP Threads     : ", omp_get_max_threads()
 #endif
-        write (num_unit, '(a)') "----------------------------------------------"
+        write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') "Time Information"
-        write (num_unit, '(a)') "----------------------------------------------"
+        write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') trim(time%start%label)//" Time : "//time%start%date(1:4)//"-"//time%start%date(5:6)//"-"//time%start%date(7:8)//"T"//time%start%time(1:2)//":"//time%start%time(3:4)//":"//time%start%time(5:6)//trim(time%start%zone)
         write (num_unit, '(a)') trim(time%end%label)//" Time   : "//time%end%date(1:4)//"-"//time%end%date(5:6)//"-"//time%end%date(7:8)//"T"//time%end%time(1:2)//":"//time%end%time(3:4)//":"//time%end%time(5:6)//trim(time%end%zone)
 
-        total_measured_time = 0.0d0
-        do i = 1, size(time%sections)
-            total_measured_time = total_measured_time + time%sections(i)%total_time
-        end do
+        component_total_time = 0.0d0
+        total_section_time = 0.0d0
 
-        write (num_unit, *)
-        write (num_unit, '(A)') "----------------------------------------------"
-        write (num_unit, '(A)') "Performance Profiling Report"
-        write (num_unit, '(A)') "----------------------------------------------"
-        write (num_unit, '(A20, A15, A12)') "Section", "Time (sec)", "Percentage"
-        write (num_unit, '(A47)') repeat('-', 47)
-
+        ! --- 先に合計を計算 ---
         do i = 1, size(time%sections)
-            if (total_measured_time > 0.0d0) then
-                write (num_unit, '(A20, F15.4, F11.2, A)') trim(time%sections(i)%label), &
-                    time%sections(i)%total_time, &
-                    (time%sections(i)%total_time / total_measured_time) * 100.0d0, " %"
+            ! 'Total'セクションは別で保持し、部品の合計からは除外する
+            if (trim(adjustl(time%sections(i)%label)) == "Total") then
+                total_section_time = time%sections(i)%total_time
             else
-                write (num_unit, '(A20, F15.4, A)') trim(time%sections(i)%label), time%sections(i)%total_time, " (N/A %)"
+                component_total_time = component_total_time + time%sections(i)%total_time
             end if
         end do
-        write (num_unit, '(a)') repeat('-', 47)
-        write (num_unit, '(a, f15.4, a)') "Total Measured", total_measured_time, ""
-        write (num_unit, '(a)') "----------------------------------------------"
+
+        write (num_unit, '(a)') repeat('=', nRepeat)
+        write (num_unit, '(a)') "Performance Profiling Report"
+        write (num_unit, '(a)') repeat('=', nRepeat)
+        write (num_unit, '(a10, a15, a15)') "Section", "Time (sec)", "Percentage"
+        write (num_unit, '(a)') repeat('-', nRepeat)
+
+        ! --- 各セクションの結果を出力 ---
+        do i = 1, size(time%sections)
+            ! 'Total'セクションはここでは表示しない (最後に表示するため)
+            if (trim(adjustl(time%sections(i)%label)) == "Total") cycle
+
+            if (component_total_time > 0.0d0) then
+                write (num_unit, '(a10, f15.4, f16.7, a)') trim(time%sections(i)%label), &
+                    time%sections(i)%total_time, &
+                    (time%sections(i)%total_time / component_total_time) * 100.0d0, " %"
+            else
+                write (num_unit, '(a10, f15.4, a)') trim(time%sections(i)%label), time%sections(i)%total_time, " (N/A %)"
+            end if
+        end do
+
+        write (num_unit, '(a)') repeat('-', nRepeat)
+
+        ! 'Total'セクションが計測されていれば、それも表示
+        if (total_section_time > 0.0d0) then
+            write (num_unit, '(a10, f15.4, a)') "Total", total_section_time, ""
+        else
+            write (num_unit, '(a10, f15.4, a)') "Total", component_total_time, ""
+        end if
+
+        write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') "Matrix Information"
-        write (num_unit, '(a)') "----------------------------------------------"
+        write (num_unit, '(a)') repeat('-', nRepeat)
         write (num_unit, '(a)') "Matrix type : CRS"
         write (num_unit, '(a,i0)') "Matrix size : ", Matrix%nrow
         write (num_unit, '(a,i0)') "Matrix nnz  : ", Matrix%nnz
+        write (num_unit, '(a)') repeat('=', nRepeat)
 
         close (num_unit)
     end subroutine Output_SystemLog
