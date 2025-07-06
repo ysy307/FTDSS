@@ -11,6 +11,7 @@ add_library(Core OBJECT
     fortran_utils/signal_flag_wrapper.F90
     fortran_utils/fortran_utils.F90
     error.F90
+    check_nan.f90
     Allocate.F90
     BaseTypes.F90
     Unique.F90

@@ -1,5 +1,6 @@
 program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_logger
     use :: Main_FTDSS
 
 #ifdef _OPENMP
@@ -15,7 +16,7 @@ program test
 
     call FTDSS%initialize()
     if (was_interrupted()) then
-        print *, "Program interrupted by user."
+        call global_logger%log_warning(message="Program interrupted by user.")
         stop
     end if
     call FTDSS%time%Profile_Start("Setup")
@@ -166,7 +167,7 @@ program test
         call FTDSS%time%Profile_Stop("IO")
 
         if (was_interrupted()) then
-            print *, "Program interrupted by user."
+            call global_logger%log_warning(message="Program interrupted by user.")
             stop
         end if
 

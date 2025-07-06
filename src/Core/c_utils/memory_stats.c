@@ -8,13 +8,12 @@
 #include <unistd.h>
 #endif
 
-// RSSをkB単位で返す
+// RSS を kB 単位で返す
 int64_t memory_stats_get_rss_kb(void)
 {
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS info;
-    if (!GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info)))
-        return -1;
+    GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
     return (int64_t)(info.WorkingSetSize / 1024);
 #else
     long pages = 0;

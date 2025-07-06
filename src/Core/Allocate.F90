@@ -63,13 +63,20 @@ contains
         implicit none
         integer(int8), intent(inout), allocatable :: array(:)
         integer(int32), intent(in) :: size
+        integer(int32) :: stat
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
-        end if
+        ! Check if the array is already allocated
+        if (allocated(array)) call error_message(951)
+
+        ! Check for invalid size
+        if (size <= 0) call error_message(952)
+        if (size > huge(array)) call error_message(953)
+
+        allocate (array(size), stat=stat)
+
+        ! Check if allocation was successful
+        if (stat /= 0) call error_message(954)
+
     end subroutine Allocate_Rank1_int8
 
     ! Rank-1 配列の割り当て
