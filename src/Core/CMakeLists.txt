@@ -12,11 +12,12 @@ add_library(Core OBJECT
     fortran_utils/fortran_utils.F90
     error.F90
     check_nan.f90
-    Allocate.F90
+    allocate.F90
     BaseTypes.F90
-    Unique.F90
+    unique.F90
     VTK_Constants.F90
     VTK.F90
+    core.F90
 )
 enable_build_flags(Core)
 enable_thirdparty (Core)

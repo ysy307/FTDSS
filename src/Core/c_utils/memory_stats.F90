@@ -8,7 +8,7 @@ module core_c_utils_memory_stats
     interface
         function c_get_rss_kb() bind(C, name="memory_stats_get_rss_kb")
             import :: c_int64_t
-            integer(c_int64_t) :: memory_stats_get_rss_kb
+            integer(c_int64_t) :: c_get_rss_kb
         end function c_get_rss_kb
     end interface
 

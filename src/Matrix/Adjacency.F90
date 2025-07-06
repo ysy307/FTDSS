@@ -17,6 +17,7 @@ module Matrix_Adjacency
         procedure, pass(self), public :: check => check_adjacent
         procedure, pass(self), public :: get => get_degree
         procedure, pass(self), public :: get_numElements => get_numElements
+        procedure, pass(self), public :: destroy => adjacency_destroy
     end type Adjacency_t
 
 contains
@@ -111,5 +112,15 @@ contains
 
         numElements = self%numElements
     end function get_numElements
+
+    subroutine adjacency_destroy(self)
+        implicit none
+        class(Adjacency_t), intent(inout) :: self
+
+        if (allocated(self%Matrix)) deallocate (self%Matrix)
+        if (allocated(self%degree)) deallocate (self%degree)
+
+        self%numElements = 0
+    end subroutine adjacency_destroy
 
 end module Matrix_Adjacency

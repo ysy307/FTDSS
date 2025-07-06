@@ -1,4 +1,4 @@
-module Core_Error
+module core_error
     use, intrinsic :: iso_fortran_env, only: int32, real32, real64, real128
     use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
     use :: stdlib_logger
@@ -98,8 +98,10 @@ contains
         else if (err_number == 953) then
             write (msg, fmt) "#", err_number, ": Array size exceeds maximum allowed."
         else if (err_number == 954) then
-            write (msg, fmt) "#", err_number, ": Memory allocation failed."
+            write (msg, fmt) "#", err_number, ": Invalid range - first index is greater than last."
         else if (err_number == 955) then
+            write (msg, fmt) "#", err_number, ": Memory allocation failed."
+        else if (err_number == 956) then
             write (msg, '(a)') "Pointer has already allocated."
         else
             msg = "Unknown error"
@@ -139,4 +141,4 @@ contains
             in_range = .false.
         end if
     end function value_in_range_real64
-end module Core_Error
+end module core_error

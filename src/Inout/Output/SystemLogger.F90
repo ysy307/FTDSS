@@ -95,7 +95,7 @@ contains
             if (trim(adjustl(time%sections(i)%label)) == "Total") cycle
 
             if (component_total_time > 0.0d0) then
-                write (num_unit, '(a10, f15.4, f16.7, a)') trim(time%sections(i)%label), &
+                write (num_unit, '(a10, f15.4, f14.4, a)') trim(time%sections(i)%label), &
                     time%sections(i)%total_time, &
                     (time%sections(i)%total_time / component_total_time) * 100.0d0, " %"
             else
