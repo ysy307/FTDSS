@@ -1,5 +1,5 @@
 add_library(Output OBJECT
-    SystemInfo.c
+    # SystemInfo.c
     Output.F90
     Base.F90
     Observation.F90

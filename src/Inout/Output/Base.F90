@@ -81,207 +81,207 @@ contains
     !     variable names.
     !
     !----------------------------------------------------------------------!
-    module function Get_UserName() result(UserName)
-        implicit none
-        character(:), allocatable :: UserName
+    ! module function Get_UserName() result(UserName)
+    !     implicit none
+    !     character(:), allocatable :: UserName
 
-        character(64) :: tmpUserName
-        integer(int32) :: len, status
-        integer(int32) :: i
+    !     character(64) :: tmpUserName
+    !     integer(int32) :: len, status
+    !     integer(int32) :: i
 
-        character(:), allocatable :: UserNameLists(:)
-        integer(int32), parameter :: UserNameListsLength = 4
+    !     character(:), allocatable :: UserNameLists(:)
+    !     integer(int32), parameter :: UserNameListsLength = 4
 
-        allocate (character(len=16) :: UserNameLists(UserNameListsLength))
+    !     allocate (character(len=16) :: UserNameLists(UserNameListsLength))
 
-        UserNameLists(1) = "USER"
-        UserNameLists(2) = "LOGNAME"
-        UserNameLists(3) = "LNAME"
-        UserNameLists(4) = "USERNAME"
+    !     UserNameLists(1) = "USER"
+    !     UserNameLists(2) = "LOGNAME"
+    !     UserNameLists(3) = "LNAME"
+    !     UserNameLists(4) = "USERNAME"
 
-        do i = 1, UserNameListsLength
-            call get_environment_variable(UserNameLists(i), &
-                                          tmpUserName, &
-                                          len, &
-                                          status)
-            if (status == 0 .and. len > 0) then
-                UserName = trim(adjustl(tmpUserName))
-                deallocate (UserNameLists)
-                return
-            end if
-        end do
+    !     do i = 1, UserNameListsLength
+    !         call get_environment_variable(UserNameLists(i), &
+    !                                       tmpUserName, &
+    !                                       len, &
+    !                                       status)
+    !         if (status == 0 .and. len > 0) then
+    !             UserName = trim(adjustl(tmpUserName))
+    !             deallocate (UserNameLists)
+    !             return
+    !         end if
+    !     end do
 
-        UserName = "Unknown"
+    !     UserName = "Unknown"
 
-        deallocate (UserNameLists)
+    !     deallocate (UserNameLists)
 
-    end function Get_UserName
+    ! end function Get_UserName
 
-    !----------------------------------------------------------------------!
-    ! Get_HostName:
-    !----------------------------------------------------------------------!
-    ! This function retrieves the hostname of the system where the program
-    ! is currently running. It attempts to obtain the hostname by querying
-    ! environment variables commonly used for this purpose.
-    !
-    ! Return Value:
-    !   HostName : Allocatable character string containing the name of the
-    !              host computer. Returns "Unknown" if the hostname cannot
-    !              be determined.
-    !
-    ! Function Details:
-    !   - Attempts to retrieve the hostname by checking common environment
-    !     variables: "HOSTNAME" and "COMPUTERNAME".
-    !   - Uses the Fortran intrinsic procedure `get_environment_variable`
-    !     to query the environment.
-    !   - If a valid hostname is found, it is returned; otherwise, the
-    !     function returns "Unknown".
-    !   - Dynamically allocates and deallocates an array used to hold
-    !     environment variable names.
-    !
-    !----------------------------------------------------------------------!
-    module function Get_HostName() result(HostName)
-        implicit none
-        character(:), allocatable :: HostName
+    ! !----------------------------------------------------------------------!
+    ! ! Get_HostName:
+    ! !----------------------------------------------------------------------!
+    ! ! This function retrieves the hostname of the system where the program
+    ! ! is currently running. It attempts to obtain the hostname by querying
+    ! ! environment variables commonly used for this purpose.
+    ! !
+    ! ! Return Value:
+    ! !   HostName : Allocatable character string containing the name of the
+    ! !              host computer. Returns "Unknown" if the hostname cannot
+    ! !              be determined.
+    ! !
+    ! ! Function Details:
+    ! !   - Attempts to retrieve the hostname by checking common environment
+    ! !     variables: "HOSTNAME" and "COMPUTERNAME".
+    ! !   - Uses the Fortran intrinsic procedure `get_environment_variable`
+    ! !     to query the environment.
+    ! !   - If a valid hostname is found, it is returned; otherwise, the
+    ! !     function returns "Unknown".
+    ! !   - Dynamically allocates and deallocates an array used to hold
+    ! !     environment variable names.
+    ! !
+    ! !----------------------------------------------------------------------!
+    ! module function Get_HostName() result(HostName)
+    !     implicit none
+    !     character(:), allocatable :: HostName
 
-        character(64) :: tmpHostName
-        integer(int32) :: len, status
-        integer(int32) :: i
+    !     character(64) :: tmpHostName
+    !     integer(int32) :: len, status
+    !     integer(int32) :: i
 
-        character(:), allocatable :: HostNameLists(:)
-        integer(int32), parameter :: HostNameListsLength = 2
+    !     character(:), allocatable :: HostNameLists(:)
+    !     integer(int32), parameter :: HostNameListsLength = 2
 
-        allocate (character(len=16) :: HostNameLists(HostNameListsLength))
-        HostNameLists(1) = "HOSTNAME"
-        HostNameLists(2) = "COMPUTERNAME"
+    !     allocate (character(len=16) :: HostNameLists(HostNameListsLength))
+    !     HostNameLists(1) = "HOSTNAME"
+    !     HostNameLists(2) = "COMPUTERNAME"
 
-        do i = 1, HostNameListsLength
-            call get_environment_variable(HostNameLists(i), &
-                                          tmpHostName, &
-                                          len, &
-                                          status)
-            if (status == 0 .and. len > 0) then
-                HostName = trim(adjustl(tmpHostName))
-                deallocate (HostNameLists)
-                return
-            end if
-        end do
+    !     do i = 1, HostNameListsLength
+    !         call get_environment_variable(HostNameLists(i), &
+    !                                       tmpHostName, &
+    !                                       len, &
+    !                                       status)
+    !         if (status == 0 .and. len > 0) then
+    !             HostName = trim(adjustl(tmpHostName))
+    !             deallocate (HostNameLists)
+    !             return
+    !         end if
+    !     end do
 
-        HostName = "Unknown"
+    !     HostName = "Unknown"
 
-        deallocate (HostNameLists)
+    !     deallocate (HostNameLists)
 
-    end function Get_HostName
+    ! end function Get_HostName
 
-    module function Get_CompilerName() result(CompilerName)
-        implicit none
-        character(:), allocatable :: CompilerName
+!     module function Get_CompilerName() result(CompilerName)
+!         implicit none
+!         character(:), allocatable :: CompilerName
 
-#ifdef __GFORTRAN__
-        CompilerName = "GNU Fortran Compiler"
-#elif defined(__INTEL_COMPILER)
-        CompilerName = "Intel Fortran Compiler"
-#elif defined(__PGI) || defined(__NVCOMPILER)
-        CompilerName = "NVIDIA (PGI) Fortran Compiler"
-#else
-        CompilerName = "Unknown Compiler"
-#endif
+! #ifdef __GFORTRAN__
+!         CompilerName = "GNU Fortran Compiler"
+! #elif defined(__INTEL_COMPILER)
+!         CompilerName = "Intel Fortran Compiler"
+! #elif defined(__PGI) || defined(__NVCOMPILER)
+!         CompilerName = "NVIDIA (PGI) Fortran Compiler"
+! #else
+!         CompilerName = "Unknown Compiler"
+! #endif
 
-    end function Get_CompilerName
+!     end function Get_CompilerName
 
-    module function Get_CompilerVersion() result(CompilerVersion)
-        use :: stdlib_strings, only:to_string
-        implicit none
-        character(:), allocatable :: CompilerVersion
-        integer(int32) :: year, major, minor
+!     module function Get_CompilerVersion() result(CompilerVersion)
+!         use :: stdlib_strings, only:to_string
+!         implicit none
+!         character(:), allocatable :: CompilerVersion
+!         integer(int32) :: year, major, minor
 
-#ifdef __GFORTRAN__
-#ifdef __GNUC__
-        CompilerVersion = to_string(__GNUC__)//"."//to_string(__GNUC_MINOR__)//"."//to_string(__GNUC_PATCHLEVEL__)
-#else
-        CompilerVersion = "Unknown Compiler Version"
-#endif
-#elif defined(__INTEL_COMPILER)
-        year = __INTEL_COMPILER / 10000
-        major = mod(__INTEL_COMPILER / 100, 100)
-        minor = mod(__INTEL_COMPILER, 100)
+! #ifdef __GFORTRAN__
+! #ifdef __GNUC__
+!         CompilerVersion = to_string(__GNUC__)//"."//to_string(__GNUC_MINOR__)//"."//to_string(__GNUC_PATCHLEVEL__)
+! #else
+!         CompilerVersion = "Unknown Compiler Version"
+! #endif
+! #elif defined(__INTEL_COMPILER)
+!         year = __INTEL_COMPILER / 10000
+!         major = mod(__INTEL_COMPILER / 100, 100)
+!         minor = mod(__INTEL_COMPILER, 100)
 
-        CompilerVersion = to_string(year)//"."//to_string(major)//"."//to_string(minor)
-#elif defined(__PGI) || defined(__NVCOMPILER)
-        CompilerVersion = to_string(__NVCOMPILER_MAJOR__)//"."//to_string(__NVCOMPILER_MINOR__)//"."//to_string(__NVCOMPILER_PATCHLEVEL__)
-#else
-        CompilerVersion = "Unknown Compiler Version"
-#endif
+!         CompilerVersion = to_string(year)//"."//to_string(major)//"."//to_string(minor)
+! #elif defined(__PGI) || defined(__NVCOMPILER)
+!         CompilerVersion = to_string(__NVCOMPILER_MAJOR__)//"."//to_string(__NVCOMPILER_MINOR__)//"."//to_string(__NVCOMPILER_PATCHLEVEL__)
+! #else
+!         CompilerVersion = "Unknown Compiler Version"
+! #endif
 
-    end function Get_CompilerVersion
+!     end function Get_CompilerVersion
 
-    module function Get_CPUArchitecture() result(architecture)
-        implicit none
-        character(:), allocatable :: architecture
-        type(c_ptr) :: ptr
+!     module function Get_CPUArchitecture() result(architecture)
+!         implicit none
+!         character(:), allocatable :: architecture
+!         type(c_ptr) :: ptr
 
-        ! C 側 get_architecture() を呼び出し
-        ptr = C_Get_Architecture()
+!         ! C 側 get_architecture() を呼び出し
+!         ptr = C_Get_Architecture()
 
-        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
-        if (c_associated(ptr)) then
-            architecture = c_ptr_to_string(ptr)
-        else
-            allocate (character(len=24) :: architecture)
-            architecture = "Unknown CPU Architecture"
-        end if
-    end function Get_CPUArchitecture
+!         ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+!         if (c_associated(ptr)) then
+!             architecture = c_ptr_to_string(ptr)
+!         else
+!             allocate (character(len=24) :: architecture)
+!             architecture = "Unknown CPU Architecture"
+!         end if
+!     end function Get_CPUArchitecture
 
-    module function Get_OS() result(os)
-        implicit none
-        character(:), allocatable :: os
-        type(c_ptr) :: ptr
+!     module function Get_OS() result(os)
+!         implicit none
+!         character(:), allocatable :: os
+!         type(c_ptr) :: ptr
 
-        ! C 側 get_os() を呼び出し
-        ptr = C_Get_OS()
+!         ! C 側 get_os() を呼び出し
+!         ptr = C_Get_OS()
 
-        ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
-        if (c_associated(ptr)) then
-            os = c_ptr_to_string(ptr)
-        else
-            allocate (character(len=10) :: os)
-            os = "Unknown OS"
-        end if
-    end function Get_OS
+!         ! NULL ポインタなら "Unknown"、そうでなければ変換関数を使う
+!         if (c_associated(ptr)) then
+!             os = c_ptr_to_string(ptr)
+!         else
+!             allocate (character(len=10) :: os)
+!             os = "Unknown OS"
+!         end if
+!     end function Get_OS
 
-    module function Get_OpneMP_Version() result(OpenMPversion)
-        implicit none
-        character(:), allocatable :: OpenMPversion
+!     module function Get_OpneMP_Version() result(OpenMPversion)
+!         implicit none
+!         character(:), allocatable :: OpenMPversion
 
-#ifdef _OPENMP
-        select case (_OPENMP)
-        case (199911)
-            OpenMPversion = '1.0'
-        case (200203)
-            OpenMPversion = '2.0'
-        case (200505)
-            OpenMPversion = '2.5'
-        case (200805)
-            OpenMPversion = '3.0'
-        case (201107)
-            OpenMPversion = '3.1'
-        case (201307)
-            OpenMPversion = '4.0'
-        case (201511)
-            OpenMPversion = '4.5'
-        case (201811)
-            OpenMPversion = '5.0'
-        case (202011)
-            OpenMPversion = '5.1'
-        case (202111)
-            OpenMPversion = '5.2'
-        case default
-            OpenMPversion = 'unknown'
-        end select
-#else
-        OpenMPversion = 'not defined'
-#endif
+! #ifdef _OPENMP
+!         select case (_OPENMP)
+!         case (199911)
+!             OpenMPversion = '1.0'
+!         case (200203)
+!             OpenMPversion = '2.0'
+!         case (200505)
+!             OpenMPversion = '2.5'
+!         case (200805)
+!             OpenMPversion = '3.0'
+!         case (201107)
+!             OpenMPversion = '3.1'
+!         case (201307)
+!             OpenMPversion = '4.0'
+!         case (201511)
+!             OpenMPversion = '4.5'
+!         case (201811)
+!             OpenMPversion = '5.0'
+!         case (202011)
+!             OpenMPversion = '5.1'
+!         case (202111)
+!             OpenMPversion = '5.2'
+!         case default
+!             OpenMPversion = 'unknown'
+!         end select
+! #else
+!         OpenMPversion = 'not defined'
+! #endif
 
-    end function Get_OpneMP_Version
+!     end function Get_OpneMP_Version
 
 end submodule Inout_Output_Base

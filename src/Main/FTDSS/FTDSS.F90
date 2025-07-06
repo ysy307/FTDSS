@@ -2,7 +2,7 @@ module Main_FTDSS
     use, intrinsic :: iso_fortran_env
 
     use :: Core_BaseTypes
-    use :: Core_Signal
+    use :: core_fortran_utils, only:setup_handler, was_interrupted
     use :: Inout_Input
     use :: Time_Time
     use :: Inout_Output

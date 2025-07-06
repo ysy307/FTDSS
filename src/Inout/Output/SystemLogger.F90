@@ -25,15 +25,14 @@ contains
         real(real64) :: total_section_time ! 「Total」セクションの時間
         integer(int32), parameter :: nRepeat = 50
 
-        username = Get_Username()
-        hostname = Get_Hostname()
-        compiler = Get_CompilerName()
-        compiler_version = Get_CompilerVersion()
-        architecture = Get_CPUArchitecture()
-        os = Get_OS()
+        username = get_username()
+        hostname = get_hostname()
+        compiler = get_compiler_name()
+        compiler_version = get_compiler_version()
+        architecture = get_cpu_architecture()
+        os = get_os()
 
-        rss_kb = get_rss_kb()
-        rss_mb = dble(rss_kb) / 1024.0d0
+        rss_mb = get_memory_usage()
 
         open (newunit=num_unit, file=self%logFileName, status='replace', action='write', iostat=ios)
         if (ios /= 0) then
@@ -51,7 +50,7 @@ contains
         write (num_unit, '(a)') "Compiler Version   : "//trim(compiler_version)
         write (num_unit, '(a,f'//to_string(int(log10(rss_mb) + 6))//'.4,a)') "RSS Memory Usage   : ", rss_mb, " MB"
 #ifdef _OPENMP
-        write (num_unit, '(2a)') "OpenMP Version     : ", Get_OpneMP_Version()
+        write (num_unit, '(2a)') "OpenMP Version     : ", get_compiler_version()
         write (num_unit, '(a,i0)') "OpenMP Max Threads : ", omp_get_num_procs()
         write (num_unit, '(a,i0)') "OpenMP Threads     : ", omp_get_max_threads()
 #endif
