@@ -1,24 +1,23 @@
 # CMake Minimum Version
-cmake_minimum_required(VERSION 3.30)
-
-# コンパイラ指定
-if(DEFINED COMPILER)
-    if(COMPILER STREQUAL "intel")
-        set(CMAKE_Fortran_COMPILER ifx CACHE STRING "" FORCE)
-        set(CMAKE_C_COMPILER icx CACHE STRING "" FORCE)
-        set(CMAKE_CXX_COMPILER icpx CACHE STRING "" FORCE)
-    elseif(COMPILER STREQUAL "gnu")
-        set(CMAKE_Fortran_COMPILER gfortran CACHE STRING "" FORCE)
-        set(CMAKE_C_COMPILER gcc CACHE STRING "" FORCE)
-        set(CMAKE_CXX_COMPILER g++ CACHE STRING "" FORCE)
-    else()
-        message(FATAL_ERROR "Unknown COMPILER specified: ${COMPILER}")
-    endif()
-endif()
+cmake_minimum_required(VERSION 3.20)
 
 # Project Name and Language
 project(YSY_FC LANGUAGES Fortran C CXX)
 enable_language(Fortran C CXX)
+
+if(NOT CMAKE_Fortran_COMPILER)
+    message(STATUS "Fortran compiler not specified, defaulting to 'ifx'.")
+    set(CMAKE_Fortran_COMPILER ifx)
+endif()
+if(NOT CMAKE_CXX_COMPILER)
+    message(STATUS "CXX compiler not specified, defaulting to 'icx'.")
+    set(CMAKE_CXX_COMPILER icx)
+endif()
+if(NOT CMAKE_C_COMPILER)
+    message(STATUS "C compiler not specified, defaulting to 'icx'.")
+    set(CMAKE_C_COMPILER icx)
+endif()
+
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING

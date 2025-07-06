@@ -46,7 +46,7 @@ function(enable_build_flags target)
 
     # Debug用フラグ（コンパイラ別）
     if(ENABLE_DEBUG)
-        if(COMPILER STREQUAL "intel")
+        if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
             target_compile_options(${target} PUBLIC
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -check all -traceback>
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:-g -O0 -debug all -traceback>
@@ -54,7 +54,7 @@ function(enable_build_flags target)
             )
             target_compile_definitions(${target} PUBLIC USE_DEBUG)
 
-        elseif(COMPILER STREQUAL "gnu")
+        elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
             target_compile_options(${target} PUBLIC
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -fcheck=all -fbacktrace>
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:
@@ -75,11 +75,11 @@ function(enable_build_flags target)
 
     # Release最適化オプション（コンパイラ別）
     if(ENABLE_OPTIMIZE)
-        if(COMPILER STREQUAL "intel")
+        if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
             target_compile_options(${target} PUBLIC
                 $<$<CONFIG:Release>:-O3 -xCORE-AVX2>
             )
-        elseif(COMPILER STREQUAL "gnu")
+        elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
             target_compile_options(${target} PUBLIC
                 $<$<CONFIG:Release>:-O3 -march=native>
             )
