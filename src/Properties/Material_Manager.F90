@@ -47,6 +47,7 @@ contains
 
         ierr = 0
         call Input%VTK%get_active_region_info(unique_region_ids, ierr)
+        print *, unique_region_ids(:)
         num_unique_regions = Input%Basic%numRegion
 
         ! ステップ2: 配列を確保

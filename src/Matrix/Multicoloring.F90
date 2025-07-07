@@ -12,7 +12,7 @@ module Matrix_Multicoloring
     ! Domain_Moduleはユーザー提供のものを使用
     use :: Domain_Module, only:Domain_t
     use :: Matrix_Adjacency, only:Adjacency_t
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:allocate_array
     implicit none
 
     private
@@ -54,7 +54,7 @@ contains
 
         ! 3a. 基本的な情報を格納
         Domain%Colors%nColor = temp_num_colors
-        call Allocate_Array(Domain%Colors%Color, n_elements)
+        call allocate_array(Domain%Colors%Color, n_elements)
         Domain%Colors%Color(:) = temp_colors(:)
 
         ! 3b. 各色ごとの詳細情報 (Colored(:)) を格納
@@ -67,7 +67,7 @@ contains
 
                 if (count_per_color > 0) then
                     ! その色の要素リストを作成して格納
-                    call Allocate_Array(Domain%Colors%Colored(c)%Elements, count_per_color)
+                    call allocate_array(Domain%Colors%Colored(c)%Elements, count_per_color)
                     Domain%Colors%Colored(c)%Elements = pack([(i, i=1, n_elements)], mask=(temp_colors == c))
                 end if
             end do
@@ -82,13 +82,12 @@ contains
     ! (このサブルーチンの実装は以前の回答から変更ありません)
     ! ==============================================================================
     subroutine Multicoloring_welsh_powell(Adjacency, colors, num_colors)
-        ! ... (実装は前回の回答と同じ) ...
         implicit none
         class(Adjacency_t), intent(in) :: Adjacency
         integer(int32), allocatable, intent(inout) :: colors(:)
         integer(int32), intent(inout) :: num_colors
 
-        integer(int32) :: num_vertices !! 無向グラフの調点数
+        integer(int32) :: num_vertices !! 無向グラフの頂点数
         integer(int32) :: i, j, k
         integer(int32) :: v_idx, u_idx
         logical(logical32) :: can_color
@@ -100,9 +99,10 @@ contains
         if (num_vertices == 0) return
 
         ! 初期化
-        call Allocate_Array(colors, num_vertices)
+        call allocate_array(colors, num_vertices)
         num_colors = 0
         colors(:) = 0
+        print *, "Number of vertices:", num_vertices
         if (allocated(sorted_vertices)) deallocate (sorted_vertices)
         allocate (sorted_vertices(num_vertices))
 
@@ -111,13 +111,23 @@ contains
             sorted_vertices(i)%degree = Adjacency%get(i)
         end do
         ! 頂点を次数の降順にソート
+        j = 0
         do i = 2, num_vertices
             temp_vertex = sorted_vertices(i)
-            j = i - 1
-            do while (j >= 1 .and. sorted_vertices(j)%degree < temp_vertex%degree)
+            ! jをi-1から1まで逆順にループさせる
+            inner_loop: do j = i - 1, 1, -1
+                ! 挿入する値(temp_vertex)の方が大きければ、入れ替えの必要はない
+                ! -> ループを抜けて、現在のjの次(j+1)に値を挿入する
+                if (sorted_vertices(j)%degree <= temp_vertex%degree) then
+                    exit inner_loop
+                end if
+
+                ! 挿入する値の方が小さいので、j番目の要素を後ろにずらす
                 sorted_vertices(j + 1) = sorted_vertices(j)
-                j = j - 1
-            end do
+            end do inner_loop
+
+            ! ループを抜けた位置、または最後まで到達した位置に値を挿入する
+            ! jが1まで実行された場合、ループ終了後のjは0になるため、j+1は1になる
             sorted_vertices(j + 1) = temp_vertex
         end do
         ! 彩色アルゴリズムの実行

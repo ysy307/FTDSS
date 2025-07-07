@@ -6,12 +6,6 @@ module core_error
     private
 
     public :: error_message
-    public :: value_in_range
-
-    interface value_in_range
-        procedure :: value_in_range_int32
-        procedure :: value_in_range_real64
-    end interface
 
 contains
 
@@ -94,15 +88,23 @@ contains
         else if (err_number == 951) then
             write (msg, fmt) "#", err_number, ": Array is already allocated."
         else if (err_number == 952) then
-            write (msg, fmt) "#", err_number, ": Invalid array size."
+            write (msg, fmt) "#", err_number, ": Invalid array length."
         else if (err_number == 953) then
-            write (msg, fmt) "#", err_number, ": Array size exceeds maximum allowed."
+            write (msg, fmt) "#", err_number, ": Requested index range is too large."
         else if (err_number == 954) then
             write (msg, fmt) "#", err_number, ": Invalid range - first index is greater than last."
         else if (err_number == 955) then
             write (msg, fmt) "#", err_number, ": Memory allocation failed."
         else if (err_number == 956) then
+            write (msg, fmt) "#", err_number, ": Cannot specify both length and bounds."
+        else if (err_number == 957) then
+            write (msg, fmt) "#", err_number, ": Either length or bounds must be specified."
+        else if (err_number == 958) then
+            write (msg, fmt) "#", err_number, ": bounds array must have exactly 2 elements."
+        else if (err_number == 961) then
             write (msg, '(a)') "Pointer has already allocated."
+        else if (err_number == 971) then
+            write (msg, fmt) "#", err_number, ": Memory deallocation failed."
         else
             msg = "Unknown error"
         end if
@@ -120,25 +122,4 @@ contains
 #endif
     end subroutine error_message
 
-    function value_in_range_int32(value, min, max) result(in_range)
-        implicit none
-        integer(int32), intent(in) :: value, min, max
-        logical :: in_range
-
-        in_range = .true.
-        if (value < min .or. value > max) then
-            in_range = .false.
-        end if
-    end function value_in_range_int32
-
-    function value_in_range_real64(value, min, max) result(in_range)
-        implicit none
-        real(real64), intent(in) :: value, min, max
-        logical :: in_range
-
-        in_range = .true.
-        if (value < min .or. value > max) then
-            in_range = .false.
-        end if
-    end function value_in_range_real64
 end module core_error

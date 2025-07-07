@@ -58,18 +58,18 @@ contains
         CountElements = 0
         CountSides = 0
 
-        do iCell = 1, Input%VTK%numTotalCells
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%CellType, 1)) then
+        do iCell = 1, Input%VTK%num_total_cells
+            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 1)) then
                 CountSides = CountSides + 1
             end if
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%CellType, 2)) then
+            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 2)) then
                 CountElements = CountElements + 1
             end if
         end do
 
         self%nElement = CountElements
         self%nSide = CountSides
-        self%nNode = Input%VTK%numPoints
+        self%nNode = Input%VTK%num_points
         self%nRegion = Input%Basic%numRegion
 
         allocate (self%Elements(self%nElement))
@@ -77,16 +77,16 @@ contains
 
         iElem = 1
         iSide = 1
-        do iCell = 1, Input%VTK%numTotalCells
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%CellType, 1)) then
+        do iCell = 1, Input%VTK%num_total_cells
+            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 1)) then
                 call Create_Side( &
                     new_side=self%Sides(iSide)%s, &
-                    shape_type=Input%VTK%CELLS(iCell)%CellType, &
+                    shape_type=Input%VTK%CELLS(iCell)%cell_type, &
                     ierr=factory_ierr, &
                     iSide=iSide, &
                     Global_Coordinate=Coordinate, &
                     Connectivity=Input%VTK%CELLS(iCell)%CONNECTIVITY, &
-                    GroupID=Input%VTK%CELLS(iCell)%CellEntityId &
+                    GroupID=Input%VTK%CELLS(iCell)%cell_entity_id &
                     )
                 if (factory_ierr /= 0) then
                     ierr = -1
@@ -94,15 +94,15 @@ contains
                 end if
                 iSide = iSide + 1
             end if
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%CellType, 2)) then
+            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 2)) then
                 call create_element( &
                     new_element=self%Elements(iElem)%e, &
-                    shape_type=Input%VTK%CELLS(iCell)%CellType, &
+                    shape_type=Input%VTK%CELLS(iCell)%cell_type, &
                     ierr=factory_ierr, &
                     iElem=iCell, &
                     Global_Coordinate=Coordinate, &
                     Connectivity=Input%VTK%CELLS(iCell)%CONNECTIVITY, &
-                    GroupID=Input%VTK%CELLS(iCell)%CellEntityId &
+                    GroupID=Input%VTK%CELLS(iCell)%cell_entity_id &
                     )
                 if (factory_ierr /= 0) then
                     ierr = -1

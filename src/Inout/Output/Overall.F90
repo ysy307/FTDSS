@@ -30,8 +30,8 @@ contains
 
         integer(int32) :: i, j, idx, total
 
-        self%VTK%nPoints = Input%VTK%numPoints
-        self%VTK%nCell = Input%VTK%numTotalCells
+        self%VTK%nPoints = Input%VTK%num_points
+        self%VTK%nCell = Input%VTK%num_total_cells
         call self%VTK%Coordinates%allocate(self%VTK%nPoints)
         self%VTK%Coordinates = Input%VTK%POINTS
 
@@ -40,7 +40,7 @@ contains
 
         do i = 1, self%VTK%nCell
             self%VTK%offset(i) = Input%VTK%CELLS(i)%offset
-            self%VTK%CellType(i) = Input%VTK%CELLS(i)%CellType
+            self%VTK%CellType(i) = Input%VTK%CELLS(i)%cell_type
         end do
         total = sum(self%VTK%offset(:))
 
@@ -65,24 +65,29 @@ contains
 
         integer(int32) :: i, j, idx, total
 
-        self%VTK%nPoints = Input%VTK%numPoints
-        self%VTK%nCell = Input%VTK%numTotalCells
+        self%VTK%nPoints = Input%VTK%num_points
+        self%VTK%nCell = Input%VTK%num_total_cells
         call self%VTK%Coordinates%allocate(self%VTK%nPoints)
         self%VTK%Coordinates = Input%VTK%POINTS
 
         call Allocate_Array(self%VTK%offset, self%VTK%nCell)
         call Allocate_Array(self%VTK%CellType, self%VTK%nCell)
 
+        print *, "VTK nPoints:", self%VTK%nPoints
+        print *, "VTK nCell:", self%VTK%nCell
+
         do i = 1, self%VTK%nCell
+            print *, "VTK CELLS offset:", Input%VTK%CELLS(i)%offset
             if (i == 1) then
                 self%VTK%offset(i) = Input%VTK%CELLS(i)%offset
             else
                 self%VTK%offset(i) = self%VTK%offset(i - 1) + &
                                      Input%VTK%CELLS(i)%offset
             end if
-            self%VTK%CellType(i) = Input%VTK%CELLS(i)%CellType
+            self%VTK%CellType(i) = Input%VTK%CELLS(i)%cell_type
         end do
         total = self%VTK%offset(self%VTK%nCell)
+        print *, total
 
         call Allocate_Array(self%VTK%connectivity, total)
         do i = 1, self%VTK%nCell

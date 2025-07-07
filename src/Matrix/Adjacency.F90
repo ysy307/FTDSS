@@ -1,7 +1,7 @@
 module Matrix_Adjacency
     use, intrinsic :: iso_fortran_env, only: int32, logical32
     use :: Domain_Module, only:Domain_t
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:allocate_array
     implicit none
     private
     ! public :: Adjacency_t, is_adjacent, get_degree
@@ -34,8 +34,8 @@ contains
 
         self%numElements = Domain%get_numElement()
 
-        call Allocate_Array(self%Matrix, self%numElements, self%numElements)
-        call Allocate_Array(self%degree, self%numElements)
+        call allocate_array(self%Matrix, self%numElements, self%numElements)
+        call allocate_array(self%degree, self%numElements)
 
         self%Matrix(:, :) = .false.
         self%degree(:) = 0

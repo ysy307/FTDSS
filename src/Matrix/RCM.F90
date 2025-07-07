@@ -1,7 +1,7 @@
 module Matrix_RCM
     use, intrinsic :: iso_fortran_env, only: int32, real64, logical32, int64
     use :: stdlib_sorting, only:sort_index
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:allocate_array
     use :: Domain_Module, only:Domain_t
 
     implicit none
@@ -45,10 +45,10 @@ contains
         if (istat /= 0) return
 
         ! --- RCM本体で利用する配列を確保 ---
-        call Allocate_Array(perm, num_nodes)
-        call Allocate_Array(R, num_nodes)
-        call Allocate_Array(Q, num_nodes)
-        call Allocate_Array(visited, num_nodes)
+        call allocate_array(perm, num_nodes)
+        call allocate_array(R, num_nodes)
+        call allocate_array(Q, num_nodes)
+        call allocate_array(visited, num_nodes)
 
         visited = .false.
         R_count = 0
@@ -110,15 +110,13 @@ contains
         integer(int32), allocatable :: temp_counters(:)
         integer(int32) :: num_adj
 
-        integer(int64) :: conv = 1_int64
-
         istat = 0
 
         ! --- 1. 全てのエッジを一時配列 (COO形式) に格納する ---
         ! 最大エッジ数を多めに見積もる (三角要素:3辺, 四角要素:6辺(対角線含む))
         max_edges = domain%get_numElement() * 30 + domain%get_numSide() * 20
-        call Allocate_Array(edge_i, max_edges)
-        call Allocate_Array(edge_j, max_edges)
+        call allocate_array(edge_i, max_edges)
+        call allocate_array(edge_j, max_edges)
 
         edge_count = 0
 
@@ -172,8 +170,8 @@ contains
         end do
 
         ! --- 2. エッジをソートして重複を削除する ---
-        call Allocate_Array(sort_keys, transfer(edge_count, conv))
-        call Allocate_Array(p, edge_count)
+        call allocate_array(sort_keys, int(edge_count, kind=int64))
+        call allocate_array(p, edge_count)
 
         ! (i, j) のペアをソートするため、64bit整数の一意なキーを作成
         sort_keys = int(edge_i(1:edge_count), int64) * int(num_nodes, int64) + int(edge_j(1:edge_count), int64)
@@ -197,7 +195,7 @@ contains
         deallocate (p)
 
         ! --- 3. 次数(degree)を計算し、CSR形式を構築する ---
-        call Allocate_Array(degree, num_nodes)
+        call allocate_array(degree, num_nodes)
         degree = 0
         do i = 1, unique_edge_count
             degree(edge_i(i)) = degree(edge_i(i)) + 1
@@ -205,8 +203,8 @@ contains
         end do
 
         num_adj = sum(degree)
-        call Allocate_Array(adj_ptr, num_nodes + 1)
-        call Allocate_Array(adj_data, num_adj)
+        call allocate_array(adj_ptr, num_nodes + 1)
+        call allocate_array(adj_data, num_adj)
 
         adj_ptr(1) = 1
         do i = 1, num_nodes
@@ -214,7 +212,7 @@ contains
         end do
 
         ! CSRのadj_dataを埋めるためのカウンタを準備
-        call Allocate_Array(temp_counters, num_nodes)
+        call allocate_array(temp_counters, num_nodes)
         temp_counters = 0
         do i = 1, unique_edge_count
             n1 = edge_i(i)
@@ -308,9 +306,9 @@ contains
         end_idx = adj_ptr(node + 1) - 1
         neighbor_count = end_idx - start_idx + 1
         if (neighbor_count == 0) return
-        call Allocate_Array(neighbors, neighbor_count)
-        call Allocate_Array(neighbor_degrees, neighbor_count)
-        call Allocate_Array(sorted_indices, neighbor_count)
+        call allocate_array(neighbors, neighbor_count)
+        call allocate_array(neighbor_degrees, neighbor_count)
+        call allocate_array(sorted_indices, neighbor_count)
         neighbors = adj_data(start_idx:end_idx)
         do i = 1, neighbor_count
             neighbor_degrees(i) = degree(neighbors(i))
@@ -348,7 +346,7 @@ contains
         if (allocated(iperm)) then
             deallocate (iperm)
         end if
-        call Allocate_Array(iperm, n)
+        call allocate_array(iperm, n)
 
         do i = 1, n
             ! [修正] コメントを現実に即したものに修正

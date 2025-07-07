@@ -33,6 +33,9 @@ endif()
 
 if(NOT TARGET VTK::CommonCore)
     find_package(VTK REQUIRED
+        COMPONENTS
+        CommonCore
+        IOLegacy
         PATHS ${PROJECT_SOURCE_DIR}/third_party/.local/lib/cmake/VTK-9.5
     )
 endif()

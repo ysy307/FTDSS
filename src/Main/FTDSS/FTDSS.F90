@@ -66,7 +66,7 @@ contains
                                      time_stamp=.true., &
                                      max_width=0)
         call setup_handler()
-        nsize = self%Input%VTK%numPoints
+        nsize = self%Input%VTK%num_points
 
         ! Initialize the Structure
         allocate (self%Coordinate)
