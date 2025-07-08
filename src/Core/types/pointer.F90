@@ -1,0 +1,17 @@
+module core_types_pointer
+    use, intrinsic :: iso_fortran_env, only: real64
+    implicit none
+    private
+
+    public :: type_dp_pointer
+
+    !--------------------------------------------------------------------------------------
+    ! Pointer type for real numbers
+    !  - This is used to manage the memory of coorinate values in a polymorphic way
+    !  - The pointer is initialized to null and can be associated with coorinate values
+    !--------------------------------------------------------------------------------------
+    type :: type_dp_pointer
+        real(real64), pointer :: val => null()
+    end type type_dp_pointer
+
+end module core_types_pointer

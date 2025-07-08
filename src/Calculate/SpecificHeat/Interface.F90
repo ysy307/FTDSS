@@ -1,6 +1,6 @@
 module Calculate_SpecificHeat
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes, only:GaussPointState_t
+    use :: core_core, only:type_gauss_point_state
     use :: Inout_Input, only:Type_Input
     implicit none
     private
@@ -38,10 +38,10 @@ module Calculate_SpecificHeat
     ! --- 手続きのインターフェース宣言 ---
     abstract interface
         function Abst_Calc_SPH_GaussPoint(self, state) result(SpecificHeat)
-            import :: Abst_SPH, GaussPointState_t, real64
+            import :: Abst_SPH, type_gauss_point_state, real64
             implicit none
             class(Abst_SPH), intent(in) :: self
-            type(GaussPointState_t), intent(in) :: state
+            type(type_gauss_point_state), intent(in) :: state
             real(real64) :: SpecificHeat
         end function Abst_Calc_SPH_GaussPoint
     end interface
@@ -64,10 +64,10 @@ module Calculate_SpecificHeat
         end function SPH_3_Construct
 
         module function Calc_SPH_GaussPoint_3Phase(self, state) result(SpecificHeat)
-            import :: Type_SPH_3Phase, GaussPointState_t
+            import :: Type_SPH_3Phase, type_gauss_point_state
             implicit none
             class(Type_SPH_3Phase), intent(in) :: self
-            type(GaussPointState_t), intent(in) :: state
+            type(type_gauss_point_state), intent(in) :: state
             real(real64) :: SpecificHeat
         end function Calc_SPH_GaussPoint_3Phase
     end interface

@@ -1,8 +1,7 @@
 module Inout_Input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
-    use :: Core_BaseTypes
-    use :: core_core, only:type_vtk
+    use :: core_core, only:type_vtk, type_dp_3d
     use :: Core_Allocate
     use :: Core_Error
     ! use :: Condition_Fix_Boundary
@@ -138,7 +137,7 @@ module Inout_Input
 
         integer(int32) :: ObservationType
         integer(int32) :: NumObservation
-        type(DP3d) :: Cood_Obs
+        type(type_dp_3d) :: Cood_Obs
         integer(int32), allocatable :: ObsID(:)
 
         logical(4) :: outTemp

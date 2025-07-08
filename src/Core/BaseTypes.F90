@@ -3,9 +3,6 @@ module Core_BaseTypes
     use :: core_allocate, only:allocate_array
     implicit none
     private
-#ifdef _MPI
-    include 'mpif.h'
-#endif
 
     public :: Vector2D, Vector3D
     public :: DP2d, DP3d

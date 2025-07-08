@@ -5,7 +5,7 @@
 ! =============================================================================
 module Condition_Initial
     use, intrinsic :: iso_fortran_env
-    use :: Core_BaseTypes, only:Variables
+    use :: core_core, only:type_variable
     use :: Domain_Module, only:Domain_t
     use :: Inout_Input, only:Type_Input
     implicit none
@@ -38,7 +38,7 @@ module Condition_Initial
     ! Concrete Type: Laplace
     !
     type, extends(Abstract_IC) :: IC_Laplace
-        ! Member variables for Laplace would be defined here
+        ! Member type_variable for Laplace would be defined here
     contains
         procedure, pass(self) :: setup => setup_laplace
         procedure, pass(self) :: apply => apply_laplace
@@ -57,10 +57,10 @@ module Condition_Initial
         end subroutine
 
         subroutine apply_ic_abstract(self, domain, var)
-            import :: Abstract_IC, Domain_t, Variables
+            import :: Abstract_IC, Domain_t, type_variable
             class(Abstract_IC), intent(in) :: self
             type(Domain_t), intent(in) :: domain
-            type(Variables), intent(inout) :: var
+            type(type_variable), intent(inout) :: var
         end subroutine
     end interface
 
@@ -77,7 +77,7 @@ module Condition_Initial
         module subroutine apply_uniform(self, domain, var)
             class(IC_Uniform), intent(in) :: self
             type(Domain_t), intent(in) :: domain
-            type(Variables), intent(inout) :: var
+            type(type_variable), intent(inout) :: var
         end subroutine
 
         module subroutine setup_laplace(self, Input, IC_target)
@@ -89,7 +89,7 @@ module Condition_Initial
         module subroutine apply_laplace(self, domain, var)
             class(IC_Laplace), intent(in) :: self
             type(Domain_t), intent(in) :: domain
-            type(Variables), intent(inout) :: var
+            type(type_variable), intent(inout) :: var
         end subroutine
     end interface
 

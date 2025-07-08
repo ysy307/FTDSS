@@ -5,7 +5,7 @@ contains
     module function SideSecond_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iSide
-        type(DP3d), pointer, intent(in) :: Global_Coordinate
+        type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(3)
         integer(int32), intent(in) :: GroupID
         class(Abst_SideType), allocatable :: Structure
@@ -35,8 +35,8 @@ contains
         end do
 
         Structure%nGauss = 2
-        call Allocate_Array(Structure%weight, Structure%nGauss)
-        call Allocate_Array(Structure%gauss, Structure%nGauss)
+        call allocate_array(Structure%weight, Structure%nGauss)
+        call allocate_array(Structure%gauss, Structure%nGauss)
         Structure%weight(:) = [1.0d0, 1.0d0]
         Structure%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
     end function SideSecond_Construct

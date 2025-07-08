@@ -13,7 +13,7 @@ target_link_libraries(Output PRIVATE
     Domain
     Properties
     Solver
-    Time
+    control
 )
 enable_build_flags(Output)
 enable_thirdparty (Output)

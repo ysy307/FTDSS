@@ -3,7 +3,7 @@ module Domain_Element_Factory
     use :: Domain_Element, only:Abst_ElementType, & !&
                                 TriangleFirst, SquareFirst, & !&
                                 TriangleSecond, SquareSecond !&
-    use :: Core_BaseTypes, only:DP3d
+    use :: core_core, only:type_dp_3d
     implicit none
     private
     integer(int32), parameter :: SHAPE_TRIANGLE = 5
@@ -21,7 +21,7 @@ contains
         integer, intent(inout) :: ierr
         ! --- 各コンストラクタに渡す引数 ---
         integer(int32), intent(in) :: iElem
-        type(DP3d), pointer, intent(in) :: Global_Coordinate
+        type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(:)
         integer(int32), intent(in) :: GroupID
 

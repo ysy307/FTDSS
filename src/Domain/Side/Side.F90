@@ -9,8 +9,7 @@ module Domain_Side
     !    - Preserve original function and type names
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes, only:DP3d, RealPointer
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:type_dp_3d, type_dp_pointer, allocate_array
     implicit none
     private
 
@@ -35,9 +34,9 @@ module Domain_Side
         integer(int32), private :: size ! Number of nodes in the Edge
         integer(int32), private :: group ! Group ID
         integer(int32), allocatable :: conn(:) !! connectivity information
-        type(RealPointer), allocatable :: X(:) !! X coordinate
-        type(RealPointer), allocatable :: Y(:) !! Y coordinate
-        type(RealPointer), allocatable :: Z(:) !! Z coordinate
+        type(type_dp_pointer), allocatable :: X(:) !! X coordinate
+        type(type_dp_pointer), allocatable :: Y(:) !! Y coordinate
+        type(type_dp_pointer), allocatable :: Z(:) !! Z coordinate
 
         !----------------------------------------------------------------------------------
         ! Gauss Quadrature points and weights
@@ -143,7 +142,7 @@ module Domain_Side
         module function SideFirst_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iSide
-            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(2)
             integer(int32), intent(in) :: GroupID
             class(Abst_SideType), allocatable :: Structure
@@ -197,7 +196,7 @@ module Domain_Side
         module function SideSecond_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iSide
-            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(3)
             integer(int32), intent(in) :: GroupID
             class(Abst_SideType), allocatable :: Structure

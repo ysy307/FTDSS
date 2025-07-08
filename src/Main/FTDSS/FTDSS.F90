@@ -1,10 +1,11 @@
 module Main_FTDSS
     use, intrinsic :: iso_fortran_env
     use :: stdlib_logger
-    use :: Core_BaseTypes
-    use :: core_fortran_utils, only:setup_handler, was_interrupted
+    use :: core_core
+    ! use :: Core_BaseTypes
+    ! use :: core_fortran_utils, only:setup_handler, was_interrupted
     use :: Inout_Input
-    use :: Time_Time
+    use :: control_control, only:type_time, type_iteration
     use :: Inout_Output
     use :: Domain_Module, only:Domain_t
     use :: Properties_Model_Base, only:Proereties_Model_t
@@ -20,7 +21,7 @@ module Main_FTDSS
     type :: Type_FTDSS
         type(Type_Input) :: Input
 
-        type(DP3d), pointer :: Coordinate
+        type(type_dp_3d), pointer :: Coordinate
         type(Domain_t) :: Domain
         ! type(Belonging), allocatable :: NodeBelonging(:)
         class(Abstract_Thermal), allocatable :: Thermal
@@ -29,10 +30,10 @@ module Main_FTDSS
         type(BCManager) :: BC
         type(ICManager) :: IC
 
-        type(Variables) :: phi
+        type(type_variable) :: phi
 
-        type(Type_Time) :: time
-        type(Type_Iteration) :: Iteration
+        type(type_time) :: time
+        type(type_iteration) :: Iteration
         type(Type_Output) :: Output
 
     contains
@@ -57,7 +58,7 @@ contains
         ! Initialize the FDTSS module
         ! This is where you would set up any necessary parameters or configurations
         self%Input = Type_Input()
-        self%time = Type_Time(self%Input, profiler_labels)
+        self%time = type_time(self%Input, profiler_labels)
         call self%time%Record("Start")
         call self%time%Profile_Start("Total")
         call self%time%Profile_Start("IO")
@@ -70,7 +71,7 @@ contains
 
         ! Initialize the Structure
         allocate (self%Coordinate)
-        call self%Coordinate%allocate(nsize)
+        call self%Coordinate%initialize(nsize)
         self%Coordinate = self%Input%VTK%POINTS
 
         call self%Domain%initialize(self%Input, self%Coordinate, ierr)
@@ -100,7 +101,7 @@ contains
 
         self%Output = Type_Output(Input=self%Input, Domain=self%Domain, Coordinate=self%Coordinate)
 
-        call self%phi%allocate(nsize, self%Input%Basic%Order)
+        call self%phi%initialize(nsize, self%Input%Basic%Order)
         self%phi%pre = self%Input%Regions(1)%Thermal%Porosity
         self%phi%old = self%Input%Regions(1)%Thermal%Porosity
 

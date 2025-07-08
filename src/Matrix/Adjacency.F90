@@ -1,24 +1,23 @@
-module Matrix_Adjacency
+module matrix_adjacency
     use, intrinsic :: iso_fortran_env, only: int32, logical32
     use :: Domain_Module, only:Domain_t
     use :: core_core, only:allocate_array
     implicit none
     private
-    ! public :: Adjacency_t, is_adjacent, get_degree
-    public :: Adjacency_t
+    public :: type_adjacency
 
-    type :: Adjacency_t
+    type :: type_adjacency
         private
-        logical(logical32), allocatable :: Matrix(:, :)
+        logical, allocatable :: matrix(:, :)
         integer(int32), allocatable :: degree(:)
-        integer(int32) :: numElements
+        integer(int32) :: num_elements
     contains
         procedure, pass(self), public :: initialize => adjacency_initialize
         procedure, pass(self), public :: check => check_adjacent
         procedure, pass(self), public :: get => get_degree
-        procedure, pass(self), public :: get_numElements => get_numElements
+        procedure, pass(self), public :: get_num_elements => get_num_elements
         procedure, pass(self), public :: destroy => adjacency_destroy
-    end type Adjacency_t
+    end type type_adjacency
 
 contains
 
@@ -28,23 +27,23 @@ contains
     !================================================================!
     subroutine adjacency_initialize(self, Domain)
         implicit none
-        class(Adjacency_t), intent(inout) :: self
+        class(type_adjacency), intent(inout) :: self
         type(Domain_t), intent(in) :: Domain
         integer(int32) :: i, j
 
-        self%numElements = Domain%get_numElement()
+        self%num_elements = Domain%get_numElement()
 
-        call allocate_array(self%Matrix, self%numElements, self%numElements)
-        call allocate_array(self%degree, self%numElements)
+        call allocate_array(self%matrix, self%num_elements, self%num_elements)
+        call allocate_array(self%degree, self%num_elements)
 
-        self%Matrix(:, :) = .false.
+        self%matrix(:, :) = .false.
         self%degree(:) = 0
 
-        do i = 1, self%numElements
-            do j = i + 1, self%numElements
+        do i = 1, self%num_elements
+            do j = i + 1, self%num_elements
                 if (share_node(Domain, i, j)) then
-                    self%Matrix(i, j) = .true.
-                    self%Matrix(j, i) = .true.
+                    self%matrix(i, j) = .true.
+                    self%matrix(j, i) = .true.
 
                     self%degree(i) = self%degree(i) + 1
                     self%degree(j) = self%degree(j) + 1
@@ -60,7 +59,7 @@ contains
     function share_node(Domain, a, b) result(shared)
         type(Domain_t), intent(in) :: Domain
         integer(int32), intent(in) :: a, b
-        logical(logical32) :: shared
+        logical :: shared
 
         integer(int32) :: ie
         integer(int32) :: nsize
@@ -82,45 +81,45 @@ contains
     !================================================================!
     function check_adjacent(self, i, j) result(is_adjacent)
         implicit none
-        class(Adjacency_t), intent(in) :: self
+        class(type_adjacency), intent(in) :: self
         integer(int32), intent(in) :: i, j
-        logical(logical32) :: is_adjacent
+        logical :: is_adjacent
 
-        if (i < 1 .or. i > self%numElements .or. j < 1 .or. j > self%numElements) then
+        if (i < 1 .or. i > self%num_elements .or. j < 1 .or. j > self%num_elements) then
             is_adjacent = .false.
         else
-            is_adjacent = self%Matrix(i, j)
+            is_adjacent = self%matrix(i, j)
         end if
     end function check_adjacent
 
     function get_degree(self, i) result(degree)
         implicit none
-        class(Adjacency_t), intent(in) :: self
+        class(type_adjacency), intent(in) :: self
         integer(int32), intent(in) :: i
         integer(int32) :: degree
-        if (i < 1 .or. i > self%numElements) then
+        if (i < 1 .or. i > self%num_elements) then
             degree = 0
         else
             degree = self%degree(i)
         end if
     end function get_degree
 
-    function get_numElements(self) result(numElements)
+    function get_num_elements(self) result(num_elements)
         implicit none
-        class(Adjacency_t), intent(in) :: self
-        integer(int32) :: numElements
+        class(type_adjacency), intent(in) :: self
+        integer(int32) :: num_elements
 
-        numElements = self%numElements
-    end function get_numElements
+        num_elements = self%num_elements
+    end function get_num_elements
 
     subroutine adjacency_destroy(self)
         implicit none
-        class(Adjacency_t), intent(inout) :: self
+        class(type_adjacency), intent(inout) :: self
 
-        if (allocated(self%Matrix)) deallocate (self%Matrix)
+        if (allocated(self%matrix)) deallocate (self%matrix)
         if (allocated(self%degree)) deallocate (self%degree)
 
-        self%numElements = 0
+        self%num_elements = 0
     end subroutine adjacency_destroy
 
-end module Matrix_Adjacency
+end module matrix_adjacency

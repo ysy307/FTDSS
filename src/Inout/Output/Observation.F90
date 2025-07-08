@@ -23,7 +23,7 @@ contains
         implicit none
         class(Output_Observation), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
-        type(DP3d), intent(inout), pointer :: Coordinate
+        type(type_dp_3d), intent(inout), pointer :: Coordinate
         type(Domain_t), intent(in), optional :: Domain
 
         integer(int32) :: iObs, iElem, nElements
@@ -37,7 +37,7 @@ contains
         case (1)
             allocate (self%ObsNodeID, source=Input%OutputSettings%ObsID)
         case (2)
-            call self%Cood_Obs%allocate(self%NumObservation)
+            call self%Cood_Obs%initialize(self%NumObservation)
             self%Cood_Obs = Input%OutputSettings%Cood_Obs
             allocate (self%Element(self%NumObservation))
             allocate (self%obs_xi(self%NumObservation))
@@ -235,7 +235,7 @@ contains
         type(Proereties_Model_t), intent(in), optional :: Properties
         type(Domain_t), intent(in), optional :: Domain
 
-        type(GaussPointState_t) :: state
+        type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: Original_Temperature(:)
@@ -280,7 +280,7 @@ contains
         type(Proereties_Model_t), intent(in), optional :: Properties
         type(Domain_t), intent(in), optional :: Domain
 
-        type(GaussPointState_t) :: state
+        type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: Original_Temperature(:)
         real(real64), allocatable :: Original_Porosity(:)
@@ -326,7 +326,7 @@ contains
         type(Proereties_Model_t), intent(in), optional :: Properties
         type(Domain_t), intent(in), optional :: Domain
 
-        type(GaussPointState_t) :: state
+        type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: Original_Temperature(:)
@@ -373,7 +373,7 @@ contains
         type(Domain_t), intent(in), optional :: Domain
         ! Note: nodal_Pw is optional, if not present, pressure is assumed to be 101325.0d0
 
-        type(GaussPointState_t) :: state
+        type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: Original_Pressure(:)
         integer(int32) :: istat

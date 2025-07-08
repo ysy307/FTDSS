@@ -5,7 +5,7 @@
 module Conditions_Initial_Manager
     use :: Condition_Initial
     use :: Inout_Input, only:Type_Input
-    use :: Core_BaseTypes, only:Variables
+    use :: core_core, only:type_variable
     use :: Domain_Module, only:Domain_t
     implicit none
     private
@@ -62,7 +62,7 @@ contains
         class(ICManager), intent(in) :: self
         character(len=*), intent(in) :: physics
         type(Domain_t), intent(in) :: domain
-        type(Variables), intent(inout) :: var
+        type(type_variable), intent(inout) :: var
 
         select case (trim(adjustl(physics)))
         case ("Thermal")

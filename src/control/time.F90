@@ -1,25 +1,23 @@
-module Time_Time
+module control_time
     use, intrinsic :: iso_fortran_env, only: int32, real64, int64
     use :: Inout_Input
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:allocate_array
 
-#ifdef _OPENMP
-    use omp_lib
-#endif
+!$  use omp_lib
 
     implicit none
     private
 
-    public :: Type_Time, Type_Profiler_Section
+    public :: type_time
 
-    type :: Type_Time_Record
+    type :: type_time_Record
         character(len=10) :: label
         character(len=10) :: date
         character(len=10) :: time
         character(len=10) :: zone
-    end type Type_Time_Record
+    end type type_time_Record
 
-    type :: Type_Profiler_Section
+    type :: type_profiler_section
         character(len=20) :: label
         real(real64) :: total_time = 0.0d0
 #ifdef _OPENMP
@@ -27,33 +25,33 @@ module Time_Time
 #else
         integer(kind=int64) :: start_tick = 0
 #endif
-    end type Type_Profiler_Section
+    end type type_profiler_section
 
-    type :: Type_Time
+    type :: type_time
         real(real64) :: start_time, end_time, time, time_old, dt
         real(real64), allocatable :: dt_old(:)
         real(real64) :: dt_max, dt_min
-        type(Type_Time_Record) :: start, end
-        type(Type_Profiler_Section), allocatable, public :: sections(:)
+        type(type_time_Record) :: start, end
+        type(type_profiler_section), allocatable :: sections(:)
 #ifndef _OPENMP
-        integer :: tick_rate = 0
+        integer(int32) :: tick_rate = 0
 #endif
     contains
         procedure, public, pass(self) :: Record => Record_Timestamp
         procedure, public, pass(self) :: Profile_Start => Profile_Start_Timer
         procedure, public, pass(self) :: Profile_Stop => Profile_Stop_Timer
-    end type Type_Time
+    end type type_time
 
-    interface Type_Time
-        module procedure Time_Construct
-    end interface Type_Time
+    interface type_time
+        module procedure construct_type_time
+    end interface type_time
 
 contains
 
-    function Time_Construct(Structure_Input, profiler_sections) result(time)
-        type(Type_Input), intent(in) :: Structure_Input
+    function construct_type_time(Structure_Input, profiler_sections) result(time)
+        type(type_Input), intent(in) :: Structure_Input
         character(len=*), intent(in), optional :: profiler_sections(:)
-        type(Type_Time) :: time
+        type(type_time) :: time
         integer :: i
         integer :: dummy
 
@@ -117,10 +115,10 @@ contains
                 end do
             end if
         end if
-    end function Time_Construct
+    end function construct_type_time
 
     subroutine Record_Timestamp(self, label)
-        class(Type_Time), intent(inout) :: self
+        class(type_time), intent(inout) :: self
         character(len=*), intent(in) :: label
 
         select case (trim(label))
@@ -137,7 +135,7 @@ contains
     end subroutine Record_Timestamp
 
     subroutine Profile_Start_Timer(self, label)
-        class(Type_Time), intent(inout) :: self
+        class(type_time), intent(inout) :: self
         character(len=*), intent(in) :: label
         integer :: i
         do i = 1, size(self%sections)
@@ -154,7 +152,7 @@ contains
     end subroutine Profile_Start_Timer
 
     subroutine Profile_Stop_Timer(self, label)
-        class(Type_Time), intent(inout) :: self
+        class(type_time), intent(inout) :: self
         character(len=*), intent(in) :: label
         integer :: i
         real(real64) :: duration
@@ -183,4 +181,4 @@ contains
         write (*, '(A,A,A)') "Error: Profiling section '", trim(label), "' not found. Timer not stopped."
     end subroutine Profile_Stop_Timer
 
-end module Time_Time
+end module control_time

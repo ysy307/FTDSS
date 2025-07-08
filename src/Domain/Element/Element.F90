@@ -9,8 +9,7 @@ module Domain_Element
     !    - Preserve original function and type names<br>
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes, only:DP3d, RealPointer
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:type_dp_3d, type_dp_pointer, allocate_array
     implicit none
     private
 
@@ -37,9 +36,9 @@ module Domain_Element
         integer(int32), private :: size !! Number of nodes in the element
         integer(int32), private :: group !! Element group number
         integer(int32), allocatable :: conn(:) !! connectivity information
-        type(RealPointer), allocatable :: X(:) !! X coordinate
-        type(RealPointer), allocatable :: Y(:) !! Y coordinate
-        type(RealPointer), allocatable :: Z(:) !! Z coordinate
+        type(type_dp_pointer), allocatable :: X(:) !! X coordinate
+        type(type_dp_pointer), allocatable :: Y(:) !! Y coordinate
+        type(type_dp_pointer), allocatable :: Z(:) !! Z coordinate
 
         !----------------------------------------------------------------------------------
         ! Gauss Quadrature points and weights
@@ -241,7 +240,7 @@ module Domain_Element
         module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
-            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(3)
             integer(int32), intent(in) :: GroupID
             class(Abst_ElementType), allocatable :: Structure
@@ -346,7 +345,7 @@ module Domain_Element
         module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
-            type(DP3d), intent(in), pointer :: Global_Coordinate
+            type(type_dp_3d), intent(in), pointer :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(4)
             integer(int32), intent(in) :: GroupID
             class(Abst_ElementType), allocatable :: Structure
@@ -451,7 +450,7 @@ module Domain_Element
         module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
-            type(DP3d), pointer, intent(in) :: Global_Coordinate
+            type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(6)
             integer(int32), intent(in) :: GroupID
             class(Abst_ElementType), allocatable :: Structure
@@ -556,7 +555,7 @@ module Domain_Element
         module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
             implicit none
             integer(int32), intent(in) :: iElem
-            type(DP3d), intent(in), pointer :: Global_Coordinate
+            type(type_dp_3d), intent(in), pointer :: Global_Coordinate
             integer(int32), intent(in) :: Connectivity(8)
             integer(int32), intent(in) :: GroupID
             class(Abst_ElementType), allocatable :: Structure

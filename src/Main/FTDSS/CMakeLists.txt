@@ -5,7 +5,7 @@ target_link_libraries(FTDSS PRIVATE
     Core
     Input
     Thermal
-    Time
+    control
     Output
 )
 enable_build_flags(FTDSS)

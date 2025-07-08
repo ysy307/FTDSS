@@ -11,20 +11,20 @@ module Matrix_Multicoloring
     use, intrinsic :: iso_fortran_env, only: int32, logical32
     ! Domain_Moduleはユーザー提供のものを使用
     use :: Domain_Module, only:Domain_t
-    use :: Matrix_Adjacency, only:Adjacency_t
+    use :: matrix_adjacency, only:type_adjacency
     use :: core_core, only:allocate_array
     implicit none
 
     private
     public :: Multicoloring ! 公開インタフェース
 
-    type :: VertexDegree
+    type :: type_vertex_degree
         integer(int32) :: index
         integer(int32) :: degree
-    end type VertexDegree
+    end type type_vertex_degree
 
     interface assignment(=)
-        module procedure VertexDegree_Assignment
+        module procedure type_vertex_degree_Assignment
     end interface
 
 contains
@@ -37,7 +37,7 @@ contains
         class(Domain_t), intent(inout) :: Domain
 
         ! ローカル変数
-        type(Adjacency_t) :: adjacency
+        type(type_adjacency) :: adjacency
         integer(int32), allocatable :: temp_colors(:)
         integer(int32) :: temp_num_colors
         integer(int32) :: n_elements
@@ -73,6 +73,7 @@ contains
             end do
         end if
 
+        call adjacency%destroy()
         deallocate (temp_colors)
 
     end subroutine Multicoloring
@@ -83,7 +84,7 @@ contains
     ! ==============================================================================
     subroutine Multicoloring_welsh_powell(Adjacency, colors, num_colors)
         implicit none
-        class(Adjacency_t), intent(in) :: Adjacency
+        class(type_adjacency), intent(in) :: Adjacency
         integer(int32), allocatable, intent(inout) :: colors(:)
         integer(int32), intent(inout) :: num_colors
 
@@ -92,10 +93,10 @@ contains
         integer(int32) :: v_idx, u_idx
         logical(logical32) :: can_color
 
-        type(VertexDegree), allocatable :: sorted_vertices(:)
-        type(VertexDegree) :: temp_vertex
+        type(type_vertex_degree), allocatable :: sorted_vertices(:)
+        type(type_vertex_degree) :: temp_vertex
 
-        num_vertices = Adjacency%get_numElements()
+        num_vertices = Adjacency%get_num_elements()
         if (num_vertices == 0) return
 
         ! 初期化
@@ -157,13 +158,13 @@ contains
         deallocate (sorted_vertices)
     end subroutine Multicoloring_welsh_powell
 
-    subroutine VertexDegree_Assignment(vertex1, vertex2)
+    subroutine type_vertex_degree_Assignment(vertex1, vertex2)
         implicit none
-        type(VertexDegree), intent(inout) :: vertex1
-        type(VertexDegree), intent(in) :: vertex2
+        type(type_vertex_degree), intent(inout) :: vertex1
+        type(type_vertex_degree), intent(in) :: vertex2
 
         vertex1%index = vertex2%index
         vertex1%degree = vertex2%degree
-    end subroutine VertexDegree_Assignment
+    end subroutine type_vertex_degree_Assignment
 
 end module Matrix_Multicoloring

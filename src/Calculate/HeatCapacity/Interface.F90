@@ -1,6 +1,6 @@
 module Calculate_VolumetricHeatCapacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes, only:GaussPointState_t
+    use :: core_core, only:type_gauss_point_state
     use :: Inout_Input, only:Type_Input
     use :: Calculate_Density, only:DENHolder
     implicit none
@@ -45,10 +45,10 @@ module Calculate_VolumetricHeatCapacity
     ! --- 手続きのインターフェース宣言 ---
     abstract interface
         function Abst_Calc_VHC_GaussPoint(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
-            import :: Abst_VHC, GaussPointState_t, real64, DENHolder
+            import :: Abst_VHC, type_gauss_point_state, real64, DENHolder
             implicit none
             class(Abst_VHC), intent(in) :: self
-            type(GaussPointState_t), intent(in) :: state
+            type(type_gauss_point_state), intent(in) :: state
             type(DENHolder), intent(in), optional :: DEN
             real(real64), intent(in), optional :: LatentHeat
             real(real64), intent(in), optional :: dQi_dT
@@ -73,10 +73,10 @@ module Calculate_VolumetricHeatCapacity
         end function VHC_3_Construct
 
         module function Calc_VHC_GaussPoint_3Phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
-            ! import :: Type_VHC_3Phase, GaussPointState_t
+            ! import :: Type_VHC_3Phase, type_gauss_point_state
             implicit none
             class(Type_VHC_3Phase), intent(in) :: self
-            type(GaussPointState_t), intent(in) :: state
+            type(type_gauss_point_state), intent(in) :: state
             type(DENHolder), intent(in), optional :: DEN
             real(real64), intent(in), optional :: LatentHeat
             real(real64), intent(in), optional :: dQi_dT
@@ -94,7 +94,7 @@ module Calculate_VolumetricHeatCapacity
         module function Calc_VHC_GaussPoint_3Phase_Apparent(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
             implicit none
             class(Type_VHC_3Phase_Apparent), intent(in) :: self
-            type(GaussPointState_t), intent(in) :: state
+            type(type_gauss_point_state), intent(in) :: state
             type(DENHolder), intent(in), optional :: DEN
             real(real64), intent(in), optional :: LatentHeat
             real(real64), intent(in), optional :: dQi_dT

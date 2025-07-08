@@ -19,16 +19,16 @@ contains
             this%Preconditioner = Preconditioner
 
             ! 配列の確保
-            call Allocate_Array(this%M, this%N)
-            call Allocate_Array(this%p, this%N)
-            call Allocate_Array(this%phat, this%N)
-            call Allocate_Array(this%s, this%N)
-            call Allocate_Array(this%shat, this%N)
-            call Allocate_Array(this%r, this%N)
-            call Allocate_Array(this%r0, this%N)
-            call Allocate_Array(this%t, this%N)
-            call Allocate_Array(this%v, this%N)
-            call Allocate_Array(this%x, this%N)
+            call allocate_array(this%M, this%N)
+            call allocate_array(this%p, this%N)
+            call allocate_array(this%phat, this%N)
+            call allocate_array(this%s, this%N)
+            call allocate_array(this%shat, this%N)
+            call allocate_array(this%r, this%N)
+            call allocate_array(this%r0, this%N)
+            call allocate_array(this%t, this%N)
+            call allocate_array(this%v, this%N)
+            call allocate_array(this%x, this%N)
 
         end select
 
@@ -152,17 +152,16 @@ contains
         implicit none
         type(Solver_CRS_BiCGSTAB) :: self
 
-        ! ポインタコンポーネントをdeallocate
-        if (allocated(self%M)) deallocate (self%M)
-        if (allocated(self%p)) deallocate (self%p)
-        if (allocated(self%phat)) deallocate (self%phat)
-        if (allocated(self%s)) deallocate (self%s)
-        if (allocated(self%shat)) deallocate (self%shat)
-        if (allocated(self%r)) deallocate (self%r)
-        if (allocated(self%r0)) deallocate (self%r0)
-        if (allocated(self%t)) deallocate (self%t)
-        if (allocated(self%v)) deallocate (self%v)
-        if (allocated(self%x)) deallocate (self%x)
+        call deallocate_array(self%M)
+        call deallocate_array(self%p)
+        call deallocate_array(self%phat)
+        call deallocate_array(self%s)
+        call deallocate_array(self%shat)
+        call deallocate_array(self%r)
+        call deallocate_array(self%r0)
+        call deallocate_array(self%t)
+        call deallocate_array(self%v)
+        call deallocate_array(self%x)
 
     end subroutine Solver_CRS_BiCGSTAB_Destructor
 end submodule Solve_BiCGSTAB

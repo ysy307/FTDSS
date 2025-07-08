@@ -2,7 +2,7 @@ module core_vtk_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
     use :: stdlib_sorting, only:sort
-    use :: Core_BaseTypes, only:DP3d
+    use :: core_types_array, only:type_dp_3d
     use :: core_allocate, only:allocate_array
     use :: core_unique, only:unique
     use :: core_vtk_vtk_constants
@@ -33,7 +33,7 @@ module core_vtk_vtk
         character(:), allocatable :: format
         character(:), allocatable :: dataset
         integer(int32) :: num_points
-        type(DP3d) :: points
+        type(type_dp_3d) :: points
         integer(int32) :: num_total_cells
         type(type_vtk_cells), allocatable :: cells(:)
     contains
@@ -85,7 +85,7 @@ contains
         ! 3. ポイントデータの取得
         call vtk_get_num_points(self%num_points)
         if (self%num_points > 0) then
-            call self%POINTS%allocate(self%num_points)
+            call self%POINTS%initialize(self%num_points)
             call vtk_get_points(self%POINTS%x, self%POINTS%y, self%POINTS%z)
         end if
 

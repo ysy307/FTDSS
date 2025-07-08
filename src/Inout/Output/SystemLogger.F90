@@ -6,7 +6,7 @@ contains
         use :: stdlib_strings, only:to_string
         implicit none
         class(Type_Output) :: self
-        type(Type_Time), intent(in) :: time
+        type(type_time), intent(in) :: time
         type(Type_CRS), intent(in) :: Matrix
         type(Domain_t), intent(in) :: Domain
 
@@ -89,7 +89,6 @@ contains
 
         ! --- 各セクションの結果を出力 ---
         do i = 1, size(time%sections)
-            ! 'Total'セクションはここでは表示しない (最後に表示するため)
             if (trim(adjustl(time%sections(i)%label)) == "Total") cycle
 
             if (component_total_time > 0.0d0) then

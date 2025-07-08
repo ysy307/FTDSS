@@ -1,6 +1,6 @@
 module Calculate_Density
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes, only:GaussPointState_t
+    use :: core_core, only:type_gauss_point_state
     use :: Inout_Input, only:Type_Input
     implicit none
     private
@@ -38,10 +38,10 @@ module Calculate_Density
     ! --- 手続きのインターフェース宣言 ---
     abstract interface
         function Abst_Calc_DEN_GaussPoint(self, state) result(Density)
-            import :: Abst_DEN, GaussPointState_t, real64
+            import :: Abst_DEN, type_gauss_point_state, real64
             implicit none
             class(Abst_DEN), intent(in) :: self
-            type(GaussPointState_t), intent(in) :: state
+            type(type_gauss_point_state), intent(in) :: state
             real(real64) :: Density
         end function Abst_Calc_DEN_GaussPoint
     end interface
@@ -64,10 +64,10 @@ module Calculate_Density
         end function DEN_3_Construct
 
         module function Calc_DEN_GaussPoint_3Phase(self, state) result(density)
-            import :: Type_DEN_3Phase, GaussPointState_t
+            import :: Type_DEN_3Phase, type_gauss_point_state
             implicit none
             class(Type_DEN_3Phase), intent(in) :: self
-            type(GaussPointState_t), intent(in) :: state
+            type(type_gauss_point_state), intent(in) :: state
             real(real64) :: density
         end function Calc_DEN_GaussPoint_3Phase
     end interface

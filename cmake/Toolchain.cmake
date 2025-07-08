@@ -98,7 +98,7 @@ function(enable_build_flags target)
 
     if(ENABLE_MPI)
         target_link_libraries(${target} PUBLIC MPI::MPI_Fortran)
-        target_compile_definitions(${target} PUBLIC USE_MPI)
+        target_compile_definitions(${target} PUBLIC _MPI)
     endif()
 
     if(ENABLE_MKL)

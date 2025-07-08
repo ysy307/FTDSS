@@ -1,6 +1,6 @@
 module Properties_Model_Base
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes, only:GaussPointState_t
+    use :: core_core, only:type_gauss_point_state
 
     use :: Properties_Material_Manager, only:MaterialManager_t
 
@@ -28,7 +28,7 @@ contains
     function calculate_THC(self, state, region_id) result(lambda)
         implicit none
         class(Proereties_Model_t), intent(in) :: self
-        type(GaussPointState_t), intent(in) :: state
+        type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: lambda
         type(THCHolder) :: THC_holder
@@ -41,7 +41,7 @@ contains
     function calculate_heat_capacity(self, state, region_id) result(Ca)
         implicit none
         class(Proereties_Model_t), intent(in) :: self
-        type(GaussPointState_t), intent(in) :: state
+        type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: Ca
 
@@ -78,7 +78,7 @@ contains
     ! function calculate_dcdt(self, state, region_id) result(dCa_dT)
     !     implicit none
     !     class(Proereties_Model_t), intent(in) :: self
-    !     type(GaussPointState_t), intent(in) :: state
+    !     type(type_gauss_point_state), intent(in) :: state
     !     integer(int32), intent(in) :: region_id
     !     real(real64) :: dCa_dT
     !     ! ... 熱容量の温度微分を計算 ...
@@ -87,7 +87,7 @@ contains
     function calculate_water_content(self, state, region_id) result(water_content)
         implicit none
         class(Proereties_Model_t), intent(in) :: self
-        type(GaussPointState_t), intent(in) :: state
+        type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: water_content
 

@@ -4,9 +4,6 @@
 !          defined in the Condition_Initial module.
 ! =============================================================================
 submodule(Condition_Initial) Condition_Initial_Uniform
-    use Domain_Module, only: Domain_t
-    use Core_BaseTypes, only: Variables
-    use Inout_Input, only: Type_Input
     implicit none
 
 contains
@@ -27,7 +24,7 @@ contains
     module subroutine apply_uniform(self, domain, var)
         class(IC_Uniform), intent(in) :: self
         type(Domain_t), intent(in) :: domain
-        type(Variables), intent(inout) :: var
+        type(type_variable), intent(inout) :: var
         ! Your implementation for applying IC_Uniform
         var%new(:) = self%value
         var%pre(:) = var%new(:)

@@ -1,7 +1,8 @@
 module Main_Thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes
-    use :: Core_Allocate, only:Allocate_Array
+    use :: Core_Core, only:allocate_array, deallocate_array, type_variable, type_dp_3d
+    ! use :: Core_BaseTypes
+    ! use :: Core_Allocate, only:Allocate_Array
     use :: Domain_Module, only:Domain_t
     use :: Properties_Model_Base, only:Proereties_Model_t
     ! use :: Core_Element
@@ -17,16 +18,16 @@ module Main_Thermal
     ! use :: Condition_Initial
     use :: Condition_Boundary
     use :: Solver_Solve
-    use :: Time_Time
+    use :: control_control, only:type_time
     ! use :: Matrix_RCM, only:RCM_Reorder, RCM_Reorder_Inverse
     implicit none
 
     type, abstract :: Abstract_Thermal
-        type(Variables) :: T
-        type(Variables) :: Qw
-        type(Variables) :: Qice
-        type(Variables) :: D_Qice
-        type(Variables) :: Si
+        type(type_variable) :: T
+        type(type_variable) :: Qw
+        type(type_variable) :: Qice
+        type(type_variable) :: D_Qice
+        type(type_variable) :: Si
 
         type(Type_CRS) :: KT_star_0
         type(Type_CRS) :: KT_l
@@ -72,14 +73,14 @@ module Main_Thermal
     end type Type_Thermal_3Phase_2D
 
     abstract interface
-        subroutine Abstract_Update(self, NodeBelonging, arr_phi)
-            import :: Abstract_Thermal, Belonging, real64
-            implicit none
-            class(Abstract_Thermal), intent(inout) :: self
-            type(Belonging), intent(inout), optional :: NodeBelonging(:)
-            real(real64), intent(inout) :: arr_phi(:)
+        ! subroutine Abstract_Update(self, arr_phi)
+        !     import :: Abstract_Thermal, real64
+        !     implicit none
+        !     class(Abstract_Thermal), intent(inout) :: self
+        !     ! type(Belonging), intent(inout), optional :: NodeBelonging(:)
+        !     real(real64), intent(inout) :: arr_phi(:)
 
-        end subroutine Abstract_Update
+        ! end subroutine Abstract_Update
 
         subroutine Abstract_Assemble(self, Domain, Property, Porosity, dt, step, iter)
             import :: Abstract_Thermal, int32, real64, Domain_t, Proereties_Model_t
@@ -100,7 +101,7 @@ module Main_Thermal
             implicit none
             class(Abstract_Thermal), allocatable :: Structure
             type(Type_Input), intent(inout) :: Input
-            type(DP3d), intent(inout), pointer :: Coordinate
+            type(type_dp_3d), intent(inout), pointer :: Coordinate
             type(Domain_t), intent(inout) :: Domain
 
         end function Type_Thermal_3Phase_2D_Construct

@@ -13,7 +13,7 @@ contains
     !   iElem             : Element index (int32).
     !                       Identifies the target element.
     !
-    !   Global_Coordinate : DP3d type pointer containing the global coordinates
+    !   Global_Coordinate : type_dp_3d type pointer containing the global coordinates
     !                       of all nodes in the mesh.
     !
     !   Connectivity      : Integer array (size 4) specifying the indices of
@@ -33,7 +33,7 @@ contains
     module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
         implicit none
         integer(int32), intent(in) :: iElem
-        type(DP3d), intent(in), pointer :: Global_Coordinate
+        type(type_dp_3d), intent(in), pointer :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(8)
         integer(int32), intent(in) :: GroupID
         class(Abst_ElementType), allocatable :: Structure
@@ -63,8 +63,8 @@ contains
         end do
 
         Structure%nGauss = 9
-        call Allocate_Array(Structure%weight, Structure%nGauss)
-        call Allocate_Array(Structure%gauss, 2_int32, Structure%nGauss)
+        call allocate_array(Structure%weight, Structure%nGauss)
+        call allocate_array(Structure%gauss, 2_int32, Structure%nGauss)
 
         Structure%weight(:) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
                                64.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &

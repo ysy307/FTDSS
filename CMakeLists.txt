@@ -46,7 +46,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
 
 # Source Files
-add_subdirectory(src/Core)
+add_subdirectory(src/core)
 add_subdirectory(src/Inout/Input)
 add_subdirectory(src/Domain)
 add_subdirectory(src/Matrix)
@@ -62,7 +62,7 @@ add_subdirectory(src/Calculate/HeatCapacity)
 add_subdirectory(src/Conditions/Boundary)
 add_subdirectory(src/Conditions/Initial)
 add_subdirectory(src/Solver)
-add_subdirectory(src/Time)
+add_subdirectory(src/control)
 add_subdirectory(src/Main/Thermal)
 add_subdirectory(src/Inout/Output)
 add_subdirectory(src/Main/FTDSS)
@@ -94,7 +94,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Boundary
         Initial
         Solver
-        Time
+        control
         Thermal
         Output
         FTDSS
@@ -129,7 +129,7 @@ elseif(BUILD_APP STREQUAL "test")
         Boundary
         Initial
         Solver
-        Time
+        control
         Thermal
         Output
         FTDSS

@@ -1,6 +1,6 @@
 module Matrix_Assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes, only:GaussPointState_t
+    use :: core_core, only:type_gauss_point_state
     use :: Properties_Model_Base, only:Proereties_Model_t
     use :: Matrix_CRS
     use :: Domain_Module, only:Domain_t
@@ -23,7 +23,7 @@ contains
         real(real64), intent(in) :: Porosity(:)
         type(Proereties_Model_t), intent(inout) :: Propeties
 
-        type(GaussPointState_t) :: State
+        type(type_gauss_point_state) :: State
 
         integer(int32) :: index, nNodes, nGauss
         integer(int32) :: iE, il, jl, iG, iRegion
@@ -110,7 +110,7 @@ contains
         real(real64) :: val, xi, eta, weight, detJ, Ca
 
         ! 各スレッド専用
-        type(GaussPointState_t) :: State
+        type(type_gauss_point_state) :: State
         integer, parameter :: MaxGauss = 10
         real(real64) :: interp_temp(MaxGauss)
         real(real64) :: interp_poro(MaxGauss)
@@ -201,7 +201,7 @@ contains
         type(Proereties_Model_t), intent(inout) :: Propeties ! MaterialManagerに相当
 
         ! --- ローカル変数 ---
-        type(GaussPointState_t) :: State ! 状態の運び屋
+        type(type_gauss_point_state) :: State ! 状態の運び屋
         integer(int32) :: index, nNodes, nGauss, nElements
         integer(int32) :: iE, il, jl, iG, iRegion
         integer(int32) :: r_il, r_jl
@@ -316,7 +316,7 @@ contains
         real(real64) :: lambda_gp
 
         ! スレッドローカル
-        type(GaussPointState_t) :: State
+        type(type_gauss_point_state) :: State
         integer, parameter :: MaxGauss = 10
         real(real64) :: interp_temp(MaxGauss)
         real(real64) :: interp_poro(MaxGauss)

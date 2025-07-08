@@ -4,7 +4,7 @@ module Domain_Module
     use :: Domain_Side, only:SideHolder
     use :: Domain_Element_Factory, only:Create_Element
     use :: Domain_Side_Factory, only:Create_Side
-    use :: Core_BaseTypes, only:DP3d
+    use :: core_core, only:type_dp_3d
     use :: Inout_Input
     implicit none
     private
@@ -47,7 +47,7 @@ contains
         implicit none
         class(Domain_t), intent(inout) :: self
         type(Type_Input), intent(in) :: Input ! Inputモジュールからデータを受け取る
-        type(DP3d), intent(inout), pointer :: Coordinate
+        type(type_dp_3d), intent(inout), pointer :: Coordinate
         integer, intent(out) :: ierr
 
         integer :: CountElements, CountSides

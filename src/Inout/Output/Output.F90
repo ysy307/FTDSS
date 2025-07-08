@@ -2,11 +2,11 @@ module Inout_Output
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
-    use :: Core_BaseTypes
-    use :: Core_Allocate
-    use :: Core_Error
-    use :: core_fortran_utils, only:get_username, get_hostname, get_compiler_name, get_compiler_version, &
-        get_cpu_architecture, get_os, get_openmp_version, get_memory_usage
+
+    use :: core_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state, & !&
+                           get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
+                           get_cpu_architecture, get_os, get_openmp_version, get_memory_usage !&
+
     use :: Inout_Input
     use :: Domain_Element, only:ElementHolder
     use :: Domain_Element_Factory, only:Create_Element
@@ -14,11 +14,10 @@ module Inout_Output
     use :: Matrix_RCM, only:Reorder_to_Original
     use :: Domain_module, only:Domain_t
     use :: Main_Thermal
-    use :: Time_Time
+    use :: control_control, only:type_time
     use :: stdlib_strings, only:to_string
-! #ifdef _OPENMP
+
 !$  use :: omp_lib
-! # endif
 
     implicit none
     private
@@ -62,7 +61,7 @@ module Inout_Output
 
         integer(int32) :: ObservationType
         integer(int32) :: NumObservation
-        type(DP3d) :: Cood_Obs
+        type(type_dp_3d) :: Cood_Obs
         type(ElementHolder), allocatable :: Element(:)
         real(real64), allocatable :: obs_xi(:)
         real(real64), allocatable :: obs_eta(:)
@@ -78,7 +77,7 @@ module Inout_Output
             implicit none
             class(Output_Observation), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
-            type(DP3d), intent(inout), pointer :: Coordinate
+            type(type_dp_3d), intent(inout), pointer :: Coordinate
             type(Domain_t), intent(in), optional :: Domain
 
         end subroutine Output_Observation_Initialize
@@ -201,7 +200,7 @@ module Inout_Output
     type :: Output_VTK_Series
         integer(int32) :: nPoints
         integer(int32) :: nCell
-        type(DP3d) :: Coordinates
+        type(type_dp_3d) :: Coordinates
         integer(int32), allocatable :: connectivity(:)
         integer(int32), allocatable :: offset(:)
         integer(int8), allocatable :: CellType(:)
@@ -235,7 +234,7 @@ module Inout_Output
             implicit none
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
-            type(DP3d), intent(in) :: Coordinate
+            type(type_dp_3d), intent(in) :: Coordinate
             type(Domain_t), intent(in) :: Domain
 
         end subroutine Inout_Output_Overall_initialize
@@ -244,7 +243,7 @@ module Inout_Output
             implicit none
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
-            type(DP3d), intent(in) :: Coordinate
+            type(type_dp_3d), intent(in) :: Coordinate
             type(Domain_t), intent(in) :: Domain
 
         end subroutine Inout_Output_Overall_initialize_vtk
@@ -253,7 +252,7 @@ module Inout_Output
             implicit none
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
-            type(DP3d), intent(in) :: Coordinate
+            type(type_dp_3d), intent(in) :: Coordinate
             type(Domain_t), intent(in) :: Domain
 
         end subroutine Inout_Output_Overall_initialize_vtu
@@ -266,7 +265,7 @@ module Inout_Output
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
-            type(DP3d), intent(in), optional :: wFlux
+            type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
         end subroutine Inout_Output_Overall_Output
@@ -279,7 +278,7 @@ module Inout_Output
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
-            type(DP3d), intent(in), optional :: wFlux
+            type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
         end subroutine Inout_Output_Overall_Output_vtk
@@ -322,7 +321,7 @@ module Inout_Output
             real(real64), intent(in), optional :: Temp(:)
             real(real64), intent(in), optional :: Si(:)
             real(real64), intent(in), optional :: Pres(:)
-            type(DP3d), intent(in), optional :: wFlux
+            type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
         end subroutine Inout_Output_Overall_Output_vtu
@@ -476,7 +475,7 @@ module Inout_Output
         module subroutine Output_SystemLog(self, time, Matrix, Domain)
             implicit none
             class(Type_Output) :: self
-            type(Type_Time), intent(in) :: time
+            type(type_time), intent(in) :: time
             type(Type_CRS), intent(in) :: Matrix
             type(Domain_t), intent(in) :: Domain
         end subroutine Output_SystemLog
@@ -489,7 +488,7 @@ contains
         type(Type_Input), intent(in) :: Input
         class(Domain_t), intent(in), optional :: Domain
         ! class(Abstract_Thermal), intent(in), optional :: Thermal
-        type(DP3d), intent(inout), pointer :: Coordinate
+        type(type_dp_3d), intent(inout), pointer :: Coordinate
         type(Type_Output) :: Structure
 
         character(256) :: dir_Path

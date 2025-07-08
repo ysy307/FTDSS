@@ -6,7 +6,7 @@ contains
         implicit none
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
-        type(DP3d), intent(in) :: Coordinate
+        type(type_dp_3d), intent(in) :: Coordinate
         type(Domain_t), intent(in) :: Domain
 
         select case (self%fextend)
@@ -25,14 +25,14 @@ contains
         implicit none
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
-        type(DP3d), intent(in) :: Coordinate
+        type(type_dp_3d), intent(in) :: Coordinate
         type(Domain_t), intent(in) :: Domain
 
         integer(int32) :: i, j, idx, total
 
         self%VTK%nPoints = Input%VTK%num_points
         self%VTK%nCell = Input%VTK%num_total_cells
-        call self%VTK%Coordinates%allocate(self%VTK%nPoints)
+        call self%VTK%Coordinates%initialize(self%VTK%nPoints)
         self%VTK%Coordinates = Input%VTK%POINTS
 
         call Allocate_Array(self%VTK%offset, self%VTK%nCell)
@@ -59,14 +59,14 @@ contains
         implicit none
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
-        type(DP3d), intent(in) :: Coordinate
+        type(type_dp_3d), intent(in) :: Coordinate
         type(Domain_t), intent(in) :: Domain
 
         integer(int32) :: i, j, idx, total
 
         self%VTK%nPoints = Input%VTK%num_points
         self%VTK%nCell = Input%VTK%num_total_cells
-        call self%VTK%Coordinates%allocate(self%VTK%nPoints)
+        call self%VTK%Coordinates%initialize(self%VTK%nPoints)
         self%VTK%Coordinates = Input%VTK%POINTS
 
         call Allocate_Array(self%VTK%offset, self%VTK%nCell)
@@ -101,7 +101,7 @@ contains
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
-        type(DP3d), intent(in), optional :: wFlux
+        type(type_dp_3d), intent(in), optional :: wFlux
         integer(int32), intent(in), optional :: Colors(:)
 
         select case (trim(adjustl(self%fextend)))
@@ -126,7 +126,7 @@ contains
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
-        type(DP3d), intent(in), optional :: wFlux
+        type(type_dp_3d), intent(in), optional :: wFlux
         integer(int32), intent(in), optional :: Colors(:)
 
         integer(int32) :: status
@@ -278,7 +278,7 @@ contains
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
-        type(DP3d), intent(in), optional :: wFlux
+        type(type_dp_3d), intent(in), optional :: wFlux
         integer(int32), intent(in), optional :: Colors(:)
 
         type(vtk_file) :: vtu

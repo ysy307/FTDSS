@@ -1,7 +1,7 @@
 module Domain_Side_Factory
     use, intrinsic :: iso_fortran_env, only: int32
     use :: Domain_Side, only:Abst_SideType, SideFirst, SideSecond
-    use :: Core_BaseTypes, only:DP3d
+    use :: core_core, only:type_dp_3d
     implicit none
     integer(int32), parameter :: SHAPE_LINE = 3
     integer(int32), parameter :: SHAPE_QUADRATIC_EDGE = 21
@@ -16,7 +16,7 @@ contains
         integer, intent(inout) :: ierr
         ! --- 各コンストラクタに渡す引数 ---
         integer(int32), intent(in) :: iSide
-        type(DP3d), pointer, intent(in) :: Global_Coordinate
+        type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
         integer(int32), intent(in) :: Connectivity(:)
         integer(int32), intent(in) :: GroupID
 

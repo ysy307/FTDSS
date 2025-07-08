@@ -5,7 +5,7 @@ contains
         implicit none
         class(Abstract_Thermal), allocatable :: Structure
         type(Type_Input), intent(inout) :: Input
-        type(DP3d), intent(inout), pointer :: Coordinate
+        type(type_dp_3d), intent(inout), pointer :: Coordinate
         type(Domain_t), intent(inout) :: Domain
 
         ! integer(int32) :: CountElements, CountSides
@@ -41,12 +41,12 @@ contains
             Structure%CT_old(i) = Structure%KT_star_0%Copy()
         end do
 
-        call Allocate_Array(Structure%FT, nNode)
-        call Allocate_Array(Structure%FT_old, nNode)
-        call Allocate_Array(Structure%PHIT, nNode)
-        call Allocate_Array(Structure%PHIT_old, nNode)
+        call allocate_array(Structure%FT, nNode)
+        call allocate_array(Structure%FT_old, nNode)
+        call allocate_array(Structure%PHIT, nNode)
+        call allocate_array(Structure%PHIT_old, nNode)
 
-        call Structure%T%allocate(nNode, Input%Basic%Order)
+        call Structure%T%initialize(nNode, Input%Basic%Order)
 
         ! allocate (Structure%Ice(Input%Basic%numRegion))
 

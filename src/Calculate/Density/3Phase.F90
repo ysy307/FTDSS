@@ -22,7 +22,7 @@ contains
     module function Calc_DEN_GaussPoint_3Phase(self, state) result(lambda)
         implicit none
         class(Type_DEN_3Phase), intent(in) :: self
-        type(GaussPointState_t), intent(in) :: state
+        type(type_gauss_point_state), intent(in) :: state
         real(real64) :: lambda
 
         real(real64) :: phi1, phi2, phi3

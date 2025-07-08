@@ -1,8 +1,9 @@
 module Solver_Solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_BaseTypes
-    use :: Core_Allocate
-    use :: Core_error
+    use :: Core_Core, only:allocate_array, deallocate_array, error_message
+    ! use :: Core_BaseTypes
+    ! use :: Core_Allocate
+    ! use :: Core_error
     use :: Calculate_BLAS, only:norm => norm_2, dot
     use :: Matrix_CRS
 #ifdef _OPENMP
@@ -170,9 +171,7 @@ module Solver_Solve
 
     abstract interface
         subroutine Abstract_Solve_CRS(self, A, b, x, status)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            use :: Matrix_CRS
-            import :: Abstract_Solver_CRS
+            import :: Abstract_Solver_CRS, Type_CRS, int32, real64
             implicit none
             class(Abstract_Solver_CRS) :: self
             type(Type_CRS), intent(in) :: A
@@ -182,9 +181,7 @@ module Solver_Solve
         end subroutine Abstract_Solve_CRS
 
         subroutine Abstract_Check_CRS(self, status, time)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            use :: Matrix_CRS
-            import :: Abstract_Solver_CRS
+            import :: Abstract_Solver_CRS, int32, real64
             implicit none
             class(Abstract_Solver_CRS) :: self
             integer(int32), intent(in) :: status
@@ -192,8 +189,7 @@ module Solver_Solve
         end subroutine Abstract_Check_CRS
 
         subroutine Abstract_Solve_Full(self, A, b, x, status)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            import :: Abstract_Solver_Full
+            import :: Abstract_Solver_Full, int32, real64
             implicit none
             class(Abstract_Solver_Full) :: self
             real(real64), intent(in) :: A(:, :)
@@ -203,8 +199,7 @@ module Solver_Solve
         end subroutine Abstract_Solve_Full
 
         subroutine Abstract_Check_Full(self, status, time)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            import :: Abstract_Solver_Full
+            import :: Abstract_Solver_Full, int32, real64
             implicit none
             class(Abstract_Solver_Full) :: self
             integer(int32), intent(in) :: status
@@ -214,8 +209,6 @@ module Solver_Solve
 
     interface
         module function Solver_CRS_BiCGSTAB_Constructor(N, tol, maxiter, Preconditioner) result(structure)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            import :: Abstract_Solver_CRS
             implicit none
             integer(int32), intent(in) :: N
             real(real64), intent(in) :: tol
@@ -242,8 +235,6 @@ module Solver_Solve
         end subroutine Apply_Preconditioner_Jacobi
 
         module subroutine Create_Preconditioner_CRS_BiCGSTAB(self, A)
-            use :: Matrix_CRS
-            import :: Solver_CRS_BiCGSTAB
             implicit none
             class(Solver_CRS_BiCGSTAB) :: self
             type(Type_CRS), intent(in) :: A
@@ -251,8 +242,6 @@ module Solver_Solve
         end subroutine Create_Preconditioner_CRS_BiCGSTAB
 
         module subroutine Apply_Preconditioner_CRS_BiCGSTAB(self, b, x)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Solver_CRS_BiCGSTAB
             implicit none
             class(Solver_CRS_BiCGSTAB) :: self
             real(real64), intent(inout) :: b(:)
@@ -267,9 +256,6 @@ module Solver_Solve
         end subroutine Solver_CRS_BiCGSTAB_Destructor
 
         module subroutine Solve_CRS_BiCGSTAB(self, A, b, x, status)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            use :: Matrix_CRS
-            import :: Solver_CRS_BiCGSTAB
             implicit none
             class(Solver_CRS_BiCGSTAB) :: self
             type(Type_CRS), intent(in) :: A
@@ -279,9 +265,7 @@ module Solver_Solve
         end subroutine
 
         module subroutine Check_CRS_BiCGSTAB(self, status, time)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            use :: Matrix_CRS
-            import :: Solver_CRS_BiCGSTAB
+            import :: Solver_CRS_BiCGSTAB, int32, real64
             implicit none
             class(Solver_CRS_BiCGSTAB) :: self
             integer(int32), intent(in) :: status
@@ -289,9 +273,6 @@ module Solver_Solve
         end subroutine Check_CRS_BiCGSTAB
 
         module subroutine Solve_CRS_LU(self, A, b, x, status)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            use :: Matrix_CRS
-            import :: Solver_CRS_LU
             implicit none
             class(Solver_CRS_LU) :: self
             type(Type_CRS), intent(in) :: A
@@ -301,9 +282,6 @@ module Solver_Solve
         end subroutine Solve_CRS_LU
 
         module subroutine Check_CRS_LU(self, status, time)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            use :: Matrix_CRS
-            import :: Solver_CRS_LU
             implicit none
             class(Solver_CRS_LU) :: self
             integer(int32), intent(in) :: status
@@ -311,8 +289,6 @@ module Solver_Solve
         end subroutine Check_CRS_LU
 
         module function Solver_CRS_LU_Constructor(N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV, A) result(structure)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            use :: Matrix_CRS
             implicit none
             integer(int32), intent(in) :: N
             integer(int32), intent(in) :: MAXFCT
@@ -327,8 +303,6 @@ module Solver_Solve
         end function Solver_CRS_LU_Constructor
 
         module subroutine Solve_Full_LU(self, A, b, x, status)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            import :: Solver_Full_LU
             implicit none
             class(Solver_Full_LU) :: self
             real(real64), intent(in) :: A(:, :)
@@ -338,8 +312,6 @@ module Solver_Solve
         end subroutine Solve_Full_LU
 
         module subroutine Check_Full_LU(self, status, time)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
-            import :: Solver_Full_LU
             implicit none
             class(Solver_Full_LU) :: self
             integer(int32), intent(in) :: status
@@ -347,7 +319,6 @@ module Solver_Solve
         end subroutine Check_Full_LU
 
         module function Solver_Full_LU_Constructor(N) result(structure)
-            use, intrinsic :: iso_fortran_env, only: int32, real64
             implicit none
             integer(int32), intent(in) :: N
 

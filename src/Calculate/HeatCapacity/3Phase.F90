@@ -22,7 +22,7 @@ contains
     module function Calc_VHC_GaussPoint_3Phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
         implicit none
         class(Type_VHC_3Phase), intent(in) :: self
-        type(GaussPointState_t), intent(in) :: state
+        type(type_gauss_point_state), intent(in) :: state
         type(DENHolder), intent(in), optional :: DEN
         real(real64), intent(in), optional :: LatentHeat
         real(real64), intent(in), optional :: dQi_dT
