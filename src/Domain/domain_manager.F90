@@ -91,15 +91,14 @@ contains
         iSide = 1
         do iCell = 1, Input%VTK%num_total_cells
             if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 1)) then
-                call Create_Side( &
-                    new_side=self%Sides(iSide)%s, &
-                    shape_type=Input%VTK%CELLS(iCell)%cell_type, &
-                    ierr=factory_ierr, &
-                    iSide=iSide, &
-                    Global_Coordinate=Coordinate, &
-                    Connectivity=Input%VTK%CELLS(iCell)%CONNECTIVITY, &
-                    GroupID=Input%VTK%CELLS(iCell)%cell_entity_id &
-                    )
+                call Create_Side(new_side=self%Sides(iSide)%s, &
+                                 shape_type=Input%VTK%CELLS(iCell)%cell_type, &
+                                 ierr=factory_ierr, &
+                                 iSide=iSide, &
+                                 Global_Coordinate=Coordinate, &
+                                 Connectivity=Input%VTK%CELLS(iCell)%CONNECTIVITY, &
+                                 GroupID=Input%VTK%CELLS(iCell)%cell_entity_id &
+                                 )
                 if (factory_ierr /= 0) then
                     ierr = -1
                     return
@@ -135,7 +134,7 @@ contains
         do i = 1, self%num_elements
             total_conn_size = total_conn_size + size(self%elements(i)%e%conn)
         end do
-        call allocate_array(conn_ptr, self%num_elements + 1)
+        call allocate_array(conn_ptr, self%num_elements + 1_int32)
         call allocate_array(conn_data, total_conn_size)
         conn_ptr(1) = 1
         do i = 1, self%num_elements

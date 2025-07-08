@@ -1,6 +1,6 @@
 ! file: domain_multicoloring.f90
 module domain_multicoloring
-    use, intrinsic :: iso_fortran_env, only: int32
+    use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: domain_adjacency, only:type_element_adjacency
     use :: core_core, only:allocate_array, deallocate_array
     ! インデックスソート用のライブラリを想定
@@ -99,35 +99,40 @@ contains
         class(type_element_adjacency), intent(in) :: adjacency
         integer(int32), allocatable, intent(inout) :: perm(:)
 
-        integer(int32) :: num_elements, i
+        integer(int32) :: num_elements, i, temp
         integer(int32), allocatable :: degrees(:)
         integer(int32), allocatable :: local_perm(:)
-        integer(int32), allocatable :: work(:)
-        integer(int32), allocatable :: iwork(:)
+
+        ! --- 作業用配列(work, iwork)を使わない、より堅牢な方法に変更 ---
 
         num_elements = adjacency%get_num_elements()
         call allocate_array(degrees, num_elements)
-        call allocate_array(perm, num_elements)
         call allocate_array(local_perm, num_elements)
-        call allocate_array(work, num_elements)
-        call allocate_array(iwork, num_elements)
 
         do i = 1, num_elements
             degrees(i) = adjacency%get_degree(i)
         end do
 
-        ! 次数が大きい順にソート
-        call sort_index(array=degrees, &
-                        index=local_perm, &
-                        work=work, &
-                        iwork=iwork, &
-                        reverse=.true.)
+        ! --- 修正箇所 ---
+        ! 1. まず、昇順でソートします (最も安定している基本的な呼び出し)
+        call sort_index(array=degrees, index=local_perm)
 
-        allocate (perm, source=local_perm)
+        ! 2. 得られたインデックス配列を、手動で逆順にします。
+        !    これにより、次数が大きい順(降順)のインデックスが得られます。
+        do i = 1, num_elements/2
+            temp = local_perm(i)
+            local_perm(i) = local_perm(num_elements - i + 1)
+            local_perm(num_elements - i + 1) = temp
+        end do
+
+        ! 結果を引数permに代入します。
+        ! allocatable配列の代入は、古いpermを自動で解放し、
+        ! 新しいサイズで確保して内容をコピーするため安全です。
+        perm = local_perm
+
         call deallocate_array(degrees)
-        call deallocate_array(work)
-        call deallocate_array(iwork)
-        ! permは1から始まるインデックスなので、0を補
+        call deallocate_array(local_perm)
+
     end subroutine get_welsh_powell_order
 
     ! 指定ノードに割り当て可能な最小の色を見つける (最適化版)

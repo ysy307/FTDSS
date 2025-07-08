@@ -14,7 +14,7 @@ add_library(Domain OBJECT
     adjacency/adjacency.F90
     multicoloring/multicoloring.F90
     rcm/rcm.F90
-    Domain_Module.F90
+    domain_manager.F90
 )
 target_link_libraries(Domain PRIVATE
     Core

@@ -1,0 +1,39 @@
+{
+    "source_dirs": [
+        "**/src",
+        "**/source"
+    ],
+    "mod_dirs": [
+        "/opt/intel/oneapi/mpi/2021.14/include/mpi",
+        "/opt/intel/oneapi/2025.0/include/mpi",
+        "third_party/.local/include",
+        "third_party/.local/jsonfortran-*/lib",
+        "third_party/.local/include/fortran_stdlib/**/*",
+        "third_party/.local/jsonfortran-intelllvm-*/lib",
+        "CMakeBuild/.mod"
+    ],
+    "preprocessor": {
+        "defines": [
+            "_MKL"
+        ]
+    },
+    "exclude_files": [
+        "third_party/**",
+        ".git/**",
+        ".vscode/**",
+        ".archive/**",
+        ".devcontainer/**",
+        "build/**",
+        "CMakeBuild/**",
+        "github/**",
+        "docs/**",
+        "fpm/**",
+        "Inout/**",
+        "log/**",
+        "Scripts/**"
+    ],
+    "lowercase_intrinsics": true,
+    "hover_signature": true,
+    "use_signature_help": true,
+    "incremental_sync": true
+}
