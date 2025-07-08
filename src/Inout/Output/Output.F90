@@ -16,9 +16,9 @@ module Inout_Output
     use :: Main_Thermal
     use :: Time_Time
     use :: stdlib_strings, only:to_string
-#ifdef _OPENMP
-    use :: omp_lib
-#endif
+! #ifdef _OPENMP
+!$  use :: omp_lib
+! # endif
 
     implicit none
     private

@@ -93,29 +93,38 @@ void VtkReader::getCellInfo(long long *connectivity, long long *offsets, int *ty
     if (!initialized)
         return;
 
+    // --- Connectivity and Types (変更なし) ---
     vtkCellArray *cells = this->grid->GetCells();
     vtkDataArray *conn_array = cells->GetConnectivityArray();
-    vtkDataArray *offsets_array = cells->GetOffsetsArray();
-
-    // Connectivity (Fortran用に +1 する)
     long long num_conn_values = conn_array->GetNumberOfTuples();
     for (long long i = 0; i < num_conn_values; ++i)
     {
         connectivity[i] = conn_array->GetTuple1(i) + 1; // 0-origin to 1-origin
     }
 
-    // Offsets
-    long long num_offsets = offsets_array->GetNumberOfTuples();
-    for (long long i = 0; i < num_offsets; ++i)
-    {
-        offsets[i] = offsets_array->GetTuple1(i);
-    }
+    // --- Offsets and Typesの計算 (Legacy VTK対応) ---
+    long long num_cells = this->grid->GetNumberOfCells();
+    long long current_offset = 0;
+    offsets[0] = 0;
 
-    // Cell Types
-    int num_cells = this->grid->GetNumberOfCells();
-    for (int i = 0; i < num_cells; ++i)
+    for (long long i = 0; i < num_cells; ++i)
     {
+        // Cell Typeを取得
         types[i] = this->grid->GetCellType(i);
+
+        // 現在のセルの頂点数を取得
+        vtkIdList *cell_points = vtkIdList::New();
+        this->grid->GetCellPoints(i, cell_points);
+        long long num_points_in_cell = cell_points->GetNumberOfIds();
+        cell_points->Delete();
+
+        // 次のオフセットを、現在のオフセットに頂点数を足して計算
+        current_offset += num_points_in_cell;
+        // offsets配列の範囲外に書き込まないようにチェック
+        if (i < num_cells)
+        {
+            offsets[i + 1] = current_offset;
+        }
     }
 }
 

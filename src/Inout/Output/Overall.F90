@@ -49,8 +49,7 @@ contains
         do i = 1, self%VTK%nCell
             do j = 1, Input%VTK%CELLS(i)%offset
                 idx = idx + 1
-                self%VTK%connectivity(idx) = &
-                    Input%VTK%CELLS(i)%connectivity(j) - 1
+                self%VTK%connectivity(idx) = Input%VTK%CELLS(i)%connectivity(j) - 1
             end do
         end do
 
@@ -73,32 +72,21 @@ contains
         call Allocate_Array(self%VTK%offset, self%VTK%nCell)
         call Allocate_Array(self%VTK%CellType, self%VTK%nCell)
 
-        print *, "VTK nPoints:", self%VTK%nPoints
-        print *, "VTK nCell:", self%VTK%nCell
-
         do i = 1, self%VTK%nCell
-            print *, "VTK CELLS offset:", Input%VTK%CELLS(i)%offset
-            if (i == 1) then
-                self%VTK%offset(i) = Input%VTK%CELLS(i)%offset
-            else
-                self%VTK%offset(i) = self%VTK%offset(i - 1) + &
-                                     Input%VTK%CELLS(i)%offset
-            end if
+            self%VTK%offset(i) = Input%VTK%CELLS(i)%offset
             self%VTK%CellType(i) = Input%VTK%CELLS(i)%cell_type
         end do
         total = self%VTK%offset(self%VTK%nCell)
-        print *, total
 
         call Allocate_Array(self%VTK%connectivity, total)
         do i = 1, self%VTK%nCell
             if (i == 1) then
-                do j = 1, Input%VTK%CELLS(i)%offset
+                do j = 1, Input%vtk%cells(i)%num_nodes_in_cell
                     self%VTK%connectivity(j) = Input%VTK%CELLS(i)%connectivity(j) - 1
                 end do
             else
-                do j = 1, Input%VTK%CELLS(i)%offset
-                    self%VTK%connectivity(self%VTK%offset(i - 1) + j) = &
-                        Input%VTK%CELLS(i)%connectivity(j) - 1
+                do j = 1, Input%vtk%cells(i)%num_nodes_in_cell
+                    self%VTK%connectivity(self%VTK%offset(i - 1) + j) = Input%VTK%CELLS(i)%connectivity(j) - 1
                 end do
             end if
         end do

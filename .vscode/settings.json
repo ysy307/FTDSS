@@ -82,7 +82,17 @@
     "fortran.preferredCase": "lowercase",
     "[FortranFreeForm]": {
         "files.autoGuessEncoding": true,
-        "files.encoding": "utf8"
+        "files.encoding": "utf8",
+        "highlight.regexes": {
+            "(^\\s*!\\$.*)": {
+                "decorations": [
+                    {
+                        "color": "#FF0000",
+                        "fontWeight": "bold"
+                    }
+                ]
+            }
+        }
     },
     "files.exclude": {
         "**/.git": true,

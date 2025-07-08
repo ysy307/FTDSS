@@ -19,10 +19,14 @@ module core_vtk_vtk
     ! Fortran側のデータ構造
 
     type :: type_vtk_cells
-        integer(int64) :: offset
-        integer(int32) :: cell_entity_id
+        integer(int32) :: offset
         integer(int32) :: cell_type
+        character(:), allocatable :: cell_type_name
+        integer(int32) :: num_nodes_in_cell
+        integer(int32) :: cell_entity_id
         integer(int32), allocatable :: connectivity(:)
+    contains
+        procedure :: set => type_vtk_cells_set
     end type type_vtk_cells
 
     type :: type_vtk
@@ -55,10 +59,10 @@ contains
         integer(int64), allocatable :: raw_connectivity(:)
         integer(int64), allocatable :: raw_offsets(:)
         integer(int32), allocatable :: raw_cell_types(:)
-        integer(int32), allocatable :: raw_cell_entry_ids(:)
+        integer(int32), allocatable :: raw_cell_entity_ids(:)
         integer(int64) :: total_conn_size
         integer(int32) :: i
-        integer(int32) :: conn_start, conn_end, num_nodes_in_cell
+        integer(int32) :: connectivity_first, connectivity_last, num_nodes_in_cell
         character(50) :: f_format, f_dataset
 
         c_filename = trim(filename)//c_null_char
@@ -90,28 +94,31 @@ contains
         if (self%num_total_cells > 0) then
             ! 4a. 生データをCから取得するためのメモリ確保
             call vtk_get_total_connectivity_size(total_conn_size)
-            allocate (raw_connectivity(total_conn_size))
-            allocate (raw_offsets(self%num_total_cells + 1))
-            allocate (raw_cell_types(self%num_total_cells))
-            allocate (raw_cell_entry_ids(self%num_total_cells))
+            call allocate_array(raw_connectivity, total_conn_size)
+            call allocate_array(raw_offsets, self%num_total_cells + 1_int64)
+            call allocate_array(raw_cell_types, self%num_total_cells)
+            call allocate_array(raw_cell_entity_ids, self%num_total_cells)
 
-            ! 4b. 生データをCから取得 (Connectivity, Offsets, Types, CellEntityIds)
+            ! 4b. 生データをCから取得 (connectivity, Offsets, Types, CellEntityIds)
             call vtk_get_cell_info(raw_connectivity, raw_offsets, raw_cell_types)
-            call vtk_get_cell_entity_ids(raw_cell_entry_ids)
+            call vtk_get_cell_entity_ids(raw_cell_entity_ids)
 
             ! 4c. Fortran構造体にデータを格納し直す
             allocate (self%cells(self%num_total_cells))
             do i = 1, self%num_total_cells
                 self%cells(i)%cell_type = raw_cell_types(i)
-                self%cells(i)%cell_entity_id = raw_cell_entry_ids(i)
+                self%cells(i)%cell_entity_id = raw_cell_entity_ids(i)
+                self%cells(i)%offset = int(raw_offsets(i + 1), kind=int32)
 
-                ! 各セルのConnectivityを抽出し、コピー
-                conn_start = raw_offsets(i) + 1
-                conn_end = raw_offsets(i + 1)
-                num_nodes_in_cell = conn_end - conn_start + 1
+                ! 各セルのconnectivityを抽出し、コピー
+                connectivity_first = raw_offsets(i) + 1
+                connectivity_last = raw_offsets(i + 1)
+                num_nodes_in_cell = connectivity_last - connectivity_first + 1
 
                 call allocate_array(self%cells(i)%connectivity, num_nodes_in_cell)
-                self%cells(i)%Connectivity = raw_connectivity(conn_start:conn_end)
+                self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32)
+
+                call self%cells(i)%set()
             end do
         end if
 
@@ -119,6 +126,206 @@ contains
         call vtk_finalize()
 
     end subroutine type_vtk_initialize
+
+    subroutine type_vtk_cells_set(self)
+        implicit none
+        class(type_vtk_cells), intent(inout) :: self !! VTK cells data
+
+        select case (self%cell_type)
+        case (VTK_VERTEX)
+            self%cell_type_name = "Vertex"
+            self%num_nodes_in_cell = 1
+        case (VTK_POLY_VERTEX)
+            self%cell_type_name = "PolyVertex"
+            self%num_nodes_in_cell = -1
+        case (VTK_LINE)
+            self%cell_type_name = "Line"
+            self%num_nodes_in_cell = 2
+        case (VTK_POLY_LINE)
+            self%cell_type_name = "PolyLine"
+            self%num_nodes_in_cell = -1
+        case (VTK_TRIANGLE)
+            self%cell_type_name = "Triangle"
+            self%num_nodes_in_cell = 3
+        case (VTK_TRIANGLE_STRIP)
+            self%cell_type_name = "TriangleStrip"
+            self%num_nodes_in_cell = 3
+        case (VTK_POLYGON)
+            self%cell_type_name = "Polygon"
+            self%num_nodes_in_cell = -1
+        case (VTK_PIXEL)
+            self%cell_type_name = "Pixel"
+            self%num_nodes_in_cell = 4
+        case (VTK_QUAD)
+            self%cell_type_name = "Quad"
+            self%num_nodes_in_cell = 4
+        case (VTK_TETRA)
+            self%cell_type_name = "Tetra"
+            self%num_nodes_in_cell = 4
+        case (VTK_VOXEL)
+            self%cell_type_name = "Voxel"
+            self%num_nodes_in_cell = 8
+        case (VTK_HEXAHEDRON)
+            self%cell_type_name = "Hexahedron"
+            self%num_nodes_in_cell = 8
+        case (VTK_WEDGE)
+            self%cell_type_name = "Wedge"
+            self%num_nodes_in_cell = 6
+        case (VTK_PYRAMID)
+            self%cell_type_name = "Pyramid"
+            self%num_nodes_in_cell = 5
+        case (VTK_PENTAGONAL_PRISM)
+            self%cell_type_name = "PentagonalPrism"
+            self%num_nodes_in_cell = 10
+        case (VTK_HEXAGONAL_PRISM)
+            self%cell_type_name = "HexagonalPrism"
+            self%num_nodes_in_cell = 12
+        case (VTK_QUADRATIC_EDGE)
+            self%cell_type_name = "QuadraticEdge"
+            self%num_nodes_in_cell = 3
+        case (VTK_QUADRATIC_TRIANGLE)
+            self%cell_type_name = "QuadraticTriangle"
+            self%num_nodes_in_cell = 6
+        case (VTK_QUADRATIC_QUAD)
+            self%cell_type_name = "QuadraticQuad"
+            self%num_nodes_in_cell = 8
+        case (VTK_QUADRATIC_POLYGON)
+            self%cell_type_name = "QuadraticPolygon"
+            self%num_nodes_in_cell = -1
+        case (VTK_QUADRATIC_TETRA)
+            self%cell_type_name = "QuadraticTetra"
+            self%num_nodes_in_cell = 10
+        case (VTK_QUADRATIC_HEXAHEDRON)
+            self%cell_type_name = "QuadraticHexahedron"
+            self%num_nodes_in_cell = 20
+        case (VTK_QUADRATIC_WEDGE)
+            self%cell_type_name = "QuadraticWedge"
+            self%num_nodes_in_cell = 15
+        case (VTK_QUADRATIC_PYRAMID)
+            self%cell_type_name = "QuadraticPyramid"
+            self%num_nodes_in_cell = 13
+        case (VTK_BIQUADRATIC_QUAD)
+            self%cell_type_name = "BiquadraticQuad"
+            self%num_nodes_in_cell = 9
+        case (VTK_TRIQUADRATIC_HEXAHEDRON)
+            self%cell_type_name = "TriquadraticHexahedron"
+            self%num_nodes_in_cell = 27
+        case (VTK_TRIQUADRATIC_PYRAMID)
+            self%cell_type_name = "TriquadraticPyramid"
+            self%num_nodes_in_cell = 14
+        case (VTK_QUADRATIC_LINEAR_QUAD)
+            self%cell_type_name = "QuadraticLinearQuad"
+            self%num_nodes_in_cell = 8
+        case (VTK_QUADRATIC_LINEAR_WEDGE)
+            self%cell_type_name = "QuadraticLinearWedge"
+            self%num_nodes_in_cell = 12
+        case (VTK_BIQUADRATIC_QUADRATIC_WEDGE)
+            self%cell_type_name = "BiquadraticQuadraticWedge"
+            self%num_nodes_in_cell = 18
+        case (VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)
+            self%cell_type_name = "BiquadraticQuadraticHexahedron"
+            self%num_nodes_in_cell = 27
+        case (VTK_BIQUADRATIC_TRIANGLE)
+            self%cell_type_name = "BiquadraticTriangle"
+            self%num_nodes_in_cell = 6
+        case (VTK_CUBIC_LINE)
+            self%cell_type_name = "CubicLine"
+            self%num_nodes_in_cell = 4
+        case (VTK_CONVEX_POINT_SET)
+            self%cell_type_name = "ConvexPointSet"
+            self%num_nodes_in_cell = 1
+        case (VTK_POLYHEDRON)
+            self%cell_type_name = "Polyhedron"
+            self%num_nodes_in_cell = -1
+        case (VTK_PARAMETRIC_CURVE)
+            self%cell_type_name = "ParametricCurve"
+            self%num_nodes_in_cell = 2
+        case (VTK_PARAMETRIC_SURFACE)
+            self%cell_type_name = "ParametricSurface"
+            self%num_nodes_in_cell = 3
+        case (VTK_PARAMETRIC_TRI_SURFACE)
+            self%cell_type_name = "ParametricTriSurface"
+            self%num_nodes_in_cell = 3
+        case (VTK_PARAMETRIC_QUAD_SURFACE)
+            self%cell_type_name = "ParametricQuadSurface"
+            self%num_nodes_in_cell = 4
+        case (VTK_PARAMETRIC_TETRA_REGION)
+            self%cell_type_name = "ParametricTetraRegion"
+            self%num_nodes_in_cell = 4
+        case (VTK_PARAMETRIC_HEX_REGION)
+            self%cell_type_name = "ParametricHexRegion"
+            self%num_nodes_in_cell = 8
+        case (VTK_HIGHER_ORDER_EDGE)
+            self%cell_type_name = "HigherOrderEdge"
+            self%num_nodes_in_cell = 3
+        case (VTK_HIGHER_ORDER_TRIANGLE)
+            self%cell_type_name = "HigherOrderTriangle"
+            self%num_nodes_in_cell = 6
+        case (VTK_HIGHER_ORDER_QUAD)
+            self%cell_type_name = "HigherOrderQuad"
+            self%num_nodes_in_cell = 8
+        case (VTK_HIGHER_ORDER_POLYGON)
+            self%cell_type_name = "HigherOrderPolygon"
+            self%num_nodes_in_cell = -1
+        case (VTK_HIGHER_ORDER_TETRAHEDRON)
+            self%cell_type_name = "HigherOrderTetrahedron"
+            self%num_nodes_in_cell = 10
+        case (VTK_HIGHER_ORDER_WEDGE)
+            self%cell_type_name = "HigherOrderWedge"
+            self%num_nodes_in_cell = 15
+        case (VTK_HIGHER_ORDER_PYRAMID)
+            self%cell_type_name = "HigherOrderPyramid"
+            self%num_nodes_in_cell = 13
+        case (VTK_HIGHER_ORDER_HEXAHEDRON)
+            self%cell_type_name = "HigherOrderHexahedron"
+            self%num_nodes_in_cell = 20
+        case (VTK_LAGRANGE_CURVE)
+            self%cell_type_name = "LagrangeCurve"
+            self%num_nodes_in_cell = 2
+        case (VTK_LAGRANGE_TRIANGLE)
+            self%cell_type_name = "LagrangeTriangle"
+            self%num_nodes_in_cell = 3
+        case (VTK_LAGRANGE_QUADRILATERAL)
+            self%cell_type_name = "LagrangeQuadrilateral"
+            self%num_nodes_in_cell = 4
+        case (VTK_LAGRANGE_TETRAHEDRON)
+            self%cell_type_name = "LagrangeTetrahedron"
+            self%num_nodes_in_cell = 4
+        case (VTK_LAGRANGE_HEXAHEDRON)
+            self%cell_type_name = "LagrangeHexahedron"
+            self%num_nodes_in_cell = 8
+        case (VTK_LAGRANGE_WEDGE)
+            self%cell_type_name = "LagrangeWedge"
+            self%num_nodes_in_cell = 6
+        case (VTK_LAGRANGE_PYRAMID)
+            self%cell_type_name = "LagrangePyramid"
+            self%num_nodes_in_cell = 5
+        case (VTK_BEZIER_CURVE)
+            self%cell_type_name = "BezierCurve"
+            self%num_nodes_in_cell = 2
+        case (VTK_BEZIER_TRIANGLE)
+            self%cell_type_name = "BezierTriangle"
+            self%num_nodes_in_cell = 3
+        case (VTK_BEZIER_QUADRILATERAL)
+            self%cell_type_name = "BezierQuadrilateral"
+            self%num_nodes_in_cell = 4
+        case (VTK_BEZIER_TETRAHEDRON)
+            self%cell_type_name = "BezierTetrahedron"
+            self%num_nodes_in_cell = 4
+        case (VTK_BEZIER_HEXAHEDRON)
+            self%cell_type_name = "BezierHexahedron"
+            self%num_nodes_in_cell = 8
+        case (VTK_BEZIER_WEDGE)
+            self%cell_type_name = "BezierWedge"
+            self%num_nodes_in_cell = 6
+        case (VTK_BEZIER_PYRAMID)
+            self%cell_type_name = "BezierPyramid"
+            self%num_nodes_in_cell = 5
+        case default
+            self%cell_type_name = "Unknown"
+            self%num_nodes_in_cell = 0
+        end select
+    end subroutine type_vtk_cells_set
 
     function Core_VTK_IN_CellType(self, iCellType, Shape_Dimention) result(isIn)
         !> Check if cell type is in VTK
