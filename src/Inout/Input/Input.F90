@@ -2,7 +2,7 @@ module Inout_Input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
     use :: Core_BaseTypes
-    use :: Core_VTK
+    use :: core_core, only:type_vtk
     use :: Core_Allocate
     use :: Core_Error
     ! use :: Condition_Fix_Boundary
@@ -273,7 +273,7 @@ module Inout_Input
         type(Input_Region), allocatable :: Regions(:)
         type(Input_Solver) :: Solver_Thermal
         type(Input_Solver) :: Solver_Hydraulic
-        type(Type_VTK) :: VTK
+        type(type_vtk) :: vtk
         type(Input_Boundary) :: Conditions
         type(Input_Initial) :: IC
         type(Input_OutputSettings) :: OutputSettings
@@ -1089,7 +1089,7 @@ contains
         implicit none
         class(Type_Input) :: self
 
-        self%VTK = Type_VTK(self%Geometry_FileName)
+        call self%vtk%initialize(self%Geometry_FileName)
     end subroutine Inout_Input_Geometry_VTK
 
 !     ! subroutine Inout_Input_Finalize(self)

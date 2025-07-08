@@ -1,7 +1,7 @@
 module Matrix_CRS
     use, intrinsic :: iso_fortran_env, only: int32, real64, logical32
     use :: stdlib_sorting, only:sort
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:allocate_array
     use :: Domain_Module, only:Domain_t
     implicit none
     private
@@ -61,9 +61,9 @@ contains
         A%nrow = nNode
         A%nptr = nNode + 1
 
-        call Allocate_Array(A%Ptr, A%nptr)
-        call Allocate_Array(rowCount, nNode)
-        call Allocate_Array(tmpInd, 30_int32 * nNode) ! 十分なサイズを確保
+        call allocate_array(A%Ptr, A%nptr)
+        call allocate_array(rowCount, nNode)
+        call allocate_array(tmpInd, 30_int32 * nNode) ! 十分なサイズを確保
 
         A%Ptr(1) = 1
         A%nnz = 0
@@ -73,7 +73,7 @@ contains
         ! RCM適用時の処理 (perm がある場合)
         !----------------------------------
 
-        ! call Allocate_Array(inv_perm, nNode)
+        ! call allocate_array(inv_perm, nNode)
         ! do iN = 1, nNode
         !     inv_perm(perm(iN)) = iN
         ! end do
@@ -156,8 +156,8 @@ contains
         ! end if
 
         ! --- 最終的なCRS配列を確保・コピー ---
-        call Allocate_Array(A%Ind, A%nnz)
-        call Allocate_Array(A%Val, A%nnz)
+        call allocate_array(A%Ind, A%nnz)
+        call allocate_array(A%Val, A%nnz)
         do iNNZ = 1, A%nnz
             A%Ind(iNNZ) = tmpInd(iNNZ)
             A%Val(iNNZ) = 0.0d0
@@ -254,9 +254,9 @@ contains
         B%nrow = self%nrow
         B%nptr = self%nptr
         B%nnz = self%nnz
-        call Allocate_Array(B%Ptr, self%nptr)
-        call Allocate_Array(B%Ind, self%nnz)
-        call Allocate_Array(B%Val, self%nnz)
+        call allocate_array(B%Ptr, self%nptr)
+        call allocate_array(B%Ind, self%nnz)
+        call allocate_array(B%Val, self%nnz)
         B%Ptr(:) = self%Ptr(:)
         B%Ind(:) = self%Ind(:)
         B%Val(:) = self%Val(:)

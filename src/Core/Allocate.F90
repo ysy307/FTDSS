@@ -1,274 +1,687 @@
-module Core_Allocate
+module core_allocate
     use, intrinsic :: iso_fortran_env
-    use :: Core_Error
+    use :: core_error, only:error_message
     implicit none
     private
 
-    public :: Allocate_Array
-    public :: Allocate_Pointer
+    public :: allocate_array
+    public :: allocate_pointer
 
-    interface Allocate_Array
-        module procedure :: Allocate_Rank1_int8
-        module procedure :: Allocate_Rank1_int16
-        module procedure :: Allocate_Rank1_int32
-        module procedure :: Allocate_Rank1_int64
-        module procedure :: Allocate_Rank1_real32
-        module procedure :: Allocate_Rank1_real64
-        module procedure :: Allocate_Rank1_real128
-        module procedure :: Allocate_Rank1_logical1
-        module procedure :: Allocate_Rank1_logical4
-        module procedure :: Allocate_Rank1_logical8
-        module procedure :: Allocate_Rank1_int32_specify
-        module procedure :: Allocate_Rank1_int64_specify
-        module procedure :: Allocate_Rank1_real32_specify
-        module procedure :: Allocate_Rank1_real64_specify
-        module procedure :: Allocate_Rank1_real128_specify
-        module procedure :: Allocate_Rank1_logical_specify
-        module procedure :: Allocate_Rank2_int8
-        module procedure :: Allocate_Rank2_int16
-        module procedure :: Allocate_Rank2_int32
-        module procedure :: Allocate_Rank2_int64
-        module procedure :: Allocate_Rank2_real32
-        module procedure :: Allocate_Rank2_real64
-        module procedure :: Allocate_Rank2_real128
-        module procedure :: Allocate_Rank2_logical1
-        module procedure :: Allocate_Rank2_logical4
-        module procedure :: Allocate_Rank2_logical8
-        module procedure :: Allocate_Rank1_int32_Pointer
-        module procedure :: Allocate_Rank1_int64_Pointer
-        module procedure :: Allocate_Rank1_real32_Pointer
-        module procedure :: Allocate_Rank1_real64_Pointer
-        module procedure :: Allocate_Rank1_real128_Pointer
-        module procedure :: Allocate_Rank1_logical_Pointer
-        module procedure :: Allocate_Rank1_int32_specify_Pointer
-        module procedure :: Allocate_Rank1_int64_specify_Pointer
-        module procedure :: Allocate_Rank1_real32_specify_Pointer
-        module procedure :: Allocate_Rank1_real64_specify_Pointer
-        module procedure :: Allocate_Rank1_real128_specify_Pointer
-        module procedure :: Allocate_Rank1_logical_specify_Pointer
+    interface allocate_array
+        ! Rank-1 arrays
+        module procedure :: allocate_rank1_int8
+        module procedure :: allocate_rank1_int16
+        module procedure :: allocate_rank1_int32
+        module procedure :: allocate_rank1_int64
+        module procedure :: allocate_rank1_real32
+        module procedure :: allocate_rank1_real64
+        module procedure :: allocate_rank1_real128
+        module procedure :: allocate_rank1_logical1
+        module procedure :: allocate_rank1_logical4
+        module procedure :: allocate_rank1_logical8
+        ! Rank-2 arrays
+        module procedure :: allocate_rank2_int8
+        module procedure :: allocate_rank2_int16
+        module procedure :: allocate_rank2_int32
+        module procedure :: allocate_rank2_int64
+        module procedure :: allocate_rank2_real32
+        module procedure :: allocate_rank2_real64
+        module procedure :: allocate_rank2_real128
+        module procedure :: allocate_rank2_logical1
+        module procedure :: allocate_rank2_logical4
+        module procedure :: allocate_rank2_logical8
     end interface
 
-    interface Allocate_Pointer
-        module procedure :: Allocate_Pointer_int32
-        module procedure :: Allocate_Pointer_int64
-        module procedure :: Allocate_Pointer_real32
-        module procedure :: Allocate_Pointer_real64
-        module procedure :: Allocate_Pointer_real128
-    end interface
+    interface allocate_pointer
+        ! Scalar pointers
+        module procedure :: allocate_pointer_int32
+        module procedure :: allocate_pointer_int64
+        module procedure :: allocate_pointer_real32
+        module procedure :: allocate_pointer_real64
+        module procedure :: allocate_pointer_real128
 
+        ! Array pointers
+        module procedure :: allocate_rank1_int32_pointer
+        module procedure :: allocate_rank1_int64_pointer
+        module procedure :: allocate_rank1_real32_pointer
+        module procedure :: allocate_rank1_real64_pointer
+        module procedure :: allocate_rank1_real128_pointer
+        module procedure :: allocate_rank1_logical_pointer
+        module procedure :: allocate_rank1_int32_specify_pointer
+        module procedure :: allocate_rank1_int64_specify_pointer
+        module procedure :: allocate_rank1_real32_specify_pointer
+        module procedure :: allocate_rank1_real64_specify_pointer
+        module procedure :: allocate_rank1_real128_specify_pointer
+        module procedure :: allocate_rank1_logical_specify_pointer
+    end interface allocate_pointer
 contains
 
-    ! Rank-1 配列の割り当て
-    subroutine Allocate_Rank1_int8(array, size)
+    ! rank-1 配列の割り当て
+    subroutine allocate_rank1_int8(array, length, bounds)
         implicit none
         integer(int8), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_int8
 
-    ! Rank-1 配列の割り当て
-    subroutine Allocate_Rank1_int16(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_int8
+
+    subroutine allocate_rank1_int16(array, length, bounds)
         implicit none
         integer(int16), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_int16
 
-    subroutine Allocate_Rank1_int32(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_int16
+
+    subroutine allocate_rank1_int32(array, length, bounds)
         implicit none
         integer(int32), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_int32
 
-    subroutine Allocate_Rank1_int64(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_int32
+
+    subroutine allocate_rank1_int64(array, length, bounds)
         implicit none
         integer(int64), intent(inout), allocatable :: array(:)
-        integer(int64), intent(in) :: size
+        integer(int64), intent(in), optional :: length
+        integer(int64), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_int64
 
-    subroutine Allocate_Rank1_real32(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int64)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_int64
+
+    subroutine allocate_rank1_real32(array, length, bounds)
         implicit none
         real(real32), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_real32
 
-    subroutine Allocate_Rank1_real64(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_real32
+
+    subroutine allocate_rank1_real64(array, length, bounds)
         implicit none
         real(real64), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_real64
 
-    subroutine Allocate_Rank1_real128(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_real64
+
+    subroutine allocate_rank1_real128(array, length, bounds)
         implicit none
         real(real128), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_real128
 
-    subroutine Allocate_Rank1_logical1(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_real128
+
+    subroutine allocate_rank1_logical1(array, length, bounds)
         implicit none
-        logical(1), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        logical(logical8), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_logical1
 
-    subroutine Allocate_Rank1_logical4(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_logical1
+
+    subroutine allocate_rank1_logical4(array, length, bounds)
         implicit none
-        logical(4), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        logical(logical32), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_logical4
 
-    subroutine Allocate_Rank1_logical8(array, size)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_logical4
+
+    subroutine allocate_rank1_logical8(array, length, bounds)
         implicit none
-        logical(8), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: size
+        logical(logical64), intent(inout), allocatable :: array(:)
+        integer(int32), intent(in), optional :: length
+        integer(int32), intent(in), optional :: bounds(:)
+        integer(int32) :: stat
+        logical(logical32) :: length_present, bounds_present
+        integer(int64) :: requested_size
+        integer(int32) :: first, last
 
-        if (size <= 0) call error_message(951)
-        if (.not. allocated(array)) then
-            allocate (array(size))
-        else
-            call error_message(953)
+        length_present = present(length)
+        bounds_present = present(bounds)
+
+        ! --- Argument validation ---
+        if (length_present .and. bounds_present) call error_message(956)
+        if (.not. length_present .and. .not. bounds_present) call error_message(957)
+        if (bounds_present) then
+            if (size(bounds) /= 2) call error_message(958)
         end if
-    end subroutine Allocate_Rank1_logical8
 
-    subroutine Allocate_Rank1_int32_specify(array, first, last)
+        ! --- Main logic ---
+        if (allocated(array)) call error_message(951)
+
+        if (length_present) then
+            ! Allocate by length
+            if (length <= 0) call error_message(952)
+            if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+            allocate (array(length), stat=stat)
+
+        else if (bounds_present) then
+            ! Allocate by bounds
+            first = bounds(1)
+            last = bounds(2)
+
+            if (first > last) call error_message(954)
+
+            requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
+            if (requested_size > huge(0_int64) / 4) call error_message(953)
+            allocate (array(first:last), stat=stat)
+        end if
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank1_logical8
+
+    subroutine allocate_rank2_int8(array, nrow, ncol)
         implicit none
-        integer(int32), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: first, last
+        integer(int8), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: nrow, ncol
+        integer(int32) :: stat
 
-        if (first > last) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(first:last))
-        else
-            call error_message(953)
-        end if
-    end subroutine Allocate_Rank1_int32_specify
+        if (allocated(array)) call error_message(951)
+        if (nrow <= 0 .or. ncol <= 0) call error_message(952)
+        ! if (nrow * ncol > huge(ncol)) call error_message(953)
 
-    subroutine Allocate_Rank1_int64_specify(array, first, last)
+        allocate (array(nrow, ncol), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_int8
+    subroutine allocate_rank2_int16(array, num_row, num_col)
         implicit none
-        integer(int64), intent(inout), allocatable :: array(:)
-        integer(int64), intent(in) :: first, last
+        integer(int16), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+        integer(int64) :: total_size
 
-        if (first > last) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(first:last))
-        else
-            call error_message(953)
-        end if
-    end subroutine Allocate_Rank1_int64_specify
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
-    subroutine Allocate_Rank1_real32_specify(array, first, last)
+        total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
+        if (total_size > huge(0_int64) / 4) call error_message(953)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_int16
+
+    subroutine allocate_rank2_int32(array, num_row, num_col)
         implicit none
-        real(real32), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: first, last
+        integer(int32), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+        integer(int64) :: total_size
 
-        if (first > last) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(first:last))
-        else
-            call error_message(953)
-        end if
-    end subroutine Allocate_Rank1_real32_specify
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
-    subroutine Allocate_Rank1_real64_specify(array, first, last)
+        total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
+        if (total_size > huge(0_int64) / 4) call error_message(953)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_int32
+
+    subroutine allocate_rank2_int64(array, num_row, num_col)
         implicit none
-        real(real64), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: first, last
+        integer(int64), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+        integer(int64) :: total_size
 
-        if (first > last) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(first:last))
-        else
-            call error_message(953)
-        end if
-    end subroutine Allocate_Rank1_real64_specify
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
-    subroutine Allocate_Rank1_real128_specify(array, first, last)
+        total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
+        if (total_size > huge(0_int64) / 8) call error_message(953)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_int64
+
+    subroutine allocate_rank2_real32(array, num_row, num_col)
         implicit none
-        real(real128), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: first, last
+        real(real32), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+        integer(int64) :: total_size
 
-        if (first > last) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(first:last))
-        else
-            call error_message(953)
-        end if
-    end subroutine Allocate_Rank1_real128_specify
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
-    subroutine Allocate_Rank1_logical_specify(array, first, last)
+        total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
+        if (total_size > huge(0_int64) / 4) call error_message(953)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_real32
+
+    subroutine allocate_rank2_real64(array, num_row, num_col)
         implicit none
-        logical(4), intent(inout), allocatable :: array(:)
-        integer(int32), intent(in) :: first, last
+        real(real64), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+        integer(int64) :: total_size
 
-        if (first > last) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(first:last))
-        else
-            call error_message(953)
-        end if
-    end subroutine Allocate_Rank1_logical_specify
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
-    subroutine Allocate_Rank1_int32_Pointer(array, size)
+        total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
+        if (total_size > huge(0_int64) / 8) call error_message(953)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_real64
+
+    subroutine allocate_rank2_real128(array, num_row, num_col)
+        implicit none
+        real(real128), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+        integer(int64) :: total_size
+
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
+
+        total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
+        if (total_size > huge(0_int64) / 16) call error_message(953)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_real128
+
+    subroutine allocate_rank2_logical1(array, num_row, num_col)
+        implicit none
+        logical(logical8), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_logical1
+
+    subroutine allocate_rank2_logical4(array, num_row, num_col)
+        implicit none
+        logical(logical32), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_logical4
+
+    subroutine allocate_rank2_logical8(array, num_row, num_col)
+        implicit none
+        logical(logical64), intent(inout), allocatable :: array(:, :)
+        integer(int32), intent(in) :: num_row, num_col
+        integer(int32) :: stat
+
+        if (allocated(array)) call error_message(951)
+        if (num_row <= 0 .or. num_col <= 0) call error_message(952)
+
+        allocate (array(num_row, num_col), stat=stat)
+
+        if (stat /= 0) call error_message(955)
+
+    end subroutine allocate_rank2_logical8
+
+    subroutine allocate_rank1_int32_pointer(array, size)
         implicit none
         integer(int32), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: size
@@ -277,11 +690,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(size))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_int32_Pointer
+    end subroutine allocate_rank1_int32_pointer
 
-    subroutine Allocate_Rank1_int64_Pointer(array, size)
+    subroutine allocate_rank1_int64_pointer(array, size)
         implicit none
         integer(int64), intent(inout), dimension(:), pointer :: array
         integer(int64), intent(in) :: size
@@ -290,11 +703,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(size))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_int64_Pointer
+    end subroutine allocate_rank1_int64_pointer
 
-    subroutine Allocate_Rank1_real32_Pointer(array, size)
+    subroutine allocate_rank1_real32_pointer(array, size)
         implicit none
         real(real32), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: size
@@ -303,11 +716,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(size))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_real32_Pointer
+    end subroutine allocate_rank1_real32_pointer
 
-    subroutine Allocate_Rank1_real64_Pointer(array, size)
+    subroutine allocate_rank1_real64_pointer(array, size)
         implicit none
         real(real64), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: size
@@ -316,11 +729,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(size))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_real64_Pointer
+    end subroutine allocate_rank1_real64_pointer
 
-    subroutine Allocate_Rank1_real128_Pointer(array, size)
+    subroutine allocate_rank1_real128_pointer(array, size)
         implicit none
         real(real128), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: size
@@ -329,11 +742,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(size))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_real128_Pointer
+    end subroutine allocate_rank1_real128_pointer
 
-    subroutine Allocate_Rank1_logical_Pointer(array, size)
+    subroutine allocate_rank1_logical_pointer(array, size)
         implicit none
         logical, intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: size
@@ -342,11 +755,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(size))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_logical_Pointer
+    end subroutine allocate_rank1_logical_pointer
 
-    subroutine Allocate_Rank1_int32_specify_Pointer(array, first, last)
+    subroutine allocate_rank1_int32_specify_pointer(array, first, last)
         implicit none
         integer(int32), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: first, last
@@ -355,11 +768,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(first:last))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_int32_specify_Pointer
+    end subroutine allocate_rank1_int32_specify_pointer
 
-    subroutine Allocate_Rank1_int64_specify_Pointer(array, first, last)
+    subroutine allocate_rank1_int64_specify_pointer(array, first, last)
         implicit none
         integer(int64), intent(inout), dimension(:), pointer :: array
         integer(int64), intent(in) :: first, last
@@ -368,11 +781,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(first:last))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_int64_specify_Pointer
+    end subroutine allocate_rank1_int64_specify_pointer
 
-    subroutine Allocate_Rank1_real32_specify_Pointer(array, first, last)
+    subroutine allocate_rank1_real32_specify_pointer(array, first, last)
         implicit none
         real(real32), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: first, last
@@ -381,11 +794,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(first:last))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_real32_specify_Pointer
+    end subroutine allocate_rank1_real32_specify_pointer
 
-    subroutine Allocate_Rank1_real64_specify_Pointer(array, first, last)
+    subroutine allocate_rank1_real64_specify_pointer(array, first, last)
         implicit none
         real(real64), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: first, last
@@ -394,11 +807,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(first:last))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_real64_specify_Pointer
+    end subroutine allocate_rank1_real64_specify_pointer
 
-    subroutine Allocate_Rank1_real128_specify_Pointer(array, first, last)
+    subroutine allocate_rank1_real128_specify_pointer(array, first, last)
         implicit none
         real(real128), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: first, last
@@ -407,11 +820,11 @@ contains
         if (.not. associated(array)) then
             allocate (array(first:last))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_real128_specify_Pointer
+    end subroutine allocate_rank1_real128_specify_pointer
 
-    subroutine Allocate_Rank1_logical_specify_Pointer(array, first, last)
+    subroutine allocate_rank1_logical_specify_pointer(array, first, last)
         implicit none
         logical(4), intent(inout), dimension(:), pointer :: array
         integer(int32), intent(in) :: first, last
@@ -420,143 +833,12 @@ contains
         if (.not. associated(array)) then
             allocate (array(first:last))
         else
-            call error_message(953)
+            ! call error_message(953)
         end if
-    end subroutine Allocate_Rank1_logical_specify_Pointer
-
-    ! Rank-2 配列の割り当て
-    subroutine Allocate_Rank2_int8(array, size1, size2)
-        implicit none
-        integer(int8), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_int8
-
-    subroutine Allocate_Rank2_int16(array, size1, size2)
-        implicit none
-        integer(int16), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_int16
-
-    subroutine Allocate_Rank2_int32(array, size1, size2)
-        implicit none
-        integer(int32), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_int32
-
-    subroutine Allocate_Rank2_int64(array, size1, size2)
-        implicit none
-        integer(int64), intent(inout), allocatable :: array(:, :)
-        integer(int64), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_int64
-
-    subroutine Allocate_Rank2_real32(array, size1, size2)
-        implicit none
-        real(real32), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_real32
-
-    subroutine Allocate_Rank2_real64(array, size1, size2)
-        implicit none
-        real(real64), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_real64
-
-    subroutine Allocate_Rank2_real128(array, size1, size2)
-        implicit none
-        real(real128), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_real128
-
-    subroutine Allocate_Rank2_logical1(array, size1, size2)
-        implicit none
-        logical(logical8), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_logical1
-
-    subroutine Allocate_Rank2_logical4(array, size1, size2)
-        implicit none
-        logical(logical32), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_logical4
-
-    subroutine Allocate_Rank2_logical8(array, size1, size2)
-        implicit none
-        logical(logical64), intent(inout), allocatable :: array(:, :)
-        integer(int32), intent(in) :: size1, size2
-
-        if (size1 <= 0 .or. size2 <= 0) call error_message(952)
-        if (.not. allocated(array)) then
-            allocate (array(size1, size2))
-        else
-            call error_message(954)
-        end if
-    end subroutine Allocate_Rank2_logical8
+    end subroutine allocate_rank1_logical_specify_pointer
 
     ! ポインタ用の割り当て
-    subroutine Allocate_Pointer_int32(iptr)
+    subroutine allocate_pointer_int32(iptr)
         implicit none
         integer(int32), pointer :: iptr
 
@@ -565,9 +847,9 @@ contains
         else
             call error_message(955)
         end if
-    end subroutine Allocate_Pointer_int32
+    end subroutine allocate_pointer_int32
 
-    subroutine Allocate_Pointer_int64(iptr)
+    subroutine allocate_pointer_int64(iptr)
         implicit none
         integer(int64), pointer :: iptr
 
@@ -576,9 +858,9 @@ contains
         else
             call error_message(955)
         end if
-    end subroutine Allocate_Pointer_int64
+    end subroutine allocate_pointer_int64
 
-    subroutine Allocate_Pointer_real32(dptr)
+    subroutine allocate_pointer_real32(dptr)
         implicit none
         real(real32), pointer :: dptr
 
@@ -587,9 +869,9 @@ contains
         else
             call error_message(955)
         end if
-    end subroutine Allocate_Pointer_real32
+    end subroutine allocate_pointer_real32
 
-    subroutine Allocate_Pointer_real64(dptr)
+    subroutine allocate_pointer_real64(dptr)
         implicit none
         real(real64), pointer :: dptr
 
@@ -598,9 +880,9 @@ contains
         else
             call error_message(955)
         end if
-    end subroutine Allocate_Pointer_real64
+    end subroutine allocate_pointer_real64
 
-    subroutine Allocate_Pointer_real128(dptr)
+    subroutine allocate_pointer_real128(dptr)
         implicit none
         real(real128), pointer :: dptr
 
@@ -609,5 +891,5 @@ contains
         else
             call error_message(955)
         end if
-    end subroutine Allocate_Pointer_real128
-end module Core_Allocate
+    end subroutine allocate_pointer_real128
+end module core_allocate

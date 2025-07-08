@@ -5,7 +5,8 @@ module Inout_Output
     use :: Core_BaseTypes
     use :: Core_Allocate
     use :: Core_Error
-    use :: Core_C_Util
+    use :: core_fortran_utils, only:get_username, get_hostname, get_compiler_name, get_compiler_version, &
+        get_cpu_architecture, get_os, get_openmp_version, get_memory_usage
     use :: Inout_Input
     use :: Domain_Element, only:ElementHolder
     use :: Domain_Element_Factory, only:Create_Element
@@ -15,9 +16,9 @@ module Inout_Output
     use :: Main_Thermal
     use :: Time_Time
     use :: stdlib_strings, only:to_string
-#ifdef _OPENMP
-    use :: omp_lib
-#endif
+! #ifdef _OPENMP
+!$  use :: omp_lib
+! # endif
 
     implicit none
     private
@@ -382,47 +383,47 @@ module Inout_Output
             character(*), dimension(:), intent(in) :: fileExtensions
         end subroutine Setup_Directory
 
-        module function Get_UserName() result(UserName)
-            implicit none
-            character(:), allocatable :: UserName
+        ! module function Get_UserName() result(UserName)
+        !     implicit none
+        !     character(:), allocatable :: UserName
 
-        end function Get_UserName
+        ! end function Get_UserName
 
-        module function Get_HostName() result(HostName)
-            implicit none
-            character(:), allocatable :: HostName
+        ! module function Get_HostName() result(HostName)
+        !     implicit none
+        !     character(:), allocatable :: HostName
 
-        end function Get_HostName
+        ! end function Get_HostName
 
-        module function Get_CompilerName() result(CompilerName)
-            implicit none
-            character(:), allocatable :: CompilerName
+        ! module function Get_CompilerName() result(CompilerName)
+        !     implicit none
+        !     character(:), allocatable :: CompilerName
 
-        end function Get_CompilerName
+        ! end function Get_CompilerName
 
-        module function Get_CompilerVersion() result(CompilerVersion)
-            implicit none
-            character(:), allocatable :: CompilerVersion
+        ! module function Get_CompilerVersion() result(CompilerVersion)
+        !     implicit none
+        !     character(:), allocatable :: CompilerVersion
 
-        end function Get_CompilerVersion
+        ! end function Get_CompilerVersion
 
-        module function Get_CPUArchitecture() result(architecture)
-            implicit none
-            character(:), allocatable :: architecture
+        ! module function Get_CPUArchitecture() result(architecture)
+        !     implicit none
+        !     character(:), allocatable :: architecture
 
-        end function Get_CPUArchitecture
+        ! end function Get_CPUArchitecture
 
-        module function Get_OS() result(os)
-            implicit none
-            character(:), allocatable :: os
+        ! module function Get_OS() result(os)
+        !     implicit none
+        !     character(:), allocatable :: os
 
-        end function Get_OS
+        ! end function Get_OS
 
-        module function Get_OpneMP_Version() result(OpenMPversion)
-            implicit none
-            character(:), allocatable :: OpenMPversion
+        ! module function Get_OpneMP_Version() result(OpenMPversion)
+        !     implicit none
+        !     character(:), allocatable :: OpenMPversion
 
-        end function Get_OpneMP_Version
+        ! end function Get_OpneMP_Version
 
     end interface
 
@@ -454,22 +455,22 @@ module Inout_Output
         end subroutine Output_Process_Observation
     end interface
 
-    interface
-        function get_rss_kb() bind(C, name="get_rss_kb")
-            import :: c_int64_t
-            integer(c_int64_t) :: get_rss_kb
-        end function
+    ! interface
+    !     function get_rss_kb() bind(C, name="get_rss_kb")
+    !         import :: c_int64_t
+    !         integer(c_int64_t) :: get_rss_kb
+    !     end function
 
-        function C_Get_OS() bind(C, name="C_Get_OS")
-            import :: c_ptr
-            type(c_ptr) :: C_Get_OS
-        end function
+    !     function C_Get_OS() bind(C, name="C_Get_OS")
+    !         import :: c_ptr
+    !         type(c_ptr) :: C_Get_OS
+    !     end function
 
-        function C_Get_Architecture() bind(C, name="C_Get_Architecture")
-            import :: c_ptr
-            type(c_ptr) :: C_Get_Architecture
-        end function
-    end interface
+    !     function C_Get_Architecture() bind(C, name="C_Get_Architecture")
+    !         import :: c_ptr
+    !         type(c_ptr) :: C_Get_Architecture
+    !     end function
+    ! end interface
 
     interface
         module subroutine Output_SystemLog(self, time, Matrix, Domain)

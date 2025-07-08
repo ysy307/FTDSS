@@ -1,5 +1,5 @@
 
-module Core_VTK_Constants
+module core_vtk_vtk_constants
     use, intrinsic :: iso_fortran_env, only: int32
     implicit none
     private
@@ -142,4 +142,4 @@ module Core_VTK_Constants
     integer(int32), parameter :: VTK_BEZIER_PYRAMID = 81
     !------------------------------------------------------------------------
 
-end module Core_VTK_Constants
+end module core_vtk_vtk_constants

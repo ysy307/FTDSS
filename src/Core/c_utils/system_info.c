@@ -1,42 +1,13 @@
-#include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
-#include <psapi.h>
 #else
-#include <unistd.h>
 #include <sys/utsname.h>
 #endif
 
-// RSS を kB 単位で返す
-int64_t get_rss_kb(void)
-{
-#ifdef _WIN32
-    PROCESS_MEMORY_COUNTERS info;
-    GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
-    return (int64_t)(info.WorkingSetSize / 1024);
-#else
-    long pages = 0;
-    FILE *f = fopen("/proc/self/statm", "r");
-    if (!f)
-        return -1;
-    if (fscanf(f, "%ld", &pages) != 1)
-    {
-        fclose(f);
-        return -1;
-    }
-    fclose(f);
-    long ps = sysconf(_SC_PAGESIZE);
-    if (ps <= 0)
-        return -1;
-    return (int64_t)(pages * ps / 1024);
-#endif
-}
-
-// OS 名を返す（静的バッファへのポインタ）
-const char *C_Get_OS(void)
+// OS名を返す（静的バッファへのポインタ）
+const char* system_info_get_os(void)
 {
     static char osname[64];
 #ifdef _WIN32
@@ -54,7 +25,7 @@ const char *C_Get_OS(void)
 }
 
 // アーキテクチャ名を返す（静的バッファへのポインタ）
-const char *C_Get_Architecture(void)
+const char* system_info_get_cpu_architecture(void)
 {
     static char arch[64];
 #ifdef _WIN32

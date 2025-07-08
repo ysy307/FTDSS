@@ -25,15 +25,24 @@ contains
         real(real64) :: total_section_time ! 「Total」セクションの時間
         integer(int32), parameter :: nRepeat = 50
 
-        username = Get_Username()
-        hostname = Get_Hostname()
-        compiler = Get_CompilerName()
-        compiler_version = Get_CompilerVersion()
-        architecture = Get_CPUArchitecture()
-        os = Get_OS()
+        character(len=32) :: fmt
+        integer(int32) :: width
 
-        rss_kb = get_rss_kb()
-        rss_mb = dble(rss_kb) / 1024.0d0
+        ! 保険として初期化
+        fmt = ''
+
+        username = get_username()
+        hostname = get_hostname()
+        compiler = get_compiler_name()
+        compiler_version = get_compiler_version()
+        architecture = get_cpu_architecture()
+        os = get_os()
+
+        rss_mb = get_memory_usage()
+        ! 幅の計算。log10(0) の回避と最小幅保証
+        width = max(6, int(log10(max(1.0d0, rss_mb))) + 6)
+        ! フォーマット文字列の構築
+        write (fmt, '(a,i0,a)') '(a,f', width, '.4,a)'
 
         open (newunit=num_unit, file=self%logFileName, status='replace', action='write', iostat=ios)
         if (ios /= 0) then
@@ -49,12 +58,10 @@ contains
         write (num_unit, '(a)') "Architecture       : "//trim(architecture)
         write (num_unit, '(a)') "Compiler           : "//trim(compiler)
         write (num_unit, '(a)') "Compiler Version   : "//trim(compiler_version)
-        write (num_unit, '(a,f'//to_string(int(log10(rss_mb) + 6))//'.4,a)') "RSS Memory Usage   : ", rss_mb, " MB"
-#ifdef _OPENMP
-        write (num_unit, '(2a)') "OpenMP Version     : ", Get_OpneMP_Version()
-        write (num_unit, '(a,i0)') "OpenMP Max Threads : ", omp_get_num_procs()
-        write (num_unit, '(a,i0)') "OpenMP Threads     : ", omp_get_max_threads()
-#endif
+        write (num_unit, fmt) "RSS Memory Usage   : ", rss_mb, " MB"
+!$      write (num_unit, '(2a)') "OpenMP Version     : ", get_compiler_version()
+!$      write (num_unit, '(a,i0)') "OpenMP Max Threads : ", omp_get_num_procs()
+!$      write (num_unit, '(a,i0)') "OpenMP Threads     : ", omp_get_max_threads()
         write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') "Time Information"
         write (num_unit, '(a)') repeat('=', nRepeat)
@@ -86,7 +93,7 @@ contains
             if (trim(adjustl(time%sections(i)%label)) == "Total") cycle
 
             if (component_total_time > 0.0d0) then
-                write (num_unit, '(a10, f15.4, f16.7, a)') trim(time%sections(i)%label), &
+                write (num_unit, '(a10, f15.4, f14.4, a)') trim(time%sections(i)%label), &
                     time%sections(i)%total_time, &
                     (time%sections(i)%total_time / component_total_time) * 100.0d0, " %"
             else

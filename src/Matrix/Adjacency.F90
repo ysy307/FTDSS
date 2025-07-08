@@ -1,7 +1,7 @@
 module Matrix_Adjacency
     use, intrinsic :: iso_fortran_env, only: int32, logical32
     use :: Domain_Module, only:Domain_t
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_core, only:allocate_array
     implicit none
     private
     ! public :: Adjacency_t, is_adjacent, get_degree
@@ -17,6 +17,7 @@ module Matrix_Adjacency
         procedure, pass(self), public :: check => check_adjacent
         procedure, pass(self), public :: get => get_degree
         procedure, pass(self), public :: get_numElements => get_numElements
+        procedure, pass(self), public :: destroy => adjacency_destroy
     end type Adjacency_t
 
 contains
@@ -33,8 +34,8 @@ contains
 
         self%numElements = Domain%get_numElement()
 
-        call Allocate_Array(self%Matrix, self%numElements, self%numElements)
-        call Allocate_Array(self%degree, self%numElements)
+        call allocate_array(self%Matrix, self%numElements, self%numElements)
+        call allocate_array(self%degree, self%numElements)
 
         self%Matrix(:, :) = .false.
         self%degree(:) = 0
@@ -111,5 +112,15 @@ contains
 
         numElements = self%numElements
     end function get_numElements
+
+    subroutine adjacency_destroy(self)
+        implicit none
+        class(Adjacency_t), intent(inout) :: self
+
+        if (allocated(self%Matrix)) deallocate (self%Matrix)
+        if (allocated(self%degree)) deallocate (self%degree)
+
+        self%numElements = 0
+    end subroutine adjacency_destroy
 
 end module Matrix_Adjacency

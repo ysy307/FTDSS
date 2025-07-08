@@ -10,8 +10,8 @@ if(NOT CMAKE_Fortran_COMPILER)
     set(CMAKE_Fortran_COMPILER ifx)
 endif()
 if(NOT CMAKE_CXX_COMPILER)
-    message(STATUS "CXX compiler not specified, defaulting to 'icx'.")
-    set(CMAKE_CXX_COMPILER icx)
+    message(STATUS "CXX compiler not specified, defaulting to 'icpx'.")
+    set(CMAKE_CXX_COMPILER icpx)
 endif()
 if(NOT CMAKE_C_COMPILER)
     message(STATUS "C compiler not specified, defaulting to 'icx'.")
@@ -26,11 +26,11 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Options
-option(ENABLE_OPTIMIZE "Enable optimization flags" ON)
+option(ENABLE_OPTIMIZE "Enable optimization flags" OFF)
 option(ENABLE_OPENMP   "Enable OpenMP support"     ON)
 option(ENABLE_MKL      "Enable MKL support"        ON)
 option(ENABLE_MPI      "Enable MPI support"        OFF)
-option(ENABLE_DEBUG    "Enable debug flags"        OFF)
+option(ENABLE_DEBUG    "Enable debug flags"        ON)
 
 # Select the application to build
 set(BUILD_APP "" CACHE STRING "Specify the application to build: ysy_fc or test")
@@ -136,6 +136,7 @@ elseif(BUILD_APP STREQUAL "test")
     )
     enable_build_flags(test)
     enable_thirdparty (test)
+    set_target_properties(test PROPERTIES LINKER_LANGUAGE Fortran)
 
 endif()
 

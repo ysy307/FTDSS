@@ -4,8 +4,7 @@ module Condition_Boundary
     use :: Core_Allocate
     use :: Domain_Side, only:SideHolder
     use :: Domain_Module, only:Domain_t
-    use :: Core_VTK
-    use :: Core_VTK_Constants
+    use :: core_core
     use :: Matrix_CRS
     use :: Inout_Input
     implicit none

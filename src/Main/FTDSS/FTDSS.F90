@@ -1,8 +1,8 @@
 module Main_FTDSS
     use, intrinsic :: iso_fortran_env
-
+    use :: stdlib_logger
     use :: Core_BaseTypes
-    use :: Core_Signal
+    use :: core_fortran_utils, only:setup_handler, was_interrupted
     use :: Inout_Input
     use :: Time_Time
     use :: Inout_Output
@@ -62,8 +62,11 @@ contains
         call self%time%Profile_Start("Total")
         call self%time%Profile_Start("IO")
 
+        call global_logger%configure(level=information_level, &
+                                     time_stamp=.true., &
+                                     max_width=0)
         call setup_handler()
-        nsize = self%Input%VTK%numPoints
+        nsize = self%Input%VTK%num_points
 
         ! Initialize the Structure
         allocate (self%Coordinate)

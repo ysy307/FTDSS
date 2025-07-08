@@ -1,19 +1,22 @@
-module Core_Unique
+module core_unique
     use, intrinsic :: iso_fortran_env
     use :: stdlib_sorting, only:sort
     use :: Core_Allocate, only:Allocate_Array
     implicit none
+    private
 
-    interface Unique
-        module procedure :: Unique_int8
-        module procedure :: Unique_int16
-        module procedure :: Unique_int32
-        module procedure :: Unique_int64
+    public :: unique
+
+    interface unique
+        procedure :: unique_int8
+        procedure :: unique_int16
+        procedure :: unique_int32
+        procedure :: unique_int64
     end interface
 
 contains
 
-    subroutine Unique_int8(array, unique_array)
+    subroutine unique_int8(array, unique_array)
         !> 整数型の配列からユニークな要素を取得する関数
         implicit none
         integer(int8), intent(in) :: array(:) !! 入力配列
@@ -47,9 +50,9 @@ contains
                 unique_array(count) = sorted_array(i)
             end if
         end do
-    end subroutine Unique_int8
+    end subroutine unique_int8
 
-    subroutine Unique_int16(array, unique_array)
+    subroutine unique_int16(array, unique_array)
         !> 整数型の配列からユニークな要素を取得する関数
         implicit none
         integer(int16), intent(in) :: array(:) !! 入力配列
@@ -83,9 +86,9 @@ contains
                 unique_array(count) = sorted_array(i)
             end if
         end do
-    end subroutine Unique_int16
+    end subroutine unique_int16
 
-    subroutine Unique_int32(array, unique_array)
+    subroutine unique_int32(array, unique_array)
         !> 整数型の配列からユニークな要素を取得する関数
         implicit none
         integer(int32), intent(in) :: array(:) !! 入力配列
@@ -119,9 +122,9 @@ contains
                 unique_array(count) = sorted_array(i)
             end if
         end do
-    end subroutine Unique_int32
+    end subroutine unique_int32
 
-    subroutine Unique_int64(array, unique_array)
+    subroutine unique_int64(array, unique_array)
         !> 整数型の配列からユニークな要素を取得する関数
         implicit none
         integer(int64), intent(in) :: array(:) !! 入力配列
@@ -155,6 +158,6 @@ contains
                 unique_array(count) = sorted_array(i)
             end if
         end do
-    end subroutine Unique_int64
+    end subroutine unique_int64
 
-end module Core_Unique
+end module core_unique

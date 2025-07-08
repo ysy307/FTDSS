@@ -1,6 +1,6 @@
 module Core_BaseTypes
     use, intrinsic :: iso_fortran_env
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_allocate, only:allocate_array
     implicit none
     private
 #ifdef _MPI
@@ -181,10 +181,10 @@ contains
         self%rank = rank
         self%nsize = nsize
 
-        call Allocate_Array(self%new, nsize)
-        call Allocate_Array(self%pre, nsize)
-        call Allocate_Array(self%old, nsize, self%rank + 1_int32)
-        call Allocate_Array(self%dif, nsize)
+        call allocate_array(self%new, nsize)
+        call allocate_array(self%pre, nsize)
+        call allocate_array(self%old, nsize, self%rank + 1_int32)
+        call allocate_array(self%dif, nsize)
 
         self%new(:) = 0.0d0
         self%pre(:) = 0.0d0
@@ -275,9 +275,9 @@ contains
         class(DP3d), intent(inout) :: self
         integer(int32), intent(in) :: nsize
 
-        call Allocate_Array(self%x, nsize)
-        call Allocate_Array(self%y, nsize)
-        call Allocate_Array(self%z, nsize)
+        call allocate_array(self%x, nsize)
+        call allocate_array(self%y, nsize)
+        call allocate_array(self%z, nsize)
 
     end subroutine DP3d_Allocate
 
@@ -295,7 +295,7 @@ contains
         class(Belonging), intent(inout) :: self
         integer(int32), intent(in) :: nsize
 
-        call Allocate_Array(self%group, nsize)
+        call allocate_array(self%group, nsize)
         self%nsize = nsize
         self%group(:) = 0
 

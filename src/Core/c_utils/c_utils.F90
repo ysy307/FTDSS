@@ -1,5 +1,10 @@
-module Core_C_Util
+module core_c_utils
     use, intrinsic :: iso_c_binding, only: c_ptr, c_f_pointer, c_char, c_null_char
+
+    use :: core_c_utils_system_info, only:c_get_os, c_get_cpu_architecture
+    use :: core_c_utils_memory_stats, only:c_get_rss_kb
+    use :: core_c_utils_signal_flag, only:c_setup_signal_handler, c_get_interrupted_flag
+
     implicit none
     public :: c_ptr_to_string
 
@@ -28,4 +33,4 @@ contains
         end do
     end function c_ptr_to_string
 
-end module Core_C_Util
+end module core_c_utils

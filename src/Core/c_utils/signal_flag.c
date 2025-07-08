@@ -1,4 +1,3 @@
-// c_handler.c
 #include <signal.h>
 
 // グローバルなvolatile変数でフラグを管理

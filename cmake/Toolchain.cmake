@@ -33,6 +33,9 @@ endif()
 
 if(NOT TARGET VTK::CommonCore)
     find_package(VTK REQUIRED
+        COMPONENTS
+        CommonCore
+        IOLegacy
         PATHS ${PROJECT_SOURCE_DIR}/third_party/.local/lib/cmake/VTK-9.5
     )
 endif()
@@ -95,7 +98,7 @@ function(enable_build_flags target)
 
     if(ENABLE_MPI)
         target_link_libraries(${target} PUBLIC MPI::MPI_Fortran)
-        target_compile_definitions(${target} PUBLIC _MPI)
+        target_compile_definitions(${target} PUBLIC USE_MPI)
     endif()
 
     if(ENABLE_MKL)
