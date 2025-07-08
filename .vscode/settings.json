@@ -1,7 +1,4 @@
 {
-    // =========================================================================
-    // エディタ基本設定
-    // =========================================================================
     "editor.formatOnSave": true,
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
@@ -9,81 +6,107 @@
     "editor.renderLineHighlight": "all",
     "editor.dragAndDrop": false,
     "editor.acceptSuggestionOnEnter": "off",
-    "editor.rulers": [
-        132
-    ],
-    // =========================================================================
-    // ファイル設定
-    // =========================================================================
     "files.autoSave": "onWindowChange",
     "files.associations": {
         "*.FOR": "FortranFreeForm",
         "*.f95": "FortranFreeForm",
         "*.f03": "FortranFreeForm",
         "*.f90": "FortranFreeForm",
-        "*.F90": "FortranFreeForm",
-        "*.py": "python",
-        "*.vtu": "xml",
-        "stdint.h": "c"
+        "*.F90": "FortranFreeForm"
+    },
+    "fortran.fortls.path": "/usr/local/bin/fortls",
+    "fortran.linter.extraArgs": [
+        "-fpp",
+        "-module",
+        "/workspaces/FTDSS/CMakeBuild/.mod",
+        "-module",
+        "/opt/intel/oneapi/mpi/2021.14/include/mpi",
+        "-module",
+        "/opt/intel/oneapi/2025.1/include/mpi",
+        "-D_MKL"
+    ],
+    "fortran.linter.compiler": "ifx",
+    "fortran.linter.compilerPath": "/opt/intel/oneapi/compiler/latest/bin/ifx",
+    "fortran.linter.includePaths": [
+        "/workspaces/FTDSS/CMakeBuild/.mod/",
+        "/opt/intel/oneapi/mkl/latest/include/",
+        "/opt/intel/oneapi/mpi/latest/include/",
+        "/opt/intel/oneapi/2025.1/include/",
+        "/workspaces/FTDSS/third_party/.local/VTKFortran/include",
+        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib",
+        "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.2.0"
+    ],
+    "fortran.linter.modOutput": "/workspaces/FTDSS/CMakeBuild/.mod/",
+    "fortran.formatting.formatter": "fprettify",
+    "fortran.formatting.fprettifyArgs": [
+        "--indent",
+        "4",
+        "--whitespace",
+        "4",
+        "--whitespace-comma",
+        "true",
+        "--whitespace-assignment",
+        "true",
+        "--whitespace-relational",
+        "true",
+        "--whitespace-logical",
+        "true",
+        "--whitespace-plusminus",
+        "true",
+        "--whitespace-multdiv",
+        "true",
+        "--whitespace-print",
+        "true",
+        "--whitespace-intrinsics",
+        "true",
+        "--whitespace-decl",
+        "true",
+        "--whitespace-type",
+        "false",
+        "--strip-comments",
+        "--case",
+        "1",
+        "1",
+        "1",
+        "1",
+        "--line-length",
+        "256",
+        "--silent",
+        "--enable-decl",
+        "--whitespace-decl",
+        "true"
+    ],
+    "fortran.preferredCase": "lowercase",
+    "[FortranFreeForm]": {
+        "files.autoGuessEncoding": true,
+        "files.encoding": "utf8"
     },
     "files.exclude": {
         "**/.git": true,
         "**/.tmp.drive*": true
     },
-    "[FortranFreeForm]": {
-        "files.autoGuessEncoding": true,
-        "files.encoding": "utf8"
-    },
-    // =========================================================================
-    // Fortran 拡張機能設定
-    // =========================================================================
-    // --- リンター & Language Server (fortls) ---
-    // fortls実行ファイルのパス (環境に合わせて変更が必要な場合があります)
-    "fortran.fortls.path": "/usr/local/bin/fortls",
-    // プリプロセッサを有効にするファイルの拡張子
-    "fortran.fortls.preprocessor.suffixes": [
-        "F90"
-    ],
-    //
-    // ▼▼▼ 以下の linter 設定はプロジェクトルートの .fortls ファイルに移行しました ▼▼▼
-    // fortran.linter.includePaths -> .fortls の "mod_dirs"
-    // fortran.linter.extraArgs    -> .fortls の "preprocessor.defines"
-    // fortran.linter.compiler* -> fortlsが自動で判断するため不要
-    // fortran.linter.modOutput    -> fortlsが自動で判断するため不要
-    //
-    // --- フォーマッター (fprettify) ---
-    "fortran.formatting.formatter": "fprettify",
-    // fprettifyの引数を整理しました
-    "fortran.formatting.fprettifyArgs": [
-        "--indent",
-        "4",
-        "--enable-decl",
-        "--line-length",
-        "256",
-        "--strip-comments",
-        "--silent"
-    ],
-    "fortran.preferredCase": "lowercase",
-    // =========================================================================
-    // UI カスタマイズ
-    // =========================================================================
+    "docker.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
     "workbench.colorCustomizations": {
         "editor.background": "#2e282c"
     },
     "editor.tokenColorCustomizations": {
         "comments": {
             "foreground": "#876487",
-            "fontStyle": "italic"
+            "fontStyle": "italic",
         },
         "functions": "#99bcf0",
         "keywords": "#dbf",
         "numbers": "#f99",
         "strings": "#df8",
         "types": "#fb6",
-        "variables": "#ddd"
+        "variables": "#ddd",
     },
-    // =========================================================================
-    // Docker / コンテナ設定
-    // =========================================================================
-    "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh"
+    "editor.rulers": [
+        132
+    ],
+    "fortran.fortls.preprocessor.suffixes": [
+        "F90"
+    ],
+    "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
+    "fortran.linter.fypp.path": "",
 }

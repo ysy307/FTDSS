@@ -1,16 +1,17 @@
 {
     "source_dirs": [
         "**/src",
-        "**/source"
+        "**/app",
+        "**/test"
     ],
     "mod_dirs": [
         "/opt/intel/oneapi/mpi/2021.14/include/mpi",
         "/opt/intel/oneapi/2025.0/include/mpi",
-        "third_party/.local/include",
-        "third_party/.local/jsonfortran-*/lib",
-        "third_party/.local/include/fortran_stdlib/**/*",
-        "third_party/.local/jsonfortran-intelllvm-*/lib",
-        "CMakeBuild/.mod"
+        "/workspaces/FTDSS/third_party/.local/include",
+        "/workspaces/FTDSS/third_party/.local/jsonfortran-*/lib",
+        "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/**/*",
+        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-*/lib",
+        "/workspaces/FTDSS/CMakeBuild/.mod"
     ],
     "preprocessor": {
         "defines": [
@@ -18,13 +19,13 @@
         ]
     },
     "exclude_files": [
+        "CMakeBuild/**",
         "third_party/**",
         ".git/**",
         ".vscode/**",
         ".archive/**",
         ".devcontainer/**",
         "build/**",
-        "CMakeBuild/**",
         "github/**",
         "docs/**",
         "fpm/**",
