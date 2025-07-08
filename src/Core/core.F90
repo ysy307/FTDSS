@@ -13,7 +13,7 @@ module core_core
     use :: core_types_variable, only:type_variable
     use :: core_types_gauss, only:type_gauss_point_state
 
-    use :: core_vtk_vtk, only:type_vtk, type_vtk_cells
+    use :: core_vtk, only:type_vtk, type_vtk_cells
     use :: core_vtk_vtk_constants
     implicit none
 

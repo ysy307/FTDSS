@@ -6,7 +6,7 @@ contains
         class(Abstract_Thermal), allocatable :: Structure
         type(Type_Input), intent(inout) :: Input
         type(type_dp_3d), intent(inout), pointer :: Coordinate
-        type(Domain_t), intent(inout) :: Domain
+        type(type_domain), intent(inout) :: Domain
 
         ! integer(int32) :: CountElements, CountSides
         ! integer(int32) :: iCell, iElem, iSide, idx
@@ -19,7 +19,7 @@ contains
         if (allocated(Structure)) deallocate (Structure)
         allocate (Type_Thermal_3Phase_2D :: Structure)
 
-        nNode = Domain%get_numNode()
+        nNode = Domain%get_num_nodes()
 
         ! print *, "RCM inverse permutation:"
         ! print *, Domain%RCM_inv_perm(:)
@@ -126,7 +126,7 @@ contains
     module subroutine Type_Thermal_3Phase_2D_Assemble(self, Domain, Property, Porosity, dt, step, iter)
         implicit none
         class(Type_Thermal_3Phase_2D), intent(inout) :: self
-        type(Domain_t), intent(inout) :: Domain
+        type(type_domain), intent(inout) :: Domain
         type(Proereties_Model_t), intent(inout) :: Property
         real(real64), intent(in) :: Porosity(:)
         real(real64), intent(in) :: dt

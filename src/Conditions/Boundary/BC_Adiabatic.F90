@@ -1,6 +1,6 @@
 submodule(Condition_Boundary) Condition_Boundary_Adiabatic
     ! use, intrinsic :: iso_fortran_env
-    ! use :: Domain_Module, only:Domain_t
+    ! use :: Domain_Module, only:type_domain
     ! use :: Matrix_CRS, only:Type_CRS
     ! use :: Inout_Input, only:Input_Boundary
     implicit none
@@ -12,7 +12,7 @@ contains
         type(Input_Boundary), intent(in) :: Input_BC
         real(real64), intent(in) :: time_conv
         integer(int32), intent(in) :: iGroup
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
 
         self%is_uniform = Input_BC%Heat(iGroup)%isUniform
         allocate (self%time_points, source=Input_BC%Time)
@@ -30,7 +30,7 @@ contains
         real(real64), intent(in) :: current_time
         real(real64), intent(inout), optional :: A(:, :)
         real(real64), intent(inout) :: b(:)
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
         integer(int32), intent(in), optional :: mode
 
     end subroutine apply_Dense_Thermal_Adiabatic
@@ -41,7 +41,7 @@ contains
         real(real64), intent(in) :: current_time
         type(Type_CRS), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
         integer(int32), intent(in), optional :: mode
 
         ! real(real64) :: Dval, timeCoe

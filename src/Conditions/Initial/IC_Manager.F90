@@ -6,7 +6,7 @@ module Conditions_Initial_Manager
     use :: Condition_Initial
     use :: Inout_Input, only:Type_Input
     use :: core_core, only:type_variable
-    use :: Domain_Module, only:Domain_t
+    use :: Domain_Module, only:type_domain
     implicit none
     private
     public :: ICManager
@@ -61,7 +61,7 @@ contains
     subroutine apply(self, physics, domain, var)
         class(ICManager), intent(in) :: self
         character(len=*), intent(in) :: physics
-        type(Domain_t), intent(in) :: domain
+        type(type_domain), intent(in) :: domain
         type(type_variable), intent(inout) :: var
 
         select case (trim(adjustl(physics)))

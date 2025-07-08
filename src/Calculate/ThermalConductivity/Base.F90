@@ -1,5 +1,5 @@
 submodule(Calculate_ThermalConductivity) Calc_THC_Base
-
+    implicit none
 contains
     module subroutine THCHolder_initialize(self, iRegion, Input)
         implicit none

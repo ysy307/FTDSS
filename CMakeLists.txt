@@ -48,8 +48,8 @@ include(Toolchain)
 # Source Files
 add_subdirectory(src/core)
 add_subdirectory(src/Inout/Input)
-add_subdirectory(src/Domain)
 add_subdirectory(src/Matrix)
+add_subdirectory(src/Domain)
 add_subdirectory(src/Calculate/BLAS)
 add_subdirectory(src/Calculate/WRF)
 add_subdirectory(src/Calculate/HCF)
@@ -80,6 +80,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
     target_link_libraries(ysy_fc PRIVATE
         Core
         Input
+        Matrix
         Domain
         Calc_WRF
         Calc_HCF
@@ -89,7 +90,6 @@ if(BUILD_APP STREQUAL "ysy_fc")
         Calc_SPH
         Calc_VHC
         Properties
-        Matrix
         Calc_BLAS
         Boundary
         Initial
@@ -115,6 +115,7 @@ elseif(BUILD_APP STREQUAL "test")
     target_link_libraries(test PRIVATE
         Core
         Input
+        Matrix
         Domain
         Calc_WRF
         Calc_HCF
@@ -124,7 +125,6 @@ elseif(BUILD_APP STREQUAL "test")
         Calc_SPH
         Calc_VHC
         Properties
-        Matrix
         Calc_BLAS
         Boundary
         Initial

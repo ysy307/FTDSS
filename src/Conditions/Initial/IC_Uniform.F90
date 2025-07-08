@@ -23,7 +23,7 @@ contains
 
     module subroutine apply_uniform(self, domain, var)
         class(IC_Uniform), intent(in) :: self
-        type(Domain_t), intent(in) :: domain
+        type(type_domain), intent(in) :: domain
         type(type_variable), intent(inout) :: var
         ! Your implementation for applying IC_Uniform
         var%new(:) = self%value

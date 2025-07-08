@@ -3,7 +3,7 @@ module Condition_Boundary
     ! use :: Core_BaseTypes
     use :: Core_Allocate
     use :: Domain_Side, only:SideHolder
-    use :: Domain_Module, only:Domain_t
+    use :: Domain_Module, only:type_domain
     use :: core_core
     use :: Matrix_CRS
     use :: Inout_Input
@@ -42,34 +42,34 @@ module Condition_Boundary
     ! 手続きのインターフェース定義
     abstract interface
         subroutine Abst_Setup_BC(self, Input_BC, time_conv, iGroup, Domain)
-            import :: Abst_BC_Thermal, Input_Boundary, int32, Domain_t, real64
+            import :: Abst_BC_Thermal, Input_Boundary, int32, type_domain, real64
             implicit none
             class(Abst_BC_Thermal), intent(inout) :: self
             type(Input_Boundary), intent(in) :: Input_BC
             real(real64), intent(in) :: time_conv
             integer(int32), intent(in) :: iGroup
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
         end subroutine Abst_Setup_BC
 
         subroutine Abst_Apply_BC_Dence(self, current_time, A, b, Domain, mode)
-            import :: Abst_BC_Thermal, real64, Domain_t, int32
+            import :: Abst_BC_Thermal, real64, type_domain, int32
             implicit none
             class(Abst_BC_Thermal), intent(in) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(inout), optional :: A(:, :)
             real(real64), intent(inout) :: b(:)
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
             integer(int32), intent(in), optional :: mode
         end subroutine Abst_Apply_BC_Dence
 
         subroutine Abst_Apply_BC_Sparse_CRS(self, current_time, A, b, Domain, mode)
-            import :: Abst_BC_Thermal, real64, Type_CRS, Domain_t, int32
+            import :: Abst_BC_Thermal, real64, Type_CRS, type_domain, int32
             implicit none
             class(Abst_BC_Thermal), intent(in) :: self
             real(real64), intent(in) :: current_time
             type(Type_CRS), intent(inout), optional :: A
             real(real64), intent(inout) :: b(:)
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
             integer(int32), intent(in), optional :: mode
         end subroutine Abst_Apply_BC_Sparse_CRS
 
@@ -90,7 +90,7 @@ module Condition_Boundary
             type(Input_Boundary), intent(in) :: Input_BC
             real(real64), intent(in) :: time_conv
             integer(int32), intent(in) :: iGroup
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
 
         end subroutine setup_Thermal_Dirichlet
 
@@ -100,7 +100,7 @@ module Condition_Boundary
             real(real64), intent(in) :: current_time
             real(real64), intent(inout), optional :: A(:, :)
             real(real64), intent(inout) :: b(:)
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_Dense_Thermal_Dirichlet
@@ -111,7 +111,7 @@ module Condition_Boundary
             real(real64), intent(in) :: current_time
             type(Type_CRS), intent(inout), optional :: A
             real(real64), intent(inout) :: b(:)
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_CRS_Thermal_Dirichlet
@@ -135,7 +135,7 @@ module Condition_Boundary
             type(Input_Boundary), intent(in) :: Input_BC
             real(real64), intent(in) :: time_conv
             integer(int32), intent(in) :: iGroup
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
 
         end subroutine setup_Thermal_Adiabatic
 
@@ -145,7 +145,7 @@ module Condition_Boundary
             real(real64), intent(in) :: current_time
             real(real64), intent(inout), optional :: A(:, :)
             real(real64), intent(inout) :: b(:)
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_Dense_Thermal_Adiabatic
@@ -156,7 +156,7 @@ module Condition_Boundary
             real(real64), intent(in) :: current_time
             type(Type_CRS), intent(inout), optional :: A
             real(real64), intent(inout) :: b(:)
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_CRS_Thermal_Adiabatic
@@ -349,7 +349,7 @@ module Condition_Boundary
 
         module subroutine Find_Target_Edges_By_Group(Domain, Input_BC, iGroup, target_edges)
             implicit none
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
             type(Input_Boundary), intent(in) :: Input_BC
             integer(int32), intent(in) :: iGroup
             integer(int32), allocatable, intent(inout) :: target_edges(:, :)

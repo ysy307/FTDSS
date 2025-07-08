@@ -29,7 +29,7 @@ contains
         ! e.g., use :: Domain_Side, only: Abst_SideType, SideHolder
         ! e.g., use :: Core_Vtk, only: VTK_LINE, VTK_QUADRATIC_EDGE
         implicit none
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
         type(Input_Boundary), intent(in) :: Input_BC
         integer(int32), intent(in) :: iGroup
         integer(int32), allocatable, intent(inout) :: target_edges(:, :)
@@ -40,7 +40,7 @@ contains
 
         ! 1. Count segments
         num_total_segments = 0
-        num_Sides = Domain%get_numSide() ! Assuming Domain%get_numSides() is a valid function
+        num_Sides = Domain%get_num_sides() ! Assuming Domain%get_numSides() is a valid function
         do i = 1, num_Sides
             ! Check if the polymorphic component 's' is allocated before using it
             if (allocated(Domain%Sides(i)%s)) then

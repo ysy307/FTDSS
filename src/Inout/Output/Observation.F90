@@ -24,7 +24,7 @@ contains
         class(Output_Observation), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(inout), pointer :: Coordinate
-        type(Domain_t), intent(in), optional :: Domain
+        type(type_domain), intent(in), optional :: Domain
 
         integer(int32) :: iObs, iElem, nElements
         integer(int32) :: local_group_id, local_type, ierr
@@ -47,7 +47,7 @@ contains
             else
                 if (Input%Basic%DimensionType == 1) then
                     do iObs = 1, self%NumObservation
-                        nElements = Domain%get_numElement()
+                        nElements = Domain%get_num_elements()
                         do iElem = 1, nElements
                             call Domain%Elements(iElem)%e%is_inside(self%Cood_Obs%x(iObs), &
                                                                     self%Cood_Obs%y(iObs), &
@@ -72,7 +72,7 @@ contains
                     end do
                 else if (Input%Basic%DimensionType == 2) then
                     do iObs = 1, self%NumObservation
-                        nElements = Domain%get_numElement()
+                        nElements = Domain%get_num_elements()
                         do iElem = 1, nElements
                             call Domain%Elements(iElem)%e%is_inside(self%Cood_Obs%x(iObs), &
                                                                     self%Cood_Obs%z(iObs), &
@@ -203,7 +203,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(Domain_t), intent(in), optional :: Domain
+        type(type_domain), intent(in), optional :: Domain
 
         integer(int32) :: iObs
         real(real64), allocatable :: Original_Temperature(:)
@@ -233,7 +233,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(Domain_t), intent(in), optional :: Domain
+        type(type_domain), intent(in), optional :: Domain
 
         type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
@@ -278,7 +278,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(Domain_t), intent(in), optional :: Domain
+        type(type_domain), intent(in), optional :: Domain
 
         type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
@@ -324,7 +324,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(Domain_t), intent(in), optional :: Domain
+        type(type_domain), intent(in), optional :: Domain
 
         type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
@@ -370,7 +370,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(Domain_t), intent(in), optional :: Domain
+        type(type_domain), intent(in), optional :: Domain
         ! Note: nodal_Pw is optional, if not present, pressure is assumed to be 101325.0d0
 
         type(type_gauss_point_state) :: state
@@ -466,7 +466,7 @@ contains
         class(Abstract_Thermal), intent(inout), optional :: Thermal
         real(real64), intent(in), optional :: phi(:)
         type(Proereties_Model_t), intent(inout), optional :: Propeties
-        type(Domain_t), intent(in), optional :: Domain
+        type(type_domain), intent(in), optional :: Domain
 
         real(real64) :: obsValues(self%Observation%NumObservation)
         real(real64) :: tmpValues(self%Observation%NumObservation)

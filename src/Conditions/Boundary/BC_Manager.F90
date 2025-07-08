@@ -34,7 +34,7 @@ contains
     subroutine setup_BC_Manager(self, Input, Domain)
         class(BCManager), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
 
         ! class(json_value), intent(in) :: json_bc_obj ! "BoundaryConditions"に対応するJSONオブジェクト
         integer(int32), allocatable :: group_ids(:)
@@ -87,7 +87,7 @@ contains
         real(real64), intent(in) :: current_time
         type(Type_CRS), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
         integer(int32), intent(in), optional :: mode
 
         integer(int32) :: iGroup

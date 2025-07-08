@@ -6,7 +6,7 @@
 module Condition_Initial
     use, intrinsic :: iso_fortran_env
     use :: core_core, only:type_variable
-    use :: Domain_Module, only:Domain_t
+    use :: Domain_Module, only:type_domain
     use :: Inout_Input, only:Type_Input
     implicit none
     private
@@ -57,9 +57,9 @@ module Condition_Initial
         end subroutine
 
         subroutine apply_ic_abstract(self, domain, var)
-            import :: Abstract_IC, Domain_t, type_variable
+            import :: Abstract_IC, type_domain, type_variable
             class(Abstract_IC), intent(in) :: self
-            type(Domain_t), intent(in) :: domain
+            type(type_domain), intent(in) :: domain
             type(type_variable), intent(inout) :: var
         end subroutine
     end interface
@@ -76,7 +76,7 @@ module Condition_Initial
 
         module subroutine apply_uniform(self, domain, var)
             class(IC_Uniform), intent(in) :: self
-            type(Domain_t), intent(in) :: domain
+            type(type_domain), intent(in) :: domain
             type(type_variable), intent(inout) :: var
         end subroutine
 
@@ -88,7 +88,7 @@ module Condition_Initial
 
         module subroutine apply_laplace(self, domain, var)
             class(IC_Laplace), intent(in) :: self
-            type(Domain_t), intent(in) :: domain
+            type(type_domain), intent(in) :: domain
             type(type_variable), intent(inout) :: var
         end subroutine
     end interface

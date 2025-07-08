@@ -23,7 +23,7 @@ contains
 
     module subroutine apply_Laplace(self, domain, var)
         class(IC_Laplace), intent(in) :: self
-        type(Domain_t), intent(in) :: domain
+        type(type_domain), intent(in) :: domain
         type(type_variable), intent(inout) :: var
         ! Your implementation for applying IC_Laplace
         ! var%new(:) = self%value

@@ -7,13 +7,13 @@ module Main_FTDSS
     use :: Inout_Input
     use :: control_control, only:type_time, type_iteration
     use :: Inout_Output
-    use :: Domain_Module, only:Domain_t
+    use :: Domain_Module, only:type_domain
     use :: Properties_Model_Base, only:Proereties_Model_t
     use :: Conditions_Boundary_Manager, only:BCManager
     use :: Conditions_Initial_Manager, only:ICManager
 
-    use :: Matrix_RCM, only:RCM_Reorder, RCM_Reorder_Inverse
-    use :: Matrix_Multicoloring, only:Multicoloring
+    ! use :: Matrix_RCM, only:RCM_Reorder, RCM_Reorder_Inverse
+    ! use :: Matrix_Multicoloring, only:Multicoloring
 
     use :: Main_Thermal
     implicit none
@@ -22,7 +22,7 @@ module Main_FTDSS
         type(Type_Input) :: Input
 
         type(type_dp_3d), pointer :: Coordinate
-        type(Domain_t) :: Domain
+        type(type_domain) :: Domain
         ! type(Belonging), allocatable :: NodeBelonging(:)
         class(Abstract_Thermal), allocatable :: Thermal
 

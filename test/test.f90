@@ -40,7 +40,7 @@ program test
 
     call FTDSS%time%Profile_Start("IO")
     call FTDSS%Output%Overall%Output(fc=count, &
-                                     iperm=FTDSS%Domain%RCM_perm, &
+                                     iperm=FTDSS%Domain%rcm%perm, &
                                      Temp=FTDSS%Thermal%T%pre, &
                                      Si=FTDSS%Thermal%Qice%pre)
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
@@ -160,7 +160,7 @@ program test
         if (mod(FTDSS%Iteration%step, 10) == 0) then
             count = count + 1
             call FTDSS%Output%Overall%Output(fc=count, &
-                                             iperm=FTDSS%Domain%RCM_perm, &
+                                             iperm=FTDSS%Domain%rcm%perm, &
                                              Temp=FTDSS%Thermal%T%pre, &
                                              Si=FTDSS%Thermal%Qice%pre)
         end if

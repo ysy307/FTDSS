@@ -2,7 +2,7 @@ module Matrix_CRS
     use, intrinsic :: iso_fortran_env, only: int32, real64, logical32
     use :: stdlib_sorting, only:sort
     use :: core_core, only:allocate_array
-    use :: Domain_Module, only:Domain_t
+    use :: Domain_Module, only:type_domain
     implicit none
     private
 
@@ -40,7 +40,7 @@ contains
 
     function Initialize_CRS(Domain) result(A)
         implicit none
-        class(Domain_t), intent(in) :: Domain
+        class(type_domain), intent(in) :: Domain
         type(Type_CRS) :: A
 
         ! --- ローカル変数宣言 ---
@@ -56,8 +56,8 @@ contains
         integer(int32) :: old_iN, col_count
 
         ! --- 初期設定 ---
-        nNode = Domain%get_numNode()
-        nElement = Domain%get_numElement()
+        nNode = Domain%get_num_nodes()
+        nElement = Domain%get_num_elements()
         A%nrow = nNode
         A%nptr = nNode + 1
 

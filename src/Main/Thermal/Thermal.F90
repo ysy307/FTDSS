@@ -3,7 +3,7 @@ module Main_Thermal
     use :: Core_Core, only:allocate_array, deallocate_array, type_variable, type_dp_3d
     ! use :: Core_BaseTypes
     ! use :: Core_Allocate, only:Allocate_Array
-    use :: Domain_Module, only:Domain_t
+    use :: Domain_Module, only:type_domain
     use :: Properties_Model_Base, only:Proereties_Model_t
     ! use :: Core_Element
     ! use :: Core_Side
@@ -13,13 +13,15 @@ module Main_Thermal
     ! use :: Calculate_Density
     ! use :: Calculate_SpecificHeat
     ! use :: Calculate_HeatCapacity
-    use :: Matrix_Assemble
+    ! use :: Matrix_Assemble
     use :: Matrix_CRS
     ! use :: Condition_Initial
     use :: Condition_Boundary
     use :: Solver_Solve
     use :: control_control, only:type_time
     ! use :: Matrix_RCM, only:RCM_Reorder, RCM_Reorder_Inverse
+
+    use :: thermal_thermal_assemble, only:Assemble_Mass_Heat_1_Parallel, Assemble_Diffusion_Heat_1_Parallel
     implicit none
 
     type, abstract :: Abstract_Thermal
@@ -83,10 +85,10 @@ module Main_Thermal
         ! end subroutine Abstract_Update
 
         subroutine Abstract_Assemble(self, Domain, Property, Porosity, dt, step, iter)
-            import :: Abstract_Thermal, int32, real64, Domain_t, Proereties_Model_t
+            import :: Abstract_Thermal, int32, real64, type_domain, Proereties_Model_t
             implicit none
             class(Abstract_Thermal), intent(inout) :: self
-            type(Domain_t), intent(inout) :: Domain
+            type(type_domain), intent(inout) :: Domain
             type(Proereties_Model_t), intent(inout) :: Property
             real(real64), intent(in) :: Porosity(:)
             real(real64), intent(in) :: dt
@@ -102,7 +104,7 @@ module Main_Thermal
             class(Abstract_Thermal), allocatable :: Structure
             type(Type_Input), intent(inout) :: Input
             type(type_dp_3d), intent(inout), pointer :: Coordinate
-            type(Domain_t), intent(inout) :: Domain
+            type(type_domain), intent(inout) :: Domain
 
         end function Type_Thermal_3Phase_2D_Construct
 
@@ -117,7 +119,7 @@ module Main_Thermal
         module subroutine Type_Thermal_3Phase_2D_Assemble(self, Domain, Property, Porosity, dt, step, iter)
             implicit none
             class(Type_Thermal_3Phase_2D), intent(inout) :: self
-            type(Domain_t), intent(inout) :: Domain
+            type(type_domain), intent(inout) :: Domain
             type(Proereties_Model_t), intent(inout) :: Property
             real(real64), intent(in) :: Porosity(:)
             real(real64), intent(in) :: dt

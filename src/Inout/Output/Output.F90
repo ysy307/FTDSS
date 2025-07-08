@@ -11,8 +11,8 @@ module Inout_Output
     use :: Domain_Element, only:ElementHolder
     use :: Domain_Element_Factory, only:Create_Element
     use :: Properties_Model_Base, only:Proereties_Model_t
-    use :: Matrix_RCM, only:Reorder_to_Original
-    use :: Domain_module, only:Domain_t
+    ! use :: Matrix_RCM, only:Reorder_to_Original
+    use :: Domain_module, only:type_domain
     use :: Main_Thermal
     use :: control_control, only:type_time
     use :: stdlib_strings, only:to_string
@@ -78,7 +78,7 @@ module Inout_Output
             class(Output_Observation), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
             type(type_dp_3d), intent(inout), pointer :: Coordinate
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
 
         end subroutine Output_Observation_Initialize
 
@@ -99,7 +99,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Temperature
 
@@ -112,7 +112,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Si
 
@@ -125,7 +125,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_THC
 
@@ -138,7 +138,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_VHC
 
@@ -151,7 +151,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Pw
 
@@ -185,7 +185,7 @@ module Inout_Output
         ! This is the "contract" for the procedure pointer.
         subroutine Abst_Calculate_obs_values(obs_values, observation_data, nodal_temperature, &
                                              nodal_porosity, nodal_Pw, Properties, Domain)
-            import :: real64, Proereties_Model_t, Output_Observation, Domain_t
+            import :: real64, Proereties_Model_t, Output_Observation, type_domain
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
@@ -193,7 +193,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
             type(Proereties_Model_t), intent(in), optional :: Properties
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
         end subroutine Abst_Calculate_obs_values
     end interface
 
@@ -235,7 +235,7 @@ module Inout_Output
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
             type(type_dp_3d), intent(in) :: Coordinate
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
 
         end subroutine Inout_Output_Overall_initialize
 
@@ -244,7 +244,7 @@ module Inout_Output
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
             type(type_dp_3d), intent(in) :: Coordinate
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
 
         end subroutine Inout_Output_Overall_initialize_vtk
 
@@ -253,7 +253,7 @@ module Inout_Output
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
             type(type_dp_3d), intent(in) :: Coordinate
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
 
         end subroutine Inout_Output_Overall_initialize_vtu
 
@@ -449,7 +449,7 @@ module Inout_Output
             class(Abstract_Thermal), intent(inout), optional :: Thermal
             real(real64), intent(in), optional :: phi(:)
             type(Proereties_Model_t), intent(inout), optional :: Propeties
-            type(Domain_t), intent(in), optional :: Domain
+            type(type_domain), intent(in), optional :: Domain
 
         end subroutine Output_Process_Observation
     end interface
@@ -477,7 +477,7 @@ module Inout_Output
             class(Type_Output) :: self
             type(type_time), intent(in) :: time
             type(Type_CRS), intent(in) :: Matrix
-            type(Domain_t), intent(in) :: Domain
+            type(type_domain), intent(in) :: Domain
         end subroutine Output_SystemLog
     end interface
 
@@ -486,7 +486,7 @@ contains
     function Type_Output_Construct(Input, Domain, Coordinate) result(Structure)
         implicit none
         type(Type_Input), intent(in) :: Input
-        class(Domain_t), intent(in), optional :: Domain
+        class(type_domain), intent(in), optional :: Domain
         ! class(Abstract_Thermal), intent(in), optional :: Thermal
         type(type_dp_3d), intent(inout), pointer :: Coordinate
         type(Type_Output) :: Structure

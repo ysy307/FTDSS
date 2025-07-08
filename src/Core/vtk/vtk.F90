@@ -1,4 +1,4 @@
-module core_vtk_vtk
+module core_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
     use :: stdlib_sorting, only:sort
@@ -432,4 +432,4 @@ contains
 
     ! self
 
-end module core_vtk_vtk
+end module core_vtk

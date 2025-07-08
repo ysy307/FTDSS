@@ -19,13 +19,13 @@ contains
         allocate (Solver_CRS_LU :: structure)
         select type (this => structure)
         type is (Solver_CRS_LU)
-            this%N = transfer(N, this%N)
-            this%MAXFCT = transfer(MAXFCT, this%MAXFCT)
-            this%MNUM = transfer(MNUM, this%MNUM)
-            this%MTYPE = transfer(MTYPE, this%MTYPE)
-            this%PHASE = transfer(PHASE, this%PHASE)
-            this%NRHS = transfer(NRHS, this%NRHS)
-            this%MSGLVL = transfer(MSGVLV, this%MSGLVL)
+            this%N = N
+            this%MAXFCT = MAXFCT
+            this%MNUM = MNUM
+            this%MTYPE = MTYPE
+            this%PHASE = PHASE
+            this%NRHS = NRHS
+            this%MSGLVL = MSGVLV
             allocate (this%PERM(N))
             allocate (this%JA(A%nnz))
             allocate (this%IA(A%nptr))
@@ -34,10 +34,10 @@ contains
             call PARDISOINIT(this%PT, this%MTYPE, this%IPARM)
 
             do i = 1, A%nnz
-                this%JA(i) = transfer(A%Ind(i), this%JA(i))
+                this%JA(i) = A%Ind(i)
             end do
             do i = 1, A%nptr
-                this%IA(i) = transfer(A%Ptr(i), this%IA(i))
+                this%IA(i) = A%Ptr(i)
             end do
         end select
 
@@ -52,7 +52,7 @@ contains
         integer(int32), intent(inout) :: status
 
         call PARDISO(self%PT, self%MAXFCT, self%MNUM, self%MTYPE, self%PHASE, self%N, A%Val, self%IA, self%JA, self%PERM, self%NRHS, self%IPARM, self%MSGLVL, b, x, self%ERROR)
-        status = transfer(self%ERROR, status)
+        status = self%ERROR
 
     end subroutine Solve_CRS_LU
 
@@ -78,7 +78,7 @@ contains
         allocate (Solver_Full_LU :: structure)
         select type (this => structure)
         type is (Solver_Full_LU)
-            this%N = transfer(N, this%N)
+            this%N = N
             allocate (this%IPIV(this%N))
         end select
 
@@ -102,7 +102,7 @@ contains
 
         x(:) = b(:)
 
-        status = transfer(self%ERROR, status)
+        status = self%ERROR
 
     end subroutine Solve_Full_LU
 

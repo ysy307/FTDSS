@@ -7,7 +7,7 @@ contains
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(in) :: Coordinate
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
 
         select case (self%fextend)
         case (".vtk")
@@ -26,7 +26,7 @@ contains
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(in) :: Coordinate
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
 
         integer(int32) :: i, j, idx, total
 
@@ -60,7 +60,7 @@ contains
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(in) :: Coordinate
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
 
         integer(int32) :: i, j, idx, total
 

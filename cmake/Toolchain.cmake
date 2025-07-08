@@ -7,11 +7,22 @@ if(ENABLE_MPI AND NOT TARGET MPI::MPI_Fortran)
 endif()
 
 if(ENABLE_MKL AND NOT TARGET MKL::MKL)
-    set(MKL_INTERFACE_FULL intel_lp64 CACHE STRING "Use 32-bit integers for MKL")
+    # ILP64版を使うためのオプションを追加
+    option(ENABLE_MKL_ILP64 "Enable MKL ILP64 interface" OFF)
+
+    if(ENABLE_MKL_ILP64)
+        set(MKL_INTERFACE_LAYER "ILP64")
+        message(STATUS "MKL Interface: ILP64 (64-bit integers)")
+    else()
+        set(MKL_INTERFACE_LAYER "LP64")
+        message(STATUS "MKL Interface: LP64 (32-bit integers)")
+    endif()
+
+    # set(... CACHE ...) の代わりに通常の set を使う方が意図が明確
     set(MKL_LINK static CACHE STRING "Static MKL linking")
-    set(MKL_THREADING intel_thread CACHE STRING "Use Intel OpenMP threading")
-    set(MKL_MPI intelmpi CACHE STRING "Use Intel MPI")
-    find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
+    set(MKL_THREADING "intel_thread")
+
+    find_package(MKL CONFIG REQUIRED)
 endif()
 
 if(NOT TARGET fortran_stdlib::fortran_stdlib)
@@ -102,12 +113,24 @@ function(enable_build_flags target)
     endif()
 
     if(ENABLE_MKL)
-        target_compile_options(${target} PUBLIC
-            $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>
-        )
-        target_include_directories(${target} PUBLIC
-            $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>
-        )
+        # MKLターゲットからコンパイルオプションとインクルードディレクトリを取得
+        get_target_property(MKL_COMPILE_OPTIONS MKL::MKL INTERFACE_COMPILE_OPTIONS)
+        get_target_property(MKL_INCLUDE_DIRS MKL::MKL INTERFACE_INCLUDE_DIRECTORIES)
+
+        if(ENABLE_MKL_ILP64)
+            # ILP64版の場合、-i8 オプションをリストから除去
+            list(REMOVE_ITEM MKL_COMPILE_OPTIONS "-i8")
+            
+            # ★★★ MKLのインクルードパスは追加しない ★★★
+            # これにより、自前で定義した安全なインターフェースが使われる
+        else()
+            # LP64版の場合は、通常通りインクルードパスを追加
+            target_include_directories(${target} PUBLIC ${MKL_INCLUDE_DIRS})
+        endif()
+
+        # 処理したコンパイルオプションを追加
+        target_compile_options(${target} PUBLIC ${MKL_COMPILE_OPTIONS})
+        
         target_link_libraries(${target} PUBLIC MKL::MKL)
         target_compile_definitions(${target} PUBLIC _MKL)
     endif()

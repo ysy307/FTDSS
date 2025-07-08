@@ -1,10 +1,10 @@
-module Matrix_Assemble
+module thermal_thermal_assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: core_core, only:type_gauss_point_state
     use :: Properties_Model_Base, only:Proereties_Model_t
     use :: Matrix_CRS
-    use :: Domain_Module, only:Domain_t
-    use :: Matrix_RCM, only:Reorder_to_Original
+    use :: Domain_Module, only:type_domain
+    ! use :: Matrix_RCM, only:Reorder_to_Original
 #ifdef _OPENMP
     use omp_lib
 #endif
@@ -18,7 +18,7 @@ contains
     subroutine Assemble_Mass_Heat_1(A, Domain, Temperature, Porosity, Propeties)
         implicit none
         type(Type_CRS), intent(inout) :: A
-        type(Domain_t) :: Domain
+        type(type_domain) :: Domain
         real(real64), intent(in) :: Temperature(:)
         real(real64), intent(in) :: Porosity(:)
         type(Proereties_Model_t), intent(inout) :: Propeties
@@ -49,7 +49,7 @@ contains
         State%pressure = 101325.0d0
         State%water_content = 0.0d0
 
-        nElements = Domain%get_numElement()
+        nElements = Domain%get_num_elements()
         do iE = 1, nElements
             nNodes = Domain%Elements(iE)%e%get_size()
             iRegion = Domain%Elements(iE)%e%get_group()
@@ -96,7 +96,7 @@ contains
         implicit none
 
         type(Type_CRS), intent(inout) :: A
-        type(Domain_t), intent(inout) :: Domain
+        type(type_domain), intent(inout) :: Domain
         real(real64), intent(in) :: Temperature(:)
         real(real64), intent(in) :: Porosity(:)
         type(Proereties_Model_t), intent(inout) :: Propeties
@@ -195,7 +195,7 @@ contains
         implicit none
         ! --- 引数 ---
         type(Type_CRS), intent(inout) :: A
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(in) :: Domain
         real(real64), intent(in) :: Temperature(:)
         real(real64), intent(in) :: Porosity(:)
         type(Proereties_Model_t), intent(inout) :: Propeties ! MaterialManagerに相当
@@ -299,7 +299,7 @@ contains
         implicit none
 
         type(Type_CRS), intent(inout) :: A
-        type(Domain_t), intent(inout) :: Domain
+        type(type_domain), intent(inout) :: Domain
         real(real64), intent(in) :: Temperature(:)
         real(real64), intent(in) :: Porosity(:)
         type(Proereties_Model_t), intent(inout) :: Propeties
@@ -406,4 +406,4 @@ contains
 
     end subroutine Assemble_Diffusion_Heat_1_Parallel
 
-end module Matrix_Assemble
+end module thermal_thermal_assemble
