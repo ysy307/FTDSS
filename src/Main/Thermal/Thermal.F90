@@ -1,9 +1,9 @@
 module Main_Thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_Core, only:allocate_array, deallocate_array, type_variable, type_dp_3d
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d
     ! use :: Core_BaseTypes
     ! use :: Core_Allocate, only:Allocate_Array
-    use :: Domain_Module, only:type_domain
+    use :: module_domain, only:type_domain
     use :: Properties_Model_Base, only:Proereties_Model_t
     ! use :: Core_Element
     ! use :: Core_Side

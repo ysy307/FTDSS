@@ -1,6 +1,6 @@
 module thermal_thermal_assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: core_core, only:type_gauss_point_state
+    use :: module_core, only:type_gauss_point_state
     use :: Properties_Model_Base, only:Proereties_Model_t
     use :: Matrix_CRS
     use :: Domain_Module, only:type_domain

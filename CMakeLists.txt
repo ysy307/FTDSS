@@ -67,6 +67,33 @@ add_subdirectory(src/Main/Thermal)
 add_subdirectory(src/Inout/Output)
 add_subdirectory(src/Main/FTDSS)
 
+# =========================================================================
+# ★改善点1: 全ての共通ライブラリをグループ化するINTERFACEライブラリを定義
+# =========================================================================
+add_library(CommonLibs INTERFACE)
+target_link_libraries(CommonLibs INTERFACE
+    Core
+    Input
+    Matrix 
+    Domain 
+    Calc_WRF
+    Calc_HCF
+    Calc_GCC
+    Calc_THC
+    Calc_DEN
+    Calc_SPH
+    Calc_VHC
+    Properties
+    Calc_BLAS
+    Boundary
+    Initial
+    Solver
+    control
+    Thermal
+    Output
+    FTDSS
+)
+
 # Debug Information
 message(STATUS "Fortran Compiler ID: ${CMAKE_Fortran_COMPILER_ID}")
 
@@ -77,30 +104,10 @@ set(TEST_FILE "${PROJECT_SOURCE_DIR}/test/test.F90")
 if(BUILD_APP STREQUAL "ysy_fc")
     # ysy_fc Target
     add_executable(ysy_fc ${MAIN_FILE})
-    target_link_libraries(ysy_fc PRIVATE
-        Core
-        Input
-        Matrix
-        Domain
-        Calc_WRF
-        Calc_HCF
-        Calc_GCC
-        Calc_THC
-        Calc_DEN
-        Calc_SPH
-        Calc_VHC
-        Properties
-        Calc_BLAS
-        Boundary
-        Initial
-        Solver
-        control
-        Thermal
-        Output
-        FTDSS
-    )
+    target_link_libraries(ysy_fc PRIVATE CommonLibs)
     enable_build_flags(ysy_fc)
     enable_thirdparty (ysy_fc)
+    set_target_properties(ysy_fc PROPERTIES LINKER_LANGUAGE Fortran)
 
 
     # Custom Run Target
@@ -112,33 +119,12 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
-    target_link_libraries(test PRIVATE
-        Core
-        Input
-        Matrix
-        Domain
-        Calc_WRF
-        Calc_HCF
-        Calc_GCC
-        Calc_THC
-        Calc_DEN
-        Calc_SPH
-        Calc_VHC
-        Properties
-        Calc_BLAS
-        Boundary
-        Initial
-        Solver
-        control
-        Thermal
-        Output
-        FTDSS
-    )
+    target_link_libraries(test PRIVATE CommonLibs)
     enable_build_flags(test)
     enable_thirdparty (test)
     set_target_properties(test PROPERTIES LINKER_LANGUAGE Fortran)
-
 endif()
+
 
 # Final Messages
 if(BUILD_APP STREQUAL "")

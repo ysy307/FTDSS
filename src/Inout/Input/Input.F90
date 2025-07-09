@@ -1,9 +1,9 @@
 module Inout_Input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
-    use :: core_core, only:type_vtk, type_dp_3d
-    use :: Core_Allocate
-    use :: Core_Error
+    use :: module_core, only:type_vtk, type_dp_3d, allocate_array, deallocate_array, error_message
+    ! use :: Core_Allocate
+    ! use :: Core_Error
     ! use :: Condition_Fix_Boundary
     use :: json_module, only:json_file
     implicit none

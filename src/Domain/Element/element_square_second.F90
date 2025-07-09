@@ -1,11 +1,11 @@
-submodule(Domain_Element) Domain_Element_SquareSecond
+submodule(Domain_Element) Domain_Element_square_second
     implicit none
 contains
 
     !----------------------------------------------------------------------!
-    ! SquareSecond_Construct:
+    ! construct_square_second:
     !----------------------------------------------------------------------!
-    ! This function constructs a SquareSecond element object based on the
+    ! This function constructs a square_second element object based on the
     ! given element index, global nodal coordinates, connectivity, and
     ! spatial dimension type.
     !
@@ -20,75 +20,77 @@ contains
     !                       nodes that form the square element.
     !
     ! Return Value:
-    !   Structure         : Allocated polymorphic object of type
-    !                       SquareSecond (extends Abstract_ElementType).
+    !   element         : Allocated polymorphic object of type
+    !                       square_second (extends Abstract_ElementType).
     !
     ! Function Details:
-    !   - Allocates a new SquareSecond element object.
+    !   - Allocates a new square_second element object.
     !   - Stores element ID and connectivity information.
     !   - Links to the corresponding global coordinates for each node.
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
+    module function construct_square_second(id, global_coordinate, cell_info) result(element)
         implicit none
-        integer(int32), intent(in) :: iElem
-        type(type_dp_3d), intent(in), pointer :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(8)
-        integer(int32), intent(in) :: GroupID
-        class(Abst_ElementType), allocatable :: Structure
+        integer(int32), intent(in) :: id
+        type(type_dp_3d), pointer, intent(in) :: global_coordinate
+        type(type_vtk_cell), intent(in) :: cell_info
+        class(abst_element), allocatable :: element
 
-        integer(int32), parameter :: nsize = 8
         integer(int32) :: i
 
-        allocate (SquareSecond :: Structure)
-        Structure%id = iElem
-        Structure%type = 23
-        Structure%group = GroupID
+        if (allocated(element)) deallocate (element)
+        allocate (type_square_second :: element)
 
-        Structure%size = nsize
-        allocate (Structure%conn(nsize))
-        Structure%conn(1:nsize) = Connectivity(1:nsize)
+        element%id = id
+        element%type = cell_info%cell_type
+        element%group = cell_info%cell_entity_id
+        element%dimension = cell_info%get_dimension()
+        element%order = cell_info%get_order()
 
-        allocate (Structure%X(nsize))
-        allocate (Structure%Y(nsize))
-        allocate (Structure%Z(nsize))
-        do i = 1, nsize
-            nullify (Structure%X(i)%val)
-            nullify (Structure%Y(i)%val)
-            nullify (Structure%Z(i)%val)
-            Structure%X(i)%val => Global_Coordinate%x(Structure%conn(i))
-            Structure%Y(i)%val => Global_Coordinate%y(Structure%conn(i))
-            Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
+        element%num_nodes = cell_info%num_nodes_in_cell
+        allocate (element%connectivity(element%num_nodes))
+        element%connectivity(:) = cell_info%connectivity(1:element%num_nodes)
+
+        allocate (element%x(element%num_nodes))
+        allocate (element%y(element%num_nodes))
+        allocate (element%z(element%num_nodes))
+        do i = 1, element%num_nodes
+            nullify (element%x(i)%val)
+            nullify (element%y(i)%val)
+            nullify (element%z(i)%val)
+            element%x(i)%val => global_coordinate%x(element%connectivity(i))
+            element%y(i)%val => global_coordinate%y(element%connectivity(i))
+            element%z(i)%val => global_coordinate%z(element%connectivity(i))
         end do
 
-        Structure%nGauss = 9
-        call allocate_array(Structure%weight, Structure%nGauss)
-        call allocate_array(Structure%gauss, 2_int32, Structure%nGauss)
+        element%num_gauss = 9_int32
+        call allocate_array(element%weight, element%num_gauss)
+        call allocate_array(element%gauss, element%dimension, element%num_gauss)
 
-        Structure%weight(:) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
-                               64.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
-                               25.0d0 / 81.0d0]
-        Structure%gauss(:, 1) = [-sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
-        Structure%gauss(:, 2) = [0.0d0, -sqrt(3.0d0 / 5.0d0)]
-        Structure%gauss(:, 3) = [sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
-        Structure%gauss(:, 4) = [-sqrt(3.0d0 / 5.0d0), 0.0d0]
-        Structure%gauss(:, 5) = [0.0d0, 0.0d0]
-        Structure%gauss(:, 6) = [sqrt(3.0d0 / 5.0d0), 0.0d0]
-        Structure%gauss(:, 7) = [-sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
-        Structure%gauss(:, 8) = [0.0d0, sqrt(3.0d0 / 5.0d0)]
-        Structure%gauss(:, 9) = [sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
+        element%weight(:) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                             64.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                             25.0d0 / 81.0d0]
+        element%gauss(:, 1) = [-sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
+        element%gauss(:, 2) = [0.0d0, -sqrt(3.0d0 / 5.0d0)]
+        element%gauss(:, 3) = [sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
+        element%gauss(:, 4) = [-sqrt(3.0d0 / 5.0d0), 0.0d0]
+        element%gauss(:, 5) = [0.0d0, 0.0d0]
+        element%gauss(:, 6) = [sqrt(3.0d0 / 5.0d0), 0.0d0]
+        element%gauss(:, 7) = [-sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
+        element%gauss(:, 8) = [0.0d0, sqrt(3.0d0 / 5.0d0)]
+        element%gauss(:, 9) = [sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
 
-    end function SquareSecond_Construct
+    end function construct_square_second
 
     !----------------------------------------------------------------------!
-    ! getNumNodes_SquareSecond:
+    ! getNumNodes_square_second:
     !----------------------------------------------------------------------!
     ! This function returns the number of nodes associated with a
-    ! SquareSecond element.
+    ! square_second element.
     !
     ! Arguments:
-    !   self : SquareSecond type object.
+    !   self : square_second type object.
     !          Represents the current square element instance.
     !
     ! Return Value:
@@ -100,46 +102,70 @@ contains
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-    module function get_id_SquareSecond(self) result(id)
+    module function get_id_square_second(self) result(id)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         integer(int32) :: id
 
         id = self%id
-    end function get_id_SquareSecond
+    end function get_id_square_second
 
-    module function get_type_SquareSecond(self) result(type)
+    module function get_type_square_second(self) result(type)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         integer(int32) :: type
 
         type = self%type
-    end function get_type_SquareSecond
+    end function get_type_square_second
 
-    module function get_size_SquareSecond(self) result(n)
+    module function get_num_nodes_square_second(self) result(num_nodes)
         implicit none
-        class(SquareSecond), intent(in) :: self
-        integer(int32) :: n
+        class(type_square_second), intent(in) :: self
+        integer(int32) :: num_nodes
 
-        n = self%size
-    end function get_size_SquareSecond
+        num_nodes = self%num_nodes
+    end function get_num_nodes_square_second
 
-    module function get_group_SquareSecond(self) result(group)
+    module function get_group_square_second(self) result(group)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         integer(int32) :: group
 
         group = self%group
-    end function get_group_SquareSecond
+    end function get_group_square_second
+
+    module function get_dimension_square_second(self) result(dimension)
+        implicit none
+        class(type_square_second), intent(in) :: self
+        integer(int32) :: dimension
+
+        dimension = self%dimension
+    end function get_dimension_square_second
+
+    module function get_order_square_second(self) result(order)
+        implicit none
+        class(type_square_second), intent(in) :: self
+        integer(int32) :: order
+
+        order = self%order
+    end function get_order_square_second
+
+    module function get_num_gauss_square_second(self) result(num_gauss)
+        implicit none
+        class(type_square_second), intent(in) :: self
+        integer(int32) :: num_gauss
+
+        num_gauss = self%num_gauss
+    end function get_num_gauss_square_second
 
     !----------------------------------------------------------------------!
-    ! psi_SquareSecond:
+    ! psi_square_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the shape function ψ_i(ξ, η) for a linear
     ! square element at the given natural coordinates (ξ, η).
     !
     ! Arguments:
-    !   self : SquareSecond type object.
+    !   self : square_second type object.
     !          Represents the square element for which the shape
     !          function is evaluated.
     !
@@ -168,9 +194,9 @@ contains
     !   - Returns 0.0d0 for indices outside the range [1, 8].
     !
     !----------------------------------------------------------------------!
-    module function psi_SquareSecond(self, i, xi, eta) result(psi)
+    module function psi_square_second(self, i, xi, eta) result(psi)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: psi
@@ -195,17 +221,17 @@ contains
         case default
             psi = 0.0d0
         end select
-    end function psi_SquareSecond
+    end function psi_square_second
 
     !----------------------------------------------------------------------!
-    ! dpsi_dxi_SquareSecond:
+    ! dpsi_dxi_square_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
     ! shape function for a linear square element with respect to ξ
     ! at a given η coordinate.
     !
     ! Arguments:
-    !   self : SquareSecond type object.
+    !   self : square_second type object.
     !          Represents the square element for which the derivative
     !          is being evaluated.
     !
@@ -233,9 +259,9 @@ contains
     !   - Returns 0.0 for indices outside [1, 8].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_dxi_SquareSecond(self, i, xi, eta) result(dpsi)
+    module function dpsi_dxi_square_second(self, i, xi, eta) result(dpsi)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
@@ -260,17 +286,17 @@ contains
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_dxi_SquareSecond
+    end function dpsi_dxi_square_second
 
     !----------------------------------------------------------------------!
-    ! dpsi_deta_SquareSecond:
+    ! dpsi_deta_square_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
     ! shape function for a linear square element with respect to η
     ! at a given ξ coordinate.
     !
     ! Arguments:
-    !   self : SquareSecond type object.
+    !   self : square_second type object.
     !          Represents the square element for which the derivative
     !          is being evaluated.
     !
@@ -298,9 +324,9 @@ contains
     !   - Returns 0.0 for indices outside [1, 8].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_deta_SquareSecond(self, i, xi, eta) result(dpsi)
+    module function dpsi_deta_square_second(self, i, xi, eta) result(dpsi)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
@@ -325,10 +351,10 @@ contains
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_deta_SquareSecond
+    end function dpsi_deta_square_second
 
     !----------------------------------------------------------------------!
-    ! Jac_SquareSecond:
+    ! jacobian_square_second:
     !----------------------------------------------------------------------!
     ! This function computes the (i,j) component of the Jacobian matrix J
     ! for a linear square finite element at a given natural coordinate
@@ -336,7 +362,7 @@ contains
     ! coordinates (x, y).
     !
     ! Arguments:
-    !   self : SquareSecond type object.
+    !   self : square_second type object.
     !          Represents the element whose Jacobian is being evaluated.
     !
     !   i    : Integer (int32), the row index of the Jacobian component.
@@ -374,9 +400,9 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    module function Jac_SquareSecond(self, i, j, xi, eta) result(Jval)
+    module function jacobian_square_second(self, i, j, xi, eta) result(Jval)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i, j
         real(real64), intent(in) :: xi, eta
         real(real64) :: Jval
@@ -390,13 +416,13 @@ contains
             select case (j)
             case (1)
                 !! dx_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%X(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%x(ii)%val
                 end do
             case (2)
                 !! dx_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%X(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%x(ii)%val
                 end do
             end select
 
@@ -405,28 +431,28 @@ contains
             select case (j)
             case (1)
                 !! dy_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%Y(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%y(ii)%val
                 end do
             case (2)
                 !! dy_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%Y(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%y(ii)%val
                 end do
             end select
         end select
 
-    end function Jac_SquareSecond
+    end function jacobian_square_second
 
     !----------------------------------------------------------------------!
-    ! Jac_Det_SquareSecond:
+    ! jacobian_det_square_second:
     !----------------------------------------------------------------------!
     ! This function computes the determinant of the Jacobian matrix J
     ! for a linear square element at a specified point (ξ, η) in
     ! the natural coordinate system.
     !
     ! Arguments:
-    !   self : SquareSecond type object.
+    !   self : square_second type object.
     !          Represents the finite element whose Jacobian is evaluated.
     !
     !   xi   : Real(real64), ξ coordinate in the natural coordinate system.
@@ -452,9 +478,9 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    module function Jac_Det_SquareSecond(self, xi, eta) result(J_Det)
+    module function jacobian_det_square_second(self, xi, eta) result(J_Det)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64) :: J_Det
 
@@ -468,17 +494,17 @@ contains
         dy_xi = 0.0d0
         dy_eta = 0.0d0
 
-        dx_xi = self%Jac(1, 1, xi, eta)
-        dx_eta = self%Jac(1, 2, xi, eta)
-        dy_xi = self%Jac(2, 1, xi, eta)
-        dy_eta = self%Jac(2, 2, xi, eta)
+        dx_xi = self%jacobian(1, 1, xi, eta)
+        dx_eta = self%jacobian(1, 2, xi, eta)
+        dy_xi = self%jacobian(2, 1, xi, eta)
+        dy_eta = self%jacobian(2, 2, xi, eta)
 
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
 
-    end function Jac_Det_SquareSecond
+    end function jacobian_det_square_second
 
     !--------------------------------------------------------------------------------------
-    ! is_in_SquareSecond:
+    ! is_in_square_second:
     !--------------------------------------------------------------------------------------
     ! This subroutine checks if the given physical coordinates (px, py) lie
     ! within the boundaries of a square element.
@@ -487,7 +513,7 @@ contains
     ! checks if the point lies within the square element.
     !
     ! Arguments:
-    !   self  : SquareSecond type object. Represents a square element.
+    !   self  : square_second type object. Represents a square element.
     !           It contains the coordinates (X, Y, Z) and connectivity
     !           information (conn) of the element.
     !
@@ -514,11 +540,11 @@ contains
     !     outside the valid range, the subroutine returns .false.
     !
     !--------------------------------------------------------------------------------------
-    module subroutine is_in_SquareSecond(self, px, py, pxi, peta, is_in)
-        class(SquareSecond), intent(in) :: self
+    module subroutine is_in_square_second(self, px, py, pxi, peta, is_in)
+        class(type_square_second), intent(in) :: self
         real(real64), intent(in) :: px, py
         real(real64), intent(inout) :: pxi, peta
-        logical(4) :: is_in
+        logical :: is_in
 
         real(real64) :: xi, eta
         real(real64) :: x0, y0
@@ -528,13 +554,13 @@ contains
         integer(int32) :: iter, max_iter
         real(real64) :: tol
         integer(int32) :: i
-        logical(4) :: converged
+        logical :: converged
 
         ! 初期化
         xi = 0.0d0
         eta = 0.0d0
         tol = 1.0d-15
-        max_iter = 100
+        max_iter = 1000
         converged = .false.
 
         ! Newton-Raphson 法による逆写像
@@ -542,9 +568,9 @@ contains
             x0 = 0.0d0
             y0 = 0.0d0
 
-            do i = 1, self%size
-                x0 = x0 + self%psi(i, xi, eta) * self%X(i)%val
-                y0 = y0 + self%psi(i, xi, eta) * self%Y(i)%val
+            do i = 1, self%num_nodes
+                x0 = x0 + self%psi(i, xi, eta) * self%x(i)%val
+                y0 = y0 + self%psi(i, xi, eta) * self%y(i)%val
             end do
 
             dx = px - x0
@@ -555,12 +581,12 @@ contains
                 exit
             end if
 
-            dx_xi = self%Jac(1, 1, xi, eta)
-            dx_eta = self%Jac(1, 2, xi, eta)
-            dy_xi = self%Jac(2, 1, xi, eta)
-            dy_eta = self%Jac(2, 2, xi, eta)
+            dx_xi = self%jacobian(1, 1, xi, eta)
+            dx_eta = self%jacobian(1, 2, xi, eta)
+            dy_xi = self%jacobian(2, 1, xi, eta)
+            dy_eta = self%jacobian(2, 2, xi, eta)
 
-            detJ = self%Jac_Det(xi, eta)
+            detJ = self%jacobian_det(xi, eta)
             if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
 
             ! Newton-Raphson 更新
@@ -574,22 +600,22 @@ contains
             pxi = xi
             peta = eta
         end if
-    end subroutine is_in_SquareSecond
+    end subroutine is_in_square_second
 
-    module function Interpolate_SquareSecond(self, xi, eta, value) result(interpolated_value)
+    module function Interpolate_square_second(self, xi, eta, value) result(interpolated_value)
         implicit none
-        class(SquareSecond), intent(in) :: self
+        class(type_square_second), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
         integer(int32) :: i
 
         interpolated_value = 0.0d0
-        do i = 1, self%size
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%conn(i))
+        do i = 1, self%num_nodes
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
         end do
 
-    end function Interpolate_SquareSecond
+    end function Interpolate_square_second
 
-end submodule Domain_Element_SquareSecond
+end submodule Domain_Element_square_second
 

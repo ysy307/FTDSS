@@ -71,13 +71,13 @@ contains
                     Side_type = Domain%Sides(i)%s%get_type()
                     if (Side_type == VTK_LINE) then
                         current_segment_idx = current_segment_idx + 1
-                        ! CORRECT: 'conn' is the public component name
-                        target_edges(:, current_segment_idx) = Domain%Sides(i)%s%conn([1, 2])
+                        ! CORRECT: 'connectivity' is the public component name
+                        target_edges(:, current_segment_idx) = Domain%Sides(i)%s%connectivity([1, 2])
                     elseif (Side_type == VTK_QUADRATIC_EDGE) then
                         current_segment_idx = current_segment_idx + 1
-                        target_edges(:, current_segment_idx) = Domain%Sides(i)%s%conn([1, 3])
+                        target_edges(:, current_segment_idx) = Domain%Sides(i)%s%connectivity([1, 3])
                         current_segment_idx = current_segment_idx + 1
-                        target_edges(:, current_segment_idx) = Domain%Sides(i)%s%conn([3, 2])
+                        target_edges(:, current_segment_idx) = Domain%Sides(i)%s%connectivity([3, 2])
                     end if
                 end if
             end if

@@ -1,17 +1,17 @@
 module Matrix_CRS
     use, intrinsic :: iso_fortran_env, only: int32, real64, logical32
     use :: stdlib_sorting, only:sort
-    use :: core_core, only:allocate_array
-    use :: Domain_Module, only:type_domain
+    use :: module_core, only:allocate_array, deallocate_array
+    use :: module_domain, only:type_domain
     implicit none
     private
 
-    public :: Type_CRS
+    public :: type_crs
     public :: operator(*)
     public :: operator(+)
     ! public :: Transpose_CRS
 
-    type :: Type_CRS
+    type :: type_crs
         integer(int32) :: nnz ! number of non-zero elements
         integer(int32) :: nrow ! number of rows
         integer(int32) :: nptr ! size of Ptr (nrow+1 entries)
@@ -21,7 +21,7 @@ module Matrix_CRS
     contains
         procedure, public, pass(self) :: Find => Find_CRS_Location
         procedure, public, pass(self) :: Copy => Copy_CRS
-    end type Type_CRS
+    end type type_crs
 
     interface operator(*)
         module procedure Matrix_Vector_Product_CRS
@@ -32,144 +32,88 @@ module Matrix_CRS
         module procedure Matrix_Addition_CRS
     end interface
 
-    interface Type_CRS
-        module procedure Initialize_CRS
+    interface type_crs
+        module procedure construct_type_crs
     end interface
 
 contains
 
-    function Initialize_CRS(Domain) result(A)
+    function construct_type_crs(domain) result(A)
         implicit none
-        class(type_domain), intent(in) :: Domain
-        type(Type_CRS) :: A
+        class(type_domain), intent(in) :: domain
+        type(type_crs) :: A
 
         ! --- ローカル変数宣言 ---
-        integer(int32) :: iN, iE, iT, irT, iNC, iNNZ, row_nnz, nsize
-        integer(int32) :: nNode, nElement
-        ! ★★★★★ 修正点1: rowCountをintegerからlogicalに変更 ★★★★★
-        logical(logical32), allocatable :: rowCount(:)
+        integer(int32) :: iN, i, iNNZ, nNode, nnz_count
         integer(int32), allocatable :: tmpInd(:)
 
         ! --- RCM適用時専用の変数 ---
-        ! integer(int32), allocatable :: inv_perm(:)
-        integer(int32), allocatable :: cols_for_this_row(:)
-        integer(int32) :: old_iN, col_count
+        integer(int32) :: old_iN, original_neighbor
+        integer(int32), allocatable :: neighbor_nodes(:), rcm_cols(:)
 
         ! --- 初期設定 ---
-        nNode = Domain%get_num_nodes()
-        nElement = Domain%get_num_elements()
+        nNode = domain%get_num_nodes()
         A%nrow = nNode
         A%nptr = nNode + 1
 
         call allocate_array(A%Ptr, A%nptr)
-        call allocate_array(rowCount, nNode)
-        call allocate_array(tmpInd, 30_int32 * nNode) ! 十分なサイズを確保
+        ! tmpIndは、最大非ゼロ要素数を見積もって確保。node_adjacencyから取得するのが理想
+        ! ここでは簡潔のため、元のコードのサイズを流用
+        call allocate_array(tmpInd, 30_int32 * nNode)
 
         A%Ptr(1) = 1
-        A%nnz = 0
+        nnz_count = 0
 
-        ! if (present(perm)) then
-        !----------------------------------
-        ! RCM適用時の処理 (perm がある場合)
-        !----------------------------------
-
-        ! call allocate_array(inv_perm, nNode)
-        ! do iN = 1, nNode
-        !     inv_perm(perm(iN)) = iN
-        ! end do
-
-        !--- RCM 適用時 ---
-        ! 1) inv_perm / perm は Domain に既に格納されている想定
+        !===============================================================
+        ! CRS構造の構築 (RCM適用 & node_adjacency使用)
+        !===============================================================
         do iN = 1, nNode
-            ! iN は「RCM順での行番号」
-            old_iN = Domain%RCM_perm(iN) ! 元ノード番号
+            ! ... (1. 元の節点番号を取得 までは同じ) ...
+            call domain%rcm%reorder_original(iN, old_iN)
 
-            rowCount = .false.
-            ! ツブし：その元ノード old_iN が属する要素を探し、
-            !  隣接ノード群を rowCount(:) = .true. にする
-            do iE = 1, nElement
-                nsize = Domain%Elements(iE)%e%get_size()
-                ! old_iN がこの要素のどこに入っているか探索
-                do iT = 1, nsize
-                    if (Domain%Elements(iE)%e%conn(iT) == old_iN) then
-                        do irT = 1, nsize
-                            rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
-                        end do
-                        exit
-                    end if
-                end do
+            ! 2. 隣接"以外"のノード群を取得
+            call domain%node_adjacency%get_neighbors(old_iN, neighbor_nodes)
+
+            ! 3.【修正】隣接ノード群(+自分自身)を「RCM順の列番号」に変換
+            !         配列サイズは隣接ノード数 + 1 (対角成分用)
+            allocate (rcm_cols(size(neighbor_nodes) + 1))
+
+            ! 隣接ノードを変換
+            do i = 1, size(neighbor_nodes)
+                original_neighbor = neighbor_nodes(i)
+                call domain%rcm%reorder_to_rcm(original_neighbor, rcm_cols(i))
             end do
+            deallocate (neighbor_nodes)
 
-            ! 2) 列数をカウント & RCMノード番号配列を作成
-            col_count = count(rowCount)
-            allocate (cols_for_this_row(col_count))
-            row_nnz = 0
-            do iNC = 1, nNode
-                if (rowCount(iNC)) then
-                    row_nnz = row_nnz + 1
-                    ! iNC（元ノード） → RCM順ノード
-                    cols_for_this_row(row_nnz) = Domain%RCM_inv_perm(iNC)
-                end if
-            end do
+            ! 自分自身（対角成分）を変換して追加
+            call domain%rcm%reorder_to_rcm(old_iN, rcm_cols(size(rcm_cols)))
 
-            call sort(cols_for_this_row) ! RCM順の列をソート
+            ! 4. CRSフォーマットのため、列番号をソート
+            call sort(rcm_cols)
 
-            ! 3) 一時バッファに格納
-            tmpInd(A%nnz + 1:A%nnz + row_nnz) = cols_for_this_row
-            A%nnz = A%nnz + row_nnz
-            A%Ptr(iN + 1) = A%nnz + 1
+            ! 5. 一時バッファに格納
+            tmpInd(nnz_count + 1:nnz_count + size(rcm_cols)) = rcm_cols
+            nnz_count = nnz_count + size(rcm_cols)
+            A%Ptr(iN + 1) = nnz_count + 1
 
-            deallocate (cols_for_this_row)
+            deallocate (rcm_cols)
         end do
-        ! deallocate (inv_perm)
 
-        ! else
-        !     !--------------------------------------
-        !     ! 通常の処理 (perm がない場合)
-        !     !--------------------------------------
-        !     do iN = 1, nNode
-        !         rowCount(:) = .false. ! logical配列として初期化
-        !         row_nnz = 0
-
-        !         do iE = 1, nElement
-        !             nsize = Domain%Elements(iE)%e%get_size()
-        !             do iT = 1, nsize
-        !                 if (Domain%Elements(iE)%e%conn(iT) == iN) then
-        !                     do irT = 1, nsize
-        !                         rowCount(Domain%Elements(iE)%e%conn(irT)) = .true.
-        !                     end do
-        !                     exit
-        !                 end if
-        !             end do
-        !         end do
-
-        !         do iNC = 1, nNode
-        !             if (rowCount(iNC)) then
-        !                 row_nnz = row_nnz + 1
-        !                 tmpInd(A%nnz + row_nnz) = iNC
-        !             end if
-        !         end do
-
-        !         A%nnz = A%nnz + row_nnz
-        !         A%Ptr(iN + 1) = A%nnz + 1
-        !     end do
-        ! end if
+        A%nnz = nnz_count
 
         ! --- 最終的なCRS配列を確保・コピー ---
         call allocate_array(A%Ind, A%nnz)
         call allocate_array(A%Val, A%nnz)
-        do iNNZ = 1, A%nnz
-            A%Ind(iNNZ) = tmpInd(iNNZ)
-            A%Val(iNNZ) = 0.0d0
-        end do
+        A%Ind(1:A%nnz) = tmpInd(1:A%nnz)
+        A%Val = 0.0d0
 
-        deallocate (rowCount, tmpInd)
+        deallocate (tmpInd)
 
-    end function Initialize_CRS
+    end function construct_type_crs
 
     function Matrix_Vector_Product_CRS(A, x) result(y)
         implicit none
-        type(Type_CRS), intent(in) :: A
+        type(type_crs), intent(in) :: A
         real(real64), intent(in) :: x(A%nrow)
         real(real64) :: y(A%nrow)
         integer(int32) :: i, j, is, ie
@@ -189,8 +133,8 @@ contains
 
     function Matrix_Addition_CRS(A, B) result(C)
         implicit none
-        type(Type_CRS), intent(in) :: A, B
-        type(Type_CRS) :: C
+        type(type_crs), intent(in) :: A, B
+        type(type_crs) :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
@@ -202,9 +146,9 @@ contains
 
     function Multiplication_Scalar_Matrix_CRS(A, b) result(C)
         implicit none
-        type(Type_CRS), intent(in) :: A
+        type(type_crs), intent(in) :: A
         real(real64), intent(in) :: b
-        type(Type_CRS) :: C
+        type(type_crs) :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
@@ -217,8 +161,8 @@ contains
     function Multiplication_Matrix_Scalar_CRS(a, B) result(C)
         implicit none
         real(real64), intent(in) :: a
-        type(Type_CRS), intent(in) :: B
-        type(Type_CRS) :: C
+        type(type_crs), intent(in) :: B
+        type(type_crs) :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
@@ -230,7 +174,7 @@ contains
 
     subroutine Find_CRS_Location(self, column, index_in, loc)
         implicit none
-        class(Type_CRS), intent(in) :: self
+        class(type_crs), intent(in) :: self
         integer(int32), intent(in) :: column, index_in
         integer(int32), intent(out) :: loc
         integer(int32) :: i, start, endp
@@ -247,8 +191,8 @@ contains
 
     function Copy_CRS(self) result(B)
         implicit none
-        class(Type_CRS) :: self
-        type(Type_CRS) :: B
+        class(type_crs) :: self
+        type(type_crs) :: B
         integer(int32) :: k
 
         B%nrow = self%nrow

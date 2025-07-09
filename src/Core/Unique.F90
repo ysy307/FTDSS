@@ -1,7 +1,7 @@
 module core_unique
     use, intrinsic :: iso_fortran_env
     use :: stdlib_sorting, only:sort
-    use :: Core_Allocate, only:Allocate_Array
+    use :: core_allocate, only:allocate_array
     implicit none
     private
 

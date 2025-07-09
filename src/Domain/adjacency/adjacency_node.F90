@@ -1,7 +1,7 @@
-module domain_node_adjacency
+module domain_adjacency_adjacency_node
     use, intrinsic :: iso_fortran_env, only: int32, int64
-    use :: core_core, only:allocate_array, deallocate_array
     use :: stdlib_sorting, only:sort
+    use :: module_core, only:allocate_array, deallocate_array
 
     implicit none
     private
@@ -17,6 +17,8 @@ module domain_node_adjacency
         procedure, pass(self), public :: is_adjacent => check_node_adjacent
         procedure, pass(self), public :: get_degree => get_node_degree
         procedure, pass(self), public :: get_num_nodes => get_num_nodes
+        ! 追加: 指定ノードの隣接ノードリストを取得
+        procedure, pass(self), public :: get_neighbors => get_node_neighbors
         procedure, pass(self), public :: destroy => destroy_node_adjacency
     end type type_node_adjacency
 
@@ -205,4 +207,35 @@ contains
         self%num_nodes = 0
     end subroutine
 
-end module domain_node_adjacency
+    !================================================================!
+    !【追加】指定されたノードの隣接ノードリストを取得する
+    !================================================================!
+    subroutine get_node_neighbors(self, node_id, neighbors)
+        class(type_node_adjacency), intent(in) :: self
+        integer(int32), intent(in) :: node_id
+        integer(int32), allocatable, intent(out) :: neighbors(:)
+
+        integer(int32) :: degree, start_p, end_p
+
+        if (node_id < 1 .or. node_id > self%num_nodes) then
+            ! 不正なノードIDの場合は、0サイズの配列を返す
+            if (allocated(neighbors)) deallocate (neighbors)
+            allocate (neighbors(0))
+            return
+        end if
+
+        ! 1. 隣接ノードの数（次数）を計算
+        start_p = self%ptr(node_id)
+        end_p = self%ptr(node_id + 1) - 1
+        degree = end_p - start_p + 1
+
+        ! 2. 戻り値の配列を確保]
+        if (allocated(neighbors)) deallocate (neighbors)
+        allocate (neighbors(degree))
+
+        ! 3. self%indから隣接ノードのリストをコピー
+        neighbors = self%ind(start_p:end_p)
+
+    end subroutine get_node_neighbors
+
+end module domain_adjacency_adjacency_node

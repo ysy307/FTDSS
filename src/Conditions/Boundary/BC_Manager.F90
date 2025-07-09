@@ -13,7 +13,7 @@ module Conditions_Boundary_Manager
     type :: BoundaryGroup
         integer :: id = 0
         ! 熱BCを保持するポリモーフィックなポインタ
-        class(Abst_BC_Thermal), allocatable :: T
+        class(Abst_BC_Thermal), allocatable :: t
         ! 将来の拡張:
         ! class(BC_Hydraulic_Abstract), allocatable :: H
     end type BoundaryGroup

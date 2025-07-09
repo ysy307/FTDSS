@@ -1,6 +1,6 @@
 module Solver_Solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_Core, only:allocate_array, deallocate_array, error_message
+    use :: module_core, only:allocate_array, deallocate_array, error_message
     use :: Calculate_BLAS, only:norm => norm_2, dot
     use :: Matrix_CRS
 !$  use omp_lib
@@ -61,18 +61,18 @@ module Solver_Solve
     end type Solver_CRS_BiCGSTAB
 
     type, extends(Abstract_Solver_CRS) :: Solver_CRS_LU
-        integer(int32) :: N
-        integer(int32) :: MAXFCT
+        integer :: N
+        integer :: MAXFCT
         !! Maximum number of factors with identical sparsity structure that must be kept in memory at the same time. In most
         !! applications this value is equal to 1. It is possible to store several different factorizations with the same nonzero
         !! structure at the same time in the internal data structure management of the solver.
         !! pardiso can process several matrices with an identical matrix sparsity pattern and it can store the factors of these
         !! matrices at the same time. Matrices with a different sparsity structure can be kept in memory with different memory
         !! address pointers pt.
-        integer(int32) :: MNUM
+        integer :: MNUM
         !! Indicates the actual matrix for the solution phase. With this scalar you can define which matrix to factorize.
         !! The value must be: 1 ≤mnum≤maxfct. In most applications this value is 1.
-        integer(int32) :: MTYPE
+        integer :: MTYPE
         !! Defines the matrix type, which influences the pivoting method. The Intel® oneAPI Math Kernel Library PARDISO solver
         !! supports the following matrices:
         !!**************************************************************************
@@ -86,7 +86,7 @@ module Solver_Solve
         !! 11: real and nonsymmetric
         !! 13: complex and nonsymmetric
         !!**************************************************************************
-        integer(int32) :: PHASE
+        integer :: PHASE
         !! Controls the execution of the solver. Usually it is a two- or three-digit integer. The first digit indicates the starting
         !! phase of execution and the second digit indicates the ending phase. Intel® oneAPI Math Kernel Library PARDISO has
         !! the following phases of execution:
@@ -113,12 +113,12 @@ module Solver_Solve
         !! 0:   Release internal memory for L and U matrix number mnum
         !! -1:  Release all internal memory for all matrices
         !!**************************************************************************
-        integer(int32) :: NRHS
+        integer :: NRHS
         !! Number of right-hand sides that need to be solved for.
-        integer(int32) :: MSGLVL
+        integer :: MSGLVL
         !! Message level information. If msglvl = 0 then pardiso generates no output, if msglvl = 1 the solver prints
         !! statistical information to the screen.
-        integer(int32) :: ERROR
+        integer :: ERROR
         integer, allocatable :: IA(:)
         !! Array, size (n+1).
         !! For CSR3 format, ia[i] (i<n) points to the first column index of row i in the array ja. That is, ia[i] gives the index
@@ -133,7 +133,7 @@ module Solver_Solve
         integer, allocatable :: PERM(:)
         !! Array, size (64). This array is used to pass various parameters to Intel® oneAPI Math Kernel Library PARDISO
         !! and to return some useful information after execution of the solver.
-        integer(int32) :: IPARM(64)
+        integer :: IPARM(64)
         type(MKL_PARDISO_HANDLE) :: PT(64)
         !! Array with size of 64.
         !! Handle to internal data structure. The entries must be set to zero prior to the first call to pardiso.
@@ -145,14 +145,13 @@ module Solver_Solve
     end type Solver_CRS_LU
 
     type, extends(Abstract_Solver_Full) :: Solver_Full_LU
-        integer(int32) :: N
-        integer(int32) :: ERROR
+        integer :: N
+        integer :: ERROR
         integer, allocatable :: IPIV(:)
     contains
         procedure :: Solve => Solve_Full_LU
         procedure :: Check => Check_Full_LU
     end type
-
     interface Solver_CRS_BiCGSTAB
         module procedure Solver_CRS_BiCGSTAB_Constructor
     end interface

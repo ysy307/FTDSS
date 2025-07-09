@@ -1,40 +1,37 @@
 {
+    "nthreads": 4,
+    "recursion_limit": 10000,
+    "debug_log": true,
     "source_dirs": [
-        "**/src",
-        "**/app",
-        "**/test"
+        "/workspaces/FTDSS/src/**",
+        "/workspaces/FTDSS/app/**",
+        "/workspaces/FTDSS/test/**",
+        "/workspaces/FTDSS/third_party/fortran_stdlib/IntelLLVM-2025.2.0/src/**",
+        "/workspaces/FTDSS/third_party/json-fortran/src/**",
+        "/workspaces/FTDSS/third_party/VTKFortran/src/**"
     ],
-    "mod_dirs": [
-        "/opt/intel/oneapi/mpi/2021.14/include/mpi",
-        "/opt/intel/oneapi/2025.0/include/mpi",
-        "/workspaces/FTDSS/third_party/.local/include",
-        "/workspaces/FTDSS/third_party/.local/jsonfortran-*/lib",
-        "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/**/*",
-        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-*/lib",
-        "/workspaces/FTDSS/CMakeBuild/.mod"
-    ],
-    "preprocessor": {
-        "defines": [
-            "_MKL"
-        ]
-    },
-    "exclude_files": [
-        "CMakeBuild/**",
-        "third_party/**",
+    "incl_suffixes": [],
+    "excl_suffixes": [],
+    "excl_paths": [
         ".git/**",
         ".vscode/**",
-        ".archive/**",
-        ".devcontainer/**",
         "build/**",
-        "github/**",
-        "docs/**",
-        "fpm/**",
-        "Inout/**",
-        "log/**",
-        "Scripts/**"
+        "CMakeBuild/**"
     ],
-    "lowercase_intrinsics": true,
-    "hover_signature": true,
-    "use_signature_help": true,
-    "incremental_sync": true
+    "max_line_length": -1,
+    "max_comment_line_length": -1,
+    "pp_suffixes": [
+        ".F90"
+    ],
+    "include_dirs": [
+        "/opt/intel/oneapi/mkl/latest/include/",
+        "/opt/intel/oneapi/mpi/latest/include/",
+        "/opt/intel/oneapi/2025.1/include/",
+        "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.2.0",
+        "/workspaces/FTDSS/third_party/.local/include/VTKFortran",
+        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib"
+    ],
+    "pp_defs": {
+        "_MKL": "null"
+    }
 }

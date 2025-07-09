@@ -2,80 +2,106 @@ submodule(Domain_Side) Domain_Side_Second
     implicit none
 contains
 
-    module function SideSecond_Construct(iSide, Global_Coordinate, Connectivity, GroupID) result(Structure)
+    module function construct_side_second(id, global_coordinate, cell_info) result(side)
         implicit none
-        integer(int32), intent(in) :: iSide
-        type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(3)
-        integer(int32), intent(in) :: GroupID
-        class(Abst_SideType), allocatable :: Structure
+        integer(int32), intent(in) :: id
+        type(type_dp_3d), pointer, intent(in) :: global_coordinate
+        type(type_vtk_cell), intent(in) :: cell_info
+        class(abst_side), allocatable :: side
 
-        integer(int32), parameter :: nsize = 3
         integer(int32) :: i
 
-        allocate (SideSecond :: Structure)
-        Structure%id = iSide
-        Structure%type = 21
-        Structure%group = GroupID
+        if (allocated(side)) deallocate (side)
+        allocate (type_side_second :: side)
 
-        Structure%size = nsize
-        allocate (Structure%conn(nsize))
-        Structure%conn(:) = Connectivity(1:nsize)
+        side%id = id
+        side%type = cell_info%cell_type
+        side%group = cell_info%cell_entity_id
+        side%dimension = cell_info%get_dimension()
+        side%order = cell_info%get_order()
 
-        allocate (Structure%X(nsize))
-        allocate (Structure%Y(nsize))
-        allocate (Structure%Z(nsize))
-        do i = 1, nsize
-            nullify (Structure%X(i)%val)
-            nullify (Structure%Y(i)%val)
-            nullify (Structure%Z(i)%val)
-            Structure%X(i)%val => Global_Coordinate%x(Structure%conn(i))
-            Structure%Y(i)%val => Global_Coordinate%y(Structure%conn(i))
-            Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
+        side%num_nodes = cell_info%num_nodes_in_cell
+        allocate (side%connectivity(side%num_nodes))
+        side%connectivity(:) = cell_info%connectivity(1:side%num_nodes)
+
+        allocate (side%x(side%num_nodes))
+        allocate (side%y(side%num_nodes))
+        allocate (side%z(side%num_nodes))
+        do i = 1, side%num_nodes
+            nullify (side%x(i)%val)
+            nullify (side%y(i)%val)
+            nullify (side%z(i)%val)
+            side%x(i)%val => global_coordinate%x(side%connectivity(i))
+            side%y(i)%val => global_coordinate%y(side%connectivity(i))
+            side%z(i)%val => global_coordinate%z(side%connectivity(i))
         end do
 
-        Structure%nGauss = 2
-        call allocate_array(Structure%weight, Structure%nGauss)
-        call allocate_array(Structure%gauss, Structure%nGauss)
-        Structure%weight(:) = [1.0d0, 1.0d0]
-        Structure%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
-    end function SideSecond_Construct
+        side%num_gauss = 2_int32
+        call allocate_array(side%weight, side%num_gauss)
+        call allocate_array(side%gauss, side%num_gauss)
+        side%weight(:) = [1.0d0, 1.0d0]
+        side%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+    end function construct_side_second
 
-    module function get_id_SideSecond(self) result(id)
+    module function get_id_side_second(self) result(id)
         implicit none
-        class(SideSecond), intent(in) :: self
+        class(type_side_second), intent(in) :: self
         integer(int32) :: id
 
         id = self%id
-    end function get_id_SideSecond
+    end function get_id_side_second
 
-    module function get_type_SideSecond(self) result(type)
+    module function get_type_side_second(self) result(type)
         implicit none
-        class(SideSecond), intent(in) :: self
+        class(type_side_second), intent(in) :: self
         integer(int32) :: type
 
         type = self%type
-    end function get_type_SideSecond
+    end function get_type_side_second
 
-    module function get_size_SideSecond(self) result(size)
+    module function get_num_nodes_side_second(self) result(num_nodes)
         implicit none
-        class(SideSecond), intent(in) :: self
-        integer(int32) :: size
+        class(type_side_second), intent(in) :: self
+        integer(int32) :: num_nodes
 
-        size = self%size
-    end function get_size_SideSecond
+        num_nodes = self%num_nodes
+    end function get_num_nodes_side_second
 
-    module function get_group_SideSecond(self) result(group)
+    module function get_group_side_second(self) result(group)
         implicit none
-        class(SideSecond), intent(in) :: self
+        class(type_side_second), intent(in) :: self
         integer(int32) :: group
 
         group = self%group
-    end function get_group_SideSecond
+    end function get_group_side_second
 
-    module function psi_SideSecond(self, i, xi) result(psi)
+    module function get_order_side_second(self) result(order)
         implicit none
-        class(SideSecond), intent(in) :: self
+        class(type_side_second), intent(in) :: self
+        integer(int32) :: order
+
+        order = self%order
+    end function get_order_side_second
+
+    module function get_dimension_side_second(self) result(dimension)
+        implicit none
+        class(type_side_second), intent(in) :: self
+        integer(int32) :: dimension
+
+        dimension = self%dimension
+    end function get_dimension_side_second
+
+    module function get_num_gauss_side_second(self) result(num_gauss)
+        implicit none
+        class(type_side_second), intent(in) :: self
+        integer(int32) :: num_gauss
+
+        num_gauss = self%num_gauss
+    end function get_num_gauss_side_second
+
+    module function psi_side_second(self, i, xi) result(psi)
+        implicit none
+        class(type_side_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi
         real(real64) :: psi
@@ -88,11 +114,11 @@ contains
         case default
             psi = 0.0d0
         end select
-    end function psi_SideSecond
+    end function psi_side_second
 
-    module function dpsi_dxi_SideSecond(self, i) result(dpsi)
+    module function dpsi_dxi_side_second(self, i) result(dpsi)
         implicit none
-        class(SideSecond), intent(in) :: self
+        class(type_side_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64) :: dpsi
 
@@ -104,6 +130,6 @@ contains
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_dxi_SideSecond
+    end function dpsi_dxi_side_second
 
 end submodule Domain_Side_Second

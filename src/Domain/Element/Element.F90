@@ -1,45 +1,46 @@
-module Domain_Element
+module domain_element
     !*---------------------------------------------------------------------------------------<br>
-    !  Module: Domain_Element<br>
+    !  Module: domain_element<br>
     !  Purpose: Define 2D finite element types (square and triangle) and their<br>
-    !           associated operations (shape functions, Jacobian, Gauss points).<br>
+    !           associated operations (shape functions, jacobian, Gauss points).<br>
     !  Ford Coding Standard:<br>
     !    - Use ISO_FORTRAN_ENV for portable kinds<br>
     !    - Maintain explicit interfaces and consistent indentation<br>
     !    - Preserve original function and type names<br>
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: core_core, only:type_dp_3d, type_dp_pointer, allocate_array
+    use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
     implicit none
     private
 
-    public :: Abst_ElementType
-    public :: SquareFirst
-    public :: SquareSecond
-    public :: TriangleFirst
-    public :: TriangleSecond
-    public :: ElementHolder
+    public :: abst_element
+    public :: type_triangle_first
+    public :: type_triangle_second
+    public :: type_square_first
+    public :: type_square_second
+    public :: holder_elements
 
     !--------------------------------------------------------------------------------------
     ! Holder for polymorphic element objects
     !--------------------------------------------------------------------------------------
-    type :: ElementHolder
-        class(Abst_ElementType), allocatable :: e
-    end type ElementHolder
+    type :: holder_elements
+        class(abst_element), allocatable :: e
+    end type holder_elements
 
     !--------------------------------------------------------------------------------------
     !   Abstract base type for 2D elements
     !--------------------------------------------------------------------------------------
-    type, abstract :: Abst_ElementType
+    type, abstract :: abst_element
         integer(int32), private :: id !! Element ID
         integer(int32), private :: type !! Element type (5: triangle 1st, 9: square 1st)
-        integer(int32), private :: size !! Number of nodes in the element
+        integer(int32), private :: num_nodes !! Number of nodes in the element
         integer(int32), private :: group !! Element group number
-        integer(int32), allocatable :: conn(:) !! connectivity information
-        type(type_dp_pointer), allocatable :: X(:) !! X coordinate
-        type(type_dp_pointer), allocatable :: Y(:) !! Y coordinate
-        type(type_dp_pointer), allocatable :: Z(:) !! Z coordinate
-
+        integer(int32), private :: dimension
+        integer(int32), private :: order
+        integer(int32), allocatable :: connectivity(:) !! connectivity information
+        type(type_dp_pointer), allocatable :: x(:) !! X coordinate
+        type(type_dp_pointer), allocatable :: y(:) !! Y coordinate
+        type(type_dp_pointer), allocatable :: z(:) !! Z coordinate
         !----------------------------------------------------------------------------------
         ! Gauss Quadrature points and weights
         !  - Gauss Quadrature points are defined in the local coordinate system
@@ -47,189 +48,232 @@ module Domain_Element
         !  - The weights are used for numerical integration over the element
         !  - The Gauss points are used to evaluate the shape functions and their derivatives
         !----------------------------------------------------------------------------------
-        integer(int32) :: nGauss !! Number of Gauss Quadrature points
+        integer(int32) :: num_gauss !! Number of Gauss Quadrature points
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
         !----------------------------------------------------------------------------------
     contains
-        procedure(Abst_get_id),      pass(self), deferred :: get_id !&
-        procedure(Abst_get_type),    pass(self), deferred :: get_type !&
-        procedure(Abst_get_size),    pass(self), deferred :: get_size !&
-        procedure(Abst_get_group),   pass(self), deferred :: get_group !&
-        procedure(Abst_psi),         pass(self), deferred :: psi !&
-        procedure(Abst_dpsi_dxi),    pass(self), deferred :: dpsi_dxi !&
-        procedure(Abst_dpsi_deta),   pass(self), deferred :: dpsi_deta !&
-        procedure(Abst_Jac),         pass(self), deferred :: Jac !&
-        procedure(Abst_Jac_Det),     pass(self), deferred :: Jac_Det !&
-        procedure(Abst_is_inside),   pass(self), deferred :: is_inside !&
-        procedure(Abst_Interpolate), pass(self), deferred :: Interpolate !&
-    end type Abst_ElementType
+        procedure(abst_get_id),        pass(self), deferred :: get_id !&
+        procedure(abst_get_type),      pass(self), deferred :: get_type !&
+        procedure(abst_get_num_nodes), pass(self), deferred :: get_num_nodes !&
+        procedure(abst_get_group),     pass(self), deferred :: get_group !&
+        procedure(abst_get_order),     pass(self), deferred :: get_order !&
+        procedure(abst_get_dimension), pass(self), deferred :: get_dimension !&
+        procedure(abst_get_num_gauss), pass(self), deferred :: get_num_gauss !&
+        !----------------------------------------------------------------------------------
+        procedure(abst_psi),           pass(self), deferred :: psi !&
+        procedure(abst_dpsi_dxi),      pass(self), deferred :: dpsi_dxi !&
+        procedure(abst_dpsi_deta),     pass(self), deferred :: dpsi_deta !&
+        procedure(abst_jacobian),      pass(self), deferred :: jacobian !&
+        procedure(abst_jacobian_det),  pass(self), deferred :: jacobian_det !&
+        procedure(abst_is_inside),     pass(self), deferred :: is_inside !&
+        procedure(abst_interpolate),   pass(self), deferred :: interpolate !&
+    end type abst_element
 
     !--------------------------------------------------------------------------------------
     !   Triangle First Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abst_ElementType) :: TriangleFirst
+    type, extends(abst_element) :: type_triangle_first
     contains
-        procedure, pass(self) :: get_id      => get_id_TriangleFirst !&
-        procedure, pass(self) :: get_type    => get_type_TriangleFirst !&
-        procedure, pass(self) :: get_size    => get_size_TriangleFirst !&
-        procedure, pass(self) :: get_group   => get_group_TriangleFirst !&
-        procedure, pass(self) :: psi         => psi_TriangleFirst !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_TriangleFirst !&
-        procedure, pass(self) :: dpsi_deta   => dpsi_deta_TriangleFirst !&
-        procedure, pass(self) :: Jac         => Jac_TriangleFirst !&
-        procedure, pass(self) :: Jac_Det     => Jac_Det_TriangleFirst !&
-        procedure, pass(self) :: is_inside   => is_in_TriangleFirst !&
-        procedure, pass(self) :: Interpolate => Interpolate_TriangleFirst !&
-    end type TriangleFirst
+        procedure, pass(self) :: get_id        => get_id_triangle_first !&
+        procedure, pass(self) :: get_type      => get_type_triangle_first !&
+        procedure, pass(self) :: get_num_nodes => get_num_nodes_triangle_first !&
+        procedure, pass(self) :: get_group     => get_group_triangle_first !&
+        procedure, pass(self) :: get_order     => get_order_triangle_first !&
+        procedure, pass(self) :: get_dimension => get_dimension_triangle_first !&
+        procedure, pass(self) :: get_num_gauss => get_num_gauss_triangle_first !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi           => psi_triangle_first !&
+        procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_triangle_first !&
+        procedure, pass(self) :: dpsi_deta     => dpsi_deta_triangle_first !&
+        procedure, pass(self) :: jacobian      => jacobian_triangle_first !&
+        procedure, pass(self) :: jacobian_det  => jacobian_det_triangle_first !&
+        procedure, pass(self) :: is_inside     => is_in_triangle_first !&
+        procedure, pass(self) :: interpolate   => interpolate_triangle_first !&
+    end type type_triangle_first
 
     !--------------------------------------------------------------------------------------
     !   Square First Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abst_ElementType) :: SquareFirst
+    type, extends(abst_element) :: type_square_first
     contains
-        procedure, pass(self) :: get_id      => get_id_SquareFirst !&
-        procedure, pass(self) :: get_type    => get_type_SquareFirst !&
-        procedure, pass(self) :: get_size    => get_size_SquareFirst !&
-        procedure, pass(self) :: get_group   => get_group_SquareFirst !&
-        procedure, pass(self) :: psi         => psi_SquareFirst !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SquareFirst !&
-        procedure, pass(self) :: dpsi_deta   => dpsi_deta_SquareFirst !&
-        procedure, pass(self) :: Jac         => Jac_SquareFirst !&
-        procedure, pass(self) :: Jac_Det     => Jac_Det_SquareFirst !&
-        procedure, pass(self) :: is_inside   => is_in_SquareFirst !&
-        procedure, pass(self) :: Interpolate => Interpolate_SquareFirst !&
-    end type SquareFirst
+        procedure, pass(self) :: get_id        => get_id_square_first !&
+        procedure, pass(self) :: get_type      => get_type_square_first !&
+        procedure, pass(self) :: get_num_nodes => get_num_nodes_square_first !&
+        procedure, pass(self) :: get_group     => get_group_square_first !&
+        procedure, pass(self) :: get_order     => get_order_square_first !&
+        procedure, pass(self) :: get_dimension => get_dimension_square_first !&
+        procedure, pass(self) :: get_num_gauss => get_num_gauss_square_first !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi           => psi_square_first !&
+        procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_square_first !&
+        procedure, pass(self) :: dpsi_deta     => dpsi_deta_square_first !&
+        procedure, pass(self) :: jacobian      => jacobian_square_first !&
+        procedure, pass(self) :: jacobian_det  => jacobian_det_square_first !&
+        procedure, pass(self) :: is_inside     => is_in_square_first !&
+        procedure, pass(self) :: interpolate   => interpolate_square_first !&
+    end type type_square_first
 
     !--------------------------------------------------------------------------------------
     !   Triangle Second Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abst_ElementType) :: TriangleSecond
+    type, extends(abst_element) :: type_triangle_second
     contains
-        procedure, pass(self) :: get_id      => get_id_TriangleSecond !&
-        procedure, pass(self) :: get_type    => get_type_TriangleSecond !&
-        procedure, pass(self) :: get_size    => get_size_TriangleSecond !&
-        procedure, pass(self) :: get_group   => get_group_TriangleSecond !&
-        procedure, pass(self) :: psi         => psi_TriangleSecond !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_TriangleSecond !&
-        procedure, pass(self) :: dpsi_deta   => dpsi_deta_TriangleSecond !&
-        procedure, pass(self) :: Jac         => Jac_TriangleSecond !&
-        procedure, pass(self) :: Jac_Det     => Jac_Det_TriangleSecond !&
-        procedure, pass(self) :: is_inside   => is_in_TriangleSecond !&
-        procedure, pass(self) :: Interpolate => Interpolate_TriangleSecond !&
-    end type TriangleSecond
+        procedure, pass(self) :: get_id        => get_id_triangle_second !&
+        procedure, pass(self) :: get_type      => get_type_triangle_second !&
+        procedure, pass(self) :: get_num_nodes => get_num_nodes_triangle_second !&
+        procedure, pass(self) :: get_group     => get_group_triangle_second !&
+        procedure, pass(self) :: get_order     => get_order_triangle_second !&
+        procedure, pass(self) :: get_dimension => get_dimension_triangle_second !&
+        procedure, pass(self) :: get_num_gauss => get_num_gauss_triangle_second !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi           => psi_triangle_second !&
+        procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_triangle_second !&
+        procedure, pass(self) :: dpsi_deta     => dpsi_deta_triangle_second !&
+        procedure, pass(self) :: jacobian      => jacobian_triangle_second !&
+        procedure, pass(self) :: jacobian_det  => jacobian_det_triangle_second !&
+        procedure, pass(self) :: is_inside     => is_in_triangle_second !&
+        procedure, pass(self) :: interpolate   => interpolate_triangle_second !&
+    end type type_triangle_second
 
     !--------------------------------------------------------------------------------------
     !   Square Second Order Element Type
     !--------------------------------------------------------------------------------------
-    type, extends(Abst_ElementType) :: SquareSecond
+    type, extends(abst_element) :: type_square_second
     contains
-        procedure, pass(self) :: get_id      => get_id_SquareSecond !&
-        procedure, pass(self) :: get_type    => get_type_SquareSecond !&
-        procedure, pass(self) :: get_size    => get_size_SquareSecond !&
-        procedure, pass(self) :: get_group   => get_group_SquareSecond !&
-        procedure, pass(self) :: psi         => psi_SquareSecond !&
-        procedure, pass(self) :: dpsi_dxi    => dpsi_dxi_SquareSecond !&
-        procedure, pass(self) :: dpsi_deta   => dpsi_deta_SquareSecond !&
-        procedure, pass(self) :: Jac         => Jac_SquareSecond !&
-        procedure, pass(self) :: Jac_Det     => Jac_Det_SquareSecond !&
-        procedure, pass(self) :: is_inside   => is_in_SquareSecond !&
-        procedure, pass(self) :: Interpolate => Interpolate_SquareSecond !&
-    end type SquareSecond
+        procedure, pass(self) :: get_id        => get_id_square_second !&
+        procedure, pass(self) :: get_type      => get_type_square_second !&
+        procedure, pass(self) :: get_num_nodes => get_num_nodes_square_second !&
+        procedure, pass(self) :: get_group     => get_group_square_second !&
+        procedure, pass(self) :: get_order     => get_order_square_second !&
+        procedure, pass(self) :: get_dimension => get_dimension_square_second !&
+        procedure, pass(self) :: get_num_gauss => get_num_gauss_square_second !&
+        !----------------------------------------------------------------------------------
+        procedure, pass(self) :: psi           => psi_square_second !&
+        procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_square_second !&
+        procedure, pass(self) :: dpsi_deta     => dpsi_deta_square_second !&
+        procedure, pass(self) :: jacobian      => jacobian_square_second !&
+        procedure, pass(self) :: jacobian_det  => jacobian_det_square_second !&
+        procedure, pass(self) :: is_inside     => is_in_square_second !&
+        procedure, pass(self) :: interpolate   => interpolate_square_second !&
+    end type type_square_second
 
     !
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
-        function Abst_get_id(self) result(id)
-            import :: Abst_ElementType, int32
+        function abst_get_id(self) result(id)
+            import :: abst_element, int32
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             integer(int32) :: id
-        end function Abst_get_id
+        end function abst_get_id
 
-        function Abst_get_type(self) result(type)
-            import :: Abst_ElementType, int32
+        function abst_get_type(self) result(type)
+            import :: abst_element, int32
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             integer(int32) :: type
-        end function Abst_get_type
+        end function abst_get_type
 
-        function Abst_get_size(self) result(size)
-            import :: Abst_ElementType, int32
+        function abst_get_num_nodes(self) result(num_nodes)
+            import :: abst_element, int32
             implicit none
-            class(Abst_ElementType), intent(in) :: self
-            integer(int32) :: size
-        end function Abst_get_size
+            class(abst_element), intent(in) :: self
+            integer(int32) :: num_nodes
 
-        function Abst_get_group(self) result(group)
-            import :: Abst_ElementType, int32
+        end function abst_get_num_nodes
+
+        function abst_get_group(self) result(group)
+            import :: abst_element, int32
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             integer(int32) :: group
-        end function Abst_get_group
+        end function abst_get_group
 
-        function Abst_psi(self, i, xi, eta) result(psi)
-            import :: Abst_ElementType, int32, real64
+        function abst_get_order(self) result(order)
+            import :: abst_element, int32
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
+            integer(int32) :: order
+        end function abst_get_order
+
+        function abst_get_dimension(self) result(dimension)
+            import :: abst_element, int32
+            implicit none
+            class(abst_element), intent(in) :: self
+            integer(int32) :: dimension
+        end function abst_get_dimension
+
+        function abst_get_num_gauss(self) result(num_gauss)
+            import :: abst_element, int32
+            implicit none
+            class(abst_element), intent(in) :: self
+            integer(int32) :: num_gauss
+
+        end function abst_get_num_gauss
+
+        function abst_psi(self, i, xi, eta) result(psi)
+            import :: abst_element, int32, real64
+            implicit none
+            class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: psi
-        end function Abst_psi
+        end function abst_psi
 
-        function Abst_dpsi_dxi(self, i, xi, eta) result(dpsi)
-            import :: Abst_ElementType, int32, real64
+        function abst_dpsi_dxi(self, i, xi, eta) result(dpsi)
+            import :: abst_element, int32, real64
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
-        end function Abst_dpsi_dxi
+        end function abst_dpsi_dxi
 
-        function Abst_dpsi_deta(self, i, xi, eta) result(dpsi)
-            import :: Abst_ElementType, int32, real64
+        function abst_dpsi_deta(self, i, xi, eta) result(dpsi)
+            import :: abst_element, int32, real64
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
-        end function Abst_dpsi_deta
+        end function abst_dpsi_deta
 
-        function Abst_Jac(self, i, j, xi, eta) result(Jval)
-            import :: Abst_ElementType, int32, real64
+        function abst_jacobian(self, i, j, xi, eta) result(Jval)
+            import :: abst_element, int32, real64
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
             real(real64) :: Jval
-        end function Abst_Jac
+        end function abst_jacobian
 
-        function Abst_Jac_Det(self, xi, eta) result(J_Det)
-            import :: Abst_ElementType, int32, real64
+        function abst_jacobian_det(self, xi, eta) result(J_Det)
+            import :: abst_element, int32, real64
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
-        end function Abst_Jac_Det
+        end function abst_jacobian_det
 
-        subroutine Abst_is_inside(self, px, py, pxi, peta, is_in)
-            import Abst_ElementType, real64
+        subroutine abst_is_inside(self, px, py, pxi, peta, is_in)
+            import abst_element, real64
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical(4) :: is_in
-        end subroutine Abst_is_inside
+            logical :: is_in
+        end subroutine abst_is_inside
 
-        function Abst_Interpolate(self, xi, eta, value) result(interpolated_value)
-            import :: Abst_ElementType, real64
+        function abst_interpolate(self, xi, eta, value) result(interpolated_value)
+            import :: abst_element, real64
             implicit none
-            class(Abst_ElementType), intent(in) :: self
+            class(abst_element), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
-        end function Abst_Interpolate
+        end function abst_interpolate
 
     end interface
 
@@ -237,436 +281,515 @@ module Domain_Element
     !   三角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function TriangleFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
+        module function construct_triangle_first(id, global_coordinate, cell_info) result(element)
             implicit none
-            integer(int32), intent(in) :: iElem
-            type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
-            integer(int32), intent(in) :: Connectivity(3)
-            integer(int32), intent(in) :: GroupID
-            class(Abst_ElementType), allocatable :: Structure
+            integer(int32), intent(in) :: id
+            type(type_dp_3d), pointer, intent(in) :: global_coordinate
+            type(type_vtk_cell), intent(in) :: cell_info
+            class(abst_element), allocatable :: element
 
-        end function TriangleFirst_Construct
+        end function construct_triangle_first
 
-        module function get_id_TriangleFirst(self) result(id)
+        module function get_id_triangle_first(self) result(id)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             integer(int32) :: id
 
-        end function get_id_TriangleFirst
+        end function get_id_triangle_first
 
-        module function get_type_TriangleFirst(self) result(type)
+        module function get_type_triangle_first(self) result(type)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             integer(int32) :: type
 
-        end function get_type_TriangleFirst
+        end function get_type_triangle_first
 
-        module function get_size_TriangleFirst(self) result(size)
+        module function get_num_nodes_triangle_first(self) result(num_nodes)
             implicit none
-            class(TriangleFirst), intent(in) :: self
-            integer(int32) :: size
+            class(type_triangle_first), intent(in) :: self
+            integer(int32) :: num_nodes
 
-        end function get_size_TriangleFirst
+        end function get_num_nodes_triangle_first
 
-        module function get_group_TriangleFirst(self) result(group)
+        module function get_group_triangle_first(self) result(group)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             integer(int32) :: group
 
-        end function get_group_TriangleFirst
+        end function get_group_triangle_first
 
-        module function psi_TriangleFirst(self, i, xi, eta) result(N)
+        module function get_order_triangle_first(self) result(order)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
+            integer(int32) :: order
+
+        end function get_order_triangle_first
+
+        module function get_dimension_triangle_first(self) result(dimension)
+            implicit none
+            class(type_triangle_first), intent(in) :: self
+            integer(int32) :: dimension
+
+        end function get_dimension_triangle_first
+
+        module function get_num_gauss_triangle_first(self) result(num_gauss)
+            implicit none
+            class(type_triangle_first), intent(in) :: self
+            integer(int32) :: num_gauss
+
+        end function get_num_gauss_triangle_first
+
+        module function psi_triangle_first(self, i, xi, eta) result(N)
+            implicit none
+            class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: N
 
-        end function psi_TriangleFirst
+        end function psi_triangle_first
 
-        module function dpsi_dxi_TriangleFirst(self, i, xi, eta) result(dpsi)
+        module function dpsi_dxi_triangle_first(self, i, xi, eta) result(dpsi)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_dxi_TriangleFirst
+        end function dpsi_dxi_triangle_first
 
-        module function dpsi_deta_TriangleFirst(self, i, xi, eta) result(dpsi)
+        module function dpsi_deta_triangle_first(self, i, xi, eta) result(dpsi)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_deta_TriangleFirst
+        end function dpsi_deta_triangle_first
 
-        module function Jac_TriangleFirst(self, i, j, xi, eta) result(Jval)
+        module function jacobian_triangle_first(self, i, j, xi, eta) result(Jval)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
             real(real64) :: Jval
 
-        end function Jac_TriangleFirst
+        end function jacobian_triangle_first
 
-        module function Jac_Det_TriangleFirst(self, xi, eta) result(J_Det)
+        module function jacobian_det_triangle_first(self, xi, eta) result(J_Det)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
 
-        end function Jac_Det_TriangleFirst
+        end function jacobian_det_triangle_first
 
-        module subroutine is_in_TriangleFirst(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_triangle_first(self, px, py, pxi, peta, is_in)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical(4) :: is_in
+            logical :: is_in
 
-        end subroutine is_in_TriangleFirst
+        end subroutine is_in_triangle_first
 
-        module function Interpolate_TriangleFirst(self, xi, eta, value) result(interpolated_value)
+        module function interpolate_triangle_first(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(TriangleFirst), intent(in) :: self
+            class(type_triangle_first), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
-        end function Interpolate_TriangleFirst
+        end function interpolate_triangle_first
     end interface
 
     !--------------------------------------------------------------------------------------
     !   四角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function SquareFirst_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
+        module function construct_square_first(id, global_coordinate, cell_info) result(element)
             implicit none
-            integer(int32), intent(in) :: iElem
-            type(type_dp_3d), intent(in), pointer :: Global_Coordinate
-            integer(int32), intent(in) :: Connectivity(4)
-            integer(int32), intent(in) :: GroupID
-            class(Abst_ElementType), allocatable :: Structure
+            integer(int32), intent(in) :: id
+            type(type_dp_3d), pointer, intent(in) :: global_coordinate
+            type(type_vtk_cell), intent(in) :: cell_info
+            class(abst_element), allocatable :: element
 
-        end function SquareFirst_Construct
+        end function construct_square_first
 
-        module function get_id_SquareFirst(self) result(id)
+        module function get_id_square_first(self) result(id)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             integer(int32) :: id
 
-        end function get_id_SquareFirst
+        end function get_id_square_first
 
-        module function get_type_SquareFirst(self) result(type)
+        module function get_type_square_first(self) result(type)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             integer(int32) :: type
 
-        end function get_type_SquareFirst
+        end function get_type_square_first
 
-        module function get_size_SquareFirst(self) result(size)
+        module function get_num_nodes_square_first(self) result(num_nodes)
             implicit none
-            class(SquareFirst), intent(in) :: self
-            integer(int32) :: size
+            class(type_square_first), intent(in) :: self
+            integer(int32) :: num_nodes
 
-        end function get_size_SquareFirst
+        end function get_num_nodes_square_first
 
-        module function get_group_SquareFirst(self) result(group)
+        module function get_group_square_first(self) result(group)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             integer(int32) :: group
 
-        end function get_group_SquareFirst
+        end function get_group_square_first
 
-        module function psi_SquareFirst(self, i, xi, eta) result(psi)
+        module function get_order_square_first(self) result(order)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
+            integer(int32) :: order
+
+        end function get_order_square_first
+
+        module function get_dimension_square_first(self) result(dimension)
+            implicit none
+            class(type_square_first), intent(in) :: self
+            integer(int32) :: dimension
+
+        end function get_dimension_square_first
+
+        module function get_num_gauss_square_first(self) result(num_gauss)
+            implicit none
+            class(type_square_first), intent(in) :: self
+            integer(int32) :: num_gauss
+
+        end function get_num_gauss_square_first
+
+        module function psi_square_first(self, i, xi, eta) result(psi)
+            implicit none
+            class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: psi
 
-        end function psi_SquareFirst
+        end function psi_square_first
 
-        module function dpsi_dxi_SquareFirst(self, i, xi, eta) result(dpsi)
+        module function dpsi_dxi_square_first(self, i, xi, eta) result(dpsi)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_dxi_SquareFirst
+        end function dpsi_dxi_square_first
 
-        module function dpsi_deta_SquareFirst(self, i, xi, eta) result(dpsi)
+        module function dpsi_deta_square_first(self, i, xi, eta) result(dpsi)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_deta_SquareFirst
+        end function dpsi_deta_square_first
 
-        module function Jac_SquareFirst(self, i, j, xi, eta) result(Jval)
+        module function jacobian_square_first(self, i, j, xi, eta) result(Jval)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
             real(real64) :: Jval
 
-        end function Jac_SquareFirst
+        end function jacobian_square_first
 
-        module function Jac_Det_SquareFirst(self, xi, eta) result(J_Det)
+        module function jacobian_det_square_first(self, xi, eta) result(J_Det)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
 
-        end function Jac_Det_SquareFirst
+        end function jacobian_det_square_first
 
-        module subroutine is_in_SquareFirst(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_square_first(self, px, py, pxi, peta, is_in)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical(4) :: is_in
+            logical :: is_in
 
-        end subroutine is_in_SquareFirst
+        end subroutine is_in_square_first
 
-        module function Interpolate_SquareFirst(self, xi, eta, value) result(interpolated_value)
+        module function interpolate_square_first(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(SquareFirst), intent(in) :: self
+            class(type_square_first), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
-        end function Interpolate_SquareFirst
+        end function interpolate_square_first
     end interface
 
     !--------------------------------------------------------------------------------------
     !   三角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
+        module function construct_triangle_second(id, global_coordinate, cell_info) result(element)
             implicit none
-            integer(int32), intent(in) :: iElem
-            type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
-            integer(int32), intent(in) :: Connectivity(6)
-            integer(int32), intent(in) :: GroupID
-            class(Abst_ElementType), allocatable :: Structure
+            integer(int32), intent(in) :: id
+            type(type_dp_3d), pointer, intent(in) :: global_coordinate
+            type(type_vtk_cell), intent(in) :: cell_info
+            class(abst_element), allocatable :: element
 
-        end function TriangleSecond_Construct
+        end function construct_triangle_second
 
-        module function get_id_TriangleSecond(self) result(id)
+        module function get_id_triangle_second(self) result(id)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             integer(int32) :: id
 
-        end function get_id_TriangleSecond
+        end function get_id_triangle_second
 
-        module function get_type_TriangleSecond(self) result(type)
+        module function get_type_triangle_second(self) result(type)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             integer(int32) :: type
 
-        end function get_type_TriangleSecond
+        end function get_type_triangle_second
 
-        module function get_size_TriangleSecond(self) result(size)
+        module function get_num_nodes_triangle_second(self) result(num_nodes)
             implicit none
-            class(TriangleSecond), intent(in) :: self
-            integer(int32) :: size
+            class(type_triangle_second), intent(in) :: self
+            integer(int32) :: num_nodes
 
-        end function get_size_TriangleSecond
+        end function get_num_nodes_triangle_second
 
-        module function get_group_TriangleSecond(self) result(group)
+        module function get_group_triangle_second(self) result(group)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             integer(int32) :: group
 
-        end function get_group_TriangleSecond
+        end function get_group_triangle_second
 
-        module function psi_TriangleSecond(self, i, xi, eta) result(N)
+        module function get_order_triangle_second(self) result(order)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
+            integer(int32) :: order
+
+        end function get_order_triangle_second
+
+        module function get_dimension_triangle_second(self) result(dimension)
+            implicit none
+            class(type_triangle_second), intent(in) :: self
+            integer(int32) :: dimension
+
+        end function get_dimension_triangle_second
+
+        module function get_num_gauss_triangle_second(self) result(num_gauss)
+            implicit none
+            class(type_triangle_second), intent(in) :: self
+            integer(int32) :: num_gauss
+
+        end function get_num_gauss_triangle_second
+
+        module function psi_triangle_second(self, i, xi, eta) result(N)
+            implicit none
+            class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: N
 
-        end function psi_TriangleSecond
+        end function psi_triangle_second
 
-        module function dpsi_dxi_TriangleSecond(self, i, xi, eta) result(dpsi)
+        module function dpsi_dxi_triangle_second(self, i, xi, eta) result(dpsi)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_dxi_TriangleSecond
+        end function dpsi_dxi_triangle_second
 
-        module function dpsi_deta_TriangleSecond(self, i, xi, eta) result(dpsi)
+        module function dpsi_deta_triangle_second(self, i, xi, eta) result(dpsi)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_deta_TriangleSecond
+        end function dpsi_deta_triangle_second
 
-        module function Jac_TriangleSecond(self, i, j, xi, eta) result(Jval)
+        module function jacobian_triangle_second(self, i, j, xi, eta) result(Jval)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
             real(real64) :: Jval
 
-        end function Jac_TriangleSecond
+        end function jacobian_triangle_second
 
-        module function Jac_Det_TriangleSecond(self, xi, eta) result(J_Det)
+        module function jacobian_det_triangle_second(self, xi, eta) result(J_Det)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
 
-        end function Jac_Det_TriangleSecond
+        end function jacobian_det_triangle_second
 
-        module subroutine is_in_TriangleSecond(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_triangle_second(self, px, py, pxi, peta, is_in)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical(4) :: is_in
+            logical :: is_in
 
-        end subroutine is_in_TriangleSecond
+        end subroutine is_in_triangle_second
 
-        module function Interpolate_TriangleSecond(self, xi, eta, value) result(interpolated_value)
+        module function interpolate_triangle_second(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(TriangleSecond), intent(in) :: self
+            class(type_triangle_second), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
-        end function Interpolate_TriangleSecond
+        end function interpolate_triangle_second
     end interface
 
     !--------------------------------------------------------------------------------------
     !   四角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function SquareSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
+        module function construct_square_second(id, global_coordinate, cell_info) result(element)
             implicit none
-            integer(int32), intent(in) :: iElem
-            type(type_dp_3d), intent(in), pointer :: Global_Coordinate
-            integer(int32), intent(in) :: Connectivity(8)
-            integer(int32), intent(in) :: GroupID
-            class(Abst_ElementType), allocatable :: Structure
+            integer(int32), intent(in) :: id
+            type(type_dp_3d), pointer, intent(in) :: global_coordinate
+            type(type_vtk_cell), intent(in) :: cell_info
+            class(abst_element), allocatable :: element
 
-        end function SquareSecond_Construct
+        end function construct_square_second
 
-        module function get_id_SquareSecond(self) result(id)
+        module function get_id_square_second(self) result(id)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             integer(int32) :: id
 
-        end function get_id_SquareSecond
+        end function get_id_square_second
 
-        module function get_type_SquareSecond(self) result(type)
+        module function get_type_square_second(self) result(type)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             integer(int32) :: type
 
-        end function get_type_SquareSecond
+        end function get_type_square_second
 
-        module function get_size_SquareSecond(self) result(size)
+        module function get_num_nodes_square_second(self) result(num_nodes)
             implicit none
-            class(SquareSecond), intent(in) :: self
-            integer(int32) :: size
+            class(type_square_second), intent(in) :: self
+            integer(int32) :: num_nodes
 
-        end function get_size_SquareSecond
+        end function get_num_nodes_square_second
 
-        module function get_group_SquareSecond(self) result(group)
+        module function get_group_square_second(self) result(group)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             integer(int32) :: group
 
-        end function get_group_SquareSecond
+        end function get_group_square_second
 
-        module function psi_SquareSecond(self, i, xi, eta) result(psi)
+        module function get_order_square_second(self) result(order)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
+            integer(int32) :: order
+
+        end function get_order_square_second
+
+        module function get_dimension_square_second(self) result(dimension)
+            implicit none
+            class(type_square_second), intent(in) :: self
+            integer(int32) :: dimension
+
+        end function get_dimension_square_second
+
+        module function get_num_gauss_square_second(self) result(num_gauss)
+            implicit none
+            class(type_square_second), intent(in) :: self
+            integer(int32) :: num_gauss
+
+        end function get_num_gauss_square_second
+        module function psi_square_second(self, i, xi, eta) result(psi)
+            implicit none
+            class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: psi
 
-        end function psi_SquareSecond
+        end function psi_square_second
 
-        module function dpsi_dxi_SquareSecond(self, i, xi, eta) result(dpsi)
+        module function dpsi_dxi_square_second(self, i, xi, eta) result(dpsi)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_dxi_SquareSecond
+        end function dpsi_dxi_square_second
 
-        module function dpsi_deta_SquareSecond(self, i, xi, eta) result(dpsi)
+        module function dpsi_deta_square_second(self, i, xi, eta) result(dpsi)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
             real(real64), intent(in) :: xi, eta
             real(real64) :: dpsi
 
-        end function dpsi_deta_SquareSecond
+        end function dpsi_deta_square_second
 
-        module function Jac_SquareSecond(self, i, j, xi, eta) result(Jval)
+        module function jacobian_square_second(self, i, j, xi, eta) result(Jval)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i, j
             real(real64), intent(in) :: xi, eta
             real(real64) :: Jval
 
-        end function Jac_SquareSecond
+        end function jacobian_square_second
 
-        module function Jac_Det_SquareSecond(self, xi, eta) result(J_Det)
+        module function jacobian_det_square_second(self, xi, eta) result(J_Det)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64) :: J_Det
 
-        end function Jac_Det_SquareSecond
+        end function jacobian_det_square_second
 
-        module subroutine is_in_SquareSecond(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_square_second(self, px, py, pxi, peta, is_in)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical(4) :: is_in
+            logical :: is_in
 
-        end subroutine is_in_SquareSecond
+        end subroutine is_in_square_second
 
-        module function Interpolate_SquareSecond(self, xi, eta, value) result(interpolated_value)
+        module function interpolate_square_second(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(SquareSecond), intent(in) :: self
+            class(type_square_second), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
-        end function Interpolate_SquareSecond
+        end function interpolate_square_second
     end interface
 
-    interface TriangleFirst
-        module procedure :: TriangleFirst_Construct
+    interface type_triangle_first
+        module procedure :: construct_triangle_first
     end interface
 
-    interface SquareFirst
-        module procedure :: SquareFirst_Construct
+    interface type_square_first
+        module procedure :: construct_square_first
     end interface
 
-    interface TriangleSecond
-        module procedure :: TriangleSecond_Construct
+    interface type_triangle_second
+        module procedure :: construct_triangle_second
     end interface
 
-    interface SquareSecond
-        module procedure :: SquareSecond_Construct
+    interface type_square_second
+        module procedure :: construct_square_second
     end interface
 
-end module Domain_Element
+end module domain_element

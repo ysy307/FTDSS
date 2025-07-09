@@ -1,8 +1,4 @@
 submodule(Condition_Boundary) Condition_Boundary_Dirichlet
-    ! use, intrinsic :: iso_fortran_env
-    ! use :: Domain_Module, only:type_domain
-    ! use :: Matrix_CRS, only:Type_CRS
-    ! use :: Inout_Input, only:Input_Boundary
     implicit none
 contains
 
@@ -58,7 +54,7 @@ contains
                                                   isUniform=self%is_uniform, &
                                                   Edge=self%target_edges(:, iEdge), &
                                                   Dval=Dval, &
-                                                  perm=Domain%RCM_inv_perm)
+                                                  rcm=Domain%rcm)
                 end do
             else
                 select case (mode)
@@ -79,7 +75,7 @@ contains
                                                   isUniform=self%is_uniform, &
                                                   Edge=self%target_edges(:, iEdge), &
                                                   Dval=Dval, &
-                                                  perm=Domain%RCM_inv_perm)
+                                                  rcm=Domain%rcm)
                 end do
             end if
         else
@@ -92,7 +88,7 @@ contains
                                                   isUniform=self%is_uniform, &
                                                   Edge=self%target_edges(:, iEdge), &
                                                   Dval=Dval, &
-                                                  perm=Domain%RCM_inv_perm)
+                                                  rcm=Domain%rcm)
                 end do
             else
                 select case (mode)
@@ -112,28 +108,29 @@ contains
                                                   isUniform=self%is_uniform, &
                                                   Edge=self%target_edges(:, iEdge), &
                                                   Dval=Dval, &
-                                                  perm=Domain%RCM_inv_perm)
+                                                  rcm=Domain%rcm)
                 end do
             end if
         end if
 
     end subroutine apply_CRS_Thermal_Dirichlet
 
-    subroutine apply_CRS_Dirichlet_base(A, b, isUniform, Edge, Dval, perm)
+    subroutine apply_CRS_Dirichlet_base(A, b, isUniform, Edge, Dval, rcm)
         implicit none
         type(Type_CRS), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
         logical(logical32), intent(in) :: isUniform
         integer(int32), intent(in) :: Edge(2)
         real(real64), intent(in) :: Dval
-        integer(int32), intent(in) :: perm(:)
+        type(type_rcm), intent(in) :: rcm
+        ! integer(int32), intent(in) :: perm(:)
 
         integer(int32) :: i, ind, ps, pe
         integer(int32) :: p1, p2
 
         if (isUniform) then
-            p1 = perm(Edge(1))
-            p2 = perm(Edge(2))
+            call rcm%reorder_original(Edge(1), p1)
+            call rcm%reorder_original(Edge(2), p2)
 
             if (present(A)) then
                 call A%Find(p1, p1, ind)

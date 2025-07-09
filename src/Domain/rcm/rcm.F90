@@ -1,8 +1,8 @@
 module domain_rcm
     use, intrinsic :: iso_fortran_env, only: int32, real64, logical32
-    use :: core_core, only:allocate_array, deallocate_array
-    use :: domain_adjacency, only:type_node_adjacency
     use :: stdlib_sorting, only:sort_index
+    use :: module_core, only:allocate_array, deallocate_array
+    use :: domain_adjacency, only:type_node_adjacency
     implicit none
     private
 
@@ -10,13 +10,30 @@ module domain_rcm
 
     ! RCMの結果と関連操作をカプセル化する型
     type :: type_rcm
-        integer(int32) :: num_nodes = 0
-        integer(int32), allocatable :: perm(:)
-        integer(int32), allocatable :: iperm(:)
+
+        integer(int32), private :: num_nodes = 0
+        integer(int32), allocatable, private :: perm(:)
+        integer(int32), allocatable, private :: iperm(:)
+        logical, private :: is_reordered_original = .false.
+        logical, private :: is_reordered = .false.
     contains
         procedure, public, pass(self) :: reorder => rcm_reorder_method
         procedure, public, pass(self) :: invert => rcm_inverse_method
-        procedure, public, pass(self) :: restore_vector => reorder_to_original_method
+
+        procedure, private, pass(self) :: reorder_original_vector_real64
+        procedure, private, pass(self) :: reorder_original_vector_int32
+        procedure, private, pass(self) :: reorder_original_index
+        generic, public :: reorder_original => reorder_original_vector_real64, & !&
+                           reorder_original_vector_int32, & !&
+                           reorder_original_index !&
+
+        procedure, private, pass(self) :: reorder_vector_real64
+        procedure, private, pass(self) :: reorder_vector_int32
+        procedure, private, pass(self) :: reorder_index
+        generic, public :: reorder_to_rcm => reorder_vector_real64, & !&
+                                             reorder_vector_int32, & !&
+                                             reorder_index !&
+
         final :: final_destroy_rcm
     end type type_rcm
 
@@ -71,6 +88,9 @@ contains
         call deallocate_array(R)
         call deallocate_array(Q)
         call deallocate_array(visited)
+
+        self%is_reordered_original = .true.
+        self%is_reordered = .false. ! [修正] ipermはまだ作られていないのでfalseに
     end subroutine rcm_reorder_method
 
     !================================================================!
@@ -80,8 +100,8 @@ contains
         class(type_rcm), intent(inout) :: self
         integer(int32) :: i
 
-        if (.not. allocated(self%perm)) then
-            error stop "domain_rcm::invert: 'perm' is not allocated. Call 'reorder' first."
+        if (.not. self%is_reordered_original) then ! [修正] permが作られているかを確認
+            error stop "domain_rcm::invert: 'perm' is not ready. Call 'reorder' first."
         end if
 
         if (allocated(self%iperm)) call deallocate_array(self%iperm)
@@ -89,28 +109,125 @@ contains
         do i = 1, self%num_nodes
             self%iperm(self%perm(i)) = i
         end do
+
+        self%is_reordered = .true.
     end subroutine rcm_inverse_method
 
     !================================================================!
     !【メソッド】RCM順序のベクトルを元の順序に戻す
     !================================================================!
-    subroutine reorder_to_original_method(self, vector_rcm, vector_original)
+    subroutine reorder_original_vector_int32(self, vector_rcm, vector_original)
         class(type_rcm), intent(in) :: self
-        real(real64), intent(in) :: vector_rcm(:)
-        real(real64), intent(out) :: vector_original(:)
+        integer(int32), intent(in) :: vector_rcm(:)
+        integer(int32), intent(out) :: vector_original(:) ! [修正] intentをoutに
         integer(int32) :: i
 
         if (size(vector_rcm) /= self%num_nodes .or. size(vector_original) /= self%num_nodes) then
-            error stop "domain_rcm::restore_vector: Vector size mismatch."
+            error stop "domain_rcm::reorder_original_vector: Vector size mismatch."
         end if
-        if (.not. allocated(self%perm)) then
-            error stop "domain_rcm::restore_vector: 'perm' is not allocated. Call 'reorder' first."
+        ! [修正] フラグの論理を修正
+        if (.not. self%is_reordered_original) then
+            error stop "domain_rcm::reorder_original_vector: 'perm' is not ready. Call 'reorder' first."
         end if
 
         do i = 1, self%num_nodes
             vector_original(self%perm(i)) = vector_rcm(i)
         end do
-    end subroutine reorder_to_original_method
+    end subroutine reorder_original_vector_int32
+
+    subroutine reorder_original_vector_real64(self, vector_rcm, vector_original)
+        class(type_rcm), intent(in) :: self
+        real(real64), intent(in) :: vector_rcm(:)
+        real(real64), intent(out) :: vector_original(:) ! [修正] intentをoutに
+        integer(int32) :: i
+
+        if (size(vector_rcm) /= self%num_nodes .or. size(vector_original) /= self%num_nodes) then
+            error stop "domain_rcm::reorder_original_vector: Vector size mismatch."
+        end if
+        ! [修正] フラグの論理を修正
+        if (.not. self%is_reordered_original) then
+            error stop "domain_rcm::reorder_original_vector: 'perm' is not ready. Call 'reorder' first."
+        end if
+
+        do i = 1, self%num_nodes
+            vector_original(self%perm(i)) = vector_rcm(i)
+        end do
+    end subroutine reorder_original_vector_real64
+
+    !================================================================!
+    !【メソッド】RCM順序のインデックスから元のインデックスを取得
+    !================================================================!
+    subroutine reorder_original_index(self, index_rcm, index_original)
+        class(type_rcm), intent(in) :: self
+        integer(int32), intent(in) :: index_rcm
+        integer(int32), intent(out) :: index_original ! [修正] intentをoutに
+
+        ! [修正] フラグの論理を修正
+        if (.not. self%is_reordered_original) then
+            error stop "domain_rcm::reorder_original_index: 'perm' is not ready. Call 'reorder' first."
+        end if
+
+        index_original = self%perm(index_rcm)
+    end subroutine reorder_original_index
+
+    ! ================================================================!
+    !【メソッド】元の順序のベクトルをRCM順序に並べ替える
+    !================================================================!
+    subroutine reorder_vector_int32(self, vector_original, vector_reordered)
+        class(type_rcm), intent(in) :: self
+        integer(int32), intent(in) :: vector_original(:) ! [修正] 引数名を明確化
+        integer(int32), intent(out) :: vector_reordered(:) ! [修正] 引数名を明確化
+        integer(int32) :: i
+
+        if (size(vector_original) /= self%num_nodes .or. size(vector_reordered) /= self%num_nodes) then
+            error stop "domain_rcm::reorder_vector_int32: Vector size mismatch."
+        end if
+        ! [修正] フラグの論理とエラーメッセージを修正
+        if (.not. self%is_reordered_original) then
+            error stop "domain_rcm::reorder_vector: 'perm' is not ready. Call 'reorder' first."
+        end if
+
+        ! [修正] 並べ替えロジックを修正
+        do i = 1, self%num_nodes
+            vector_reordered(i) = vector_original(self%perm(i))
+        end do
+    end subroutine reorder_vector_int32
+
+    subroutine reorder_vector_real64(self, vector_original, vector_reordered)
+        class(type_rcm), intent(in) :: self
+        real(real64), intent(in) :: vector_original(:) ! [修正] 引数名を明確化
+        real(real64), intent(out) :: vector_reordered(:) ! [修正] 引数名を明確化
+        integer(int32) :: i
+
+        if (size(vector_original) /= self%num_nodes .or. size(vector_reordered) /= self%num_nodes) then
+            error stop "domain_rcm::reorder_vector_real64: Vector size mismatch."
+        end if
+        ! [修正] フラグの論理とエラーメッセージを修正
+        if (.not. self%is_reordered_original) then
+            error stop "domain_rcm::reorder_vector: 'perm' is not ready. Call 'reorder' first."
+        end if
+
+        ! [修正] 並べ替えロジックを修正
+        do i = 1, self%num_nodes
+            vector_reordered(i) = vector_original(self%perm(i))
+        end do
+    end subroutine reorder_vector_real64
+
+    !================================================================!
+    !【メソッド】元のインデックスからRCM順序のインデックスを取得
+    !================================================================!
+    subroutine reorder_index(self, index_original, index_reordered)
+        class(type_rcm), intent(in) :: self
+        integer(int32), intent(in) :: index_original ! [修正] 引数名を明確化
+        integer(int32), intent(out) :: index_reordered ! [修正] 引数名を明確化
+
+        ! [修正] フラグの論理とエラーメッセージを修正
+        if (.not. self%is_reordered) then
+            error stop "domain_rcm::reorder_index: 'iperm' is not ready. Call 'invert' first."
+        end if
+
+        index_reordered = self%iperm(index_original)
+    end subroutine reorder_index
 
     !================================================================!
     ! RCMアルゴリズム用のプライベート・ヘルパーサブルーチン群

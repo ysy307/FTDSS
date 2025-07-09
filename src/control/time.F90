@@ -1,9 +1,8 @@
 module control_time
     use, intrinsic :: iso_fortran_env, only: int32, real64, int64
-    use :: Inout_Input
-    use :: core_core, only:allocate_array
-
 !$  use omp_lib
+    use :: module_core, only:allocate_array
+    use :: Inout_Input
 
     implicit none
     private

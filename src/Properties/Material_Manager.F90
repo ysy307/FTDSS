@@ -79,10 +79,10 @@ contains
 
     function get_THC(self, region_id) result(model_holder)
         class(MaterialManager_t), intent(in) :: self
-        integer, intent(in) :: region_id
+        integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(THCHolder) :: model_holder
-        integer :: model_index
+        integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
         model_index = self%region_id_map(region_id)
@@ -100,10 +100,10 @@ contains
 
     function get_DEN(self, region_id) result(model_holder)
         class(MaterialManager_t), intent(in) :: self
-        integer, intent(in) :: region_id
+        integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(DENHolder) :: model_holder
-        integer :: model_index
+        integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
         model_index = self%region_id_map(region_id)
@@ -121,10 +121,10 @@ contains
 
     function get_SPH(self, region_id) result(model_holder)
         class(MaterialManager_t), intent(in) :: self
-        integer, intent(in) :: region_id
+        integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(SPHHolder) :: model_holder
-        integer :: model_index
+        integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
         model_index = self%region_id_map(region_id)
@@ -142,10 +142,10 @@ contains
 
     function get_VHC(self, region_id) result(model_holder)
         class(MaterialManager_t), intent(in) :: self
-        integer, intent(in) :: region_id
+        integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(VHCHolder) :: model_holder
-        integer :: model_index
+        integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
         model_index = self%region_id_map(region_id)
@@ -165,10 +165,10 @@ contains
     ! 例えば、get_GCC(self, region_id) と get_WRF(self, region_id) を追加します。
     function get_GCC(self, region_id) result(model_holder)
         class(MaterialManager_t), intent(in) :: self
-        integer, intent(in) :: region_id
+        integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(GCCHolder) :: model_holder
-        integer :: model_index
+        integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
 
@@ -187,10 +187,10 @@ contains
 
     function get_WRF(self, region_id) result(model_holder)
         class(MaterialManager_t), intent(in) :: self
-        integer, intent(in) :: region_id
+        integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(WRFHolder) :: model_holder
-        integer :: model_index
+        integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
         model_index = self%region_id_map(region_id)

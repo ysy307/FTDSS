@@ -3,18 +3,14 @@ module Inout_Output
     use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
     use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
 
-    use :: core_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state, & !&
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state, & !&
                            get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                            get_cpu_architecture, get_os, get_openmp_version, get_memory_usage !&
 
     use :: Inout_Input
-    use :: Domain_Element, only:ElementHolder
-    use :: Domain_Element_Factory, only:Create_Element
+    use :: module_domain, only:ElementHolder, Create_Element, type_domain
     use :: Properties_Model_Base, only:Proereties_Model_t
-    ! use :: Matrix_RCM, only:Reorder_to_Original
-    use :: Domain_module, only:type_domain
     use :: Main_Thermal
-    use :: control_control, only:type_time
     use :: stdlib_strings, only:to_string
 
 !$  use :: omp_lib

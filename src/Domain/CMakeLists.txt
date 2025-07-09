@@ -1,20 +1,21 @@
 add_library(Domain OBJECT
-    Element/Element.F90
-    Element/Element_SquareFirst.F90
-    Element/Element_SquareSecond.F90
-    Element/Element_TriangleFirst.F90
-    Element/Element_TriangleSecond.F90
-    Element/Element_Factory.F90
-    Side/Side.F90
-    Side/Side_First.F90
-    Side/Side_Second.F90
-    Side/Side_Factory.F90
-    adjacency/node.F90
-    adjacency/element.F90
+    element/element.F90
+    element/element_triangle_first.F90
+    element/element_triangle_second.F90
+    element/element_square_first.F90
+    element/element_square_second.F90
+    element/element_factory.F90
+    side/side.F90
+    side/side_first.F90
+    side/side_second.F90
+    side/side_factory.F90
+    adjacency/adjacency_element.F90
+    adjacency/adjacency_node.F90
     adjacency/adjacency.F90
     multicoloring/multicoloring.F90
     rcm/rcm.F90
     domain_manager.F90
+    domain.F90
 )
 target_link_libraries(Domain PRIVATE
     Core

@@ -1,10 +1,7 @@
-module Condition_Boundary
+module condition_boundary
     use, intrinsic :: iso_fortran_env
-    ! use :: Core_BaseTypes
-    use :: Core_Allocate
-    use :: Domain_Side, only:SideHolder
-    use :: Domain_Module, only:type_domain
-    use :: core_core
+    use :: module_core
+    use :: module_domain, only:type_domain, holder_sides, type_rcm
     use :: Matrix_CRS
     use :: Inout_Input
     implicit none
@@ -923,4 +920,4 @@ module Condition_Boundary
 !         A(p2, p2) = A(p2, p2) + 2.0d0 * val1 * Edge_Distance / 6.0d0
 
 !     end subroutine Fix_BoundaryCondition_HeatRadiation_Full
-end module Condition_Boundary
+end module condition_boundary

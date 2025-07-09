@@ -1,39 +1,27 @@
-module Domain_Module
+module domain_manager
     use, intrinsic :: iso_fortran_env, only: int32
-    use :: core_core, only:type_dp_3d
-    use :: Domain_Element, only:ElementHolder
-    use :: Domain_Side, only:SideHolder
-    use :: Domain_Element_Factory, only:Create_Element
-    use :: Domain_Side_Factory, only:Create_Side
+    use :: module_core, only:type_dp_3d
+    use :: Domain_Element, only:holder_elements
+    use :: Domain_Side, only:holder_sides
+    use :: Domain_Element_Factory, only:create_element
+    use :: Domain_Side_Factory, only:create_side
     use :: domain_adjacency, only:type_node_adjacency, type_element_adjacency
     use :: domain_multicoloring, only:type_coloring, type_colored_info
     use :: domain_rcm, only:type_rcm
     use :: Inout_Input
     implicit none
     private
+
     public :: type_domain
 
-    ! type :: type_colored_info
-    !     integer(int32) :: num_elements
-    !     integer(int32), allocatable :: elements(:) ! 各要素のインデックス
-    ! end type type_colored_info
-
-    ! type :: type_coloring
-    !     integer(int32) :: num_colors
-    !     integer(int32), allocatable :: color(:)
-    !     type(type_colored_info), allocatable :: colored(:) ! 各色に属する要素の情報
-    ! end type type_coloring
-
     type :: type_domain
-        integer(int32), private :: num_volumes
-        integer(int32), private :: num_elements
         integer(int32), private :: num_sides
+        integer(int32), private :: num_elements
+        integer(int32), private :: num_volumes
         integer(int32), private :: num_nodes
         integer(int32), private :: num_regions
-        type(ElementHolder), allocatable :: elements(:)
-        type(SideHolder), allocatable :: sides(:)
-        integer(int32), allocatable :: RCM_perm(:)
-        integer(int32), allocatable :: RCM_inv_perm(:)
+        type(holder_elements), allocatable :: elements(:)
+        type(holder_sides), allocatable :: sides(:)
 
         type(type_element_adjacency) :: element_adjacency
         type(type_node_adjacency) :: node_adjacency
@@ -44,7 +32,7 @@ module Domain_Module
         procedure, pass(self) :: initialize
 
         procedure, pass(self) :: get_num_elements
-        procedure, pass(self) :: get_num_Sides
+        procedure, pass(self) :: get_num_sides
         procedure, pass(self) :: get_num_Nodes
         procedure, pass(self) :: get_num_Regions
     end type type_domain
@@ -57,92 +45,100 @@ contains
         type(type_dp_3d), intent(inout), pointer :: Coordinate
         integer, intent(out) :: ierr
 
-        integer :: CountElements, CountSides
-        integer :: iCell, iElem, iSide
-        integer :: factory_ierr
+        integer(int32) :: count_sides, count_elements, count_volumes
+        integer(int32) :: iCell, iElem, iSide
+        integer(int32) :: factory_ierr
+        integer(int32) :: cell_dimension
 
         ! --- 一時的なデータ配列 ---
         integer(int32), allocatable :: conn_data(:)
         integer(int32), allocatable :: conn_ptr(:)
-        integer(int32) :: total_conn_size, i, n_nodes_in_elem
+        integer(int32) :: total_connec_size, i, n_nodes_in_elem
 
+        ! -----------------------------------------------------------------------------------
+        ! 初期化処理
+        ! -----------------------------------------------------------------------------------
         ierr = 0
-        CountElements = 0
-        CountSides = 0
+        count_sides = 0
+        count_elements = 0
+        count_volumes = 0
 
         do iCell = 1, Input%VTK%num_total_cells
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 1)) then
-                CountSides = CountSides + 1
-            end if
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 2)) then
-                CountElements = CountElements + 1
-            end if
+            cell_dimension = Input%vtk%cells(iCell)%get_dimension()
+            select case (cell_dimension)
+            case (1)
+                count_sides = count_sides + 1
+            case (2)
+                count_elements = count_elements + 1
+            case (3)
+                count_volumes = count_volumes + 1
+            end select
         end do
 
-        self%num_elements = CountElements
-        self%num_sides = CountSides
+        self%num_elements = count_elements
+        self%num_sides = count_sides
         self%num_nodes = Input%VTK%num_points
         self%num_regions = Input%Basic%numRegion
 
-        allocate (self%Elements(self%num_elements))
-        allocate (self%Sides(self%num_sides))
+        if (allocated(self%elements)) deallocate (self%elements)
+        allocate (self%elements(self%num_elements))
+        if (allocated(self%sides)) deallocate (self%sides)
+        allocate (self%sides(self%num_sides))
 
         iElem = 1
         iSide = 1
         do iCell = 1, Input%VTK%num_total_cells
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 1)) then
-                call Create_Side(new_side=self%Sides(iSide)%s, &
-                                 shape_type=Input%VTK%CELLS(iCell)%cell_type, &
-                                 ierr=factory_ierr, &
-                                 iSide=iSide, &
-                                 Global_Coordinate=Coordinate, &
-                                 Connectivity=Input%VTK%CELLS(iCell)%CONNECTIVITY, &
-                                 GroupID=Input%VTK%CELLS(iCell)%cell_entity_id &
-                                 )
+            cell_dimension = Input%vtk%cells(iCell)%get_dimension()
+            select case (cell_dimension)
+            case (1)
+                call create_side(new_side=self%sides(iSide)%s, &
+                                 id=iCell, &
+                                 global_coordinate=Coordinate, &
+                                 cell_info=Input%vtk%cells(iCell), &
+                                 ierr=factory_ierr)
                 if (factory_ierr /= 0) then
                     ierr = -1
                     return
                 end if
                 iSide = iSide + 1
-            end if
-            if (Input%VTK%Is_In(Input%VTK%CELLS(iCell)%cell_type, 2)) then
-                call create_element( &
-                    new_element=self%Elements(iElem)%e, &
-                    shape_type=Input%VTK%CELLS(iCell)%cell_type, &
-                    ierr=factory_ierr, &
-                    iElem=iCell, &
-                    Global_Coordinate=Coordinate, &
-                    Connectivity=Input%VTK%CELLS(iCell)%CONNECTIVITY, &
-                    GroupID=Input%VTK%CELLS(iCell)%cell_entity_id &
-                    )
+            case (2)
+                call create_element(new_element=self%elements(iElem)%e, &
+                                    id=iCell, &
+                                    global_coordinate=Coordinate, &
+                                    cell_info=Input%vtk%cells(iCell), &
+                                    ierr=factory_ierr)
                 if (factory_ierr /= 0) then
                     ierr = -1
                     return
                 end if
                 iElem = iElem + 1
-            end if
+            case (3)
+                !!TBI
+            end select
+
+        end do
+        !===============================================================
+        ! 2. 汎用モジュール用のデータ準備 (Input%vtkからCSR形式を構築)
+        !===============================================================
+        ! 全コネクティビティデータの合計サイズを計算
+        total_connec_size = 0
+        do i = 1, Input%vtk%num_total_cells
+            total_connec_size = total_connec_size + size(Input%vtk%cells(i)%connectivity)
         end do
 
-        ! =============================================================== !
-        ! ▼▼▼ ここからが隣接行列の構築処理 ▼▼▼
-        ! =============================================================== !
+        ! CSR配列を確保
+        call allocate_array(conn_ptr, Input%vtk%num_total_cells + 1_int32)
+        call allocate_array(conn_data, total_connec_size)
 
-        !===============================================================
-        ! 2. 汎用モジュール用のデータ準備 (要素コネクティビティをCSR形式に)
-        !===============================================================
-        total_conn_size = 0
-        do i = 1, self%num_elements
-            total_conn_size = total_conn_size + size(self%elements(i)%e%conn)
-        end do
-        call allocate_array(conn_ptr, self%num_elements + 1_int32)
-        call allocate_array(conn_data, total_conn_size)
+        ! Input%vtk%cells の情報を使ってCSR配列を構築
         conn_ptr(1) = 1
-        do i = 1, self%num_elements
-            n_nodes_in_elem = size(self%elements(i)%e%conn)
+        do i = 1, Input%vtk%num_total_cells
+            n_nodes_in_elem = size(Input%vtk%cells(i)%connectivity)
             conn_ptr(i + 1) = conn_ptr(i) + n_nodes_in_elem
-            conn_data(conn_ptr(i):conn_ptr(i + 1) - 1) = self%elements(i)%e%conn
+
+            conn_data(conn_ptr(i):conn_ptr(i + 1) - 1) = Input%vtk%cells(i)%connectivity
         end do
-        print *, "Step 2: Raw connectivity data prepared."
+        print *, "Step 2: Connectivity data prepared from VTK input."
 
         !===============================================================
         ! 3. 隣接行列の構築
@@ -172,9 +168,6 @@ contains
         call deallocate_array(conn_ptr)
         call deallocate_array(conn_data)
         print *, "Initialization process completed successfully."
-        ! =============================================================== !
-        ! ▲▲▲ 隣接行列の構築処理ここまで ▲▲▲
-        ! =============================================================== !
 
     end subroutine initialize
 
@@ -187,14 +180,14 @@ contains
 
     end function get_num_elements
 
-    function get_num_Sides(self) result(numSide)
+    function get_num_sides(self) result(numSide)
         implicit none
         class(type_domain), intent(in) :: self
         integer(int32) :: numSide
 
         numSide = self%num_sides
 
-    end function get_num_Sides
+    end function get_num_sides
 
     function get_num_Nodes(self) result(numNode)
         implicit none
@@ -214,4 +207,4 @@ contains
 
     end function get_num_Regions
 
-end module Domain_Module
+end module domain_manager

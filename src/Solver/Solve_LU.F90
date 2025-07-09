@@ -1,4 +1,6 @@
 submodule(Solver_Solve) Solve_LU
+    use, intrinsic :: iso_fortran_env, only: int32, int64, real64
+    use :: Matrix_CRS
     implicit none
 
 contains
@@ -19,13 +21,13 @@ contains
         allocate (Solver_CRS_LU :: structure)
         select type (this => structure)
         type is (Solver_CRS_LU)
-            this%N = N
-            this%MAXFCT = MAXFCT
-            this%MNUM = MNUM
-            this%MTYPE = MTYPE
-            this%PHASE = PHASE
-            this%NRHS = NRHS
-            this%MSGLVL = MSGVLV
+            this%N = int(N, kind=kind(this%N))
+            this%MAXFCT = int(MAXFCT, kind=kind(this%MAXFCT))
+            this%MNUM = int(MNUM, kind=kind(this%MNUM))
+            this%MTYPE = int(MTYPE, kind=kind(this%MTYPE))
+            this%PHASE = int(PHASE, kind=kind(this%PHASE))
+            this%NRHS = int(NRHS, kind=kind(this%NRHS))
+            this%MSGLVL = int(MSGVLV, kind=kind(this%MSGLVL))
             allocate (this%PERM(N))
             allocate (this%JA(A%nnz))
             allocate (this%IA(A%nptr))
@@ -34,10 +36,10 @@ contains
             call PARDISOINIT(this%PT, this%MTYPE, this%IPARM)
 
             do i = 1, A%nnz
-                this%JA(i) = A%Ind(i)
+                this%JA(i) = int(A%Ind(i), kind=kind(this%JA(i)))
             end do
             do i = 1, A%nptr
-                this%IA(i) = A%Ptr(i)
+                this%IA(i) = int(A%Ptr(i), kind=kind(this%IA(i)))
             end do
         end select
 
@@ -52,7 +54,7 @@ contains
         integer(int32), intent(inout) :: status
 
         call PARDISO(self%PT, self%MAXFCT, self%MNUM, self%MTYPE, self%PHASE, self%N, A%Val, self%IA, self%JA, self%PERM, self%NRHS, self%IPARM, self%MSGLVL, b, x, self%ERROR)
-        status = self%ERROR
+        status = int(self%ERROR, kind=kind(status))
 
     end subroutine Solve_CRS_LU
 
@@ -78,7 +80,7 @@ contains
         allocate (Solver_Full_LU :: structure)
         select type (this => structure)
         type is (Solver_Full_LU)
-            this%N = N
+            this%N = int(N, kind=kind(this%N))
             allocate (this%IPIV(this%N))
         end select
 
@@ -102,7 +104,7 @@ contains
 
         x(:) = b(:)
 
-        status = self%ERROR
+        status = int(self%ERROR, kind=kind(status))
 
     end subroutine Solve_Full_LU
 

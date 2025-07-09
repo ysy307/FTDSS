@@ -3,10 +3,10 @@
 ! Purpose: Manages all initial condition objects.
 ! =============================================================================
 module Conditions_Initial_Manager
-    use :: Condition_Initial
+    use :: module_core, only:type_variable
+    use :: module_domain, only:type_domain
     use :: Inout_Input, only:Type_Input
-    use :: core_core, only:type_variable
-    use :: Domain_Module, only:type_domain
+    use :: Condition_Initial
     implicit none
     private
     public :: ICManager

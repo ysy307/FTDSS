@@ -1,7 +1,7 @@
-module domain_element_adjacency
+module domain_adjacency_adjacency_element
     use, intrinsic :: iso_fortran_env, only: int32, int64
-    use :: core_core, only:allocate_array, deallocate_array
     use :: stdlib_sorting, only:sort
+    use :: module_core, only:allocate_array, deallocate_array
 
     implicit none
     private
@@ -271,5 +271,5 @@ contains
         self%num_elements = 0
     end subroutine destroy_adjacency
 
-end module domain_element_adjacency
+end module domain_adjacency_adjacency_element
 !================================================================!

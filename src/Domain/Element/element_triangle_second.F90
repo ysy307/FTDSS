@@ -1,10 +1,10 @@
-submodule(Domain_Element) Domain_Element_TriangleSecond
+submodule(Domain_Element) Domain_Element_triangle_second
     implicit none
 contains
     !----------------------------------------------------------------------!
-    ! TriangleSecond_Construct:
+    ! construct_triangle_second:
     !----------------------------------------------------------------------!
-    ! This function constructs a TriangleSecond element object based on the
+    ! This function constructs a type_triangle_second element object based on the
     ! given element index, global nodal coordinates, connectivity, and
     ! spatial dimension type.
     !
@@ -15,68 +15,73 @@ contains
     !   Global_Coordinate : type_dp_3d type pointer containing the global coordinates
     !                       of all nodes in the mesh.
     !
-    !   Connectivity      : Integer array (size 6) specifying the indices of
+    !   connectivity      : Integer array (size 6) specifying the indices of
     !                       nodes that form the triangular element.
     !
     ! Return Value:
-    !   Structure         : Allocated polymorphic object of type
-    !                       TriangleSecond (extends Abstract_ElementType).
+    !   element         : Allocated polymorphic object of type
+    !                       type_triangle_second (extends Abstract_ElementType).
     !
     ! Function Details:
-    !   - Allocates a new TriangleSecond element object.
+    !   - Allocates a new type_triangle_second element object.
     !   - Stores element ID and connectivity information.
     !   - Links to the corresponding global coordinates for each node.
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function TriangleSecond_Construct(iElem, Global_Coordinate, Connectivity, GroupID) result(Structure)
+    module function construct_triangle_second(id, global_coordinate, cell_info) result(element)
         implicit none
-        integer(int32), intent(in) :: iElem
-        type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(6)
-        integer(int32), intent(in) :: GroupID
-        class(Abst_ElementType), allocatable :: Structure
-        integer(int32), parameter :: nsize = 6
+        integer(int32), intent(in) :: id
+        type(type_dp_3d), pointer, intent(in) :: global_coordinate
+        type(type_vtk_cell), intent(in) :: cell_info
+        class(abst_element), allocatable :: element
+
         integer(int32) :: i
 
-        allocate (TriangleSecond :: Structure)
-        Structure%id = iElem
-        Structure%type = 22
-        Structure%group = GroupID
+        if (allocated(element)) deallocate (element)
+        allocate (type_triangle_second :: element)
 
-        Structure%size = nsize
-        allocate (Structure%conn(nsize))
-        Structure%conn(:) = Connectivity(1:nsize)
+        element%id = id
+        element%type = cell_info%cell_type
+        element%group = cell_info%cell_entity_id
+        element%dimension = cell_info%get_dimension()
+        element%order = cell_info%get_order()
 
-        allocate (Structure%X(nsize))
-        allocate (Structure%Y(nsize))
-        allocate (Structure%Z(nsize))
-        do i = 1, nsize
-            nullify (Structure%X(i)%val)
-            nullify (Structure%Y(i)%val)
-            nullify (Structure%Z(i)%val)
-            Structure%X(i)%val => Global_Coordinate%x(Structure%conn(i))
-            Structure%Y(i)%val => Global_Coordinate%y(Structure%conn(i))
-            Structure%Z(i)%val => Global_Coordinate%z(Structure%conn(i))
+        element%num_nodes = cell_info%num_nodes_in_cell
+        allocate (element%connectivity(element%num_nodes))
+        element%connectivity(:) = cell_info%connectivity(1:element%num_nodes)
+
+        allocate (element%x(element%num_nodes))
+        allocate (element%y(element%num_nodes))
+        allocate (element%z(element%num_nodes))
+        do i = 1, element%num_nodes
+            nullify (element%x(i)%val)
+            nullify (element%y(i)%val)
+            nullify (element%z(i)%val)
+            element%x(i)%val => global_coordinate%x(element%connectivity(i))
+            element%y(i)%val => global_coordinate%y(element%connectivity(i))
+            element%z(i)%val => global_coordinate%z(element%connectivity(i))
         end do
 
-        Structure%nGauss = 3
-        call allocate_array(Structure%weight, Structure%nGauss)
-        call allocate_array(Structure%gauss, 2_int32, Structure%nGauss)
-        Structure%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
-        Structure%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
-        Structure%gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
-        Structure%gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
-    end function TriangleSecond_Construct
+        element%num_gauss = 3_int32
+        call allocate_array(element%weight, element%num_gauss)
+        call allocate_array(element%gauss, element%dimension, element%num_gauss)
+
+        element%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+        element%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+        element%gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
+        element%gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
+
+    end function construct_triangle_second
 
     !----------------------------------------------------------------------!
-    ! getNumNodes_TriangleSecond:
+    ! getNumNodes_triangle_second:
     !----------------------------------------------------------------------!
     ! This function returns the number of nodes associated with a
-    ! TriangleSecond element.
+    ! type_triangle_second element.
     !
     ! Arguments:
-    !   self : TriangleSecond type object.
+    !   self : type_triangle_second type object.
     !          Represents the current triangular element instance.
     !
     ! Return Value:
@@ -84,51 +89,75 @@ contains
     !          element. This is typically 6 for a linear triangle.
     !
     ! Function Details:
-    !   - Retrieves the value stored in `self%size`, which represents
+    !   - Retrieves the value stored in `self%num_nodes`, which represents
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
 
-    module function get_id_TriangleSecond(self) result(id)
+    module function get_id_triangle_second(self) result(id)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32) :: id
 
         id = self%id
-    end function get_id_TriangleSecond
+    end function get_id_triangle_second
 
-    module function get_type_TriangleSecond(self) result(type)
+    module function get_type_triangle_second(self) result(type)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32) :: type
 
         type = self%type
-    end function get_type_TriangleSecond
+    end function get_type_triangle_second
 
-    module function get_size_TriangleSecond(self) result(size)
+    module function get_num_nodes_triangle_second(self) result(num_nodes)
         implicit none
-        class(TriangleSecond), intent(in) :: self
-        integer(int32) :: size
+        class(type_triangle_second), intent(in) :: self
+        integer(int32) :: num_nodes
 
-        size = self%size
-    end function get_size_TriangleSecond
+        num_nodes = self%num_nodes
+    end function get_num_nodes_triangle_second
 
-    module function get_group_TriangleSecond(self) result(group)
+    module function get_group_triangle_second(self) result(group)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32) :: group
 
         group = self%group
-    end function get_group_TriangleSecond
+    end function get_group_triangle_second
+
+    module function get_dimension_triangle_second(self) result(dimension)
+        implicit none
+        class(type_triangle_second), intent(in) :: self
+        integer(int32) :: dimension
+
+        dimension = self%dimension
+    end function get_dimension_triangle_second
+
+    module function get_order_triangle_second(self) result(order)
+        implicit none
+        class(type_triangle_second), intent(in) :: self
+        integer(int32) :: order
+
+        order = self%order
+    end function get_order_triangle_second
+
+    module function get_num_gauss_triangle_second(self) result(num_gauss)
+        implicit none
+        class(type_triangle_second), intent(in) :: self
+        integer(int32) :: num_gauss
+
+        num_gauss = self%num_gauss
+    end function get_num_gauss_triangle_second
 
     !----------------------------------------------------------------------!
-    ! psi_TriangleSecond:
+    ! psi_triangle_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the shape function ψ_i(ξ, η) for a linear
     ! triangular element at the given natural coordinates (ξ, η).
     !
     ! Arguments:
-    !   self : TriangleSecond type object.
+    !   self : type_triangle_second type object.
     !          Represents the triangular element for which the shape
     !          function is evaluated.
     !
@@ -154,9 +183,9 @@ contains
     !   - Returns 0.0d0 for indices outside the range [1, 6].
     !
     !----------------------------------------------------------------------!
-    module function psi_TriangleSecond(self, i, xi, eta) result(psi)
+    module function psi_triangle_second(self, i, xi, eta) result(psi)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: psi
@@ -176,17 +205,17 @@ contains
         case default
             psi = 0.0d0
         end select
-    end function psi_TriangleSecond
+    end function psi_triangle_second
 
     !----------------------------------------------------------------------!
-    ! dpsi_dxi_TriangleSecond:
+    ! dpsi_dxi_triangle_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
     ! shape function for a linear triangular element with respect to ξ
     ! at a given η coordinate.
     !
     ! Arguments:
-    !   self : TriangleSecond type object.
+    !   self : type_triangle_second type object.
     !          Represents the triangular element for which the derivative
     !          is being evaluated.
     !
@@ -209,9 +238,9 @@ contains
     !   - Returns 0.0 for indices outside [1, 6].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_dxi_TriangleSecond(self, i, xi, eta) result(dpsi)
+    module function dpsi_dxi_triangle_second(self, i, xi, eta) result(dpsi)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
@@ -232,17 +261,17 @@ contains
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_dxi_TriangleSecond
+    end function dpsi_dxi_triangle_second
 
     !----------------------------------------------------------------------!
-    ! dpsi_deta_TriangleSecond:
+    ! dpsi_deta_triangle_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
     ! shape function for a linear triangular element with respect to η
     ! at a given ξ coordinate.
     !
     ! Arguments:
-    !   self : TriangleSecond type object.
+    !   self : type_triangle_second type object.
     !          Represents the triangular element for which the derivative
     !          is being evaluated.
     !
@@ -268,9 +297,9 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 6].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_deta_TriangleSecond(self, i, xi, eta) result(dpsi)
+    module function dpsi_deta_triangle_second(self, i, xi, eta) result(dpsi)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
@@ -291,25 +320,25 @@ contains
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_deta_TriangleSecond
+    end function dpsi_deta_triangle_second
 
     !----------------------------------------------------------------------!
-    ! Jac_TriangleSecond:
+    ! jacobian_triangle_second:
     !----------------------------------------------------------------------!
-    ! This function computes the (i,j) component of the Jacobian matrix J
+    ! This function computes the (i,j) component of the jacobian matrix J
     ! for a linear triangular finite element at a given natural coordinate
-    ! (ξ, η). The Jacobian maps natural coordinates (ξ, η) to physical
+    ! (ξ, η). The jacobian maps natural coordinates (ξ, η) to physical
     ! coordinates (x, y).
     !
     ! Arguments:
-    !   self : TriangleSecond type object.
-    !          Represents the element whose Jacobian is being evaluated.
+    !   self : type_triangle_second type object.
+    !          Represents the element whose jacobian is being evaluated.
     !
-    !   i    : Integer (int32), the row index of the Jacobian component.
+    !   i    : Integer (int32), the row index of the jacobian component.
     !          i = 1 → corresponds to x-component (dx/dξ or dx/dη),
     !          i = 2 → corresponds to y-component (dy/dξ or dy/dη).
     !
-    !   j    : Integer (int32), the column index of the Jacobian component.
+    !   j    : Integer (int32), the column index of the jacobian component.
     !          j = 1 → partial derivative w.r.t ξ,
     !          j = 2 → partial derivative w.r.t η.
     !
@@ -318,10 +347,10 @@ contains
     !   eta  : Real(real64), η coordinate in natural coordinate system.
     !
     ! Return Value:
-    !   Jval : Real(real64), the (i,j) component of the Jacobian matrix.
+    !   Jval : Real(real64), the (i,j) component of the jacobian matrix.
     !
     ! Function Details:
-    !   - The Jacobian matrix J is a 2×2 matrix defined as:
+    !   - The jacobian matrix J is a 2×2 matrix defined as:
     !         [ ∂x/∂ξ  ∂x/∂η ]
     !         [ ∂y/∂ξ  ∂y/∂η ]
     !
@@ -340,9 +369,9 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    module function Jac_TriangleSecond(self, i, j, xi, eta) result(Jval)
+    module function jacobian_triangle_second(self, i, j, xi, eta) result(Jval)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i, j
         real(real64), intent(in) :: xi, eta
 
@@ -356,13 +385,13 @@ contains
             select case (j)
             case (1)
                 !! dx_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%X(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%x(ii)%val
                 end do
             case (2)
                 !! dx_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%X(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%x(ii)%val
                 end do
             end select
 
@@ -371,39 +400,39 @@ contains
             select case (j)
             case (1)
                 !! dy_dxi
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%Y(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%y(ii)%val
                 end do
             case (2)
                 !! dy_deta
-                do ii = 1, self%size
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%Y(ii)%val
+                do ii = 1, self%num_nodes
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%y(ii)%val
                 end do
             end select
         end select
 
-    end function Jac_TriangleSecond
+    end function jacobian_triangle_second
 
     !----------------------------------------------------------------------!
-    ! Jac_Det_TriangleSecond:
+    ! jacobian_det_triangle_second:
     !----------------------------------------------------------------------!
-    ! This function computes the determinant of the Jacobian matrix J
+    ! This function computes the determinant of the jacobian matrix J
     ! for a linear triangular element at a specified point (ξ, η) in
     ! the natural coordinate system.
     !
     ! Arguments:
-    !   self : TriangleSecond type object.
-    !          Represents the finite element whose Jacobian is evaluated.
+    !   self : type_triangle_second type object.
+    !          Represents the finite element whose jacobian is evaluated.
     !
     !   xi   : Real(real64), ξ coordinate in the natural coordinate system.
     !
     !   eta  : Real(real64), η coordinate in the natural coordinate system.
     !
     ! Return Value:
-    !   J_Det : Real(real64), the determinant of the Jacobian matrix J.
+    !   J_Det : Real(real64), the determinant of the jacobian matrix J.
     !
     ! Function Details:
-    !   - The Jacobian matrix J is a 2×2 matrix defined as:
+    !   - The jacobian matrix J is a 2×2 matrix defined as:
     !         [ ∂x/∂ξ  ∂x/∂η ]
     !         [ ∂y/∂ξ  ∂y/∂η ]
     !
@@ -418,9 +447,9 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    module function Jac_Det_TriangleSecond(self, xi, eta) result(J_Det)
+    module function jacobian_det_triangle_second(self, xi, eta) result(J_Det)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64) :: J_Det
 
@@ -429,16 +458,16 @@ contains
 
         integer(int32) :: i
 
-        dx_xi = self%Jac(1, 1, xi, eta)
-        dx_eta = self%Jac(1, 2, xi, eta)
-        dy_xi = self%Jac(2, 1, xi, eta)
-        dy_eta = self%Jac(2, 2, xi, eta)
+        dx_xi = self%jacobian(1, 1, xi, eta)
+        dx_eta = self%jacobian(1, 2, xi, eta)
+        dy_xi = self%jacobian(2, 1, xi, eta)
+        dy_eta = self%jacobian(2, 2, xi, eta)
 
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
-    end function Jac_Det_TriangleSecond
+    end function jacobian_det_triangle_second
 
     !----------------------------------------------------------------------!
-    ! is_in_TriangleSecond:
+    ! is_in_triangle_second:
     !----------------------------------------------------------------------!
     ! This function checks if the given physical coordinates (px, py) lie
     ! within the boundaries of a square element.
@@ -447,7 +476,7 @@ contains
     ! checks if the point lies within the square element.
     !
     ! Arguments:
-    !   self  : TriangleSecond type object.
+    !   self  : type_triangle_second type object.
     !
     !   px    : x-coordinate (real64 type) in the physical coordinate system.
     !           This coordinate is checked to see if it lies inside the square element.
@@ -472,11 +501,11 @@ contains
     !     outside the valid range, the function returns .false.
     !
     !----------------------------------------------------------------------!
-    module subroutine is_in_TriangleSecond(self, px, py, pxi, peta, is_in)
-        class(TriangleSecond), intent(in) :: self
+    module subroutine is_in_triangle_second(self, px, py, pxi, peta, is_in)
+        class(type_triangle_second), intent(in) :: self
         real(real64), intent(in) :: px, py
         real(real64), intent(inout) :: pxi, peta
-        logical(4) :: is_in
+        logical :: is_in
 
         real(real64) :: xi, eta
         real(real64) :: x0, y0
@@ -486,7 +515,7 @@ contains
         integer(int32) :: iter, max_iter
         real(real64) :: tol
         integer(int32) :: i
-        logical(4) :: converged
+        logical :: converged
 
         ! 初期化
         xi = 0.0d0
@@ -500,9 +529,9 @@ contains
             x0 = 0.0d0
             y0 = 0.0d0
 
-            do i = 1, self%size
-                x0 = x0 + self%psi(i, xi, eta) * self%X(i)%val
-                y0 = y0 + self%psi(i, xi, eta) * self%Y(i)%val
+            do i = 1, self%num_nodes
+                x0 = x0 + self%psi(i, xi, eta) * self%x(i)%val
+                y0 = y0 + self%psi(i, xi, eta) * self%y(i)%val
             end do
 
             dx = px - x0
@@ -513,12 +542,12 @@ contains
                 exit
             end if
 
-            dx_xi = self%Jac(1, 1, xi, eta)
-            dx_eta = self%Jac(1, 2, xi, eta)
-            dy_xi = self%Jac(2, 1, xi, eta)
-            dy_eta = self%Jac(2, 2, xi, eta)
+            dx_xi = self%jacobian(1, 1, xi, eta)
+            dx_eta = self%jacobian(1, 2, xi, eta)
+            dy_xi = self%jacobian(2, 1, xi, eta)
+            dy_eta = self%jacobian(2, 2, xi, eta)
 
-            detJ = self%Jac_Det(xi, eta)
+            detJ = self%jacobian_Det(xi, eta)
             if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
 
             ! Newton-Raphson 更新
@@ -533,21 +562,21 @@ contains
             pxi = xi
             peta = eta
         end if
-    end subroutine is_in_TriangleSecond
+    end subroutine is_in_triangle_second
 
-    module function Interpolate_TriangleSecond(self, xi, eta, value) result(interpolated_value)
+    module function Interpolate_triangle_second(self, xi, eta, value) result(interpolated_value)
         implicit none
-        class(TriangleSecond), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
         integer(int32) :: i
 
         interpolated_value = 0.0d0
-        do i = 1, self%size
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%conn(i))
+        do i = 1, self%num_nodes
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
         end do
 
-    end function Interpolate_TriangleSecond
+    end function Interpolate_triangle_second
 
-end submodule Domain_Element_TriangleSecond
+end submodule Domain_Element_triangle_second

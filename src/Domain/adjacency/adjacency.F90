@@ -1,6 +1,6 @@
 module domain_adjacency
-    use :: domain_node_adjacency, only:type_node_adjacency
-    use :: domain_element_adjacency, only:type_element_adjacency
+    use :: domain_adjacency_adjacency_node, only:type_node_adjacency
+    use :: domain_adjacency_adjacency_element, only:type_element_adjacency
     implicit none
 
 end module domain_adjacency

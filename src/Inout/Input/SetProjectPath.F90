@@ -1,6 +1,6 @@
 module Inout_ProjectPath
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_Error
+    use :: module_core, only:error_message
     implicit none
     private
     character(256) :: ProjectPath
@@ -14,7 +14,7 @@ contains
         implicit none
         character(64), parameter :: dName = "ProjectPath.dir"
         integer(int32) :: access, status, len_path, unit_num
-        integer :: i
+        integer(int32) :: i
 
         status = access(dName, "r")
         if (status /= 0) call error_message(901, opt_file_name=dName)

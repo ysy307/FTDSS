@@ -5,8 +5,8 @@
 ! =============================================================================
 module Condition_Initial
     use, intrinsic :: iso_fortran_env
-    use :: core_core, only:type_variable
-    use :: Domain_Module, only:type_domain
+    use :: module_core, only:type_variable
+    use :: module_domain, only:type_domain
     use :: Inout_Input, only:Type_Input
     implicit none
     private

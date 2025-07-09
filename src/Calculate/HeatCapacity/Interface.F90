@@ -1,6 +1,6 @@
 module Calculate_VolumetricHeatCapacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: core_core, only:type_gauss_point_state
+    use :: module_core, only:type_gauss_point_state
     use :: Inout_Input, only:Type_Input
     use :: Calculate_Density, only:DENHolder
     implicit none

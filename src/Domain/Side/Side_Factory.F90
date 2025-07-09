@@ -1,38 +1,38 @@
 module Domain_Side_Factory
     use, intrinsic :: iso_fortran_env, only: int32
-    use :: Domain_Side, only:Abst_SideType, SideFirst, SideSecond
-    use :: core_core, only:type_dp_3d
+    use :: module_core, only:type_dp_3d, type_vtk_cell
+    use :: Domain_Side, only:abst_side, type_side_first, type_side_second
     implicit none
-    integer(int32), parameter :: SHAPE_LINE = 3
-    integer(int32), parameter :: SHAPE_QUADRATIC_EDGE = 21
 
-    public :: Create_Side
+    public :: create_side
 
 contains
     ! 要素オブジェクトを生成して返す、独立したファクトリサブルーチン
-    subroutine Create_Side(new_side, shape_type, ierr, iSide, Global_Coordinate, Connectivity, GroupID)
-        class(Abst_SideType), allocatable, intent(inout) :: new_side
-        integer(int32), intent(in) :: shape_type
-        integer, intent(inout) :: ierr
-        ! --- 各コンストラクタに渡す引数 ---
-        integer(int32), intent(in) :: iSide
-        type(type_dp_3d), pointer, intent(in) :: Global_Coordinate
-        integer(int32), intent(in) :: Connectivity(:)
-        integer(int32), intent(in) :: GroupID
+    subroutine create_side(new_side, id, global_coordinate, cell_info, ierr)
+        implicit none
+        class(abst_side), allocatable, intent(inout) :: new_side
+        integer(int32), intent(in) :: id
+        type(type_dp_3d), pointer, intent(in) :: global_coordinate
+        type(type_vtk_cell), intent(in) :: cell_info
+        integer(int32), intent(inout) :: ierr
+
+        character(:), allocatable :: type_name
 
         ierr = 0
         if (allocated(new_side)) deallocate (new_side)
 
-        select case (shape_type)
-        case (SHAPE_LINE)
-            new_side = SideFirst(iSide, Global_Coordinate, Connectivity, GroupID)
-        case (SHAPE_QUADRATIC_EDGE)
-            new_side = SideSecond(iSide, Global_Coordinate, Connectivity, GroupID)
+        type_name = cell_info%cell_type_name
+
+        select case (type_name)
+        case ("Line")
+            new_side = type_side_first(id, global_coordinate, cell_info)
+        case ("QuadraticEdge")
+            new_side = type_side_second(id, global_coordinate, cell_info)
         case default
-            write (*, '(a,i0)') "Error: Unknown element shape type = ", shape_type
+            write (*, '(a)') "Error: Unknown side shape type = "//type_name
             ierr = -1
         end select
 
-    end subroutine Create_Side
+    end subroutine create_side
 
 end module Domain_Side_Factory

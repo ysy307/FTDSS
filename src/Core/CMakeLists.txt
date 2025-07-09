@@ -37,12 +37,12 @@ add_library(Core OBJECT
     check_range.F90
     allocate.F90
     deallocate.F90
-    # BaseTypes.F90
     types/vector.F90
     types/array.F90
     types/pointer.F90
     types/variable.F90
     types/gauss.F90
+    types/types.F90
     vtk/vtk_wrapper.F90
     vtk/vtk_constants.F90
     vtk/vtk.F90

@@ -1,10 +1,10 @@
 ! file: domain_multicoloring.f90
 module domain_multicoloring
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: domain_adjacency, only:type_element_adjacency
-    use :: core_core, only:allocate_array, deallocate_array
-    ! インデックスソート用のライブラリを想定
     use :: stdlib_sorting, only:sort_index
+    use :: module_core, only:allocate_array, deallocate_array
+    use :: domain_adjacency, only:type_element_adjacency
+    ! インデックスソート用のライブラリを想定
 
     implicit none
     private
@@ -119,7 +119,7 @@ contains
 
         ! 2. 得られたインデックス配列を、手動で逆順にします。
         !    これにより、次数が大きい順(降順)のインデックスが得られます。
-        do i = 1, num_elements/2
+        do i = 1, num_elements / 2
             temp = local_perm(i)
             local_perm(i) = local_perm(num_elements - i + 1)
             local_perm(num_elements - i + 1) = temp
