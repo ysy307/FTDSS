@@ -4,6 +4,7 @@ module core_vtk
     use :: stdlib_sorting, only:sort
     use :: core_types_array, only:type_dp_3d
     use :: core_allocate, only:allocate_array
+    use :: core_deallocate, only:deallocate_array
     use :: core_unique, only:unique
     use :: core_vtk_vtk_constants
     use :: core_vtk_vtk_wrapper, only: vtk_initialize, vtk_read_header, vtk_get_num_points, & !&
@@ -19,7 +20,6 @@ module core_vtk
     ! Fortran側のデータ構造
 
     type :: type_vtk_cell
-        integer(int32) :: offset
         integer(int32) :: cell_type
         character(:), allocatable :: cell_type_name
         integer(int32) :: num_nodes_in_cell
@@ -44,7 +44,6 @@ module core_vtk
         type(type_vtk_cell), allocatable :: cells(:)
     contains
         procedure :: initialize => type_vtk_initialize
-        procedure :: Is_In => Core_VTK_IN_CellType
         procedure :: get_active_region_info
     end type type_vtk
 
@@ -116,7 +115,6 @@ contains
             do i = 1, self%num_total_cells
                 self%cells(i)%cell_type = raw_cell_types(i)
                 self%cells(i)%cell_entity_id = raw_cell_entity_ids(i)
-                self%cells(i)%offset = int(raw_offsets(i + 1), kind=int32)
 
                 ! 各セルのconnectivityを抽出し、コピー
                 connectivity_first = raw_offsets(i) + 1
@@ -126,338 +124,343 @@ contains
                 call allocate_array(self%cells(i)%connectivity, num_nodes_in_cell)
                 self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32)
 
-                call self%cells(i)%set()
+                call self%cells(i)%set(num_nodes_in_cell)
             end do
         end if
 
         ! 5. 後片付け
         call vtk_finalize()
+        call deallocate_array(raw_connectivity)
+        call deallocate_array(raw_offsets)
+        call deallocate_array(raw_cell_types)
+        call deallocate_array(raw_cell_entity_ids)
 
     end subroutine type_vtk_initialize
 
-    subroutine type_vtk_cell_set(self)
+    subroutine type_vtk_cell_set(self, num_nodes_in_cell)
         implicit none
         class(type_vtk_cell), intent(inout) :: self !! VTK cells data
+        integer(int32), intent(in) :: num_nodes_in_cell !! セルのノード数
 
         select case (self%cell_type)
         case (VTK_VERTEX)
             self%cell_type_name = "Vertex"
-            self%num_nodes_in_cell = 1
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 0 ! 0次元要素
             self%cell_order = 1
         case (VTK_POLY_VERTEX)
             self%cell_type_name = "PolyVertex"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 0 ! 0次元要素の集合
             self%cell_order = 1
         case (VTK_LINE)
             self%cell_type_name = "Line"
-            self%num_nodes_in_cell = 2
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = 1
         case (VTK_POLY_LINE)
             self%cell_type_name = "PolyLine"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = -1 ! 可変
         case (VTK_TRIANGLE)
             self%cell_type_name = "Triangle"
-            self%num_nodes_in_cell = 3
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 1
         case (VTK_TRIANGLE_STRIP)
             self%cell_type_name = "TriangleStrip"
-            self%num_nodes_in_cell = -1 ! 可変（通常は3だが、ストリップなので連続）
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 1
         case (VTK_POLYGON)
             self%cell_type_name = "Polygon"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_PIXEL)
             self%cell_type_name = "Pixel"
-            self%num_nodes_in_cell = 4
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 1
         case (VTK_QUAD)
             self%cell_type_name = "Quad"
-            self%num_nodes_in_cell = 4
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 1
         case (VTK_TETRA)
             self%cell_type_name = "Tetra"
-            self%num_nodes_in_cell = 4
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_VOXEL)
             self%cell_type_name = "Voxel"
-            self%num_nodes_in_cell = 8
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_HEXAHEDRON)
             self%cell_type_name = "Hexahedron"
-            self%num_nodes_in_cell = 8
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_WEDGE)
             self%cell_type_name = "Wedge"
-            self%num_nodes_in_cell = 6
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_PYRAMID)
             self%cell_type_name = "Pyramid"
-            self%num_nodes_in_cell = 5
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_PENTAGONAL_PRISM)
             self%cell_type_name = "PentagonalPrism"
-            self%num_nodes_in_cell = 10
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_HEXAGONAL_PRISM)
             self%cell_type_name = "HexagonalPrism"
-            self%num_nodes_in_cell = 12
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_QUADRATIC_EDGE)
             self%cell_type_name = "QuadraticEdge"
-            self%num_nodes_in_cell = 3
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = 2
         case (VTK_QUADRATIC_TRIANGLE)
             self%cell_type_name = "QuadraticTriangle"
-            self%num_nodes_in_cell = 6
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 2
         case (VTK_QUADRATIC_QUAD)
             self%cell_type_name = "QuadraticQuad"
-            self%num_nodes_in_cell = 8
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 2
         case (VTK_QUADRATIC_POLYGON)
             self%cell_type_name = "QuadraticPolygon"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 2
         case (VTK_QUADRATIC_TETRA)
             self%cell_type_name = "QuadraticTetra"
-            self%num_nodes_in_cell = 10
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2
         case (VTK_QUADRATIC_HEXAHEDRON)
             self%cell_type_name = "QuadraticHexahedron"
-            self%num_nodes_in_cell = 20
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2
         case (VTK_QUADRATIC_WEDGE)
             self%cell_type_name = "QuadraticWedge"
-            self%num_nodes_in_cell = 15
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2
         case (VTK_QUADRATIC_PYRAMID)
             self%cell_type_name = "QuadraticPyramid"
-            self%num_nodes_in_cell = 13
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2
         case (VTK_BIQUADRATIC_QUAD)
             self%cell_type_name = "BiquadraticQuad"
-            self%num_nodes_in_cell = 9
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 2 ! 双二次
         case (VTK_TRIQUADRATIC_HEXAHEDRON)
             self%cell_type_name = "TriquadraticHexahedron"
-            self%num_nodes_in_cell = 27
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2 ! 三次二次
         case (VTK_TRIQUADRATIC_PYRAMID)
             self%cell_type_name = "TriquadraticPyramid"
-            self%num_nodes_in_cell = 14
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2 ! 三次二次
         case (VTK_QUADRATIC_LINEAR_QUAD)
             self%cell_type_name = "QuadraticLinearQuad"
-            self%num_nodes_in_cell = 8
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 2 ! 線形と二次
         case (VTK_QUADRATIC_LINEAR_WEDGE)
             self%cell_type_name = "QuadraticLinearWedge"
-            self%num_nodes_in_cell = 12
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2 ! 線形と二次
         case (VTK_BIQUADRATIC_QUADRATIC_WEDGE)
             self%cell_type_name = "BiquadraticQuadraticWedge"
-            self%num_nodes_in_cell = 18
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2 ! 双二次と二次
         case (VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)
             self%cell_type_name = "BiquadraticQuadraticHexahedron"
-            self%num_nodes_in_cell = 27
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 2 ! 双二次と二次
         case (VTK_BIQUADRATIC_TRIANGLE)
             self%cell_type_name = "BiquadraticTriangle"
-            self%num_nodes_in_cell = 6
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = 2 ! 双二次
         case (VTK_CUBIC_LINE)
             self%cell_type_name = "CubicLine"
-            self%num_nodes_in_cell = 4
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = 3
         case (VTK_CONVEX_POINT_SET)
             self%cell_type_name = "ConvexPointSet"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = -1 ! 可変
             self%cell_order = -1 ! 可変
         case (VTK_POLYHEDRON)
             self%cell_type_name = "Polyhedron"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = 1
         case (VTK_PARAMETRIC_CURVE)
             self%cell_type_name = "ParametricCurve"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = -1 ! 可変
         case (VTK_PARAMETRIC_SURFACE)
             self%cell_type_name = "ParametricSurface"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_PARAMETRIC_TRI_SURFACE)
             self%cell_type_name = "ParametricTriSurface"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_PARAMETRIC_QUAD_SURFACE)
             self%cell_type_name = "ParametricQuadSurface"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_PARAMETRIC_TETRA_REGION)
             self%cell_type_name = "ParametricTetraRegion"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_PARAMETRIC_HEX_REGION)
             self%cell_type_name = "ParametricHexRegion"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_EDGE)
             self%cell_type_name = "HigherOrderEdge"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_TRIANGLE)
             self%cell_type_name = "HigherOrderTriangle"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_QUAD)
             self%cell_type_name = "HigherOrderQuad"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_POLYGON)
             self%cell_type_name = "HigherOrderPolygon"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_TETRAHEDRON)
             self%cell_type_name = "HigherOrderTetrahedron"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_WEDGE)
             self%cell_type_name = "HigherOrderWedge"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_PYRAMID)
             self%cell_type_name = "HigherOrderPyramid"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_HIGHER_ORDER_HEXAHEDRON)
             self%cell_type_name = "HigherOrderHexahedron"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_LAGRANGE_CURVE)
             self%cell_type_name = "LagrangeCurve"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = -1 ! 可変
         case (VTK_LAGRANGE_TRIANGLE)
             self%cell_type_name = "LagrangeTriangle"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_LAGRANGE_QUADRILATERAL)
             self%cell_type_name = "LagrangeQuadrilateral"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_LAGRANGE_TETRAHEDRON)
             self%cell_type_name = "LagrangeTetrahedron"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_LAGRANGE_HEXAHEDRON)
             self%cell_type_name = "LagrangeHexahedron"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_LAGRANGE_WEDGE)
             self%cell_type_name = "LagrangeWedge"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_LAGRANGE_PYRAMID)
             self%cell_type_name = "LagrangePyramid"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_BEZIER_CURVE)
             self%cell_type_name = "BezierCurve"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 1
             self%cell_order = -1 ! 可変
         case (VTK_BEZIER_TRIANGLE)
             self%cell_type_name = "BezierTriangle"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_BEZIER_QUADRILATERAL)
             self%cell_type_name = "BezierQuadrilateral"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 2
             self%cell_order = -1 ! 可変
         case (VTK_BEZIER_TETRAHEDRON)
             self%cell_type_name = "BezierTetrahedron"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_BEZIER_HEXAHEDRON)
             self%cell_type_name = "BezierHexahedron"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_BEZIER_WEDGE)
             self%cell_type_name = "BezierWedge"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case (VTK_BEZIER_PYRAMID)
             self%cell_type_name = "BezierPyramid"
-            self%num_nodes_in_cell = -1 ! 可変
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 3
             self%cell_order = -1 ! 可変
         case default
             self%cell_type_name = "Unknown"
-            self%num_nodes_in_cell = 0
+            self%num_nodes_in_cell = num_nodes_in_cell
             self%cell_dimension = 0
             self%cell_order = 0
         end select
@@ -562,36 +565,6 @@ contains
         end if
 
     end function type_vtk_cell_get_order
-
-    function Core_VTK_IN_CellType(self, iCellType, Shape_Dimention) result(isIn)
-        !> Check if cell type is in VTK
-        implicit none
-        class(Type_VTK), intent(in) :: self !! VTK data
-        integer(int32), intent(in) :: iCellType !! Cell type
-        integer(int32), intent(in) :: Shape_Dimention !! Shape dimension
-        logical(4) :: isIn
-        integer(int32) :: i
-
-        isIn = .false.
-        select case (Shape_Dimention)
-        case (1)
-            if (iCellType == VTK_LINE .or. &
-                iCellType == VTK_QUADRATIC_EDGE &
-                ) then
-                isIn = .true.
-            end if
-        case (2)
-            if (iCellType == VTK_TRIANGLE .or. &
-                iCellType == VTK_PIXEL .or. &
-                iCellType == VTK_QUAD .or. &
-                iCellType == VTK_QUADRATIC_TRIANGLE .or. &
-                iCellType == VTK_QUADRATIC_QUAD &
-                ) then
-                isIn = .true.
-            end if
-        end select
-
-    end function Core_VTK_IN_CellType
 
     subroutine get_active_region_info(self, unique_ids, ierr)
         ! --- 引数 ---

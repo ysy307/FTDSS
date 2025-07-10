@@ -24,12 +24,13 @@ contains
         class(Output_Observation), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(inout), pointer :: Coordinate
-        type(type_domain), intent(in), optional :: Domain
+        type(type_domain), intent(inout), optional :: Domain
 
         integer(int32) :: iObs, iElem, nElements
-        integer(int32) :: local_group_id, local_type, ierr
+        integer(int32) :: local_id, local_type, ierr
         real(real64) :: tmp_xi, tmp_eta
-        logical(4) :: is_inside
+
+        logical :: inside
 
         self%ObservationType = Input%OutputSettings%ObservationType
         self%NumObservation = Input%OutputSettings%NumObservation
@@ -53,17 +54,14 @@ contains
                                                                     self%Cood_Obs%y(iObs), &
                                                                     tmp_xi, &
                                                                     tmp_eta, &
-                                                                    is_inside)
-                            if (is_inside) then
-                                local_group_id = Domain%Elements(iElem)%e%get_group()
-                                local_type = Domain%Elements(iElem)%e%get_type()
-                                call Create_Element(new_element=self%Element(iObs)%e, &
-                                                    shape_type=local_type, &
-                                                    ierr=ierr, &
-                                                    iElem=iElem, &
-                                                    Global_Coordinate=Coordinate, &
-                                                    Connectivity=Domain%Elements(iElem)%e%conn, &
-                                                    GroupID=local_group_id)
+                                                                    inside)
+                            if (inside) then
+                                local_id = Domain%Elements(iElem)%e%get_id()
+                                call create_element(new_element=self%Element(iObs)%e, &
+                                                    id=local_id, &
+                                                    global_coordinate=Coordinate, &
+                                                    cell_info=Input%vtk%cells(local_id), &
+                                                    ierr=ierr)
                                 self%obs_xi(iObs) = tmp_xi
                                 self%obs_eta(iObs) = tmp_eta
                                 exit
@@ -78,17 +76,14 @@ contains
                                                                     self%Cood_Obs%z(iObs), &
                                                                     tmp_xi, &
                                                                     tmp_eta, &
-                                                                    is_inside)
-                            if (is_inside) then
-                                local_group_id = Domain%Elements(iElem)%e%get_group()
-                                local_type = Domain%Elements(iElem)%e%get_type()
-                                call Create_Element(new_element=self%Element(iObs)%e, &
-                                                    shape_type=local_type, &
-                                                    ierr=ierr, &
-                                                    iElem=iElem, &
-                                                    Global_Coordinate=Coordinate, &
-                                                    Connectivity=Domain%Elements(iElem)%e%conn, &
-                                                    GroupID=local_group_id)
+                                                                    inside)
+                            if (inside) then
+                                local_id = Domain%Elements(iElem)%e%get_id()
+                                call create_element(new_element=self%Element(iObs)%e, &
+                                                    id=local_id, &
+                                                    global_coordinate=Coordinate, &
+                                                    cell_info=Input%vtk%cells(local_id), &
+                                                    ierr=ierr)
                                 self%obs_xi(iObs) = tmp_xi
                                 self%obs_eta(iObs) = tmp_eta
                                 exit
@@ -203,7 +198,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(type_domain), intent(in), optional :: Domain
+        type(type_domain), intent(inout), optional :: Domain
 
         integer(int32) :: iObs
         real(real64), allocatable :: Original_Temperature(:)
@@ -214,7 +209,7 @@ contains
         if (.not. present(nodal_temperature)) return
 
         allocate (Original_Temperature, mold=nodal_temperature)
-        call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
+        call Domain%rcm%reorder_to_original(nodal_temperature, Original_Temperature)
 
         do iObs = 1, observation_data%NumObservation
             obs_values(iObs) = observation_data%Element(iObs)%e%Interpolate( &
@@ -233,7 +228,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(type_domain), intent(in), optional :: Domain
+        type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
@@ -252,8 +247,9 @@ contains
         allocate (Original_Temperature, mold=nodal_temperature)
         allocate (Original_Porosity, mold=nodal_porosity)
 
-        call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
-        call Reorder_to_Original(nodal_porosity, Original_Porosity, Domain%RCM_perm, istat)
+        ! Reorder nodal values to original order
+        call Domain%rcm%reorder_to_original(nodal_temperature, Original_Temperature)
+        call Domain%rcm%reorder_to_original(nodal_porosity, Original_Porosity)
 
         do iObs = 1, observation_data%NumObservation
             state%temperature = observation_data%Element(iObs)%e%Interpolate( &
@@ -278,7 +274,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(type_domain), intent(in), optional :: Domain
+        type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
@@ -296,8 +292,8 @@ contains
 
             allocate (Original_Temperature, mold=nodal_temperature)
             allocate (Original_Porosity, mold=nodal_porosity)
-            call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
-            call Reorder_to_Original(nodal_porosity, Original_Porosity, Domain%RCM_perm, istat)
+            call Domain%rcm%reorder_to_original(nodal_temperature, Original_Temperature)
+            call Domain%rcm%reorder_to_original(nodal_porosity, Original_Porosity)
 
             do iObs = 1, observation_data%NumObservation
                 state%temperature = observation_data%Element(iObs)%e%Interpolate( &
@@ -324,7 +320,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(type_domain), intent(in), optional :: Domain
+        type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
         integer(int32) :: iObs, group_id
@@ -343,8 +339,8 @@ contains
 
             allocate (Original_Temperature, mold=nodal_temperature)
             allocate (Original_Porosity, mold=nodal_porosity)
-            call Reorder_to_Original(nodal_temperature, Original_Temperature, Domain%RCM_perm, istat)
-            call Reorder_to_Original(nodal_porosity, Original_Porosity, Domain%RCM_perm, istat)
+            call Domain%rcm%reorder_to_original(nodal_temperature, Original_Temperature)
+            call Domain%rcm%reorder_to_original(nodal_porosity, Original_Porosity)
 
             do iObs = 1, observation_data%NumObservation
                 state%temperature = observation_data%Element(iObs)%e%Interpolate( &
@@ -370,7 +366,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
         type(Proereties_Model_t), intent(in), optional :: Properties
-        type(type_domain), intent(in), optional :: Domain
+        type(type_domain), intent(inout), optional :: Domain
         ! Note: nodal_Pw is optional, if not present, pressure is assumed to be 101325.0d0
 
         type(type_gauss_point_state) :: state
@@ -383,7 +379,7 @@ contains
         if (.not. present(nodal_Pw)) return
 
         allocate (Original_Pressure, mold=nodal_Pw)
-        call Reorder_to_Original(nodal_Pw, Original_Pressure, Domain%RCM_perm, istat)
+        call Domain%rcm%reorder_to_original(nodal_Pw, Original_Pressure)
 
         do iObs = 1, observation_data%NumObservation
             obs_values(iObs) = observation_data%Element(iObs)%e%Interpolate( &
@@ -466,7 +462,7 @@ contains
         class(Abstract_Thermal), intent(inout), optional :: Thermal
         real(real64), intent(in), optional :: phi(:)
         type(Proereties_Model_t), intent(inout), optional :: Propeties
-        type(type_domain), intent(in), optional :: Domain
+        type(type_domain), intent(inout), optional :: Domain
 
         real(real64) :: obsValues(self%Observation%NumObservation)
         real(real64) :: tmpValues(self%Observation%NumObservation)

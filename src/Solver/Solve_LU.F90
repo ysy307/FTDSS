@@ -21,25 +21,25 @@ contains
         allocate (Solver_CRS_LU :: structure)
         select type (this => structure)
         type is (Solver_CRS_LU)
-            this%N = int(N, kind=kind(this%N))
-            this%MAXFCT = int(MAXFCT, kind=kind(this%MAXFCT))
-            this%MNUM = int(MNUM, kind=kind(this%MNUM))
-            this%MTYPE = int(MTYPE, kind=kind(this%MTYPE))
-            this%PHASE = int(PHASE, kind=kind(this%PHASE))
-            this%NRHS = int(NRHS, kind=kind(this%NRHS))
-            this%MSGLVL = int(MSGVLV, kind=kind(this%MSGLVL))
+            this%N = transfer(N, this%N)
+            this%MAXFCT = transfer(MAXFCT, this%MAXFCT)
+            this%MNUM = transfer(MNUM, this%MNUM)
+            this%MTYPE = transfer(MTYPE, this%MTYPE)
+            this%PHASE = transfer(PHASE, this%PHASE)
+            this%NRHS = transfer(NRHS, this%NRHS)
+            this%MSGLVL = transfer(MSGVLV, this%MSGLVL)
             allocate (this%PERM(N))
             allocate (this%JA(A%nnz))
-            allocate (this%IA(A%nptr))
+            allocate (this%IA(A%num_ptr))
 
-            this%IPARM = 0
+            this%IPARM(:) = 0
             call PARDISOINIT(this%PT, this%MTYPE, this%IPARM)
 
             do i = 1, A%nnz
-                this%JA(i) = int(A%Ind(i), kind=kind(this%JA(i)))
+                this%JA(i) = transfer(A%Ind(i), this%JA(i))
             end do
-            do i = 1, A%nptr
-                this%IA(i) = int(A%Ptr(i), kind=kind(this%IA(i)))
+            do i = 1, A%num_ptr
+                this%IA(i) = transfer(A%Ptr(i), this%IA(i))
             end do
         end select
 
@@ -54,7 +54,7 @@ contains
         integer(int32), intent(inout) :: status
 
         call PARDISO(self%PT, self%MAXFCT, self%MNUM, self%MTYPE, self%PHASE, self%N, A%Val, self%IA, self%JA, self%PERM, self%NRHS, self%IPARM, self%MSGLVL, b, x, self%ERROR)
-        status = int(self%ERROR, kind=kind(status))
+        status = transfer(self%ERROR, status)
 
     end subroutine Solve_CRS_LU
 
@@ -65,7 +65,8 @@ contains
         real(real64), intent(in) :: time
 
         if (status /= 0) then
-            print *, 'PARDISO '
+            print *, 'PARDISO ', status, ' LU 解法エラー'
+            print *, 'PARDISO Error Code: ', self%ERROR
             stop
         end if
 
@@ -80,7 +81,7 @@ contains
         allocate (Solver_Full_LU :: structure)
         select type (this => structure)
         type is (Solver_Full_LU)
-            this%N = int(N, kind=kind(this%N))
+            this%N = transfer(N, this%N)
             allocate (this%IPIV(this%N))
         end select
 
@@ -104,7 +105,7 @@ contains
 
         x(:) = b(:)
 
-        status = int(self%ERROR, kind=kind(status))
+        status = transfer(self%ERROR, status)
 
     end subroutine Solve_Full_LU
 

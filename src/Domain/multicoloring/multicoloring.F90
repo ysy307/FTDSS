@@ -3,8 +3,8 @@ module domain_multicoloring
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_sorting, only:sort_index
     use :: module_core, only:allocate_array, deallocate_array
-    use :: domain_adjacency, only:type_element_adjacency
-    ! インデックスソート用のライブラリを想定
+    ! 最終版の隣接行列モジュールをuseする
+    use :: domain_adjacency_adjacency_element, only:type_crs_adjacency_element
 
     implicit none
     private
@@ -16,8 +16,6 @@ module domain_multicoloring
     type :: type_colored_info
         integer(int32) :: num_elements = 0
         integer(int32), allocatable :: elements(:)
-        ! contains
-        ! procedure, pass(self), public :: get_elements => get_colored_elements
     end type type_colored_info
 
     ! 着色結果全体を管理する型
@@ -35,8 +33,9 @@ contains
     !【初期化メソッド】アルゴリズム名に応じて処理を分岐
     !================================================================!
     subroutine initialize_coloring(self, adjacency, algorithm_name)
+        implicit none
         class(type_coloring), intent(inout) :: self
-        class(type_element_adjacency), intent(in) :: adjacency
+        class(type_crs_adjacency_element), intent(in) :: adjacency
         character(len=*), intent(in), optional :: algorithm_name
 
         character(len=30) :: selected_algorithm
@@ -62,8 +61,9 @@ contains
     !【アルゴリズム実装】Welsh-Powell法 (プライベート)
     !================================================================!
     subroutine execute_welsh_powell(self, adjacency)
+        implicit none
         class(type_coloring), intent(inout) :: self
-        class(type_element_adjacency), intent(in) :: adjacency
+        class(type_crs_adjacency_element), intent(in) :: adjacency
 
         integer(int32) :: num_elements, i, v
         integer(int32), allocatable :: perm(:)
@@ -71,7 +71,7 @@ contains
         num_elements = adjacency%get_num_elements()
 
         if (allocated(self%color)) call deallocate_array(self%color)
-        call allocate_array(self%color, num_elements)
+        call allocate_array(self%color, length=num_elements)
         self%color = 0
 
         ! ステップ1: 次数降順の処理順序(perm)を取得
@@ -96,38 +96,31 @@ contains
     ! 次数降順の処理順序(perm)を取得する
     subroutine get_welsh_powell_order(adjacency, perm)
         implicit none
-        class(type_element_adjacency), intent(in) :: adjacency
+        class(type_crs_adjacency_element), intent(in) :: adjacency
         integer(int32), allocatable, intent(inout) :: perm(:)
 
         integer(int32) :: num_elements, i, temp
         integer(int32), allocatable :: degrees(:)
         integer(int32), allocatable :: local_perm(:)
 
-        ! --- 作業用配列(work, iwork)を使わない、より堅牢な方法に変更 ---
-
         num_elements = adjacency%get_num_elements()
-        call allocate_array(degrees, num_elements)
-        call allocate_array(local_perm, num_elements)
+        call allocate_array(degrees, length=num_elements)
+        call allocate_array(local_perm, length=num_elements)
 
         do i = 1, num_elements
             degrees(i) = adjacency%get_degree(i)
         end do
 
-        ! --- 修正箇所 ---
-        ! 1. まず、昇順でソートします (最も安定している基本的な呼び出し)
+        ! stdlibのsort_indexで昇順ソートのインデックスを取得
         call sort_index(array=degrees, index=local_perm)
 
-        ! 2. 得られたインデックス配列を、手動で逆順にします。
-        !    これにより、次数が大きい順(降順)のインデックスが得られます。
+        ! 得られたインデックス配列を手動で逆順にし、降順のインデックスを得る
         do i = 1, num_elements / 2
             temp = local_perm(i)
             local_perm(i) = local_perm(num_elements - i + 1)
             local_perm(num_elements - i + 1) = temp
         end do
 
-        ! 結果を引数permに代入します。
-        ! allocatable配列の代入は、古いpermを自動で解放し、
-        ! 新しいサイズで確保して内容をコピーするため安全です。
         perm = local_perm
 
         call deallocate_array(degrees)
@@ -137,35 +130,38 @@ contains
 
     ! 指定ノードに割り当て可能な最小の色を見つける (最適化版)
     function find_smallest_available_color(v, adjacency, colors) result(color_id)
+        implicit none
         integer(int32) :: color_id
         integer(int32), intent(in) :: v
-        class(type_element_adjacency), intent(in) :: adjacency
+        class(type_crs_adjacency_element), intent(in) :: adjacency
         integer(int32), intent(in) :: colors(:)
 
         logical, allocatable :: forbidden_colors(:)
-        integer(int32) :: neighbor_color, max_possible_colors, i, start_p, end_p
+        integer(int32) :: neighbor_color, max_possible_colors, i
+        integer(int32), allocatable :: neighbors(:)
+        integer(int32) :: neighbor_id
 
-        ! vの隣接ノードが取りうる最大の色+1が、必要な色の最大数
         max_possible_colors = adjacency%get_degree(v) + 1
 
-        call allocate_array(forbidden_colors, max_possible_colors)
+        call allocate_array(forbidden_colors, length=max_possible_colors)
         forbidden_colors = .false.
 
-        ! vの隣接ノードをループし、使用済みの色をマーク
-        start_p = adjacency%ptr(v)
-        end_p = adjacency%ptr(v + 1) - 1
-        do i = start_p, end_p
-            neighbor_color = colors(adjacency%ind(i))
+        ! ゲッターで隣接要素リストを取得し、使用済み色をマーク
+        neighbors = adjacency%get_neighbors(v)
+        do i = 1, size(neighbors)
+            neighbor_id = neighbors(i)
+            neighbor_color = colors(neighbor_id)
             if (neighbor_color > 0 .and. neighbor_color <= max_possible_colors) then
                 forbidden_colors(neighbor_color) = .true.
             end if
         end do
+        call deallocate_array(neighbors)
 
-        ! マークされていない最小の色を見つける (1からスキャン)
+        ! マークされていない最小の色を見つける
         color_id = 1
         do while (color_id <= max_possible_colors)
             if (.not. forbidden_colors(color_id)) then
-                exit ! 最初の利用可能な色が見つかった
+                exit
             end if
             color_id = color_id + 1
         end do
@@ -175,8 +171,9 @@ contains
 
     ! 計算結果をtype_coloring構造体に整理して格納する
     subroutine populate_coloring_result(self)
+        implicit none
         class(type_coloring), intent(inout) :: self
-        integer(int32) :: i, j, count, num_elements
+        integer(int32) :: i, j, counts, num_elements
 
         num_elements = size(self%color)
         if (num_elements > 0) then
@@ -192,13 +189,10 @@ contains
         allocate (self%colored(self%num_colors))
 
         do i = 1, self%num_colors
-            count = 0
-            do j = 1, num_elements
-                if (self%color(j) == i) count = count + 1
-            end do
-            call allocate_array(self%colored(i)%elements, count)
-            self%colored(i)%num_elements = count
-            if (count > 0) then
+            counts = count(self%color == i)
+            call allocate_array(self%colored(i)%elements, length=counts)
+            self%colored(i)%num_elements = counts
+            if (counts > 0) then
                 self%colored(i)%elements = pack([(j, j=1, num_elements)], self%color == i)
             end if
         end do

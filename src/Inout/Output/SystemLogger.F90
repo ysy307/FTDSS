@@ -8,7 +8,7 @@ contains
         class(Type_Output) :: self
         type(type_time), intent(in) :: time
         type(Type_CRS), intent(in) :: Matrix
-        type(Domain_t), intent(in) :: Domain
+        type(type_domain), intent(inout) :: Domain
 
         character(:), allocatable :: username
         character(:), allocatable :: hostname
@@ -113,10 +113,10 @@ contains
         write (num_unit, '(a)') "Matrix Information"
         write (num_unit, '(a)') repeat('-', nRepeat)
         write (num_unit, '(a)') "Matrix type : CRS"
-        write (num_unit, '(a,i0)') "Matrix size : ", Matrix%nrow
+        write (num_unit, '(a,i0)') "Matrix size : ", Matrix%num_row
         write (num_unit, '(a,i0)') "Matrix nnz  : ", Matrix%nnz
         write (num_unit, '(a)') repeat('-', nRepeat)
-        write (num_unit, '(a,i0)') "Coloring Count : ", Domain%Colors%nColor
+        write (num_unit, '(a,i0)') "Coloring Count : ", Domain%Colors%num_colors
         write (num_unit, '(a)') repeat('=', nRepeat)
 
         close (num_unit)

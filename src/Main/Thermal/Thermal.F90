@@ -14,14 +14,15 @@ module Main_Thermal
     ! use :: Calculate_SpecificHeat
     ! use :: Calculate_HeatCapacity
     ! use :: Matrix_Assemble
-    use :: Matrix_CRS
+    use :: Matrix_CRS, only:type_crs, operator(*), operator(+)
     ! use :: Condition_Initial
     use :: Condition_Boundary
     use :: Solver_Solve
-    use :: control_control, only:type_time
+    use :: module_control, only:type_time
     ! use :: Matrix_RCM, only:RCM_Reorder, RCM_Reorder_Inverse
 
-    use :: thermal_thermal_assemble, only:Assemble_Mass_Heat_1_Parallel, Assemble_Diffusion_Heat_1_Parallel
+    use :: thermal_thermal_assemble
+    ! use :: thermal_thermal_assemble, only:Assemble_Mass_Heat_1_Parallel, Assemble_Diffusion_Heat_1_Parallel
     implicit none
 
     type, abstract :: Abstract_Thermal
@@ -31,11 +32,11 @@ module Main_Thermal
         type(type_variable) :: D_Qice
         type(type_variable) :: Si
 
-        type(Type_CRS) :: KT_star_0
-        type(Type_CRS) :: KT_l
-        type(Type_CRS) :: KT_old
-        type(Type_CRS) :: CT_l
-        type(Type_CRS), allocatable :: CT_old(:)
+        type(type_crs) :: KT_star_0
+        type(type_crs) :: KT_l
+        type(type_crs) :: KT_old
+        type(type_crs) :: CT_l
+        type(type_crs), allocatable :: CT_old(:)
 
         real(real64), allocatable :: FT(:)
         real(real64), allocatable :: FT_old(:)

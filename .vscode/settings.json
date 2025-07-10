@@ -27,17 +27,44 @@
     ],
     "fortran.linter.compiler": "ifx",
     "fortran.linter.compilerPath": "/opt/intel/oneapi/compiler/latest/bin/ifx",
-    "fortran.formatting.formatter": "fprettify",
+    "fortran.linter.modOutput": "/workspaces/FTDSS/CMakeBuild/.mod/",
+    "fortran.fortls.nthreads": 8,
+    "fortran.fortls.preprocessor.suffixes": [
+        ".F90"
+    ],
+    "fortran.fortls.directories": [
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/third_party/fortran_stdlib/IntelLLVM-2025.2.0/src",
+        "${workspaceFolder}/third_party/json-fortran/src",
+        "${workspaceFolder}/third_party/VTKFortran/src/"
+    ],
+    "fortran.fortls.excludeDirectories": [
+        "${workspaceFolder}/.archive",
+        "${workspaceFolder}/.devcontainer",
+        "${workspaceFolder}/.github",
+        "${workspaceFolder}/.vscode",
+        "${workspaceFolder}/cmake",
+        "${workspaceFolder}/docs",
+        "${workspaceFolder}/fpm",
+        "${workspaceFolder}/Inout",
+        "${workspaceFolder}/log"
+    ],
+    // "fortran.fortls.preprocessor.definitions": {
+    //     "_MKL": "1"
+    // },
+    "fortran.fortls.notifyInit": true,
+    "fortran.fortls.sortKeywords": true,
+    "fortran.linter.fypp.path": "",
     "fortran.linter.includePaths": [
-        "/workspaces/FTDSS/CMakeBuild/.mod/",
-        "/opt/intel/oneapi/mkl/latest/include/",
-        "/opt/intel/oneapi/mpi/latest/include/",
-        "/opt/intel/oneapi/2025.1/include/",
+        "/workspaces/FTDSS/CMakeBuild/.mod",
+        "/opt/intel/oneapi/mkl/latest/include",
+        "/opt/intel/oneapi/mpi/latest/include",
+        "/opt/intel/oneapi/2025.1/include",
         "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.2.0",
         "/workspaces/FTDSS/third_party/.local/include/VTKFortran",
         "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib"
     ],
-    "fortran.linter.modOutput": "/workspaces/FTDSS/CMakeBuild/.mod/",
+    "fortran.formatting.formatter": "fprettify",
     "fortran.formatting.fprettifyArgs": [
         "--indent",
         "4",
@@ -76,7 +103,6 @@
         "--whitespace-decl",
         "true"
     ],
-    "fortran.linter.fypp.path": "",
     "fortran.preferredCase": "lowercase",
     "[FortranFreeForm]": {
         "files.autoGuessEncoding": true,
@@ -105,8 +131,5 @@
     "editor.rulers": [
         132
     ],
-    "fortran.fortls.preprocessor.suffixes": [
-        "F90"
-    ],
-    "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
+    "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh"
 }

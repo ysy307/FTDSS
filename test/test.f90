@@ -15,10 +15,10 @@ program test
     character(1) :: BC_Type
 
     call FTDSS%initialize()
-    if (was_interrupted()) then
-        call global_logger%log_warning(message="Program interrupted by user.")
-        stop
-    end if
+    ! if (was_interrupted()) then
+    !     call global_logger%log_warning(message="Program interrupted by user.")
+    !     stop
+    ! end if
     call FTDSS%time%Profile_Start("Setup")
     call FTDSS%IC%apply(physics="Thermal", &
                         domain=FTDSS%Domain, &
@@ -40,7 +40,7 @@ program test
 
     call FTDSS%time%Profile_Start("IO")
     call FTDSS%Output%Overall%Output(fc=count, &
-                                     iperm=FTDSS%Domain%rcm%perm, &
+                                     rcm=FTDSS%Domain%rcm, &
                                      Temp=FTDSS%Thermal%T%pre, &
                                      Si=FTDSS%Thermal%Qice%pre)
     call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
@@ -102,14 +102,14 @@ program test
             !                              time=FTDSS%time%time)
 
             ! open (unit=10, file='log/debug4.txt', status='replace')
-            ! do i = 1, FTDSS%Thermal%nsize
+            ! do i = 1, FTDSS%Thermal%KT_star_0%num_row
             !     do j = FTDSS%Thermal%KT_star_0%Ptr(i), FTDSS%Thermal%KT_star_0%Ptr(i + 1) - 1
             !         write (10, '(i0, 2x, i0,2x,f16.7)') i, FTDSS%Thermal%KT_star_0%Ind(j), FTDSS%Thermal%KT_star_0%Val(j)
             !     end do
             ! end do
             ! close (10)
             ! open (unit=20, file='log/debug5.txt', status='replace')
-            ! do i = 1, FTDSS%Thermal%nsize
+            ! do i = 1, size(FTDSS%Thermal%PHIT(:))
             !     write (20, '( i0,2x,f16.7)') i, FTDSS%Thermal%PHIT(i)
             ! end do
             ! close (20)
@@ -120,13 +120,16 @@ program test
 
             call FTDSS%time%Profile_Start("Solve")
             call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
+
             call FTDSS%time%Profile_Stop("Solve")
             ! open (unit=30, file='log/debug3.txt', status='replace')
-            ! do i = 1, FTDSS%Thermal%nsize
+            ! do i = 1, size(FTDSS%Thermal%T%new(:))
             !     write (30, '( i0,2x,f16.7)') i, FTDSS%Thermal%T%new(i)
             ! end do
             ! close (30)
+            ! call FTDSS%Thermal%Solver%Check(stat, FTDSS%time%time)
             ! stop
+
             ! call Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
 
             ! Thermal%T%new(:) = Thermal%T%pre(:) + Thermal%T%dif(:)
@@ -160,16 +163,16 @@ program test
         if (mod(FTDSS%Iteration%step, 10) == 0) then
             count = count + 1
             call FTDSS%Output%Overall%Output(fc=count, &
-                                             iperm=FTDSS%Domain%rcm%perm, &
+                                             rcm=FTDSS%Domain%rcm, &
                                              Temp=FTDSS%Thermal%T%pre, &
                                              Si=FTDSS%Thermal%Qice%pre)
         end if
         call FTDSS%time%Profile_Stop("IO")
 
-        if (was_interrupted()) then
-            call global_logger%log_warning(message="Program interrupted by user.")
-            stop
-        end if
+        ! if (was_interrupted()) then
+        !     call global_logger%log_warning(message="Program interrupted by user.")
+        !     stop
+        ! end if
 
     end do TIME_LOOP
 

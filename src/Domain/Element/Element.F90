@@ -263,7 +263,7 @@ module domain_element
             class(abst_element), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical :: is_in
+            logical, intent(inout) :: is_in
         end subroutine abst_is_inside
 
         function abst_interpolate(self, xi, eta, value) result(interpolated_value)
@@ -388,7 +388,7 @@ module domain_element
             class(type_triangle_first), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical :: is_in
+            logical, intent(inout) :: is_in
 
         end subroutine is_in_triangle_first
 
@@ -513,7 +513,7 @@ module domain_element
             class(type_square_first), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical :: is_in
+            logical, intent(inout) :: is_in
 
         end subroutine is_in_square_first
 
@@ -638,7 +638,7 @@ module domain_element
             class(type_triangle_second), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical :: is_in
+            logical, intent(inout) :: is_in
 
         end subroutine is_in_triangle_second
 
@@ -762,7 +762,7 @@ module domain_element
             class(type_square_second), intent(in) :: self
             real(real64), intent(in) :: px, py
             real(real64), intent(inout) :: pxi, peta
-            logical :: is_in
+            logical, intent(inout) :: is_in
 
         end subroutine is_in_square_second
 

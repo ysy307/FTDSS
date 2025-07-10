@@ -7,7 +7,7 @@ contains
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(in) :: Coordinate
-        type(type_domain), intent(in) :: Domain
+        type(type_domain), intent(inout) :: Domain
 
         select case (self%fextend)
         case (".vtk")
@@ -26,7 +26,7 @@ contains
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(in) :: Coordinate
-        type(type_domain), intent(in) :: Domain
+        type(type_domain), intent(inout) :: Domain
 
         integer(int32) :: i, j, idx, total
 
@@ -39,7 +39,7 @@ contains
         call Allocate_Array(self%VTK%CellType, self%VTK%nCell)
 
         do i = 1, self%VTK%nCell
-            self%VTK%offset(i) = Input%VTK%CELLS(i)%offset
+            self%VTK%offset(i) = Input%VTK%CELLS(i)%num_nodes_in_cell
             self%VTK%CellType(i) = Input%VTK%CELLS(i)%cell_type
         end do
         total = sum(self%VTK%offset(:))
@@ -47,7 +47,7 @@ contains
         call Allocate_Array(self%VTK%connectivity, total)
         idx = 0
         do i = 1, self%VTK%nCell
-            do j = 1, Input%VTK%CELLS(i)%offset
+            do j = 1, Input%VTK%CELLS(i)%num_nodes_in_cell
                 idx = idx + 1
                 self%VTK%connectivity(idx) = Input%VTK%CELLS(i)%connectivity(j) - 1
             end do
@@ -60,44 +60,58 @@ contains
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(in) :: Coordinate
-        type(type_domain), intent(in) :: Domain
+        type(type_domain), intent(inout) :: Domain
 
-        integer(int32) :: i, j, idx, total
+        integer(int32) :: i, j
+        integer(int32) :: total_connectivity_size, current_offset, start_index
 
         self%VTK%nPoints = Input%VTK%num_points
         self%VTK%nCell = Input%VTK%num_total_cells
         call self%VTK%Coordinates%initialize(self%VTK%nPoints)
         self%VTK%Coordinates = Input%VTK%POINTS
 
+        ! --- offset と CellType 配列を確保 ---
         call Allocate_Array(self%VTK%offset, self%VTK%nCell)
         call Allocate_Array(self%VTK%CellType, self%VTK%nCell)
 
+        ! ★★★ 修正箇所: offset配列を累積和として正しく計算 ★★★
+        current_offset = 0
         do i = 1, self%VTK%nCell
-            self%VTK%offset(i) = Input%VTK%CELLS(i)%offset
             self%VTK%CellType(i) = Input%VTK%CELLS(i)%cell_type
+            current_offset = current_offset + Input%VTK%CELLS(i)%num_nodes_in_cell
+            self%VTK%offset(i) = current_offset
         end do
-        total = self%VTK%offset(self%VTK%nCell)
 
-        call Allocate_Array(self%VTK%connectivity, total)
+        ! --- connectivity配列を正しい合計サイズで確保 ---
+        if (self%VTK%nCell > 0) then
+            total_connectivity_size = self%VTK%offset(self%VTK%nCell)
+        else
+            total_connectivity_size = 0
+        end if
+        call Allocate_Array(self%VTK%connectivity, total_connectivity_size)
+
+        ! ★★★ 修正箇所: 正しいオフセットを用いてconnectivity配列にデータを格納 ★★★
         do i = 1, self%VTK%nCell
+            ! 各セルの書き込み開始インデックスを計算
             if (i == 1) then
-                do j = 1, Input%vtk%cells(i)%num_nodes_in_cell
-                    self%VTK%connectivity(j) = Input%VTK%CELLS(i)%connectivity(j) - 1
-                end do
+                start_index = 0
             else
-                do j = 1, Input%vtk%cells(i)%num_nodes_in_cell
-                    self%VTK%connectivity(self%VTK%offset(i - 1) + j) = Input%VTK%CELLS(i)%connectivity(j) - 1
-                end do
+                start_index = self%VTK%offset(i - 1)
             end if
+
+            ! 各セルの接続情報をコピー (VTKは0-based indexなので-1する)
+            do j = 1, Input%VTK%CELLS(i)%num_nodes_in_cell
+                self%VTK%connectivity(start_index + j) = Input%VTK%CELLS(i)%connectivity(j) - 1
+            end do
         end do
 
     end subroutine Inout_Output_Overall_initialize_vtu
 
-    module subroutine Inout_Output_Overall_Output(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
+    module subroutine Inout_Output_Overall_Output(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in) :: fc
-        integer(int32), intent(in), optional :: iperm(:)
+        type(type_rcm), intent(in), optional :: rcm
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
@@ -106,12 +120,13 @@ contains
 
         select case (trim(adjustl(self%fextend)))
         case (".vtk")
-            call self%Output_vtk(fc=fc, iperm=iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+            call self%Output_vtk(fc=fc, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+            ! call self%Output_vtk(fc=fc, iperm=rcm%iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
         case (".vtu")
             if (present(Colors)) then
-                call self%Output_vtu(fc=fc, iperm=iperm, Colors=Colors)
+                call self%Output_vtu(fc=fc, Colors=Colors)
             else
-                call self%Output_vtu(fc=fc, iperm=iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
+                call self%Output_vtu(fc=fc, rcm=rcm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
             end if
         end select
 
@@ -207,7 +222,8 @@ contains
         integer(int32) :: status
 
         call Allocate_Array(Original, self%VTK%nPoints)
-        call Reorder_to_Original(x, Original, iperm, status)
+        ! call rcm
+        ! call Reorder_to_Original(x, Original, iperm, status)
 
         write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
         write (unit_num, '(a)') "LOOKUP_TABLE default"
@@ -257,9 +273,9 @@ contains
         call Allocate_Array(Original_y, self%VTK%nPoints)
         call Allocate_Array(Original_z, self%VTK%nPoints)
 
-        call Reorder_to_Original(x, Original_x, iperm, status)
-        call Reorder_to_Original(y, Original_y, iperm, status)
-        call Reorder_to_Original(z, Original_z, iperm, status)
+        ! call Reorder_to_Original(x, Original_x, iperm, status)
+        ! call Reorder_to_Original(y, Original_y, iperm, status)
+        ! call Reorder_to_Original(z, Original_z, iperm, status)
 
         write (unit_num, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
         do i = 1, self%VTK%nPoints
@@ -269,12 +285,12 @@ contains
 
     end subroutine Inout_Output_Overall_Output_vtk_vector
 
-    module subroutine Inout_Output_Overall_Output_vtu(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
+    module subroutine Inout_Output_Overall_Output_vtu(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
         use :: vtk_fortran, only:vtk_file
         implicit none
         class(Output_Overall), intent(inout) :: self
         integer(int32), intent(in) :: fc
-        integer(int32), intent(in), optional :: iperm(:)
+        type(type_rcm), intent(in), optional :: rcm
         real(real64), intent(in), optional :: Temp(:)
         real(real64), intent(in), optional :: Si(:)
         real(real64), intent(in), optional :: Pres(:)
@@ -328,28 +344,24 @@ contains
         else
             status = vtu%xml_writer%write_dataarray(location='node', action='open')
             if (present(Temp)) then
-                if (present(iperm)) then
-                    call Reorder_to_Original(Temp, Original, iperm, status)
-                else
-                    Original = Temp
-                end if
+                call rcm%reorder_to_original(Temp, Original)
                 status = vtu%xml_writer%write_dataarray(data_name='Temperature', &
                                                         x=Original)
             end if
             if (present(Si)) then
-                call Reorder_to_Original(Si, Original, iperm, status)
+                call rcm%reorder_to_original(Si, Original)
                 status = vtu%xml_writer%write_dataarray(data_name='Si', &
                                                         x=Original)
             end if
             if (present(Pres)) then
-                call Reorder_to_Original(Pres, Original, iperm, status)
+                call rcm%reorder_to_original(Pres, Original)
                 status = vtu%xml_writer%write_dataarray(data_name='Pressure', &
                                                         x=Original)
             end if
             if (present(wFlux)) then
-                call Reorder_to_Original(wFlux%x, Original_vector(:, 1), iperm, status)
-                call Reorder_to_Original(wFlux%y, Original_vector(:, 2), iperm, status)
-                call Reorder_to_Original(wFlux%z, Original_vector(:, 3), iperm, status)
+                call rcm%reorder_to_original(wFlux%x, Original_vector(:, 1))
+                call rcm%reorder_to_original(wFlux%y, Original_vector(:, 2))
+                call rcm%reorder_to_original(wFlux%z, Original_vector(:, 3))
                 status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
                                                         x=Original_vector(:, 1), &
                                                         y=Original_vector(:, 2), &

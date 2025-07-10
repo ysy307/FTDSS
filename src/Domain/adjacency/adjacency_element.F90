@@ -1,275 +1,198 @@
 module domain_adjacency_adjacency_element
-    use, intrinsic :: iso_fortran_env, only: int32, int64
-    use :: stdlib_sorting, only:sort
+    use, intrinsic :: iso_fortran_env, only: int32
     use :: module_core, only:allocate_array, deallocate_array
-
+    use :: domain_element, only:abst_element, holder_elements
     implicit none
     private
 
-    public :: type_element_adjacency
+    public :: type_crs_adjacency_element
 
-    type :: type_element_adjacency
-        integer(int32) :: num_elements = 0
+    !============================================================
+    ! CRS形式の隣接行列を格納する型
+    !============================================================
+    type :: type_crs_adjacency_element
+        private
+        integer(int32) :: nnz = 0
+        integer(int32) :: num_row = 0
         integer(int32), allocatable :: ptr(:)
         integer(int32), allocatable :: ind(:)
     contains
-        procedure, pass(self), public :: initialize => initialize_adjacency
-        procedure, pass(self), public :: is_adjacent => check_adjacent_sparse
-        procedure, pass(self), public :: get_degree => get_degree_sparse
-        procedure, pass(self), public :: get_num_elements => get_num_elements
-        procedure, pass(self), public :: destroy => destroy_adjacency
-    end type type_element_adjacency
+        procedure, pass(self), public :: initialize => initialize_crs_adjacency
+        procedure, pass(self), public :: get_num_elements => get_num_elements_impl
+        procedure, pass(self), public :: get_degree => get_degree_impl
+        ! ★★★ 新しいゲッターを追加 ★★★
+        procedure, pass(self), public :: get_neighbors => get_neighbors_impl
+    end type type_crs_adjacency_element
 
 contains
 
-    !================================================================!
-    !【コントローラー】初期化処理のメインフロー
-    !================================================================!
-    subroutine initialize_adjacency(self, num_nodes, elements_conn_data, elements_ptr)
-        class(type_element_adjacency), intent(inout) :: self
-        integer(int32), intent(in) :: num_nodes
-        integer(int32), intent(in) :: elements_conn_data(:)
-        integer(int32), intent(in) :: elements_ptr(:)
+    !============================================================
+    ! メインの初期化サブルーチン
+    !============================================================
+    subroutine initialize_crs_adjacency(self, elements)
+        class(type_crs_adjacency_element), intent(inout) :: self
+        type(holder_elements), intent(in) :: elements(:)
 
-        integer(int32), allocatable :: node_to_elem_ptr(:)
-        integer(int32), allocatable :: node_to_elem_data(:)
-        integer(int32), allocatable :: adj_i(:)
-        integer(int32), allocatable :: adj_j(:)
-        integer(int32) :: pair_count
+        integer(int32) :: num_elements
+        integer(int32) :: i, j
+        integer(int32) :: pair_count, capacity
+        integer(int32), allocatable :: coo_row(:), coo_col(:), temp_row(:), temp_col(:)
 
-        self%num_elements = size(elements_ptr) - 1
+        num_elements = size(elements)
+        self%num_row = num_elements
+        if (num_elements <= 1) return
 
-        ! ステップ1: ノード->要素の逆引きマップ作成
-        call build_node_to_element_map(num_nodes, self%num_elements, &
-                                       elements_conn_data, elements_ptr, &
-                                       node_to_elem_ptr, node_to_elem_data)
+        ! --- Step 1 & 2: 隣接ペアを全探索で探し、一時的なCOO形式で格納 ---
+        pair_count = 0
+        capacity = num_elements * 5
+        call allocate_array(coo_row, length=capacity)
+        call allocate_array(coo_col, length=capacity)
 
-        ! ステップ2: 隣接ペア列挙
-        call generate_adjacent_pairs(num_nodes, node_to_elem_ptr, node_to_elem_data, &
-                                     adj_i, adj_j, pair_count)
+        do i = 1, num_elements
+            do j = i + 1, num_elements
+                if (are_elements_adjacent(elements(i)%e, elements(j)%e)) then
+                    if ((pair_count + 2) > capacity) then
+                        capacity = capacity * 2
+                        call allocate_array(temp_row, length=capacity)
+                        call allocate_array(temp_col, length=capacity)
+                        temp_row(1:pair_count) = coo_row(1:pair_count)
+                        temp_col(1:pair_count) = coo_col(1:pair_count)
 
-        call deallocate_array(node_to_elem_ptr)
-        call deallocate_array(node_to_elem_data)
+                        call deallocate_array(coo_row)
+                        call deallocate_array(coo_col)
 
-        ! ステップ3: CSR 構築
-        call build_csr_from_pairs(self, adj_i, adj_j, pair_count)
+                        call move_alloc(temp_row, coo_row)
+                        call move_alloc(temp_col, coo_col)
+                    end if
 
-        call deallocate_array(adj_i)
-        call deallocate_array(adj_j)
-    end subroutine initialize_adjacency
+                    pair_count = pair_count + 1
+                    coo_row(pair_count) = i
+                    coo_col(pair_count) = j
 
-    !================================================================!
-    !【ステップ1】ノード->要素の逆引きマップ作成 (ロジック修正版)
-    !================================================================!
-    subroutine build_node_to_element_map(num_nodes, num_elems, data, ptr_in, node_ptr, node_data)
-        integer(int32), intent(in) :: num_nodes, num_elems
-        integer(int32), intent(in) :: data(:), ptr_in(:)
-        integer(int32), allocatable, intent(out) :: node_ptr(:), node_data(:)
-
-        integer(int32), allocatable :: temp_counts(:)
-        integer(int32) :: i, j, id, total
-
-        call allocate_array(temp_counts, num_nodes)
-        temp_counts = 0
-
-        do i = 1, num_elems
-            do j = ptr_in(i), ptr_in(i + 1) - 1
-                id = data(j)
-                if (id >= 1 .and. id <= num_nodes) then
-                    temp_counts(id) = temp_counts(id) + 1
+                    pair_count = pair_count + 1
+                    coo_row(pair_count) = j
+                    coo_col(pair_count) = i
                 end if
             end do
         end do
 
-        call allocate_array(node_ptr, num_nodes + 1_int32)
-        node_ptr(1) = 1
-        do i = 1, num_nodes
-            node_ptr(i + 1) = node_ptr(i) + temp_counts(i)
+        self%nnz = pair_count
+
+        ! --- Step 3: COO形式からCRS形式へ変換 ---
+        call allocate_array(self%ptr, length=self%num_row + 1_int32)
+        call allocate_array(self%ind, length=self%nnz)
+        self%ptr = 0
+
+        ! Pass 1: 各行の非ゼロ要素数(次数)をカウント
+        do i = 1, self%nnz
+            self%ptr(coo_row(i) + 1) = self%ptr(coo_row(i) + 1) + 1
         end do
 
-        total = node_ptr(num_nodes + 1) - 1
-        call allocate_array(node_data, total)
-
-        temp_counts = node_ptr(1:num_nodes)
-
-        do i = 1, num_elems
-            do j = ptr_in(i), ptr_in(i + 1) - 1
-                id = data(j)
-                if (id >= 1 .and. id <= num_nodes) then
-                    node_data(temp_counts(id)) = i
-                    temp_counts(id) = temp_counts(id) + 1
-                end if
-            end do
-        end do
-
-        call deallocate_array(temp_counts)
-    end subroutine build_node_to_element_map
-
-    !================================================================!
-    !【ステップ2】隣接ペア列挙 (ロジック修正版)
-    !================================================================!
-    subroutine generate_adjacent_pairs(num_nodes, node_ptr, node_data, adj_i, adj_j, count)
-        integer(int32), intent(in) :: num_nodes
-        integer(int32), intent(in) :: node_ptr(:), node_data(:)
-        integer(int32), allocatable, intent(out) :: adj_i(:), adj_j(:)
-        integer(int32), intent(out) :: count
-
-        integer(int32) :: est, i, j, k, s, e, n1, n2
-
-        est = size(node_data) * 30 ! 推定サイズ
-        call allocate_array(adj_i, est)
-        call allocate_array(adj_j, est)
-        count = 0
-
-        do i = 1, num_nodes
-            s = node_ptr(i)
-            e = node_ptr(i + 1) - 1
-            do j = s, e - 1
-                do k = j + 1, e
-                    count = count + 1
-                    if (count > est) then
-                        ! 必要であればここで配列を拡張する処理を追加
-                        error stop "generate_adjacent_pairs: estimation size exceeded."
-                    end if
-                    n1 = node_data(j)
-                    n2 = node_data(k)
-                    if (n1 < n2) then
-                        adj_i(count) = n1
-                        adj_j(count) = n2
-                    else
-                        adj_i(count) = n2
-                        adj_j(count) = n1
-                    end if
-                end do
-            end do
-        end do
-    end subroutine generate_adjacent_pairs
-
-    !================================================================!
-    !【ステップ3】CSR 構築 (重複削除処理を追加した修正版)
-    !================================================================!
-    subroutine build_csr_from_pairs(self, adj_i_in, adj_j_in, count_in)
-        class(type_element_adjacency), intent(inout) :: self
-        integer(int32), intent(in) :: adj_i_in(:), adj_j_in(:)
-        integer(int32), intent(in) :: count_in
-
-        integer(int64), allocatable :: sort_keys(:)
-        integer(int32) :: unique_count, i, n1, n2, total_adj
-        integer(int32), allocatable :: deg(:), pos(:)
-
-        if (count_in == 0) then
-            call allocate_array(self%ptr, self%num_elements + 1_int32)
-            self%ptr = 1
-            call allocate_array(self%ind, 0_int32)
-            return
-        end if
-
-        ! --- ペアのソートと重複削除 (重要) ---
-        call allocate_array(sort_keys, int(count_in, int64))
-        do i = 1, count_in
-            sort_keys(i) = int(adj_i_in(i), int64) * self%num_elements + int(adj_j_in(i), int64)
-        end do
-        call sort(sort_keys)
-
-        unique_count = 1
-        do i = 2, count_in
-            if (sort_keys(i) > sort_keys(i - 1)) then
-                unique_count = unique_count + 1
-                sort_keys(unique_count) = sort_keys(i)
-            end if
-        end do
-
-        ! --- CSR構築 ---
-        call allocate_array(deg, self%num_elements)
-        deg = 0
-        do i = 1, unique_count
-            n1 = int(sort_keys(i) / self%num_elements)
-            n2 = int(mod(sort_keys(i), int(self%num_elements, int64)))
-            deg(n1) = deg(n1) + 1
-            deg(n2) = deg(n2) + 1
-        end do
-
-        call allocate_array(self%ptr, self%num_elements + 1_int32)
+        ! Pass 2: 累積和を計算して、ptr配列を完成させる
         self%ptr(1) = 1
-        do i = 1, self%num_elements
-            self%ptr(i + 1) = self%ptr(i) + deg(i)
+        do i = 2, self%num_row + 1
+            self%ptr(i) = self%ptr(i) + self%ptr(i - 1)
         end do
 
-        total_adj = self%ptr(self%num_elements + 1) - 1
-        call allocate_array(self%ind, total_adj)
+        ! Pass 3: ind配列を構築する
+        call allocate_array(temp_row, length=self%num_row)
+        temp_row(:) = self%ptr(1:self%num_row)
 
-        call allocate_array(pos, self%num_elements)
-        pos = self%ptr(1:self%num_elements)
-
-        do i = 1, unique_count
-            n1 = int(sort_keys(i) / self%num_elements)
-            n2 = int(mod(sort_keys(i), int(self%num_elements, int64)))
-            self%ind(pos(n1)) = n2
-            pos(n1) = pos(n1) + 1
-            self%ind(pos(n2)) = n1
-            pos(n2) = pos(n2) + 1
+        do i = 1, self%nnz
+            j = temp_row(coo_row(i))
+            self%ind(j) = coo_col(i)
+            temp_row(coo_row(i)) = j + 1
         end do
 
-        call deallocate_array(sort_keys)
-        call deallocate_array(deg)
-        call deallocate_array(pos)
-    end subroutine build_csr_from_pairs
+        call deallocate_array(temp_row)
 
-    !================================================================!
-    ! 照会・取得・解放用サブルーチン
-    !================================================================!
-    function check_adjacent_sparse(self, i, j) result(is_adj)
-        class(type_element_adjacency), intent(in) :: self
-        integer(int32), intent(in) :: i, j
-        logical :: is_adj
-        integer(int32) :: k, startp, endp
+        call deallocate_array(coo_row)
+        call deallocate_array(coo_col)
 
-        is_adj = .false.
-        if (i < 1 .or. i > self%num_elements) then
-            return
-        end if
-        if (j < 1 .or. j > self%num_elements) then
-            return
-        end if
+    end subroutine initialize_crs_adjacency
 
-        startp = self%ptr(i)
-        endp = self%ptr(i + 1) - 1
-        do k = startp, endp
-            if (self%ind(k) == j) then
-                is_adj = .true.
-                return
-            end if
+    !============================================================
+    ! 2つの要素が隣接しているか判定する private logical 関数
+    ! (この関数は変更なし)
+    !============================================================
+    function are_elements_adjacent(elem1, elem2) result(is_adjacent)
+        class(abst_element), intent(in) :: elem1, elem2
+        logical :: is_adjacent
+        integer(int32) :: i, j
+        integer(int32) :: num_nodes1, num_nodes2
+        integer(int32), allocatable :: conn1(:), conn2(:)
+
+        is_adjacent = .false.
+        num_nodes1 = elem1%get_num_nodes()
+        num_nodes2 = elem2%get_num_nodes()
+
+        conn1 = elem1%connectivity
+        conn2 = elem2%connectivity
+
+        do i = 1, num_nodes1
+            do j = 1, num_nodes2
+                if (conn1(i) == conn2(j)) then
+                    is_adjacent = .true.
+                    return
+                end if
+            end do
         end do
-    end function check_adjacent_sparse
+    end function are_elements_adjacent
 
-    function get_degree_sparse(self, i) result(deg)
-        class(type_element_adjacency), intent(in) :: self
+    !============================================================
+    ! Getter: 要素数を返す
+    !============================================================
+    function get_num_elements_impl(self) result(num_row)
+        implicit none
+        class(type_crs_adjacency_element), intent(in) :: self
+        integer(int32) :: num_row
+
+        num_row = self%num_row
+    end function get_num_elements_impl
+
+    !============================================================
+    ! Getter: 指定した要素の次数を返す
+    !============================================================
+    function get_degree_impl(self, i) result(degree)
+        implicit none
+        class(type_crs_adjacency_element), intent(in) :: self
         integer(int32), intent(in) :: i
-        integer(int32) :: deg
+        integer(int32) :: degree
 
-        if (i < 1 .or. i > self%num_elements) then
-            deg = 0
+        if (i < 1 .or. i > self%num_row) then
+            degree = 0
         else
-            deg = self%ptr(i + 1) - self%ptr(i)
+            degree = self%ptr(i + 1) - self%ptr(i)
         end if
-    end function get_degree_sparse
+    end function get_degree_impl
 
-    function get_num_elements(self) result(n)
-        class(type_element_adjacency), intent(in) :: self
-        integer(int32) :: n
-        n = self%num_elements
-    end function get_num_elements
+    !============================================================
+    ! ★★★ Getter: 指定した要素の隣接要素リストを返す (新規追加) ★★★
+    !============================================================
+    function get_neighbors_impl(self, i) result(neighbors)
+        implicit none
+        class(type_crs_adjacency_element), intent(in) :: self
+        integer(int32), intent(in) :: i
+        integer(int32), allocatable :: neighbors(:)
 
-    subroutine destroy_adjacency(self)
-        class(type_element_adjacency), intent(inout) :: self
-        if (allocated(self%ptr)) then
-            call deallocate_array(self%ptr)
+        integer(int32) :: start_p, end_p, num_neighbors
+
+        if (i < 1 .or. i > self%num_row) then
+            ! 範囲外の場合はサイズ0の配列を返す
+            call allocate_array(neighbors, length=0_int32)
+            return
         end if
-        if (allocated(self%ind)) then
-            call deallocate_array(self%ind)
+
+        start_p = self%ptr(i)
+        end_p = self%ptr(i + 1) - 1
+        num_neighbors = end_p - start_p + 1
+
+        if (num_neighbors > 0) then
+            call allocate_array(neighbors, length=num_neighbors)
+            neighbors = self%ind(start_p:end_p)
+        else
+            call allocate_array(neighbors, length=0_int32)
         end if
-        self%num_elements = 0
-    end subroutine destroy_adjacency
+    end function get_neighbors_impl
 
 end module domain_adjacency_adjacency_element
-!================================================================!

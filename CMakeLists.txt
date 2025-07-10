@@ -49,7 +49,7 @@ include(Toolchain)
 add_subdirectory(src/core)
 add_subdirectory(src/Inout/Input)
 add_subdirectory(src/Matrix)
-add_subdirectory(src/Domain)
+add_subdirectory(src/domain)
 add_subdirectory(src/Calculate/BLAS)
 add_subdirectory(src/Calculate/WRF)
 add_subdirectory(src/Calculate/HCF)
@@ -70,8 +70,7 @@ add_subdirectory(src/Main/FTDSS)
 # =========================================================================
 # ★改善点1: 全ての共通ライブラリをグループ化するINTERFACEライブラリを定義
 # =========================================================================
-add_library(CommonLibs INTERFACE)
-target_link_libraries(CommonLibs INTERFACE
+set(COMMON_LIBS
     Core
     Input
     Matrix 
@@ -104,7 +103,7 @@ set(TEST_FILE "${PROJECT_SOURCE_DIR}/test/test.F90")
 if(BUILD_APP STREQUAL "ysy_fc")
     # ysy_fc Target
     add_executable(ysy_fc ${MAIN_FILE})
-    target_link_libraries(ysy_fc PRIVATE CommonLibs)
+    target_link_libraries(ysy_fc PRIVATE ${COMMON_LIBS})
     enable_build_flags(ysy_fc)
     enable_thirdparty (ysy_fc)
     set_target_properties(ysy_fc PROPERTIES LINKER_LANGUAGE Fortran)
@@ -119,7 +118,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
-    target_link_libraries(test PRIVATE CommonLibs)
+    target_link_libraries(test PRIVATE ${COMMON_LIBS})
     enable_build_flags(test)
     enable_thirdparty (test)
     set_target_properties(test PROPERTIES LINKER_LANGUAGE Fortran)

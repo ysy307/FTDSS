@@ -1,4 +1,4 @@
-module control_control
+module module_control
     use :: control_time, only:type_time
     use :: control_iteration, only:type_iteration
     implicit none
@@ -7,5 +7,5 @@ module control_control
     public :: type_time
     public :: type_iteration
 
-end module control_control
+end module module_control
 

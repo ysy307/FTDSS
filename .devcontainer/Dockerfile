@@ -73,7 +73,6 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     sed -i "/'prompt'/c \\\ 'contrib-prompt' \\\\\n  'prompt'" /root/.zpreztorc && \
     sed -i "s/theme 'sorin'/theme 'bart'/g" /root/.zpreztorc && \
     echo 'export PS1="%~ %# "' >> /root/.zshrc && \
-    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
     echo "export FC=ifx" >> ~/.zshrc && \
     echo "export F90=ifx" >> ~/.zshrc && \
     echo "export F77=ifx" >> ~/.zshrc && \
@@ -84,6 +83,7 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "export MPIF77=mpiifx" >> ~/.zshrc && \
     echo "export MPICC=mpiicc" >> ~/.zshrc && \
     echo "export MPICXX=mpiicpc" >> ~/.zshrc &&\
+    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
     echo "ulimit -s unlimited" >> ~/.zshrc
 
 # デフォルトのシェルをZshに設定

@@ -62,19 +62,19 @@ contains
                     ! 最後の履歴はクリア
                     self%old(:, self%rank) = 0.0d0
                 end if
+                return
             end if
-            ! ⏩ 通常の順方向シフトの場合
-        else
-            ! 履歴を1つ過去へずらす (old(2) <- old(1), old(3) <- old(2), ...)
-            if (self%rank > 0) then
-                do i = self%rank, 2, -1
-                    self%old(:, i) = self%old(:, i - 1)
-                end do
-                self%old(:, 1) = self%pre(:)
-            end if
-            ! pre に new の値を格納
-            self%pre(:) = self%new(:)
         end if
+        ! ⏩ 通常の順方向シフトの場合
+        ! 履歴を1つ過去へずらす (old(2) <- old(1), old(3) <- old(2), ...)
+        if (self%rank > 2) then
+            do i = self%rank, 2, -1
+                self%old(:, i) = self%old(:, i - 1)
+            end do
+        end if
+
+        self%old(:, 1) = self%pre(:)
+        self%pre(:) = self%new(:)
 
     end subroutine type_variable_shift
 

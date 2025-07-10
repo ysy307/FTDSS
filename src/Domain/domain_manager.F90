@@ -1,14 +1,15 @@
 module domain_manager
     use, intrinsic :: iso_fortran_env, only: int32
+    use :: stdlib_logger
     use :: module_core, only:type_dp_3d
-    use :: Domain_Element, only:holder_elements
-    use :: Domain_Side, only:holder_sides
-    use :: Domain_Element_Factory, only:create_element
-    use :: Domain_Side_Factory, only:create_side
-    use :: domain_adjacency, only:type_node_adjacency, type_element_adjacency
+    use :: Inout_Input
+    use :: domain_element, only:holder_elements
+    use :: domain_side, only:holder_sides
+    use :: domain_element_factory, only:create_element
+    use :: domain_side_factory, only:create_side
+    use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element
     use :: domain_multicoloring, only:type_coloring, type_colored_info
     use :: domain_rcm, only:type_rcm
-    use :: Inout_Input
     implicit none
     private
 
@@ -23,18 +24,21 @@ module domain_manager
         type(holder_elements), allocatable :: elements(:)
         type(holder_sides), allocatable :: sides(:)
 
-        type(type_element_adjacency) :: element_adjacency
+        type(type_crs_adjacency_element) :: element_adjacency
         type(type_node_adjacency) :: node_adjacency
         type(type_coloring) :: colors
         type(type_rcm) :: rcm
+
+        integer(int32), private :: computaion_dimension
         ! ...
     contains
         procedure, pass(self) :: initialize
 
         procedure, pass(self) :: get_num_elements
         procedure, pass(self) :: get_num_sides
-        procedure, pass(self) :: get_num_Nodes
-        procedure, pass(self) :: get_num_Regions
+        procedure, pass(self) :: get_num_nodes
+        procedure, pass(self) :: get_num_regions
+        procedure, pass(self) :: get_computation_dimension
     end type type_domain
 
 contains
@@ -43,17 +47,17 @@ contains
         class(type_domain), intent(inout) :: self
         type(Type_Input), intent(in) :: Input ! Inputモジュールからデータを受け取る
         type(type_dp_3d), intent(inout), pointer :: Coordinate
-        integer, intent(out) :: ierr
+        integer(int32), intent(inout) :: ierr
 
         integer(int32) :: count_sides, count_elements, count_volumes
         integer(int32) :: iCell, iElem, iSide
         integer(int32) :: factory_ierr
         integer(int32) :: cell_dimension
 
-        ! --- 一時的なデータ配列 ---
-        integer(int32), allocatable :: conn_data(:)
-        integer(int32), allocatable :: conn_ptr(:)
-        integer(int32) :: total_connec_size, i, n_nodes_in_elem
+        ! ! --- 一時的なデータ配列 ---
+        ! integer(int32), allocatable :: conn_data(:)
+        ! integer(int32), allocatable :: conn_ptr(:)
+        ! integer(int32) :: total_connec_size, i, n_nodes_in_elem
 
         ! -----------------------------------------------------------------------------------
         ! 初期化処理
@@ -117,42 +121,49 @@ contains
             end select
 
         end do
-        !===============================================================
-        ! 2. 汎用モジュール用のデータ準備 (Input%vtkからCSR形式を構築)
-        !===============================================================
-        ! 全コネクティビティデータの合計サイズを計算
-        total_connec_size = 0
-        do i = 1, Input%vtk%num_total_cells
-            total_connec_size = total_connec_size + size(Input%vtk%cells(i)%connectivity)
-        end do
 
-        ! CSR配列を確保
-        call allocate_array(conn_ptr, Input%vtk%num_total_cells + 1_int32)
-        call allocate_array(conn_data, total_connec_size)
+        select case (Input%Basic%DimensionType)
+        case (1, 2)
+            self%computaion_dimension = 2_int32
+        case (3)
+            self%computaion_dimension = 3_int32
+        end select
+        ! !===============================================================
+        ! ! 2. 汎用モジュール用のデータ準備 (Input%vtkからCSR形式を構築)
+        ! !===============================================================
+        ! ! 全コネクティビティデータの合計サイズを計算
+        ! total_connec_size = 0
+        ! do i = 1, self%num_elements
+        !     total_connec_size = total_connec_size + self%elements(i)%e%get_num_nodes()
+        ! end do
 
-        ! Input%vtk%cells の情報を使ってCSR配列を構築
-        conn_ptr(1) = 1
-        do i = 1, Input%vtk%num_total_cells
-            n_nodes_in_elem = size(Input%vtk%cells(i)%connectivity)
-            conn_ptr(i + 1) = conn_ptr(i) + n_nodes_in_elem
+        ! ! CSR配列を確保
+        ! call allocate_array(conn_ptr, self%num_elements + 1_int32)
+        ! call allocate_array(conn_data, total_connec_size)
 
-            conn_data(conn_ptr(i):conn_ptr(i + 1) - 1) = Input%vtk%cells(i)%connectivity
-        end do
-        print *, "Step 2: Connectivity data prepared from VTK input."
+        ! ! Input%vtk%cells の情報を使ってCSR配列を構築
+        ! conn_ptr(1) = 1
+        ! do i = 1, self%num_elements
+        !     n_nodes_in_elem = self%elements(i)%e%get_num_nodes()
+        !     conn_ptr(i + 1) = conn_ptr(i) + n_nodes_in_elem
+
+        !     conn_data(conn_ptr(i):conn_ptr(i + 1) - 1) = self%elements(i)%e%connectivity(1:n_nodes_in_elem)
+        ! end do
+        ! print *, "Step 2: Connectivity data prepared from VTK input."
 
         !===============================================================
         ! 3. 隣接行列の構築
         !===============================================================
-        call self%element_adjacency%initialize(self%num_nodes, conn_data, conn_ptr)
+        call self%element_adjacency%initialize(self%elements)
         print *, "Step 3a: Element adjacency matrix created."
 
-        call self%node_adjacency%initialize(self%num_nodes, self%num_elements, conn_data, conn_ptr)
-        print *, "Step 3b: Node adjacency matrix created."
+        ! call self%node_adjacency%initialize(self%num_nodes, self%num_elements, conn_data, conn_ptr)
+        ! print *, "Step 3b: Node adjacency matrix created."
 
         !===============================================================
         ! 4. RCM並べ替えの実行
         !===============================================================
-        call self%rcm%reorder(self%node_adjacency)
+        call self%rcm%reorder(self%elements)
         call self%rcm%invert()
         print *, "Step 4: RCM reordering performed."
 
@@ -165,46 +176,55 @@ contains
         !===============================================================
         ! 6. 後片付け
         !===============================================================
-        call deallocate_array(conn_ptr)
-        call deallocate_array(conn_data)
+        ! call deallocate_array(conn_ptr)
+        ! call deallocate_array(conn_data)
         print *, "Initialization process completed successfully."
 
     end subroutine initialize
 
-    function get_num_elements(self) result(numElement)
+    function get_num_elements(self) result(num_elements)
         implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: numElement
+        integer(int32) :: num_elements
 
-        numElement = self%num_elements
+        num_elements = self%num_elements
 
     end function get_num_elements
 
-    function get_num_sides(self) result(numSide)
+    function get_num_sides(self) result(num_sides)
         implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: numSide
+        integer(int32) :: num_sides
 
-        numSide = self%num_sides
+        num_sides = self%num_sides
 
     end function get_num_sides
 
-    function get_num_Nodes(self) result(numNode)
+    function get_num_nodes(self) result(num_nodea)
         implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: numNode
+        integer(int32) :: num_nodea
 
-        numNode = self%num_nodes
+        num_nodea = self%num_nodes
 
-    end function get_num_Nodes
+    end function get_num_nodes
 
-    function get_num_Regions(self) result(numRegion)
+    function get_num_regions(self) result(num_regions)
         implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: numRegion
+        integer(int32) :: num_regions
 
-        numRegion = self%num_regions
+        num_regions = self%num_regions
 
-    end function get_num_Regions
+    end function get_num_regions
+
+    function get_computation_dimension(self) result(computaion_dimension)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: computaion_dimension
+
+        computaion_dimension = self%computaion_dimension
+
+    end function get_computation_dimension
 
 end module domain_manager

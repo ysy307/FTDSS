@@ -129,8 +129,8 @@ contains
         integer(int32) :: p1, p2
 
         if (isUniform) then
-            call rcm%reorder_original(Edge(1), p1)
-            call rcm%reorder_original(Edge(2), p2)
+            call rcm%reorder_to_rcm(Edge(1), p1)
+            call rcm%reorder_to_rcm(Edge(2), p2)
 
             if (present(A)) then
                 call A%Find(p1, p1, ind)

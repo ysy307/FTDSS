@@ -1,7 +1,8 @@
 add_library(Matrix OBJECT
     # adjacency.F90
     # multicoloring.F90
-    CRS.F90
+    coo.F90
+    crs.F90
     # RCM.F90
     # Assemble.F90
 )

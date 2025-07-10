@@ -8,11 +8,8 @@ contains
         type(type_dp_3d), intent(inout), pointer :: Coordinate
         type(type_domain), intent(inout) :: Domain
 
-        ! integer(int32) :: CountElements, CountSides
-        ! integer(int32) :: iCell, iElem, iSide, idx
         integer(int32) :: i
         integer(int32) :: nNode
-        ! integer(int32) :: iRegion
 
         integer(int32) :: ierr
 
@@ -21,21 +18,13 @@ contains
 
         nNode = Domain%get_num_nodes()
 
-        ! print *, "RCM inverse permutation:"
-        ! print *, Domain%RCM_inv_perm(:)
-        ! stop
-
-        ! if (ierr /= 0) then
-        !     print *, "Error in RCM_Reorder in Type_Thermal_3Phase_2D_Construct"
-        !     return
-        ! end if
-
-        Structure%KT_star_0 = Type_CRS(Domain)
+        call Structure%KT_star_0%initialize(Domain)
 
         Structure%KT_l = Structure%KT_star_0%Copy()
         Structure%KT_old = Structure%KT_star_0%Copy()
         Structure%CT_l = Structure%KT_star_0%Copy()
         Structure%Order = Input%Basic%Order
+
         allocate (Structure%CT_old(Input%Basic%Order))
         do i = 1, Input%Basic%Order
             Structure%CT_old(i) = Structure%KT_star_0%Copy()
@@ -48,39 +37,14 @@ contains
 
         call Structure%T%initialize(nNode, Input%Basic%Order)
 
-        ! allocate (Structure%Ice(Input%Basic%numRegion))
-
-        ! do iRegion = 1, Input%Basic%numRegion
-        !     select case (Input%Regions(iRegion)%Ice%QiceType)
-        !     case (1)
-        !         Structure%Ice(iRegion)%f = Type_Ice_TRM(Input%Regions(iRegion), nNode)
-        !     case (2)
-        !         Structure%Ice(iRegion)%f = Type_Ice_GCC(Input%Regions(iRegion), nNode)
-        !     case (3)
-        !         Structure%Ice(iRegion)%f = Type_Ice_EXP(Input%Regions(iRegion), nNode)
-        !     end select
-        ! end do
-
-        ! !! Thermal properties
-        ! Structure%THC = Type_ThermalConductivity_3Phase(Input)
-        ! Structure%DEN = Type_Density_3Phase(Input)
-        ! Structure%SPH = Type_SpecificHeat_3Phase(Input)
-
-        ! Structure%HTC = Type_HeatCapacity_3Phase_Apparent(Input)
-
-        ! call Structure%Qw%allocate(nNode, Input%Basic%Order)
-        ! call Structure%Qice%allocate(nNode, Input%Basic%Order)
-        ! call Structure%D_Qice%allocate(nNode, Input%Basic%Order)
-        ! call Structure%Si%allocate(nNode, Input%Basic%Order)
-
-        ! Structure%BC = Type_BC_Thermal_CRS(Input)
-        ! Structure%IC = Type_Condition_IC_CRS(Input, "Thermal")
-
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! 線形求解ソルバーの設定
+        !---------------------------------------------------------------------------------------------------------------------------
         if (Input%Solver_Thermal%useSolver == 1) then
             Structure%Solver = Solver_CRS_LU_Constructor(N=nNode, &
                                                          MAXFCT=1, &
                                                          MNUM=1, &
-                                                         MTYPE=11, &
+                                                         MTYPE=1, &
                                                          PHASE=13, &
                                                          NRHS=1, &
                                                          MSGVLV=0, &
@@ -93,6 +57,7 @@ contains
                                                                    Preconditioner=Input%Solver_Thermal%usePreconditionerType)
             end if
         end if
+        !---------------------------------------------------------------------------------------------------------------------------
 
     end function Type_Thermal_3Phase_2D_Construct
 
@@ -144,14 +109,22 @@ contains
         ! ! if (step == 1) then
 
         ! ! end if
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! 各剛性行列の組み立て
+        !---------------------------------------------------------------------------------------------------------------------------
         !!!-----------------------------------------------------------------------
         ! (A, Domain, Temperature, Porosity, Propeties)
         call Assemble_Mass_Heat_1_Parallel(self%CT_l, Domain, self%T%new, Porosity, Property)
+        ! call Assemble_Mass_Heat_1(self%CT_l, Domain, self%T%new, Porosity, Property)
         !
         call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, Domain, self%T%new, Porosity, Property)
+        ! call Assemble_Diffusion_Heat_1(self%KT_l, Domain, self%T%new, Porosity, Property)
          !!!-----------------------------------------------------------------------
+
+        !---------------------------------------------------------------------------------------------------------------------------
         ! if (step == 1) then
         self%KT_star_0 = dt * self%KT_l + self%CT_l
+
         !     if (iter == 1) then
         ! self%CT_old(1)%Val(:) = self%CT_l%Val(:)
         !         self%KT_old%Val(:) = self%KT_l%Val(:)

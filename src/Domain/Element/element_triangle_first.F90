@@ -477,7 +477,7 @@ contains
         class(type_triangle_first), intent(in) :: self
         real(real64), intent(in) :: px, py
         real(real64), intent(inout) :: pxi, peta
-        logical :: is_in
+        logical, intent(inout) :: is_in
 
         real(real64) :: xi, eta
         real(real64) :: x0, y0

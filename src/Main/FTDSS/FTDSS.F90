@@ -1,19 +1,14 @@
 module Main_FTDSS
     use, intrinsic :: iso_fortran_env
     use :: stdlib_logger
-    use :: core_core
-    ! use :: Core_BaseTypes
-    ! use :: core_fortran_utils, only:setup_handler, was_interrupted
+    use :: module_core
     use :: Inout_Input
-    use :: control_control, only:type_time, type_iteration
+    use :: module_control, only:type_time, type_iteration
     use :: Inout_Output
-    use :: Domain_Module, only:type_domain
+    use :: module_domain, only:type_domain
     use :: Properties_Model_Base, only:Proereties_Model_t
     use :: Conditions_Boundary_Manager, only:BCManager
     use :: Conditions_Initial_Manager, only:ICManager
-
-    ! use :: Matrix_RCM, only:RCM_Reorder, RCM_Reorder_Inverse
-    ! use :: Matrix_Multicoloring, only:Multicoloring
 
     use :: Main_Thermal
     implicit none
@@ -66,7 +61,11 @@ contains
         call global_logger%configure(level=information_level, &
                                      time_stamp=.true., &
                                      max_width=0)
-        call setup_handler()
+        ! call setup_handler()
+
+        !---------------------------------------------------------------------------------------------------------------------------
+        !
+        !---------------------------------------------------------------------------------------------------------------------------
         nsize = self%Input%VTK%num_points
 
         ! Initialize the Structure
@@ -75,9 +74,11 @@ contains
         self%Coordinate = self%Input%VTK%POINTS
 
         call self%Domain%initialize(self%Input, self%Coordinate, ierr)
-        call RCM_Reorder(self%Domain, self%Domain%RCM_perm, ierr)
-        call RCM_Reorder_Inverse(self%Domain%RCM_perm, self%Domain%RCM_inv_perm, ierr)
-        call Multicoloring(self%Domain)
+        ! call RCM_Reorder(self%Domain, self%Domain%RCM_perm, ierr)
+        ! call RCM_Reorder_Inverse(self%Domain%RCM_perm, self%Domain%RCM_inv_perm, ierr)
+        ! call Multicoloring(self%Domain)
+
+        print *, "Domain initialized with"
 
         if (ierr /= 0) then
             print *, "Error initializing domain in Type_Thermal_3Phase_2D_Construct"
@@ -86,6 +87,8 @@ contains
 
         call self%BC%setup(self%Input, self%Domain)
         call self%IC%setup(self%Input)
+
+        print *, "Boundary and Initial Conditions set up."
 
         ! allocate (self%NodeBelonging(nsize))
         ! do iN = 1, nsize
@@ -106,10 +109,10 @@ contains
         self%phi%old = self%Input%Regions(1)%Thermal%Porosity
 
         call self%Output%Overall%Output_vtu(fc=0, &
-                                            iperm=self%Domain%RCM_perm, &
                                             Colors=self%Domain%Colors%Color)
 
         call self%time%Profile_Stop("IO")
+        call global_logger%log_information(message="FTDSS module initialized successfully.")
     end subroutine FDTSS_initialize
 
 end module Main_FTDSS

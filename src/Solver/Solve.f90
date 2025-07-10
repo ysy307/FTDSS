@@ -1,13 +1,13 @@
 module Solver_Solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
+!$  use omp_lib
     use :: module_core, only:allocate_array, deallocate_array, error_message
     use :: Calculate_BLAS, only:norm => norm_2, dot
     use :: Matrix_CRS
-!$  use omp_lib
     implicit none
     private
 #ifdef _MKL
-    include "mkl.fi"
+    include "mkl_pardiso.fi"
 #endif
 
     public :: Abstract_Solver_CRS
