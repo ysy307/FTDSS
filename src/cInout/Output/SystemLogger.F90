@@ -4,6 +4,7 @@ submodule(Inout_Output) Inout_Output_SystemLogger
 contains
     module subroutine Output_SystemLog(self, time, Matrix, Domain)
         use :: stdlib_strings, only:to_string
+        use :: thermal_thermal_assemble
         implicit none
         class(Type_Output) :: self
         type(type_time), intent(in) :: time
@@ -16,6 +17,9 @@ contains
         character(:), allocatable :: compiler_version
         character(:), allocatable :: architecture
         character(:), allocatable :: os
+!$      character(:), allocatable :: openmp_version
+!$      integer(int32) :: max_threads
+!$      integer(int32) :: num_threads
         integer(int32) :: num_unit, ios
         integer(int64) :: rss_kb
         real(real64) :: rss_mb
@@ -37,6 +41,9 @@ contains
         compiler_version = get_compiler_version()
         architecture = get_cpu_architecture()
         os = get_os()
+!$      openmp_version = get_openmp_version()
+!$      max_threads = omp_get_num_procs()
+!$      num_threads = omp_get_max_threads()
 
         rss_mb = get_memory_usage()
         ! 幅の計算。log10(0) の回避と最小幅保証
@@ -50,20 +57,20 @@ contains
             stop
         end if
         write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "FTDSS System Log"
+        write (num_unit, '(a)') "FTDSS System Log" !&
         write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "Username           : "//trim(username)
-        write (num_unit, '(a)') "Hostname           : "//trim(hostname)
-        write (num_unit, '(a)') "OS                 : "//trim(os)
-        write (num_unit, '(a)') "Architecture       : "//trim(architecture)
-        write (num_unit, '(a)') "Compiler           : "//trim(compiler)
-        write (num_unit, '(a)') "Compiler Version   : "//trim(compiler_version)
-        write (num_unit, fmt) "RSS Memory Usage   : ", rss_mb, " MB"
-!$      write (num_unit, '(2a)') "OpenMP Version     : ", get_compiler_version()
-!$      write (num_unit, '(a,i0)') "OpenMP Max Threads : ", omp_get_num_procs()
-!$      write (num_unit, '(a,i0)') "OpenMP Threads     : ", omp_get_max_threads()
+        write (num_unit, '(a)') "Username           : "//trim(username) !&
+        write (num_unit, '(a)') "Hostname           : "//trim(hostname) !&
+        write (num_unit, '(a)') "OS                 : "//trim(os) !&
+        write (num_unit, '(a)') "Architecture       : "//trim(architecture) !&
+        write (num_unit, '(a)') "Compiler           : "//trim(compiler) !&
+        write (num_unit, '(a)') "Compiler Version   : "//trim(compiler_version) !&
+        write (num_unit, fmt)   "RSS Memory Usage   : ", rss_mb, " MB" !&
+!$      write (num_unit, '(a)') "OpenMP Version     : "//trim(openmp_version) !&
+!$      write (num_unit, '(a)') "OpenMP Max Threads : "//trim(to_string(max_threads)) !&
+!$      write (num_unit, '(a)') "OpenMP Threads     : "//trim(to_string(num_threads)) !&
         write (num_unit, '(a)') repeat('=', nRepeat)
-        write (num_unit, '(a)') "Time Information"
+        write (num_unit, '(a)') "Time Information" !&
         write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') trim(time%start%label)//" Time : "//time%start%date(1:4)//"-"//time%start%date(5:6)//"-"//time%start%date(7:8)//"T"//time%start%time(1:2)//":"//time%start%time(3:4)//":"//time%start%time(5:6)//trim(time%start%zone)
         write (num_unit, '(a)') trim(time%end%label)//" Time   : "//time%end%date(1:4)//"-"//time%end%date(5:6)//"-"//time%end%date(7:8)//"T"//time%end%time(1:2)//":"//time%end%time(3:4)//":"//time%end%time(5:6)//trim(time%end%zone)
@@ -108,6 +115,15 @@ contains
         else
             write (num_unit, '(a10, f15.4, a)') "Total", component_total_time, ""
         end if
+
+!$      write (num_unit, *) '========= Accumulated Timing (over all time steps) ========='
+!$      write (num_unit, *) 'Total time             :', time_total
+!$      write (num_unit, *) ' Interpolation         :', time_interp
+!$      write (num_unit, *) ' Property evaluation   :', time_get_prop
+!$      write (num_unit, *) ' Integration           :', time_integration
+!$      write (num_unit, *) ' Matrix index lookup   :', time_find_index
+!$      write (num_unit, *) ' Matrix add            :', time_add_val
+!$      write (num_unit, *) '============================================================'
 
         write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') "Matrix Information"

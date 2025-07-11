@@ -119,6 +119,15 @@ contains
         !
         call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, Domain, self%T%new, Porosity, Property)
         ! call Assemble_Diffusion_Heat_1(self%KT_l, Domain, self%T%new, Porosity, Property)
+        ! モジュール変数へ反映
+
+!$      t_total = t_total + time_total
+!$      t_interp = t_interp + time_interp
+!$      t_get_prop = t_get_prop + time_get_prop
+!$      t_integration = t_integration + time_integration
+!$      t_find_index = t_find_index + time_find_index
+!$      t_add_val = t_add_val + time_add_val
+        ! !!!-----------------------------------------------------------------------
          !!!-----------------------------------------------------------------------
 
         !---------------------------------------------------------------------------------------------------------------------------

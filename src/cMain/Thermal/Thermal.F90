@@ -25,6 +25,8 @@ module Main_Thermal
     ! use :: thermal_thermal_assemble, only:Assemble_Mass_Heat_1_Parallel, Assemble_Diffusion_Heat_1_Parallel
     implicit none
 
+!$  real(real64) :: t_total, t_interp, t_get_prop, t_integration, t_find_index, t_add_val
+
     type, abstract :: Abstract_Thermal
         type(type_variable) :: T
         type(type_variable) :: Qw
