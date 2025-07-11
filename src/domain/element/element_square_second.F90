@@ -1,4 +1,4 @@
-submodule(Domain_Element) Domain_Element_square_second
+submodule(domain_element) domain_element_square_second
     implicit none
 contains
 
@@ -617,5 +617,5 @@ contains
 
     end function Interpolate_square_second
 
-end submodule Domain_Element_square_second
+end submodule domain_element_square_second
 

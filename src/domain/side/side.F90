@@ -1,6 +1,6 @@
-module Domain_Side
+module domain_side
     !---------------------------------------------------------------------------------------
-    !  Module: Domain_Side
+    !  Module: domain_side
     !  Purpose: Define 1D finite element types (square and triangle) and their
     !           associated operations (shape functions, Jacobian, Gauss points).
     !  Ford Coding Standard:
@@ -317,4 +317,4 @@ module Domain_Side
         module procedure :: construct_side_second
     end interface
 
-end module Domain_Side
+end module domain_side

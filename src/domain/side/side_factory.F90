@@ -1,7 +1,7 @@
-module Domain_Side_Factory
+module domain_side_factory
     use, intrinsic :: iso_fortran_env, only: int32
     use :: module_core, only:type_dp_3d, type_vtk_cell
-    use :: Domain_Side, only:abst_side, type_side_first, type_side_second
+    use :: domain_side, only:abst_side, type_side_first, type_side_second
     implicit none
 
     public :: create_side
@@ -35,4 +35,4 @@ contains
 
     end subroutine create_side
 
-end module Domain_Side_Factory
+end module domain_side_factory

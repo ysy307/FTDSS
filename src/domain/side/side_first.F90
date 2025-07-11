@@ -1,4 +1,4 @@
-submodule(Domain_Side) Domain_Side_First
+submodule(domain_side) domain_side_first
     implicit none
 contains
 
@@ -132,4 +132,4 @@ contains
         end select
     end function dpsi_dxi_side_first
 
-end submodule Domain_Side_First
+end submodule domain_side_First

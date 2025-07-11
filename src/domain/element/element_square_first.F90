@@ -1,10 +1,11 @@
-submodule(Domain_Element) Domain_Element_triangle_second
+submodule(domain_element) domain_element_square_first
     implicit none
 contains
+
     !----------------------------------------------------------------------!
-    ! construct_triangle_second:
+    ! construct_square_second:
     !----------------------------------------------------------------------!
-    ! This function constructs a type_triangle_second element object based on the
+    ! This function constructs a square_first element object based on the
     ! given element index, global nodal coordinates, connectivity, and
     ! spatial dimension type.
     !
@@ -15,21 +16,21 @@ contains
     !   Global_Coordinate : type_dp_3d type pointer containing the global coordinates
     !                       of all nodes in the mesh.
     !
-    !   connectivity      : Integer array (size 6) specifying the indices of
-    !                       nodes that form the triangular element.
+    !   Connectivity      : Integer array (size 4) specifying the indices of
+    !                       nodes that form the square element.
     !
     ! Return Value:
     !   element         : Allocated polymorphic object of type
-    !                       type_triangle_second (extends Abstract_ElementType).
+    !                       square_first (extends Abstract_ElementType).
     !
     ! Function Details:
-    !   - Allocates a new type_triangle_second element object.
+    !   - Allocates a new square_first element object.
     !   - Stores element ID and connectivity information.
     !   - Links to the corresponding global coordinates for each node.
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function construct_triangle_second(id, global_coordinate, cell_info) result(element)
+    module function construct_square_first(id, global_coordinate, cell_info) result(element)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
@@ -39,7 +40,7 @@ contains
         integer(int32) :: i
 
         if (allocated(element)) deallocate (element)
-        allocate (type_triangle_second :: element)
+        allocate (type_square_second :: element)
 
         element%id = id
         element%type = cell_info%cell_type
@@ -63,163 +64,138 @@ contains
             element%z(i)%val => global_coordinate%z(element%connectivity(i))
         end do
 
-        element%num_gauss = 3_int32
+        element%num_gauss = 4
         call allocate_array(element%weight, element%num_gauss)
         call allocate_array(element%gauss, element%dimension, element%num_gauss)
 
-        element%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
-        element%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
-        element%gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
-        element%gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
+        element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
+        element%gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
+        element%gauss(:, 2) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+        element%gauss(:, 3) = [sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+        element%gauss(:, 4) = [sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
 
-    end function construct_triangle_second
+    end function construct_square_first
 
     !----------------------------------------------------------------------!
-    ! getNumNodes_triangle_second:
+    ! get_id_square_first:
     !----------------------------------------------------------------------!
     ! This function returns the number of nodes associated with a
-    ! type_triangle_second element.
+    ! square_first element.
     !
     ! Arguments:
-    !   self : type_triangle_second type object.
-    !          Represents the current triangular element instance.
+    !   self : square_first type object.
+    !          Represents the current square element instance.
     !
     ! Return Value:
     !   n    : Integer (int32) indicating the number of nodes used by the
-    !          element. This is typically 6 for a linear triangle.
+    !          element. This is typically 4 for a linear square.
     !
     ! Function Details:
     !   - Retrieves the value stored in `self%num_nodes`, which represents
     !     the number of nodes for the element.
     !
     !----------------------------------------------------------------------!
-
-    module function get_id_triangle_second(self) result(id)
+    module function get_id_square_first(self) result(id)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32) :: id
 
         id = self%id
-    end function get_id_triangle_second
+    end function get_id_square_first
 
-    module function get_type_triangle_second(self) result(type)
+    module function get_type_square_first(self) result(type)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32) :: type
 
         type = self%type
-    end function get_type_triangle_second
+    end function get_type_square_first
 
-    module function get_num_nodes_triangle_second(self) result(num_nodes)
+    module function get_num_nodes_square_first(self) result(num_nodes)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32) :: num_nodes
 
         num_nodes = self%num_nodes
-    end function get_num_nodes_triangle_second
+    end function get_num_nodes_square_first
 
-    module function get_group_triangle_second(self) result(group)
+    module function get_group_square_first(self) result(group)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32) :: group
 
         group = self%group
-    end function get_group_triangle_second
-
-    module function get_dimension_triangle_second(self) result(dimension)
-        implicit none
-        class(type_triangle_second), intent(in) :: self
-        integer(int32) :: dimension
-
-        dimension = self%dimension
-    end function get_dimension_triangle_second
-
-    module function get_order_triangle_second(self) result(order)
-        implicit none
-        class(type_triangle_second), intent(in) :: self
-        integer(int32) :: order
-
-        order = self%order
-    end function get_order_triangle_second
-
-    module function get_num_gauss_triangle_second(self) result(num_gauss)
-        implicit none
-        class(type_triangle_second), intent(in) :: self
-        integer(int32) :: num_gauss
-
-        num_gauss = self%num_gauss
-    end function get_num_gauss_triangle_second
+    end function get_group_square_first
 
     !----------------------------------------------------------------------!
-    ! psi_triangle_second:
+    ! psi_square_first:
     !----------------------------------------------------------------------!
     ! This function evaluates the shape function ψ_i(ξ, η) for a linear
-    ! triangular element at the given natural coordinates (ξ, η).
+    ! square element at the given natural coordinates (ξ, η).
     !
     ! Arguments:
-    !   self : type_triangle_second type object.
-    !          Represents the triangular element for which the shape
+    !   self : square_first type object.
+    !          Represents the square element for which the shape
     !          function is evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
-    !          Each index corresponds to a vertex of the triangle.
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
+    !          Each index corresponds to a vertex of the square.
     !
     !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system (barycentric or reference triangle).
+    !          system.
     !
-    !   eta  : Real(real64), the η coordinate in the natural coordinate system.
+    !   eta  : Real(real64), the η coordinate in the natural coordinate
+    !          system.
     !
     ! Return Value:
     !   psi  : Real(real64), value of the i-th shape function ψ_i at (ξ, η).
     !
     ! Function Details:
-    !   - For a bilenar triangular element, the shape functions are:
-    !       ψ₁(ξ, η) = ξ * (2 * ξ -1)
-    !       ψ₂(ξ, η) = η
-    !       ψ₃(ξ, η) = 1 - ξ - η
-    !       ψ₄(ξ, η) = 4 * ξ * η
-    !       ψ₅(ξ, η) = 4 * (1 - ξ - η) * η
-    !       ψ₆(ξ, η) = 4 * ξ * (1 - ξ - η)
-    !   - Returns 0.0d0 for indices outside the range [1, 6].
+    !   - For a linear square element, the shape functions are:
+    !       ψ₁(ξ, η) = 0.25 * (1 - ξ) * (1 - η)
+    !       ψ₂(ξ, η) = 0.25 * (1 + ξ) * (1 - η)
+    !       ψ₃(ξ, η) = 0.25 * (1 + ξ) * (1 + η)
+    !       ψ₄(ξ, η) = 0.25 * (1 - ξ) * (1 + η)
+    !   - Returns 0.0d0 for indices outside the range [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function psi_triangle_second(self, i, xi, eta) result(psi)
+    module function psi_square_first(self, i, xi, eta) result(psi)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: psi
+
         select case (i)
         case (1)
-            psi = xi * (2.0d0 * xi - 1.0d0)
+            psi = 0.25d0 * (1.0d0 - xi) * (1.0d0 - eta)
         case (2)
-            psi = eta * (2.0d0 * eta - 1.0d0)
+            psi = 0.25d0 * (1.0d0 + xi) * (1.0d0 - eta)
         case (3)
-            psi = (1.0d0 - xi - eta) * (1.0d0 - 2.0d0 * xi - 2.0d0 * eta)
+            psi = 0.25d0 * (1.0d0 + xi) * (1.0d0 + eta)
         case (4)
-            psi = 4.0d0 * xi * eta
-        case (5)
-            psi = 4.0d0 * (1.0d0 - xi - eta) * eta
-        case (6)
-            psi = 4.0d0 * xi * (1.0d0 - xi - eta)
+            psi = 0.25d0 * (1.0d0 - xi) * (1.0d0 + eta)
         case default
             psi = 0.0d0
         end select
-    end function psi_triangle_second
+    end function psi_square_first
 
     !----------------------------------------------------------------------!
-    ! dpsi_dxi_triangle_second:
+    ! dpsi_dxi_square_first:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
-    ! shape function for a linear triangular element with respect to ξ
+    ! shape function for a linear square element with respect to ξ
     ! at a given η coordinate.
     !
     ! Arguments:
-    !   self : type_triangle_second type object.
-    !          Represents the triangular element for which the derivative
+    !   self : square_first type object.
+    !          Represents the square element for which the derivative
     !          is being evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
+    !
+    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
+    !          system (not used in linear case, but included for interface).
     !
     !   eta  : Real(real64), the η coordinate in the natural coordinate
     !          system.
@@ -228,110 +204,95 @@ contains
     !   dpsi : Real(real64), value of ∂ψ_i/∂ξ evaluated at (ξ, η).
     !
     ! Function Details:
-    !   - For a linear triangle element:
-    !       ∂ψ₁/∂ξ =  4 * ξ - 1
-    !       ∂ψ₂/∂ξ =  0
-    !       ∂ψ₃/∂ξ =  4 * ξ + 4 * η - 3
-    !       ∂ψ₄/∂ξ =  4 * η
-    !       ∂ψ₅/∂ξ = -4 * η
-    !       ∂ψ₆/∂ξ =  4 - 8 * ξ - 4 * η
-    !   - Returns 0.0 for indices outside [1, 6].
+    !   - For a linear square element:
+    !       ∂ψ₁/∂ξ = -0.25 * (1 - η)
+    !       ∂ψ₂/∂ξ =  0.25 * (1 - η)
+    !       ∂ψ₃/∂ξ =  0.25 * (1 + η)
+    !       ∂ψ₄/∂ξ = -0.25 * (1 + η)
+    !   - Returns 0.0d0 for indices outside [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_dxi_triangle_second(self, i, xi, eta) result(dpsi)
+    module function dpsi_dxi_square_first(self, i, xi, eta) result(dpsi)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
 
         select case (i)
         case (1)
-            dpsi = 4.0d0 * xi - 1.0d0
+            dpsi = -0.25d0 * (1.0d0 - eta)
         case (2)
-            dpsi = 0.0d0
+            dpsi = 0.25d0 * (1.0d0 - eta)
         case (3)
-            dpsi = -3.0d0 + 4.0d0 * xi + 4.0d0 * eta
+            dpsi = 0.25d0 * (1.0d0 + eta)
         case (4)
-            dpsi = 4.0d0 * eta
-        case (5)
-            dpsi = -4.0d0 * eta
-        case (6)
-            dpsi = 4.0d0 - 8.0d0 * xi - 4.0d0 * eta
+            dpsi = -0.25d0 * (1.0d0 + eta)
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_dxi_triangle_second
+    end function dpsi_dxi_square_first
 
     !----------------------------------------------------------------------!
-    ! dpsi_deta_triangle_second:
+    ! dpsi_deta_square_first:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
-    ! shape function for a linear triangular element with respect to η
+    ! shape function for a linear square element with respect to η
     ! at a given ξ coordinate.
     !
     ! Arguments:
-    !   self : type_triangle_second type object.
-    !          Represents the triangular element for which the derivative
+    !   self : square_first type object.
+    !          Represents the square element for which the derivative
     !          is being evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
     !
     !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system.
-    !
-    !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system.
+    !          system (not used in linear case, but included for interface).
     !
     ! Return Value:
     !   dpsi : Real(real64), value of ∂ψ_i/∂η evaluated at (ξ, η).
     !
     ! Function Details:
-    !   - For a linear triangle element:
-    !       ∂ψ₁/∂η = 0
-    !       ∂ψ₂/∂η = 4 * η - 1
-    !       ∂ψ₃/∂η = 4 * η + 4 * ξ - 3
-    !       ∂ψ₄/∂η = 4 * ξ
-    !       ∂ψ₅/∂η = 4 * (1 - ξ - η)
-    !       ∂ψ₆/∂η = -4 * ξ
-    !   - Returns 0.0d0 for indices outside [1, 6].
+    !   - For a linear square element:
+    !       ∂ψ₁/∂η = -0.25 * (1 - ξ)
+    !       ∂ψ₂/∂η = -0.25 * (1 + ξ)
+    !       ∂ψ₃/∂η =  0.25 * (1 + ξ)
+    !       ∂ψ₄/∂η =  0.25 * (1 - ξ)
+    !   - Returns 0.0d0 for indices outside [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_deta_triangle_second(self, i, xi, eta) result(dpsi)
+    module function dpsi_deta_square_first(self, i, xi, eta) result(dpsi)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
         real(real64), intent(in) :: xi, eta
         real(real64) :: dpsi
 
         select case (i)
         case (1)
-            dpsi = 0.0d0
+            dpsi = -0.25d0 * (1.0d0 - xi)
         case (2)
-            dpsi = 4.0d0 * eta - 1.0d0
+            dpsi = -0.25d0 * (1.0d0 + xi)
         case (3)
-            dpsi = -3.0d0 + 4.0d0 * eta + 4.0d0 * xi
+            dpsi = 0.25d0 * (1.0d0 + xi)
         case (4)
-            dpsi = 4.0d0 * xi
-        case (5)
-            dpsi = 4.0d0 - 4.0d0 * xi - 8.0d0 * eta
-        case (6)
-            dpsi = -4.0d0 * xi
+            dpsi = 0.25d0 * (1.0d0 - xi)
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_deta_triangle_second
+    end function dpsi_deta_square_first
 
     !----------------------------------------------------------------------!
-    ! jacobian_triangle_second:
+    ! jacobian_square_first:
     !----------------------------------------------------------------------!
     ! This function computes the (i,j) component of the jacobian matrix J
-    ! for a linear triangular finite element at a given natural coordinate
+    ! for a linear square finite element at a given natural coordinate
     ! (ξ, η). The jacobian maps natural coordinates (ξ, η) to physical
     ! coordinates (x, y).
     !
     ! Arguments:
-    !   self : type_triangle_second type object.
+    !   self : square_first type object.
     !          Represents the element whose jacobian is being evaluated.
     !
     !   i    : Integer (int32), the row index of the jacobian component.
@@ -369,13 +330,13 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    module function jacobian_triangle_second(self, i, j, xi, eta) result(Jval)
+    module function jacobian_square_first(self, i, j, xi, eta) result(Jval)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i, j
         real(real64), intent(in) :: xi, eta
-
         real(real64) :: Jval
+
         integer(int32) :: ii, jlocal
 
         Jval = 0
@@ -386,12 +347,12 @@ contains
             case (1)
                 !! dx_dxi
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%x(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%X(ii)%val
                 end do
             case (2)
                 !! dx_deta
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%x(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%X(ii)%val
                 end do
             end select
 
@@ -401,27 +362,27 @@ contains
             case (1)
                 !! dy_dxi
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%y(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%Y(ii)%val
                 end do
             case (2)
                 !! dy_deta
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%y(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%Y(ii)%val
                 end do
             end select
         end select
 
-    end function jacobian_triangle_second
+    end function jacobian_square_first
 
     !----------------------------------------------------------------------!
-    ! jacobian_det_triangle_second:
+    ! jacobian_det_square_first:
     !----------------------------------------------------------------------!
     ! This function computes the determinant of the jacobian matrix J
-    ! for a linear triangular element at a specified point (ξ, η) in
+    ! for a linear square element at a specified point (ξ, η) in
     ! the natural coordinate system.
     !
     ! Arguments:
-    !   self : type_triangle_second type object.
+    !   self : square_first type object.
     !          Represents the finite element whose jacobian is evaluated.
     !
     !   xi   : Real(real64), ξ coordinate in the natural coordinate system.
@@ -447,9 +408,9 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    module function jacobian_det_triangle_second(self, xi, eta) result(J_Det)
+    module function jacobian_det_square_first(self, xi, eta) result(J_Det)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64) :: J_Det
 
@@ -458,25 +419,33 @@ contains
 
         integer(int32) :: i
 
+        dx_xi = 0.0d0
+        dx_eta = 0.0d0
+        dy_xi = 0.0d0
+        dy_eta = 0.0d0
+
         dx_xi = self%jacobian(1, 1, xi, eta)
         dx_eta = self%jacobian(1, 2, xi, eta)
         dy_xi = self%jacobian(2, 1, xi, eta)
         dy_eta = self%jacobian(2, 2, xi, eta)
 
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
-    end function jacobian_det_triangle_second
 
-    !----------------------------------------------------------------------!
-    ! is_in_triangle_second:
-    !----------------------------------------------------------------------!
-    ! This function checks if the given physical coordinates (px, py) lie
+    end function jacobian_det_square_first
+
+    !--------------------------------------------------------------------------------------
+    ! is_in_square_first:
+    !--------------------------------------------------------------------------------------
+    ! This subroutine checks if the given physical coordinates (px, py) lie
     ! within the boundaries of a square element.
-    ! The function uses a reverse mapping (Newton-Raphson method) to map
+    ! The subroutine uses a reverse mapping (Newton-Raphson method) to map
     ! the physical coordinates to natural coordinates (ξ, η) and then
     ! checks if the point lies within the square element.
     !
     ! Arguments:
-    !   self  : type_triangle_second type object.
+    !   self  : square_first type object. Represents a square element.
+    !           It contains the coordinates (X, Y, Z) and connectivity
+    !           information (conn) of the element.
     !
     !   px    : x-coordinate (real64 type) in the physical coordinate system.
     !           This coordinate is checked to see if it lies inside the square element.
@@ -487,22 +456,22 @@ contains
     ! Return Value:
     !   is_in : .true. if the point lies within the square element,
     !           .false. otherwise.
-    !           The function also returns .false. if the Newton-Raphson method
+    !           The subroutine also returns .false. if the Newton-Raphson method
     !           does not converge or if the natural coordinates fall outside
     !           the square element's domain.
     !
     ! Algorithm:
-    !   - The function uses the Newton-Raphson method to map the physical
+    !   - The subroutine uses the Newton-Raphson method to map the physical
     !     coordinates (px, py) to the natural coordinates (ξ, η).
-    !   - The function then checks if the natural coordinates (ξ, η) are
+    !   - The subroutine then checks if the natural coordinates (ξ, η) are
     !     within the valid range [-1, 1]. If they are, the point is inside
     !     the square element.
     !   - If the method does not converge, or the natural coordinates fall
-    !     outside the valid range, the function returns .false.
+    !     outside the valid range, the subroutine returns .false.
     !
-    !----------------------------------------------------------------------!
-    module subroutine is_in_triangle_second(self, px, py, pxi, peta, is_in)
-        class(type_triangle_second), intent(in) :: self
+    !--------------------------------------------------------------------------------------
+    module subroutine is_in_square_first(self, px, py, pxi, peta, is_in)
+        class(type_square_first), intent(in) :: self
         real(real64), intent(in) :: px, py
         real(real64), intent(inout) :: pxi, peta
         logical, intent(inout) :: is_in
@@ -530,8 +499,8 @@ contains
             y0 = 0.0d0
 
             do i = 1, self%num_nodes
-                x0 = x0 + self%psi(i, xi, eta) * self%x(i)%val
-                y0 = y0 + self%psi(i, xi, eta) * self%y(i)%val
+                x0 = x0 + self%psi(i, xi, eta) * self%X(i)%val
+                y0 = y0 + self%psi(i, xi, eta) * self%Y(i)%val
             end do
 
             dx = px - x0
@@ -556,17 +525,16 @@ contains
         end do
 
         ! 最終判定：収束かつ自然座標が範囲内
-        is_in = converged .and. (xi >= 0.0d0) .and. (eta >= 0.0d0) .and. (xi + eta <= 1.0d0)
-
+        is_in = converged .and. (abs(xi) <= 1.0d0) .and. (abs(eta) <= 1.0d0)
         if (is_in) then
             pxi = xi
             peta = eta
         end if
-    end subroutine is_in_triangle_second
+    end subroutine is_in_square_first
 
-    module function Interpolate_triangle_second(self, xi, eta, value) result(interpolated_value)
+    module function interpolate_square_first(self, xi, eta, value) result(interpolated_value)
         implicit none
-        class(type_triangle_second), intent(in) :: self
+        class(type_square_first), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
@@ -577,6 +545,7 @@ contains
             interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
         end do
 
-    end function Interpolate_triangle_second
+    end function interpolate_square_first
 
-end submodule Domain_Element_triangle_second
+end submodule domain_element_square_first
+
