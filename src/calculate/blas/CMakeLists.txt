@@ -1,5 +1,5 @@
 add_library(Calc_BLAS  OBJECT
-    BLAS.F90
+    blas.F90
 )
 target_link_libraries(Calc_BLAS PRIVATE
     Matrix
