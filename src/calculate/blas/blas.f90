@@ -12,7 +12,7 @@ module calculate_blas
 #endif
 
     public :: norm_2
-    public :: dot
+    public :: inner_product
 
 contains
 
@@ -37,7 +37,7 @@ contains
 #endif
     end function norm_2
 
-    function dot(N, x, y) result(d_dot)
+    function inner_product(N, x, y) result(d_dot)
         implicit none
         integer(int32), intent(in) :: N
         real(real64), intent(in) :: x(:)
@@ -56,5 +56,5 @@ contains
         end do
         !$omp end parallel do
 #endif
-    end function dot
+    end function inner_product
 end module calculate_blas
