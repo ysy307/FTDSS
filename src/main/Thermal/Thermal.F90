@@ -4,7 +4,7 @@ module Main_Thermal
     ! use :: Core_BaseTypes
     ! use :: Core_Allocate, only:Allocate_Array
     use :: module_domain, only:type_domain
-    use :: Properties_Model_Base, only:Proereties_Model_t
+    use :: module_properties, only:type_proereties_manager
     ! use :: Core_Element
     ! use :: Core_Side
     use :: Inout_Input
@@ -88,11 +88,11 @@ module Main_Thermal
         ! end subroutine Abstract_Update
 
         subroutine Abstract_Assemble(self, Domain, Property, Porosity, dt, step, iter)
-            import :: Abstract_Thermal, int32, real64, type_domain, Proereties_Model_t
+            import :: Abstract_Thermal, int32, real64, type_domain, type_proereties_manager
             implicit none
             class(Abstract_Thermal), intent(inout) :: self
             type(type_domain), intent(inout) :: Domain
-            type(Proereties_Model_t), intent(inout) :: Property
+            type(type_proereties_manager), intent(inout) :: Property
             real(real64), intent(in) :: Porosity(:)
             real(real64), intent(in) :: dt
             integer(int32), intent(in) :: step
@@ -123,7 +123,7 @@ module Main_Thermal
             implicit none
             class(Type_Thermal_3Phase_2D), intent(inout) :: self
             type(type_domain), intent(inout) :: Domain
-            type(Proereties_Model_t), intent(inout) :: Property
+            type(type_proereties_manager), intent(inout) :: Property
             real(real64), intent(in) :: Porosity(:)
             real(real64), intent(in) :: dt
             integer(int32), intent(in) :: step

@@ -5,7 +5,7 @@ add_library(Calc_WRF OBJECT
     wrf_ko.F90
     wrf_mvg.F90
     wrf_durner.F90
-    wrf_dvgcgh.F90
+    wrf_dvgch.F90
     wrf_base.F90
 )
 target_link_libraries(Calc_WRF PRIVATE

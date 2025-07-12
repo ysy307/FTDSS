@@ -2,7 +2,7 @@ module Solver_Solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
     use :: module_core, only:allocate_array, deallocate_array, error_message
-    use :: Calculate_BLAS, only:norm => norm_2, dot
+    use :: module_calculate, only:norm => norm_2, dot => inner_product
     use :: Matrix_CRS
     implicit none
     private

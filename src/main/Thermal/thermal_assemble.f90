@@ -3,7 +3,7 @@ module thermal_thermal_assemble
 !$  use omp_lib
     use :: module_core, only:type_gauss_point_state
     use :: module_domain, only:type_domain
-    use :: Properties_Model_Base, only:Proereties_Model_t
+    use :: module_properties, only:type_proereties_manager
     use :: Matrix_CRS
 
     implicit none
@@ -28,7 +28,7 @@ contains
         type(type_domain) :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(Proereties_Model_t), intent(inout) :: Propeties
+        type(type_proereties_manager), intent(inout) :: Propeties
 
         type(type_gauss_point_state) :: state
 
@@ -110,7 +110,7 @@ contains
         type(type_domain), intent(inout) :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(Proereties_Model_t), intent(inout) :: Propeties
+        type(type_proereties_manager), intent(inout) :: Propeties
 
         ! ループ・局所変数
         integer(int32) :: c, ie_idx
@@ -249,7 +249,7 @@ contains
         type(type_domain), intent(inout) :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(Proereties_Model_t), intent(inout) :: Propeties ! MaterialManagerに相当
+        type(type_proereties_manager), intent(inout) :: Propeties ! MaterialManagerに相当
 
         ! --- ローカル変数 ---
         type(type_gauss_point_state) :: state ! 状態の運び屋
@@ -349,7 +349,7 @@ contains
         type(type_domain), intent(inout) :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(Proereties_Model_t), intent(inout) :: Propeties
+        type(type_proereties_manager), intent(inout) :: Propeties
 
         integer(int32) :: c, ie_idx, index, nNodes, nGauss
         integer(int32) :: iE, il, jl, iG, iRegion

@@ -1,43 +1,37 @@
-module Properties_Material_Manager
+module properties_material_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
-
-    use :: module_calculate, only:holder_gccs, holder_dens, holder_vhcs, holder_wrfs
-
-    use :: Calculate_ThermalConductivity, only:THCHolder
-    use :: Calculate_SpecificHeat, only:SPHHolder
-    ! use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
-    ! use :: Calculate_GCC, only:holder_gcc
-    ! use :: Calculate_WRF, only:WRFHolder
     use :: Inout_Input, only:Type_Input
+    use :: module_calculate, only:holder_gccs, holder_wrfs, holder_dens, holder_sphs, holder_vhcs, holder_thcs
+
     implicit none
     private
 
-    public :: MaterialManager_t
+    public :: type_material_manager
 
-    type :: MaterialManager_t
+    type :: type_material_manager
         private
-        type(THCHolder), allocatable :: THC(:)
-        type(holder_dens), allocatable :: DEN(:)
-        type(SPHHolder), allocatable :: SPH(:)
-        type(holder_vhcs), allocatable :: VHC(:)
-        type(holder_gccs), allocatable :: GCC(:)
-        type(holder_wrfs), allocatable :: WRF(:)
-        ! region_idを配列インデックスに変換するマッピング配列
+        type(holder_thcs), allocatable :: thc(:)
+        type(holder_dens), allocatable :: den(:)
+        type(holder_sphs), allocatable :: sph(:)
+        type(holder_vhcs), allocatable :: vhc(:)
+        type(holder_gccs), allocatable :: gcc(:)
+        type(holder_wrfs), allocatable :: wrf(:)
+
         integer(int32), allocatable :: region_id_map(:)
     contains
         procedure, pass(self) :: initialize
-        procedure, pass(self) :: get_THC
-        procedure, pass(self) :: get_DEN
-        procedure, pass(self) :: get_SPH
-        procedure, pass(self) :: get_VHC
-        procedure, pass(self) :: get_GCC
-        procedure, pass(self) :: get_WRF
+        procedure, pass(self) :: get_thc
+        procedure, pass(self) :: get_den
+        procedure, pass(self) :: get_sph
+        procedure, pass(self) :: get_vhc
+        procedure, pass(self) :: get_gcc
+        procedure, pass(self) :: get_wrf
     end type
 
 contains
     ! Managerを初期化するサブルーチン (シミュレーション開始時に一度だけ呼ぶ)
     subroutine initialize(self, Input, ierr)
-        class(MaterialManager_t), intent(inout) :: self
+        class(type_material_manager), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         integer(int32), intent(inout) :: ierr
 
@@ -49,16 +43,15 @@ contains
 
         ierr = 0
         call Input%VTK%get_active_region_info(unique_region_ids, ierr)
-        print *, unique_region_ids(:)
         num_unique_regions = Input%Basic%numRegion
 
         ! ステップ2: 配列を確保
-        allocate (self%THC(num_unique_regions))
-        allocate (self%DEN(num_unique_regions))
-        allocate (self%SPH(num_unique_regions))
-        allocate (self%VHC(num_unique_regions))
-        allocate (self%GCC(num_unique_regions))
-        allocate (self%WRF(num_unique_regions))
+        allocate (self%thc(num_unique_regions))
+        allocate (self%den(num_unique_regions))
+        allocate (self%sph(num_unique_regions))
+        allocate (self%vhc(num_unique_regions))
+        allocate (self%gcc(num_unique_regions))
+        allocate (self%wrf(num_unique_regions))
 
         ! allocate (self%region_id_map(num_unique_regions))
         allocate (self%region_id_map, source=unique_region_ids)
@@ -68,22 +61,22 @@ contains
         do model_idx = 1, num_unique_regions
             current_region_id = unique_region_ids(model_idx)
 
-            call self%THC(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%DEN(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%SPH(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%VHC(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%GCC(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%WRF(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%thc(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%den(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%sph(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%vhc(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%gcc(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%wrf(model_idx)%initialize(iRegion=current_region_id, Input=Input)
 
             self%region_id_map(current_region_id) = model_idx
         end do
     end subroutine initialize
 
-    function get_THC(self, region_id) result(model_holder)
-        class(MaterialManager_t), intent(in) :: self
+    function get_thc(self, region_id) result(model_holder)
+        class(type_material_manager), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(THCHolder) :: model_holder
+        type(holder_thcs) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
@@ -91,17 +84,17 @@ contains
 
         ! エラーチェック
         if (model_index == 0) then
-            print *, "Error: Invalid region_id in get_THC:", region_id
+            print *, "Error: Invalid region_id in get_thc:", region_id
             call exit(-1)
         end if
 
         ! ポインタ結合( => )ではなく、代入( = )でコピーを返す
-        model_holder = self%THC(model_index)
+        model_holder = self%thc(model_index)
 
-    end function get_THC
+    end function get_thc
 
-    function get_DEN(self, region_id) result(model_holder)
-        class(MaterialManager_t), intent(in) :: self
+    function get_den(self, region_id) result(model_holder)
+        class(type_material_manager), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(holder_dens) :: model_holder
@@ -112,20 +105,20 @@ contains
 
         ! エラーチェック
         if (model_index == 0) then
-            print *, "Error: Invalid region_id in get_DEN:", region_id
+            print *, "Error: Invalid region_id in get_den:", region_id
             call exit(-1)
         end if
 
         ! ポインタ結合( => )ではなく、代入( = )でコピーを返す
-        model_holder = self%DEN(model_index)
+        model_holder = self%den(model_index)
 
-    end function get_DEN
+    end function get_den
 
-    function get_SPH(self, region_id) result(model_holder)
-        class(MaterialManager_t), intent(in) :: self
+    function get_sph(self, region_id) result(model_holder)
+        class(type_material_manager), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(SPHHolder) :: model_holder
+        type(holder_sphs) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
@@ -133,17 +126,17 @@ contains
 
         ! エラーチェック
         if (model_index == 0) then
-            print *, "Error: Invalid region_id in get_SPH:", region_id
+            print *, "Error: Invalid region_id in get_sph:", region_id
             call exit(-1)
         end if
 
         ! ポインタ結合( => )ではなく、代入( = )でコピーを返す
-        model_holder = self%SPH(model_index)
+        model_holder = self%sph(model_index)
 
-    end function get_SPH
+    end function get_sph
 
-    function get_VHC(self, region_id) result(model_holder)
-        class(MaterialManager_t), intent(in) :: self
+    function get_vhc(self, region_id) result(model_holder)
+        class(type_material_manager), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
         type(holder_vhcs) :: model_holder
@@ -154,22 +147,22 @@ contains
 
         ! エラーチェック
         if (model_index == 0) then
-            print *, "Error: Invalid region_id in get_VHC:", region_id
+            print *, "Error: Invalid region_id in get_vhc:", region_id
             call exit(-1)
         end if
 
         ! ポインタ結合( => )ではなく、代入( = )でコピーを返す
-        model_holder = self%VHC(model_index)
+        model_holder = self%vhc(model_index)
 
-    end function get_VHC
+    end function get_vhc
 
-    ! ここで、holder_gccとWRFHolderのget関数も同様に実装することができます。
-    ! 例えば、get_GCC(self, region_id) と get_WRF(self, region_id) を追加します。
-    function get_GCC(self, region_id) result(model_holder)
-        class(MaterialManager_t), intent(in) :: self
+    ! ここで、holder_gccとholder_wrfsのget関数も同様に実装することができます。
+    ! 例えば、get_gcc(self, region_id) と get_wrf(self, region_id) を追加します。
+    function get_gcc(self, region_id) result(model_holder)
+        class(type_material_manager), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(holder_gcc) :: model_holder
+        type(holder_gccs) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
@@ -178,20 +171,20 @@ contains
 
         ! エラーチェック
         if (model_index == 0) then
-            print *, "Error: Invalid region_id in get_GCC:", region_id
+            print *, "Error: Invalid region_id in get_gcc:", region_id
             call exit(-1)
         end if
 
         ! ポインタ結合( => )ではなく、代入( = )でコピーを返す
-        model_holder = self%GCC(model_index)
+        model_holder = self%gcc(model_index)
 
-    end function get_GCC
+    end function get_gcc
 
-    function get_WRF(self, region_id) result(model_holder)
-        class(MaterialManager_t), intent(in) :: self
+    function get_wrf(self, region_id) result(model_holder)
+        class(type_material_manager), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(WRFHolder) :: model_holder
+        type(holder_wrfs) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
@@ -199,12 +192,12 @@ contains
 
         ! エラーチェック
         if (model_index == 0) then
-            print *, "Error: Invalid region_id in get_WRF:", region_id
+            print *, "Error: Invalid region_id in get_wrf:", region_id
             call exit(-1)
         end if
 
         ! ポインタ結合( => )ではなく、代入( = )でコピーを返す
-        model_holder = self%WRF(model_index)
+        model_holder = self%wrf(model_index)
 
-    end function get_WRF
-end module Properties_Material_Manager
+    end function get_wrf
+end module properties_material_manager

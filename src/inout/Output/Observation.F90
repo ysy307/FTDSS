@@ -197,7 +197,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(Proereties_Model_t), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(in), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         integer(int32) :: iObs
@@ -227,7 +227,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(Proereties_Model_t), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(in), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
@@ -273,7 +273,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(Proereties_Model_t), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(in), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
@@ -319,7 +319,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(Proereties_Model_t), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(in), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
@@ -365,7 +365,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(Proereties_Model_t), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(in), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
         ! Note: nodal_Pw is optional, if not present, pressure is assumed to be 101325.0d0
 
@@ -461,7 +461,7 @@ contains
         real(real64), intent(in), optional :: K(:)
         class(Abstract_Thermal), intent(inout), optional :: Thermal
         real(real64), intent(in), optional :: phi(:)
-        type(Proereties_Model_t), intent(inout), optional :: Propeties
+        type(type_proereties_manager), intent(inout), optional :: Propeties
         type(type_domain), intent(inout), optional :: Domain
 
         real(real64) :: obsValues(self%Observation%NumObservation)

@@ -13,7 +13,7 @@ module Inout_Output
     use :: Inout_Input
     use :: module_domain, only:holder_elements, create_element, type_domain, type_rcm
     use :: module_control, only:type_time, type_iteration
-    use :: Properties_Model_Base, only:Proereties_Model_t
+    use :: module_properties, only:type_proereties_manager
     use :: Main_Thermal
     use :: Matrix_CRS
 
@@ -96,7 +96,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(Proereties_Model_t), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(in), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Temperature
@@ -109,7 +109,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(Proereties_Model_t), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(in), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Si
@@ -122,7 +122,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(Proereties_Model_t), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(in), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_THC
@@ -135,7 +135,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(Proereties_Model_t), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(in), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_VHC
@@ -148,7 +148,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(Proereties_Model_t), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(in), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Pw
@@ -161,7 +161,7 @@ module Inout_Output
         !     real(real64), intent(in), optional :: nodal_temperature(:)
         !     real(real64), intent(in), optional :: nodal_porosity(:)
         !     real(real64), intent(in), optional :: nodal_Pw(:)
-        !     type(Proereties_Model_t), intent(in), optional :: Properties
+        !     type(type_proereties_manager), intent(in), optional :: Properties
 
         ! end subroutine Interpolate_ObsValues_wFlux
 
@@ -173,7 +173,7 @@ module Inout_Output
         !     real(real64), intent(in), optional :: nodal_temperature(:)
         !     real(real64), intent(in), optional :: nodal_porosity(:)
         !     real(real64), intent(in), optional :: nodal_Pw(:)
-        !     type(Proereties_Model_t), intent(in), optional :: Properties
+        !     type(type_proereties_manager), intent(in), optional :: Properties
 
         ! end subroutine Interpolate_ObsValues_K
     end interface
@@ -183,14 +183,14 @@ module Inout_Output
         ! This is the "contract" for the procedure pointer.
         subroutine Abst_Calculate_obs_values(obs_values, observation_data, nodal_temperature, &
                                              nodal_porosity, nodal_Pw, Properties, Domain)
-            import :: real64, Proereties_Model_t, Output_Observation, type_domain
+            import :: real64, type_proereties_manager, Output_Observation, type_domain
             implicit none
             real(real64), intent(out) :: obs_values(:)
             type(Output_Observation), intent(in) :: observation_data
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(Proereties_Model_t), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(in), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
         end subroutine Abst_Calculate_obs_values
     end interface
@@ -446,7 +446,7 @@ module Inout_Output
             real(real64), intent(in), optional :: K(:)
             class(Abstract_Thermal), intent(inout), optional :: Thermal
             real(real64), intent(in), optional :: phi(:)
-            type(Proereties_Model_t), intent(inout), optional :: Propeties
+            type(type_proereties_manager), intent(inout), optional :: Propeties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Output_Process_Observation

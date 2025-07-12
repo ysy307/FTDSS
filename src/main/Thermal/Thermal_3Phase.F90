@@ -92,7 +92,7 @@ contains
         implicit none
         class(Type_Thermal_3Phase_2D), intent(inout) :: self
         type(type_domain), intent(inout) :: Domain
-        type(Proereties_Model_t), intent(inout) :: Property
+        type(type_proereties_manager), intent(inout) :: Property
         real(real64), intent(in) :: Porosity(:)
         real(real64), intent(in) :: dt
         integer(int32), intent(in) :: step

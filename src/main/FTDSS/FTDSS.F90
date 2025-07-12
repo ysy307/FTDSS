@@ -6,7 +6,7 @@ module Main_FTDSS
     use :: module_control, only:type_time, type_iteration
     use :: Inout_Output
     use :: module_domain, only:type_domain
-    use :: Properties_Model_Base, only:Proereties_Model_t
+    use :: module_properties, only:type_proereties_manager
     use :: Conditions_Boundary_Manager, only:BCManager
     use :: Conditions_Initial_Manager, only:ICManager
 
@@ -21,7 +21,7 @@ module Main_FTDSS
         ! type(Belonging), allocatable :: NodeBelonging(:)
         class(Abstract_Thermal), allocatable :: Thermal
 
-        type(Proereties_Model_t) :: Property
+        type(type_proereties_manager) :: Property
         type(BCManager) :: BC
         type(ICManager) :: IC
 
@@ -88,15 +88,7 @@ contains
         call self%BC%setup(self%Input, self%Domain)
         call self%IC%setup(self%Input)
 
-        print *, "Boundary and Initial Conditions set up."
-
-        ! allocate (self%NodeBelonging(nsize))
-        ! do iN = 1, nsize
-        !     ! The details are to be implemented
-        !     call self%NodeBelonging(iN)%allocate(1_int32)
-        !     self%NodeBelonging(iN)%group(1) = 1
-        !     self%NodeBelonging(iN)%nsize = 1
-        ! end do
+        call global_logger%log_information(message="Boundary and Initial Conditions set up.")
 
         self%Thermal = Type_Thermal_3Phase_2D(self%Input, self%Coordinate, self%Domain)
 
