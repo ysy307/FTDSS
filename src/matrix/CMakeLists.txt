@@ -9,7 +9,6 @@ add_library(Matrix OBJECT
 target_link_libraries(Matrix PRIVATE
     Core
     Domain
-    Properties
 )
 enable_build_flags(Matrix)
 enable_thirdparty (Matrix)

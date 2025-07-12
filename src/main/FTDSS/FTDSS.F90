@@ -74,12 +74,6 @@ contains
         self%Coordinate = self%Input%VTK%POINTS
 
         call self%Domain%initialize(self%Input, self%Coordinate, ierr)
-        ! call RCM_Reorder(self%Domain, self%Domain%RCM_perm, ierr)
-        ! call RCM_Reorder_Inverse(self%Domain%RCM_perm, self%Domain%RCM_inv_perm, ierr)
-        ! call Multicoloring(self%Domain)
-
-        print *, "Domain initialized with"
-
         if (ierr /= 0) then
             print *, "Error initializing domain in Type_Thermal_3Phase_2D_Construct"
             return
@@ -92,7 +86,7 @@ contains
 
         self%Thermal = Type_Thermal_3Phase_2D(self%Input, self%Coordinate, self%Domain)
 
-        call self%Property%Materials%initialize(self%Input, ierr)
+        call self%Property%initialize(self%Input, ierr)
 
         self%Output = Type_Output(Input=self%Input, Domain=self%Domain, Coordinate=self%Coordinate)
 

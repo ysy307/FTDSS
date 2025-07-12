@@ -13,6 +13,9 @@ add_library(Domain OBJECT
     adjacency/adjacency_node.F90
     adjacency/adjacency.F90
     multicoloring/multicoloring.F90
+    multicoloring/welch_powell.F90
+    multicoloring/dsatur.F90
+    multicoloring/lfo.F90
     rcm/rcm.F90
     domain_manager.F90
     domain.F90

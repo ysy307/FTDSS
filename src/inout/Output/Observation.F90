@@ -197,7 +197,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(type_proereties_manager), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(inout), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         integer(int32) :: iObs
@@ -227,7 +227,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(type_proereties_manager), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(inout), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
@@ -257,7 +257,7 @@ contains
             state%porosity = observation_data%Element(iObs)%e%Interpolate( &
                              observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Porosity(:))
             group_id = observation_data%Element(iObs)%e%get_group()
-            state%water_content = Properties%get_Qw(state, group_id)
+            state%water_content = Properties%get_qw(state, group_id)
             obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
         end do
 
@@ -273,7 +273,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(type_proereties_manager), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(inout), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
@@ -301,8 +301,8 @@ contains
                 state%porosity = observation_data%Element(iObs)%e%Interpolate( &
                                  observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_Porosity(:))
                 group_id = observation_data%Element(iObs)%e%get_group()
-                state%water_content = Properties%get_Qw(state, group_id)
-                obs_values(iObs) = Properties%get_lambda(state, group_id)
+                state%water_content = Properties%get_qw(state, group_id)
+                obs_values(iObs) = Properties%get_thc(state, group_id)
             end do
 
             deallocate (Original_Temperature)
@@ -319,7 +319,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(type_proereties_manager), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(inout), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
 
         type(type_gauss_point_state) :: state
@@ -348,8 +348,8 @@ contains
                 state%porosity = observation_data%Element(iObs)%e%Interpolate( &
                                  observation_data%obs_xi(iObs), observation_data%obs_eta(iObs), Original_porosity(:))
                 group_id = observation_data%Element(iObs)%e%get_group()
-                state%water_content = Properties%get_Qw(state, group_id)
-                obs_values(iObs) = Properties%get_Ca(state, group_id)
+                state%water_content = Properties%get_qw(state, group_id)
+                obs_values(iObs) = Properties%get_vhc(state, group_id)
             end do
 
             deallocate (Original_Temperature)
@@ -365,7 +365,7 @@ contains
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_Pw(:)
-        type(type_proereties_manager), intent(in), optional :: Properties
+        type(type_proereties_manager), intent(inout), optional :: Properties
         type(type_domain), intent(inout), optional :: Domain
         ! Note: nodal_Pw is optional, if not present, pressure is assumed to be 101325.0d0
 

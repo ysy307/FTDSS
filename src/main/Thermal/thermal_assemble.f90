@@ -76,9 +76,9 @@ contains
 
                         state%temperature = domain%Elements(iE)%e%Interpolate(xi, eta, Original_temperature)
                         state%porosity = domain%Elements(iE)%e%Interpolate(xi, eta, Original_porosity)
-                        state%water_content = Propeties%get_Qw(state, iRegion)
+                        state%water_content = Propeties%get_qw(state, iRegion)
 
-                        Ca = Propeties%get_Ca(state, iRegion)
+                        Ca = Propeties%get_vhc(state, iRegion)
 
                         val = val + (domain%Elements(iE)%e%psi(il, xi, eta) * &
                                      domain%Elements(iE)%e%psi(jl, xi, eta) * &
@@ -202,8 +202,8 @@ contains
 !$                          t_start = omp_get_wtime()
                             state%temperature = interp_temp(iG)
                             state%porosity = interp_poro(iG)
-                            state%water_content = Propeties%get_Qw(state, iRegion)
-                            Ca = Propeties%get_Ca(state, iRegion)
+                            state%water_content = Propeties%get_qw(state, iRegion)
+                            Ca = Propeties%get_vhc(state, iRegion)
 !$                          t_end = omp_get_wtime()
 !$                          t_get_prop = t_get_prop + (t_end - t_start)
 
@@ -324,10 +324,10 @@ contains
                         ! (1) このガウス点での「状態」を計算する (質量行列と同じ)
                         state%temperature = domain%Elements(iE)%e%Interpolate(xi, eta, Original_temperature)
                         state%porosity = domain%Elements(iE)%e%Interpolate(xi, eta, Original_porosity)
-                        state%water_content = Propeties%get_Qw(state, iRegion) ! 必要なら
+                        state%water_content = Propeties%get_qw(state, iRegion) ! 必要なら
 
                         ! (2) その「状態」を使って、このガウス点での熱伝導率を取得する
-                        lambda_gp = Propeties%get_lambda(state, iRegion)
+                        lambda_gp = Propeties%get_thc(state, iRegion)
 
                         val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda_gp * weight * detJ
                     end do
@@ -437,8 +437,8 @@ contains
 !$                          t_start = omp_get_wtime()
                             state%temperature = interp_temp(iG)
                             state%porosity = interp_poro(iG)
-                            state%water_content = Propeties%get_Qw(state, iRegion)
-                            lambda_gp = Propeties%get_lambda(state, iRegion)
+                            state%water_content = Propeties%get_qw(state, iRegion)
+                            lambda_gp = Propeties%get_thc(state, iRegion)
 !$                          t_end = omp_get_wtime()
 !$                          t_get_prop = t_get_prop + (t_end - t_start)
 

@@ -2,7 +2,7 @@ module calculate_volumetric_heat_capacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
     use :: Inout_Input, only:Type_Input
-    use :: calculate_density, only:holder_dens
+    use :: calculate_density, only:holder_dens, abst_den
     implicit none
     private
 
@@ -26,24 +26,29 @@ module calculate_volumetric_heat_capacity
         real(real64) :: material3 !! ice
         real(real64) :: material4 !! gas
     contains
-        procedure(abst_calc_vhc_gauss_point), pass(self), deferred :: calc_gauss_point
+        procedure(abst_calc_vhc_gauss_point_holder), pass(self), deferred :: calc_gauss_point_holder
+        procedure(abst_calc_vhc_gauss_point_ptr), pass(self), deferred :: calc_gauss_point_ptr
+
     end type abst_vhc
 
     ! --- 3相モデルの具象クラス ---
     type, extends(abst_vhc) :: type_vhc_3phase
     contains
         ! calcの具体的な実装としてcalc_vhc_3_Wrapをバインドする
-        procedure :: calc_gauss_point => calc_vhc_gauss_point_3phase
+        procedure :: calc_gauss_point_holder => calc_vhc_gauss_point_3phase_holder
+        procedure :: calc_gauss_point_ptr => calc_vhc_gauss_point_3phase_ptr
+
     end type type_vhc_3phase
     type, extends(abst_vhc) :: type_vhc_3phase_apparent
     contains
         ! calcの具体的な実装としてcalc_vhc_3_Wrapをバインドする
-        procedure :: calc_gauss_point => calc_vhc_gauss_point_3phase_apparent
+        procedure :: calc_gauss_point_holder => calc_vhc_gauss_point_3phase_apparent_holder
+        procedure :: calc_gauss_point_ptr => calc_vhc_gauss_point_3phase_apparent_ptr
     end type type_vhc_3phase_apparent
 
     ! --- 手続きのインターフェース宣言 ---
     abstract interface
-        function abst_calc_vhc_gauss_point(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+        function abst_calc_vhc_gauss_point_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
             import :: abst_vhc, type_gauss_point_state, holder_dens, real64
             implicit none
             class(abst_vhc), intent(in) :: self
@@ -52,7 +57,19 @@ module calculate_volumetric_heat_capacity
             real(real64), intent(in), optional :: LatentHeat
             real(real64), intent(in), optional :: dQi_dT
             real(real64) :: VHC
-        end function abst_calc_vhc_gauss_point
+        end function abst_calc_vhc_gauss_point_holder
+
+        function abst_calc_vhc_gauss_point_ptr(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+            import :: abst_vhc, type_gauss_point_state, abst_den, real64
+            implicit none
+            class(abst_vhc), intent(in) :: self
+            type(type_gauss_point_state), intent(in) :: state
+            class(abst_den), pointer, intent(in), optional :: DEN
+            real(real64), intent(in), optional :: LatentHeat
+            real(real64), intent(in), optional :: dQi_dT
+            real(real64) :: VHC
+        end function abst_calc_vhc_gauss_point_ptr
+
     end interface
 
     interface
@@ -70,7 +87,7 @@ module calculate_volumetric_heat_capacity
             type(Type_Input), intent(in) :: Input
         end function construct_type_vhc_3phase
 
-        module function calc_vhc_gauss_point_3phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+        module function calc_vhc_gauss_point_3phase_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
             implicit none
             class(type_vhc_3phase), intent(in) :: self
             type(type_gauss_point_state), intent(in) :: state
@@ -78,7 +95,17 @@ module calculate_volumetric_heat_capacity
             real(real64), intent(in), optional :: LatentHeat
             real(real64), intent(in), optional :: dQi_dT
             real(real64) :: VHC
-        end function calc_vhc_gauss_point_3phase
+        end function calc_vhc_gauss_point_3phase_holder
+
+        module function calc_vhc_gauss_point_3phase_ptr(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+            implicit none
+            class(type_vhc_3phase), intent(in) :: self
+            type(type_gauss_point_state), intent(in) :: state
+            class(abst_den), pointer, intent(in), optional :: DEN
+            real(real64), intent(in), optional :: LatentHeat
+            real(real64), intent(in), optional :: dQi_dT
+            real(real64) :: VHC
+        end function calc_vhc_gauss_point_3phase_ptr
 
         module function construct_type_vhc_3phase_apparent(iRegion, Input) result(property)
             import :: abst_vhc, Type_Input
@@ -88,7 +115,7 @@ module calculate_volumetric_heat_capacity
             type(Type_Input), intent(in) :: Input
         end function construct_type_vhc_3phase_apparent
 
-        module function calc_vhc_gauss_point_3phase_apparent(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+        module function calc_vhc_gauss_point_3phase_apparent_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
             implicit none
             class(type_vhc_3phase_apparent), intent(in) :: self
             type(type_gauss_point_state), intent(in) :: state
@@ -96,7 +123,19 @@ module calculate_volumetric_heat_capacity
             real(real64), intent(in), optional :: LatentHeat
             real(real64), intent(in), optional :: dQi_dT
             real(real64) :: VHC
-        end function calc_vhc_gauss_point_3phase_apparent
+
+        end function calc_vhc_gauss_point_3phase_apparent_holder
+
+        module function calc_vhc_gauss_point_3phase_apparent_ptr(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+            implicit none
+            class(type_vhc_3phase_apparent), intent(in) :: self
+            type(type_gauss_point_state), intent(in) :: state
+            class(abst_den), pointer, intent(in), optional :: DEN
+            real(real64), intent(in), optional :: LatentHeat
+            real(real64), intent(in), optional :: dQi_dT
+            real(real64) :: VHC
+
+        end function calc_vhc_gauss_point_3phase_apparent_ptr
     end interface
 
     interface

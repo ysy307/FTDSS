@@ -24,8 +24,6 @@ module domain_manager
         type(holder_elements), allocatable :: elements(:)
         type(holder_sides), allocatable :: sides(:)
 
-        type(type_crs_adjacency_element) :: element_adjacency
-        type(type_node_adjacency) :: node_adjacency
         type(type_coloring) :: colors
         type(type_rcm) :: rcm
 
@@ -48,6 +46,9 @@ contains
         type(Type_Input), intent(in) :: Input ! Inputモジュールからデータを受け取る
         type(type_dp_3d), intent(inout), pointer :: Coordinate
         integer(int32), intent(inout) :: ierr
+
+        type(type_crs_adjacency_element) :: element_adjacency
+        type(type_node_adjacency) :: node_adjacency
 
         integer(int32) :: count_sides, count_elements, count_volumes
         integer(int32) :: iCell, iElem, iSide
@@ -128,33 +129,10 @@ contains
         case (3)
             self%computaion_dimension = 3_int32
         end select
-        ! !===============================================================
-        ! ! 2. 汎用モジュール用のデータ準備 (Input%vtkからCSR形式を構築)
-        ! !===============================================================
-        ! ! 全コネクティビティデータの合計サイズを計算
-        ! total_connec_size = 0
-        ! do i = 1, self%num_elements
-        !     total_connec_size = total_connec_size + self%elements(i)%e%get_num_nodes()
-        ! end do
-
-        ! ! CSR配列を確保
-        ! call allocate_array(conn_ptr, self%num_elements + 1_int32)
-        ! call allocate_array(conn_data, total_connec_size)
-
-        ! ! Input%vtk%cells の情報を使ってCSR配列を構築
-        ! conn_ptr(1) = 1
-        ! do i = 1, self%num_elements
-        !     n_nodes_in_elem = self%elements(i)%e%get_num_nodes()
-        !     conn_ptr(i + 1) = conn_ptr(i) + n_nodes_in_elem
-
-        !     conn_data(conn_ptr(i):conn_ptr(i + 1) - 1) = self%elements(i)%e%connectivity(1:n_nodes_in_elem)
-        ! end do
-        ! print *, "Step 2: Connectivity data prepared from VTK input."
-
         !===============================================================
         ! 3. 隣接行列の構築
         !===============================================================
-        call self%element_adjacency%initialize(self%elements)
+        call element_adjacency%initialize(self%elements)
         print *, "Step 3a: Element adjacency matrix created."
 
         ! call self%node_adjacency%initialize(self%num_nodes, self%num_elements, conn_data, conn_ptr)
@@ -170,14 +148,12 @@ contains
         !===============================================================
         ! 5. グラフ彩色の実行
         !===============================================================
-        call self%colors%initialize(self%element_adjacency, algorithm_name="welsh-powell")
+        call self%colors%initialize(element_adjacency, algorithm_name="dsatur")
         print *, "Step 5: Graph coloring performed."
 
         !===============================================================
         ! 6. 後片付け
         !===============================================================
-        ! call deallocate_array(conn_ptr)
-        ! call deallocate_array(conn_data)
         print *, "Initialization process completed successfully."
 
     end subroutine initialize

@@ -96,7 +96,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(inout), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Temperature
@@ -109,7 +109,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(inout), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Si
@@ -122,7 +122,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(inout), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_THC
@@ -135,7 +135,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(inout), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_VHC
@@ -148,7 +148,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(inout), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
 
         end subroutine Interpolate_ObsValues_Pw
@@ -161,7 +161,7 @@ module Inout_Output
         !     real(real64), intent(in), optional :: nodal_temperature(:)
         !     real(real64), intent(in), optional :: nodal_porosity(:)
         !     real(real64), intent(in), optional :: nodal_Pw(:)
-        !     type(type_proereties_manager), intent(in), optional :: Properties
+        !     type(type_proereties_manager), intent(inout), optional :: Properties
 
         ! end subroutine Interpolate_ObsValues_wFlux
 
@@ -173,7 +173,7 @@ module Inout_Output
         !     real(real64), intent(in), optional :: nodal_temperature(:)
         !     real(real64), intent(in), optional :: nodal_porosity(:)
         !     real(real64), intent(in), optional :: nodal_Pw(:)
-        !     type(type_proereties_manager), intent(in), optional :: Properties
+        !     type(type_proereties_manager), intent(inout), optional :: Properties
 
         ! end subroutine Interpolate_ObsValues_K
     end interface
@@ -190,7 +190,7 @@ module Inout_Output
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(in), optional :: Properties
+            type(type_proereties_manager), intent(inout), optional :: Properties
             type(type_domain), intent(inout), optional :: Domain
         end subroutine Abst_Calculate_obs_values
     end interface

@@ -7,11 +7,6 @@ add_library(Properties OBJECT
 target_link_libraries(Properties PRIVATE
     Core
     Input
-    Calc_THC
-    Calc_DEN
-    Calc_SPH
-    Calc_VHC
-    Calc_GCC
-    Calc_WRF
+    Calc
 )
 enable_build_flags(Properties)

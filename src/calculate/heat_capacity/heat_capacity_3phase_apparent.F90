@@ -19,7 +19,7 @@ contains
 
     end function construct_type_vhc_3phase_apparent
 
-    module function calc_vhc_gauss_point_3phase_apparent(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+    module function calc_vhc_gauss_point_3phase_apparent_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
         implicit none
         class(type_vhc_3phase_apparent), intent(in) :: self
         type(type_gauss_point_state), intent(in) :: state
@@ -36,6 +36,25 @@ contains
 
         VHC = calc_vhc_3a(self%material1, phi1, self%material2, phi2, self%material3, phi3, &
                           LatentHeat, DEN%p%material3, dQi_dT)
-    end function calc_vhc_gauss_point_3phase_apparent
+    end function calc_vhc_gauss_point_3phase_apparent_holder
+
+    module function calc_vhc_gauss_point_3phase_apparent_ptr(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+        implicit none
+        class(type_vhc_3phase_apparent), intent(in) :: self
+        type(type_gauss_point_state), intent(in) :: state
+        class(abst_den), pointer, intent(in), optional :: DEN
+        real(real64), intent(in), optional :: LatentHeat
+        real(real64), intent(in), optional :: dQi_dT
+        real(real64) :: VHC
+
+        real(real64) :: phi1, phi2, phi3
+
+        phi1 = 1.0d0 - state%porosity
+        phi2 = state%water_content
+        phi3 = 1.0d0 - phi1 - phi2
+
+        VHC = calc_vhc_3a(self%material1, phi1, self%material2, phi2, self%material3, phi3, &
+                          LatentHeat, DEN%material3, dQi_dT)
+    end function calc_vhc_gauss_point_3phase_apparent_ptr
 
 end submodule calc_vhc_3phase_apparent

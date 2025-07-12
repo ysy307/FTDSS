@@ -47,6 +47,6 @@ Red Hat Enterprise Linux release 9.4 (Plow)
 [Documents](https://ysy307.github.io/FTDSS/)
 
 
-bfe41abf0975# code --install-extension /root/fortran-lang.linter-gfortran-3.2.0.vsix 
-開発コンテナー: FTDSS @ desktop-linux に拡張機能をインストールしています...
-拡張機能 'fortran-lang.linter-gfortran-3.2.0.vsix' が正常にインストールされました。
+<!-- bfe41abf0975# code --install-extension /root/fortran-lang.linter-gfortran-3.2.0.vsix  -->
+<!-- 開発コンテナー: FTDSS @ desktop-linux に拡張機能をインストールしています... -->
+<!-- 拡張機能 'fortran-lang.linter-gfortran-3.2.0.vsix' が正常にインストールされました。 -->

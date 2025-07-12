@@ -20,7 +20,6 @@ module domain_adjacency_adjacency_element
         procedure, pass(self), public :: initialize => initialize_crs_adjacency
         procedure, pass(self), public :: get_num_elements => get_num_elements_impl
         procedure, pass(self), public :: get_degree => get_degree_impl
-        ! ★★★ 新しいゲッターを追加 ★★★
         procedure, pass(self), public :: get_neighbors => get_neighbors_impl
     end type type_crs_adjacency_element
 
