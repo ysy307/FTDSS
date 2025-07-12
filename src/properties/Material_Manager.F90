@@ -1,12 +1,12 @@
 module Properties_Material_Manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
 
-    use :: module_calculate, only:holder_den
+    use :: module_calculate, only:holder_gcc, holder_den
 
     use :: Calculate_ThermalConductivity, only:THCHolder
     use :: Calculate_SpecificHeat, only:SPHHolder
     use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
-    use :: Calculate_GCC, only:GCCHolder
+    ! use :: Calculate_GCC, only:holder_gcc
     use :: Calculate_WRF, only:WRFHolder
     use :: Inout_Input, only:Type_Input
     implicit none
@@ -20,7 +20,7 @@ module Properties_Material_Manager
         type(holder_den), allocatable :: DEN(:)
         type(SPHHolder), allocatable :: SPH(:)
         type(VHCHolder), allocatable :: VHC(:)
-        type(GCCHolder), allocatable :: GCC(:)
+        type(holder_gcc), allocatable :: GCC(:)
         type(WRFHolder), allocatable :: WRF(:)
         ! region_idを配列インデックスに変換するマッピング配列
         integer(int32), allocatable :: region_id_map(:)
@@ -163,13 +163,13 @@ contains
 
     end function get_VHC
 
-    ! ここで、GCCHolderとWRFHolderのget関数も同様に実装することができます。
+    ! ここで、holder_gccとWRFHolderのget関数も同様に実装することができます。
     ! 例えば、get_GCC(self, region_id) と get_WRF(self, region_id) を追加します。
     function get_GCC(self, region_id) result(model_holder)
         class(MaterialManager_t), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(GCCHolder) :: model_holder
+        type(holder_gcc) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得

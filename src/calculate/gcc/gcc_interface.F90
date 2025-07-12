@@ -13,7 +13,7 @@ module calculate_gcc
     public :: type_gcc_segregation_pa
 
     type :: holder_gcc
-        class(abst_gcc), allocatable :: g
+        class(abst_gcc), allocatable :: p
     contains
         procedure, pass(self) :: initialize => initialize_holder_gcc
     end type holder_gcc

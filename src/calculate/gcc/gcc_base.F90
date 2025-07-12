@@ -11,16 +11,16 @@ contains
         if (Input%Regions(iRegion)%Ice%isSegregation) then
             select case (Input%Regions(iRegion)%Ice%c_unit)
             case ('m')
-                self%g = type_gcc_segregation_m(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
+                self%p = type_gcc_segregation_m(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
             case ("Pa")
-                self%g = type_gcc_segregation_pa(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
+                self%p = type_gcc_segregation_pa(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
             end select
         else
             select case (Input%Regions(iRegion)%Ice%c_unit)
             case ('m')
-                self%g = type_gcc_non_segregation_m(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
+                self%p = type_gcc_non_segregation_m(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
             case ("Pa")
-                self%g = type_gcc_non_segregation_pa(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
+                self%p = type_gcc_non_segregation_pa(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
             end select
         end if
 
