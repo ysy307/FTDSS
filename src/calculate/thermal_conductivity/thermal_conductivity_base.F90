@@ -1,19 +1,19 @@
-submodule(Calculate_ThermalConductivity) Calc_THC_Base
+submodule(calculate_thermal_conductivity) calc_thc_base
     implicit none
 contains
-    module subroutine THCHolder_initialize(self, iRegion, Input)
+    module subroutine initialize_holder_thcs(self, iRegion, Input)
         implicit none
-        class(THCHolder), intent(inout) :: self
+        class(holder_thcs), intent(inout) :: self
         integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
 
         if (Input%Regions(iRegion)%Flag%is3Phase) then
-            self%l = Type_THC_3Phase(iRegion, Input)
+            self%p = Type_THC_3Phase(iRegion, Input)
         end if
 
-    end subroutine THCHolder_initialize
+    end subroutine initialize_holder_thcs
 
-    module function Calc_THC_3(lambda_soil, phi_soil, &
+    module function calc_thc_3(lambda_soil, phi_soil, &
                                lambda_water, phi_water, &
                                lambda_ice, phi_ice) result(lambda)
         implicit none
@@ -29,6 +29,6 @@ contains
                  * lambda_water**phi_water &
                  * lambda_ice**phi_ice
 
-    end function Calc_THC_3
+    end function calc_thc_3
 
-end submodule Calc_THC_Base
+end submodule calc_thc_base

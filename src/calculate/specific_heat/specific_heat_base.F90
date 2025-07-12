@@ -1,21 +1,21 @@
-submodule(Calculate_SpecificHeat) Calc_SPH_Base
+submodule(calculate_specific_heat) calc_sph_base
     implicit none
 
 contains
 
-    module subroutine SPHHolder_initialize(self, iRegion, Input)
+    module subroutine initialize_holder_sphs(self, iRegion, Input)
         implicit none
-        class(SPHHolder), intent(inout) :: self
+        class(holder_sphs), intent(inout) :: self
         integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
 
         if (Input%Regions(iRegion)%Flag%is3Phase) then
-            self%c = Type_SPH_3Phase(iRegion, Input)
+            self%p = type_sph_3phase(iRegion, Input)
         end if
 
-    end subroutine SPHHolder_initialize
+    end subroutine initialize_holder_sphs
 
-    module function Calc_SPH_3(SpecificHeat_soil, phi_soil, &
+    module function calc_sph_3(SpecificHeat_soil, phi_soil, &
                                SpecificHeat_water, phi_water, &
                                SpecificHeat_ice, phi_ice) result(SpecificHeat)
         implicit none
@@ -31,5 +31,5 @@ contains
                        + SpecificHeat_water * phi_water &
                        + SpecificHeat_ice * phi_ice
 
-    end function Calc_SPH_3
-end submodule Calc_SPH_Base
+    end function calc_sph_3
+end submodule calc_sph_base

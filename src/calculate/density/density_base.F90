@@ -1,4 +1,4 @@
-submodule(calculate_density) calculate_density_den
+submodule(calculate_density) calc_den_base
     implicit none
 
 contains
@@ -32,4 +32,4 @@ contains
                   + density_ice * phi_ice
 
     end function calc_den_3
-end submodule calculate_density_den
+end submodule calc_den_base
