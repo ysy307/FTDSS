@@ -1,4 +1,4 @@
-module Calculate_Density
+module calculate_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
     use :: Inout_Input, only:Type_Input
@@ -92,4 +92,4 @@ module Calculate_Density
         module procedure DEN_3_Construct
     end interface
 
-end module Calculate_Density
+end module calculate_density

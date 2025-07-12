@@ -1,4 +1,4 @@
-submodule(Calculate_Density) Calc_DEN_3
+submodule(calculate_density) calculate_den_3
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -58,4 +58,4 @@ contains
     !     !$omp end parallel do
     ! end subroutine Update_DEN_3
 
-end submodule Calc_DEN_3
+end submodule calculate_den_3
