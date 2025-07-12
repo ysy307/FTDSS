@@ -2,14 +2,11 @@ module Properties_Model_Base
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
 
-    use :: module_calculate, only:holder_gccs, holder_wrfs, holder_dens
+    use :: module_calculate, only:holder_gccs, holder_wrfs, holder_dens, holder_vhcs
 
     use :: Properties_Material_Manager, only:MaterialManager_t
 
     use :: Calculate_ThermalConductivity, only:THCHolder
-    use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
-    ! use :: Calculate_GCC, only:holder_gcc
-    ! use :: Calculate_WRF, only:WRFHolder
 
     implicit none
     private
@@ -47,10 +44,10 @@ contains
 
         real(real64) :: Lf, dQi_dT
 
-        type(VHCHolder) :: VHC_holder
+        type(holder_vhcs) :: VHC_holder
         type(holder_gccs) :: GCC_holder
         type(holder_dens) :: DEN_holder
-        type(WRFHolder) :: WRF_holder
+        type(holder_wrfs) :: WRF_holder
 
         VHC_holder = self%Materials%get_VHC(region_id)
         DEN_holder = self%Materials%get_DEN(region_id)
@@ -92,7 +89,7 @@ contains
         real(real64) :: water_content
 
         type(holder_gcc) :: GCC_holder
-        type(WRFHolder) :: WRF_holder
+        type(holder_wrfs) :: WRF_holder
         type(holder_den) :: DEN_holder
 
         GCC_holder = self%Materials%get_GCC(region_id)

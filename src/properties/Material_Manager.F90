@@ -1,13 +1,13 @@
 module Properties_Material_Manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
 
-    use :: module_calculate, only:holder_gcc, holder_den
+    use :: module_calculate, only:holder_gccs, holder_dens, holder_vhcs, holder_wrfs
 
     use :: Calculate_ThermalConductivity, only:THCHolder
     use :: Calculate_SpecificHeat, only:SPHHolder
-    use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
+    ! use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
     ! use :: Calculate_GCC, only:holder_gcc
-    use :: Calculate_WRF, only:WRFHolder
+    ! use :: Calculate_WRF, only:WRFHolder
     use :: Inout_Input, only:Type_Input
     implicit none
     private
@@ -17,11 +17,11 @@ module Properties_Material_Manager
     type :: MaterialManager_t
         private
         type(THCHolder), allocatable :: THC(:)
-        type(holder_den), allocatable :: DEN(:)
+        type(holder_dens), allocatable :: DEN(:)
         type(SPHHolder), allocatable :: SPH(:)
-        type(VHCHolder), allocatable :: VHC(:)
-        type(holder_gcc), allocatable :: GCC(:)
-        type(WRFHolder), allocatable :: WRF(:)
+        type(holder_vhcs), allocatable :: VHC(:)
+        type(holder_gccs), allocatable :: GCC(:)
+        type(holder_wrfs), allocatable :: WRF(:)
         ! region_idを配列インデックスに変換するマッピング配列
         integer(int32), allocatable :: region_id_map(:)
     contains
@@ -104,7 +104,7 @@ contains
         class(MaterialManager_t), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(holder_den) :: model_holder
+        type(holder_dens) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得
@@ -146,7 +146,7 @@ contains
         class(MaterialManager_t), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(VHCHolder) :: model_holder
+        type(holder_vhcs) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得

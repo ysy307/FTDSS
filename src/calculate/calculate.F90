@@ -2,6 +2,7 @@ module module_calculate
     use :: calculate_gcc, only:holder_gccs, abst_gcc, type_gcc_non_segregation_m, type_gcc_non_segregation_pa, type_gcc_segregation_m, type_gcc_segregation_pa
     use :: calculate_wrf, only:holder_wrfs, abst_wrf, type_wrf_bc, type_wrf_vg, type_wrf_ko, type_wrf_mvg, type_wrf_durner, type_wrf_dvgch
     use :: calculate_density, only:holder_dens, abst_den, type_den_3phase
+    use :: calculate_volumetric_heat_capacity, only:holder_vhcs, abst_vhc, type_vhc_3phase, type_vhc_3phase_apparent
     implicit none
     private
 
@@ -28,10 +29,18 @@ module module_calculate
     public :: type_wrf_dvgch
 
     !-------------------------------------------------------------------------------------------------------------------------------
-    !  Dinsity calculation module
+    !  Density calculation module
     !-------------------------------------------------------------------------------------------------------------------------------
     public :: holder_dens
     public :: abst_den
     public :: type_den_3phase
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !  Volumetric heat capacity calculation module
+    !-------------------------------------------------------------------------------------------------------------------------------
+    public :: holder_vhcs
+    public :: abst_vhc
+    public :: type_vhc_3phase
+    public :: type_vhc_3phase_apparent
 
 end module module_calculate

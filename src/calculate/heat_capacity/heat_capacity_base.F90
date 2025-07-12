@@ -1,23 +1,23 @@
-submodule(Calculate_VolumetricHeatCapacity) Calc_VHC_Base
+submodule(calculate_volumetric_heat_capacity) Calc_VHC_Base
     implicit none
 
 contains
 
-    module subroutine VHCHolder_initialize(self, iRegion, Input)
+    module subroutine initialize_holder_vhcs(self, iRegion, Input)
         implicit none
-        class(VHCHolder), intent(inout) :: self
+        class(holder_vhcs), intent(inout) :: self
         integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
 
         if (Input%Regions(iRegion)%Flag%is3Phase) then
             if (Input%Regions(iRegion)%Flag%isFrozen) then
-                self%c = Type_VHC_3Phase_Apparent(iRegion, input)
+                self%p = Type_VHC_3Phase_Apparent(iRegion, input)
             else
-                self%c = Type_VHC_3Phase(iRegion, Input)
+                self%p = Type_VHC_3Phase(iRegion, Input)
             end if
         end if
 
-    end subroutine VHCHolder_initialize
+    end subroutine initialize_holder_vhcs
 
     module function Calc_VHC_3(VHC_soil, phi_soil, &
                                VHC_water, phi_water, &
@@ -31,9 +31,7 @@ contains
         real(real64), intent(in) :: phi_ice
         real(real64) :: VHC
 
-        VHC = VHC_soil * phi_soil &
-              + VHC_water * phi_water &
-              + VHC_ice * phi_ice
+        VHC = VHC_soil * phi_soil + VHC_water * phi_water + VHC_ice * phi_ice
 
     end function Calc_VHC_3
 
@@ -51,8 +49,7 @@ contains
         real(real64), intent(in) :: dQi_dT
         real(real64) :: VHC
 
-        VHC = VHC_soil * phi_soil + VHC_water * phi_water + VHC_ice * phi_ice &
-              - Lf * DEN_ice * dQi_dT
+        VHC = VHC_soil * phi_soil + VHC_water * phi_water + VHC_ice * phi_ice - Lf * DEN_ice * dQi_dT
 
     end function Calc_VHC_3A
 
