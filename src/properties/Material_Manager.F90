@@ -1,7 +1,9 @@
 module Properties_Material_Manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
+
+    use :: module_calculate, only:holder_den
+
     use :: Calculate_ThermalConductivity, only:THCHolder
-    use :: Calculate_Density, only:DENHolder
     use :: Calculate_SpecificHeat, only:SPHHolder
     use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
     use :: Calculate_GCC, only:GCCHolder
@@ -15,7 +17,7 @@ module Properties_Material_Manager
     type :: MaterialManager_t
         private
         type(THCHolder), allocatable :: THC(:)
-        type(DENHolder), allocatable :: DEN(:)
+        type(holder_den), allocatable :: DEN(:)
         type(SPHHolder), allocatable :: SPH(:)
         type(VHCHolder), allocatable :: VHC(:)
         type(GCCHolder), allocatable :: GCC(:)
@@ -102,7 +104,7 @@ contains
         class(MaterialManager_t), intent(in) :: self
         integer(int32), intent(in) :: region_id
         ! 返り値から POINTER 属性を削除
-        type(DENHolder) :: model_holder
+        type(holder_den) :: model_holder
         integer(int32) :: model_index
 
         ! マッピング配列を使って、正しいインデックスをO(1)で取得

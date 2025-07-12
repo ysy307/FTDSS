@@ -4,26 +4,26 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function DEN_3_Construct(iRegion, Input) result(Structure)
+    module function construct_den_3phase(iRegion, Input) result(property)
         implicit none
-        class(Abst_DEN), allocatable :: Structure
+        class(abst_den), allocatable :: property
         integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
 
-        if (allocated(Structure)) deallocate (Structure)
-        allocate (Type_DEN_3Phase :: Structure)
+        if (allocated(property)) deallocate (property)
+        allocate (Type_DEN_3Phase :: property)
 
-        Structure%Material1 = Input%Regions(iRegion)%Thermal%rho(1)
-        Structure%Material2 = Input%Regions(iRegion)%Thermal%rho(2)
-        Structure%Material3 = Input%Regions(iRegion)%Thermal%rho(3)
+        property%material1 = Input%Regions(iRegion)%Thermal%rho(1)
+        property%material2 = Input%Regions(iRegion)%Thermal%rho(2)
+        property%material3 = Input%Regions(iRegion)%Thermal%rho(3)
 
-    end function DEN_3_Construct
+    end function construct_den_3phase
 
-    module function Calc_DEN_GaussPoint_3Phase(self, state) result(lambda)
+    module function calc_den_gauss_point_3phase(self, state) result(density)
         implicit none
-        class(Type_DEN_3Phase), intent(in) :: self
+        class(type_den_3phase), intent(in) :: self
         type(type_gauss_point_state), intent(in) :: state
-        real(real64) :: lambda
+        real(real64) :: density
 
         real(real64) :: phi1, phi2, phi3
 
@@ -31,31 +31,7 @@ contains
         phi2 = state%water_content
         phi3 = 1.0d0 - phi1 - phi2
 
-        lambda = Calc_DEN_3(self%Material1, phi1, self%Material2, phi2, self%Material3, phi3)
-    end function Calc_DEN_GaussPoint_3Phase
-
-    ! module subroutine Update_DEN_3(self, NodeBelonging, arr_phi1, arr_phi2, arr_phi3, arr_phi4)
-    !     implicit none
-    !     class(Type_DEN_3Phase), intent(inout) :: self
-    !     type(Belonging), intent(inout) :: NodeBelonging(:)
-    !     real(real64), intent(in), optional :: arr_phi1(:)
-    !     real(real64), intent(in), optional :: arr_phi2(:)
-    !     real(real64), intent(in), optional :: arr_phi3(:)
-    !     real(real64), intent(in), optional :: arr_phi4(:)
-    !     integer(int32) :: iN
-    !     real(real64) :: density_soil, density_water, density_ice
-
-    !     !$omp parallel do private(iN)
-    !     do iN = 1, self%nsize
-    !         self%value(iN, 1) = Calc_DEN_3(NodeBelonging(iN), &
-    !                                        self%soil, &
-    !                                        arr_phi1(iN), &
-    !                                        self%water, &
-    !                                        arr_phi2(iN), &
-    !                                        self%ice, &
-    !                                        arr_phi3(iN))
-    !     end do
-    !     !$omp end parallel do
-    ! end subroutine Update_DEN_3
+        density = Calc_DEN_3(self%material1, phi1, self%material2, phi2, self%material3, phi3)
+    end function calc_den_gauss_point_3phase
 
 end submodule calculate_den_3

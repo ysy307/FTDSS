@@ -1,113 +1,110 @@
-module Calculate_GCC
+module calculate_gcc
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Inout_Input, only:Type_Input
-#ifdef _OPENMP
-    use omp_lib
-#endif
+!$  use omp_lib
+    use :: Inout_Input, only:type_Input
     implicit none
     private
 
-    ! public :: Abst_GCC
-    ! public :: Type_GCC_NonSegregation_m
-    ! public :: Type_GCC_NonSegregation_Pa
-    ! public :: Type_GCC_Segregation_m
-    ! public :: Type_GCC_Segregation_Pa
+    public :: holder_gcc
+    public :: abst_gcc
+    public :: type_gcc_non_segregation_m
+    public :: type_gcc_non_segregation_pa
+    public :: type_gcc_segregation_m
+    public :: type_gcc_segregation_pa
 
-    public :: GCCHolder
-
-    type :: GCCHolder
-        class(Abst_GCC), allocatable :: g
+    type :: holder_gcc
+        class(abst_gcc), allocatable :: g
     contains
-        procedure, pass(self) :: initialize => GCCHolder_initialize
-    end type GCCHolder
+        procedure, pass(self) :: initialize => initialize_holder_gcc
+    end type holder_gcc
 
-    type, abstract :: Abst_GCC
+    type, abstract :: abst_gcc
         real(real64) :: Tf !! Freezing point
         real(real64) :: Lf !! Latent heat of fusion
         real(real64), private :: TtoK = 273.15d0
         real(real64), private :: g = 9.80665d0
     contains
-        procedure(Abst_GCC_Calc), pass(self), deferred :: Calc
-        procedure(Abst_GCC_Calc_Derivative), pass(self), deferred :: DERIV
-        procedure(Abst_GCC_Calc_Derivative), pass(self), deferred :: DERIV2
-    end type Abst_GCC
+        procedure(abst_gcc_Calc), pass(self), deferred :: Calc
+        procedure(abst_gcc_Calc_Derivative), pass(self), deferred :: DERIV
+        procedure(abst_gcc_Calc_Derivative), pass(self), deferred :: DERIV2
+    end type abst_gcc
 
-    type, extends(Abst_GCC) :: Type_GCC_NonSegregation_m
+    type, extends(abst_gcc) :: type_gcc_non_segregation_m
     contains
         procedure, pass(self) :: Calc => Calc_GCC_NonSeg_m
         procedure, pass(self) :: DERIV => Calc_GCC_NonSeg_m_Derivative
         procedure, pass(self) :: DERIV2 => Calc_GCC_NonSeg_m_Derivative_2nd
-    end type Type_GCC_NonSegregation_m
+    end type type_gcc_non_segregation_m
 
-    type, extends(Abst_GCC) :: Type_GCC_NonSegregation_Pa
+    type, extends(abst_gcc) :: type_gcc_non_segregation_pa
     contains
         procedure, pass(self) :: Calc => Calc_GCC_NonSeg_Pa
         procedure, pass(self) :: DERIV => Calc_GCC_NonSeg_Pa_Derivative
         procedure, pass(self) :: DERIV2 => Calc_GCC_NonSeg_Pa_Derivative_2nd
-    end type Type_GCC_NonSegregation_Pa
+    end type type_gcc_non_segregation_pa
 
-    type, extends(Abst_GCC) :: Type_GCC_Segregation_m
+    type, extends(abst_gcc) :: type_gcc_segregation_m
     contains
         procedure, pass(self) :: Calc => Calc_GCC_Seg_m
         procedure, pass(self) :: DERIV => Calc_GCC_Seg_m_Derivative
         procedure, pass(self) :: DERIV2 => Calc_GCC_Seg_m_Derivative_2nd
-    end type Type_GCC_Segregation_m
+    end type type_gcc_segregation_m
 
-    type, extends(Abst_GCC) :: Type_GCC_Segregation_Pa
+    type, extends(abst_gcc) :: type_gcc_segregation_pa
     contains
         procedure, pass(self) :: Calc => Calc_GCC_Seg_Pa
         procedure, pass(self) :: DERIV => Calc_GCC_Seg_Pa_Derivative
         procedure, pass(self) :: DERIV2 => Calc_GCC_Seg_Pa_Derivative_2nd
-    end type Type_GCC_Segregation_Pa
+    end type type_gcc_segregation_pa
 
     abstract interface
-        function Abst_GCC_Calc(self, T, Pw, rhoW, rhoI) result(Suction)
-            import :: Abst_GCC, real64
+        function abst_gcc_Calc(self, T, Pw, rhoW, rhoI) result(Suction)
+            import :: abst_gcc, real64
             implicit none
-            class(Abst_GCC), intent(in) :: self
+            class(abst_gcc), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
             real(real64), intent(in), optional :: rhoI
             real(real64) :: Suction
 
-        end function Abst_GCC_Calc
+        end function abst_gcc_Calc
 
-        function Abst_GCC_Calc_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
-            import :: Abst_GCC, real64
+        function abst_gcc_Calc_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
+            import :: abst_gcc, real64
             implicit none
-            class(Abst_GCC), intent(in) :: self
+            class(abst_gcc), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
             real(real64), intent(in), optional :: rhoI
             real(real64) :: Suction_Derivative
 
-        end function Abst_GCC_Calc_Derivative
+        end function abst_gcc_Calc_Derivative
     end interface
 
     interface
-        module subroutine GCCHolder_initialize(self, iRegion, Input)
+        module subroutine initialize_holder_gcc(self, iRegion, Input)
             implicit none
-            class(GCCHolder), intent(inout) :: self
+            class(holder_gcc), intent(inout) :: self
             integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            type(type_Input), intent(in) :: Input
 
-        end subroutine GCCHolder_initialize
+        end subroutine initialize_holder_gcc
     end interface
 
     interface
-        module function Type_GCC_NonSeg_m_Construct(Tf, Lf) result(structure)
+        module function type_GCC_NonSeg_m_Construct(Tf, Lf) result(structure)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(Abst_GCC), allocatable :: structure
+            class(abst_gcc), allocatable :: structure
 
-        end function Type_GCC_NonSeg_m_Construct
+        end function type_GCC_NonSeg_m_Construct
 
         module function Calc_GCC_NonSeg_m(self, T, Pw, rhoW, rhoI) result(Suction)
             implicit none
-            class(Type_GCC_NonSegregation_m), intent(in) :: self
+            class(type_gcc_non_segregation_m), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -118,7 +115,7 @@ module Calculate_GCC
 
         module function Calc_GCC_NonSeg_m_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_NonSegregation_m), intent(in) :: self
+            class(type_gcc_non_segregation_m), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -129,7 +126,7 @@ module Calculate_GCC
 
         module function Calc_GCC_NonSeg_m_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_NonSegregation_m), intent(in) :: self
+            class(type_gcc_non_segregation_m), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -141,17 +138,17 @@ module Calculate_GCC
     end interface
 
     interface
-        module function Type_GCC_NonSeg_Pa_Construct(Tf, Lf) result(structure)
+        module function type_GCC_NonSeg_Pa_Construct(Tf, Lf) result(structure)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(Abst_GCC), allocatable :: structure
+            class(abst_gcc), allocatable :: structure
 
-        end function Type_GCC_NonSeg_Pa_Construct
+        end function type_GCC_NonSeg_Pa_Construct
 
         module function Calc_GCC_NonSeg_Pa(self, T, Pw, rhoW, rhoI) result(Suction)
             implicit none
-            class(Type_GCC_NonSegregation_Pa), intent(in) :: self
+            class(type_gcc_non_segregation_pa), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -162,7 +159,7 @@ module Calculate_GCC
 
         module function Calc_GCC_NonSeg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_NonSegregation_Pa), intent(in) :: self
+            class(type_gcc_non_segregation_pa), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -173,7 +170,7 @@ module Calculate_GCC
 
         module function Calc_GCC_NonSeg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_NonSegregation_Pa), intent(in) :: self
+            class(type_gcc_non_segregation_pa), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -185,17 +182,17 @@ module Calculate_GCC
     end interface
 
     interface
-        module function Type_GCC_Seg_m_Construct(Tf, Lf) result(structure)
+        module function type_GCC_Seg_m_Construct(Tf, Lf) result(structure)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(Abst_GCC), allocatable :: structure
+            class(abst_gcc), allocatable :: structure
 
-        end function Type_GCC_Seg_m_Construct
+        end function type_GCC_Seg_m_Construct
 
         module function Calc_GCC_Seg_m(self, T, Pw, rhoW, rhoI) result(Suction)
             implicit none
-            class(Type_GCC_Segregation_m), intent(in) :: self
+            class(type_gcc_segregation_m), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -206,7 +203,7 @@ module Calculate_GCC
 
         module function Calc_GCC_Seg_m_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_Segregation_m), intent(in) :: self
+            class(type_gcc_segregation_m), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -217,7 +214,7 @@ module Calculate_GCC
 
         module function Calc_GCC_Seg_m_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_Segregation_m), intent(in) :: self
+            class(type_gcc_segregation_m), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -229,17 +226,17 @@ module Calculate_GCC
     end interface
 
     interface
-        module function Type_GCC_Seg_Pa_Construct(Tf, Lf) result(structure)
+        module function type_GCC_Seg_Pa_Construct(Tf, Lf) result(structure)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(Abst_GCC), allocatable :: structure
+            class(abst_gcc), allocatable :: structure
 
-        end function Type_GCC_Seg_Pa_Construct
+        end function type_GCC_Seg_Pa_Construct
 
         module function Calc_GCC_Seg_Pa(self, T, Pw, rhoW, rhoI) result(Suction)
             implicit none
-            class(Type_GCC_Segregation_Pa), intent(in) :: self
+            class(type_gcc_segregation_pa), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -250,7 +247,7 @@ module Calculate_GCC
 
         module function Calc_GCC_Seg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_Segregation_Pa), intent(in) :: self
+            class(type_gcc_segregation_pa), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -261,7 +258,7 @@ module Calculate_GCC
 
         module function Calc_GCC_Seg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
             implicit none
-            class(Type_GCC_Segregation_Pa), intent(in) :: self
+            class(type_gcc_segregation_pa), intent(in) :: self
             real(real64), intent(in) :: T
             real(real64), intent(in), optional :: Pw
             real(real64), intent(in), optional :: rhoW
@@ -272,20 +269,20 @@ module Calculate_GCC
 
     end interface
 
-    interface Type_GCC_NonSegregation_m
-        module procedure Type_GCC_NonSeg_m_Construct
+    interface type_gcc_non_segregation_m
+        module procedure type_GCC_NonSeg_m_Construct
     end interface
 
-    interface Type_GCC_NonSegregation_Pa
-        module procedure Type_GCC_NonSeg_Pa_Construct
+    interface type_gcc_non_segregation_pa
+        module procedure type_GCC_NonSeg_Pa_Construct
     end interface
 
-    interface Type_GCC_Segregation_m
-        module procedure Type_GCC_Seg_m_Construct
+    interface type_gcc_segregation_m
+        module procedure type_GCC_Seg_m_Construct
     end interface
 
-    interface Type_GCC_Segregation_Pa
-        module procedure Type_GCC_Seg_Pa_Construct
+    interface type_gcc_segregation_pa
+        module procedure type_GCC_Seg_Pa_Construct
     end interface
 
-end module Calculate_GCC
+end module calculate_gcc

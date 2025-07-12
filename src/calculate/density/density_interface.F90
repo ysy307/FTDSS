@@ -6,75 +6,80 @@ module calculate_density
     private
 
     ! --- 公開する型定義 ---
-    public :: DENHolder
-    public :: Abst_DEN
-    public :: Type_DEN_3Phase
+    public :: holder_den
+    public :: abst_den
+    public :: type_den_3phase
 
     ! --- ポリモーフィックなコンテナ ---
-    type :: DENHolder
-        class(Abst_DEN), allocatable :: d
+    type :: holder_den
+        class(abst_den), allocatable :: p
     contains
-        procedure, pass(self) :: initialize => DENHolder_initialize
-    end type DENHolder
+        procedure, pass(self) :: initialize => initialize_holder_den
+    end type holder_den
 
     ! --- 密度の抽象基底クラス (インターフェースの契約) ---
-    type, abstract :: Abst_DEN
+    type, abstract :: abst_den
         integer(int32) :: region_id
-        real(real64) :: Material1 !! soil, rock, concrete
-        real(real64) :: Material2 !! water
-        real(real64) :: Material3 !! ice
-        real(real64) :: Material4 !! gas
+        real(real64) :: material1 !! soil, rock, concrete
+        real(real64) :: material2 !! water
+        real(real64) :: material3 !! ice
+        real(real64) :: material4 !! gas
     contains
-        procedure(Abst_Calc_DEN_GaussPoint), pass(self), deferred :: Calc_GaussPoint
-    end type Abst_DEN
+        procedure(abst_calc_den_gauss_point), pass(self), deferred :: Calc_GaussPoint
+    end type abst_den
 
     ! --- 3相モデルの具象クラス ---
-    type, extends(Abst_DEN) :: Type_DEN_3Phase
+    type, extends(abst_den) :: type_den_3phase
     contains
-        ! Calcの具体的な実装としてCalc_DEN_3_Wrapをバインドする
-        procedure :: Calc_GaussPoint => Calc_DEN_GaussPoint_3Phase
-    end type Type_DEN_3Phase
+        ! Calcの具体的な実装としてcalc_den_3_Wrapをバインドする
+        procedure :: Calc_GaussPoint => calc_den_gauss_point_3phase
+    end type type_den_3phase
 
-    ! --- 手続きのインターフェース宣言 ---
+    ! ----------------------------------------------------------------
+    ! 抽象基底クラスのインターフェース
+    ! ----------------------------------------------------------------
     abstract interface
-        function Abst_Calc_DEN_GaussPoint(self, state) result(Density)
-            import :: Abst_DEN, type_gauss_point_state, real64
+        function abst_calc_den_gauss_point(self, state) result(density)
+            import :: abst_den, type_gauss_point_state, real64
             implicit none
-            class(Abst_DEN), intent(in) :: self
+            class(abst_den), intent(in) :: self
             type(type_gauss_point_state), intent(in) :: state
-            real(real64) :: Density
-        end function Abst_Calc_DEN_GaussPoint
+            real(real64) :: density
+        end function abst_calc_den_gauss_point
     end interface
 
     ! このモジュールで実装される手続きのインターフェース
     interface
-        module subroutine DENHolder_initialize(self, iRegion, Input)
+        module subroutine initialize_holder_den(self, iRegion, Input)
             implicit none
-            class(DENHolder), intent(inout) :: self
+            class(holder_den), intent(inout) :: self
             integer(int32), intent(in) :: iRegion
             type(Type_Input), intent(in) :: Input
-        end subroutine DENHolder_initialize
+        end subroutine initialize_holder_den
 
-        module function DEN_3_Construct(iRegion, Input) result(Structure)
-            import :: Abst_DEN, Type_Input
+        module function construct_den_3phase(iRegion, Input) result(property)
+            import :: abst_den, Type_Input
             implicit none
-            class(Abst_DEN), allocatable :: Structure
+            class(abst_den), allocatable :: property
             integer(int32), intent(in) :: iRegion
             type(Type_Input), intent(in) :: Input
-        end function DEN_3_Construct
+        end function construct_den_3phase
 
-        module function Calc_DEN_GaussPoint_3Phase(self, state) result(density)
-            import :: Type_DEN_3Phase, type_gauss_point_state
+        module function calc_den_gauss_point_3phase(self, state) result(density)
+            import :: type_den_3phase, type_gauss_point_state
             implicit none
-            class(Type_DEN_3Phase), intent(in) :: self
+            class(type_den_3phase), intent(in) :: self
             type(type_gauss_point_state), intent(in) :: state
             real(real64) :: density
-        end function Calc_DEN_GaussPoint_3Phase
+        end function calc_den_gauss_point_3phase
     end interface
 
+    ! ------------------------------------------------------------------------------
+    ! 密度計算のための関数インターフェース
+    ! ------------------------------------------------------------------------------
     interface
 
-        module function Calc_DEN_3(density_soil, phi_soil, &
+        module function calc_den_3(density_soil, phi_soil, &
                                    density_water, phi_water, &
                                    density_ice, phi_ice) result(density)
             implicit none
@@ -85,11 +90,11 @@ module calculate_density
             real(real64), intent(in) :: density_ice
             real(real64), intent(in) :: phi_ice
             real(real64) :: density
-        end function Calc_DEN_3
+        end function calc_den_3
     end interface
 
-    interface Type_DEN_3Phase
-        module procedure DEN_3_Construct
+    interface type_den_3phase
+        module procedure construct_den_3phase
     end interface
 
 end module calculate_density

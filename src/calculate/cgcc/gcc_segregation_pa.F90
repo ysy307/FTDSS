@@ -1,27 +1,27 @@
-submodule(Calculate_GCC) GCC_Segregation_Pa
+submodule(calculate_gcc) gcc_segregation_pa
     implicit none
 contains
 
-    module function Type_GCC_Seg_Pa_Construct(Tf, Lf) result(structure)
+    module function type_GCC_Seg_Pa_Construct(Tf, Lf) result(property)
         implicit none
         real(real64), intent(in) :: Tf
         real(real64), intent(in) :: Lf
-        class(Abst_GCC), allocatable :: structure
+        class(Abst_GCC), allocatable :: property
 
-        if (allocated(structure)) deallocate (structure)
-        allocate (Type_GCC_Segregation_Pa :: structure)
+        if (allocated(property)) deallocate (property)
+        allocate (type_gcc_segregation_pa :: property)
 
-        select type (this => structure)
-        type is (Type_GCC_Segregation_Pa)
+        select type (this => property)
+        type is (type_gcc_segregation_pa)
             this%Lf = Lf
             this%Tf = Tf
         end select
 
-    end function Type_GCC_Seg_Pa_Construct
+    end function type_GCC_Seg_Pa_Construct
 
     module function Calc_GCC_Seg_Pa(self, T, Pw, rhoW, rhoI) result(Suction)
         implicit none
-        class(Type_GCC_Segregation_Pa), intent(in) :: self
+        class(type_gcc_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in), optional :: Pw
         real(real64), intent(in), optional :: rhoW
@@ -38,7 +38,7 @@ contains
 
     module function Calc_GCC_Seg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
         implicit none
-        class(Type_GCC_Segregation_Pa), intent(in) :: self
+        class(type_gcc_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in), optional :: Pw
         real(real64), intent(in), optional :: rhoW
@@ -55,7 +55,7 @@ contains
 
     module function Calc_GCC_Seg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
         implicit none
-        class(Type_GCC_Segregation_Pa), intent(in) :: self
+        class(type_gcc_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in), optional :: Pw
         real(real64), intent(in), optional :: rhoW
@@ -70,4 +70,4 @@ contains
 
     end function Calc_GCC_Seg_Pa_Derivative_2nd
 
-end submodule GCC_Segregation_Pa
+end submodule gcc_segregation_pa

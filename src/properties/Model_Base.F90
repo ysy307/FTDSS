@@ -2,14 +2,14 @@ module Properties_Model_Base
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
 
+    use :: module_calculate, only:holder_den
+
     use :: Properties_Material_Manager, only:MaterialManager_t
 
     use :: Calculate_ThermalConductivity, only:THCHolder
-    use :: Calculate_Density, only:DENHolder
     use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
     use :: Calculate_GCC, only:GCCHolder
     use :: Calculate_WRF, only:WRFHolder
-    use :: Calculate_Density, only:DENHolder
 
     implicit none
     private
@@ -49,7 +49,7 @@ contains
 
         type(VHCHolder) :: VHC_holder
         type(GCCHolder) :: GCC_holder
-        type(DENHolder) :: DEN_holder
+        type(holder_den) :: DEN_holder
         type(WRFHolder) :: WRF_holder
 
         VHC_holder = self%Materials%get_VHC(region_id)
@@ -60,12 +60,12 @@ contains
         Lf = GCC_holder%g%Lf
         dQi_dT = WRF_holder%w%DERIV(-GCC_holder%g%Calc(T=state%temperature, &
                                                        Pw=state%pressure, &
-                                                       rhoW=DEN_holder%d%Material2, &
-                                                       rhoI=DEN_holder%d%Material3)) &
+                                                       rhoW=DEN_holder%p%Material2, &
+                                                       rhoI=DEN_holder%p%Material3)) &
                  * GCC_holder%g%DERIV(T=state%temperature, &
                                       Pw=state%pressure, &
-                                      rhoW=DEN_holder%d%Material2, &
-                                      rhoI=DEN_holder%d%Material3)
+                                      rhoW=DEN_holder%p%Material2, &
+                                      rhoI=DEN_holder%p%Material3)
 
         ! , state, DEN, LatentHeat, dQi_dT
         Ca = VHC_holder%c%Calc_GaussPoint(state=state, &
@@ -93,7 +93,7 @@ contains
 
         type(GCCHolder) :: GCC_holder
         type(WRFHolder) :: WRF_holder
-        type(DENHolder) :: DEN_holder
+        type(holder_den) :: DEN_holder
 
         GCC_holder = self%Materials%get_GCC(region_id)
         WRF_holder = self%Materials%get_WRF(region_id)
@@ -102,13 +102,13 @@ contains
         ! ... 水分量の計算ロジックをここに追加 ...
         ! print *, GCC_holder%g%Calc(T=-10.0d0, &
         !                            Pw=state%pressure, &
-        !                            rhoW=DEN_holder%d%Material2, &
-        !                            rhoI=DEN_holder%d%Material3)
+        !                            rhoW=DEN_holder%p%Material2, &
+        !                            rhoI=DEN_holder%p%Material3)
         water_content = WRF_holder%w%Calc(-GCC_holder%g%Calc(T=state%temperature, &
                                                              Pw=state%pressure, &
-                                                             rhoW=DEN_holder%d%Material2, &
-                                                             rhoI=DEN_holder%d%Material3))
-        ! print *, state%temperature, water_content, DEN_holder%d%Material2
+                                                             rhoW=DEN_holder%p%Material2, &
+                                                             rhoI=DEN_holder%p%Material3))
+        ! print *, state%temperature, water_content, DEN_holder%p%Material2
 
     end function
 

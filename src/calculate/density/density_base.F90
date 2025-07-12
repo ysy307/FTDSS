@@ -3,19 +3,19 @@ submodule(calculate_density) calculate_density_den
 
 contains
 
-    module subroutine DENHolder_initialize(self, iRegion, Input)
+    module subroutine initialize_holder_den(self, iRegion, Input)
         implicit none
-        class(DENHolder), intent(inout) :: self
+        class(holder_den), intent(inout) :: self
         integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
 
         if (Input%Regions(iRegion)%Flag%is3Phase) then
-            self%d = Type_DEN_3Phase(iRegion, Input)
+            self%p = type_den_3phase(iRegion, Input)
         end if
 
-    end subroutine DENHolder_initialize
+    end subroutine initialize_holder_den
 
-    module function Calc_DEN_3(density_soil, phi_soil, &
+    module function calc_den_3(density_soil, phi_soil, &
                                density_water, phi_water, &
                                density_ice, phi_ice) result(density)
         implicit none
@@ -31,5 +31,5 @@ contains
                   + density_water * phi_water &
                   + density_ice * phi_ice
 
-    end function Calc_DEN_3
+    end function calc_den_3
 end submodule calculate_density_den
