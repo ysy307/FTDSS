@@ -47,7 +47,8 @@ include(Toolchain)
 
 # Source Files
 add_subdirectory(src/core)
-add_subdirectory(src/inout/Input)
+add_subdirectory(src/inout)
+add_subdirectory(src/inout/input)
 add_subdirectory(src/matrix)
 add_subdirectory(src/domain)
 add_subdirectory(src/calculate/blas)

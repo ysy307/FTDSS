@@ -1,16 +1,17 @@
-module Inout_ProjectPath
+module inout_project_settings
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:error_message
     implicit none
     private
-    character(256) :: ProjectPath
-    logical :: isSetProjectPath = .false.
 
-    public :: Inout_ProjectPath_GetProjectPath
+    character(256) :: ProjectPath
+    logical :: is_initialize_project_path = .false.
+
+    public :: get_project_path
 
 contains
 
-    subroutine Inout_ProjectPath_SetProjectPath
+    subroutine inout_project_path_initialize()
         implicit none
         character(64), parameter :: dName = "ProjectPath.dir"
         integer(int32) :: access, status, len_path, unit_num
@@ -51,17 +52,18 @@ contains
             ProjectPath = trim(adjustl(ProjectPath))//"/"
         end if
 
-        isSetProjectPath = .true.
+        is_initialize_project_path = .true.
 
-    end subroutine Inout_ProjectPath_SetProjectPath
+    end subroutine inout_project_path_initialize
 
-    character(256) function Inout_ProjectPath_GetProjectPath()
+    function get_project_path() result(project_path)
         implicit none
+        character(256) :: project_path
 
-        if (.not. isSetProjectPath) call Inout_ProjectPath_SetProjectPath
+        if (.not. is_initialize_project_path) call inout_project_path_initialize
 
-        Inout_ProjectPath_GetProjectPath = ProjectPath
+        project_path = ProjectPath
 
-    end function Inout_ProjectPath_GetProjectPath
+    end function get_project_path
 
-end module Inout_ProjectPath
+end module inout_project_settings

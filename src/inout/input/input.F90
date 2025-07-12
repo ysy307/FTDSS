@@ -1,6 +1,6 @@
 module Inout_Input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
-    use :: Inout_ProjectPath, only:GetProjectPath => Inout_ProjectPath_GetProjectPath
+    use :: inout_project_settings, only:get_project_path
     use :: module_core, only:type_vtk, type_dp_3d, allocate_array, deallocate_array, error_message
     ! use :: Core_Allocate
     ! use :: Core_Error
@@ -309,7 +309,7 @@ contains
         character(256) :: access_mode
 
         ! Path settings
-        dir_Path = GetProjectPath()
+        dir_Path = get_project_path()
 
         inquire (DIRECTORY=trim(adjustl(dir_Path))//"Input/", exist=exists)
         if (.not. exists) stop !!! comment
