@@ -2,14 +2,14 @@ module Properties_Model_Base
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
 
-    use :: module_calculate, only:holder_gccs, holder_dens
+    use :: module_calculate, only:holder_gccs, holder_wrfs, holder_dens
 
     use :: Properties_Material_Manager, only:MaterialManager_t
 
     use :: Calculate_ThermalConductivity, only:THCHolder
     use :: Calculate_VolumetricHeatCapacity, only:VHCHolder
     ! use :: Calculate_GCC, only:holder_gcc
-    use :: Calculate_WRF, only:WRFHolder
+    ! use :: Calculate_WRF, only:WRFHolder
 
     implicit none
     private

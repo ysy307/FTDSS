@@ -1,7 +1,7 @@
-module Calculate_BLAS
+module calculate_blas
+!$  use :: omp_lib
     use, intrinsic :: iso_fortran_env, only: int32, int64, real64
 #ifdef _OPENMP
-    use :: omp_lib
 #endif
     implicit none
     private
@@ -26,7 +26,7 @@ contains
         norm = 0.0d0
 
 #ifdef _MKL
-        norm = dnrm2(transfer(N, converter), x, 1)
+        norm = dnrm2(int(N, kind=kind(converter)), x, 1)
 #else
         !$omp parallel do private(iN) reduction(+:norm)
         do iN = 1, N
@@ -48,7 +48,7 @@ contains
         d_dot = 0.0d0
 
 #ifdef _MKL
-        d_dot = ddot(transfer(N, converter), x, 1, y, 1)
+        d_dot = ddot(int(N, kind=kind(converter)), x, 1, y, 1)
 #else
         !$omp parallel do private(iN) reduction(+:d_dot)
         do iN = 1, N
@@ -57,5 +57,4 @@ contains
         !$omp end parallel do
 #endif
     end function dot
-
-end module Calculate_BLAS
+end module calculate_blas
