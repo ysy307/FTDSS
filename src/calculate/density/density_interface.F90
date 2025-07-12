@@ -6,16 +6,16 @@ module calculate_density
     private
 
     ! --- 公開する型定義 ---
-    public :: holder_den
+    public :: holder_dens
     public :: abst_den
     public :: type_den_3phase
 
     ! --- ポリモーフィックなコンテナ ---
-    type :: holder_den
+    type :: holder_dens
         class(abst_den), allocatable :: p
     contains
-        procedure, pass(self) :: initialize => initialize_holder_den
-    end type holder_den
+        procedure, pass(self) :: initialize => initialize_holder_dens
+    end type holder_dens
 
     ! --- 密度の抽象基底クラス (インターフェースの契約) ---
     type, abstract :: abst_den
@@ -50,12 +50,12 @@ module calculate_density
 
     ! このモジュールで実装される手続きのインターフェース
     interface
-        module subroutine initialize_holder_den(self, iRegion, Input)
+        module subroutine initialize_holder_dens(self, iRegion, Input)
             implicit none
-            class(holder_den), intent(inout) :: self
+            class(holder_dens), intent(inout) :: self
             integer(int32), intent(in) :: iRegion
             type(Type_Input), intent(in) :: Input
-        end subroutine initialize_holder_den
+        end subroutine initialize_holder_dens
 
         module function construct_den_3phase(iRegion, Input) result(property)
             import :: abst_den, Type_Input

@@ -3,9 +3,9 @@ submodule(calculate_density) calculate_density_den
 
 contains
 
-    module subroutine initialize_holder_den(self, iRegion, Input)
+    module subroutine initialize_holder_dens(self, iRegion, Input)
         implicit none
-        class(holder_den), intent(inout) :: self
+        class(holder_dens), intent(inout) :: self
         integer(int32), intent(in) :: iRegion
         type(Type_Input), intent(in) :: Input
 
@@ -13,7 +13,7 @@ contains
             self%p = type_den_3phase(iRegion, Input)
         end if
 
-    end subroutine initialize_holder_den
+    end subroutine initialize_holder_dens
 
     module function calc_den_3(density_soil, phi_soil, &
                                density_water, phi_water, &

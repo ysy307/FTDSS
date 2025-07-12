@@ -2,9 +2,9 @@ submodule(calculate_gcc) gcc_base
     implicit none
 contains
 
-    module subroutine initialize_holder_gcc(self, iRegion, Input)
+    module subroutine initialize_holder_gccs(self, iRegion, Input)
         implicit none
-        class(holder_gcc), intent(inout) :: self
+        class(holder_gccs), intent(inout) :: self
         integer(int32), intent(in) :: iRegion
         type(type_Input), intent(in) :: Input
 
@@ -24,6 +24,6 @@ contains
             end select
         end if
 
-    end subroutine initialize_holder_gcc
+    end subroutine initialize_holder_gccs
 
 end submodule gcc_base

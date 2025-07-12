@@ -2,7 +2,7 @@ module Properties_Model_Base
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
 
-    use :: module_calculate, only:holder_gcc, holder_den
+    use :: module_calculate, only:holder_gccs, holder_dens
 
     use :: Properties_Material_Manager, only:MaterialManager_t
 
@@ -48,8 +48,8 @@ contains
         real(real64) :: Lf, dQi_dT
 
         type(VHCHolder) :: VHC_holder
-        type(holder_gcc) :: GCC_holder
-        type(holder_den) :: DEN_holder
+        type(holder_gccs) :: GCC_holder
+        type(holder_dens) :: DEN_holder
         type(WRFHolder) :: WRF_holder
 
         VHC_holder = self%Materials%get_VHC(region_id)
