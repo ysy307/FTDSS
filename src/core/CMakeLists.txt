@@ -33,10 +33,11 @@ add_library(Core OBJECT
     fortran_utils/signal_flag_wrapper.F90
     fortran_utils/fortran_utils.F90
     error.F90
-    check_nan.f90
+    check_nan.F90
     check_range.F90
     allocate.F90
     deallocate.F90
+    string_utils.F90
     types/vector.F90
     types/array.F90
     types/pointer.F90

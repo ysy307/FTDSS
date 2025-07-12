@@ -3,26 +3,28 @@
         "title": "1d triangle 2nd order",
         "calculate_type": 1
     },
-    "analysis_control": {
+    "analysis_controls": {
         "calculate_thermal": true,
-        "calculate_hydraulic": true,
+        "calculate_hydraulic": false,
         "calculate_mechanical": false
     },
     "materials": [
         {
             "id": 1,
-            "name": "frozen_silty_sand",
+            "name": "soil",
+            "model_number": 31,
+            "is_frozen": true,
             "thermal": {
                 "porosity": 0.3,
                 "density": [
-                    2800,
-                    1000,
-                    917
+                    2800.0,
+                    1000.0,
+                    917.0
                 ],
                 "specific_heat": [
-                    912,
-                    4180,
-                    2100
+                    912.0,
+                    4180.0,
+                    2100.0
                 ],
                 "thermal_conductivity": [
                     3.78,
@@ -34,10 +36,10 @@
                     0.1
                 ],
                 "phase_change": {
-                    "latent_heat": 334560,
+                    "latent_heat": 334560.0,
                     "freezing_temperature": 0.0,
                     "unfrozen_water_model": {
-                        "type": "van_genuchten",
+                        "type": 2,
                         "theta_s": 0.30,
                         "theta_r": 0.0,
                         "alpha": 0.2,
@@ -46,7 +48,7 @@
                 }
             },
             "hydraulic": {
-                "saturated_conductivity": 1.96e-7,
+                "hydraulic_conductivity": 1.96e-7,
                 "impedance_factor": 10
             }
         },

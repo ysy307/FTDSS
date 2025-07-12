@@ -1,6 +1,5 @@
 module core_error
     use, intrinsic :: iso_fortran_env, only: int32, real32, real64, real128
-    use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
     use :: stdlib_logger
     implicit none
     private
@@ -9,28 +8,43 @@ module core_error
 
 contains
 
-    subroutine error_message(err_number, myrank, opt, opt_file_name, copt1, copt2)
+    subroutine error_message(err_number, myrank, opt, c_opt)
         implicit none
         integer(int32), intent(in) :: err_number
-        real(real64), optional, intent(in) :: opt
         integer(int32), optional, intent(in) :: myrank
+        real(real64), optional, intent(in) :: opt
+        character(*), optional, intent(in) :: c_opt
+
         character(256) :: msg
-        character(*), optional, intent(in) :: opt_file_name, copt1, copt2
         integer(int32) :: ierr
         character(8) :: fmt = '(a,i3,a)'
 
         if (err_number == 901) then
-            write (msg, '(3a)') "Does not exit file '", trim(adjustl(opt_file_name)), "'."
+            write (msg, '(a)') "Don't exist Input folder."
         else if (err_number == 902) then
-            write (msg, '(3a)') "Can not open file '", trim(adjustl(opt_file_name)), "'."
+            if (present(c_opt)) then
+                write (msg, '(3a)') "Don't exist file '", trim(adjustl(c_opt)), "'."
+            else
+                write (msg, '(a)') "Don't exist file."
+            end if
         else if (err_number == 903) then
-            write (msg, '(3a)') "Selected ", trim(adjustl(copt1)), " number is invalid."
+            if (present(c_opt)) then
+                write (msg, '(3a)') "Can't open file '", trim(adjustl(c_opt)), "'."
+            else
+                write (msg, '(a)') "Can't open file."
+            end if
         else if (err_number == 904) then
-            msg = "Opening file 'coordinate.in'"
+            if (present(c_opt)) then
+                write (msg, '(3a)') "Selected variable '", trim(adjustl(c_opt)), "' is not found in JSON file."
+            else
+                write (msg, '(a)') "Selected variable is not found in JSON file."
+            end if
         else if (err_number == 905) then
-            msg = "Opening file 'top.in'"
-        else if (err_number == 906) then
-            msg = "Opening file 'coordinate.in'"
+            if (present(c_opt)) then
+                write (msg, '(3a)') "Selected variable '", trim(adjustl(c_opt)), "' is invalid."
+            else
+                write (msg, '(a)') "Selected variable is invalid."
+            end if
         else if (err_number == 911) then
             msg = "The number of elements must be positive."
         else if (err_number == 912) then
