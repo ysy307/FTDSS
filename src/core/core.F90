@@ -6,6 +6,7 @@ module module_core
     use :: core_unique, only:unique
     use :: core_allocate, only:allocate_array, allocate_pointer
     use :: core_deallocate, only:deallocate_array
+    use :: core_string_utils, only:join
     use :: core_types
     use :: core_vtk, only:type_vtk, type_vtk_cell
     use :: core_vtk_vtk_constants

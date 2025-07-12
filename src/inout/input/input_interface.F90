@@ -1,11 +1,8 @@
-module Inout_Input
+module inout_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
-    use :: inout_project_settings, only:get_project_path
-    use :: module_core, only:type_vtk, type_dp_3d, allocate_array, deallocate_array, error_message
-    ! use :: Core_Allocate
-    ! use :: Core_Error
-    ! use :: Condition_Fix_Boundary
     use :: json_module, only:json_file
+    use :: inout_project_settings, only:get_project_path
+    use :: module_core, only:type_vtk, type_dp_3d, allocate_array, deallocate_array, error_message, join
     implicit none
 !     private
 
@@ -279,23 +276,15 @@ module Inout_Input
 
     contains
 
-        procedure :: Input_Parameters => Inout_Input_Parameters_JSON
-        procedure :: Input_Geometry => Inout_Input_Geometry_VTK
-        procedure :: Input_Conditions => Inout_Input_Conditions_JSON
-        procedure :: Input_OutputSettings => Inout_Input_OutputSettings_JSON
+        procedure :: Input_Parameters => inout_input_Parameters_JSON
+        procedure :: Input_Geometry => inout_input_Geometry_VTK
+        procedure :: Input_Conditions => inout_input_Conditions_JSON
+        procedure :: Input_OutputSettings => inout_input_OutputSettings_JSON
 
     end type Type_Input
 
     interface Type_Input
         module procedure :: Input_Constructor
-    end interface
-
-    interface Connect_dot
-        module procedure :: Inout_Input_Connect_dot_2
-        module procedure :: Inout_Input_Connect_dot_3
-        module procedure :: Inout_Input_Connect_dot_4
-        module procedure :: Inout_Input_Connect_dot_5
-        module procedure :: Inout_Input_Connect_dot_6
     end interface
 
 contains
@@ -338,7 +327,7 @@ contains
         call Input_Constructor%Input_OutputSettings()
     end function Input_Constructor
 
-    subroutine Inout_Input_Parameters_JSON(self)
+    subroutine inout_input_Parameters_JSON(self)
         !< Load the input parameters from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -351,24 +340,24 @@ contains
         call json%load(filename=self%Basic_FileName)
         call json%print_error_message(output_unit)
 
-        call Inout_Input_Parameters_JSON_Basic(self, json)
+        call inout_input_Parameters_JSON_Basic(self, json)
         if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%numRegion))
         do iRegion = 1, self%Basic%numRegion
-            call Inout_Input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
+            call inout_input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
             if (self%Regions(iRegion)%Flag%isHeat) then
-                call Inout_Input_Parameters_JSON_Thermal(self, json, iRegion)
+                call inout_input_Parameters_JSON_Thermal(self, json, iRegion)
             end if
             !     if (self%Regions(iRegion)%Flags%isWater) then
-            !         call Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
+            !         call inout_input_Parameters_JSON_Hydraulic(self, json, iRegion)
             !     end if
         end do
-        call Inout_Input_Parameters_JSON_Solver(self, json)
+        call inout_input_Parameters_JSON_Solver(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
-    end subroutine Inout_Input_Parameters_JSON
+    end subroutine inout_input_Parameters_JSON
 
-    subroutine Inout_Input_Parameters_JSON_Basic(self, json)
+    subroutine inout_input_Parameters_JSON_Basic(self, json)
         !> Load the basic input parameters from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -415,9 +404,9 @@ contains
         call json%get(key, self%Basic%shouldDisplayPrompt)
         call json%print_error_message(output_unit)
 
-    end subroutine Inout_Input_Parameters_JSON_Basic
+    end subroutine inout_input_Parameters_JSON_Basic
 
-    subroutine Inout_Input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
+    subroutine inout_input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
         !> load the region information from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -447,60 +436,60 @@ contains
 
         select case (self%Regions(iRegion)%CalculationType)
         case (1)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .false., .true.)
+            call inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .false., .true.)
         case (2)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .false.)
+            call inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .false.)
         case (3)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .true.)
+            call inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .true.)
         case (4)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .false.)
+            call inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .false.)
         case (5)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .true.)
+            call inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .true.)
         case (6)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .false.)
+            call inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .false.)
         case (7)
-            call Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .true.)
+            call inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .true.)
         case default
             call error_message(903, copt1=CalculationTypeName)
         end select
 
         select case (self%Regions(iRegion)%Modelnumber)
         case (10)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .true., .false., .false., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .true., .false., .false., .false.)
         case (20)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .true., .false., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .true., .false., .false.)
         case (31)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false., .false.)
         case (32)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false., .true.)
         case (33)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true., .false.)
         case (34)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true., .true.)
         case (35)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false., .false.)
         case (36)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false., .true.)
         case (37)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true., .false.)
         case (38)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true., .true.)
         case (41)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .false., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .false., .false.)
         case (42)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .false., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .false., .true.)
         case (43)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .true., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .true., .false.)
         case (44)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .true., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .true., .true.)
         case (45)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .false., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .false., .false.)
         case (46)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .false., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .false., .true.)
         case (47)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .true., .false.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .true., .false.)
         case (48)
-            call Inout_Input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .true., .true.)
+            call inout_input_Parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .true., .true.)
         case default
             call error_message(903, copt1=ModelnumberName)
         end select
@@ -509,9 +498,9 @@ contains
         call json%get(key, self%Regions(iRegion)%Flag%isFrozen)
         call json%print_error_message(output_unit)
 
-    end subroutine Inout_Input_Parameters_JSON_Reigion_Infomation
+    end subroutine inout_input_Parameters_JSON_Reigion_Infomation
 
-    subroutine Inout_Input_Parameters_JSON_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
+    subroutine inout_input_Parameters_JSON_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
         !> Set the calculation types
         implicit none
         class(Type_Input) :: self
@@ -524,9 +513,9 @@ contains
         self%Regions(iRegion)%Flag%isWater = isWater
         self%Regions(iRegion)%Flag%isStress = isStress
 
-    end subroutine Inout_Input_Parameters_JSON_SetCalculationTypes
+    end subroutine inout_input_Parameters_JSON_SetCalculationTypes
 
-    subroutine Inout_Input_Parameters_JSON_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, is4Phase, isCompression, isFrostHeavePressure, isDispersity)
+    subroutine inout_input_Parameters_JSON_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, is4Phase, isCompression, isFrostHeavePressure, isDispersity)
         !> Set the calculation flags
         implicit none
         class(Type_Input) :: self
@@ -546,9 +535,9 @@ contains
         if (present(isFrostHeavePressure)) self%Regions(iRegion)%Flag%isFrostHeavePressure = isFrostHeavePressure
         if (present(isDispersity)) self%Regions(iRegion)%Flag%isDispersity = isDispersity
 
-    end subroutine Inout_Input_Parameters_JSON_SetFlags
+    end subroutine inout_input_Parameters_JSON_SetFlags
 
-    subroutine Inout_Input_Parameters_JSON_Thermal(self, json, iRegion)
+    subroutine inout_input_Parameters_JSON_Thermal(self, json, iRegion)
         !> Load the thermal parameters from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -674,9 +663,9 @@ contains
                 call json%print_error_message(output_unit)
             end if
         end if
-    end subroutine Inout_Input_Parameters_JSON_Thermal
+    end subroutine inout_input_Parameters_JSON_Thermal
 
-!     subroutine Inout_Input_Parameters_JSON_Hydraulic(self, json, iRegion)
+!     subroutine inout_input_Parameters_JSON_Hydraulic(self, json, iRegion)
 !         !> Load the hydraulic parameters from the JSON file
 !         implicit none
 !         class(Input) :: self
@@ -688,144 +677,144 @@ contains
 
 !         write (region_name, '(a, i0)') RegionName, iRegion
 
-!         key = Inout_Input_Connect_dot(region_name, HydraulicName, useHCFName)
+!         key = inout_input_Connect_dot(region_name, HydraulicName, useHCFName)
 !         call json%get(key, self%Regions(iRegion)%Hydraulic%useHCF)
 !         call json%print_error_message(output_unit)
 
-!         key = Inout_Input_Connect_dot(region_name, HydraulicName, useImpedanceName)
+!         key = inout_input_Connect_dot(region_name, HydraulicName, useImpedanceName)
 !         call json%get(key, self%Regions(iRegion)%Hydraulic%useImpedance)
 !         call json%print_error_message(output_unit)
 
-!         key = Inout_Input_Connect_dot(region_name, HydraulicName, useKTDynamicsName)
+!         key = inout_input_Connect_dot(region_name, HydraulicName, useKTDynamicsName)
 !         call json%get(key, self%Regions(iRegion)%Hydraulic%useKTDynamics)
 !         call json%print_error_message(output_unit)
 
 !         call Allocate_Structure_Hydraulic_Type(self%Regions(iRegion)%Hydraulic)
 
-!         key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, KsName)
+!         key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, KsName)
 !         call json%get(key, self%Regions(iRegion)%Hydraulic%Ks)
 !         call json%print_error_message(output_unit)
 
 !         if (allocated(self%Regions(iRegion)%Hydraulic%HCF)) then
 !             select type (HCF => self%Regions(iRegion)%Hydraulic%HCF)
 !             type is (Type_HCF_BC)
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
 !                 call json%get(key, HCF%thetaS)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
 !                 call json%get(key, HCF%thetaR)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
 !                 call json%get(key, HCF%alpha1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
 !                 call json%get(key, HCF%n1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
 !                 call json%get(key, HCF%l)
 !                 call json%print_error_message(output_unit)
 
 !             type is (Type_HCF_VG)
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
 !                 call json%get(key, HCF%thetaS)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
 !                 call json%get(key, HCF%thetaR)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
 !                 call json%get(key, HCF%alpha1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
 !                 call json%get(key, HCF%n1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
 !                 call json%get(key, HCF%l)
 !                 call json%print_error_message(output_unit)
 
 !                 HCF%m1 = 1.0 - 1.0 / HCF%n1
 
 !             type is (Type_HCF_KO)
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
 !                 call json%get(key, HCF%thetaS)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
 !                 call json%get(key, HCF%thetaR)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
 !                 call json%get(key, HCF%alpha1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
 !                 call json%get(key, HCF%n1)
 !                 call json%print_error_message(output_unit)
 
 !             type is (Type_HCF_MVG)
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
 !                 call json%get(key, HCF%thetaS)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
 !                 call json%get(key, HCF%thetaR)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
 !                 call json%get(key, HCF%alpha1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
 !                 call json%get(key, HCF%n1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, hcritName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, hcritName)
 !                 call json%get(key, HCF%hcrit)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
 !                 call json%get(key, HCF%l)
 !                 call json%print_error_message(output_unit)
 
 !                 HCF%m1 = 1.0 - 1.0 / HCF%n1
 
 !             type is (Type_HCF_Durner)
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
 !                 call json%get(key, HCF%thetaS)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
 !                 call json%get(key, HCF%thetaR)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
 !                 call json%get(key, HCF%alpha1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
 !                 call json%get(key, HCF%n1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, alpha2Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha2Name)
 !                 call json%get(key, HCF%alpha2)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n2Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n2Name)
 !                 call json%get(key, HCF%n2)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, w1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, w1Name)
 !                 call json%get(key, HCF%w1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
 !                 call json%get(key, HCF%l)
 !                 call json%print_error_message(output_unit)
 
@@ -834,31 +823,31 @@ contains
 !                 HCF%w2 = 1.0 - HCF%w1
 
 !             type is (Type_HCF_DVGCH)
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
 !                 call json%get(key, HCF%thetaS)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
 !                 call json%get(key, HCF%thetaR)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
 !                 call json%get(key, HCF%alpha1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
 !                 call json%get(key, HCF%n1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, n2Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n2Name)
 !                 call json%get(key, HCF%n2)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, w1Name)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, w1Name)
 !                 call json%get(key, HCF%w1)
 !                 call json%print_error_message(output_unit)
 
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
 !                 call json%get(key, HCF%l)
 !                 call json%print_error_message(output_unit)
 
@@ -871,15 +860,15 @@ contains
 !         if (allocated(self%Regions(iRegion)%Hydraulic%Impedance)) then
 !             select type (Impedance => self%Regions(iRegion)%Hydraulic%Impedance)
 !             type is (Type_Impedance)
-!                 key = Inout_Input_Connect_dot(region_name, HydraulicName, ParametersName, OmegaName)
+!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, OmegaName)
 !                 call json%get(key, Impedance%Omega)
 !                 call json%print_error_message(output_unit)
 !             end select
 !         end if
 
-!     end subroutine Inout_Input_Parameters_JSON_Hydraulic
+!     end subroutine inout_input_Parameters_JSON_Hydraulic
 
-    subroutine Inout_Input_Parameters_JSON_Solver(self, json)
+    subroutine inout_input_Parameters_JSON_Solver(self, json)
         !> load Solver settings from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -929,12 +918,12 @@ contains
         !     call json%get(key, useSolver)
         !     call json%print_error_message(output_unit)
 
-        !     call Inout_Input_Parameters_JSON_Solver_Settings(self, json, useSolver, HydraulicName)
+        !     call inout_input_Parameters_JSON_Solver_Settings(self, json, useSolver, HydraulicName)
         ! end if
 
-    end subroutine Inout_Input_Parameters_JSON_Solver
+    end subroutine inout_input_Parameters_JSON_Solver
 
-    subroutine Inout_Input_Conditions_JSON(self)
+    subroutine inout_input_Conditions_JSON(self)
         !> Load the boundary/initial conditions from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -947,15 +936,15 @@ contains
         call json%load(filename=self%Conditions_FileName)
         call json%print_error_message(output_unit)
 
-        call Inout_Input_Conditions_JSON_BC(self, json)
-        call Inout_Input_Conditions_JSON_IC(self, json)
+        call inout_input_Conditions_JSON_BC(self, json)
+        call inout_input_Conditions_JSON_IC(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
 
-    end subroutine Inout_Input_Conditions_JSON
+    end subroutine inout_input_Conditions_JSON
 
-    subroutine Inout_Input_Conditions_JSON_BC(self, json)
+    subroutine inout_input_Conditions_JSON_BC(self, json)
         !> Load the boundary conditions from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -1001,13 +990,13 @@ contains
                 call json%print_error_message(output_unit)
             end select
 
-            ! key = Inout_Input_Connect_dot(BCName, cBCGroup, HydsraulicName, TypeName)
+            ! key = inout_input_Connect_dot(BCName, cBCGroup, HydsraulicName, TypeName)
             ! call json%get(key, self%Conditions%BC_Hydraulic(iBC)%type)
             ! call json%print_error_message(output_unit)
 
             ! select case (self%Conditions%BC_Hydraulic(iBC)%type)
             ! case (DirichletName, HeatTransferName)
-            !     key = Inout_Input_Connect_dot(BCName, cBCGroup, HydraulicName, ValueName)
+            !     key = inout_input_Connect_dot(BCName, cBCGroup, HydraulicName, ValueName)
             !     call json%get(key, self%Conditions%BC_Hydraulic(iBC)%value)
             !     call json%print_error_message(output_unit)
             ! case default
@@ -1015,9 +1004,9 @@ contains
             ! end select
         end do
 
-    end subroutine Inout_Input_Conditions_JSON_BC
+    end subroutine inout_input_Conditions_JSON_BC
 
-    subroutine Inout_Input_Conditions_JSON_IC(self, json)
+    subroutine inout_input_Conditions_JSON_IC(self, json)
         !> Load the initialy conditions from the JSON file
         implicit none
         class(Type_Input) :: self
@@ -1081,17 +1070,17 @@ contains
         !     end do
         ! end select
 
-    end subroutine Inout_Input_Conditions_JSON_IC
+    end subroutine inout_input_Conditions_JSON_IC
 
-    subroutine Inout_Input_Geometry_VTK(self)
+    subroutine inout_input_Geometry_VTK(self)
         !> Load the geometry from the VTK file
         implicit none
         class(Type_Input) :: self
 
         call self%vtk%initialize(self%Geometry_FileName)
-    end subroutine Inout_Input_Geometry_VTK
+    end subroutine inout_input_Geometry_VTK
 
-!     ! subroutine Inout_Input_Finalize(self)
+!     ! subroutine inout_input_Finalize(self)
 !     !     implicit none
 !     !     type(Input) :: self
 
@@ -1116,9 +1105,9 @@ contains
 !     !     if (allocated(self%Work_Observation_Coordinate)) deallocate (self%Work_Observation_Coordinate)
 !     !     if (allocated(self%Work_Observation_Flag)) deallocate (self%Work_Observation_Flag)
 
-!     ! end subroutine Inout_Input_Finalize
+!     ! end subroutine inout_input_Finalize
 
-    subroutine Inout_Input_OutputSettings_JSON(self)
+    subroutine inout_input_OutputSettings_JSON(self)
         implicit none
         class(Type_Input) :: self
         type(json_file) :: json
@@ -1213,71 +1202,6 @@ contains
         call json%get(key, self%OutputSettings%outK)
         call json%print_error_message(output_unit)
 
-    end subroutine Inout_Input_OutputSettings_JSON
+    end subroutine inout_input_OutputSettings_JSON
 
-    function Inout_Input_Connect_dot_2(c1, c2) result(key)
-        !> connect two strings with dot
-        implicit none
-        character(*), intent(in) :: c1 !! First string
-        character(*), intent(in) :: c2 !! Second string
-        character(:), allocatable :: key
-
-        key = trim(adjustl(c1))//"."//trim(adjustl(c2))
-
-    end function Inout_Input_Connect_dot_2
-
-    function Inout_Input_Connect_dot_3(c1, c2, c3) result(key)
-        !> connect three strings with dot
-        implicit none
-        character(*), intent(in) :: c1 !! First string
-        character(*), intent(in) :: c2 !! Second string
-        character(*), intent(in) :: c3 !! Third string
-        character(:), allocatable :: key
-
-        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))
-
-    end function Inout_Input_Connect_dot_3
-
-    function Inout_Input_Connect_dot_4(c1, c2, c3, c4) result(key)
-        !> connect four strings with dot
-        implicit none
-        character(*), intent(in) :: c1 !! First string
-        character(*), intent(in) :: c2 !! Second string
-        character(*), intent(in) :: c3 !! Third string
-        character(*), intent(in) :: c4 !! Fourth string
-        character(:), allocatable :: key
-
-        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))
-
-    end function Inout_Input_Connect_dot_4
-
-    function Inout_Input_Connect_dot_5(c1, c2, c3, c4, c5) result(key)
-        !> connect five strings with dot
-        implicit none
-        character(*), intent(in) :: c1 !! First string
-        character(*), intent(in) :: c2 !! Second string
-        character(*), intent(in) :: c3 !! Third string
-        character(*), intent(in) :: c4 !! Fourth string
-        character(*), intent(in) :: c5 !! Fifth string
-        character(:), allocatable :: key
-
-        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))//"."//trim(adjustl(c5))
-
-    end function Inout_Input_Connect_dot_5
-
-    function Inout_Input_Connect_dot_6(c1, c2, c3, c4, c5, c6) result(key)
-        !> connect six strings with dot
-        implicit none
-        character(*), intent(in) :: c1 !! First string
-        character(*), intent(in) :: c2 !! Second string
-        character(*), intent(in) :: c3 !! Third string
-        character(*), intent(in) :: c4 !! Fourth string
-        character(*), intent(in) :: c5 !! Fifth string
-        character(*), intent(in) :: c6 !! Sixth string
-        character(:), allocatable :: key
-
-        key = trim(adjustl(c1))//"."//trim(adjustl(c2))//"."//trim(adjustl(c3))//"."//trim(adjustl(c4))//"."//trim(adjustl(c5))//"."//trim(adjustl(c6))
-
-    end function Inout_Input_Connect_dot_6
-
-end module Inout_Input
+end module inout_input

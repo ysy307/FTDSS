@@ -1,6 +1,6 @@
 add_library(Input OBJECT
-    # SetProjectPath.F90
-    Input.F90
+    input_interface.F90
+    input_basic.F90
 )
 target_link_libraries(Input PRIVATE
     Core
