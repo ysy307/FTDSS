@@ -31,7 +31,19 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: specific_heat = "specific_heat"
     character(*), parameter :: thermal_conductivity = "thermal_conductivity"
     character(*), parameter :: dispersivity = "dispersivity"
-    ! character(*), parameter :: phase_change = "phase_change"
+    character(*), parameter :: phase_change = "phase_change"
+    character(*), parameter :: latent_heat = "latent_heat"
+    character(*), parameter :: freezeing_temperature = "freezing_temperature"
+    character(*), parameter :: unfrozen_water_model = "unfrozen_water_model"
+    character(*), parameter :: model_number = "model_number"
+    character(*), parameter :: theta_s = "theta_s"
+    character(*), parameter :: theta_r = "theta_r"
+    character(*), parameter :: n1 = "n1"
+    character(*), parameter :: n2 = "n2"
+    character(*), parameter :: alpha1 = "alpha1"
+    character(*), parameter :: alpha2 = "alpha2"
+    character(*), parameter :: w1 = "w1"
+    character(*), parameter :: h_crit = "h_crit"
 
     character(*), parameter :: hydraulic = "hydraulic"
 
@@ -87,7 +99,10 @@ contains
         key = join([simulation_settins, calculate_type])
         call json%get(key, self%basic%simulation_settings%calculate_type, found)
         call json%print_error_message(output_unit)
-        if (.not. found) call error_message(904, c_opt=key)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
         if (.not. value_in_range(self%basic%simulation_settings%calculate_type, min_calculation_type, max_calculation_type)) then
             call json%destroy()
             call error_message(905, c_opt=key)
@@ -170,16 +185,6 @@ contains
         do i = 1, self%basic%num_materials
             call read_parameters_materials_basic(self, json, i)
             call read_parameters_materials_thermal(self, json, i)
-            print *, "Material ", i, ":", self%basic%materials(i)%name
-            print *, "  Phase: ", self%basic%materials(i)%phase
-            print *, "  Density: ", self%basic%materials(i)%thermal%density
-            print *, "  Specific Heat: ", self%basic%materials(i)%thermal%specific_heat
-            print *, "  Thermal Conductivity: ", self%basic%materials(i)%thermal%thermal_conductivity
-            if (self%basic%materials(i)%is_dispersed) then
-                print *, "  Thermal Conductivity Dispersivity: ", self%basic%materials(i)%thermal%thermal_conductivity_dispersity
-            else
-                print *, "  Thermal Conductivity Dispersivity: Not applicable"
-            end if
 
         end do
         stop
@@ -216,7 +221,10 @@ contains
         key = join([key_material, phase])
         call json%get(key, self%basic%materials(i)%phase, found)
         call json%print_error_message(output_unit)
-        if (.not. found) call error_message(904, c_opt=key)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
         if (.not. value_in_range(self%basic%materials(i)%phase, 1, 4)) then
             call json%destroy()
             call error_message(905, c_opt=key)
@@ -249,9 +257,12 @@ contains
         key = join([key_material, denstiy])
         call json%get(key, self%basic%materials(i)%thermal%density, found)
         call json%print_error_message(output_unit)
-        if (.not. found) call error_message(904, c_opt=key)
-        if (any(self%basic%materials(i)%thermal%density(:) <= 0.0d0) .and. &
-            size(self%basic%materials(i)%thermal%density(:)) == self%basic%materials(i)%phase) then
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (any(self%basic%materials(i)%thermal%density(:) <= 0.0d0) .or. &
+            size(self%basic%materials(i)%thermal%density(:)) /= self%basic%materials(i)%phase) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -259,9 +270,12 @@ contains
         key = join([key_material, specific_heat])
         call json%get(key, self%basic%materials(i)%thermal%specific_heat, found)
         call json%print_error_message(output_unit)
-        if (.not. found) call error_message(904, c_opt=key)
-        if (any(self%basic%materials(i)%thermal%specific_heat(:) <= 0.0d0) .and. &
-            size(self%basic%materials(i)%thermal%specific_heat(:)) == self%basic%materials(i)%phase) then
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (any(self%basic%materials(i)%thermal%specific_heat(:) <= 0.0d0) .or. &
+            size(self%basic%materials(i)%thermal%specific_heat(:)) /= self%basic%materials(i)%phase) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -269,9 +283,12 @@ contains
         key = join([key_material, thermal_conductivity])
         call json%get(key, self%basic%materials(i)%thermal%thermal_conductivity, found)
         call json%print_error_message(output_unit)
-        if (.not. found) call error_message(904, c_opt=key)
-        if (any(self%basic%materials(i)%thermal%thermal_conductivity(:) <= 0.0d0) .and. &
-            size(self%basic%materials(i)%thermal%thermal_conductivity(:)) == self%basic%materials(i)%phase) then
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (any(self%basic%materials(i)%thermal%thermal_conductivity(:) <= 0.0d0) .or. &
+            size(self%basic%materials(i)%thermal%thermal_conductivity(:)) /= self%basic%materials(i)%phase) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -280,9 +297,12 @@ contains
             key = join([key_material, dispersivity])
             call json%get(key, self%basic%materials(i)%thermal%thermal_conductivity_dispersity, found)
             call json%print_error_message(output_unit)
-            if (.not. found) call error_message(904, c_opt=key)
-            if (any(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:) < 0.0d0) .and. &
-                size(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:)) == 2) then
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (any(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:) < 0.0d0) .or. &
+                size(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:)) /= 2) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -291,6 +311,183 @@ contains
             self%basic%materials(i)%thermal%thermal_conductivity_dispersity = 0.0d0
         end if
 
+        if (self%basic%materials(i)%is_frozen) then
+            key = join([key_material, phase_change, latent_heat])
+            call json%get(key, self%basic%materials(i)%thermal%phase_change%latent_heat, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (self%basic%materials(i)%thermal%phase_change%latent_heat <= 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            key = join([key_material, phase_change, freezeing_temperature])
+            call json%get(key, self%basic%materials(i)%thermal%phase_change%freezing_temperature, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (self%basic%materials(i)%thermal%phase_change%freezing_temperature > 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            key = join([key_material, phase_change, unfrozen_water_model])
+            call read_parameters_materials_wrf(self%basic%materials(i)%thermal%phase_change%wrf, json, key)
+        end if
+
     end subroutine read_parameters_materials_thermal
+
+    subroutine read_parameters_materials_wrf(wrf, json, key_base)
+        type(type_materials_wrf), intent(inout) :: wrf
+        type(json_file), intent(inout) :: json !! JSON parser
+        character(*), intent(in) :: key_base !! Base key for WRF material parameters
+
+        logical :: found
+        character(:), allocatable :: key
+
+        key = join([key_base, model_number])
+        call json%get(key, wrf%model_number, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (.not. value_in_range(wrf%model_number, 1, 6)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+        key = join([key_base, theta_s])
+        call json%get(key, wrf%theta_s, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        key = join([key_base, theta_r])
+        call json%get(key, wrf%theta_r, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (wrf%theta_s <= wrf%theta_r .or. &
+            wrf%theta_s <= 0.0d0 .or. &
+            wrf%theta_s < 0.0d0) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        key = join([key_base, alpha1])
+        call json%get(key, wrf%alpha1, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        key = join([key_base, n1])
+        call json%get(key, wrf%n1, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (wrf%n1 <= 0.0d0) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        wrf%m1 = 1.0d0 - 1.0d0 / wrf%n1
+
+        select case (wrf%model_number)
+        case (4)
+            key = join([key_base, h_crit])
+            call json%get(key, wrf%h_crit, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%h_crit > 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+        case (5)
+            key = join([key_base, alpha2])
+            call json%get(key, wrf%alpha2, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%alpha2 <= 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            key = join([key_base, n2])
+            call json%get(key, wrf%n2, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%n2 <= 0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            wrf%m2 = 1.0d0 - 1.0d0 / wrf%n2
+
+            key = join([key_base, w1])
+            call json%get(key, wrf%w1, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            wrf%w2 = 1.0d0 - wrf%w1
+        case (6)
+            key = join([key_base, n2])
+            call json%get(key, wrf%n2, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%n2 <= 1.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            wrf%m1 = 1.0d0 - 1.0d0 / wrf%n2
+
+            key = join([key_base, w1])
+            call json%get(key, wrf%w1, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            wrf%w2 = 1.0d0 - wrf%w1
+        end select
+
+    end subroutine read_parameters_materials_wrf
 
 end submodule inout_input_basic

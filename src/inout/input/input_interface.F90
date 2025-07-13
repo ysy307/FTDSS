@@ -147,10 +147,12 @@ module inout_input
         real(real64) :: theta_r
         real(real64) :: alpha1
         real(real64) :: n1
+        real(real64) :: m1
         real(real64) :: w1
         real(real64) :: h_crit
         real(real64) :: alpha2
         real(real64) :: n2
+        real(real64) :: m2
         real(real64) :: w2
     end type type_materials_wrf
 
@@ -161,7 +163,7 @@ module inout_input
 
     type :: type_materials_phase_change
         real(real64) :: latent_heat
-        real(real64) :: freezeing_temperature
+        real(real64) :: freezing_temperature
         type(type_materials_wrf) :: wrf
         type(type_materials_gcc) :: gcc
     end type type_materials_phase_change
