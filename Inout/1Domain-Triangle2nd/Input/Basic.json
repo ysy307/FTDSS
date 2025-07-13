@@ -6,16 +6,17 @@
     "analysis_controls": {
         "calculate_thermal": true,
         "calculate_hydraulic": false,
-        "calculate_mechanical": false
+        "calculate_mechanical": false,
+        "coupling_mode": "weak"
     },
     "materials": [
         {
             "id": 1,
             "name": "soil",
-            "model_number": 31,
+            "phase": 3,
             "is_frozen": true,
+            "is_dispersed": false,
             "thermal": {
-                "porosity": 0.3,
                 "density": [
                     2800.0,
                     1000.0,
@@ -39,26 +40,22 @@
                     "latent_heat": 334560.0,
                     "freezing_temperature": 0.0,
                     "unfrozen_water_model": {
-                        "type": 2,
+                        "model_number": 2,
                         "theta_s": 0.30,
                         "theta_r": 0.0,
                         "alpha": 0.2,
                         "n": 1.8
+                    },
+                    "equiburium_model": {
+                        "segregation": false,
+                        "unit": "m"
                     }
                 }
             },
             "hydraulic": {
+                "model_number": 31,
                 "hydraulic_conductivity": 1.96e-7,
                 "impedance_factor": 10
-            }
-        },
-        {
-            "id": 10,
-            "name": "bedrock",
-            "thermal": {
-                "density": 2623,
-                "specific_heat": 1155,
-                "conductivity": 2.7
             }
         }
     ],

@@ -1,5 +1,6 @@
 module inout_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+    use :: stdlib_strings, only:to_string
     use :: json_module, only:json_file
     use :: inout_project_settings, only:get_project_path
     use :: module_core, only:type_vtk, type_dp_3d, allocate_array, deallocate_array, error_message, join, value_in_range
@@ -129,13 +130,69 @@ module inout_input
     type :: type_simulation_settings
         character(:), allocatable :: title
         integer(int32) :: calculate_type
+        integer(int32) :: calculate_dimension
     end type type_simulation_settings
 
     type :: type_analysis_controls
         logical :: calculate_thermal
         logical :: calculate_hydraulic
         logical :: calculate_mechanical
+        character(:), allocatable :: coupling_mode
     end type type_analysis_controls
+
+    !-------------------------------------------------------------------------------
+    type :: type_materials_wrf
+        integer(int32) :: model_number
+        real(real64) :: theta_s
+        real(real64) :: theta_r
+        real(real64) :: alpha1
+        real(real64) :: n1
+        real(real64) :: w1
+        real(real64) :: h_crit
+        real(real64) :: alpha2
+        real(real64) :: n2
+        real(real64) :: w2
+    end type type_materials_wrf
+
+    type :: type_materials_gcc
+        logical :: is_segregation
+        character(:), allocatable :: unit
+    end type type_materials_gcc
+
+    type :: type_materials_phase_change
+        real(real64) :: latent_heat
+        real(real64) :: freezeing_temperature
+        type(type_materials_wrf) :: wrf
+        type(type_materials_gcc) :: gcc
+    end type type_materials_phase_change
+
+    type :: type_materials_thermal
+
+        real(real64), allocatable :: density(:)
+        real(real64), allocatable :: specific_heat(:)
+        real(real64), allocatable :: thermal_conductivity(:)
+        real(real64), allocatable :: thermal_conductivity_dispersity(:)
+        type(type_materials_phase_change) :: phase_change
+    end type type_materials_thermal
+
+    type :: type_materials_hydraulic
+        integer(int32) :: model_number
+        real(real64) :: hydraulic_conductivity
+        type(type_materials_wrf) :: wrf
+        real(real64) :: impedance_factor
+    end type type_materials_hydraulic
+
+    type :: type_material_settings
+        integer(int32) :: id
+        character(:), allocatable :: name
+        integer(int32) :: phase
+        logical :: is_frozen
+        logical :: is_dispersed
+        type(type_materials_thermal) :: thermal
+        type(type_materials_hydraulic) :: hydraulic
+    end type type_material_settings
+
+    !-------------------------------------------------------------------------------
 
     type :: Input_OutputSettings
         character(:), allocatable :: FileFormat
@@ -157,9 +214,11 @@ module inout_input
         logical(4) :: outK
     end type Input_OutputSettings
 
-    type :: Input_Basic
+    type :: input_basic
         type(type_simulation_settings) :: simulation_settings
         type(type_analysis_controls) :: analysis_controls
+        integer(int32) :: num_materials
+        type(type_material_settings), allocatable :: materials(:)
         integer(int32) :: DimensionType
         integer(int32) :: numRegion
         character(:), allocatable :: Calculation_TimeUnit
@@ -174,7 +233,7 @@ module inout_input
         logical(4) :: shouldDisplayPrompt
         integer(int32) :: Order
         integer(int32) :: MaxNonlinearIteration
-    end type Input_Basic
+    end type input_basic
 
     type :: Input_Ice
         !***********************************************************************
@@ -278,7 +337,7 @@ module inout_input
         character(256) :: geometry_file_name
         character(256) :: output_file_name
 
-        type(Input_Basic) :: Basic
+        type(input_basic) :: basic
         type(Input_Region), allocatable :: Regions(:)
         type(Input_Solver) :: Solver_Thermal
         type(Input_Solver) :: Solver_Hydraulic
