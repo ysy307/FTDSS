@@ -61,11 +61,13 @@ extern "C"
             g_reader->getCellInfo(connectivity, offsets, types);
     }
 
-    // 関数5: "CellEntryIds"を取得する
-    void c_vtk_get_cell_entity_ids(int *ids)
+    // 関数5: celを取得する
+    void c_vtk_get_cell_ids(const char *array_name, int *ids)
     {
         if (g_reader)
-            g_reader->getCellDataInt32("CellEntityIds", ids);
+        {
+            g_reader->getCellDataInt32(array_name, ids);
+        }
     }
 
     // 後片付け用

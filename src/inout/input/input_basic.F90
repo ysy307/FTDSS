@@ -18,6 +18,12 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: coupling_mode = "coupling_mode"
     character(*), parameter :: coppling_modes(3) = ["none", "weak", "strong"]
     !-------------------------------------------------------------------------------
+    ! JSON key names for geometry settings
+    !-------------------------------------------------------------------------------
+    character(*), parameter :: geometry_settings = "geometry_settings"
+    character(*), parameter :: file_name = "file_name"
+    character(*), parameter :: cell_id_array_name = "cell_id_array_name"
+    !-------------------------------------------------------------------------------
     ! JSON key names for materials
     !-------------------------------------------------------------------------------
     character(*), parameter :: materials = "materials"
@@ -33,6 +39,7 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: dispersivity = "dispersivity"
     character(*), parameter :: phase_change = "phase_change"
     character(*), parameter :: latent_heat = "latent_heat"
+    character(*), parameter :: fusion = "fusion"
     character(*), parameter :: freezeing_temperature = "freezing_temperature"
     character(*), parameter :: unfrozen_water_model = "unfrozen_water_model"
     character(*), parameter :: model_number = "model_number"
@@ -63,6 +70,10 @@ contains
 
         call read_parameters_simulation_settings(self, json)
         call read_parameters_analysis_controls(self, json)
+        call read_parameters_geometry_settings(self, json)
+        print *, "Geometry file name: ", self%geometry_file_name
+        print *, "Cell ID array name: ", self%basic%geometry_settings%cell_id_array_name
+        stop
         call read_parameters_materials(self, json)
 
         ! call inout_input_Parameters_JSON_basic(self, json)
@@ -161,6 +172,40 @@ contains
         end if
 
     end subroutine read_parameters_analysis_controls
+
+    subroutine read_parameters_geometry_settings(self, json)
+        !> Load the geometry settings from the JSON file
+        implicit none
+        class(type_input) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
+
+        logical :: found
+        character(:), allocatable :: key
+
+        key = join([geometry_settings, file_name])
+        call json%get(key, self%basic%geometry_settings%file_name, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        self%geometry_file_name = self%project_path//"Input/"//trim(adjustl(self%basic%geometry_settings%file_name))
+        inquire (file=self%geometry_file_name, exist=found)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(902, c_opt=self%geometry_file_name)
+        end if
+
+        key = join([geometry_settings, cell_id_array_name])
+        call json%get(key, self%basic%geometry_settings%cell_id_array_name, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+    end subroutine read_parameters_geometry_settings
 
     subroutine read_parameters_materials(self, json)
         !> Load the material parameters from the JSON file
@@ -312,7 +357,7 @@ contains
         end if
 
         if (self%basic%materials(i)%is_frozen) then
-            key = join([key_material, phase_change, latent_heat])
+            key = join([key_material, phase_change, latent_heat, fusion])
             call json%get(key, self%basic%materials(i)%thermal%phase_change%latent_heat, found)
             call json%print_error_message(output_unit)
             if (.not. found) then

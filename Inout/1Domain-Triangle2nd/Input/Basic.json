@@ -9,6 +9,10 @@
         "calculate_mechanical": false,
         "coupling_mode": "weak"
     },
+    "geometry_settings": {
+        "file_name": "Geometry.vtk",
+        "cell_id_array_name": "CellEntityIds"
+    },
     "materials": [
         {
             "id": 1,
@@ -37,7 +41,9 @@
                     0.1
                 ],
                 "phase_change": {
-                    "latent_heat": 334560.0,
+                    "latent_heat": {
+                        "fusion": 334560.0
+                    },
                     "freezing_temperature": 0.0,
                     "unfrozen_water_model": {
                         "model_number": 6,

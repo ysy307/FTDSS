@@ -127,19 +127,24 @@ module inout_input
     !! Positive NaN
     real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
 
+    !-------------------------------------------------------------------------------
     type :: type_simulation_settings
         character(:), allocatable :: title
         integer(int32) :: calculate_type
         integer(int32) :: calculate_dimension
     end type type_simulation_settings
-
+    !-------------------------------------------------------------------------------
     type :: type_analysis_controls
         logical :: calculate_thermal
         logical :: calculate_hydraulic
         logical :: calculate_mechanical
         character(:), allocatable :: coupling_mode
     end type type_analysis_controls
-
+    !-------------------------------------------------------------------------------
+    type :: type_geometry_settings
+        character(:), allocatable :: file_name
+        character(:), allocatable :: cell_id_array_name
+    end type type_geometry_settings
     !-------------------------------------------------------------------------------
     type :: type_materials_wrf
         integer(int32) :: model_number
@@ -193,7 +198,6 @@ module inout_input
         type(type_materials_thermal) :: thermal
         type(type_materials_hydraulic) :: hydraulic
     end type type_material_settings
-
     !-------------------------------------------------------------------------------
 
     type :: Input_OutputSettings
@@ -219,6 +223,7 @@ module inout_input
     type :: input_basic
         type(type_simulation_settings) :: simulation_settings
         type(type_analysis_controls) :: analysis_controls
+        type(type_geometry_settings) :: geometry_settings
         integer(int32) :: num_materials
         type(type_material_settings), allocatable :: materials(:)
         integer(int32) :: DimensionType
@@ -333,11 +338,12 @@ module inout_input
         type(Input_Thermal) :: Thermal
     end type Input_Region
 
-    type :: Type_Input
-        character(256) :: basic_file_name
-        character(256) :: conditions_file_name
-        character(256) :: geometry_file_name
-        character(256) :: output_file_name
+    type :: type_input
+        character(:), allocatable :: project_path ! Path to the project directory
+        character(:), allocatable :: basic_file_name
+        character(:), allocatable :: conditions_file_name
+        character(:), allocatable :: geometry_file_name
+        character(:), allocatable :: output_file_name
 
         type(input_basic) :: basic
         type(Input_Region), allocatable :: Regions(:)
@@ -356,19 +362,19 @@ module inout_input
         procedure :: Input_conditions => inout_input_conditions_JSON
         procedure :: Input_OutputSettings => inout_input_OutputSettings_JSON
 
-    end type Type_Input
+    end type type_input
 
     interface
         module subroutine inout_input_basic_parameters(self)
             !< Load the input parameters from the JSON file
             implicit none
-            class(Type_Input), intent(inout) :: self
+            class(type_input), intent(inout) :: self
 
         end subroutine inout_input_basic_parameters
 
     end interface
 
-    interface Type_Input
+    interface type_input
         module procedure :: type_input_initialize
     end interface
 
@@ -376,24 +382,19 @@ contains
 
     subroutine type_input_initialize(self)
         implicit none
-        class(Type_Input), intent(inout) :: self
+        class(type_input), intent(inout) :: self
 
-        character(256) :: dir_path ! Path to the project directory
-        integer(int32) :: access ! File access status
-        integer(int32) :: status ! File access status
         logical :: exists ! File existence status
-        character(256) :: access_mode
 
         ! Path settings
-        dir_path = get_project_path()
+        self%project_path = trim(adjustl(get_project_path()))
 
-        inquire (DIRECTORY=trim(adjustl(dir_path))//"Input/", exist=exists)
+        inquire (directory=self%project_path//"Input/", exist=exists)
         if (.not. exists) call error_message(901)
 
-        self%basic_file_name = trim(adjustl(dir_path))//"Input/Basic.json"
-        self%conditions_file_name = trim(adjustl(dir_path))//"Input/conditions.json"
-        self%geometry_file_name = trim(adjustl(dir_path))//"Input/Geometry.vtk"
-        self%output_file_name = trim(adjustl(dir_path))//"Input/Output.json"
+        self%basic_file_name = self%project_path//"Input/Basic.json"
+        self%conditions_file_name = self%project_path//"Input/conditions.json"
+        self%output_file_name = self%project_path//"Input/Output.json"
 
         ! Check the existence of the file
         inquire (file=self%basic_file_name, exist=exists)
@@ -402,22 +403,19 @@ contains
         inquire (file=self%conditions_file_name, exist=exists)
         if (.not. exists) call error_message(902, c_opt=self%conditions_file_name)
 
-        inquire (file=self%geometry_file_name, exist=exists)
-        if (.not. exists) call error_message(902, c_opt=self%geometry_file_name)
-
         inquire (file=self%output_file_name, exist=exists)
         if (.not. exists) call error_message(902, c_opt=self%output_file_name)
 
         call self%read_parameters()
-        call self%Input_Geometry()
         call self%Input_conditions()
         call self%Input_OutputSettings()
+        call self%Input_Geometry()
     end subroutine type_input_initialize
 
     ! subroutine inout_read_parameters_JSON(self)
     !     !< Load the input parameters from the JSON file
     !     implicit none
-    !     class(Type_Input) :: self
+    !     class(type_input) :: self
     !     type(json_file) :: json
     !     integer(int32) :: status, unit_num
     !     integer(int32) :: iRegion
@@ -447,7 +445,7 @@ contains
     ! subroutine inout_read_parameters_JSON_Basic(self, json)
     !     !> Load the basic input parameters from the JSON file
     !     implicit none
-    !     class(Type_Input) :: self
+    !     class(type_input) :: self
     !     type(json_file), intent(inout) :: json !! JSON parser
     !     character(:), allocatable :: key
 
@@ -496,7 +494,7 @@ contains
     subroutine inout_read_parameters_JSON_Reigion_Infomation(self, json, iRegion)
         !> load the region information from the JSON file
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         type(json_file), intent(inout) :: json !! JSON parser
         integer(int32), intent(in) :: iRegion !! Region number
 
@@ -590,7 +588,7 @@ contains
     subroutine inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
         !> Set the calculation types
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         integer(int32), intent(in) :: iRegion !! Region number
         logical(4), intent(in) :: isHeat !! Heat calculation
         logical(4), intent(in) :: isWater !! Water calculation
@@ -605,7 +603,7 @@ contains
     subroutine inout_read_parameters_JSON_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, is4Phase, isCompression, isFrostHeavePressure, isDispersity)
         !> Set the calculation flags
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         integer(int32), intent(in) :: iRegion !! Region number
         logical(4), intent(in) :: is1Phase !! 1 Phase calculation
         logical(4), intent(in) :: is2Phase !! 2 Phase calculation
@@ -627,7 +625,7 @@ contains
     subroutine inout_read_parameters_JSON_Thermal(self, json, iRegion)
         !> Load the thermal parameters from the JSON file
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         type(json_file), intent(inout) :: json !! JSON parser
         integer(int32), intent(in) :: iRegion !! Region number
 
@@ -958,7 +956,7 @@ contains
     subroutine inout_read_parameters_JSON_Solver(self, json)
         !> load Solver settings from the JSON file
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         type(json_file), intent(inout) :: json !! JSON parser
 
         character(:), allocatable :: key
@@ -1013,7 +1011,7 @@ contains
     subroutine inout_input_conditions_JSON(self)
         !> Load the boundary/initial conditions from the JSON file
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
 
         type(json_file) :: json
         character(:), allocatable :: key
@@ -1034,7 +1032,7 @@ contains
     subroutine inout_input_conditions_JSON_BC(self, json)
         !> Load the boundary conditions from the JSON file
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         type(json_file), intent(inout) :: json !! JSON parser
 
         character(:), allocatable :: key
@@ -1096,7 +1094,7 @@ contains
     subroutine inout_input_conditions_JSON_IC(self, json)
         !> Load the initialy conditions from the JSON file
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         type(json_file), intent(inout) :: json !! JSON parser
 
         character(:), allocatable :: key
@@ -1162,9 +1160,9 @@ contains
     subroutine inout_input_geometry_VTK(self)
         !> Load the geometry from the VTK file
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
 
-        call self%vtk%initialize(self%geometry_file_name)
+        call self%vtk%initialize(self%geometry_file_name, self%basic%geometry_settings%cell_id_array_name)
     end subroutine inout_input_geometry_VTK
 
 !     ! subroutine inout_input_Finalize(self)
@@ -1196,7 +1194,7 @@ contains
 
     subroutine inout_input_OutputSettings_JSON(self)
         implicit none
-        class(Type_Input) :: self
+        class(type_input) :: self
         type(json_file) :: json
         integer(int32) :: status, unit_num
         integer(int32) :: iRegion
