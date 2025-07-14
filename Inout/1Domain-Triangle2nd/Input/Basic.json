@@ -56,21 +56,38 @@
                         "h_crit": -10.0,
                         "w1": 0.4
                     },
-                    "equiburium_model": {
+                    "equilibrium_model": {
                         "segregation": false,
                         "unit": "m"
                     }
                 }
             },
             "hydraulic": {
-                "model_number": 31,
-                "hydraulic_conductivity": 1.96e-7,
-                "impedance_factor": 10
+                "hydraulic_conductivity_model": {
+                    "model_number": 5,
+                    "saturated_conductivity": 1.96e-7
+                },
+                "impedance_factor": 10,
+                "water_retention_model": {
+                    "model_number": 6,
+                    "theta_s": 0.30,
+                    "theta_r": 0.0,
+                    "alpha1": 0.2,
+                    "n1": 1.8,
+                    "alpha2": 0.2,
+                    "n2": 1.8,
+                    "h_crit": -10.0,
+                    "w1": 0.4,
+                    "l": 0.5
+                },
+                "water_viscosity_model": 0
             }
         }
     ],
     "solver_settings": {
-        "time_discretization": "backward_euler",
+        "bdf_order": 1,
+        "reordering": "RCM",
+        "coloring": "DSATUR",
         "nonlinear_solver": {
             "max_iterations": 100,
             "tolerance": 1.0e-6
@@ -88,6 +105,15 @@
                 "max_iterations": 50000,
                 "tolerance": 1.0e-9
             }
+        }
+    },
+    "parallel_settings": {
+        "thread": {
+            "num_threads": 8,
+            "schedule": "STATIC",
+            "dynamic_adjustment": false,
+            "nested_parallelism": false,
+            "max_active_levels": 1
         }
     }
 }

@@ -174,7 +174,6 @@ module inout_input
     end type type_materials_phase_change
 
     type :: type_materials_thermal
-
         real(real64), allocatable :: density(:)
         real(real64), allocatable :: specific_heat(:)
         real(real64), allocatable :: thermal_conductivity(:)
@@ -182,11 +181,16 @@ module inout_input
         type(type_materials_phase_change) :: phase_change
     end type type_materials_thermal
 
+    type, extends(type_materials_wrf) :: type_materials_hcf
+        real(real64) :: l
+    end type type_materials_hcf
+
     type :: type_materials_hydraulic
         integer(int32) :: model_number
-        real(real64) :: hydraulic_conductivity
-        type(type_materials_wrf) :: wrf
         real(real64) :: impedance_factor
+        real(real64) :: hydraulic_conductivity
+        type(type_materials_hcf) :: hcf
+        integer(int32) :: water_viscosity_model
     end type type_materials_hydraulic
 
     type :: type_material_settings

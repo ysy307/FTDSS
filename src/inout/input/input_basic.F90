@@ -51,8 +51,16 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: alpha2 = "alpha2"
     character(*), parameter :: w1 = "w1"
     character(*), parameter :: h_crit = "h_crit"
-
+    character(*), parameter :: equilibrium_model = "equilibrium_model"
+    character(*), parameter :: segregation = "segregation"
+    character(*), parameter :: unit = "unit"
     character(*), parameter :: hydraulic = "hydraulic"
+    character(*), parameter :: hydraulic_conductivity_model = "hydraulic_conductivity_model"
+    character(*), parameter :: saturated_conductivity = "saturated_conductivity"
+    character(*), parameter :: l = "l"
+    character(*), parameter :: impedance_factor = "impedance_factor"
+    character(*), parameter :: water_viscosity_model = "water_viscosity_model"
+    character(*), parameter :: water_retention_model = "water_retention_model"
 
 contains
     module subroutine inout_input_basic_parameters(self)
@@ -71,23 +79,7 @@ contains
         call read_parameters_simulation_settings(self, json)
         call read_parameters_analysis_controls(self, json)
         call read_parameters_geometry_settings(self, json)
-        print *, "Geometry file name: ", self%geometry_file_name
-        print *, "Cell ID array name: ", self%basic%geometry_settings%cell_id_array_name
-        stop
         call read_parameters_materials(self, json)
-
-        ! call inout_input_Parameters_JSON_basic(self, json)
-        ! if (.not. allocated(self%Regions)) allocate (self%Regions(self%basic%numRegion))
-        ! do iRegion = 1, self%basic%numRegion
-        !     call inout_input_Parameters_JSON_Reigion_Infomation(self, json, iRegion)
-        !     if (self%Regions(iRegion)%Flag%isHeat) then
-        !         call inout_input_Parameters_JSON_Thermal(self, json, iRegion)
-        !     end if
-        !     !     if (self%Regions(iRegion)%Flags%isWater) then
-        !     !         call inout_input_Parameters_JSON_Hydraulic(self, json, iRegion)
-        !     !     end if
-        ! end do
-        ! call inout_input_Parameters_JSON_Solver(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
@@ -230,6 +222,7 @@ contains
         do i = 1, self%basic%num_materials
             call read_parameters_materials_basic(self, json, i)
             call read_parameters_materials_thermal(self, json, i)
+            call read_parameters_materials_hydrauilic(self, json, i)
 
         end do
         stop
@@ -383,19 +376,166 @@ contains
 
             key = join([key_material, phase_change, unfrozen_water_model])
             call read_parameters_materials_wrf(self%basic%materials(i)%thermal%phase_change%wrf, json, key)
+
+            key = join([key_material, phase_change, equilibrium_model, segregation])
+            call json%get(key, self%basic%materials(i)%thermal%phase_change%gcc%is_segregation, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+
+            key = join([key_material, phase_change, equilibrium_model, unit])
+            call json%get(key, self%basic%materials(i)%thermal%phase_change%gcc%unit, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+
         end if
 
     end subroutine read_parameters_materials_thermal
 
-    subroutine read_parameters_materials_wrf(wrf, json, key_base)
-        type(type_materials_wrf), intent(inout) :: wrf
+    subroutine read_parameters_materials_hydrauilic(self, json, i)
+        !> Load the hydraulic parameters from the JSON file
+        implicit none
+        class(type_input) :: self
         type(json_file), intent(inout) :: json !! JSON parser
-        character(*), intent(in) :: key_base !! Base key for WRF material parameters
+        integer(int32), intent(in) :: i !! Material index
 
         logical :: found
         character(:), allocatable :: key
+        character(:), allocatable :: key_material
 
-        key = join([key_base, model_number])
+        key_material = join([materials//"("//to_string(i)//")", hydraulic])
+
+        key = join([key_material, hydraulic_conductivity_model, model_number])
+        call json%get(key, self%basic%materials(i)%hydraulic%model_number, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (.not. value_in_range(self%basic%materials(i)%hydraulic%model_number, 1, 5)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        key = join([key_material, hydraulic_conductivity_model, saturated_conductivity])
+        call json%get(key, self%basic%materials(i)%hydraulic%hydraulic_conductivity, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (self%basic%materials(i)%hydraulic%hydraulic_conductivity <= 0.0d0) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        select case (self%basic%materials(i)%hydraulic%model_number)
+        case (1)
+            key = join([key_material, impedance_factor])
+            call json%get(key, self%basic%materials(i)%hydraulic%impedance_factor, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+        case (2)
+            key = join([key_material, water_retention_model])
+            call read_parameters_materials_wrf(self%basic%materials(i)%hydraulic%hcf, json, key)
+        case (3)
+            key = join([key_material, water_retention_model])
+            call read_parameters_materials_wrf(self%basic%materials(i)%hydraulic%hcf, json, key)
+
+            key = join([key_material, water_viscosity_model])
+            call json%get(key, self%basic%materials(i)%hydraulic%water_viscosity_model, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (.not. value_in_range(self%basic%materials(i)%hydraulic%water_viscosity_model, 0, 2)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+        case (4)
+            key = join([key_material, impedance_factor])
+            call json%get(key, self%basic%materials(i)%hydraulic%impedance_factor, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            key = join([key_material, water_retention_model])
+            call read_parameters_materials_wrf(self%basic%materials(i)%hydraulic%hcf, json, key)
+        case (5)
+            key = join([key_material, impedance_factor])
+            call json%get(key, self%basic%materials(i)%hydraulic%impedance_factor, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            key = join([key_material, water_retention_model])
+            call read_parameters_materials_wrf(self%basic%materials(i)%hydraulic%hcf, json, key)
+
+            key = join([key_material, water_viscosity_model])
+            call json%get(key, self%basic%materials(i)%hydraulic%water_viscosity_model, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (.not. value_in_range(self%basic%materials(i)%hydraulic%water_viscosity_model, 0, 2)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+        end select
+
+    end subroutine read_parameters_materials_hydrauilic
+
+    !================================================================!
+    !   type_materials_wrf およびそれを継承する型（hcfなど）の
+    !   パラメータをJSONオブジェクトから読み込むサブルーチン
+    !================================================================!
+    subroutine read_parameters_materials_wrf(wrf, json, key_base)
+        ! 引数:
+        !   wrf: wrfまたはhcf型のインスタンス (多態性のためclassで宣言)
+        !   json: JSONパーサーのインスタンス
+        !   key_base: パラメータへの基底パス
+
+        class(type_materials_wrf), intent(inout) :: wrf
+        type(json_file), intent(inout) :: json
+        character(*), intent(in) :: key_base
+
+        ! ローカル変数
+        logical :: found
+        character(:), allocatable :: key
+
+        ! ----------------------------------------------------------------
+        ! 1. 共通パラメータの読み込み (wrfとhcfの両方に存在する)
+        ! ----------------------------------------------------------------
+
+        ! model_numberの読み込みとチェック
+        key = join([key_base, 'model_number'])
         call json%get(key, wrf%model_number, found)
         call json%print_error_message(output_unit)
         if (.not. found) then
@@ -406,7 +546,9 @@ contains
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
-        key = join([key_base, theta_s])
+
+        ! theta_sの読み込みとチェック
+        key = join([key_base, 'theta_s'])
         call json%get(key, wrf%theta_s, found)
         call json%print_error_message(output_unit)
         if (.not. found) then
@@ -414,7 +556,8 @@ contains
             call error_message(904, c_opt=key)
         end if
 
-        key = join([key_base, theta_r])
+        ! theta_rの読み込みとチェック
+        key = join([key_base, 'theta_r'])
         call json%get(key, wrf%theta_r, found)
         call json%print_error_message(output_unit)
         if (.not. found) then
@@ -423,12 +566,13 @@ contains
         end if
         if (wrf%theta_s <= wrf%theta_r .or. &
             wrf%theta_s <= 0.0d0 .or. &
-            wrf%theta_s < 0.0d0) then
+            wrf%theta_r < 0.0d0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
-        key = join([key_base, alpha1])
+        ! alpha1の読み込みとチェック
+        key = join([key_base, 'alpha1'])
         call json%get(key, wrf%alpha1, found)
         call json%print_error_message(output_unit)
         if (.not. found) then
@@ -436,23 +580,25 @@ contains
             call error_message(904, c_opt=key)
         end if
 
-        key = join([key_base, n1])
+        ! n1の読み込みとチェック
+        key = join([key_base, 'n1'])
         call json%get(key, wrf%n1, found)
         call json%print_error_message(output_unit)
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
         end if
-        if (wrf%n1 <= 0.0d0) then
+        if (wrf%n1 <= 1.0d0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
         wrf%m1 = 1.0d0 - 1.0d0 / wrf%n1
 
+        ! model_numberに応じた共通パラメータの読み込み
         select case (wrf%model_number)
         case (4)
-            key = join([key_base, h_crit])
+            key = join([key_base, 'h_crit'])
             call json%get(key, wrf%h_crit, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
@@ -463,8 +609,9 @@ contains
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
+
         case (5)
-            key = join([key_base, alpha2])
+            key = join([key_base, 'alpha2'])
             call json%get(key, wrf%alpha2, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
@@ -476,35 +623,7 @@ contains
                 call error_message(905, c_opt=key)
             end if
 
-            key = join([key_base, n2])
-            call json%get(key, wrf%n2, found)
-            call json%print_error_message(output_unit)
-            if (.not. found) then
-                call json%destroy()
-                call error_message(904, c_opt=key)
-            end if
-            if (wrf%n2 <= 0) then
-                call json%destroy()
-                call error_message(905, c_opt=key)
-            end if
-
-            wrf%m2 = 1.0d0 - 1.0d0 / wrf%n2
-
-            key = join([key_base, w1])
-            call json%get(key, wrf%w1, found)
-            call json%print_error_message(output_unit)
-            if (.not. found) then
-                call json%destroy()
-                call error_message(904, c_opt=key)
-            end if
-            if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
-                call json%destroy()
-                call error_message(905, c_opt=key)
-            end if
-
-            wrf%w2 = 1.0d0 - wrf%w1
-        case (6)
-            key = join([key_base, n2])
+            key = join([key_base, 'n2'])
             call json%get(key, wrf%n2, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
@@ -515,10 +634,9 @@ contains
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
+            wrf%m2 = 1.0d0 - 1.0d0 / wrf%n2
 
-            wrf%m1 = 1.0d0 - 1.0d0 / wrf%n2
-
-            key = join([key_base, w1])
+            key = join([key_base, 'w1'])
             call json%get(key, wrf%w1, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
@@ -529,8 +647,55 @@ contains
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
-
             wrf%w2 = 1.0d0 - wrf%w1
+
+        case (6)
+            key = join([key_base, 'n2'])
+            call json%get(key, wrf%n2, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%n2 <= 1.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+            wrf%m2 = 1.0d0 - 1.0d0 / wrf%n2
+
+            key = join([key_base, 'w1'])
+            call json%get(key, wrf%w1, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+            wrf%w2 = 1.0d0 - wrf%w1
+        end select
+
+        ! ----------------------------------------------------------------
+        ! 2. 型に固有のパラメータを読み込む
+        ! ----------------------------------------------------------------
+        select type (wrf)
+        type is (type_materials_hcf)
+            key = join([key_base, 'l'])
+            call json%get(key, wrf%l, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (wrf%l <= 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+        class default
+            ! do nothing
         end select
 
     end subroutine read_parameters_materials_wrf
