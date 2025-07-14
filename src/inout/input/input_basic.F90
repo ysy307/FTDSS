@@ -221,9 +221,15 @@ contains
 
         do i = 1, self%basic%num_materials
             call read_parameters_materials_basic(self, json, i)
-            call read_parameters_materials_thermal(self, json, i)
-            call read_parameters_materials_hydrauilic(self, json, i)
-
+            if (self%basic%analysis_controls%calculate_thermal) then
+                call read_parameters_materials_thermal(self, json, i)
+            end if
+            if (self%basic%analysis_controls%calculate_hydraulic) then
+                call read_parameters_materials_hydrauilic(self, json, i)
+            end if
+            if (self%basic%analysis_controls%calculate_mechanical) then
+                ! Mechanical parameters can be added here in the future
+            end if
         end do
         stop
 
@@ -512,10 +518,6 @@ contains
 
     end subroutine read_parameters_materials_hydrauilic
 
-    !================================================================!
-    !   type_materials_wrf およびそれを継承する型（hcfなど）の
-    !   パラメータをJSONオブジェクトから読み込むサブルーチン
-    !================================================================!
     subroutine read_parameters_materials_wrf(wrf, json, key_base)
         ! 引数:
         !   wrf: wrfまたはhcf型のインスタンス (多態性のためclassで宣言)
@@ -699,5 +701,7 @@ contains
         end select
 
     end subroutine read_parameters_materials_wrf
+
+    ! subroutine read_parameters_solver_settings(self, json)
 
 end submodule inout_input_basic
