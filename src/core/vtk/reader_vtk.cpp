@@ -1,4 +1,4 @@
-#include "reader.h"
+#include "reader_vtk.h"
 #include <cstring>
 #include <iostream>
 #include <vector>
@@ -13,22 +13,30 @@ VtkReader::VtkReader() : initialized(false)
     this->grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 }
 
-// VtkReader::initialize の中身を書き換える
-// VtkReader::initialize
 int VtkReader::initialize(const char *filename)
 {
+    if (!filename || strlen(filename) == 0)
+    {
+        this->initialized = false;
+        return -1;
+    }
+
+    // ★★★ 修正点①: 毎回新しいリーダーのインスタンスを生成する ★★★
+    this->reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
     this->reader->SetFileName(filename);
-    this->reader->Update(); // 先に読み込みを試行する
+    this->reader->Update();
 
-    // 読み込んだ結果を取得する
-    // GetUnstructuredGridOutput() ではなく GetOutput() を使う
-    this->grid = this->reader->GetOutput();
+    // ★★★ 修正点②: 新しいグリッドのインスタンスに結果をコピーする ★★★
+    this->grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    this->grid->ShallowCopy(this->reader->GetOutput());
 
-    // 結果がNULLでないか、または中身が空でないかで成功を判断する
+    // 結果が有効か（NULLでないか、中身が空でないか）をチェック
     if (!this->grid || this->grid->GetNumberOfPoints() == 0)
     {
         std::cerr << "Error: Failed to read valid UnstructuredGrid data from: " << filename << std::endl;
         this->initialized = false;
+        // 失敗した場合も、gridをクリーンな状態に保つ
+        this->grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
         return -1; // エラーコード
     }
 
@@ -144,5 +152,26 @@ void VtkReader::getCellDataInt32(const char *dataName, int *data)
     for (int i = 0; i < num_tuples; ++i)
     {
         data[i] = static_cast<int>(data_array->GetTuple1(i));
+    }
+}
+
+void VtkReader::getPointDataFloat64(const char *dataName, double *data)
+{
+    if (!initialized)
+        return;
+
+    // 節点データを名前で取得
+    vtkDataArray *data_array = this->grid->GetPointData()->GetArray(dataName);
+    if (!data_array)
+    {
+        std::cerr << "Warning: Point data array '" << dataName << "' not found in the file." << std::endl;
+        return;
+    }
+
+    long long num_tuples = data_array->GetNumberOfTuples();
+    for (long long i = 0; i < num_tuples; ++i)
+    {
+        // doubleで取得して格納
+        data[i] = data_array->GetTuple1(i);
     }
 }

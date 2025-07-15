@@ -1,7 +1,7 @@
 module inout_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
 !$  use :: omp_lib
-    use :: stdlib_strings, only:to_string
+    use :: stdlib_strings, only:to_string, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: inout_project_settings, only:get_project_path
@@ -379,6 +379,12 @@ module inout_input
         type(type_standard_output) :: standard_output
     end type type_output_settings
     !!------------------------------------------------------------------------------------------------------------------------------
+    type :: type_geometry
+        type(type_vtk) :: vtk
+        character(:), allocatable :: point_data_names(:)
+        real(real64), allocatable :: initial_values(:, :)
+    end type type_geometry
+    !!------------------------------------------------------------------------------------------------------------------------------
 
     type :: Input_OutputSettings
         character(:), allocatable :: FileFormat
@@ -506,6 +512,7 @@ module inout_input
         type(input_basic) :: basic
         type(type_conditions) :: conditions
         type(type_output_settings) :: output_settings
+        type(type_geometry) :: geometry
 
         type(Input_Region), allocatable :: Regions(:)
         type(Input_Solver) :: Solver_Thermal
@@ -521,8 +528,8 @@ module inout_input
 
         procedure :: read_parameters => inout_read_basic_parameters
         procedure :: read_conditions => inout_read_conditions
-        procedure :: Input_Geometry => inout_input_geometry_VTK
         procedure :: read_output_settings => inout_read_output_settings
+        procedure :: read_geometry => inout_read_geometry
 
     end type type_input
 
@@ -544,6 +551,12 @@ module inout_input
             class(type_input), intent(inout) :: self
 
         end subroutine inout_read_output_settings
+
+        module subroutine inout_read_geometry(self)
+            implicit none
+            class(type_input), intent(inout) :: self
+
+        end subroutine inout_read_geometry
 
     end interface
 
@@ -578,15 +591,7 @@ contains
         call self%read_parameters()
         call self%read_conditions()
         call self%read_output_settings()
-        call self%Input_Geometry()
+        call self%read_geometry()
     end subroutine type_input_initialize
-
-    subroutine inout_input_geometry_VTK(self)
-        !> Load the geometry from the VTK file
-        implicit none
-        class(type_input) :: self
-
-        call self%vtk%initialize(self%geometry_file_name, self%basic%geometry_settings%cell_id_array_name)
-    end subroutine inout_input_geometry_VTK
 
 end module inout_input

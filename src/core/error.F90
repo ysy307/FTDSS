@@ -45,6 +45,12 @@ contains
             else
                 write (msg, '(a)') "Selected variable is invalid."
             end if
+        else if (err_number == 906) then
+            if (present(c_opt)) then
+                write (msg, '(3a)') "Selected file '", trim(adjustl(c_opt)), "' is invalid"
+            else
+                write (msg, '(a)') "Selected file is invalid"
+            end if
         else if (err_number == 911) then
             msg = "The number of elements must be positive."
         else if (err_number == 912) then

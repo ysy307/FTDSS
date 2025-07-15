@@ -1,0 +1,29 @@
+#ifndef READER_VTU_H
+#define READER_VTU_H
+
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkXMLUnstructuredGridReader.h> // .vtu用のヘッダー
+
+class VtuReader
+{
+public:
+    VtuReader();
+    int initialize(const char *filename);
+    void getHeaderInfo(char *format, int format_len, char *dataset, int dataset_len);
+    int getNumPoints();
+    void getPoints(double *x_arr, double *y_arr, double *z_arr);
+    int getNumCells();
+    long long getTotalConnectivitySize();
+    void getCellInfo(long long *connectivity, long long *offsets, int *types);
+    void getCellDataInt32(const char *dataName, int *data);
+    // .vtkリーダーと同じインターフェースを持つ節点データ取得関数
+    void getPointDataFloat64(const char *dataName, double *data);
+
+private:
+    vtkSmartPointer<vtkXMLUnstructuredGridReader> reader; // .vtu用のリーダー
+    vtkSmartPointer<vtkUnstructuredGrid> grid;
+    bool initialized;
+};
+
+#endif // READER_VTU_H

@@ -1,78 +1,251 @@
-#include "reader.h"
-#include <memory>
+#include "reader_vtk.h"
+#include "reader_vtu.h"
+#include <iostream>
 
-// グローバルなリーダーインスタンスを管理
-static std::unique_ptr<VtkReader> g_reader = nullptr;
+// ===================================================================
+// このファイルでは、グローバル変数を一切使用しません。
+// 全ての操作は、Fortranから渡されるハンドル（オブジェクトのポインタ）
+// 経由で行われます。
+// ===================================================================
 
 extern "C"
 {
+    // ===================================================================
+    // VTK (.vtk) 用のC言語インターフェース関数群
+    // ===================================================================
 
-    // 関数1: リーダーを初期化する
-    void c_vtk_initialize(const char *filename, int *error_code)
+    /**
+     * @brief VTKリーダーを初期化し、そのハンドル(ポインタ)を返す
+     */
+    void *c_vtk_initialize(const char *filename, int *ierr)
     {
-        if (!g_reader)
+        VtkReader *reader = new VtkReader();
+        *ierr = reader->initialize(filename);
+        if (*ierr != 0)
         {
-            g_reader = std::make_unique<VtkReader>();
+            delete reader; // 失敗した場合はここで解放
+            return nullptr;
         }
-        *error_code = g_reader->initialize(filename);
+        return static_cast<void *>(reader); // 成功したらハンドルを返す
     }
 
-    // 関数2: ヘッダー情報を読み込む
-    void c_vtk_read_header(char *format, int format_len, char *dataset, int dataset_len)
+    /**
+     * @brief VTKリーダーのハンドルを受け取り、対応するオブジェクトを解放する
+     */
+    void c_vtk_finalize(void *handle)
     {
-        if (g_reader)
-        {
-            g_reader->getHeaderInfo(format, format_len, dataset, dataset_len);
-        }
+        if (!handle)
+            return;
+        VtkReader *reader = static_cast<VtkReader *>(handle);
+        delete reader;
     }
 
-    // 関数3: ポイントに関する情報を取得
-    void c_vtk_get_num_points(int *num_points)
+    /**
+     * @brief ヘッダー情報を取得する
+     */
+    void c_vtk_read_header(void *handle, char *format, int format_len, char *dataset, int dataset_len)
     {
-        if (g_reader)
-            *num_points = g_reader->getNumPoints();
-        else
+        if (!handle)
+            return;
+        static_cast<VtkReader *>(handle)->getHeaderInfo(format, format_len, dataset, dataset_len);
+    }
+
+    /**
+     * @brief ポイント数を取得する
+     */
+    void c_vtk_get_num_points(void *handle, int *num_points)
+    {
+        if (!handle)
+        {
             *num_points = 0;
-    }
-    void c_vtk_get_points(double *x, double *y, double *z)
-    {
-        if (g_reader)
-            g_reader->getPoints(x, y, z);
-    }
-
-    // 関数4: セルに関する情報を取得
-    void c_vtk_get_num_cells(int *num_cells)
-    {
-        if (g_reader)
-            *num_cells = g_reader->getNumCells();
-        else
-            *num_cells = 0;
-    }
-    void c_vtk_get_total_connectivity_size(long long *size)
-    {
-        if (g_reader)
-            *size = g_reader->getTotalConnectivitySize();
-        else
-            *size = 0;
-    }
-    void c_vtk_get_cell_info(long long *connectivity, long long *offsets, int *types)
-    {
-        if (g_reader)
-            g_reader->getCellInfo(connectivity, offsets, types);
-    }
-
-    // 関数5: celを取得する
-    void c_vtk_get_cell_ids(const char *array_name, int *ids)
-    {
-        if (g_reader)
-        {
-            g_reader->getCellDataInt32(array_name, ids);
+            return;
         }
+        *num_points = static_cast<VtkReader *>(handle)->getNumPoints();
     }
 
-    // 後片付け用
-    void c_vtk_finalize()
+    /**
+     * @brief ポイント座標を取得する
+     */
+    void c_vtk_get_points(void *handle, double *x, double *y, double *z)
     {
-        g_reader.reset();
+        if (!handle)
+            return;
+        static_cast<VtkReader *>(handle)->getPoints(x, y, z);
     }
-}
+
+    /**
+     * @brief セル数を取得する
+     */
+    void c_vtk_get_num_cells(void *handle, int *num_cells)
+    {
+        if (!handle)
+        {
+            *num_cells = 0;
+            return;
+        }
+        *num_cells = static_cast<VtkReader *>(handle)->getNumCells();
+    }
+
+    /**
+     * @brief 全コネクティビティ配列のサイズを取得する
+     */
+    void c_vtk_get_total_connectivity_size(void *handle, long long *size)
+    {
+        if (!handle)
+        {
+            *size = 0;
+            return;
+        }
+        *size = static_cast<VtkReader *>(handle)->getTotalConnectivitySize();
+    }
+
+    /**
+     * @brief セル情報（コネクティビティ、オフセット、タイプ）を取得する
+     */
+    void c_vtk_get_cell_info(void *handle, long long *connectivity, long long *offsets, int *types)
+    {
+        if (!handle)
+            return;
+        static_cast<VtkReader *>(handle)->getCellInfo(connectivity, offsets, types);
+    }
+
+    /**
+     * @brief 名前で指定されたセルID配列を取得する
+     */
+    void c_vtk_get_cell_ids(void *handle, const char *array_name, int *ids)
+    {
+        if (!handle)
+            return;
+        static_cast<VtkReader *>(handle)->getCellDataInt32(array_name, ids);
+    }
+
+    /**
+     * @brief 名前で指定されたポイントデータを取得する
+     */
+    void c_vtk_get_point_data(void *handle, const char *array_name, double *data)
+    {
+        if (!handle)
+            return;
+        static_cast<VtkReader *>(handle)->getPointDataFloat64(array_name, data);
+    }
+
+    // ===================================================================
+    // VTU (.vtu) 用のC言語インターフェース関数群
+    // ===================================================================
+
+    /**
+     * @brief VTUリーダーを初期化し、そのハンドル(ポインタ)を返す
+     */
+    void *c_vtu_initialize(const char *filename, int *ierr)
+    {
+        VtuReader *reader = new VtuReader();
+        *ierr = reader->initialize(filename);
+        if (*ierr != 0)
+        {
+            delete reader; // 失敗した場合はここで解放
+            return nullptr;
+        }
+        return static_cast<void *>(reader); // 成功したらハンドルを返す
+    }
+
+    /**
+     * @brief VTUリーダーのハンドルを受け取り、対応するオブジェクトを解放する
+     */
+    void c_vtu_finalize(void *handle)
+    {
+        if (!handle)
+            return;
+        VtuReader *reader = static_cast<VtuReader *>(handle);
+        delete reader;
+    }
+
+    /**
+     * @brief ヘッダー情報を取得する
+     */
+    void c_vtu_read_header(void *handle, char *format, int format_len, char *dataset, int dataset_len)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuReader *>(handle)->getHeaderInfo(format, format_len, dataset, dataset_len);
+    }
+
+    /**
+     * @brief ポイント数を取得する
+     */
+    void c_vtu_get_num_points(void *handle, int *num_points)
+    {
+        if (!handle)
+        {
+            *num_points = 0;
+            return;
+        }
+        *num_points = static_cast<VtuReader *>(handle)->getNumPoints();
+    }
+
+    /**
+     * @brief ポイント座標を取得する
+     */
+    void c_vtu_get_points(void *handle, double *x, double *y, double *z)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuReader *>(handle)->getPoints(x, y, z);
+    }
+
+    /**
+     * @brief セル数を取得する
+     */
+    void c_vtu_get_num_cells(void *handle, int *num_cells)
+    {
+        if (!handle)
+        {
+            *num_cells = 0;
+            return;
+        }
+        *num_cells = static_cast<VtuReader *>(handle)->getNumCells();
+    }
+
+    /**
+     * @brief 全コネクティビティ配列のサイズを取得する
+     */
+    void c_vtu_get_total_connectivity_size(void *handle, long long *size)
+    {
+        if (!handle)
+        {
+            *size = 0;
+            return;
+        }
+        *size = static_cast<VtuReader *>(handle)->getTotalConnectivitySize();
+    }
+
+    /**
+     * @brief セル情報（コネクティビティ、オフセット、タイプ）を取得する
+     */
+    void c_vtu_get_cell_info(void *handle, long long *connectivity, long long *offsets, int *types)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuReader *>(handle)->getCellInfo(connectivity, offsets, types);
+    }
+
+    /**
+     * @brief 名前で指定されたセルID配列を取得する
+     */
+    void c_vtu_get_cell_ids(void *handle, const char *array_name, int *ids)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuReader *>(handle)->getCellDataInt32(array_name, ids);
+    }
+
+    /**
+     * @brief 名前で指定されたポイントデータを取得する
+     */
+    void c_vtu_get_point_data(void *handle, const char *array_name, double *data)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuReader *>(handle)->getPointDataFloat64(array_name, data);
+    }
+
+} // extern "C"

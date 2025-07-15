@@ -9,7 +9,10 @@ module core_vtk
     use :: core_vtk_vtk_constants
     use :: core_vtk_vtk_wrapper, only: vtk_initialize, vtk_read_header, vtk_get_num_points, & !&
                                        vtk_get_points, vtk_get_num_cells, vtk_get_total_connectivity_size, & !&
-                                       vtk_get_cell_info, vtk_get_cell_ids, vtk_finalize !&
+                                       vtk_get_cell_info, vtk_get_cell_ids, vtk_get_point_data, vtk_finalize !&
+    use :: core_vtk_vtu_wrapper, only: vtu_initialize, vtu_read_header, vtu_get_num_points, & !&
+                                       vtu_get_points, vtu_get_num_cells, vtu_get_total_connectivity_size, & !&
+                                       vtu_get_cell_info, vtu_get_cell_ids, vtu_get_point_data, vtu_finalize !&
 
     implicit none
     private
@@ -42,25 +45,35 @@ module core_vtk
         ! VTK Cells data
         integer(int32) :: num_total_cells
         type(type_vtk_cell), allocatable :: cells(:)
+
+        type(c_ptr), private :: handle = c_null_ptr
+        character(4), private :: reader_type = "none"
     contains
-        procedure :: initialize => type_vtk_initialize
+        procedure :: initialize_vtk => type_vtk_vtk_initialize
+        procedure :: initialize_vtu => type_vtk_vtu_initialize
         procedure :: get_active_region_info
+        final :: finalize_vtk_object
     end type type_vtk
 
 contains
     ! =================================================================
     ! 公開APIの実装 (内部をC++呼び出しに置き換え)
     ! =================================================================
-    subroutine type_vtk_initialize(self, file_name, cell_id_array_name)
-        !> Read VTK file using C++ backend
+    subroutine type_vtk_vtk_initialize(self, file_name, cell_id_array_name, field_names, field_values)
+        !> Read VTK file using C++ backend with the handle pattern
         implicit none
         class(type_vtk), intent(inout) :: self
         character(*), intent(in) :: file_name
         character(*), intent(in) :: cell_id_array_name
+        character(*), intent(in), optional :: field_names(:)
+        real(real64), intent(inout), allocatable, optional :: field_values(:, :)
 
+        ! --- ローカル変数 ---
         character(len=256) :: c_file_name
         character(len=256) :: c_cell_id_array_name
+        character(len=256) :: c_field_name
         integer(c_int) :: ierr
+        integer(int32) :: i
 
         ! --- 生データ格納用の一時配列 ---
         integer(int64), allocatable :: raw_connectivity(:)
@@ -68,77 +81,229 @@ contains
         integer(int32), allocatable :: raw_cell_types(:)
         integer(int32), allocatable :: raw_cell_entity_ids(:)
         integer(int64) :: total_conn_size
-        integer(int32) :: i
         integer(int32) :: connectivity_first, connectivity_last, num_nodes_in_cell
         character(50, kind=c_char) :: f_format, f_dataset
         integer(c_int) :: len_f_format, len_f_dataset
 
+        !----------------------------------------------------------------!
+        ! 1. C++リーダーの初期化とハンドルの取得
+        !----------------------------------------------------------------!
+
+        ! 自分が "vtk" リーダーであることを記録 (finalizerでの呼び分けに使う)
+        self%reader_type = "vtk"
+
+        ! もし既にハンドルが有効なら、古いC++オブジェクトを解放してメモリリークを防ぐ
+        if (c_associated(self%handle)) then
+            call vtk_finalize(self%handle)
+            self%handle = c_null_ptr
+        end if
+
+        ! C言語で扱えるように文字列を準備
         c_file_name = trim(file_name)//c_null_char
         c_cell_id_array_name = trim(cell_id_array_name)//c_null_char
 
-        ! 1. C++リーダーを初期化
-        call vtk_initialize(c_file_name, ierr)
-        if (ierr /= 0) then
+        ! C++リーダーを初期化し、返されたポインタをハンドルとして保存
+        self%handle = vtk_initialize(c_file_name, ierr)
+
+        ! ハンドルが有効か、エラーコードが0かを確認
+        if (.not. c_associated(self%handle) .or. ierr /= 0) then
             write (*, *) "C++ VTK Reader failed to initialize. Error code: ", ierr
-            stop
+            stop "VTK Initialization Failed"
         end if
 
-        ! 2. ヘッダー情報の取得
+        !----------------------------------------------------------------!
+        ! 2. ハンドルを使って各種データを取得
+        !----------------------------------------------------------------!
+
+        ! ヘッダー情報の取得
         len_f_dataset = 50
         len_f_format = 50
-        call vtk_read_header(f_format, len_f_dataset, f_dataset, len_f_format)
+        call vtk_read_header(self%handle, f_format, len_f_dataset, f_dataset, len_f_format)
         allocate (character(len=len_trim(f_format)) :: self%format)
         self%format = trim(adjustl(f_format))
         allocate (character(len=len_trim(f_dataset)) :: self%dataset)
         self%dataset = trim(adjustl(f_dataset))
 
-        ! 3. ポイントデータの取得
-        call vtk_get_num_points(self%num_points)
+        ! ポイントデータの取得
+        call vtk_get_num_points(self%handle, self%num_points)
         if (self%num_points > 0) then
             call self%POINTS%initialize(self%num_points)
-            call vtk_get_points(self%POINTS%x, self%POINTS%y, self%POINTS%z)
+            call vtk_get_points(self%handle, self%POINTS%x, self%POINTS%y, self%POINTS%z)
         end if
 
-        ! 4. セルデータの取得
-        call vtk_get_num_cells(self%num_total_cells)
+        ! セルデータの取得
+        call vtk_get_num_cells(self%handle, self%num_total_cells)
         if (self%num_total_cells > 0) then
-            ! 4a. 生データをCから取得するためのメモリ確保
-            call vtk_get_total_connectivity_size(total_conn_size)
+            ! 生データをCから取得するためのメモリ確保
+            call vtk_get_total_connectivity_size(self%handle, total_conn_size)
             call allocate_array(raw_connectivity, total_conn_size)
             call allocate_array(raw_offsets, self%num_total_cells + 1_int64)
             call allocate_array(raw_cell_types, self%num_total_cells)
             call allocate_array(raw_cell_entity_ids, self%num_total_cells)
 
-            ! 4b. 生データをCから取得 (connectivity, Offsets, Types, CellEntityIds)
-            call vtk_get_cell_info(raw_connectivity, raw_offsets, raw_cell_types)
-            call vtk_get_cell_ids(c_cell_id_array_name, raw_cell_entity_ids)
+            ! 生データをCから取得
+            call vtk_get_cell_info(self%handle, raw_connectivity, raw_offsets, raw_cell_types)
+            call vtk_get_cell_ids(self%handle, c_cell_id_array_name, raw_cell_entity_ids)
 
-            ! 4c. Fortran構造体にデータを格納し直す
+            ! Fortran構造体にデータを格納し直す
             allocate (self%cells(self%num_total_cells))
             do i = 1, self%num_total_cells
                 self%cells(i)%cell_type = raw_cell_types(i)
                 self%cells(i)%cell_entity_id = raw_cell_entity_ids(i)
 
-                ! 各セルのconnectivityを抽出し、コピー
                 connectivity_first = raw_offsets(i) + 1
                 connectivity_last = raw_offsets(i + 1)
                 num_nodes_in_cell = connectivity_last - connectivity_first + 1
 
                 call allocate_array(self%cells(i)%connectivity, num_nodes_in_cell)
                 self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32)
-
                 call self%cells(i)%set(num_nodes_in_cell)
             end do
         end if
 
-        ! 5. 後片付け
-        call vtk_finalize()
+        ! 初期条件フィールドの読み込み (オプション)
+        if (present(field_names) .and. present(field_values)) then
+            if (self%num_points > 0 .and. size(field_names) > 0) then
+                allocate (field_values(self%num_points, size(field_names)))
+                do i = 1, size(field_names)
+                    c_field_name = trim(field_names(i))//c_null_char
+                    call vtk_get_point_data(self%handle, c_field_name, field_values(:, i))
+                end do
+            end if
+        end if
+
+        !----------------------------------------------------------------!
+        ! 3. 後片付け (C++オブジェクトのfinalizeは呼ばない)
+        !----------------------------------------------------------------!
         call deallocate_array(raw_connectivity)
         call deallocate_array(raw_offsets)
         call deallocate_array(raw_cell_types)
         call deallocate_array(raw_cell_entity_ids)
 
-    end subroutine type_vtk_initialize
+    end subroutine type_vtk_vtk_initialize
+
+    subroutine type_vtk_vtu_initialize(self, file_name, cell_id_array_name, field_names, field_values)
+        !> Read VTK file using C++ backend with the handle pattern
+        implicit none
+        class(type_vtk), intent(inout) :: self
+        character(*), intent(in) :: file_name
+        character(*), intent(in) :: cell_id_array_name
+        character(*), intent(in), optional :: field_names(:)
+        real(real64), intent(inout), allocatable, optional :: field_values(:, :)
+
+        ! --- ローカル変数 ---
+        character(len=256) :: c_file_name
+        character(len=256) :: c_cell_id_array_name
+        character(len=256) :: c_field_name
+        integer(c_int) :: ierr
+        integer(int32) :: i
+
+        ! --- 生データ格納用の一時配列 ---
+        integer(int64), allocatable :: raw_connectivity(:)
+        integer(int64), allocatable :: raw_offsets(:)
+        integer(int32), allocatable :: raw_cell_types(:)
+        integer(int32), allocatable :: raw_cell_entity_ids(:)
+        integer(int64) :: total_conn_size
+        integer(int32) :: connectivity_first, connectivity_last, num_nodes_in_cell
+        character(50, kind=c_char) :: f_format, f_dataset
+        integer(c_int) :: len_f_format, len_f_dataset
+
+        !----------------------------------------------------------------!
+        ! 1. C++リーダーの初期化とハンドルの取得
+        !----------------------------------------------------------------!
+
+        ! 自分が "vtu" リーダーであることを記録 (finalizerでの呼び分けに使う)
+        self%reader_type = "vtu"
+
+        ! もし既にハンドルが有効なら、古いC++オブジェクトを解放してメモリリークを防ぐ
+        if (c_associated(self%handle)) then
+            call vtu_finalize(self%handle)
+            self%handle = c_null_ptr
+        end if
+
+        ! C言語で扱えるように文字列を準備
+        c_file_name = trim(file_name)//c_null_char
+        c_cell_id_array_name = trim(cell_id_array_name)//c_null_char
+
+        ! C++リーダーを初期化し、返されたポインタをハンドルとして保存
+        self%handle = vtu_initialize(c_file_name, ierr)
+
+        ! ハンドルが有効か、エラーコードが0かを確認
+        if (.not. c_associated(self%handle) .or. ierr /= 0) then
+            write (*, *) "C++ VTU Reader failed to initialize. Error code: ", ierr
+            stop "VTU Initialization Failed"
+        end if
+
+        !----------------------------------------------------------------!
+        ! 2. ハンドルを使って各種データを取得
+        !----------------------------------------------------------------!
+
+        ! ヘッダー情報の取得
+        len_f_dataset = 50
+        len_f_format = 50
+        call vtu_read_header(self%handle, f_format, len_f_dataset, f_dataset, len_f_format)
+        allocate (character(len=len_trim(f_format)) :: self%format)
+        self%format = trim(adjustl(f_format))
+        allocate (character(len=len_trim(f_dataset)) :: self%dataset)
+        self%dataset = trim(adjustl(f_dataset))
+
+        ! ポイントデータの取得
+        call vtu_get_num_points(self%handle, self%num_points)
+        if (self%num_points > 0) then
+            call self%POINTS%initialize(self%num_points)
+            call vtu_get_points(self%handle, self%POINTS%x, self%POINTS%y, self%POINTS%z)
+        end if
+
+        ! セルデータの取得
+        call vtu_get_num_cells(self%handle, self%num_total_cells)
+        if (self%num_total_cells > 0) then
+            ! 生データをCから取得するためのメモリ確保
+            call vtu_get_total_connectivity_size(self%handle, total_conn_size)
+            call allocate_array(raw_connectivity, total_conn_size)
+            call allocate_array(raw_offsets, self%num_total_cells + 1_int64)
+            call allocate_array(raw_cell_types, self%num_total_cells)
+            call allocate_array(raw_cell_entity_ids, self%num_total_cells)
+
+            ! 生データをCから取得
+            call vtu_get_cell_info(self%handle, raw_connectivity, raw_offsets, raw_cell_types)
+            call vtu_get_cell_ids(self%handle, c_cell_id_array_name, raw_cell_entity_ids)
+
+            ! Fortran構造体にデータを格納し直す
+            allocate (self%cells(self%num_total_cells))
+            do i = 1, self%num_total_cells
+                self%cells(i)%cell_type = raw_cell_types(i)
+                self%cells(i)%cell_entity_id = raw_cell_entity_ids(i)
+
+                connectivity_first = raw_offsets(i) + 1
+                connectivity_last = raw_offsets(i + 1)
+                num_nodes_in_cell = connectivity_last - connectivity_first + 1
+
+                call allocate_array(self%cells(i)%connectivity, num_nodes_in_cell)
+                self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32)
+                call self%cells(i)%set(num_nodes_in_cell)
+            end do
+        end if
+
+        ! 初期条件フィールドの読み込み (オプション)
+        if (present(field_names) .and. present(field_values)) then
+            if (self%num_points > 0 .and. size(field_names) > 0) then
+                allocate (field_values(self%num_points, size(field_names)))
+                do i = 1, size(field_names)
+                    c_field_name = trim(field_names(i))//c_null_char
+                    call vtu_get_point_data(self%handle, c_field_name, field_values(:, i))
+                end do
+            end if
+        end if
+
+        !----------------------------------------------------------------!
+        ! 3. 後片付け (C++オブジェクトのfinalizeは呼ばない)
+        !----------------------------------------------------------------!
+        call deallocate_array(raw_connectivity)
+        call deallocate_array(raw_offsets)
+        call deallocate_array(raw_cell_types)
+        call deallocate_array(raw_cell_entity_ids)
+
+    end subroutine type_vtk_vtu_initialize
 
     subroutine type_vtk_cell_set(self, num_nodes_in_cell)
         implicit none
@@ -469,7 +634,6 @@ contains
         end select
     end subroutine type_vtk_cell_set
 
-    !> Get the dimension of the cell
     function type_vtk_cell_get_dimension(self) result(dimension)
         implicit none
         class(type_vtk_cell), intent(in) :: self !! VTK cell data
@@ -642,6 +806,22 @@ contains
 
     end subroutine get_active_region_info
 
-    ! self
+    subroutine finalize_vtk_object(self)
+        type(type_vtk), intent(inout) :: self
 
+        if (c_associated(self%handle)) then
+
+            select case (trim(adjustl(self%reader_type)))
+            case ("vtk")
+                call vtk_finalize(self%handle)
+            case ("vtu")
+                call vtu_finalize(self%handle)
+            case default
+                ! 知らないリーダータイプの場合は何もしない
+            end select
+
+            self%handle = c_null_ptr
+
+        end if
+    end subroutine finalize_vtk_object
 end module core_vtk
