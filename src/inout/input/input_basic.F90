@@ -65,9 +65,48 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: impedance_factor = "impedance_factor"
     character(*), parameter :: water_viscosity_model = "water_viscosity_model"
     character(*), parameter :: water_retention_model = "water_retention_model"
+    character(*), parameter :: mechanical = "mechanical"
     !-------------------------------------------------------------------------------
     ! JSON key names for solver settings
     !-------------------------------------------------------------------------------
+    character(*), parameter :: solver_settings = "solver_settings"
+    character(*), parameter :: bdf_order = "bdf_order"
+    character(*), parameter :: reordering = "reordering"
+    character(*), parameter :: reordering_types(3) = ["none", "cm", "rcm"]
+    character(*), parameter :: coloring = "coloring"
+    character(*), parameter :: coloring_types(4) = ["none", "welch_powell", "lfo", "dsatur"]
+    character(*), parameter :: nonlinear_solver = "nonlinear_solver"
+    character(*), parameter :: method = "method"
+    character(*), parameter :: nonlinear_solver_methods(3) = ["none", "newton", "modified_newton"]
+    character(*), parameter :: update_frequency = "update_frequency"
+    character(*), parameter :: max_iterations = "max_iterations"
+    character(*), parameter :: convergence = "convergence"
+    character(*), parameter :: use_criteria = "use_criteria"
+    character(*), parameter :: criteria_types(3) = ["residual", "update", "both"]
+    character(*), parameter :: logic_between_criteria = "logic_between_criteria"
+    character(*), parameter :: logic_types(2) = ["and", "or"]
+    character(*), parameter :: residual = "residual"
+    character(*), parameter :: update = "update"
+    character(*), parameter :: criteria = "criteria"
+    character(*), parameter :: local_criteria_types(3) = ["absolute", "relative", "both"]
+    character(*), parameter :: logic = "logic"
+    character(*), parameter :: absolute_tolerance = "absolute_tolerance"
+    character(*), parameter :: relative_tolerance = "relative_tolerance"
+    character(*), parameter :: linear_solver = "linear_solver"
+    character(*), parameter :: linear_solver_methods(2) = ["direct", "iterative"]
+    character(*), parameter :: iterative_solver = "iterative_solver"
+    character(*), parameter :: solver_type = "solver_type"
+    character(*), parameter :: preconditioner_type = "preconditioner_type"
+    character(*), parameter :: tolerance = "tolerance"
+    character(*), parameter :: parallel_settings = "parallel_settings"
+    character(*), parameter :: threads = "threads"
+    character(*), parameter :: is_parallel = "is_parallel"
+    character(*), parameter :: num_threads = "num_threads"
+    character(*), parameter :: schedule = "schedule"
+    character(*), parameter :: schedule_types(6) = ["affinity", "auto", "dynamic", "guided", "runtime", "static"]
+    character(*), parameter :: dynamic_adjustment = "dynamic_adjustment"
+    character(*), parameter :: nested_parallelism = "nested_parallelism"
+    character(*), parameter :: max_active_levels = "max_active_levels"
 
 contains
     module subroutine inout_input_basic_parameters(self)
@@ -75,8 +114,6 @@ contains
         implicit none
         class(type_input), intent(inout) :: self
         type(json_file) :: json
-        integer(int32) :: status, unit_num
-        integer(int32) :: iRegion
 
         call json%initialize()
 
@@ -87,9 +124,12 @@ contains
         call read_parameters_analysis_controls(self, json)
         call read_parameters_geometry_settings(self, json)
         call read_parameters_materials(self, json)
+        call read_parameters_solver_settings(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
+
+        stop
     end subroutine inout_input_basic_parameters
 
     subroutine read_parameters_simulation_settings(self, json)
@@ -265,7 +305,6 @@ contains
                 ! Mechanical parameters can be added here in the future
             end if
         end do
-        stop
 
     end subroutine read_parameters_materials
 
@@ -736,6 +775,487 @@ contains
 
     end subroutine read_parameters_materials_wrf
 
-    ! subroutine read_parameters_solver_settings(self, json)
+    subroutine read_parameters_solver_settings(self, json)
+        implicit none
+        class(type_input) :: self
+        type(json_file), intent(inout) :: json
+
+        logical :: found
+        character(:), allocatable :: key
+
+        key = join([solver_settings, bdf_order])
+        call json%get(key, self%basic%solver_settings%bdf_order, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (.not. value_in_range(self%basic%solver_settings%bdf_order, 1, 6)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        key = join([solver_settings, reordering])
+        call json%get(key, self%basic%solver_settings%reordering, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call global_logger%log_warning(message="Default reordering is set to 'none'.")
+            self%basic%solver_settings%reordering = "none"
+        else
+            if (.not. any(reordering_types(:) == self%basic%solver_settings%reordering)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+        end if
+
+        key = join([solver_settings, coloring])
+        call json%get(key, self%basic%solver_settings%coloring, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call global_logger%log_warning(message="Default coloring is set to 'none'.")
+            self%basic%solver_settings%coloring = "none"
+        else
+            if (.not. any(coloring_types(:) == self%basic%solver_settings%coloring)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+        end if
+
+        call read_parameters_solver_settings_nonlinear(self, json)
+        call read_parameters_solver_settings_linear(self, json)
+        call read_parameters_solver_parallel_settings(self, json)
+
+                !! Debug output
+
+    end subroutine read_parameters_solver_settings
+
+    subroutine read_parameters_solver_settings_nonlinear(self, json)
+        implicit none
+        class(type_input) :: self
+        type(json_file), intent(inout) :: json
+
+        logical :: found
+        character(:), allocatable :: key
+        character(:), allocatable :: key_base
+
+        key = join([solver_settings, nonlinear_solver, method])
+        call json%get(key, self%basic%solver_settings%nonlinear_solver%method, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call global_logger%log_warning(message="Default nonlinear solver method is set to 'none'.")
+            self%basic%solver_settings%nonlinear_solver%method = "none"
+        else
+            if (.not. any(nonlinear_solver_methods(:) == self%basic%solver_settings%nonlinear_solver%method)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+        end if
+
+        !! If the method is modified newton then read the additional parameters
+        select case (self%basic%solver_settings%nonlinear_solver%method)
+        case (nonlinear_solver_methods(3))
+            key = join([solver_settings, nonlinear_solver, update_frequency])
+            call json%get(key, self%basic%solver_settings%nonlinear_solver%update_frequency, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default update frequency of 5 for modified Newton method.")
+                self%basic%solver_settings%nonlinear_solver%update_frequency = 5
+            end if
+        end select
+
+        select case (self%basic%solver_settings%nonlinear_solver%method)
+        case (nonlinear_solver_methods(2), nonlinear_solver_methods(3))
+            key = join([solver_settings, nonlinear_solver, max_iterations])
+            call json%get(key, self%basic%solver_settings%nonlinear_solver%max_iterations, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default maximum iterations of 1000 for nonlinear solver.")
+                self%basic%solver_settings%nonlinear_solver%max_iterations = 1000
+            end if
+            if (self%basic%solver_settings%nonlinear_solver%max_iterations <= 0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            key = join([solver_settings, nonlinear_solver, convergence, use_criteria])
+            call json%get(key, self%basic%solver_settings%nonlinear_solver%convergence%use_criteria, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (.not. any(criteria_types(:) == self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
+            case (criteria_types(3)) ! absolute
+                key = join([solver_settings, nonlinear_solver, convergence, logic_between_criteria])
+                call json%get(key, self%basic%solver_settings%nonlinear_solver%convergence%use_logic, found)
+                call json%print_error_message(output_unit)
+                if (.not. found) then
+                    call json%destroy()
+                    call error_message(904, c_opt=key)
+                end if
+                if (.not. any(logic_types(:) == self%basic%solver_settings%nonlinear_solver%convergence%use_logic)) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end select
+
+            select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
+            case (criteria_types(1)) ! residual
+                key_base = join([solver_settings, nonlinear_solver, convergence, residual])
+                call read_parameters_solver_settings_nonlinear_convergence( &
+                    self%basic%solver_settings%nonlinear_solver%convergence%residual, json, key_base)
+            case (criteria_types(2)) ! update
+                key_base = join([solver_settings, nonlinear_solver, convergence, update])
+                call read_parameters_solver_settings_nonlinear_convergence( &
+                    self%basic%solver_settings%nonlinear_solver%convergence%update, json, key_base)
+            case (criteria_types(3)) ! residual and update
+                key_base = join([solver_settings, nonlinear_solver, convergence, residual])
+                call read_parameters_solver_settings_nonlinear_convergence( &
+                    self%basic%solver_settings%nonlinear_solver%convergence%residual, json, key_base)
+                key_base = join([solver_settings, nonlinear_solver, convergence, update])
+                call read_parameters_solver_settings_nonlinear_convergence( &
+                    self%basic%solver_settings%nonlinear_solver%convergence%update, json, key_base)
+            end select
+        end select
+
+        print *, "Solver settings:"
+        print *, "  BDF order: ", self%basic%solver_settings%bdf_order
+        print *, "  Reordering: ", self%basic%solver_settings%reordering
+        print *, "  Coloring: ", self%basic%solver_settings%coloring
+        print *, "  Nonlinear solver method: ", self%basic%solver_settings%nonlinear_solver%method
+        select case (self%basic%solver_settings%nonlinear_solver%method)
+        case (nonlinear_solver_methods(1)) ! none
+            print *, "  Nonlinear solver method: none"
+        case (nonlinear_solver_methods(2)) ! newton
+            print *, "  Nonlinear solver method: newton"
+            print *, "  Max iterations: ", self%basic%solver_settings%nonlinear_solver%max_iterations
+            print *, "  Convergence criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_criteria
+            if (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria == criteria_types(3)) then
+                print *, "  Logic between criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_logic
+            end if
+            select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
+            case (criteria_types(1)) ! residual
+                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
+            case (criteria_types(2)) ! update
+                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
+            case (criteria_types(3)) ! residual and update
+                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
+                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
+            end select
+        case (nonlinear_solver_methods(3)) ! modified newton
+            print *, "  Nonlinear solver method: modified newton"
+            print *, "  Update frequency: ", self%basic%solver_settings%nonlinear_solver%update_frequency
+            print *, "  Max iterations: ", self%basic%solver_settings%nonlinear_solver%max_iterations
+            print *, "  Convergence criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_criteria
+            if (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria == criteria_types(3)) then
+                print *, "  Logic between criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_logic
+            end if
+            select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
+            case (criteria_types(1)) ! residual
+                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
+            case (criteria_types(2)) ! update
+                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
+            case (criteria_types(3)) ! residual and update
+                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
+                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
+            end select
+        end select
+
+    end subroutine read_parameters_solver_settings_nonlinear
+
+    subroutine read_parameters_solver_settings_nonlinear_convergence(convergences, json, key_base)
+        implicit none
+        type(type_convergence_criteria) :: convergences
+        type(json_file), intent(inout) :: json
+        character(*), intent(in) :: key_base
+
+        logical :: found
+        character(:), allocatable :: key
+
+        key = join([key_base, criteria])
+        call json%get(key, convergences%criteria, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (.not. any(local_criteria_types(:) == convergences%criteria)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        if (convergences%criteria == local_criteria_types(3)) then
+            key = join([key_base, logic])
+            call json%get(key, convergences%logic, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default convergences logic 'and'.")
+                convergences%logic = "and"
+            else
+                if (.not. any(logic_types(:) == convergences%logic)) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end if
+        end if
+
+        select case (convergences%criteria)
+        case (local_criteria_types(1)) ! absolute
+
+            key = join([key_base, absolute_tolerance])
+            call json%get(key, convergences%absolute_tolerance, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default absolute convergences of 1.0d-6.")
+                convergences%absolute_tolerance = 1.0d-6
+            else
+                if (convergences%absolute_tolerance < 0.0d0) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end if
+        case (local_criteria_types(2)) ! relative
+
+            key = join([key_base, relative_tolerance])
+            call json%get(key, convergences%relative_tolerance, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default relative convergences of 1.0d-6.")
+                convergences%relative_tolerance = 1.0d-6
+            else
+                if (convergences%relative_tolerance < 0.0d0) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end if
+        case (local_criteria_types(3)) ! absolute and relative
+            key = join([key_base, absolute_tolerance])
+            call json%get(key, convergences%absolute_tolerance, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default absolute convergences of 1.0d-6.")
+                convergences%absolute_tolerance = 1.0d-6
+            else
+                if (convergences%absolute_tolerance < 0.0d0) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end if
+            key = join([key_base, relative_tolerance])
+            call json%get(key, convergences%relative_tolerance, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default relative convergences of 1.0d-6.")
+                convergences%relative_tolerance = 1.0d-6
+            else
+                if (convergences%relative_tolerance < 0.0d0) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end if
+        end select
+    end subroutine read_parameters_solver_settings_nonlinear_convergence
+
+    subroutine read_parameters_solver_settings_linear(self, json)
+        implicit none
+        class(type_input) :: self
+        type(json_file), intent(inout) :: json
+
+        logical :: found
+        character(:), allocatable :: key
+
+        if (self%basic%analysis_controls%calculate_thermal) then
+            key = join([solver_settings, linear_solver, thermal])
+            call read_parameters_solver_settings_linear_local(self%basic%solver_settings%linear_solver%thermal, json, key)
+            !! Debug output
+            print *, "Thermal linear solver method: ", self%basic%solver_settings%linear_solver%thermal%method
+            if (self%basic%solver_settings%linear_solver%thermal%method == linear_solver_methods(2)) then
+                print *, "  Iterative solver type: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%solver_type
+                print *, "  Preconditioner type: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%preconditioner_type
+                print *, "  Max iterations: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%max_iterations
+                print *, "  Tolerance: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%tolerance
+            end if
+        end if
+
+        if (self%basic%analysis_controls%calculate_hydraulic) then
+            key = join([solver_settings, linear_solver, hydraulic])
+            call read_parameters_solver_settings_linear_local(self%basic%solver_settings%linear_solver%hydraulic, json, key)
+            !! Debug output
+            print *, "Hydraulic linear solver method: ", self%basic%solver_settings%linear_solver%hydraulic%method
+            if (self%basic%solver_settings%linear_solver%hydraulic%method == linear_solver_methods(2)) then
+                print *, "  Iterative solver type: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%solver_type
+                print *, "  Preconditioner type: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%preconditioner_type
+                print *, "  Max iterations: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%max_iterations
+                print *, "  Tolerance: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%tolerance
+            end if
+        end if
+
+        if (self%basic%analysis_controls%calculate_mechanical) then
+            key = join([solver_settings, linear_solver, mechanical])
+            call read_parameters_solver_settings_linear_local(self%basic%solver_settings%linear_solver%mechanical, json, key)
+        end if
+
+    end subroutine read_parameters_solver_settings_linear
+
+    subroutine read_parameters_solver_settings_linear_local(solver_setting, json, key_base)
+        implicit none
+        class(type_linear_solver_settings) :: solver_setting
+        type(json_file), intent(inout) :: json
+        character(*), intent(in) :: key_base
+
+        logical :: found
+        character(:), allocatable :: key
+
+        key = join([key_base, method])
+        call json%get(key, solver_setting%method, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (.not. any(linear_solver_methods(:) == solver_setting%method)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        select case (solver_setting%method)
+        case (linear_solver_methods(2))
+            key = join([key_base, iterative_solver, solver_type])
+            call json%get(key, solver_setting%iterative_solver%solver_type, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+
+            key = join([key_base, iterative_solver, preconditioner_type])
+            call json%get(key, solver_setting%iterative_solver%preconditioner_type, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+
+            key = join([key_base, iterative_solver, max_iterations])
+            call json%get(key, solver_setting%iterative_solver%max_iterations, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default maximum iterations of 10000 for iterative solver.")
+                solver_setting%iterative_solver%max_iterations = 10000
+            end if
+            if (solver_setting%iterative_solver%max_iterations <= 0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+            key = join([key_base, iterative_solver, tolerance])
+            call json%get(key, solver_setting%iterative_solver%tolerance, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Using default tolerance of 1.0d-6 for iterative solver.")
+                solver_setting%iterative_solver%tolerance = 1.0d-6
+            end if
+            if (solver_setting%iterative_solver%tolerance < 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+
+        end select
+
+    end subroutine read_parameters_solver_settings_linear_local
+
+    subroutine read_parameters_solver_parallel_settings(self, json)
+        implicit none
+        class(type_input) :: self
+        type(json_file), intent(inout) :: json
+
+        logical :: found
+        character(:), allocatable :: key
+
+        key = join([solver_settings, parallel_settings, threads, is_parallel])
+        call json%get(key, self%basic%solver_settings%parallel_settings%threads%is_parallel, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        if (self%basic%solver_settings%parallel_settings%threads%is_parallel) then
+            key = join([solver_settings, parallel_settings, threads, num_threads])
+            call json%get(key, self%basic%solver_settings%parallel_settings%threads%num_threads, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (self%basic%solver_settings%parallel_settings%threads%num_threads <= 0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
+!$          if (self%basic%solver_settings%parallel_settings%threads%num_threads > omp_get_max_threads()) then
+!$              call global_logger%log_warning(message="Number of threads exceeds available threads. Using maximum available threads.")
+!$              self%basic%solver_settings%parallel_settings%threads%num_threads = omp_get_max_threads()
+!$          end if
+
+            key = join([solver_settings, parallel_settings, threads, schedule])
+            call json%get(key, self%basic%solver_settings%parallel_settings%threads%schedule, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Default schedule is set to 'static'.")
+                self%basic%solver_settings%parallel_settings%threads%schedule = "static"
+            else
+                if (.not. any(schedule_types(:) == self%basic%solver_settings%parallel_settings%threads%schedule)) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end if
+
+            key = join([solver_settings, parallel_settings, threads, dynamic_adjustment])
+            call json%get(key, self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Default dynamic adjustment is set to 'false'.")
+                self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment = .false.
+            end if
+
+            key = join([solver_settings, parallel_settings, threads, nested_parallelism])
+            call json%get(key, self%basic%solver_settings%parallel_settings%threads%nested_parallelism, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Default nested parallelism is set to 'false'.")
+                self%basic%solver_settings%parallel_settings%threads%nested_parallelism = .false.
+            end if
+
+            key = join([solver_settings, parallel_settings, threads, max_active_levels])
+            call json%get(key, self%basic%solver_settings%parallel_settings%threads%max_active_levels, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call global_logger%log_warning(message="Default maximum active levels is set to 1.")
+                self%basic%solver_settings%parallel_settings%threads%max_active_levels = 1
+            else
+                if (self%basic%solver_settings%parallel_settings%threads%max_active_levels < 0) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+            end if
+        end if
+
+        !! Debug output
+        print *, "Parallel settings:"
+        print *, "  Is parallel: ", self%basic%solver_settings%parallel_settings%threads%is_parallel
+        if (self%basic%solver_settings%parallel_settings%threads%is_parallel) then
+            print *, "  Number of threads: ", self%basic%solver_settings%parallel_settings%threads%num_threads
+            print *, "  Schedule: ", self%basic%solver_settings%parallel_settings%threads%schedule
+            print *, "  Dynamic adjustment: ", self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment
+            print *, "  Nested parallelism: ", self%basic%solver_settings%parallel_settings%threads%nested_parallelism
+            print *, "  Maximum active levels: ", self%basic%solver_settings%parallel_settings%threads%max_active_levels
+        end if
+
+    end subroutine read_parameters_solver_parallel_settings
 
 end submodule inout_input_basic

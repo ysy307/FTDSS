@@ -1,6 +1,8 @@
 module inout_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+!$  use :: omp_lib
     use :: stdlib_strings, only:to_string
+    use :: stdlib_logger
     use :: json_module, only:json_file
     use :: inout_project_settings, only:get_project_path
     use :: module_core, only:type_vtk, type_dp_3d, allocate_array, deallocate_array, error_message, join, value_in_range
@@ -205,6 +207,67 @@ module inout_input
         type(type_materials_hydraulic) :: hydraulic
     end type type_material_settings
     !-------------------------------------------------------------------------------
+    type :: type_convergence_criteria
+        character(:), allocatable :: criteria
+        character(:), allocatable :: logic
+        real(real64) :: absolute_tolerance
+        real(real64) :: relative_tolerance
+    end type type_convergence_criteria
+
+    type :: type_convergence
+        character(:), allocatable :: use_criteria
+        character(:), allocatable :: use_logic
+        type(type_convergence_criteria) :: residual
+        type(type_convergence_criteria) :: update
+    end type type_convergence
+
+    type :: type_nonlinear_solver
+        character(:), allocatable :: method
+        integer(int32) :: update_frequency
+        integer(int32) :: max_iterations
+        type(type_convergence) :: convergence
+    end type type_nonlinear_solver
+
+    type :: type_linear_solver_iterative
+        integer(int32) :: solver_type
+        integer(int32) :: preconditioner_type
+        integer(int32) :: max_iterations
+        real(real64) :: tolerance
+    end type type_linear_solver_iterative
+
+    type :: type_linear_solver_settings
+        character(:), allocatable :: method
+        type(type_linear_solver_iterative) :: iterative_solver
+    end type type_linear_solver_settings
+
+    type :: type_linear_solver
+        type(type_linear_solver_settings) :: thermal
+        type(type_linear_solver_settings) :: hydraulic
+        type(type_linear_solver_settings) :: mechanical
+    end type type_linear_solver
+
+    type :: type_parallel_threads
+        logical :: is_parallel
+        integer(int32) :: num_threads
+        character(:), allocatable :: schedule
+        logical :: dynamic_adjustment
+        logical :: nested_parallelism
+        integer(int32) :: max_active_levels
+    end type type_parallel_threads
+
+    type :: type_parallel_settings
+        type(type_parallel_threads) :: threads
+    end type type_parallel_settings
+
+    type :: type_solver_settings
+        integer(int32) :: bdf_order
+        character(:), allocatable :: reordering
+        character(:), allocatable :: coloring
+        type(type_nonlinear_solver) :: nonlinear_solver
+        type(type_linear_solver) :: linear_solver
+        type(type_parallel_settings) :: parallel_settings
+    end type
+    !-------------------------------------------------------------------------------
 
     type :: Input_OutputSettings
         character(:), allocatable :: FileFormat
@@ -232,6 +295,8 @@ module inout_input
         type(type_geometry_settings) :: geometry_settings
         integer(int32) :: num_materials
         type(type_material_settings), allocatable :: materials(:)
+        type(type_solver_settings) :: solver_settings
+
         integer(int32) :: DimensionType
         integer(int32) :: numRegion
         character(:), allocatable :: Calculation_TimeUnit
@@ -345,7 +410,7 @@ module inout_input
     end type Input_Region
 
     type :: type_input
-        character(:), allocatable :: project_path ! Path to the project directory
+        character(:), allocatable :: project_path
         character(:), allocatable :: basic_file_name
         character(:), allocatable :: conditions_file_name
         character(:), allocatable :: geometry_file_name

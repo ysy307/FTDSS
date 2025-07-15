@@ -13,7 +13,7 @@
         "file_name": "Geometry.vtk",
         "cell_id_array_name": "CellEntityIds",
         "integration": {
-            "type": "free",
+            "type": "full",
             "points": 0.8165
         }
     },
@@ -91,10 +91,10 @@
     "solver_settings": {
         "bdf_order": 1,
         "reordering": "rcm",
-        "coloring": "dsatur",
+        "coloring": "lfo",
         "nonlinear_solver": {
-            "method": "newton",
-            "update_frequency": 1,
+            "method": "modified_newton",
+            "update_frequency": 5,
             "max_iterations": 100,
             "convergence": {
                 "use_criteria": "both",
@@ -118,7 +118,7 @@
                 "method": "iterative",
                 "iterative_solver": {
                     "solver_type": 4,
-                    "preconditioner": 1,
+                    "preconditioner_type": 1,
                     "max_iterations": 50000,
                     "tolerance": 1.0e-10
                 }
@@ -127,7 +127,7 @@
                 "method": "direct",
                 "algorithm": {
                     "solver_type": 4,
-                    "preconditioner": 1,
+                    "preconditioner_type": 1,
                     "max_iterations": 50000,
                     "tolerance": 1.0e-10
                 }
