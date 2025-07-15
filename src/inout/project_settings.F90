@@ -18,10 +18,10 @@ contains
         integer(int32) :: i
 
         status = access(dName, "r")
-        if (status /= 0) call error_message(901, opt_file_name=dName)
+        if (status /= 0) call error_message(901, c_opt=dName)
 
         open (newunit=unit_num, file=dName, iostat=status, status="old")
-        if (status /= 0) call error_message(902, opt_file_name=dName)
+        if (status /= 0) call error_message(902, c_opt=dName)
 
         read (unit_num, '(a)') ProjectPath
         close (unit_num)

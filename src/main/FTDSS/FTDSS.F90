@@ -52,7 +52,7 @@ contains
 
         ! Initialize the FDTSS module
         ! This is where you would set up any necessary parameters or configurations
-        self%Input = Type_Input()
+        call self%Input%initialize()
         self%time = type_time(self%Input, profiler_labels)
         call self%time%Record("Start")
         call self%time%Profile_Start("Total")

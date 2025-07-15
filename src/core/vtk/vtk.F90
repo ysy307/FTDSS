@@ -9,7 +9,7 @@ module core_vtk
     use :: core_vtk_vtk_constants
     use :: core_vtk_vtk_wrapper, only: vtk_initialize, vtk_read_header, vtk_get_num_points, & !&
                                        vtk_get_points, vtk_get_num_cells, vtk_get_total_connectivity_size, & !&
-                                       vtk_get_cell_info, vtk_get_cell_entity_ids, vtk_finalize !&
+                                       vtk_get_cell_info, vtk_get_cell_ids, vtk_finalize !&
 
     implicit none
     private
@@ -51,13 +51,15 @@ contains
     ! =================================================================
     ! 公開APIの実装 (内部をC++呼び出しに置き換え)
     ! =================================================================
-    subroutine type_vtk_initialize(self, filename)
+    subroutine type_vtk_initialize(self, file_name, cell_id_array_name)
         !> Read VTK file using C++ backend
         implicit none
         class(type_vtk), intent(inout) :: self
-        character(*), intent(in) :: filename
+        character(*), intent(in) :: file_name
+        character(*), intent(in) :: cell_id_array_name
 
-        character(len=256) :: c_filename
+        character(len=256) :: c_file_name
+        character(len=256) :: c_cell_id_array_name
         integer(c_int) :: ierr
 
         ! --- 生データ格納用の一時配列 ---
@@ -71,10 +73,11 @@ contains
         character(50, kind=c_char) :: f_format, f_dataset
         integer(c_int) :: len_f_format, len_f_dataset
 
-        c_filename = trim(filename)//c_null_char
+        c_file_name = trim(file_name)//c_null_char
+        c_cell_id_array_name = trim(cell_id_array_name)//c_null_char
 
         ! 1. C++リーダーを初期化
-        call vtk_initialize(c_filename, ierr)
+        call vtk_initialize(c_file_name, ierr)
         if (ierr /= 0) then
             write (*, *) "C++ VTK Reader failed to initialize. Error code: ", ierr
             stop
@@ -108,7 +111,7 @@ contains
 
             ! 4b. 生データをCから取得 (connectivity, Offsets, Types, CellEntityIds)
             call vtk_get_cell_info(raw_connectivity, raw_offsets, raw_cell_types)
-            call vtk_get_cell_entity_ids(raw_cell_entity_ids)
+            call vtk_get_cell_ids(c_cell_id_array_name, raw_cell_entity_ids)
 
             ! 4c. Fortran構造体にデータを格納し直す
             allocate (self%cells(self%num_total_cells))

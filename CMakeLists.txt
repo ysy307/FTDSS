@@ -74,6 +74,7 @@ add_subdirectory(src/main/FTDSS)
 # =========================================================================
 set(COMMON_LIBS
     Core
+    Inout
     Input
     Matrix 
     Domain 

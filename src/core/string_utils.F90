@@ -60,4 +60,4 @@ contains
         end do
 
     end function join
-end module
+end module core_string_utils
