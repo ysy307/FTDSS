@@ -4,18 +4,18 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function construct_den_3phase(iRegion, Input) result(property)
+    module function construct_den_3phase(i_material, input) result(property)
         implicit none
         class(abst_den), allocatable :: property
-        integer(int32), intent(in) :: iRegion
-        type(Type_Input), intent(in) :: Input
+        integer(int32), intent(in) :: i_material
+        type(type_input), intent(in) :: input
 
         if (allocated(property)) deallocate (property)
         allocate (Type_DEN_3Phase :: property)
 
-        property%material1 = Input%Regions(iRegion)%Thermal%rho(1)
-        property%material2 = Input%Regions(iRegion)%Thermal%rho(2)
-        property%material3 = Input%Regions(iRegion)%Thermal%rho(3)
+        property%material1 = input%basic%materials(i_material)%thermal%density(1)
+        property%material2 = input%basic%materials(i_material)%thermal%density(2)
+        property%material3 = input%basic%materials(i_material)%thermal%density(3)
 
     end function construct_den_3phase
 
