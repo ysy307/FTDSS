@@ -5,7 +5,8 @@ module inout_input
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: inout_project_settings, only:get_project_path
-    use :: module_core, only:type_vtk, type_dp_3d, allocate_array, deallocate_array, error_message, join, value_in_range
+    use :: module_core, only:type_vtk, type_dp_3d, type_dp_vector_3d, allocate_array, deallocate_array, & !&
+                             error_message, join, value_in_range
     implicit none
 !     private
 
@@ -276,6 +277,7 @@ module inout_input
         type(type_material_settings), allocatable :: materials(:)
         type(type_solver_settings) :: solver_settings
 
+        !! ここから下は後で消す
         integer(int32) :: DimensionType
         integer(int32) :: numRegion
         character(:), allocatable :: Calculation_TimeUnit
@@ -345,6 +347,37 @@ module inout_input
         integer(int32) :: num_boundaries
         type(type_initail_conditions) :: initial_conditions
     end type type_conditions
+    !!------------------------------------------------------------------------------------------------------------------------------
+    type :: type_field_output
+        character(:), allocatable :: file_format
+        logical :: coloring
+        character(:), allocatable :: output_interval_unit
+        real(real64) :: output_interval_step
+        character(:), allocatable :: variable_names(:)
+    end type type_field_output
+    !!------------------------------------------------------------------------------------------------------------------------------
+    type :: types_history_output
+        character(:), allocatable :: file_format
+        character(:), allocatable :: observation_type
+        character(:), allocatable :: output_interval_unit
+        real(real64) :: output_interval_step
+        character(:), allocatable :: variable_names(:)
+        integer(int32) :: num_observations
+        type(type_dp_vector_3d), allocatable :: coordinates(:)
+        integer(int32), allocatable :: node_ids(:)
+    end type types_history_output
+    !!------------------------------------------------------------------------------------------------------------------------------
+    type :: type_standard_output
+        logical :: print_progress
+        character(:), allocatable :: print_progress_unit
+        real(real64) :: print_progress_interval
+    end type type_standard_output
+    !!------------------------------------------------------------------------------------------------------------------------------
+    type :: type_output_settings
+        type(type_field_output) :: field_output
+        type(types_history_output) :: history_output
+        type(type_standard_output) :: standard_output
+    end type type_output_settings
     !!------------------------------------------------------------------------------------------------------------------------------
 
     type :: Input_OutputSettings
@@ -472,6 +505,7 @@ module inout_input
 
         type(input_basic) :: basic
         type(type_conditions) :: conditions
+        type(type_output_settings) :: output_settings
 
         type(Input_Region), allocatable :: Regions(:)
         type(Input_Solver) :: Solver_Thermal
@@ -488,7 +522,7 @@ module inout_input
         procedure :: read_parameters => inout_read_basic_parameters
         procedure :: read_conditions => inout_read_conditions
         procedure :: Input_Geometry => inout_input_geometry_VTK
-        procedure :: Input_OutputSettings => inout_input_OutputSettings_JSON
+        procedure :: read_output_settings => inout_read_output_settings
 
     end type type_input
 
@@ -501,9 +535,15 @@ module inout_input
 
         module subroutine inout_read_conditions(self)
             implicit none
-            class(type_input) :: self
+            class(type_input), intent(inout) :: self
 
         end subroutine inout_read_conditions
+
+        module subroutine inout_read_output_settings(self)
+            implicit none
+            class(type_input), intent(inout) :: self
+
+        end subroutine inout_read_output_settings
 
     end interface
 
@@ -537,7 +577,7 @@ contains
 
         call self%read_parameters()
         call self%read_conditions()
-        call self%Input_OutputSettings()
+        call self%read_output_settings()
         call self%Input_Geometry()
     end subroutine type_input_initialize
 
@@ -548,129 +588,5 @@ contains
 
         call self%vtk%initialize(self%geometry_file_name, self%basic%geometry_settings%cell_id_array_name)
     end subroutine inout_input_geometry_VTK
-
-!     ! subroutine inout_input_Finalize(self)
-!     !     implicit none
-!     !     type(Input) :: self
-
-!     !     if (allocated(self%Work_Region_Basic_Infomatin)) deallocate (self%Work_Region_Basic_Infomatin)
-!     !     if (allocated(self%Work_Region_Paremeters_real64)) deallocate (self%Work_Region_Paremeters_real64)
-!     !     if (allocated(self%Work_Region_Parameters_int32)) deallocate (self%Work_Region_Parameters_int32)
-!     !     if (allocated(self%Work_Region_Parameters_Number)) deallocate (self%Work_Region_Parameters_Number)
-!     !     if (allocated(self%Work_Coordinates)) deallocate (self%Work_Coordinates)
-!     !     if (allocated(self%Work_Coordinates_Region)) deallocate (self%Work_Coordinates_Region)
-!     !     if (allocated(self%Work_Top)) deallocate (self%Work_Top)
-!     !     if (allocated(self%Work_NBC_Node)) deallocate (self%Work_NBC_Node)
-!     !     if (allocated(self%Work_NBC_Node_Type)) deallocate (self%Work_NBC_Node_Type)
-!     !     if (allocated(self%Work_NBC_Node_Value_Info)) deallocate (self%Work_NBC_Node_Value_Info)
-!     !     if (allocated(self%Work_NBC_Node_Value)) deallocate (self%Work_NBC_Node_Value)
-!     !     if (allocated(self%Work_EBC_Edge)) deallocate (self%Work_EBC_Edge)
-!     !     if (allocated(self%Work_EBC_Edge_Type)) deallocate (self%Work_EBC_Edge_Type)
-!     !     if (allocated(self%Work_EBC_Edge_Value_Info)) deallocate (self%Work_EBC_Edge_Value_Info)
-!     !     if (allocated(self%Work_EBC_Edge_Value)) deallocate (self%Work_EBC_Edge_Value)
-!     !     if (allocated(self%Work_IC_Type)) deallocate (self%Work_IC_Type)
-!     !     if (allocated(self%Work_IC_Value)) deallocate (self%Work_IC_Value)
-!     !     if (allocated(self%Work_Observation_Node)) deallocate (self%Work_Observation_Node)
-!     !     if (allocated(self%Work_Observation_Coordinate)) deallocate (self%Work_Observation_Coordinate)
-!     !     if (allocated(self%Work_Observation_Flag)) deallocate (self%Work_Observation_Flag)
-
-!     ! end subroutine inout_input_Finalize
-
-    subroutine inout_input_OutputSettings_JSON(self)
-        implicit none
-        class(type_input) :: self
-        type(json_file) :: json
-        integer(int32) :: status, unit_num
-        integer(int32) :: iRegion
-        character(:), allocatable :: key
-
-        call json%initialize()
-
-        call json%load(filename=self%output_file_name)
-        call json%print_error_message(output_unit)
-
-        ! key = trim(adjustl(FileOutputName))
-        ! call json%get(key, self%OutputSettings%FileFormat)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(TimeSettingsName, UnitName)
-        ! call json%get(key, self%OutputSettings%Output_TimeUnit)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(TimeSettingsName, IntervalName, UnitName)
-        ! call json%get(key, self%OutputSettings%Interval_TimeUnit)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(TimeSettingsName, IntervalName, StepName)
-        ! call json%get(key, self%OutputSettings%Interval_Step)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(ObservationName, TypeName)
-        ! call json%get(key, self%OutputSettings%ObservationType)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(ObservationName, TotalNumberName)
-        ! call json%get(key, self%OutputSettings%NumObservation)
-        ! call json%print_error_message(output_unit)
-
-        ! select case (self%OutputSettings%ObservationType)
-        ! case (1)
-        !     key = Connect_dot(ObservationName, NodeName)
-        !     call json%get(key, self%OutputSettings%ObsID)
-        !     call json%print_error_message(output_unit)
-        !     if (.not. size(self%OutputSettings%ObsID) == self%OutputSettings%NumObservation) then
-        !         write (*, *) "dont match shapes"
-        !         stop
-        !     end if
-        ! case (2)
-        !     key = Connect_dot(ObservationName, CoordinatesName, xName)
-        !     call json%get(key, self%OutputSettings%Cood_Obs%x)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(ObservationName, CoordinatesName, yName)
-        !     call json%get(key, self%OutputSettings%Cood_Obs%y)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(ObservationName, CoordinatesName, zName)
-        !     call json%get(key, self%OutputSettings%Cood_Obs%z)
-        !     call json%print_error_message(output_unit)
-
-        !     if (.not. size(self%OutputSettings%Cood_Obs%x) == self%OutputSettings%NumObservation .or. &
-        !         .not. size(self%OutputSettings%Cood_Obs%y) == self%OutputSettings%NumObservation .or. &
-        !         .not. size(self%OutputSettings%Cood_Obs%z) == self%OutputSettings%NumObservation) then
-        !         write (*, *) "dont match shapes"
-        !         stop
-        !     end if
-        ! end select
-
-        ! key = Connect_dot(OutputSettingsName, KindsName, TempName)
-        ! call json%get(key, self%OutputSettings%outTemp)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(OutputSettingsName, KindsName, SiName)
-        ! call json%get(key, self%OutputSettings%outSi)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(OutputSettingsName, KindsName, TCName)
-        ! call json%get(key, self%OutputSettings%outTC)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(OutputSettingsName, KindsName, CName)
-        ! call json%get(key, self%OutputSettings%outC)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(OutputSettingsName, KindsName, PresName)
-        ! call json%get(key, self%OutputSettings%outPres)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(OutputSettingsName, KindsName, FluxName)
-        ! call json%get(key, self%OutputSettings%outFlux)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(OutputSettingsName, KindsName, KName)
-        ! call json%get(key, self%OutputSettings%outK)
-        ! call json%print_error_message(output_unit)
-
-    end subroutine inout_input_OutputSettings_JSON
 
 end module inout_input

@@ -6,7 +6,7 @@ submodule(inout_input) inout_input_conditions
     character(*), parameter :: time_control = "time_control"
     character(*), parameter :: simulation_period = "simulation_period"
     character(*), parameter :: unit = "unit"
-    character(*), parameter :: time_units(5) = ["second", "minute", "hour", "day", "year"]
+    character(*), parameter :: valid_units(5) = ["second", "minute", "hour", "day", "year"]
     character(*), parameter :: start = "start"
     character(*), parameter :: end = "end"
     character(*), parameter :: time_stepping = "time_stepping"
@@ -24,26 +24,24 @@ submodule(inout_input) inout_input_conditions
     character(*), parameter :: type = "type"
     character(*), parameter :: is_uniform = "is_uniform"
     character(*), parameter :: values = "values"
-    character(*), parameter :: thermal_boundary_types(8) = ["dirichlet", "neumann", "flux", "robin", "adiabatic", &
-                                                            "free", "heat_trasfer", "head_radiation"]
-    character(*), parameter :: hydraulic_boundary_types(4) = ["dirichlet", "neumann", "flux", "impermeable"]
+    character(*), parameter :: valid_thermal_boundary_types(8) = ["dirichlet", "neumann", "flux", "robin", "adiabatic", &
+                                                                  "free", "heat_trasfer", "head_radiation"]
+    character(*), parameter :: valid_hydraulic_boundary_types(4) = ["dirichlet", "neumann", "flux", "impermeable"]
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for initial conditions
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: initial_conditions = "initial_conditions"
     character(*), parameter :: value = "value"
-    character(*), parameter :: initial_condition_types(3) = ["uniform", "laplace", "file"]
+    character(*), parameter :: valid_initial_condition_types(3) = ["uniform", "laplace", "file"]
     character(*), parameter :: field_name = "field_name"
+    !!------------------------------------------------------------------------------------------------------------------------------
 
 contains
     module subroutine inout_read_conditions(self)
         !> Load the boundary/initial conditions from the JSON file
         implicit none
-        class(type_input) :: self
-
+        class(type_input), intent(inout) :: self
         type(json_file) :: json
-        character(:), allocatable :: key
-        integer(int32) :: iRegion
 
         call json%initialize()
         call json%load(filename=self%conditions_file_name)
@@ -69,7 +67,7 @@ contains
 
         call read_conditions_time_control_simulation_period(self, json)
         call read_conditions_time_control_time_stepping(self, json)
-        call read_conditions_time_control_boundary_condition_time_points(self, json)
+        call read_conditions_time_control_boundary_time_points(self, json)
 
     end subroutine read_conditions_time_control
 
@@ -88,7 +86,7 @@ contains
             call json%destroy()
             call error_message(904, c_opt=key)
         end if
-        if (.not. any(time_units(:) == self%conditions%time_control%simulation_period%unit)) then
+        if (.not. any(valid_units(:) == self%conditions%time_control%simulation_period%unit)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -105,9 +103,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-
-        if (self%conditions%time_control%simulation_period%start >= self%conditions%time_control%simulation_period%end) then
+        else if (self%conditions%time_control%simulation_period%start >= self%conditions%time_control%simulation_period%end) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -128,8 +124,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. any(time_units(:) == self%conditions%time_control%time_stepping%unit)) then
+        else if (.not. any(valid_units(:) == self%conditions%time_control%time_stepping%unit)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -139,8 +134,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (self%conditions%time_control%time_stepping%initial_step <= 0.0) then
+        else if (self%conditions%time_control%time_stepping%initial_step <= 0.0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -150,8 +144,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (self%conditions%time_control%time_stepping%min_step <= 0.0) then
+        else if (self%conditions%time_control%time_stepping%min_step <= 0.0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -161,8 +154,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (self%conditions%time_control%time_stepping%max_step <= 0.0) then
+        else if (self%conditions%time_control%time_stepping%max_step <= 0.0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -180,7 +172,7 @@ contains
 
     end subroutine read_conditions_time_control_time_stepping
 
-    subroutine read_conditions_time_control_boundary_condition_time_points(self, json)
+    subroutine read_conditions_time_control_boundary_time_points(self, json)
         !> Load the boundary condition time points from the JSON file
         implicit none
         class(type_input) :: self
@@ -233,7 +225,7 @@ contains
             end if
         end if
 
-    end subroutine read_conditions_time_control_boundary_condition_time_points
+    end subroutine read_conditions_time_control_boundary_time_points
 
     subroutine read_conditions_boundary_conditions(self, json)
         implicit none
@@ -307,15 +299,13 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-
-        if (.not. any(thermal_boundary_types(:) == boundary%type)) then
+        else if (.not. any(valid_thermal_boundary_types(:) == boundary%type)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
         select case (boundary%type)
-        case (thermal_boundary_types(1))
+        case (valid_thermal_boundary_types(1))
             key = join([key_base, is_uniform])
             call json%get(key, boundary%is_uniform, found=found)
             if (.not. found) then
@@ -330,9 +320,7 @@ contains
                 if (.not. found) then
                     call json%destroy()
                     call error_message(904, c_opt=key)
-                end if
-
-                if (present(num_time_points)) then
+                else if (present(num_time_points)) then
                     if (size(boundary%values(:)) /= num_time_points) then
                         call json%destroy()
                         call error_message(905, c_opt=key)
@@ -370,15 +358,13 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-
-        if (.not. any(hydraulic_boundary_types(:) == boundary%type)) then
+        else if (.not. any(valid_hydraulic_boundary_types(:) == boundary%type)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
         select case (boundary%type)
-        case (hydraulic_boundary_types(1))
+        case (valid_hydraulic_boundary_types(1))
             key = join([key_base, is_uniform])
             call json%get(key, boundary%is_uniform, found=found)
             if (.not. found) then
@@ -392,9 +378,7 @@ contains
                 if (.not. found) then
                     call json%destroy()
                     call error_message(904, c_opt=key)
-                end if
-
-                if (present(num_time_points)) then
+                else if (present(num_time_points)) then
                     if (size(boundary%values(:)) /= num_time_points) then
                         call json%destroy()
                         call error_message(905, c_opt=key)
@@ -444,20 +428,20 @@ contains
             call error_message(904, c_opt=key)
         end if
 
-        if (.not. any(initial_condition_types(:) == initial_condition%type)) then
+        if (.not. any(valid_initial_condition_types(:) == initial_condition%type)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
         select case (initial_condition%type)
-        case (initial_condition_types(1)) ! uniform
+        case (valid_initial_condition_types(1)) ! uniform
             key = join([key_base, value])
             call json%get(key, initial_condition%value, found=found)
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
             end if
-        case (initial_condition_types(2)) ! laplace
+        case (valid_initial_condition_types(2)) ! laplace
             if (allocated(initial_condition%boundary)) deallocate (initial_condition%boundary)
             allocate (initial_condition%boundary(num_boundaries))
 
@@ -465,7 +449,7 @@ contains
                 key = join([key_base, boundary_conditions//"("//to_string(i)//")"])
                 call read_conditions_boundary_conditions_thermal(initial_condition%boundary(i), json, key)
             end do
-        case (initial_condition_types(3)) ! file
+        case (valid_initial_condition_types(3)) ! file
             key = join([key_base, field_name])
             call json%get(key, initial_condition%field_name, found=found)
             if (.not. found) then
@@ -494,20 +478,20 @@ contains
             call error_message(904, c_opt=key)
         end if
 
-        if (.not. any(initial_condition_types(:) == initial_condition%type)) then
+        if (.not. any(valid_initial_condition_types(:) == initial_condition%type)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
         select case (initial_condition%type)
-        case (initial_condition_types(1)) ! uniform
+        case (valid_initial_condition_types(1)) ! uniform
             key = join([key_base, value])
             call json%get(key, initial_condition%value, found=found)
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
             end if
-        case (initial_condition_types(2)) ! laplace
+        case (valid_initial_condition_types(2)) ! laplace
             if (allocated(initial_condition%boundary)) deallocate (initial_condition%boundary)
             allocate (initial_condition%boundary(num_boundaries))
 
@@ -515,7 +499,7 @@ contains
                 key = join([key_base, boundary_conditions//"("//to_string(i)//")"])
                 call read_conditions_boundary_conditions_hydraulic(initial_condition%boundary(i), json, key)
             end do
-        case (initial_condition_types(3)) ! file
+        case (valid_initial_condition_types(3)) ! file
             key = join([key_base, field_name])
             call json%get(key, initial_condition%field_name, found=found)
             if (.not. found) then
