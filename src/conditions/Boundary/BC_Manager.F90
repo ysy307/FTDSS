@@ -43,7 +43,7 @@ contains
 
         real(real64) :: time_conv
 
-        allocate (group_ids, source=Input%Conditions%Groups)
+        allocate (group_ids, source=Input%BC%Groups)
         n_groups = size(group_ids)
 
         ! 2. 各グループのコンテナを確保
@@ -65,18 +65,18 @@ contains
 
         ! 3. 各グループをループして、対応するBCオブジェクトを生成・セットアップ
         do i = 1, n_groups
-            iGroup = Input%Conditions%Groups(i)
+            iGroup = Input%BC%Groups(i)
 
             self%groups(i)%id = iGroup
             ! -- 熱BCの初期化 --
-            select case (Input%Conditions%Heat(iGroup)%type)
+            select case (Input%BC%Heat(iGroup)%type)
             case ("Dirichlet")
                 allocate (BC_Thermal_Dirichlet :: self%groups(i)%T)
-                call self%groups(i)%T%setup(Input%Conditions, time_conv, iGroup, Domain)
+                call self%groups(i)%T%setup(Input%BC, time_conv, iGroup, Domain)
 
             case ("Adiabatic")
                 allocate (BC_Thermal_Adiabatic :: self%groups(i)%T)
-                call self%groups(i)%T%setup(Input%Conditions, time_conv, iGroup, Domain)
+                call self%groups(i)%T%setup(Input%BC, time_conv, iGroup, Domain)
             end select
         end do
     end subroutine setup_BC_Manager

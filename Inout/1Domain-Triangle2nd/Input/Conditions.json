@@ -1,71 +1,108 @@
 {
-    "BoundaryConditions": {
-        "Groups": [
-            2,
-            3,
-            4,
-            5
-        ],
-        "Time": [
+    "time_control": {
+        "simulation_period": {
+            "unit": "day",
+            "start": 0.0,
+            "end": 10.0
+        },
+        "time_stepping": {
+            "unit": "second",
+            "initial_step": 300.0,
+            "min_step": 300.0,
+            "max_step": 300.0
+        },
+        "boundary_condition_time_points": [
             0.0,
-            20.0
-        ],
-        "2": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": [
+            10.0
+        ]
+    },
+    "boundary_conditions": [
+        {
+            "id": 2,
+            "thermal": {
+                "type": "dirichlet",
+                "is_uniform": true,
+                "values": [
                     -20.0,
                     -20.0
                 ]
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "impermeable"
             }
         },
-        "3": {
-            "Thermal": {
-                "Type": "Adiabatic"
+        {
+            "id": 3,
+            "thermal": {
+                "type": "adiabatic"
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "dirichlet",
+                "is_uniform": true,
+                "values": [
+                    0.1,
+                    0.1
+                ]
             }
         },
-        "4": {
-            "Thermal": {
-                "Type": "Adiabatic"
+        {
+            "id": 4,
+            "thermal": {
+                "type": "adiabatic"
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "impermeable"
             }
         },
-        "5": {
-            "Thermal": {
-                "Type": "Adiabatic"
+        {
+            "id": 5,
+            "thermal": {
+                "type": "adiabatic"
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "dirichlet",
+                "is_uniform": true,
+                "values": [
+                    0.0,
+                    0.0
+                ]
             }
         }
-    },
-    "InitialConditions": {
-        "porosity": 0.3,
-        "Thermal": {
-            "Type": "Constant",
-            "Value": 18.0
+    ],
+    "initial_conditions": {
+        "thermal": {
+            "type": "uniform",
+            "value": 18.0,
+            "field_name": "Temperature"
         },
-        "Hydraulic": {
-            "Type": "Laplace",
-            "Value": {
-                "3": {
-                    "Type": "Dirichlet",
-                    "Value": 0.1
+        "hydraulic": {
+            "type": "laplace",
+            "boundary_conditions": [
+                {
+                    "id": 2,
+                    "type": "impermeable"
                 },
-                "5": {
-                    "Type": "Dirichlet",
-                    "Value": 0.0
+                {
+                    "id": 3,
+                    "type": "dirichlet",
+                    "is_uniform": true,
+                    "values": [
+                        0.1
+                    ]
+                },
+                {
+                    "id": 4,
+                    "type": "impermeable"
+                },
+                {
+                    "id": 5,
+                    "type": "dirichlet",
+                    "is_uniform": true,
+                    "values": [
+                        0.0
+                    ]
                 }
-            }
+            ]
         }
     }
 }

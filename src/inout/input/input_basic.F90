@@ -129,7 +129,6 @@ contains
         call json%destroy()
         call json%print_error_message(output_unit)
 
-        stop
     end subroutine inout_read_basic_parameters
 
     subroutine read_parameters_simulation_settings(self, json)
