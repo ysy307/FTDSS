@@ -1,71 +1,88 @@
 {
-    "BoundaryConditions": {
-        "Groups": [
-            2,
-            3,
-            4,
-            5
-        ],
-        "Time": [
+    "time_control": {
+        "simulation_period": {
+            "unit": "day",
+            "start": 0.0,
+            "end": 10.0
+        },
+        "time_stepping": {
+            "unit": "second",
+            "initial_step": 300.0,
+            "min_step": 300.0,
+            "max_step": 300.0
+        },
+        "boundary_condition_time_points": [
             0.0,
-            20.0
-        ],
-        "2": {
-            "Thermal": {
-                "Type": "Dirichlet",
-                "Uniform": true,
-                "Value": [
+            10.0
+        ]
+    },
+    "boundary_conditions": [
+        {
+            "target_group_id": 2,
+            "thermal": {
+                "type": "Dirichlet",
+                "values": [
                     -20.0,
                     -20.0
                 ]
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "Impermeable"
             }
         },
-        "3": {
-            "Thermal": {
-                "Type": "Adiabatic"
+        {
+            "target_group_id": 3,
+            "thermal": {
+                "type": "Adiabatic"
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "Dirichlet",
+                "values": [
+                    0.1
+                ]
             }
         },
-        "4": {
-            "Thermal": {
-                "Type": "Adiabatic"
+        {
+            "target_group_id": 4,
+            "thermal": {
+                "type": "Adiabatic"
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "Impermeable"
             }
         },
-        "5": {
-            "Thermal": {
-                "Type": "Adiabatic"
+        {
+            "target_group_id": 5,
+            "thermal": {
+                "type": "Adiabatic"
             },
-            "Hydraulic": {
-                "Type": "Impermeable"
+            "hydraulic": {
+                "type": "Dirichlet",
+                "values": [
+                    0.0
+                ]
             }
         }
-    },
-    "InitialConditions": {
-        "porosity": 0.3,
-        "Thermal": {
-            "Type": "Constant",
-            "Value": 18.0
+    ],
+    "initial_conditions": {
+        "thermal": {
+            "type": "Constant",
+            "value": 18.0
         },
-        "Hydraulic": {
-            "Type": "Laplace",
-            "Value": {
-                "3": {
-                    "Type": "Dirichlet",
-                    "Value": 0.1
+        "hydraulic": {
+            "type": "Laplace",
+            "boundary_conditions": [
+                {
+                    "target_group_id": 3,
+                    "type": "Dirichlet",
+                    "value": 0.1
                 },
-                "5": {
-                    "Type": "Dirichlet",
-                    "Value": 0.0
+                {
+                    "target_group_id": 5,
+                    "type": "Dirichlet",
+                    "value": 0.0
                 }
-            }
+            ]
         }
     }
 }

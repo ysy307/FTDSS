@@ -129,27 +129,27 @@ module inout_input
     !! Positive NaN
     real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
 
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_simulation_settings
         character(:), allocatable :: title
         integer(int32) :: calculate_type
         integer(int32) :: calculate_dimension
     end type type_simulation_settings
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_analysis_controls
         logical :: calculate_thermal
         logical :: calculate_hydraulic
         logical :: calculate_mechanical
         character(:), allocatable :: coupling_mode
     end type type_analysis_controls
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_geometry_settings
         character(:), allocatable :: file_name
         character(:), allocatable :: cell_id_array_name
         character(:), allocatable :: integration_type
         real(real64) :: integration_points
     end type type_geometry_settings
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_materials_wrf
         integer(int32) :: model_number
         real(real64) :: theta_s
@@ -206,7 +206,7 @@ module inout_input
         type(type_materials_thermal) :: thermal
         type(type_materials_hydraulic) :: hydraulic
     end type type_material_settings
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_convergence_criteria
         character(:), allocatable :: criteria
         character(:), allocatable :: logic
@@ -267,28 +267,7 @@ module inout_input
         type(type_linear_solver) :: linear_solver
         type(type_parallel_settings) :: parallel_settings
     end type
-    !-------------------------------------------------------------------------------
-
-    type :: Input_OutputSettings
-        character(:), allocatable :: FileFormat
-        character(:), allocatable :: Output_TimeUnit
-        character(:), allocatable :: Interval_TimeUnit
-        real(real64) :: Interval_Step
-
-        integer(int32) :: ObservationType
-        integer(int32) :: NumObservation
-        type(type_dp_3d) :: Cood_Obs
-        integer(int32), allocatable :: ObsID(:)
-
-        logical(4) :: outTemp
-        logical(4) :: outSi
-        logical(4) :: outTC
-        logical(4) :: outC
-        logical(4) :: outPres
-        logical(4) :: outFlux
-        logical(4) :: outK
-    end type Input_OutputSettings
-
+    !!------------------------------------------------------------------------------------------------------------------------------
     type :: input_basic
         type(type_simulation_settings) :: simulation_settings
         type(type_analysis_controls) :: analysis_controls
@@ -312,6 +291,52 @@ module inout_input
         integer(int32) :: Order
         integer(int32) :: MaxNonlinearIteration
     end type input_basic
+    !!------------------------------------------------------------------------------------------------------------------------------
+
+    type :: type_time_control_simulation_period
+        character(:), allocatable :: unit
+        real(real64) :: start
+        real(real64) :: end
+    end type type_time_control_simulation_period
+
+    type :: type_time_control_time_stepping
+        character(:), allocatable :: unit
+        real(real64) :: initial_step
+        real(real64) :: min_step
+        real(real64) :: max_step
+    end type type_time_control_time_stepping
+
+    type :: type_time_control
+        type(type_time_control_simulation_period) :: simulation_period
+        type(type_time_control_time_stepping) :: time_stepping
+        real(real64), allocatable :: boundary_time_points(:)
+    end type type_time_control
+
+    type :: type_conditions
+        type(type_time_control) :: time_control
+
+    end type type_conditions
+    !!------------------------------------------------------------------------------------------------------------------------------
+
+    type :: Input_OutputSettings
+        character(:), allocatable :: FileFormat
+        character(:), allocatable :: Output_TimeUnit
+        character(:), allocatable :: Interval_TimeUnit
+        real(real64) :: Interval_Step
+
+        integer(int32) :: ObservationType
+        integer(int32) :: NumObservation
+        type(type_dp_3d) :: Cood_Obs
+        integer(int32), allocatable :: ObsID(:)
+
+        logical(4) :: outTemp
+        logical(4) :: outSi
+        logical(4) :: outTC
+        logical(4) :: outC
+        logical(4) :: outPres
+        logical(4) :: outFlux
+        logical(4) :: outK
+    end type Input_OutputSettings
 
     type :: Input_Ice
         !***********************************************************************
@@ -417,36 +442,40 @@ module inout_input
         character(:), allocatable :: output_file_name
 
         type(input_basic) :: basic
+        type(type_conditions) :: conditions
+
         type(Input_Region), allocatable :: Regions(:)
         type(Input_Solver) :: Solver_Thermal
         type(Input_Solver) :: Solver_Hydraulic
-        type(type_vtk) :: vtk
-        type(Input_Boundary) :: conditions
+        type(Input_Boundary) :: BC
         type(Input_Initial) :: IC
         type(Input_OutputSettings) :: OutputSettings
+
+        type(type_vtk) :: vtk
 
     contains
         procedure, pass(self), public :: initialize => type_input_initialize
 
         procedure :: read_parameters => inout_read_basic_parameters
+        procedure :: read_conditions => inout_read_conditions
         procedure :: Input_Geometry => inout_input_geometry_VTK
-        procedure :: Input_conditions => inout_input_conditions_JSON
         procedure :: Input_OutputSettings => inout_input_OutputSettings_JSON
 
     end type type_input
 
     interface
         module subroutine inout_read_basic_parameters(self)
-            !< Load the input parameters from the JSON file
             implicit none
             class(type_input), intent(inout) :: self
 
         end subroutine inout_read_basic_parameters
 
-    end interface
+        module subroutine inout_read_conditions(self)
+            implicit none
+            class(type_input) :: self
 
-    interface type_input
-        module procedure :: type_input_initialize
+        end subroutine inout_read_conditions
+
     end interface
 
 contains
@@ -478,755 +507,10 @@ contains
         if (.not. exists) call error_message(902, c_opt=self%output_file_name)
 
         call self%read_parameters()
-        call self%Input_conditions()
+        call self%read_conditions()
         call self%Input_OutputSettings()
         call self%Input_Geometry()
     end subroutine type_input_initialize
-
-    ! subroutine inout_read_parameters_JSON(self)
-    !     !< Load the input parameters from the JSON file
-    !     implicit none
-    !     class(type_input) :: self
-    !     type(json_file) :: json
-    !     integer(int32) :: status, unit_num
-    !     integer(int32) :: iRegion
-
-    !     call json%initialize()
-
-    !     call json%load(filename=self%basic_file_name)
-    !     call json%print_error_message(output_unit)
-
-    !     call inout_read_parameters_JSON_Basic(self, json)
-    !     if (.not. allocated(self%Regions)) allocate (self%Regions(self%Basic%numRegion))
-    !     do iRegion = 1, self%Basic%numRegion
-    !         call inout_read_parameters_JSON_Reigion_Infomation(self, json, iRegion)
-    !         if (self%Regions(iRegion)%Flag%isHeat) then
-    !             call inout_read_parameters_JSON_Thermal(self, json, iRegion)
-    !         end if
-    !         !     if (self%Regions(iRegion)%Flags%isWater) then
-    !         !         call inout_read_parameters_JSON_Hydraulic(self, json, iRegion)
-    !         !     end if
-    !     end do
-    !     call inout_read_parameters_JSON_Solver(self, json)
-
-    !     call json%destroy()
-    !     call json%print_error_message(output_unit)
-    ! end subroutine inout_read_parameters_JSON
-
-    ! subroutine inout_read_parameters_JSON_Basic(self, json)
-    !     !> Load the basic input parameters from the JSON file
-    !     implicit none
-    !     class(type_input) :: self
-    !     type(json_file), intent(inout) :: json !! JSON parser
-    !     character(:), allocatable :: key
-
-    !     key = Connect_dot(BasicName, DimensionName)
-    !     call json%get(key, self%Basic%DimensionType)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, RegionName)
-    !     call json%get(key, self%Basic%numRegion)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, TimeName, CalculationName, UnitName)
-    !     call json%get(key, self%Basic%Calculation_TimeUnit)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, TimeName, CalculationName, StepName)
-    !     call json%get(key, self%Basic%Calculation_Step)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, TimeName, CalculationName, StepMinimumName)
-    !     call json%get(key, self%Basic%Calculation_StepMinimum)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, TimeName, CalculationName, StepMaximumName)
-    !     call json%get(key, self%Basic%Calculation_StepMaximum)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, TimeName, InputName, UnitName)
-    !     call json%get(key, self%Basic%Input_TimeUnit)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, TimeName, InputName, StartCalculationName)
-    !     call json%get(key, self%Basic%StartCalculation)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, TimeName, InputName, EndCalculationName)
-    !     call json%get(key, self%Basic%EndCalculation)
-    !     call json%print_error_message(output_unit)
-
-    !     key = Connect_dot(BasicName, shouldDisplayPromptName)
-    !     call json%get(key, self%Basic%shouldDisplayPrompt)
-    !     call json%print_error_message(output_unit)
-
-    ! end subroutine inout_read_parameters_JSON_Basic
-
-    subroutine inout_read_parameters_JSON_Reigion_Infomation(self, json, iRegion)
-        !> load the region information from the JSON file
-        implicit none
-        class(type_input) :: self
-        type(json_file), intent(inout) :: json !! JSON parser
-        integer(int32), intent(in) :: iRegion !! Region number
-
-        !     character(8) :: region_name
-        !     character(:), allocatable :: key
-
-        !     write (region_name, '(a, i0)') RegionName, iRegion
-
-        !     key = Connect_dot(region_name, BelongName, SurfaceName)
-        !     call json%get(key, self%Regions(iRegion)%BelongingSurface)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(region_name, BelongName, EdgeName)
-        !     call json%get(key, self%Regions(iRegion)%BelongingEdge)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(region_name, CalculationTypeName)
-        !     call json%get(key, self%Regions(iRegion)%CalculationType)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(region_name, ModelnumberName)
-        !     call json%get(key, self%Regions(iRegion)%ModelNumber)
-        !     call json%print_error_message(output_unit)
-
-        !     select case (self%Regions(iRegion)%CalculationType)
-        !     case (1)
-        !         call inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, .false., .false., .true.)
-        !     case (2)
-        !         call inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .false.)
-        !     case (3)
-        !         call inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, .false., .true., .true.)
-        !     case (4)
-        !         call inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .false.)
-        !     case (5)
-        !         call inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, .true., .false., .true.)
-        !     case (6)
-        !         call inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .false.)
-        !     case (7)
-        !         call inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, .true., .true., .true.)
-        !     case default
-        !         call error_message(903, copt1=CalculationTypeName)
-        !     end select
-
-        !     select case (self%Regions(iRegion)%Modelnumber)
-        !     case (10)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .true., .false., .false., .false.)
-        !     case (20)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .true., .false., .false.)
-        !     case (31)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false., .false.)
-        !     case (32)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .false., .true.)
-        !     case (33)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true., .false.)
-        !     case (34)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .false., .true., .true.)
-        !     case (35)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false., .false.)
-        !     case (36)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .false., .true.)
-        !     case (37)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true., .false.)
-        !     case (38)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .true., .false., .true., .true., .true.)
-        !     case (41)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .false., .false.)
-        !     case (42)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .false., .true.)
-        !     case (43)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .true., .false.)
-        !     case (44)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .false., .true., .true.)
-        !     case (45)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .false., .false.)
-        !     case (46)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .false., .true.)
-        !     case (47)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .true., .false.)
-        !     case (48)
-        !         call inout_read_parameters_JSON_SetFlags(self, iRegion, .false., .false., .false., .true., .true., .true., .true.)
-        !     case default
-        !         call error_message(903, copt1=ModelnumberName)
-        !     end select
-
-        !     key = Connect_dot(region_name, isFrozenName)
-        !     call json%get(key, self%Regions(iRegion)%Flag%isFrozen)
-        !     call json%print_error_message(output_unit)
-
-    end subroutine inout_read_parameters_JSON_Reigion_Infomation
-
-    subroutine inout_read_parameters_JSON_SetCalculationTypes(self, iRegion, isHeat, isWater, isStress)
-        !> Set the calculation types
-        implicit none
-        class(type_input) :: self
-        integer(int32), intent(in) :: iRegion !! Region number
-        logical(4), intent(in) :: isHeat !! Heat calculation
-        logical(4), intent(in) :: isWater !! Water calculation
-        logical(4), intent(in) :: isStress !! Stress calculation
-
-        self%Regions(iRegion)%Flag%isHeat = isHeat
-        self%Regions(iRegion)%Flag%isWater = isWater
-        self%Regions(iRegion)%Flag%isStress = isStress
-
-    end subroutine inout_read_parameters_JSON_SetCalculationTypes
-
-    subroutine inout_read_parameters_JSON_SetFlags(self, iRegion, is1Phase, is2Phase, is3Phase, is4Phase, isCompression, isFrostHeavePressure, isDispersity)
-        !> Set the calculation flags
-        implicit none
-        class(type_input) :: self
-        integer(int32), intent(in) :: iRegion !! Region number
-        logical(4), intent(in) :: is1Phase !! 1 Phase calculation
-        logical(4), intent(in) :: is2Phase !! 2 Phase calculation
-        logical(4), intent(in) :: is3Phase !! 3 Phase calculation
-        logical(4), intent(in) :: is4Phase !! 3 Phase calculation
-        logical(4), intent(in), optional :: isCompression !! consideer the water/ice compression
-        logical(4), intent(in), optional :: isFrostHeavePressure !! Frost heave pressure calculation
-        logical(4), intent(in), optional :: isDispersity !! Thermalc onductivity dispersity calculation
-
-        self%Regions(iRegion)%Flag%is1Phase = is1Phase
-        self%Regions(iRegion)%Flag%is2Phase = is2Phase
-        self%Regions(iRegion)%Flag%is3Phase = is3Phase
-        if (present(isCompression)) self%Regions(iRegion)%Flag%isCompression = isCompression
-        if (present(isFrostHeavePressure)) self%Regions(iRegion)%Flag%isFrostHeavePressure = isFrostHeavePressure
-        if (present(isDispersity)) self%Regions(iRegion)%Flag%isDispersity = isDispersity
-
-    end subroutine inout_read_parameters_JSON_SetFlags
-
-    subroutine inout_read_parameters_JSON_Thermal(self, json, iRegion)
-        !> Load the thermal parameters from the JSON file
-        implicit none
-        class(type_input) :: self
-        type(json_file), intent(inout) :: json !! JSON parser
-        integer(int32), intent(in) :: iRegion !! Region number
-
-        character(8) :: region_name
-        integer(int32) :: QiceType
-        character(:), allocatable :: key
-
-        ! write (region_name, '(a, i0)') RegionName, iRegion
-        ! if (.not. self%Regions(iRegion)%Flag%is1Phase) then
-        !     key = Connect_dot(region_name, ThermalName, PorosityName)
-        !     call json%get(key, self%Regions(iRegion)%Thermal%Porosity)
-        !     call json%print_error_message(output_unit)
-        ! end if
-        ! if (self%Regions(iRegion)%Flag%isFrozen) then
-        !     key = Connect_dot(region_name, ThermalName, LatentHeatName)
-        !     call json%get(key, self%Regions(iRegion)%Thermal%LatentHeat)
-        !     call json%print_error_message(output_unit)
-        ! end if
-
-        ! key = Connect_dot(region_name, ThermalName, DensityName)
-        ! call json%get(key, self%Regions(iRegion)%Thermal%rho)
-        ! call json%print_error_message(output_unit)
-
-        ! key = Connect_dot(region_name, ThermalName, SpecificHeatName)
-        ! call json%get(key, self%Regions(iRegion)%Thermal%c)
-        ! call json%print_error_message(output_unit)
-
-        ! if (allocated(self%Regions(iRegion)%Thermal%c) .and. &
-        !     allocated(self%Regions(iRegion)%Thermal%rho)) then
-        !     allocate (self%Regions(iRegion)%Thermal%Cp, mold=self%Regions(iRegion)%Thermal%c)
-        !     self%Regions(iRegion)%Thermal%Cp(:) = self%Regions(iRegion)%Thermal%c(:) * self%Regions(iRegion)%Thermal%rho(:)
-        ! end if
-
-        ! key = Connect_dot(region_name, ThermalName, ThermalConductivityName)
-        ! call json%get(key, self%Regions(iRegion)%Thermal%lambda)
-        ! call json%print_error_message(output_unit)
-
-        ! if (self%Regions(iRegion)%Flag%isDispersity) then
-        !     key = Connect_dot(region_name, ThermalName, DispersityName)
-        !     call json%get(key, self%Regions(iRegion)%Thermal%lambdaDispersity)
-        !     call json%print_error_message(output_unit)
-        ! end if
-
-        ! if (self%Regions(iRegion)%Flag%isFrozen) then
-        !     key = Connect_dot(region_name, ThermalName, IceName, QiceTypeName)
-        !     call json%get(key, self%Regions(iRegion)%Ice%QiceType)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(region_name, ThermalName, IceName, TfName)
-        !     call json%get(key, self%Regions(iRegion)%Ice%Tf)
-        !     call json%print_error_message(output_unit)
-
-        !     if (self%Regions(iRegion)%Ice%QiceType == 2) then
-        !         !! GCC model
-
-        !         key = Connect_dot(region_name, ThermalName, IceName, ParametersName, ModelName)
-        !         call json%get(key, self%Regions(iRegion)%Ice%ModelType)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(region_name, ThermalName, IceName, ParametersName, thetaSName)
-        !         call json%get(key, self%Regions(iRegion)%Ice%thetaS)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(region_name, ThermalName, IceName, ParametersName, thetaRName)
-        !         call json%get(key, self%Regions(iRegion)%Ice%thetaR)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(region_name, ThermalName, IceName, ParametersName, alpha1Name)
-        !         call json%get(key, self%Regions(iRegion)%Ice%alpha1)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(region_name, ThermalName, IceName, ParametersName, n1Name)
-        !         call json%get(key, self%Regions(iRegion)%Ice%n1)
-        !         call json%print_error_message(output_unit)
-
-        !         select case (self%Regions(iRegion)%Ice%ModelType)
-        !         case (4)
-        !             key = Connect_dot(region_name, ThermalName, IceName, ParametersName, hcritName)
-        !             call json%get(key, self%Regions(iRegion)%Ice%hcrit)
-        !             call json%print_error_message(output_unit)
-        !         case (5)
-        !             key = Connect_dot(region_name, ThermalName, IceName, ParametersName, alpha2Name)
-        !             call json%get(key, self%Regions(iRegion)%Ice%alpha2)
-        !             call json%print_error_message(output_unit)
-
-        !             key = Connect_dot(region_name, ThermalName, IceName, ParametersName, n2Name)
-        !             call json%get(key, self%Regions(iRegion)%Ice%n2)
-        !             call json%print_error_message(output_unit)
-
-        !             key = Connect_dot(region_name, ThermalName, IceName, ParametersName, w1Name)
-        !             call json%get(key, self%Regions(iRegion)%Ice%w1)
-        !             call json%print_error_message(output_unit)
-        !         case (6)
-        !             key = Connect_dot(region_name, ThermalName, IceName, ParametersName, n2Name)
-        !             call json%get(key, self%Regions(iRegion)%Ice%n2)
-        !             call json%print_error_message(output_unit)
-
-        !             key = Connect_dot(region_name, ThermalName, IceName, ParametersName, w1Name)
-        !             call json%get(key, self%Regions(iRegion)%Ice%w1)
-        !             call json%print_error_message(output_unit)
-        !         end select
-
-        !         key = Connect_dot(region_name, ThermalName, IceName, UnitName)
-        !         call json%get(key, self%Regions(iRegion)%Ice%c_unit)
-        !         call json%print_error_message(output_unit)
-
-        !         self%Regions(iRegion)%Ice%isSegregation = self%Regions(iRegion)%Flag%isFrostHeavePressure
-        !         if (self%Regions(iRegion)%Flag%is3Phase .or. self%Regions(iRegion)%Flag%is4Phase) then
-        !             self%Regions(iRegion)%Ice%rhoI = self%Regions(iRegion)%Thermal%rho(3)
-        !         end if
-
-        !     else if (self%Regions(iRegion)%Ice%QiceType == 3) then
-        !         !! EXP model
-        !         key = Connect_dot(region_name, ThermalName, IceName, ParametersName, phiName)
-        !         call json%get(key, self%Regions(iRegion)%Ice%phi)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(region_name, ThermalName, IceName, ParametersName, aName)
-        !         call json%get(key, self%Regions(iRegion)%Ice%a)
-        !         call json%print_error_message(output_unit)
-        !     end if
-        ! end if
-    end subroutine inout_read_parameters_JSON_Thermal
-
-!     subroutine inout_read_parameters_JSON_Hydraulic(self, json, iRegion)
-!         !> Load the hydraulic parameters from the JSON file
-!         implicit none
-!         class(Input) :: self
-!         type(json_file), intent(inout) :: json !! JSON parser
-!         integer(int32), intent(in) :: iRegion !! Region number
-
-!         character(8) :: region_name
-!         character(:), allocatable :: key
-
-!         write (region_name, '(a, i0)') RegionName, iRegion
-
-!         key = inout_input_Connect_dot(region_name, HydraulicName, useHCFName)
-!         call json%get(key, self%Regions(iRegion)%Hydraulic%useHCF)
-!         call json%print_error_message(output_unit)
-
-!         key = inout_input_Connect_dot(region_name, HydraulicName, useImpedanceName)
-!         call json%get(key, self%Regions(iRegion)%Hydraulic%useImpedance)
-!         call json%print_error_message(output_unit)
-
-!         key = inout_input_Connect_dot(region_name, HydraulicName, useKTDynamicsName)
-!         call json%get(key, self%Regions(iRegion)%Hydraulic%useKTDynamics)
-!         call json%print_error_message(output_unit)
-
-!         call Allocate_Structure_Hydraulic_Type(self%Regions(iRegion)%Hydraulic)
-
-!         key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, KsName)
-!         call json%get(key, self%Regions(iRegion)%Hydraulic%Ks)
-!         call json%print_error_message(output_unit)
-
-!         if (allocated(self%Regions(iRegion)%Hydraulic%HCF)) then
-!             select type (HCF => self%Regions(iRegion)%Hydraulic%HCF)
-!             type is (Type_HCF_BC)
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
-!                 call json%get(key, HCF%thetaS)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
-!                 call json%get(key, HCF%thetaR)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
-!                 call json%get(key, HCF%alpha1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
-!                 call json%get(key, HCF%n1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
-!                 call json%get(key, HCF%l)
-!                 call json%print_error_message(output_unit)
-
-!             type is (Type_HCF_VG)
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
-!                 call json%get(key, HCF%thetaS)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
-!                 call json%get(key, HCF%thetaR)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
-!                 call json%get(key, HCF%alpha1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
-!                 call json%get(key, HCF%n1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
-!                 call json%get(key, HCF%l)
-!                 call json%print_error_message(output_unit)
-
-!                 HCF%m1 = 1.0 - 1.0 / HCF%n1
-
-!             type is (Type_HCF_KO)
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
-!                 call json%get(key, HCF%thetaS)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
-!                 call json%get(key, HCF%thetaR)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
-!                 call json%get(key, HCF%alpha1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
-!                 call json%get(key, HCF%n1)
-!                 call json%print_error_message(output_unit)
-
-!             type is (Type_HCF_MVG)
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
-!                 call json%get(key, HCF%thetaS)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
-!                 call json%get(key, HCF%thetaR)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
-!                 call json%get(key, HCF%alpha1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
-!                 call json%get(key, HCF%n1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, hcritName)
-!                 call json%get(key, HCF%hcrit)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
-!                 call json%get(key, HCF%l)
-!                 call json%print_error_message(output_unit)
-
-!                 HCF%m1 = 1.0 - 1.0 / HCF%n1
-
-!             type is (Type_HCF_Durner)
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
-!                 call json%get(key, HCF%thetaS)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
-!                 call json%get(key, HCF%thetaR)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
-!                 call json%get(key, HCF%alpha1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
-!                 call json%get(key, HCF%n1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha2Name)
-!                 call json%get(key, HCF%alpha2)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n2Name)
-!                 call json%get(key, HCF%n2)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, w1Name)
-!                 call json%get(key, HCF%w1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
-!                 call json%get(key, HCF%l)
-!                 call json%print_error_message(output_unit)
-
-!                 HCF%m1 = 1.0 - 1.0 / HCF%n1
-!                 HCF%m2 = 1.0 - 1.0 / HCF%n2
-!                 HCF%w2 = 1.0 - HCF%w1
-
-!             type is (Type_HCF_DVGCH)
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaSName)
-!                 call json%get(key, HCF%thetaS)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, thetaRName)
-!                 call json%get(key, HCF%thetaR)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, alpha1Name)
-!                 call json%get(key, HCF%alpha1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n1Name)
-!                 call json%get(key, HCF%n1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, n2Name)
-!                 call json%get(key, HCF%n2)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, w1Name)
-!                 call json%get(key, HCF%w1)
-!                 call json%print_error_message(output_unit)
-
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, lName)
-!                 call json%get(key, HCF%l)
-!                 call json%print_error_message(output_unit)
-
-!                 HCF%m1 = 1.0 - 1.0 / HCF%n1
-!                 HCF%m2 = 1.0 - 1.0 / HCF%n2
-!                 HCF%w2 = 1.0 - HCF%w1
-!             end select
-!         end if
-
-!         if (allocated(self%Regions(iRegion)%Hydraulic%Impedance)) then
-!             select type (Impedance => self%Regions(iRegion)%Hydraulic%Impedance)
-!             type is (Type_Impedance)
-!                 key = inout_input_Connect_dot(region_name, HydraulicName, ParametersName, OmegaName)
-!                 call json%get(key, Impedance%Omega)
-!                 call json%print_error_message(output_unit)
-!             end select
-!         end if
-
-!     end subroutine inout_read_parameters_JSON_Hydraulic
-
-    subroutine inout_read_parameters_JSON_Solver(self, json)
-        !> load Solver settings from the JSON file
-        implicit none
-        class(type_input) :: self
-        type(json_file), intent(inout) :: json !! JSON parser
-
-        character(:), allocatable :: key
-
-        ! if (any(self%Regions(:)%Flag%isHeat)) then
-        !     key = Connect_dot(SolverName, OrderName)
-        !     call json%get(key, self%Basic%Order)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(SolverName, MaxNonlinearIterationName)
-        !     call json%get(key, self%Basic%MaxNonlinearIteration)
-        !     call json%print_error_message(output_unit)
-
-        !     key = Connect_dot(SolverName, ThermalName, useSolverName)
-        !     call json%get(key, self%Solver_Thermal%useSolver)
-        !     call json%print_error_message(output_unit)
-
-        !     if (self%Solver_Thermal%useSolver == 2) then
-        !         key = Connect_dot(SolverName, ThermalName, ParametersName, SolverName)
-        !         call json%get(key, self%Solver_Thermal%useSolverType)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(SolverName, ThermalName, ParametersName, PreconditionerName)
-        !         call json%get(key, self%Solver_Thermal%usePreconditionerType)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(SolverName, ThermalName, ParametersName, MaxIterationName)
-        !         call json%get(key, self%Solver_Thermal%maxIteration)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(SolverName, ThermalName, ParametersName, ToleranceName)
-        !         call json%get(key, self%Solver_Thermal%tolerance)
-        !         call json%print_error_message(output_unit)
-        !     end if
-
-        !     if (.not. (self%Solver_Thermal%useSolver == 1 .or. &
-        !                self%Solver_Thermal%useSolver == 2)) then
-        !         call error_message(903, copt1=SolverName, copt2=ThermalName)
-        !     end if
-
-        ! end if
-        ! if (any(self%Regions(:)%Flag%isWater)) then
-        !     key = Connect_dot(SolveName, HydraulicName, useSolverName)
-        !     call json%get(key, useSolver)
-        !     call json%print_error_message(output_unit)
-
-        !     call inout_read_parameters_JSON_Solver_Settings(self, json, useSolver, HydraulicName)
-        ! end if
-
-    end subroutine inout_read_parameters_JSON_Solver
-
-    subroutine inout_input_conditions_JSON(self)
-        !> Load the boundary/initial conditions from the JSON file
-        implicit none
-        class(type_input) :: self
-
-        type(json_file) :: json
-        character(:), allocatable :: key
-        integer(int32) :: iRegion
-
-        call json%initialize()
-        call json%load(filename=self%conditions_file_name)
-        call json%print_error_message(output_unit)
-
-        call inout_input_conditions_JSON_BC(self, json)
-        call inout_input_conditions_JSON_IC(self, json)
-
-        call json%destroy()
-        call json%print_error_message(output_unit)
-
-    end subroutine inout_input_conditions_JSON
-
-    subroutine inout_input_conditions_JSON_BC(self, json)
-        !> Load the boundary conditions from the JSON file
-        implicit none
-        class(type_input) :: self
-        type(json_file), intent(inout) :: json !! JSON parser
-
-        character(:), allocatable :: key
-        character(2) :: cBCGroup
-        integer(int32) :: iBC
-        integer(int32) :: minium, maximum
-
-        integer(int32) :: numGroup
-        integer(int32) :: iGroup
-
-        ! key = Connect_dot(BCName, GroupName)
-        ! call json%get(key, self%conditions%Groups)
-        ! call json%print_error_message(output_unit)
-
-        ! numGroup = size(self%conditions%Groups)
-        ! minium = minval(self%conditions%Groups)
-        ! maximum = maxval(self%conditions%Groups)
-        ! allocate (self%conditions%Heat(minium:maximum))
-        ! allocate (self%conditions%Water(minium:maximum))
-
-        ! key = Connect_dot(BCName, TimeName)
-        ! call json%get(key, self%conditions%Time)
-        ! call json%print_error_message(output_unit)
-
-        ! do iBC = 1, numGroup
-        !     iGroup = self%conditions%Groups(iBC)
-        !     write (cBCGroup, '(i0)') iGroup
-        !     key = Connect_dot(BCName, cBCGroup, ThermalName, TypeName)
-        !     call json%get(key, self%conditions%Heat(iGroup)%type)
-        !     call json%print_error_message(output_unit)
-
-        !     select case (self%conditions%Heat(iGroup)%type)
-        !     case (DirichletName, HeatTransferName)
-        !         key = Connect_dot(BCName, cBCGroup, ThermalName, UniformName)
-        !         call json%get(key, self%conditions%Heat(iGroup)%isUniform)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_dot(BCName, cBCGroup, ThermalName, ValueName)
-        !         call json%get(key, self%conditions%Heat(iGroup)%value)
-        !         call json%print_error_message(output_unit)
-        !     end select
-
-        ! key = inout_input_Connect_dot(BCName, cBCGroup, HydsraulicName, TypeName)
-        ! call json%get(key, self%conditions%BC_Hydraulic(iBC)%type)
-        ! call json%print_error_message(output_unit)
-
-        ! select case (self%conditions%BC_Hydraulic(iBC)%type)
-        ! case (DirichletName, HeatTransferName)
-        !     key = inout_input_Connect_dot(BCName, cBCGroup, HydraulicName, ValueName)
-        !     call json%get(key, self%conditions%BC_Hydraulic(iBC)%value)
-        !     call json%print_error_message(output_unit)
-        ! case default
-        !     self%conditions%BC_Hydraulic(iBC)%value = NaNValue
-        ! end select
-        ! end do
-
-    end subroutine inout_input_conditions_JSON_BC
-
-    subroutine inout_input_conditions_JSON_IC(self, json)
-        !> Load the initialy conditions from the JSON file
-        implicit none
-        class(type_input) :: self
-        type(json_file), intent(inout) :: json !! JSON parser
-
-        character(:), allocatable :: key
-        character(:), allocatable :: tmp
-
-        character(2) :: cICGroup
-        integer(int32) :: i, count
-        logical(4) :: isFind
-
-        ! key = Connect_Dot(ICName, ThermalName, TypeName)
-        ! call json%get(key, self%IC%Heat%type)
-        ! call json%print_error_message(output_unit)
-
-        ! select case (self%IC%Heat%type)
-        ! case (ConstantName)
-        !     key = Connect_Dot(ICName, ThermalName, ValueName)
-        !     call json%get(key, self%IC%Heat%value)
-        !     call json%print_error_message(output_unit)
-        ! case (LaplaceName)
-        !     stop 'Laplace type is not supported yet, sorry'
-
-        ! end select
-
-        ! key = Connect_Dot(ICName, HydraulicName, TypeName)
-        ! call json%get(key, self%conditions%IC_Hydraulic%type)
-        ! call json%print_error_message(output_unit)
-
-        ! select case (self%conditions%IC_Hydraulic%type)
-        ! case (ConstantName)
-        !     key = Connect_Dot(ICName, HydraulicName, ValueName)
-        !     call json%get(key, self%conditions%IC_Hydraulic%value)
-        !     call json%print_error_message(output_unit)
-        ! case (LaplaceName)
-        !     count = 0
-        !     do i = 1, size(self%conditions%BCGroup)
-        !         write (cICGroup, '(i0)') self%conditions%BCGroup(i)
-        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-        !         call json%get(key, tmp, found=isFind)
-        !         if (isFind) count = count + 1
-        !     end do
-        !     allocate (self%conditions%IC_Hydraulic%IC_BC(count))
-        !     count = 0
-        !     do i = 1, size(self%conditions%BCGroup)
-        !         write (cICGroup, '(i0)') self%conditions%BCGroup(i)
-        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-        !         call json%get(key, tmp, found=isFind)
-
-        !         if (.not. isFind) cycle
-        !         count = count + 1
-
-        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-        !         call json%get(key, self%conditions%IC_Hydraulic%IC_BC(count)%type)
-        !         call json%print_error_message(output_unit)
-
-        !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
-        !         call json%get(key, self%conditions%IC_Hydraulic%IC_BC(count)%value)
-        !         call json%print_error_message(output_unit)
-        !     end do
-        ! end select
-
-    end subroutine inout_input_conditions_JSON_IC
 
     subroutine inout_input_geometry_VTK(self)
         !> Load the geometry from the VTK file
