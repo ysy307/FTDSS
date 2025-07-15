@@ -38,6 +38,7 @@ module domain_side
         integer(int32), private :: dimension
         integer(int32), private :: order
         integer(int32), allocatable :: connectivity(:) !! connectivity information
+        integer(int32), allocatable :: connectivity_reordered(:) !! reordered connectivity information
         type(type_dp_pointer), allocatable :: x(:) !! X coordinate
         type(type_dp_pointer), allocatable :: y(:) !! Y coordinate
         type(type_dp_pointer), allocatable :: z(:) !! Z coordinate
