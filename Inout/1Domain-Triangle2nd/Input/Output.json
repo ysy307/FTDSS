@@ -1,48 +1,67 @@
 {
-    "FileOutput": "vtu",
-    "TimeSettings": {
-        "Unit": "Day",
-        "Interval": {
-            "Unit": "Second",
-            "Step": 3600.0
-        }
+    "field_output": {
+        "file_format": "vtu",
+        "coloring": true,
+        "output_interval": {
+            "unit": "second",
+            "value": 3600.0
+        },
+        "variables": [
+            "temperature",
+            "ice_saturation"
+        ]
     },
-    "Observation": {
-        "Type": 2,
-        "TotalNumber": 5,
-        "Coordinates": {
-            "x": [
-                0.10000,
-                0.20000,
-                0.30000,
-                0.40000,
-                0.50000
-            ],
-            "y": [
-                1.00000,
-                1.00000,
-                1.00000,
-                1.00000,
-                1.00000
-            ],
-            "z": [
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ]
-        }
+    "history_output": {
+        "file_format": "dat",
+        "observation_type": "coordinates",
+        "output_interval": {
+            "unit": "second",
+            "value": 600.0
+        },
+        "variables": [
+            "temperature",
+            "pressure"
+        ],
+        "coordinates": [
+            {
+                "x": 0.1,
+                "y": 1.0,
+                "z": 0.0
+            },
+            {
+                "x": 0.2,
+                "y": 1.0,
+                "z": 0.0
+            },
+            {
+                "x": 0.3,
+                "y": 1.0,
+                "z": 0.0
+            },
+            {
+                "x": 0.4,
+                "y": 1.0,
+                "z": 0.0
+            },
+            {
+                "x": 0.5,
+                "y": 1.0,
+                "z": 0.0
+            }
+        ],
+        "node_ids": [
+            101,
+            250,
+            512,
+            750,
+            888
+        ]
     },
-    "OutputSettings": {
-        "Kinds": {
-            "Temp": true,
-            "Si": true,
-            "TC": false,
-            "C": false,
-            "Pres": false,
-            "Flux": false,
-            "K": false
+    "standard_output": {
+        "print_progress": true,
+        "print_interval": {
+            "unit": "second",
+            "value": 3000.0
         }
     }
 }

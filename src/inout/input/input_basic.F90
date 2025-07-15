@@ -1,25 +1,25 @@
 submodule(inout_input) inout_input_basic
     implicit none
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for simulation settings
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: simulation_settins = "simulation_settings"
     character(*), parameter :: title = "title"
     character(*), parameter :: calculate_type = "calculate_type"
     integer(int32), parameter :: min_calculation_type = 1
     integer(int32), parameter :: max_calculation_type = 3
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for analysis controls
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: analysis_controls = "analysis_controls"
     character(*), parameter :: calculate_thermal = "calculate_thermal"
     character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: calculate_mechanical = "calculate_mechanical"
     character(*), parameter :: coupling_mode = "coupling_mode"
     character(*), parameter :: coppling_modes(3) = ["none", "weak", "strong"]
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for geometry settings
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: geometry_settings = "geometry_settings"
     character(*), parameter :: file_name = "file_name"
     character(*), parameter :: cell_id_array_name = "cell_id_array_name"
@@ -27,9 +27,9 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: integration_type = "type"
     character(*), parameter :: integration_types(3) = ["full", "reduced", "free"]
     character(*), parameter :: integration_points = "points"
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for materials
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: materials = "materials"
     character(*), parameter :: id = "id"
     character(*), parameter :: name = "name"
@@ -66,34 +66,34 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: water_viscosity_model = "water_viscosity_model"
     character(*), parameter :: water_retention_model = "water_retention_model"
     character(*), parameter :: mechanical = "mechanical"
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for solver settings
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: solver_settings = "solver_settings"
     character(*), parameter :: bdf_order = "bdf_order"
     character(*), parameter :: reordering = "reordering"
-    character(*), parameter :: reordering_types(3) = ["none", "cm", "rcm"]
+    character(*), parameter :: valid_reordering_types(3) = ["none", "cm", "rcm"]
     character(*), parameter :: coloring = "coloring"
     character(*), parameter :: coloring_types(4) = ["none", "welch_powell", "lfo", "dsatur"]
     character(*), parameter :: nonlinear_solver = "nonlinear_solver"
     character(*), parameter :: method = "method"
-    character(*), parameter :: nonlinear_solver_methods(3) = ["none", "newton", "modified_newton"]
+    character(*), parameter :: valid_nonlinear_solver_methods(3) = ["none", "newton", "modified_newton"]
     character(*), parameter :: update_frequency = "update_frequency"
     character(*), parameter :: max_iterations = "max_iterations"
     character(*), parameter :: convergence = "convergence"
     character(*), parameter :: use_criteria = "use_criteria"
-    character(*), parameter :: criteria_types(3) = ["residual", "update", "both"]
+    character(*), parameter :: valid_criteria_types(3) = ["residual", "update", "both"]
     character(*), parameter :: logic_between_criteria = "logic_between_criteria"
-    character(*), parameter :: logic_types(2) = ["and", "or"]
+    character(*), parameter :: valid_logic_types(2) = ["and", "or"]
     character(*), parameter :: residual = "residual"
     character(*), parameter :: update = "update"
     character(*), parameter :: criteria = "criteria"
-    character(*), parameter :: local_criteria_types(3) = ["absolute", "relative", "both"]
+    character(*), parameter :: valid_local_criteria_types(3) = ["absolute", "relative", "both"]
     character(*), parameter :: logic = "logic"
     character(*), parameter :: absolute_tolerance = "absolute_tolerance"
     character(*), parameter :: relative_tolerance = "relative_tolerance"
     character(*), parameter :: linear_solver = "linear_solver"
-    character(*), parameter :: linear_solver_methods(2) = ["direct", "iterative"]
+    character(*), parameter :: valid_linear_solver_methods(2) = ["direct", "iterative"]
     character(*), parameter :: iterative_solver = "iterative_solver"
     character(*), parameter :: solver_type = "solver_type"
     character(*), parameter :: preconditioner_type = "preconditioner_type"
@@ -103,10 +103,11 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: is_parallel = "is_parallel"
     character(*), parameter :: num_threads = "num_threads"
     character(*), parameter :: schedule = "schedule"
-    character(*), parameter :: schedule_types(6) = ["affinity", "auto", "dynamic", "guided", "runtime", "static"]
+    character(*), parameter :: valid_schedule_types(6) = ["affinity", "auto", "dynamic", "guided", "runtime", "static"]
     character(*), parameter :: dynamic_adjustment = "dynamic_adjustment"
     character(*), parameter :: nested_parallelism = "nested_parallelism"
     character(*), parameter :: max_active_levels = "max_active_levels"
+    !!------------------------------------------------------------------------------------------------------------------------------
 
 contains
     module subroutine inout_read_basic_parameters(self)
@@ -151,8 +152,8 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. value_in_range(self%basic%simulation_settings%calculate_type, min_calculation_type, max_calculation_type)) then
+        else if (.not. value_in_range(self%basic%simulation_settings%calculate_type, &
+                                      min_calculation_type, max_calculation_type)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -202,11 +203,9 @@ contains
         call json%print_error_message(output_unit)
         if (.not. found) then
             self%basic%analysis_controls%coupling_mode = "weak"
-        else
-            if (.not. any(coppling_modes(:) == self%basic%analysis_controls%coupling_mode)) then
-                call json%destroy()
-                call error_message(905, c_opt=key)
-            end if
+        else if (.not. any(coppling_modes(:) == self%basic%analysis_controls%coupling_mode)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
         end if
 
     end subroutine read_parameters_analysis_controls
@@ -249,8 +248,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. any(integration_types(:) == self%basic%geometry_settings%integration_type)) then
+        else if (.not. any(integration_types(:) == self%basic%geometry_settings%integration_type)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -262,9 +260,8 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (self%basic%geometry_settings%integration_points < 0.0d0 .or. &
-                self%basic%geometry_settings%integration_points > 1.0d0) then
+            else if (self%basic%geometry_settings%integration_points < 0.0d0 .or. &
+                     self%basic%geometry_settings%integration_points > 1.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -340,8 +337,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. value_in_range(self%basic%materials(i)%phase, 1, 4)) then
+        else if (.not. value_in_range(self%basic%materials(i)%phase, 1, 4)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -376,9 +372,8 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (any(self%basic%materials(i)%thermal%density(:) <= 0.0d0) .or. &
-            size(self%basic%materials(i)%thermal%density(:)) /= self%basic%materials(i)%phase) then
+        else if (any(self%basic%materials(i)%thermal%density(:) <= 0.0d0) .or. &
+                 size(self%basic%materials(i)%thermal%density(:)) /= self%basic%materials(i)%phase) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -389,9 +384,8 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (any(self%basic%materials(i)%thermal%specific_heat(:) <= 0.0d0) .or. &
-            size(self%basic%materials(i)%thermal%specific_heat(:)) /= self%basic%materials(i)%phase) then
+        else if (any(self%basic%materials(i)%thermal%specific_heat(:) <= 0.0d0) .or. &
+                 size(self%basic%materials(i)%thermal%specific_heat(:)) /= self%basic%materials(i)%phase) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -402,9 +396,8 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (any(self%basic%materials(i)%thermal%thermal_conductivity(:) <= 0.0d0) .or. &
-            size(self%basic%materials(i)%thermal%thermal_conductivity(:)) /= self%basic%materials(i)%phase) then
+        else if (any(self%basic%materials(i)%thermal%thermal_conductivity(:) <= 0.0d0) .or. &
+                 size(self%basic%materials(i)%thermal%thermal_conductivity(:)) /= self%basic%materials(i)%phase) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -416,9 +409,8 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (any(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:) < 0.0d0) .or. &
-                size(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:)) /= 2) then
+            else if (any(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:) < 0.0d0) .or. &
+                     size(self%basic%materials(i)%thermal%thermal_conductivity_dispersity(:)) /= 2) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -446,8 +438,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (self%basic%materials(i)%thermal%phase_change%freezing_temperature > 0.0d0) then
+            else if (self%basic%materials(i)%thermal%phase_change%freezing_temperature > 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -494,8 +485,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. value_in_range(self%basic%materials(i)%hydraulic%model_number, 1, 5)) then
+        else if (.not. value_in_range(self%basic%materials(i)%hydraulic%model_number, 1, 5)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -506,8 +496,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (self%basic%materials(i)%hydraulic%hydraulic_conductivity <= 0.0d0) then
+        else if (self%basic%materials(i)%hydraulic%hydraulic_conductivity <= 0.0d0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -520,8 +509,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
+            else if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -538,8 +526,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (.not. value_in_range(self%basic%materials(i)%hydraulic%water_viscosity_model, 0, 2)) then
+            else if (.not. value_in_range(self%basic%materials(i)%hydraulic%water_viscosity_model, 0, 2)) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -551,8 +538,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
+            else if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -566,8 +552,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
+            else if (self%basic%materials(i)%hydraulic%impedance_factor <= 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -581,8 +566,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (.not. value_in_range(self%basic%materials(i)%hydraulic%water_viscosity_model, 0, 2)) then
+            else if (.not. value_in_range(self%basic%materials(i)%hydraulic%water_viscosity_model, 0, 2)) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -615,8 +599,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. value_in_range(wrf%model_number, 1, 6)) then
+        else if (.not. value_in_range(wrf%model_number, 1, 6)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -637,10 +620,9 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (wrf%theta_s <= wrf%theta_r .or. &
-            wrf%theta_s <= 0.0d0 .or. &
-            wrf%theta_r < 0.0d0) then
+        else if (wrf%theta_s <= wrf%theta_r .or. &
+                 wrf%theta_s <= 0.0d0 .or. &
+                 wrf%theta_r < 0.0d0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -661,8 +643,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (wrf%n1 <= 1.0d0) then
+        else if (wrf%n1 <= 1.0d0) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -678,8 +659,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (wrf%h_crit > 0.0d0) then
+            else if (wrf%h_crit > 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -691,8 +671,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (wrf%alpha2 <= 0.0d0) then
+            else if (wrf%alpha2 <= 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -703,8 +682,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (wrf%n2 <= 1.0d0) then
+            else if (wrf%n2 <= 1.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -716,8 +694,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
+            else if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -730,8 +707,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (wrf%n2 <= 1.0d0) then
+            else if (wrf%n2 <= 1.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -743,8 +719,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
+            else if (wrf%w1 < 0.0d0 .or. wrf%w1 > 1.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -762,8 +737,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (wrf%l <= 0.0d0) then
+            else if (wrf%l <= 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -788,8 +762,7 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. value_in_range(self%basic%solver_settings%bdf_order, 1, 6)) then
+        else if (.not. value_in_range(self%basic%solver_settings%bdf_order, 1, 6)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
@@ -800,11 +773,9 @@ contains
         if (.not. found) then
             call global_logger%log_warning(message="Default reordering is set to 'none'.")
             self%basic%solver_settings%reordering = "none"
-        else
-            if (.not. any(reordering_types(:) == self%basic%solver_settings%reordering)) then
-                call json%destroy()
-                call error_message(905, c_opt=key)
-            end if
+        else if (.not. any(valid_reordering_types(:) == self%basic%solver_settings%reordering)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
         end if
 
         key = join([solver_settings, coloring])
@@ -813,11 +784,9 @@ contains
         if (.not. found) then
             call global_logger%log_warning(message="Default coloring is set to 'none'.")
             self%basic%solver_settings%coloring = "none"
-        else
-            if (.not. any(coloring_types(:) == self%basic%solver_settings%coloring)) then
-                call json%destroy()
-                call error_message(905, c_opt=key)
-            end if
+        else if (.not. any(coloring_types(:) == self%basic%solver_settings%coloring)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
         end if
 
         call read_parameters_solver_settings_nonlinear(self, json)
@@ -841,16 +810,14 @@ contains
         if (.not. found) then
             call global_logger%log_warning(message="Default nonlinear solver method is set to 'none'.")
             self%basic%solver_settings%nonlinear_solver%method = "none"
-        else
-            if (.not. any(nonlinear_solver_methods(:) == self%basic%solver_settings%nonlinear_solver%method)) then
-                call json%destroy()
-                call error_message(905, c_opt=key)
-            end if
+        else if (.not. any(valid_nonlinear_solver_methods(:) == self%basic%solver_settings%nonlinear_solver%method)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
         end if
 
         !! If the method is modified newton then read the additional parameters
         select case (self%basic%solver_settings%nonlinear_solver%method)
-        case (nonlinear_solver_methods(3))
+        case (valid_nonlinear_solver_methods(3))
             key = join([solver_settings, nonlinear_solver, update_frequency])
             call json%get(key, self%basic%solver_settings%nonlinear_solver%update_frequency, found)
             call json%print_error_message(output_unit)
@@ -861,15 +828,14 @@ contains
         end select
 
         select case (self%basic%solver_settings%nonlinear_solver%method)
-        case (nonlinear_solver_methods(2), nonlinear_solver_methods(3))
+        case (valid_nonlinear_solver_methods(2), valid_nonlinear_solver_methods(3))
             key = join([solver_settings, nonlinear_solver, max_iterations])
             call json%get(key, self%basic%solver_settings%nonlinear_solver%max_iterations, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
                 call global_logger%log_warning(message="Using default maximum iterations of 1000 for nonlinear solver.")
                 self%basic%solver_settings%nonlinear_solver%max_iterations = 1000
-            end if
-            if (self%basic%solver_settings%nonlinear_solver%max_iterations <= 0) then
+            else if (self%basic%solver_settings%nonlinear_solver%max_iterations <= 0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -880,37 +846,36 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (.not. any(criteria_types(:) == self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)) then
+            else if (.not. any(valid_criteria_types(:) == &
+                               self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
 
             select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
-            case (criteria_types(3)) ! absolute
+            case (valid_criteria_types(3)) ! absolute
                 key = join([solver_settings, nonlinear_solver, convergence, logic_between_criteria])
                 call json%get(key, self%basic%solver_settings%nonlinear_solver%convergence%use_logic, found)
                 call json%print_error_message(output_unit)
                 if (.not. found) then
                     call json%destroy()
                     call error_message(904, c_opt=key)
-                end if
-                if (.not. any(logic_types(:) == self%basic%solver_settings%nonlinear_solver%convergence%use_logic)) then
+                else if (.not. any(valid_logic_types(:) == self%basic%solver_settings%nonlinear_solver%convergence%use_logic)) then
                     call json%destroy()
                     call error_message(905, c_opt=key)
                 end if
             end select
 
             select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
-            case (criteria_types(1)) ! residual
+            case (valid_criteria_types(1)) ! residual
                 key_base = join([solver_settings, nonlinear_solver, convergence, residual])
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%basic%solver_settings%nonlinear_solver%convergence%residual, json, key_base)
-            case (criteria_types(2)) ! update
+            case (valid_criteria_types(2)) ! update
                 key_base = join([solver_settings, nonlinear_solver, convergence, update])
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%basic%solver_settings%nonlinear_solver%convergence%update, json, key_base)
-            case (criteria_types(3)) ! residual and update
+            case (valid_criteria_types(3)) ! residual and update
                 key_base = join([solver_settings, nonlinear_solver, convergence, residual])
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%basic%solver_settings%nonlinear_solver%convergence%residual, json, key_base)
@@ -937,29 +902,26 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. any(local_criteria_types(:) == convergences%criteria)) then
+        else if (.not. any(valid_local_criteria_types(:) == convergences%criteria)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
-        if (convergences%criteria == local_criteria_types(3)) then
+        if (convergences%criteria == valid_local_criteria_types(3)) then
             key = join([key_base, logic])
             call json%get(key, convergences%logic, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
                 call global_logger%log_warning(message="Using default convergences logic 'and'.")
                 convergences%logic = "and"
-            else
-                if (.not. any(logic_types(:) == convergences%logic)) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
+            else if (.not. any(valid_logic_types(:) == convergences%logic)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
         end if
 
         select case (convergences%criteria)
-        case (local_criteria_types(1)) ! absolute
+        case (valid_local_criteria_types(1)) ! absolute
 
             key = join([key_base, absolute_tolerance])
             call json%get(key, convergences%absolute_tolerance, found)
@@ -967,13 +929,11 @@ contains
             if (.not. found) then
                 call global_logger%log_warning(message="Using default absolute convergences of 1.0d-6.")
                 convergences%absolute_tolerance = 1.0d-6
-            else
-                if (convergences%absolute_tolerance < 0.0d0) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
+            else if (convergences%absolute_tolerance < 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
-        case (local_criteria_types(2)) ! relative
+        case (valid_local_criteria_types(2)) ! relative
 
             key = join([key_base, relative_tolerance])
             call json%get(key, convergences%relative_tolerance, found)
@@ -981,24 +941,20 @@ contains
             if (.not. found) then
                 call global_logger%log_warning(message="Using default relative convergences of 1.0d-6.")
                 convergences%relative_tolerance = 1.0d-6
-            else
-                if (convergences%relative_tolerance < 0.0d0) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
+            else if (convergences%relative_tolerance < 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
-        case (local_criteria_types(3)) ! absolute and relative
+        case (valid_local_criteria_types(3)) ! absolute and relative
             key = join([key_base, absolute_tolerance])
             call json%get(key, convergences%absolute_tolerance, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
                 call global_logger%log_warning(message="Using default absolute convergences of 1.0d-6.")
                 convergences%absolute_tolerance = 1.0d-6
-            else
-                if (convergences%absolute_tolerance < 0.0d0) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
+            else if (convergences%absolute_tolerance < 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
             key = join([key_base, relative_tolerance])
             call json%get(key, convergences%relative_tolerance, found)
@@ -1006,11 +962,9 @@ contains
             if (.not. found) then
                 call global_logger%log_warning(message="Using default relative convergences of 1.0d-6.")
                 convergences%relative_tolerance = 1.0d-6
-            else
-                if (convergences%relative_tolerance < 0.0d0) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
+            else if (convergences%relative_tolerance < 0.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
         end select
     end subroutine read_parameters_solver_settings_nonlinear_convergence
@@ -1055,14 +1009,13 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
-        end if
-        if (.not. any(linear_solver_methods(:) == solver_setting%method)) then
+        else if (.not. any(valid_linear_solver_methods(:) == solver_setting%method)) then
             call json%destroy()
             call error_message(905, c_opt=key)
         end if
 
         select case (solver_setting%method)
-        case (linear_solver_methods(2))
+        case (valid_linear_solver_methods(2))
             key = join([key_base, iterative_solver, solver_type])
             call json%get(key, solver_setting%iterative_solver%solver_type, found)
             call json%print_error_message(output_unit)
@@ -1085,8 +1038,7 @@ contains
             if (.not. found) then
                 call global_logger%log_warning(message="Using default maximum iterations of 10000 for iterative solver.")
                 solver_setting%iterative_solver%max_iterations = 10000
-            end if
-            if (solver_setting%iterative_solver%max_iterations <= 0) then
+            else if (solver_setting%iterative_solver%max_iterations <= 0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -1097,8 +1049,7 @@ contains
             if (.not. found) then
                 call global_logger%log_warning(message="Using default tolerance of 1.0d-6 for iterative solver.")
                 solver_setting%iterative_solver%tolerance = 1.0d-6
-            end if
-            if (solver_setting%iterative_solver%tolerance < 0.0d0) then
+            else if (solver_setting%iterative_solver%tolerance < 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -1130,8 +1081,7 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
-            end if
-            if (self%basic%solver_settings%parallel_settings%threads%num_threads <= 0) then
+            else if (self%basic%solver_settings%parallel_settings%threads%num_threads <= 0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -1146,11 +1096,9 @@ contains
             if (.not. found) then
                 call global_logger%log_warning(message="Default schedule is set to 'static'.")
                 self%basic%solver_settings%parallel_settings%threads%schedule = "static"
-            else
-                if (.not. any(schedule_types(:) == self%basic%solver_settings%parallel_settings%threads%schedule)) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
+            else if (.not. any(valid_schedule_types(:) == self%basic%solver_settings%parallel_settings%threads%schedule)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
 
             key = join([solver_settings, parallel_settings, threads, dynamic_adjustment])
@@ -1175,11 +1123,9 @@ contains
             if (.not. found) then
                 call global_logger%log_warning(message="Default maximum active levels is set to 1.")
                 self%basic%solver_settings%parallel_settings%threads%max_active_levels = 1
-            else
-                if (self%basic%solver_settings%parallel_settings%threads%max_active_levels < 0) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
+            else if (self%basic%solver_settings%parallel_settings%threads%max_active_levels < 0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
         end if
 
