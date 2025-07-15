@@ -1,8 +1,5 @@
 submodule(Solver_Solve) Solve_LU
-    use, intrinsic :: iso_fortran_env, only: int32, int64, real64
-    use :: Matrix_CRS
     implicit none
-
 contains
     module function Solver_CRS_LU_Constructor(N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV, A) result(structure)
         implicit none
@@ -13,7 +10,7 @@ contains
         integer(int32), intent(in) :: PHASE
         integer(int32), intent(in) :: NRHS
         integer(int32), intent(in) :: MSGVLV
-        type(Type_CRS), intent(in) :: A
+        type(type_crs), intent(in) :: A
         class(Abstract_Solver_CRS), allocatable :: structure
 
         integer(int32) :: i
@@ -48,7 +45,7 @@ contains
     module subroutine Solve_CRS_LU(self, A, b, x, status)
         implicit none
         class(Solver_CRS_LU) :: self
-        type(Type_CRS), intent(in) :: A
+        type(type_crs), intent(in) :: A
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
         integer(int32), intent(inout) :: status
