@@ -144,6 +144,8 @@ module inout_input
     type :: type_geometry_settings
         character(:), allocatable :: file_name
         character(:), allocatable :: cell_id_array_name
+        character(:), allocatable :: integration_type
+        real(real64) :: integration_points
     end type type_geometry_settings
     !-------------------------------------------------------------------------------
     type :: type_materials_wrf

@@ -23,6 +23,10 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: geometry_settings = "geometry_settings"
     character(*), parameter :: file_name = "file_name"
     character(*), parameter :: cell_id_array_name = "cell_id_array_name"
+    character(*), parameter :: integration = "integration"
+    character(*), parameter :: integration_type = "type"
+    character(*), parameter :: integration_types(3) = ["full", "reduced", "free"]
+    character(*), parameter :: integration_points = "points"
     !-------------------------------------------------------------------------------
     ! JSON key names for materials
     !-------------------------------------------------------------------------------
@@ -61,6 +65,9 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: impedance_factor = "impedance_factor"
     character(*), parameter :: water_viscosity_model = "water_viscosity_model"
     character(*), parameter :: water_retention_model = "water_retention_model"
+    !-------------------------------------------------------------------------------
+    ! JSON key names for solver settings
+    !-------------------------------------------------------------------------------
 
 contains
     module subroutine inout_input_basic_parameters(self)
@@ -195,6 +202,33 @@ contains
         if (.not. found) then
             call json%destroy()
             call error_message(904, c_opt=key)
+        end if
+
+        key = join([geometry_settings, integration, integration_type])
+        call json%get(key, self%basic%geometry_settings%integration_type, found)
+        call json%print_error_message(output_unit)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+        if (.not. any(integration_types(:) == self%basic%geometry_settings%integration_type)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        if (self%basic%geometry_settings%integration_type == "free") then
+            key = join([geometry_settings, integration, integration_points])
+            call json%get(key, self%basic%geometry_settings%integration_points, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            if (self%basic%geometry_settings%integration_points < 0.0d0 .or. &
+                self%basic%geometry_settings%integration_points > 1.0d0) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
+            end if
         end if
 
     end subroutine read_parameters_geometry_settings
