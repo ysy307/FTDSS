@@ -3,19 +3,20 @@ submodule(calculate_volumetric_heat_capacity) Calc_VHC_Base
 
 contains
 
-    module subroutine initialize_holder_vhcs(self, iRegion, Input)
+    module subroutine initialize_holder_vhcs(self, input, i_material)
         implicit none
         class(holder_vhcs), intent(inout) :: self
-        integer(int32), intent(in) :: iRegion
-        type(Type_Input), intent(in) :: Input
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
 
-        if (Input%Regions(iRegion)%Flag%is3Phase) then
-            if (Input%Regions(iRegion)%Flag%isFrozen) then
-                self%p = Type_VHC_3Phase_Apparent(iRegion, input)
+        select case (input%basic%materials(i_material)%phase)
+        case (3)
+            if (input%basic%materials(i_material)%is_frozen) then
+                self%p = type_vhc_3phase_apparent(input, i_material)
             else
-                self%p = Type_VHC_3Phase(iRegion, Input)
+                self%p = type_vhc_3phase(input, i_material)
             end if
-        end if
+        end select
 
     end subroutine initialize_holder_vhcs
 

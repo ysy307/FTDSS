@@ -4,24 +4,26 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function construct_sph_3phase(iRegion, Input) result(property)
+    module function construct_sph_3phase(input, i_material) result(property)
         implicit none
-        class(Abst_SPH), allocatable :: property
-        integer(int32), intent(in) :: iRegion
-        type(Type_Input), intent(in) :: Input
+        class(abst_sph), allocatable :: property
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
 
         if (allocated(property)) deallocate (property)
-        allocate (Type_SPH_3Phase :: property)
+        allocate (type_sph_3phase :: property)
 
-        property%material1 = Input%Regions(iRegion)%Thermal%c(1)
-        property%material2 = Input%Regions(iRegion)%Thermal%c(2)
-        property%material3 = Input%Regions(iRegion)%Thermal%c(3)
+        property%material_id = i_material
+
+        property%material1 = input%basic%materials(i_material)%thermal%specific_heat(1)
+        property%material2 = input%basic%materials(i_material)%thermal%specific_heat(2)
+        property%material3 = input%basic%materials(i_material)%thermal%specific_heat(3)
 
     end function construct_sph_3phase
 
     module function calc_sph_gauss_point_3phase(self, state) result(SPH)
         implicit none
-        class(Type_SPH_3Phase), intent(in) :: self
+        class(type_sph_3phase), intent(in) :: self
         type(type_gauss_point_state), intent(in) :: state
         real(real64) :: SPH
 

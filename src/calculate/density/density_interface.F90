@@ -19,7 +19,7 @@ module calculate_density
 
     ! --- 密度の抽象基底クラス (インターフェースの契約) ---
     type, abstract :: abst_den
-        integer(int32) :: region_id
+        integer(int32) :: material_id
         real(real64) :: material1 !! soil, rock, concrete
         real(real64) :: material2 !! water
         real(real64) :: material3 !! ice
@@ -50,19 +50,19 @@ module calculate_density
 
     ! このモジュールで実装される手続きのインターフェース
     interface
-        module subroutine initialize_holder_dens(self, i_material, input)
+        module subroutine initialize_holder_dens(self, input, i_material)
             implicit none
             class(holder_dens), intent(inout) :: self
-            integer(int32), intent(in) :: i_material
             type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
         end subroutine initialize_holder_dens
 
-        module function construct_den_3phase(i_material, input) result(property)
+        module function construct_den_3phase(input, i_material) result(property)
             import :: abst_den, type_input
             implicit none
             class(abst_den), allocatable :: property
-            integer(int32), intent(in) :: i_material
             type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
         end function construct_den_3phase
 
         module function calc_den_gauss_point_3phase(self, state) result(density)

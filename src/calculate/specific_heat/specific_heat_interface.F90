@@ -1,7 +1,7 @@
 module calculate_specific_heat
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
-    use :: Inout_Input, only:Type_Input
+    use :: module_input, only:type_input
     implicit none
     private
 
@@ -19,7 +19,7 @@ module calculate_specific_heat
 
     ! --- 密度の抽象基底クラス (インターフェースの契約) ---
     type, abstract :: abst_sph
-        integer(int32) :: region_id
+        integer(int32) :: material_id
         real(real64) :: material1 !! soil, rock, concrete
         real(real64) :: material2 !! water
         real(real64) :: material3 !! ice
@@ -47,18 +47,18 @@ module calculate_specific_heat
 
     ! このモジュールで実装される手続きのインターフェース
     interface
-        module subroutine initialize_holder_sphs(self, iRegion, Input)
+        module subroutine initialize_holder_sphs(self, input, i_material)
             implicit none
             class(holder_sphs), intent(inout) :: self
-            integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
         end subroutine initialize_holder_sphs
 
-        module function construct_sph_3phase(iRegion, Input) result(property)
+        module function construct_sph_3phase(input, i_material) result(property)
             implicit none
             class(abst_sph), allocatable :: property
-            integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
         end function construct_sph_3phase
 
         module function calc_sph_gauss_point_3phase(self, state) result(SpecificHeat)

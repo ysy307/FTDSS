@@ -172,7 +172,7 @@ module inout_input
     end type type_materials_gcc
 
     type :: type_materials_phase_change
-        real(real64) :: latent_heat
+        real(real64) :: latent_heat_fusion
         real(real64) :: freezing_temperature
         type(type_materials_wrf) :: wrf
         type(type_materials_gcc) :: gcc

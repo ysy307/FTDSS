@@ -21,8 +21,8 @@ module Matrix_CRS
         real(real64), allocatable :: val(:) ! non-zero values
     contains
         procedure, public, pass(self) :: initialize => initialize_type_crs
-        procedure, public, pass(self) :: Find => Find_CRS_Location
-        procedure, public, pass(self) :: Copy => Copy_CRS
+        procedure, public, pass(self) :: find => type_crs_find
+        procedure, public, pass(self) :: Copy => type_crs_copy
     end type type_crs
 
     interface operator(*)
@@ -34,13 +34,7 @@ module Matrix_CRS
         module procedure Matrix_Addition_CRS
     end interface
 
-    ! interface type_crs
-    !     module procedure initialize_type_crs
-    ! end interface
-
 contains
-
-! in module Matrix_CRS
 
     subroutine initialize_type_crs(self, domain)
         implicit none
@@ -74,7 +68,8 @@ contains
         call allocate_array(rcm_row, self%nnz)
         call allocate_array(rcm_col, self%nnz)
 
-        call domain%rcm%reorder_to_rcm(coo%row, coo%col, rcm_row, rcm_col)
+        call domain%reordering%to_reordered(coo%row, rcm_row)
+        call domain%reordering%to_reordered(coo%col, rcm_col)
 
         ! =================================================================
         ! Step 3: RCM適用後のデータから直接CRS行列を構築
@@ -178,24 +173,40 @@ contains
         end do
     end function Multiplication_Matrix_Scalar_CRS
 
-    subroutine Find_CRS_Location(self, column, index_in, loc)
+    subroutine type_crs_find(self, column, indes, location)
         implicit none
         class(type_crs), intent(in) :: self
-        integer(int32), intent(in) :: column, index_in
-        integer(int32), intent(out) :: loc
-        integer(int32) :: i, start, endp
+        integer(int32), intent(in) :: column, indes
+        integer(int32), intent(out) :: location
 
-        loc = 0
-        start = self%ptr(column)
-        endp = self%ptr(column + 1) - 1
-        do i = start, endp
-            if (self%ind(i) == index_in) then
-                loc = i; return
+        integer(int32) :: low, high, mid
+
+        location = 0 ! 見つからなかった場合のデフォルト値
+
+        ! 検索範囲を設定
+        low = self%ptr(column)
+        high = self%ptr(column + 1) - 1
+
+        ! 範囲が存在しない場合は終了
+        if (low > high) return
+
+        ! 二分探索
+        do while (low <= high)
+            mid = low + (high - low) / 2 ! オーバーフローを防ぐための計算
+
+            if (self%ind(mid) < indes) then
+                low = mid + 1
+            else if (self%ind(mid) > indes) then
+                high = mid - 1
+            else
+                location = mid
+                return
             end if
         end do
-    end subroutine Find_CRS_Location
 
-    function Copy_CRS(self) result(B)
+    end subroutine type_crs_find
+
+    function type_crs_copy(self) result(B)
         implicit none
         class(type_crs) :: self
         type(type_crs) :: B
@@ -209,6 +220,6 @@ contains
         B%ptr(:) = self%ptr(:)
         B%ind(:) = self%ind(:)
         B%val(:) = self%val(:)
-    end function Copy_CRS
+    end function type_crs_copy
 
 end module Matrix_CRS

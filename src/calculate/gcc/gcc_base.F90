@@ -2,25 +2,29 @@ submodule(calculate_gcc) gcc_base
     implicit none
 contains
 
-    module subroutine initialize_holder_gccs(self, iRegion, Input)
+    module subroutine initialize_holder_gccs(self, input, i_material)
         implicit none
         class(holder_gccs), intent(inout) :: self
-        integer(int32), intent(in) :: iRegion
-        type(type_Input), intent(in) :: Input
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
 
-        if (Input%Regions(iRegion)%Ice%isSegregation) then
-            select case (Input%Regions(iRegion)%Ice%c_unit)
+        if (input%basic%materials(i_material)%thermal%phase_change%gcc%is_segregation) then
+            select case (input%basic%materials(i_material)%thermal%phase_change%gcc%unit)
             case ('m')
-                self%p = type_gcc_segregation_m(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
-            case ("Pa")
-                self%p = type_gcc_segregation_pa(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
+                self%p = type_gcc_segregation_m(input%basic%materials(i_material)%thermal%phase_change%freezing_temperature, &
+                                                input%basic%materials(i_material)%thermal%phase_change%latent_heat_fusion)
+            case ("pa")
+                self%p = type_gcc_segregation_pa(input%basic%materials(i_material)%thermal%phase_change%freezing_temperature, &
+                                                 input%basic%materials(i_material)%thermal%phase_change%latent_heat_fusion)
             end select
         else
-            select case (Input%Regions(iRegion)%Ice%c_unit)
+            select case (input%basic%materials(i_material)%thermal%phase_change%gcc%unit)
             case ('m')
-                self%p = type_gcc_non_segregation_m(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
-            case ("Pa")
-                self%p = type_gcc_non_segregation_pa(Input%Regions(iRegion)%Ice%Tf, Input%Regions(iRegion)%Thermal%LatentHeat)
+                self%p = type_gcc_non_segregation_m(input%basic%materials(i_material)%thermal%phase_change%freezing_temperature, &
+                                                    input%basic%materials(i_material)%thermal%phase_change%latent_heat_fusion)
+            case ("pa")
+                self%p = type_gcc_non_segregation_pa(input%basic%materials(i_material)%thermal%phase_change%freezing_temperature, &
+                                                     input%basic%materials(i_material)%thermal%phase_change%latent_heat_fusion)
             end select
         end if
 

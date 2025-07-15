@@ -3,15 +3,15 @@ submodule(calculate_density) calc_den_base
 
 contains
 
-    module subroutine initialize_holder_dens(self, i_material, input)
+    module subroutine initialize_holder_dens(self, input, i_material)
         implicit none
         class(holder_dens), intent(inout) :: self
-        integer(int32), intent(in) :: i_material
         type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
 
         select case (input%basic%materials(i_material)%phase)
         case (3)
-            self%p = type_den_3phase(i_material, input)
+            self%p = type_den_3phase(input, i_material)
         end select
 
     end subroutine initialize_holder_dens

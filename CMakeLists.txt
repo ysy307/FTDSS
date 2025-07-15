@@ -53,7 +53,7 @@ add_subdirectory(src/matrix)
 add_subdirectory(src/domain)
 add_subdirectory(src/calculate/blas)
 add_subdirectory(src/calculate/wrf)
-add_subdirectory(src/calculate/HCF)
+# add_subdirectory(src/calculate/HCF)
 add_subdirectory(src/calculate/gcc)
 add_subdirectory(src/calculate/thermal_conductivity)
 add_subdirectory(src/calculate/density)
@@ -79,7 +79,7 @@ set(COMMON_LIBS
     Matrix 
     Domain 
     Calc_WRF
-    Calc_HCF
+    # Calc_HCF
     Calc_GCC
     Calc_THC
     Calc_DEN

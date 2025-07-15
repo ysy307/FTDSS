@@ -55,21 +55,13 @@ contains
     !================================================================!
     !【初期化メソッド】アルゴリズム名に応じて処理を分岐
     !================================================================!
-    subroutine initialize_type_coloring(self, adjacency, algorithm_name)
+    subroutine initialize_type_coloring(self, algorithm_name, adjacency)
         implicit none
         class(type_coloring), intent(inout) :: self
         class(type_crs_adjacency_element), intent(in) :: adjacency
-        character(len=*), intent(in), optional :: algorithm_name
+        character(*), intent(in) :: algorithm_name
 
-        character(len=30) :: selected_algorithm
-
-        if (present(algorithm_name)) then
-            selected_algorithm = trim(adjustl(algorithm_name))
-        else
-            selected_algorithm = "welsh-powell" ! 指定がない場合のデフォルト
-        end if
-
-        select case (selected_algorithm)
+        select case (trim(adjustl(algorithm_name)))
         case ("welsh-powell")
             self%algorithm_name = "Welsh-Powell"
             call self%coloring_welsh_powell(adjacency)
@@ -79,9 +71,6 @@ contains
         case ("lfo")
             self%algorithm_name = "Largest First Order"
             call self%coloring_lfo(adjacency) ! LFOアルゴリズムの実行
-        case default
-            print *, "Error: Unknown coloring algorithm specified:", selected_algorithm
-            error stop 1
         end select
     end subroutine initialize_type_coloring
 

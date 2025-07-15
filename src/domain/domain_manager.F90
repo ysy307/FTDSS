@@ -9,7 +9,7 @@ module domain_manager
     use :: domain_side_factory, only:create_side
     use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element
     use :: domain_multicoloring, only:type_coloring, type_colored_info
-    use :: domain_rcm, only:type_rcm
+    use :: domain_reordering, only:type_reordering
     implicit none
     private
 
@@ -25,7 +25,7 @@ module domain_manager
         type(holder_sides), allocatable :: sides(:)
 
         type(type_coloring) :: colors
-        type(type_rcm) :: rcm
+        type(type_reordering) :: reordering
 
         integer(int32), private :: computaion_dimension
         ! ...
@@ -131,22 +131,15 @@ contains
         !===============================================================
         ! 4. RCM並べ替えの実行
         !===============================================================
-        select case (input%basic%solver_settings%reordering)
-        case ("rcm")
-            call self%rcm%reorder(self%elements)
-            call self%rcm%invert()
-            call global_logger%log_information(message="RCM reordering completed.")
-        end select
+        call self%reordering%initialize(input%basic%solver_settings%reordering, self%elements)
+        call global_logger%log_information(message="RCM reordering completed.")
 
         !===============================================================
         ! 5. グラフ彩色の実行
         !===============================================================
-        select case (input%basic%solver_settings%coloring)
-        case ("welsh_powell", "dsatur", "lfo")
-            call self%colors%initialize(element_adjacency, algorithm_name=input%basic%solver_settings%coloring)
-            call global_logger%log_information(message="Graph coloring completed using " &
-                                               //trim(self%colors%algorithm_name)//" algorithm.")
-        end select
+        call self%colors%initialize(input%basic%solver_settings%coloring, element_adjacency)
+        call global_logger%log_information(message="Graph coloring completed using " &
+                                           //trim(self%colors%algorithm_name)//" algorithm.")
 
         !===============================================================
         ! 6. 後片付け

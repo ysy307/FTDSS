@@ -4,7 +4,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function construct_den_3phase(i_material, input) result(property)
+    module function construct_den_3phase(input, i_material) result(property)
         implicit none
         class(abst_den), allocatable :: property
         integer(int32), intent(in) :: i_material
@@ -12,6 +12,8 @@ contains
 
         if (allocated(property)) deallocate (property)
         allocate (Type_DEN_3Phase :: property)
+
+        property%material_id = i_material
 
         property%material1 = input%basic%materials(i_material)%thermal%density(1)
         property%material2 = input%basic%materials(i_material)%thermal%density(2)

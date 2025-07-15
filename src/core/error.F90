@@ -85,10 +85,22 @@ contains
             msg = "The number of array elements must be positive."
         else if (err_number == 930) then
             msg = "The number of matrix elements must be positive."
+
+            ! reordering error message
         else if (err_number == 931) then
-            msg = "opening output file"
+            if (present(c_opt)) then
+                write (msg, fmt) "#", err_number, ": Could not find a starting node in "//trim(adjustl(c_opt))//"."
+            else
+                write (msg, fmt) "#", err_number, ": Could not find a starting node."
+            end if
         else if (err_number == 932) then
-            msg = "Invalid element index"
+            if (present(c_opt)) then
+                write (msg, fmt) "#", err_number, ": Permutation is not ready in"//trim(adjustl(c_opt))//". Call reordering first."
+            else
+                write (msg, fmt) "#", err_number, ": Permutation is not ready. Call reordering first."
+            end if
+
+            ! solver error message
         else if (err_number == 933) then
             msg = "Solver type is not selected."
         else if (err_number == 934) then

@@ -3,15 +3,16 @@ submodule(calculate_specific_heat) calc_sph_base
 
 contains
 
-    module subroutine initialize_holder_sphs(self, iRegion, Input)
+    module subroutine initialize_holder_sphs(self, input, i_material)
         implicit none
         class(holder_sphs), intent(inout) :: self
-        integer(int32), intent(in) :: iRegion
-        type(Type_Input), intent(in) :: Input
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
 
-        if (Input%Regions(iRegion)%Flag%is3Phase) then
-            self%p = type_sph_3phase(iRegion, Input)
-        end if
+        select case (input%basic%materials(i_material)%phase)
+        case (3)
+            self%p = type_sph_3phase(input, i_material)
+        end select
 
     end subroutine initialize_holder_sphs
 

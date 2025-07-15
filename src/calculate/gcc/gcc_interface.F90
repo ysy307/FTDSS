@@ -1,7 +1,6 @@
 module calculate_gcc
     use, intrinsic :: iso_fortran_env, only: int32, real64
-!$  use omp_lib
-    use :: Inout_Input, only:type_Input
+    use :: module_input, only:type_input
     implicit none
     private
 
@@ -84,21 +83,21 @@ module calculate_gcc
     end interface
 
     interface
-        module subroutine initialize_holder_gccs(self, iRegion, Input)
+        module subroutine initialize_holder_gccs(self, input, i_material)
             implicit none
             class(holder_gccs), intent(inout) :: self
-            integer(int32), intent(in) :: iRegion
-            type(type_Input), intent(in) :: Input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
 
         end subroutine initialize_holder_gccs
     end interface
 
     interface
-        module function type_GCC_NonSeg_m_Construct(Tf, Lf) result(structure)
+        module function type_GCC_NonSeg_m_Construct(Tf, Lf) result(property)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(abst_gcc), allocatable :: structure
+            class(abst_gcc), allocatable :: property
 
         end function type_GCC_NonSeg_m_Construct
 
@@ -138,11 +137,11 @@ module calculate_gcc
     end interface
 
     interface
-        module function type_GCC_NonSeg_Pa_Construct(Tf, Lf) result(structure)
+        module function type_GCC_NonSeg_Pa_Construct(Tf, Lf) result(property)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(abst_gcc), allocatable :: structure
+            class(abst_gcc), allocatable :: property
 
         end function type_GCC_NonSeg_Pa_Construct
 
@@ -182,11 +181,11 @@ module calculate_gcc
     end interface
 
     interface
-        module function type_GCC_Seg_m_Construct(Tf, Lf) result(structure)
+        module function type_GCC_Seg_m_Construct(Tf, Lf) result(property)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(abst_gcc), allocatable :: structure
+            class(abst_gcc), allocatable :: property
 
         end function type_GCC_Seg_m_Construct
 
@@ -226,11 +225,11 @@ module calculate_gcc
     end interface
 
     interface
-        module function type_GCC_Seg_Pa_Construct(Tf, Lf) result(structure)
+        module function type_GCC_Seg_Pa_Construct(Tf, Lf) result(property)
             implicit none
             real(real64), intent(in) :: Tf
             real(real64), intent(in) :: Lf
-            class(abst_gcc), allocatable :: structure
+            class(abst_gcc), allocatable :: property
 
         end function type_GCC_Seg_Pa_Construct
 

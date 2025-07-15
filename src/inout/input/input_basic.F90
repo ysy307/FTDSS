@@ -58,6 +58,7 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: equilibrium_model = "equilibrium_model"
     character(*), parameter :: segregation = "segregation"
     character(*), parameter :: unit = "unit"
+    character(*), parameter :: valid_gcc_units(2) = ["m", "pa"]
     character(*), parameter :: hydraulic = "hydraulic"
     character(*), parameter :: hydraulic_conductivity_model = "hydraulic_conductivity_model"
     character(*), parameter :: saturated_conductivity = "saturated_conductivity"
@@ -421,13 +422,13 @@ contains
 
         if (self%basic%materials(i)%is_frozen) then
             key = join([key_material, phase_change, latent_heat, fusion])
-            call json%get(key, self%basic%materials(i)%thermal%phase_change%latent_heat, found)
+            call json%get(key, self%basic%materials(i)%thermal%phase_change%latent_heat_fusion, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
             end if
-            if (self%basic%materials(i)%thermal%phase_change%latent_heat <= 0.0d0) then
+            if (self%basic%materials(i)%thermal%phase_change%latent_heat_fusion <= 0.0d0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -460,6 +461,9 @@ contains
             if (.not. found) then
                 call json%destroy()
                 call error_message(904, c_opt=key)
+            else if (.not. any(valid_gcc_units(:) == self%basic%materials(i)%thermal%phase_change%gcc%unit)) then
+                call json%destroy()
+                call error_message(905, c_opt=key)
             end if
 
         end if
