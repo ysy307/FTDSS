@@ -109,7 +109,7 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: max_active_levels = "max_active_levels"
 
 contains
-    module subroutine inout_input_basic_parameters(self)
+    module subroutine inout_read_basic_parameters(self)
         !< Load the input parameters from the JSON file
         implicit none
         class(type_input), intent(inout) :: self
@@ -130,7 +130,7 @@ contains
         call json%print_error_message(output_unit)
 
         stop
-    end subroutine inout_input_basic_parameters
+    end subroutine inout_read_basic_parameters
 
     subroutine read_parameters_simulation_settings(self, json)
         !> Load the basic input parameters from the JSON file
@@ -825,8 +825,6 @@ contains
         call read_parameters_solver_settings_linear(self, json)
         call read_parameters_solver_parallel_settings(self, json)
 
-                !! Debug output
-
     end subroutine read_parameters_solver_settings
 
     subroutine read_parameters_solver_settings_nonlinear(self, json)
@@ -920,49 +918,6 @@ contains
                 key_base = join([solver_settings, nonlinear_solver, convergence, update])
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%basic%solver_settings%nonlinear_solver%convergence%update, json, key_base)
-            end select
-        end select
-
-        print *, "Solver settings:"
-        print *, "  BDF order: ", self%basic%solver_settings%bdf_order
-        print *, "  Reordering: ", self%basic%solver_settings%reordering
-        print *, "  Coloring: ", self%basic%solver_settings%coloring
-        print *, "  Nonlinear solver method: ", self%basic%solver_settings%nonlinear_solver%method
-        select case (self%basic%solver_settings%nonlinear_solver%method)
-        case (nonlinear_solver_methods(1)) ! none
-            print *, "  Nonlinear solver method: none"
-        case (nonlinear_solver_methods(2)) ! newton
-            print *, "  Nonlinear solver method: newton"
-            print *, "  Max iterations: ", self%basic%solver_settings%nonlinear_solver%max_iterations
-            print *, "  Convergence criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_criteria
-            if (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria == criteria_types(3)) then
-                print *, "  Logic between criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_logic
-            end if
-            select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
-            case (criteria_types(1)) ! residual
-                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
-            case (criteria_types(2)) ! update
-                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
-            case (criteria_types(3)) ! residual and update
-                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
-                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
-            end select
-        case (nonlinear_solver_methods(3)) ! modified newton
-            print *, "  Nonlinear solver method: modified newton"
-            print *, "  Update frequency: ", self%basic%solver_settings%nonlinear_solver%update_frequency
-            print *, "  Max iterations: ", self%basic%solver_settings%nonlinear_solver%max_iterations
-            print *, "  Convergence criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_criteria
-            if (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria == criteria_types(3)) then
-                print *, "  Logic between criteria: ", self%basic%solver_settings%nonlinear_solver%convergence%use_logic
-            end if
-            select case (self%basic%solver_settings%nonlinear_solver%convergence%use_criteria)
-            case (criteria_types(1)) ! residual
-                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
-            case (criteria_types(2)) ! update
-                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
-            case (criteria_types(3)) ! residual and update
-                print *, "  Residual absolute tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
-                print *, "  Update relative tolerance: ", self%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
             end select
         end select
 
@@ -1072,27 +1027,11 @@ contains
         if (self%basic%analysis_controls%calculate_thermal) then
             key = join([solver_settings, linear_solver, thermal])
             call read_parameters_solver_settings_linear_local(self%basic%solver_settings%linear_solver%thermal, json, key)
-            !! Debug output
-            print *, "Thermal linear solver method: ", self%basic%solver_settings%linear_solver%thermal%method
-            if (self%basic%solver_settings%linear_solver%thermal%method == linear_solver_methods(2)) then
-                print *, "  Iterative solver type: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%solver_type
-                print *, "  Preconditioner type: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%preconditioner_type
-                print *, "  Max iterations: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%max_iterations
-                print *, "  Tolerance: ", self%basic%solver_settings%linear_solver%thermal%iterative_solver%tolerance
-            end if
         end if
 
         if (self%basic%analysis_controls%calculate_hydraulic) then
             key = join([solver_settings, linear_solver, hydraulic])
             call read_parameters_solver_settings_linear_local(self%basic%solver_settings%linear_solver%hydraulic, json, key)
-            !! Debug output
-            print *, "Hydraulic linear solver method: ", self%basic%solver_settings%linear_solver%hydraulic%method
-            if (self%basic%solver_settings%linear_solver%hydraulic%method == linear_solver_methods(2)) then
-                print *, "  Iterative solver type: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%solver_type
-                print *, "  Preconditioner type: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%preconditioner_type
-                print *, "  Max iterations: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%max_iterations
-                print *, "  Tolerance: ", self%basic%solver_settings%linear_solver%hydraulic%iterative_solver%tolerance
-            end if
         end if
 
         if (self%basic%analysis_controls%calculate_mechanical) then
@@ -1243,17 +1182,6 @@ contains
                     call error_message(905, c_opt=key)
                 end if
             end if
-        end if
-
-        !! Debug output
-        print *, "Parallel settings:"
-        print *, "  Is parallel: ", self%basic%solver_settings%parallel_settings%threads%is_parallel
-        if (self%basic%solver_settings%parallel_settings%threads%is_parallel) then
-            print *, "  Number of threads: ", self%basic%solver_settings%parallel_settings%threads%num_threads
-            print *, "  Schedule: ", self%basic%solver_settings%parallel_settings%threads%schedule
-            print *, "  Dynamic adjustment: ", self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment
-            print *, "  Nested parallelism: ", self%basic%solver_settings%parallel_settings%threads%nested_parallelism
-            print *, "  Maximum active levels: ", self%basic%solver_settings%parallel_settings%threads%max_active_levels
         end if
 
     end subroutine read_parameters_solver_parallel_settings

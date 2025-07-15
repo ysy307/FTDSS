@@ -428,7 +428,7 @@ module inout_input
     contains
         procedure, pass(self), public :: initialize => type_input_initialize
 
-        procedure :: read_parameters => inout_input_basic_parameters
+        procedure :: read_parameters => inout_read_basic_parameters
         procedure :: Input_Geometry => inout_input_geometry_VTK
         procedure :: Input_conditions => inout_input_conditions_JSON
         procedure :: Input_OutputSettings => inout_input_OutputSettings_JSON
@@ -436,12 +436,12 @@ module inout_input
     end type type_input
 
     interface
-        module subroutine inout_input_basic_parameters(self)
+        module subroutine inout_read_basic_parameters(self)
             !< Load the input parameters from the JSON file
             implicit none
             class(type_input), intent(inout) :: self
 
-        end subroutine inout_input_basic_parameters
+        end subroutine inout_read_basic_parameters
 
     end interface
 
@@ -464,7 +464,7 @@ contains
         if (.not. exists) call error_message(901)
 
         self%basic_file_name = self%project_path//"Input/Basic.json"
-        self%conditions_file_name = self%project_path//"Input/conditions.json"
+        self%conditions_file_name = self%project_path//"Input/Conditions.json"
         self%output_file_name = self%project_path//"Input/Output.json"
 
         ! Check the existence of the file
