@@ -1,8 +1,8 @@
 submodule(inout_input) inout_input_conditions
     implicit none
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for time control
-    !-------------------------------------------------------------------------------
+    !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: time_control = "time_control"
     character(*), parameter :: simulation_period = "simulation_period"
     character(*), parameter :: unit = "unit"
@@ -14,6 +14,20 @@ submodule(inout_input) inout_input_conditions
     character(*), parameter :: min_step = "min_step"
     character(*), parameter :: max_step = "max_step"
     character(*), parameter :: boundary_condition_time_points = "boundary_condition_time_points"
+    !!------------------------------------------------------------------------------------------------------------------------------
+    ! JSON key names for boundary conditions
+    !!------------------------------------------------------------------------------------------------------------------------------
+    character(*), parameter :: boundary_conditions = "boundary_conditions"
+    character(*), parameter :: id = "id"
+    character(*), parameter :: thermal = "thermal"
+    character(*), parameter :: hydraulic = "hydraulic"
+    character(*), parameter :: type = "type"
+    character(*), parameter :: is_uniform = "is_uniform"
+    character(*), parameter :: values = "values"
+    character(*), parameter :: thermal_boundary_types(8) = ["dirichlet", "neumann", "flux", "robin", "adiabatic", &
+                                                            "free", "heat_trasfer", "head_radiation"]
+    character(*), parameter :: hydraulic_boundary_types(4) = ["dirichlet", "neumann", "flux", "impermeable"]
+    !!------------------------------------------------------------------------------------------------------------------------------
 
 contains
     module subroutine inout_read_conditions(self)
@@ -30,12 +44,15 @@ contains
         call json%print_error_message(output_unit)
 
         call read_conditions_time_control(self, json)
+        call read_conditions_boundary_conditions(self, json)
 
         ! call inout_read_conditions_BC(self, json)
         ! call inout_read_conditions_IC(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
+
+        stop
 
     end subroutine inout_read_conditions
 
@@ -216,67 +233,160 @@ contains
 
     end subroutine read_conditions_time_control_boundary_condition_time_points
 
-    ! subroutine inout_input_conditions_JSON_BC(self, json)
-    !     !> Load the boundary conditions from the JSON file
-    !     implicit none
-    !     class(type_input) :: self
-    !     type(json_file), intent(inout) :: json !! JSON parser
+    subroutine read_conditions_boundary_conditions(self, json)
+        implicit none
+        class(type_input) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
 
-    !     character(:), allocatable :: key
-    !     character(2) :: cBCGroup
-    !     integer(int32) :: iBC
-    !     integer(int32) :: minium, maximum
+        character(:), allocatable :: key
+        character(:), allocatable :: key_base
+        logical :: found
+        integer(int32) :: i
 
-    !     integer(int32) :: numGroup
-    !     integer(int32) :: iGroup
+        call json%info(boundary_conditions, found=found, n_children=self%conditions%num_boundaries)
+        call json%print_error_message(output_unit)
+        if (.not. found .or. self%conditions%num_boundaries <= 0) then
+            call json%destroy()
+            call error_message(904, c_opt=boundary_conditions)
+        end if
 
-    !     ! key = Connect_dot(BCName, GroupName)
-    !     ! call json%get(key, self%conditions%Groups)
-    !     ! call json%print_error_message(output_unit)
+        if (allocated(self%conditions%boundary_conditions)) deallocate (self%conditions%boundary_conditions)
+        allocate (self%conditions%boundary_conditions(self%conditions%num_boundaries))
 
-    !     ! numGroup = size(self%conditions%Groups)
-    !     ! minium = minval(self%conditions%Groups)
-    !     ! maximum = maxval(self%conditions%Groups)
-    !     ! allocate (self%conditions%Heat(minium:maximum))
-    !     ! allocate (self%conditions%Water(minium:maximum))
+        do i = 1, self%conditions%num_boundaries
+            key_base = boundary_conditions//"("//to_string(i)//")"
+            key = join([key_base, id])
+            call json%get(key, self%conditions%boundary_conditions(i)%id, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+            print *, "Boundary ID: ", self%conditions%boundary_conditions(i)%id
 
-    !     ! key = Connect_dot(BCName, TimeName)
-    !     ! call json%get(key, self%conditions%Time)
-    !     ! call json%print_error_message(output_unit)
+            if (self%basic%analysis_controls%calculate_thermal) then
+                key = join([key_base, thermal])
+                call read_conditions_boundary_conditions_thermal(self%conditions%boundary_conditions(i)%thermal, json, key, &
+                                                                 size(self%conditions%time_control%boundary_time_points(:)))
+            end if
 
-    !     ! do iBC = 1, numGroup
-    !     !     iGroup = self%conditions%Groups(iBC)
-    !     !     write (cBCGroup, '(i0)') iGroup
-    !     !     key = Connect_dot(BCName, cBCGroup, ThermalName, TypeName)
-    !     !     call json%get(key, self%conditions%Heat(iGroup)%type)
-    !     !     call json%print_error_message(output_unit)
+            if (self%basic%analysis_controls%calculate_hydraulic) then
+                key = join([key_base, hydraulic])
+                call read_conditions_boundary_conditions_hydraulic(self%conditions%boundary_conditions(i)%hydraulic, json, key, &
+                                                                   size(self%conditions%time_control%boundary_time_points(:)))
+            end if
 
-    !     !     select case (self%conditions%Heat(iGroup)%type)
-    !     !     case (DirichletName, HeatTransferName)
-    !     !         key = Connect_dot(BCName, cBCGroup, ThermalName, UniformName)
-    !     !         call json%get(key, self%conditions%Heat(iGroup)%isUniform)
-    !     !         call json%print_error_message(output_unit)
+        end do
 
-    !     !         key = Connect_dot(BCName, cBCGroup, ThermalName, ValueName)
-    !     !         call json%get(key, self%conditions%Heat(iGroup)%value)
-    !     !         call json%print_error_message(output_unit)
-    !     !     end select
+    end subroutine read_conditions_boundary_conditions
 
-    !     ! key = inout_input_Connect_dot(BCName, cBCGroup, HydsraulicName, TypeName)
-    !     ! call json%get(key, self%conditions%BC_Hydraulic(iBC)%type)
-    !     ! call json%print_error_message(output_unit)
+    subroutine read_conditions_boundary_conditions_thermal(boundary, json, key_base, num_time_points)
+        implicit none
+        type(type_boundary_local), intent(inout) :: boundary
+        type(json_file), intent(inout) :: json !! JSON parser
+        character(*), intent(in) :: key_base !! Base key for the boundary condition
+        integer(int32), intent(in), optional :: num_time_points !! Number of time points for the boundary condition
 
-    !     ! select case (self%conditions%BC_Hydraulic(iBC)%type)
-    !     ! case (DirichletName, HeatTransferName)
-    !     !     key = inout_input_Connect_dot(BCName, cBCGroup, HydraulicName, ValueName)
-    !     !     call json%get(key, self%conditions%BC_Hydraulic(iBC)%value)
-    !     !     call json%print_error_message(output_unit)
-    !     ! case default
-    !     !     self%conditions%BC_Hydraulic(iBC)%value = NaNValue
-    !     ! end select
-    !     ! end do
+        character(:), allocatable :: key
+        logical :: found
 
-    ! end subroutine inout_input_conditions_JSON_BC
+        key = join([key_base, type])
+        call json%get(key, boundary%type, found=found)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        if (.not. any(thermal_boundary_types(:) == boundary%type)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        select case (boundary%type)
+        case (thermal_boundary_types(1))
+            key = join([key_base, is_uniform])
+            call json%get(key, boundary%is_uniform, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+
+            if (boundary%is_uniform) then
+                key = join([key_base, values])
+
+                call json%get(key, boundary%values, found=found)
+                if (.not. found) then
+                    call json%destroy()
+                    call error_message(904, c_opt=key)
+                end if
+
+                if (size(boundary%values(:)) < 2) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+                if (present(num_time_points)) then
+                    if (size(boundary%values(:)) /= num_time_points) then
+                        call json%destroy()
+                        call error_message(905, c_opt=key)
+                    end if
+                end if
+            end if
+        end select
+
+    end subroutine read_conditions_boundary_conditions_thermal
+
+    subroutine read_conditions_boundary_conditions_hydraulic(boundary, json, key_base, num_time_points)
+        implicit none
+        type(type_boundary_local), intent(inout) :: boundary
+        type(json_file), intent(inout) :: json !! JSON parser
+        character(*), intent(in) :: key_base !! Base key for the boundary condition
+        integer(int32), intent(in), optional :: num_time_points !! Number of time points for the boundary condition
+
+        character(:), allocatable :: key
+        logical :: found
+
+        key = join([key_base, type])
+        call json%get(key, boundary%type, found=found)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        if (.not. any(hydraulic_boundary_types(:) == boundary%type)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        select case (boundary%type)
+        case (hydraulic_boundary_types(1))
+            key = join([key_base, is_uniform])
+            call json%get(key, boundary%is_uniform, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+
+            if (boundary%is_uniform) then
+                key = join([key_base, values])
+                call json%get(key, boundary%values, found=found)
+                if (.not. found) then
+                    call json%destroy()
+                    call error_message(904, c_opt=key)
+                end if
+
+                if (size(boundary%values(:)) < 2) then
+                    call json%destroy()
+                    call error_message(905, c_opt=key)
+                end if
+                if (present(num_time_points)) then
+                    if (size(boundary%values(:)) /= num_time_points) then
+                        call json%destroy()
+                        call error_message(905, c_opt=key)
+                    end if
+                end if
+            end if
+        end select
+
+    end subroutine read_conditions_boundary_conditions_hydraulic
 
     ! subroutine inout_input_conditions_JSON_IC(self, json)
     !     !> Load the initialy conditions from the JSON file

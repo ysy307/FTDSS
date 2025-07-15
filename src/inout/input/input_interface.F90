@@ -311,9 +311,26 @@ module inout_input
         type(type_time_control_time_stepping) :: time_stepping
         real(real64), allocatable :: boundary_time_points(:)
     end type type_time_control
+    !!------------------------------------------------------------------------------------------------------------------------------
+
+    type :: type_boundary_local
+        character(:), allocatable :: type
+        logical :: is_uniform
+        real(real64), allocatable :: values(:)
+    end type type_boundary_local
+
+    type :: type_boundary_conditions
+        integer(int32) :: id
+        type(type_boundary_local) :: thermal
+        type(type_boundary_local) :: hydraulic
+    end type type_boundary_conditions
+
+    !!------------------------------------------------------------------------------------------------------------------------------
 
     type :: type_conditions
         type(type_time_control) :: time_control
+        type(type_boundary_conditions), allocatable :: boundary_conditions(:)
+        integer(int32) :: num_boundaries
 
     end type type_conditions
     !!------------------------------------------------------------------------------------------------------------------------------
