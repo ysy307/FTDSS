@@ -9,7 +9,9 @@ module domain_side
     !    - Preserve original function and type names
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_logger
     use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array
+    use :: module_input, only:type_geometry_settings
     implicit none
     private
 
@@ -171,11 +173,12 @@ module domain_side
     !   Edge first order procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_side_first(id, global_coordinate, cell_info) result(side)
+        module function construct_side_first(id, global_coordinate, cell_info, integration) result(side)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_side), allocatable :: side
 
         end function construct_side_first
@@ -242,11 +245,12 @@ module domain_side
     !   Edge Second order procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_side_second(id, global_coordinate, cell_info) result(side)
+        module function construct_side_second(id, global_coordinate, cell_info, integration) result(side)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_side), allocatable :: side
 
         end function construct_side_second

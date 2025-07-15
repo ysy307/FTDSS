@@ -798,7 +798,6 @@ contains
         ! --- ステップ3: 収集したIDリストから、ユニークなものだけを抽出 ---
         ! (これはFortranの標準的なユニーク化のアルゴリズム)
         if (count > 0) then
-            call sort(collected_ids(1:count))
             call unique(collected_ids(1:count), unique_ids)
         else
             allocate (unique_ids(0))

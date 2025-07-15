@@ -18,6 +18,7 @@ module domain_multicoloring
 
     ! 着色結果全体を管理する型
     type :: type_coloring
+        character(:), allocatable :: algorithm_name ! 使用するアルゴリズム名
         integer(int32) :: num_colors = 0
         integer(int32), allocatable :: color(:) ! 各要素の色
         type(type_colored_info), allocatable :: colored(:) ! 色ごとの要素リスト
@@ -70,10 +71,13 @@ contains
 
         select case (selected_algorithm)
         case ("welsh-powell")
+            self%algorithm_name = "Welsh-Powell"
             call self%coloring_welsh_powell(adjacency)
         case ("dsatur") ! DSATURのケースを追加
+            self%algorithm_name = "DSATUR"
             call self%coloring_dsatur(adjacency)
         case ("lfo")
+            self%algorithm_name = "Largest First Order"
             call self%coloring_lfo(adjacency) ! LFOアルゴリズムの実行
         case default
             print *, "Error: Unknown coloring algorithm specified:", selected_algorithm

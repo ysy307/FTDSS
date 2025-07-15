@@ -1,7 +1,7 @@
 module calculate_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
-    use :: Inout_Input, only:Type_Input
+    use :: module_input, only:type_input
     implicit none
     private
 
@@ -50,19 +50,19 @@ module calculate_density
 
     ! このモジュールで実装される手続きのインターフェース
     interface
-        module subroutine initialize_holder_dens(self, iRegion, Input)
+        module subroutine initialize_holder_dens(self, i_material, input)
             implicit none
             class(holder_dens), intent(inout) :: self
-            integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            integer(int32), intent(in) :: i_material
+            type(type_input), intent(in) :: input
         end subroutine initialize_holder_dens
 
-        module function construct_den_3phase(iRegion, Input) result(property)
-            import :: abst_den, Type_Input
+        module function construct_den_3phase(i_material, input) result(property)
+            import :: abst_den, type_input
             implicit none
             class(abst_den), allocatable :: property
-            integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            integer(int32), intent(in) :: i_material
+            type(type_input), intent(in) :: input
         end function construct_den_3phase
 
         module function calc_den_gauss_point_3phase(self, state) result(density)

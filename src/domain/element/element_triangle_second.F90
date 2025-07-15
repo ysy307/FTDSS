@@ -29,11 +29,12 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function construct_triangle_second(id, global_coordinate, cell_info) result(element)
+    module function construct_triangle_second(id, global_coordinate, cell_info, integration) result(element)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
         type(type_vtk_cell), intent(in) :: cell_info
+        type(type_geometry_settings), intent(in) :: integration
         class(abst_element), allocatable :: element
 
         integer(int32) :: i
@@ -63,14 +64,31 @@ contains
             element%z(i)%val => global_coordinate%z(element%connectivity(i))
         end do
 
-        element%num_gauss = 3_int32
-        call allocate_array(element%weight, element%num_gauss)
-        call allocate_array(element%gauss, element%dimension, element%num_gauss)
-
-        element%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
-        element%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
-        element%gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
-        element%gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
+        select case (integration%integration_type)
+        case ("full")
+            element%num_gauss = 3_int32
+            call allocate_array(element%weight, element%num_gauss)
+            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+            element%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+            element%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+            element%gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
+            element%gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
+        case ("reduced")
+            element%num_gauss = 1_int32
+            call allocate_array(element%weight, element%num_gauss)
+            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+            element%weight(:) = [1.0d0 / 3.0d0]
+            element%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
+        case ("free")
+            call global_logger%log_warning(message="Free-type integration is not implemented for triangles.")
+            element%num_gauss = 3_int32
+            call allocate_array(element%weight, element%num_gauss)
+            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+            element%weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+            element%gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+            element%gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0]
+            element%gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]
+        end select
 
     end function construct_triangle_second
 

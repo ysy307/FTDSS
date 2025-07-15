@@ -278,20 +278,20 @@ module inout_input
         type(type_solver_settings) :: solver_settings
 
         !! ここから下は後で消す
-        integer(int32) :: DimensionType
-        integer(int32) :: numRegion
-        character(:), allocatable :: Calculation_TimeUnit
-        real(real64) :: Calculation_Step
-        real(real64) :: Calculation_StepMinimum
-        real(real64) :: Calculation_StepMaximum
+        ! integer(int32) :: DimensionType
+        ! integer(int32) :: numRegion
+        ! character(:), allocatable :: Calculation_TimeUnit
+        ! real(real64) :: Calculation_Step
+        ! real(real64) :: Calculation_StepMinimum
+        ! real(real64) :: Calculation_StepMaximum
 
-        character(:), allocatable :: Input_TimeUnit
-        real(real64) :: StartCalculation
-        real(real64) :: EndCalculation
+        ! character(:), allocatable :: Input_TimeUnit
+        ! real(real64) :: StartCalculation
+        ! real(real64) :: EndCalculation
 
-        logical(4) :: shouldDisplayPrompt
-        integer(int32) :: Order
-        integer(int32) :: MaxNonlinearIteration
+        ! logical(4) :: shouldDisplayPrompt
+        ! integer(int32) :: Order
+        ! integer(int32) :: MaxNonlinearIteration
     end type input_basic
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_time_control_simulation_period
@@ -386,121 +386,121 @@ module inout_input
     end type type_geometry
     !!------------------------------------------------------------------------------------------------------------------------------
 
-    type :: Input_OutputSettings
-        character(:), allocatable :: FileFormat
-        character(:), allocatable :: Output_TimeUnit
-        character(:), allocatable :: Interval_TimeUnit
-        real(real64) :: Interval_Step
+    ! type :: Input_OutputSettings
+    !     character(:), allocatable :: FileFormat
+    !     character(:), allocatable :: Output_TimeUnit
+    !     character(:), allocatable :: Interval_TimeUnit
+    !     real(real64) :: Interval_Step
 
-        integer(int32) :: ObservationType
-        integer(int32) :: NumObservation
-        type(type_dp_3d) :: Cood_Obs
-        integer(int32), allocatable :: ObsID(:)
+    !     integer(int32) :: ObservationType
+    !     integer(int32) :: NumObservation
+    !     type(type_dp_3d) :: Cood_Obs
+    !     integer(int32), allocatable :: ObsID(:)
 
-        logical(4) :: outTemp
-        logical(4) :: outSi
-        logical(4) :: outTC
-        logical(4) :: outC
-        logical(4) :: outPres
-        logical(4) :: outFlux
-        logical(4) :: outK
-    end type Input_OutputSettings
+    !     logical(4) :: outTemp
+    !     logical(4) :: outSi
+    !     logical(4) :: outTC
+    !     logical(4) :: outC
+    !     logical(4) :: outPres
+    !     logical(4) :: outFlux
+    !     logical(4) :: outK
+    ! end type Input_OutputSettings
 
-    type :: Input_Ice
-        !***********************************************************************
-        integer(int32) :: QiceType
-        real(real64) :: Tf
-        !***********************************************************************
-        ! GCC optional parameters
-        !***********************************************************************
-        integer(int32) :: ModelType
-        logical(4) :: isSegregation
-        character(:), allocatable :: c_unit
-        real(real64) :: thetaS
-        real(real64) :: thetaR
-        real(real64) :: alpha1
-        real(real64) :: n1
-        real(real64) :: w1
-        real(real64) :: hcrit
-        real(real64) :: alpha2
-        real(real64) :: n2
-        real(real64) :: rhoI
-        !***********************************************************************
-        ! EXP optional parameters
-        !***********************************************************************
-        real(real64) :: phi
-        real(real64) :: a
-        !***********************************************************************
-    end type Input_Ice
+    ! type :: Input_Ice
+    !     !***********************************************************************
+    !     integer(int32) :: QiceType
+    !     real(real64) :: Tf
+    !     !***********************************************************************
+    !     ! GCC optional parameters
+    !     !***********************************************************************
+    !     integer(int32) :: ModelType
+    !     logical(4) :: isSegregation
+    !     character(:), allocatable :: c_unit
+    !     real(real64) :: thetaS
+    !     real(real64) :: thetaR
+    !     real(real64) :: alpha1
+    !     real(real64) :: n1
+    !     real(real64) :: w1
+    !     real(real64) :: hcrit
+    !     real(real64) :: alpha2
+    !     real(real64) :: n2
+    !     real(real64) :: rhoI
+    !     !***********************************************************************
+    !     ! EXP optional parameters
+    !     !***********************************************************************
+    !     real(real64) :: phi
+    !     real(real64) :: a
+    !     !***********************************************************************
+    ! end type Input_Ice
 
-    type :: Input_Thermal
-        real(real64) :: Porosity
-        real(real64) :: LatentHeat
-        real(real64), allocatable :: Cp(:)
-        real(real64), allocatable :: c(:)
-        real(real64), allocatable :: rho(:)
-        real(real64), allocatable :: lambda(:)
-        real(real64), allocatable :: lambdaDispersity(:)
-    end type Input_Thermal
+    ! type :: Input_Thermal
+    !     real(real64) :: Porosity
+    !     real(real64) :: LatentHeat
+    !     real(real64), allocatable :: Cp(:)
+    !     real(real64), allocatable :: c(:)
+    !     real(real64), allocatable :: rho(:)
+    !     real(real64), allocatable :: lambda(:)
+    !     real(real64), allocatable :: lambdaDispersity(:)
+    ! end type Input_Thermal
 
-    type :: Input_Flags
-        logical(4) :: isHeat
-        logical(4) :: isWater
-        logical(4) :: isStress
-        logical(4) :: is1Phase
-        logical(4) :: is2Phase
-        logical(4) :: is3Phase
-        logical(4) :: is4Phase
-        logical(4) :: isCompression
-        logical(4) :: isFrostHeavePressure
-        logical(4) :: isDispersity
-        logical(4) :: isFrozen
-    end type
+    ! type :: Input_Flags
+    !     logical(4) :: isHeat
+    !     logical(4) :: isWater
+    !     logical(4) :: isStress
+    !     logical(4) :: is1Phase
+    !     logical(4) :: is2Phase
+    !     logical(4) :: is3Phase
+    !     logical(4) :: is4Phase
+    !     logical(4) :: isCompression
+    !     logical(4) :: isFrostHeavePressure
+    !     logical(4) :: isDispersity
+    !     logical(4) :: isFrozen
+    ! end type
 
-    type :: Input_Solver
-        !***********************************************************************
-        integer(int32) :: useSolver
-        !***********************************************************************
-        integer(int32) :: useSolverType
-        integer(int32) :: usePreconditionerType
-        integer(int32) :: maxIteration
-        real(real64) :: tolerance
-        !***********************************************************************
-    end type
+    ! type :: Input_Solver
+    !     !***********************************************************************
+    !     integer(int32) :: useSolver
+    !     !***********************************************************************
+    !     integer(int32) :: useSolverType
+    !     integer(int32) :: usePreconditionerType
+    !     integer(int32) :: maxIteration
+    !     real(real64) :: tolerance
+    !     !***********************************************************************
+    ! end type
 
-    type :: Input_BC_Local
-        character(:), allocatable :: type
-        logical(4) :: isUniform
-        real(real64), allocatable :: value(:)
-    end type Input_BC_Local
+    ! type :: Input_BC_Local
+    !     character(:), allocatable :: type
+    !     logical(4) :: isUniform
+    !     real(real64), allocatable :: value(:)
+    ! end type Input_BC_Local
 
-    type :: Input_Boundary
-        integer(int32), allocatable :: Groups(:)
-        real(real64), allocatable :: Time(:)
-        type(Input_BC_Local), allocatable :: Heat(:)
-        type(Input_BC_Local), allocatable :: Water(:)
-    end type Input_Boundary
+    ! type :: Input_Boundary
+    !     integer(int32), allocatable :: Groups(:)
+    !     real(real64), allocatable :: Time(:)
+    !     type(Input_BC_Local), allocatable :: Heat(:)
+    !     type(Input_BC_Local), allocatable :: Water(:)
+    ! end type Input_Boundary
 
-    type :: Input_IC_Local
-        character(:), allocatable :: type
-        real(real64) :: value
-        type(Input_BC_Local) :: Laplace
-    end type Input_IC_Local
+    ! type :: Input_IC_Local
+    !     character(:), allocatable :: type
+    !     real(real64) :: value
+    !     type(Input_BC_Local) :: Laplace
+    ! end type Input_IC_Local
 
-    type :: Input_Initial
-        type(Input_IC_Local) :: Heat
-    end type Input_Initial
+    ! type :: Input_Initial
+    !     type(Input_IC_Local) :: Heat
+    ! end type Input_Initial
 
-    type :: Input_Region
-        integer(int32), allocatable :: BelongingSurface(:)
-        integer(int32), allocatable :: BelongingEdge(:)
-        integer(int32) :: CalculationType
-        integer(int32) :: ModelNumber
-        logical(4) :: isFrozen
-        type(Input_Flags) :: Flag
-        type(Input_Ice) :: Ice
-        type(Input_Thermal) :: Thermal
-    end type Input_Region
+    ! type :: Input_Region
+    !     integer(int32), allocatable :: BelongingSurface(:)
+    !     integer(int32), allocatable :: BelongingEdge(:)
+    !     integer(int32) :: CalculationType
+    !     integer(int32) :: ModelNumber
+    !     logical(4) :: isFrozen
+    !     type(Input_Flags) :: Flag
+    !     type(Input_Ice) :: Ice
+    !     type(Input_Thermal) :: Thermal
+    ! end type Input_Region
 
     type :: type_input
         character(:), allocatable :: project_path
@@ -514,14 +514,14 @@ module inout_input
         type(type_output_settings) :: output_settings
         type(type_geometry) :: geometry
 
-        type(Input_Region), allocatable :: Regions(:)
-        type(Input_Solver) :: Solver_Thermal
-        type(Input_Solver) :: Solver_Hydraulic
-        type(Input_Boundary) :: BC
-        type(Input_Initial) :: IC
-        type(Input_OutputSettings) :: OutputSettings
+        ! type(Input_Region), allocatable :: Regions(:)
+        ! type(Input_Solver) :: Solver_Thermal
+        ! type(Input_Solver) :: Solver_Hydraulic
+        ! type(Input_Boundary) :: BC
+        ! type(Input_Initial) :: IC
+        ! type(Input_OutputSettings) :: OutputSettings
 
-        type(type_vtk) :: vtk
+        ! type(type_vtk) :: vtk
 
     contains
         procedure, pass(self), public :: initialize => type_input_initialize

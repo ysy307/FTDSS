@@ -9,7 +9,9 @@ module domain_element
     !    - Preserve original function and type names<br>
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_logger
     use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
+    use :: module_input, only:type_geometry_settings
     implicit none
     private
 
@@ -281,11 +283,12 @@ module domain_element
     !   三角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_triangle_first(id, global_coordinate, cell_info) result(element)
+        module function construct_triangle_first(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_triangle_first
@@ -406,11 +409,12 @@ module domain_element
     !   四角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_square_first(id, global_coordinate, cell_info) result(element)
+        module function construct_square_first(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_square_first
@@ -531,11 +535,12 @@ module domain_element
     !   三角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_triangle_second(id, global_coordinate, cell_info) result(element)
+        module function construct_triangle_second(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_triangle_second
@@ -656,11 +661,12 @@ module domain_element
     !   四角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_square_second(id, global_coordinate, cell_info) result(element)
+        module function construct_square_second(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_square_second

@@ -1,11 +1,8 @@
-! file: domain_rcm.f90
 module domain_rcm
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_sorting, only:sort, sort_index
     use :: module_core, only:allocate_array, deallocate_array
-    ! 基本的な要素データを扱うモジュール
     use :: domain_element, only:holder_elements
-    ! RCMの計算に使う「節点」の隣接行列モジュール
     use :: domain_adjacency_adjacency_node, only:type_node_adjacency
 
     implicit none
@@ -34,8 +31,8 @@ module domain_rcm
                                                   reorder_to_original_vector_int32, & !&
                                                   reorder_to_original_index, & !&
                                                   reorder_to_original_coo_indices !&
-        ! RCM順序 -> 元の順序
 
+        ! RCM順序 -> 元の順序
         procedure, private, pass(self) :: reorder_to_rcm_vector_int32
         procedure, private, pass(self) :: reorder_to_rcm_vector_real64
         procedure, private, pass(self) :: reorder_to_rcm_index

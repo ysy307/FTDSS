@@ -1,7 +1,7 @@
 module properties_properties_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
-    use :: Inout_Input
+    use :: module_input
     use :: module_calculate, only:holder_gccs, holder_wrfs, holder_dens, holder_vhcs, holder_thcs, & !&
                                         abst_gcc, abst_wrf, abst_den, abst_vhc, abst_thc
     use :: Properties_material_Manager, only:type_material_manager
@@ -18,10 +18,6 @@ module properties_properties_manager
         procedure(abst_get_value), pointer, pass(self) :: get_qw => null()
     contains
         procedure, pass(self) :: initialize => type_proereties_manager_initialize
-        ! procedure, pass(self) :: get_thc => calculate_thc
-        ! procedure, pass(self) :: get_Ca => calculate_heat_capacity
-        ! ! procedure, pass(self) :: get_dCa_dT => calculate_dcdt
-        ! procedure, pass(self) :: get_Qw => calculate_water_content
     end type
 
     abstract interface
