@@ -292,7 +292,6 @@ module inout_input
         integer(int32) :: MaxNonlinearIteration
     end type input_basic
     !!------------------------------------------------------------------------------------------------------------------------------
-
     type :: type_time_control_simulation_period
         character(:), allocatable :: unit
         real(real64) :: start
@@ -312,7 +311,6 @@ module inout_input
         real(real64), allocatable :: boundary_time_points(:)
     end type type_time_control
     !!------------------------------------------------------------------------------------------------------------------------------
-
     type :: type_boundary_local
         character(:), allocatable :: type
         logical :: is_uniform
@@ -324,14 +322,28 @@ module inout_input
         type(type_boundary_local) :: thermal
         type(type_boundary_local) :: hydraulic
     end type type_boundary_conditions
-
     !!------------------------------------------------------------------------------------------------------------------------------
+    type, extends(type_boundary_local) :: type_boundary_local_initial
+        integer(int32) :: id
+    end type
 
+    type :: type_initial_local
+        character(:), allocatable :: type
+        real(real64) :: value
+        type(type_boundary_local_initial), allocatable :: boundary(:)
+        character(:), allocatable :: field_name
+    end type type_initial_local
+
+    type :: type_initail_conditions
+        type(type_initial_local) :: thermal
+        type(type_initial_local) :: hydraulic
+    end type type_initail_conditions
+    !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_conditions
         type(type_time_control) :: time_control
         type(type_boundary_conditions), allocatable :: boundary_conditions(:)
         integer(int32) :: num_boundaries
-
+        type(type_initail_conditions) :: initial_conditions
     end type type_conditions
     !!------------------------------------------------------------------------------------------------------------------------------
 

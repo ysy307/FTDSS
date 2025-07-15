@@ -28,6 +28,12 @@ submodule(inout_input) inout_input_conditions
                                                             "free", "heat_trasfer", "head_radiation"]
     character(*), parameter :: hydraulic_boundary_types(4) = ["dirichlet", "neumann", "flux", "impermeable"]
     !!------------------------------------------------------------------------------------------------------------------------------
+    ! JSON key names for initial conditions
+    !!------------------------------------------------------------------------------------------------------------------------------
+    character(*), parameter :: initial_conditions = "initial_conditions"
+    character(*), parameter :: value = "value"
+    character(*), parameter :: initial_condition_types(3) = ["uniform", "laplace", "file"]
+    character(*), parameter :: field_name = "field_name"
 
 contains
     module subroutine inout_read_conditions(self)
@@ -45,9 +51,7 @@ contains
 
         call read_conditions_time_control(self, json)
         call read_conditions_boundary_conditions(self, json)
-
-        ! call inout_read_conditions_BC(self, json)
-        ! call inout_read_conditions_IC(self, json)
+        call read_conditions_initial_conditions(self, json)
 
         call json%destroy()
         call json%print_error_message(output_unit)
@@ -261,7 +265,6 @@ contains
                 call json%destroy()
                 call error_message(904, c_opt=key)
             end if
-            print *, "Boundary ID: ", self%conditions%boundary_conditions(i)%id
 
             if (self%basic%analysis_controls%calculate_thermal) then
                 key = join([key_base, thermal])
@@ -281,13 +284,25 @@ contains
 
     subroutine read_conditions_boundary_conditions_thermal(boundary, json, key_base, num_time_points)
         implicit none
-        type(type_boundary_local), intent(inout) :: boundary
+        class(type_boundary_local), intent(inout) :: boundary
         type(json_file), intent(inout) :: json !! JSON parser
         character(*), intent(in) :: key_base !! Base key for the boundary condition
         integer(int32), intent(in), optional :: num_time_points !! Number of time points for the boundary condition
 
         character(:), allocatable :: key
         logical :: found
+
+        select type (bc => boundary)
+        class is (type_boundary_local)
+            ! Do nothing, bc is already of type type_boundary_local
+        class is (type_boundary_local_initial)
+            key = join([key_base, id])
+            call json%get(key, bc%id, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        end select
 
         key = join([key_base, type])
         call json%get(key, boundary%type, found=found)
@@ -319,10 +334,6 @@ contains
                     call error_message(904, c_opt=key)
                 end if
 
-                if (size(boundary%values(:)) < 2) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
                 if (present(num_time_points)) then
                     if (size(boundary%values(:)) /= num_time_points) then
                         call json%destroy()
@@ -336,13 +347,25 @@ contains
 
     subroutine read_conditions_boundary_conditions_hydraulic(boundary, json, key_base, num_time_points)
         implicit none
-        type(type_boundary_local), intent(inout) :: boundary
+        class(type_boundary_local), intent(inout) :: boundary
         type(json_file), intent(inout) :: json !! JSON parser
         character(*), intent(in) :: key_base !! Base key for the boundary condition
         integer(int32), intent(in), optional :: num_time_points !! Number of time points for the boundary condition
 
         character(:), allocatable :: key
         logical :: found
+
+        select type (bc => boundary)
+        class is (type_boundary_local)
+            ! Do nothing, bc is already of type type_boundary_local
+        class is (type_boundary_local_initial)
+            key = join([key_base, id])
+            call json%get(key, bc%id, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        end select
 
         key = join([key_base, type])
         call json%get(key, boundary%type, found=found)
@@ -373,10 +396,6 @@ contains
                     call error_message(904, c_opt=key)
                 end if
 
-                if (size(boundary%values(:)) < 2) then
-                    call json%destroy()
-                    call error_message(905, c_opt=key)
-                end if
                 if (present(num_time_points)) then
                     if (size(boundary%values(:)) /= num_time_points) then
                         call json%destroy()
@@ -388,70 +407,125 @@ contains
 
     end subroutine read_conditions_boundary_conditions_hydraulic
 
-    ! subroutine inout_input_conditions_JSON_IC(self, json)
-    !     !> Load the initialy conditions from the JSON file
-    !     implicit none
-    !     class(type_input) :: self
-    !     type(json_file), intent(inout) :: json !! JSON parser
+    subroutine read_conditions_initial_conditions(self, json)
+        implicit none
+        class(type_input) :: self
+        type(json_file), intent(inout) :: json !! JSON parser
 
-    !     character(:), allocatable :: key
-    !     character(:), allocatable :: tmp
+        character(:), allocatable :: key
 
-    !     character(2) :: cICGroup
-    !     integer(int32) :: i, count
-    !     logical(4) :: isFind
+        if (self%basic%analysis_controls%calculate_thermal) then
+            key = join([initial_conditions, thermal])
+            call read_conditions_initial_conditions_thermal(self%conditions%initial_conditions%thermal, json, key, &
+                                                            self%conditions%num_boundaries)
+        end if
 
-    !     ! key = Connect_Dot(ICName, ThermalName, TypeName)
-    !     ! call json%get(key, self%IC%Heat%type)
-    !     ! call json%print_error_message(output_unit)
+        if (self%basic%analysis_controls%calculate_hydraulic) then
+            key = join([initial_conditions, hydraulic])
+            call read_conditions_initial_conditions_hydraulic(self%conditions%initial_conditions%hydraulic, json, key, &
+                                                              self%conditions%num_boundaries)
+        end if
 
-    !     ! select case (self%IC%Heat%type)
-    !     ! case (ConstantName)
-    !     !     key = Connect_Dot(ICName, ThermalName, ValueName)
-    !     !     call json%get(key, self%IC%Heat%value)
-    !     !     call json%print_error_message(output_unit)
-    !     ! case (LaplaceName)
-    !     !     stop 'Laplace type is not supported yet, sorry'
+    end subroutine read_conditions_initial_conditions
 
-    !     ! end select
+    subroutine read_conditions_initial_conditions_thermal(initial_condition, json, key_base, num_boundaries)
+        implicit none
+        type(type_initial_local), intent(inout) :: initial_condition
+        type(json_file), intent(inout) :: json !! JSON parser
+        character(*), intent(in) :: key_base !! Base key for the initial condition
+        integer(int32), intent(in), optional :: num_boundaries !! Number of boundaries for the initial condition
 
-    !     ! key = Connect_Dot(ICName, HydraulicName, TypeName)
-    !     ! call json%get(key, self%conditions%IC_Hydraulic%type)
-    !     ! call json%print_error_message(output_unit)
+        character(:), allocatable :: key
+        logical :: found
+        integer(int32) :: i
 
-    !     ! select case (self%conditions%IC_Hydraulic%type)
-    !     ! case (ConstantName)
-    !     !     key = Connect_Dot(ICName, HydraulicName, ValueName)
-    !     !     call json%get(key, self%conditions%IC_Hydraulic%value)
-    !     !     call json%print_error_message(output_unit)
-    !     ! case (LaplaceName)
-    !     !     count = 0
-    !     !     do i = 1, size(self%conditions%BCGroup)
-    !     !         write (cICGroup, '(i0)') self%conditions%BCGroup(i)
-    !     !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-    !     !         call json%get(key, tmp, found=isFind)
-    !     !         if (isFind) count = count + 1
-    !     !     end do
-    !     !     allocate (self%conditions%IC_Hydraulic%IC_BC(count))
-    !     !     count = 0
-    !     !     do i = 1, size(self%conditions%BCGroup)
-    !     !         write (cICGroup, '(i0)') self%conditions%BCGroup(i)
-    !     !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-    !     !         call json%get(key, tmp, found=isFind)
+        key = join([key_base, type])
+        call json%get(key, initial_condition%type, found=found)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
 
-    !     !         if (.not. isFind) cycle
-    !     !         count = count + 1
+        if (.not. any(initial_condition_types(:) == initial_condition%type)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
 
-    !     !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, TypeName)
-    !     !         call json%get(key, self%conditions%IC_Hydraulic%IC_BC(count)%type)
-    !     !         call json%print_error_message(output_unit)
+        select case (initial_condition%type)
+        case (initial_condition_types(1)) ! uniform
+            key = join([key_base, value])
+            call json%get(key, initial_condition%value, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        case (initial_condition_types(2)) ! laplace
+            if (allocated(initial_condition%boundary)) deallocate (initial_condition%boundary)
+            allocate (initial_condition%boundary(num_boundaries))
 
-    !     !         key = Connect_Dot(ICName, HydraulicName, ValueName, cICGroup, ValueName)
-    !     !         call json%get(key, self%conditions%IC_Hydraulic%IC_BC(count)%value)
-    !     !         call json%print_error_message(output_unit)
-    !     !     end do
-    !     ! end select
+            do i = 1, num_boundaries
+                key = join([key_base, boundary_conditions//"("//to_string(i)//")"])
+                call read_conditions_boundary_conditions_thermal(initial_condition%boundary(i), json, key)
+            end do
+        case (initial_condition_types(3)) ! file
+            key = join([key_base, field_name])
+            call json%get(key, initial_condition%field_name, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        end select
 
-    ! end subroutine inout_input_conditions_JSON_IC
+    end subroutine read_conditions_initial_conditions_thermal
+
+    subroutine read_conditions_initial_conditions_hydraulic(initial_condition, json, key_base, num_boundaries)
+        implicit none
+        type(type_initial_local), intent(inout) :: initial_condition
+        type(json_file), intent(inout) :: json !! JSON parser
+        character(*), intent(in) :: key_base !! Base key for the initial condition
+        integer(int32), intent(in), optional :: num_boundaries !! Number of boundaries for the initial condition
+
+        character(:), allocatable :: key
+        logical :: found
+        integer(int32) :: i
+
+        key = join([key_base, type])
+        call json%get(key, initial_condition%type, found=found)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        if (.not. any(initial_condition_types(:) == initial_condition%type)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        select case (initial_condition%type)
+        case (initial_condition_types(1)) ! uniform
+            key = join([key_base, value])
+            call json%get(key, initial_condition%value, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        case (initial_condition_types(2)) ! laplace
+            if (allocated(initial_condition%boundary)) deallocate (initial_condition%boundary)
+            allocate (initial_condition%boundary(num_boundaries))
+
+            do i = 1, num_boundaries
+                key = join([key_base, boundary_conditions//"("//to_string(i)//")"])
+                call read_conditions_boundary_conditions_hydraulic(initial_condition%boundary(i), json, key)
+            end do
+        case (initial_condition_types(3)) ! file
+            key = join([key_base, field_name])
+            call json%get(key, initial_condition%field_name, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        end select
+
+    end subroutine read_conditions_initial_conditions_hydraulic
 
 end submodule inout_input_conditions

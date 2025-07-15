@@ -71,21 +71,36 @@
     ],
     "initial_conditions": {
         "thermal": {
-            "type": "Constant",
-            "value": 18.0
+            "type": "uniform",
+            "value": 18.0,
+            "field_name": "Temperature"
         },
         "hydraulic": {
-            "type": "Laplace",
+            "type": "laplace",
             "boundary_conditions": [
+                {
+                    "id": 2,
+                    "type": "impermeable"
+                },
                 {
                     "id": 3,
                     "type": "dirichlet",
-                    "value": 0.1
+                    "is_uniform": true,
+                    "values": [
+                        0.1
+                    ]
+                },
+                {
+                    "id": 4,
+                    "type": "impermeable"
                 },
                 {
                     "id": 5,
                     "type": "dirichlet",
-                    "value": 0.0
+                    "is_uniform": true,
+                    "values": [
+                        0.0
+                    ]
                 }
             ]
         }
