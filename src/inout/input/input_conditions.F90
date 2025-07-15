@@ -56,8 +56,6 @@ contains
         call json%destroy()
         call json%print_error_message(output_unit)
 
-        stop
-
     end subroutine inout_read_conditions
 
     subroutine read_conditions_time_control(self, json)
