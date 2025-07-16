@@ -40,23 +40,7 @@ contains
         !---------------------------------------------------------------------------------------------------------------------------
         ! 線形求解ソルバーの設定
         !---------------------------------------------------------------------------------------------------------------------------
-        ! if (input%Solver_Thermal%useSolver == 1) then
-        !     structure%Solver = Solver_CRS_LU_Constructor(N=nNode, &
-        !                                                  MAXFCT=1, &
-        !                                                  MNUM=1, &
-        !                                                  MTYPE=1, &
-        !                                                  PHASE=13, &
-        !                                                  NRHS=1, &
-        !                                                  MSGVLV=0, &
-        !                                                  a=structure%KT_star_0)
-        ! else if (input%Solver_Thermal%useSolver == 2) then
-        !     if (input%Solver_Thermal%useSolverType == 4) then
-        !         structure%Solver = Solver_CRS_BiCGSTAB_Constructor(N=nNode, &
-        !                                                            tol=input%Solver_Thermal%tolerance, &
-        !                                                            maxiter=input%Solver_Thermal%maxIteration, &
-        !                                                            Preconditioner=input%Solver_Thermal%usePreconditionerType)
-        !     end if
-        ! end if
+        structure%solver = create_solver(input, "thermal", structure%KT_star_0, nNode)
         !---------------------------------------------------------------------------------------------------------------------------
 
     end function construct_type_thermal_3phase_2d
@@ -118,16 +102,6 @@ contains
         !
         call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, domain, self%T%new, porosity, property)
         ! call Assemble_Diffusion_Heat_1(self%KT_l, domain, self%T%new, porosity, property)
-        ! モジュール変数へ反映
-
-!$      t_total = t_total + time_total
-!$      t_interp = t_interp + time_interp
-!$      t_get_prop = t_get_prop + time_get_prop
-!$      t_integration = t_integration + time_integration
-!$      t_find_index = t_find_index + time_find_index
-!$      t_add_val = t_add_val + time_add_val
-        ! !!!-----------------------------------------------------------------------
-         !!!-----------------------------------------------------------------------
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! if (step == 1) then

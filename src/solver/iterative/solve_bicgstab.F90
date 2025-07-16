@@ -1,22 +1,22 @@
 submodule(Solver_Solve) Solve_BiCGSTAB
     implicit none
 contains
-    module function Solver_CRS_BiCGSTAB_Constructor(N, tol, maxiter, Preconditioner) result(structure)
+    module function construct_type_solver_sparse_crs_bicgstab(N, tolerance, max_iterations, preconditioner) result(structure)
         implicit none
         integer(int32), intent(in) :: N
-        real(real64), intent(in) :: tol
-        integer(int32), intent(in) :: maxiter
-        integer(int32), intent(in) :: Preconditioner
-        class(Abstract_Solver_CRS), allocatable :: structure
+        real(real64), intent(in) :: tolerance
+        integer(int32), intent(in) :: max_iterations
+        integer(int32), intent(in) :: preconditioner
+        class(abst_solver), allocatable :: structure
 
-        allocate (Solver_CRS_BiCGSTAB :: structure)
+        allocate (type_solver_sparse_crs_bicgstab :: structure)
         select type (this => structure)
-        type is (Solver_CRS_BiCGSTAB)
+        type is (type_solver_sparse_crs_bicgstab)
 
             this%N = N
-            this%tol = tol
-            this%maxiter = maxiter
-            this%Preconditioner = Preconditioner
+            this%tolerance = tolerance
+            this%max_iterations = max_iterations
+            this%preconditioner = preconditioner
 
             ! 配列の確保
             call allocate_array(this%M, this%N)
@@ -32,11 +32,11 @@ contains
 
         end select
 
-    end function Solver_CRS_BiCGSTAB_Constructor
+    end function construct_type_solver_sparse_crs_bicgstab
 
-    module subroutine Solve_CRS_BiCGSTAB(self, A, b, x, status)
+    module subroutine solve_sparse_crs_bicgstab(self, A, b, x, status)
         implicit none
-        class(Solver_CRS_BiCGSTAB) :: self
+        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
         type(Type_CRS), intent(in) :: A
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
@@ -70,7 +70,7 @@ contains
         ! 5: ^r0 = r0, (r*0, r0)!=0
         self%r0(:) = self%r(:)
 
-        do iter = 1, self%maxiter
+        do iter = 1, self%max_iterations
             ! 7: (^r0, rk)
             rho = dot(self%N, self%r(:), self%r0(:))
             ! 8: rho check
@@ -120,7 +120,7 @@ contains
 
             ! 25: ||r_k+1||_2
             resid = norm(self%N, self%r(:))
-            if (resid < self%tol) then
+            if (resid < self%tolerance) then
                 status = 0
                 x(:) = self%x(:)
                 return
@@ -129,11 +129,11 @@ contains
             rho_old = rho
         end do
         status = -2
-    end subroutine Solve_CRS_BiCGSTAB
+    end subroutine solve_sparse_crs_bicgstab
 
-    module subroutine Check_CRS_BiCGSTAB(self, status, time)
+    module subroutine check_sparse_crs_bicgstab(self, status, time)
         implicit none
-        class(Solver_CRS_BiCGSTAB) :: self
+        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
         integer(int32), intent(in) :: status
         real(real64), intent(in) :: time
 
@@ -146,13 +146,13 @@ contains
             stop
         end if
 
-    end subroutine Check_CRS_BiCGSTAB
+    end subroutine check_sparse_crs_bicgstab
 
-    module subroutine Solver_CRS_BiCGSTAB_Destructor(self)
+    module subroutine destruct_type_solver_sparse_crs_bicgstab(self)
         implicit none
-        type(Solver_CRS_BiCGSTAB) :: self
+        type(type_solver_sparse_crs_bicgstab), intent(inout) :: self
 
-        call deallocate_array(self%M)
+        call deallocate_array(self%m)
         call deallocate_array(self%p)
         call deallocate_array(self%phat)
         call deallocate_array(self%s)
@@ -163,5 +163,5 @@ contains
         call deallocate_array(self%v)
         call deallocate_array(self%x)
 
-    end subroutine Solver_CRS_BiCGSTAB_Destructor
+    end subroutine destruct_type_solver_sparse_crs_bicgstab
 end submodule Solve_BiCGSTAB

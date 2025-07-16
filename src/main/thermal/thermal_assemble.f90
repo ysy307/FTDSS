@@ -200,7 +200,7 @@ contains
                 element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
                 call process_single_element_mass(A, element, temperature, porosity, propeties)
             end do
-            !$omp end end parallel do
+            !$omp end parallel do
         end do
 
     end subroutine Assemble_Mass_Heat_1_Parallel

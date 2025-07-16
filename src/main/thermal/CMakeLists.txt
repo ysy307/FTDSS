@@ -1,7 +1,8 @@
 add_library(Thermal OBJECT
-    thermal_assemble.f90
-    thermal.F90
+    thermal_assemble.F90
+    thermal_interface.F90
     thermal_3Phase.F90
+    thermal.F90
 
 )
 target_link_libraries(Thermal PRIVATE

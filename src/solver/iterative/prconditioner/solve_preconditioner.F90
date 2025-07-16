@@ -2,7 +2,7 @@ submodule(Solver_Solve) Solve_Preconditioner
     implicit none
 
 contains
-    module subroutine Create_Preconditioner_Jacobi(N, A, M)
+    module subroutine create_preconditioner_jacobi(N, A, M)
         implicit none
         integer(int32), intent(in) :: N
         type(type_crs), intent(in) :: A
@@ -19,9 +19,9 @@ contains
         end do
         !$omp end parallel do
 
-    end subroutine Create_Preconditioner_Jacobi
+    end subroutine create_preconditioner_jacobi
 
-    module subroutine Apply_Preconditioner_Jacobi(N, M, r, z)
+    module subroutine apply_preconditioner_jacobi(N, M, r, z)
         implicit none
         integer(int32), intent(in) :: N
         real(real64), intent(in) :: M(:)
@@ -34,11 +34,11 @@ contains
             z(i) = M(i) * r(i)
         end do
         !$omp end parallel do
-    end subroutine Apply_Preconditioner_Jacobi
+    end subroutine apply_preconditioner_jacobi
 
-    module subroutine Create_Preconditioner_CRS_BiCGSTAB(self, A)
+    module subroutine create_preconditioner_sparse_crs_bicgstab(self, A)
         implicit none
-        class(Solver_CRS_BiCGSTAB) :: self
+        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
         type(type_crs), intent(in) :: A
         integer(int32) :: i, j
 
@@ -48,16 +48,16 @@ contains
             return
         case (1)
             !! Jacobi preconditioner
-            call Create_Preconditioner_Jacobi(self%N, A, self%M(:))
+            call create_preconditioner_jacobi(self%N, A, self%M(:))
         case (2)
             !! ILU preconditioner
         end select
 
-    end subroutine Create_Preconditioner_CRS_BiCGSTAB
+    end subroutine create_preconditioner_sparse_crs_bicgstab
 
-    module subroutine Apply_Preconditioner_CRS_BiCGSTAB(self, b, x)
+    module subroutine apply_preconditioner_sparse_crs_bicgstab(self, b, x)
         implicit none
-        class(Solver_CRS_BiCGSTAB) :: self
+        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
         integer(int32) :: i, j
@@ -68,11 +68,11 @@ contains
             return
         case (1)
             !! Jacobi preconditioner
-            call Apply_Preconditioner_Jacobi(self%N, self%M(:), b(:), x(:))
+            call apply_preconditioner_jacobi(self%N, self%M(:), b(:), x(:))
         case (2)
             !! ILU preconditioner
         end select
 
-    end subroutine Apply_Preconditioner_CRS_BiCGSTAB
+    end subroutine apply_preconditioner_sparse_crs_bicgstab
 end submodule Solve_Preconditioner
 

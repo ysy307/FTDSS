@@ -3,25 +3,23 @@ module input_output
     use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
 !$  use :: omp_lib
     use :: stdlib_strings, only:to_string
-
     use :: inout_project_settings, only:get_project_path
-
     use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state, & !&
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                              get_cpu_architecture, get_os, get_openmp_version, get_memory_usage !&
 
     use :: module_input
-    use :: module_domain, only:holder_elements, create_element, type_domain, type_rcm
+    use :: module_domain, only:holder_elements, create_element, type_domain
     use :: module_control, only:type_time, type_iteration
     use :: module_properties, only:type_proereties_manager
+    use :: module_matrix
     use :: Main_Thermal
-    use :: Matrix_CRS
 
     implicit none
     private
 
     ! 個々の観測変数を管理するクラス
-    type :: ObservationVariable_t
+    type :: type_oservations
         character(:), allocatable :: VariableName
         character(:), allocatable :: VariableUnitName
         character(:), allocatable :: FileName
@@ -30,14 +28,14 @@ module input_output
         procedure(Abst_Calculate_obs_values), pointer, nopass :: get_values => null()
     contains
         procedure, pass(self) :: initialize => ObservationVariable_Initialize
-    end type
+    end type type_oservations
 
 ! In a new or existing module
 
     interface
         module subroutine ObservationVariable_Initialize(self, dir_Output, VariableName, FileName, VariableUnitName, doOutput)
             implicit none
-            class(ObservationVariable_t), intent(inout) :: self
+            class(type_oservations), intent(inout) :: self
             character(*), intent(in) :: dir_Output
             character(*), intent(in) :: VariableName
             character(*), intent(in) :: FileName
@@ -55,7 +53,7 @@ module input_output
     ! end type
 
     type :: Output_Observation
-        type(ObservationVariable_t), allocatable :: Variables(:)
+        type(type_oservations), allocatable :: Variables(:)
 
         integer(int32) :: ObservationType
         integer(int32) :: NumObservation
@@ -83,7 +81,7 @@ module input_output
         module subroutine Output_Observation_Write_Header(self, ObsVar, TimeUnit)
             implicit none
             class(Output_Observation), intent(inout) :: self
-            class(ObservationVariable_t), intent(inout) :: ObsVar
+            class(type_oservations), intent(inout) :: ObsVar
             character(*), intent(in) :: TimeUnit
 
         end subroutine Output_Observation_Write_Header

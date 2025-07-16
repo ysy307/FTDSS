@@ -6,10 +6,14 @@ module main_thermal
     use :: module_input, only:type_input
     use :: module_matrix, only:type_crs, operator(*), operator(+)
     use :: module_boundary
-    use :: Solver_Solve
+    use :: module_solver
     use :: module_control, only:type_time
     use :: thermal_thermal_assemble
     implicit none
+    private
+
+    public :: abst_thermal
+    public :: type_thermal_3phase_2d
 
     type, abstract :: abst_thermal
         type(type_variable) :: T
@@ -30,7 +34,7 @@ module main_thermal
         real(real64), allocatable :: PHIT_old(:)
 
         !! Solver
-        class(Abstract_Solver_CRS), allocatable :: solver
+        class(abst_solver), allocatable :: solver
         integer(int32) :: order
     contains
         ! procedure(Abstract_Update), pass(self), deferred :: Update
