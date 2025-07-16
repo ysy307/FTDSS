@@ -24,10 +24,10 @@ contains
     !   - File deletion only occurs if the directory already exists.
     !
     !----------------------------------------------------------------------!
-    module subroutine Setup_Directory(dirPath, fileExtensions)
+    module subroutine setup_directory(dir_path, file_extension)
         implicit none
-        character(*), intent(in) :: dirPath
-        character(*), dimension(:), intent(in) :: fileExtensions
+        character(*), intent(in) :: dir_path
+        character(*), intent(in) :: file_extension(:)
 
         character(len=512) :: command
         logical :: exists
@@ -56,6 +56,6 @@ contains
 #endif
             end do
         end if
-    end subroutine Setup_Directory
+    end subroutine setup_directory
 
 end submodule input_output_base
