@@ -2,19 +2,19 @@ module control_time
     use, intrinsic :: iso_fortran_env, only: int32, real64, int64
 !$  use omp_lib
     use :: module_core, only:allocate_array
-    use :: Inout_Input
+    use :: module_input, only:type_Input
 
     implicit none
     private
 
     public :: type_time
 
-    type :: type_time_Record
+    type :: type_time_record
         character(len=10) :: label
         character(len=10) :: date
         character(len=10) :: time
         character(len=10) :: zone
-    end type type_time_Record
+    end type type_time_record
 
     type :: type_profiler_section
         character(len=20) :: label
@@ -27,98 +27,106 @@ module control_time
     end type type_profiler_section
 
     type :: type_time
-        real(real64) :: start_time, end_time, time, time_old, dt
+        real(real64) :: start_time
+        real(real64) :: end_time
+        real(real64) :: time
+        real(real64) :: time_old
+        real(real64) :: dt
         real(real64), allocatable :: dt_old(:)
-        real(real64) :: dt_max, dt_min
-        type(type_time_Record) :: start, end
+        real(real64) :: dt_min
+        real(real64) :: dt_max
+        type(type_time_record) :: start
+        type(type_time_record) :: end
         type(type_profiler_section), allocatable :: sections(:)
 #ifndef _OPENMP
         integer(int32) :: tick_rate = 0
 #endif
     contains
-        procedure, public, pass(self) :: Record => Record_Timestamp
-        procedure, public, pass(self) :: Profile_Start => Profile_Start_Timer
-        procedure, public, pass(self) :: Profile_Stop => Profile_Stop_Timer
+        procedure, public, pass(self) :: initialize    => initialize_type_time !&
+        procedure, public, pass(self) :: record        => record_timestamp !&
+        procedure, public, pass(self) :: profile_start => profile_start_timer !&
+        procedure, public, pass(self) :: profile_stop  => profile_stop_timer !&
     end type type_time
-
-    interface type_time
-        module procedure construct_type_time
-    end interface type_time
 
 contains
 
-    function construct_type_time(Structure_Input, profiler_sections) result(time)
-        type(type_Input), intent(in) :: Structure_Input
-        character(len=*), intent(in), optional :: profiler_sections(:)
-        type(type_time) :: time
-        integer :: i
-        integer :: dummy
+    subroutine initialize_type_time(self, input, profiler_sections)
+        implicit none
+        class(type_time), intent(inout) :: self
+        type(type_Input), intent(in), optional :: input
+        character(*), intent(in), optional :: profiler_sections(:)
 
-        select case (trim(Structure_Input%Basic%Calculation_TimeUnit))
-        case ("Second")
-            time%dt = Structure_Input%Basic%Calculation_Step
-            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum
-            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum
-        case ("Minute")
-            time%dt = Structure_Input%Basic%Calculation_Step * 60.0d0
-            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 60.0d0
-            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 60.0d0
-        case ("Hour")
-            time%dt = Structure_Input%Basic%Calculation_Step * 3600.0d0
-            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 3600.0d0
-            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 3600.0d0
-        case ("Day")
-            time%dt = Structure_Input%Basic%Calculation_Step * 86400.0d0
-            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 86400.0d0
-            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 86400.0d0
-        case ("Year")
-            time%dt = Structure_Input%Basic%Calculation_Step * 31557600.0d0
-            time%dt_max = Structure_Input%Basic%Calculation_StepMaximum * 31557600.0d0
-            time%dt_min = Structure_Input%Basic%Calculation_StepMinimum * 31557600.0d0
-        case default
-            write (*, *) "Error: Unknown time unit in Calculation_TimeUnit"
-            stop
-        end select
+        integer(int32) :: i
+        integer(int32) :: dummy
 
-        select case (trim(Structure_Input%Basic%Input_TimeUnit))
-        case ("Second")
-            time%start_time = Structure_Input%Basic%StartCalculation
-            time%end_time = Structure_Input%Basic%EndCalculation
-        case ("Minute")
-            time%start_time = Structure_Input%Basic%StartCalculation * 60.0d0
-            time%end_time = Structure_Input%Basic%EndCalculation * 60.0d0
-        case ("Hour")
-            time%start_time = Structure_Input%Basic%StartCalculation * 3600.0d0
-            time%end_time = Structure_Input%Basic%EndCalculation * 3600.0d0
-        case ("Day")
-            time%start_time = Structure_Input%Basic%StartCalculation * 86400.0d0
-            time%end_time = Structure_Input%Basic%EndCalculation * 86400.0d0
-        case ("Year")
-            time%start_time = Structure_Input%Basic%StartCalculation * 31557600.0d0
-            time%end_time = Structure_Input%Basic%EndCalculation * 31557600.0d0
-        case default
-            write (*, *) "Error: Unknown time unit in Input_TimeUnit"
-            stop
-        end select
+        if (present(input)) then
+            select case (trim(input%conditions%time_control%time_stepping%unit))
+            case ("second")
+                self%dt     = input%conditions%time_control%time_stepping%initial_step !&
+                self%dt_max = input%conditions%time_control%time_stepping%max_step !&
+                self%dt_min = input%conditions%time_control%time_stepping%min_step !&
+            case ("minute")
+                self%dt     = input%conditions%time_control%time_stepping%initial_step * 60.0d0 !&
+                self%dt_max = input%conditions%time_control%time_stepping%max_step * 60.0d0 !&
+                self%dt_min = input%conditions%time_control%time_stepping%min_step * 60.0d0 !&
+            case ("hour")
+                self%dt     = input%conditions%time_control%time_stepping%initial_step * 3600.0d0 !&
+                self%dt_max = input%conditions%time_control%time_stepping%max_step * 3600.0d0 !&
+                self%dt_min = input%conditions%time_control%time_stepping%min_step * 3600.0d0 !&
+            case ("day")
+                self%dt     = input%conditions%time_control%time_stepping%initial_step * 86400.0d0 !&
+                self%dt_max = input%conditions%time_control%time_stepping%max_step * 86400.0d0 !&
+                self%dt_min = input%conditions%time_control%time_stepping%min_step * 86400.0d0 !&
+            case ("year")
+                self%dt     = input%conditions%time_control%time_stepping%initial_step * 31557600.0d0 !&
+                self%dt_max = input%conditions%time_control%time_stepping%max_step * 31557600.0d0 !&
+                self%dt_min = input%conditions%time_control%time_stepping%min_step * 31557600.0d0 !&
+            case default
+                write (*, *) "Error: Unknown time unit in Calculation_TimeUnit"
+                stop
+            end select
 
-        call Allocate_Array(time%dt_old, Structure_Input%Basic%Order)
+            select case (trim(input%conditions%time_control%simulation_period%unit))
+            case ("second")
+                self%start_time = input%conditions%time_control%simulation_period%start !&
+                self%end_time   = input%conditions%time_control%simulation_period%end !&
+            case ("minute")
+                self%start_time = input%conditions%time_control%simulation_period%start * 60.0d0 !&
+                self%end_time   = input%conditions%time_control%simulation_period%end * 60.0d0 !&
+            case ("hour")
+                self%start_time = input%conditions%time_control%simulation_period%start * 3600.0d0 !&
+                self%end_time   = input%conditions%time_control%simulation_period%end * 3600.0d0 !&
+            case ("day")
+                self%start_time = input%conditions%time_control%simulation_period%start * 86400.0d0 !&
+                self%end_time   = input%conditions%time_control%simulation_period%end * 86400.0d0 !&
+            case ("year")
+                self%start_time = input%conditions%time_control%simulation_period%start * 31557600.0d0 !&
+                self%end_time   = input%conditions%time_control%simulation_period%end * 31557600.0d0 !&
+            case default
+                write (*, *) "Error: Unknown time unit in Input_TimeUnit"
+                stop
+            end select
+
+            call Allocate_Array(self%dt_old, input%basic%solver_settings%bdf_order)
+        end if
 
         if (present(profiler_sections)) then
             if (size(profiler_sections) > 0) then
 #ifndef _OPENMP
-                call system_clock(dummy, time%tick_rate)
+                call system_clock(dummy, self%tick_rate)
 #endif
-                allocate (time%sections(size(profiler_sections)))
+                allocate (self%sections(size(profiler_sections)))
                 do i = 1, size(profiler_sections)
-                    time%sections(i)%label = trim(profiler_sections(i))
+                    self%sections(i)%label = trim(profiler_sections(i))
                 end do
             end if
         end if
-    end function construct_type_time
+    end subroutine initialize_type_time
 
-    subroutine Record_Timestamp(self, label)
+    subroutine record_timestamp(self, label)
+        implicit none
         class(type_time), intent(inout) :: self
-        character(len=*), intent(in) :: label
+        character(*), intent(in) :: label
 
         select case (trim(label))
         case ("Start")
@@ -131,9 +139,9 @@ contains
             write (*, *) "Error: Unknown time label"
             stop
         end select
-    end subroutine Record_Timestamp
+    end subroutine record_timestamp
 
-    subroutine Profile_Start_Timer(self, label)
+    subroutine profile_start_timer(self, label)
         class(type_time), intent(inout) :: self
         character(len=*), intent(in) :: label
         integer :: i
@@ -147,10 +155,10 @@ contains
                 return
             end if
         end do
-        write (*, '(A,A,A)') "Error: Profiling section '", trim(label), "' not found. Timer not started."
-    end subroutine Profile_Start_Timer
+        write (*, '(3a)') "Error: Profiling section '", trim(label), "' not found. Timer not started."
+    end subroutine profile_start_timer
 
-    subroutine Profile_Stop_Timer(self, label)
+    subroutine profile_stop_timer(self, label)
         class(type_time), intent(inout) :: self
         character(len=*), intent(in) :: label
         integer :: i
@@ -177,7 +185,7 @@ contains
                 return
             end if
         end do
-        write (*, '(A,A,A)') "Error: Profiling section '", trim(label), "' not found. Timer not stopped."
-    end subroutine Profile_Stop_Timer
+        write (*, '(3a)') "Error: Profiling section '", trim(label), "' not found. Timer not stopped."
+    end subroutine profile_stop_timer
 
 end module control_time

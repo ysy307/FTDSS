@@ -1,4 +1,4 @@
-module Inout_Output
+module input_output
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding, only: c_int64_t, c_ptr, c_f_pointer, c_char, c_null_char, c_associated
 !$  use :: omp_lib
@@ -213,49 +213,49 @@ module Inout_Output
         ! DATA
         type(Output_VTK_Series) :: VTK
     contains
-        procedure, pass(self), public :: initialize => Inout_Output_Overall_initialize
-        procedure, pass(self) :: initialize_vtk => Inout_Output_Overall_initialize_vtk
-        procedure, pass(self) :: initialize_vtu => Inout_Output_Overall_initialize_vtu
-        procedure, pass(self), public :: Output => Inout_Output_Overall_Output
-        procedure, pass(self) :: Output_vtu => Inout_Output_Overall_Output_vtu
-        procedure, pass(self) :: Output_vtk => Inout_Output_Overall_Output_vtk
-        procedure, pass(self) :: Output_vtk_scalar_int32 => Inout_Output_Overall_Output_vtk_scalar_int32
-        procedure, pass(self) :: Output_vtk_scalar_real64 => Inout_Output_Overall_Output_vtk_scalar_real64
+        procedure, pass(self), public :: initialize => input_output_Overall_initialize
+        procedure, pass(self) :: initialize_vtk => input_output_Overall_initialize_vtk
+        procedure, pass(self) :: initialize_vtu => input_output_Overall_initialize_vtu
+        procedure, pass(self), public :: Output => input_output_Overall_Output
+        procedure, pass(self) :: Output_vtu => input_output_Overall_Output_vtu
+        procedure, pass(self) :: Output_vtk => input_output_Overall_Output_vtk
+        procedure, pass(self) :: Output_vtk_scalar_int32 => input_output_Overall_Output_vtk_scalar_int32
+        procedure, pass(self) :: Output_vtk_scalar_real64 => input_output_Overall_Output_vtk_scalar_real64
         generic :: Output_vtk_scalar => Output_vtk_scalar_int32, & !&
                                         Output_vtk_scalar_real64 !&
-        procedure, pass(self) :: Output_vtk_vector => Inout_Output_Overall_Output_vtk_vector
+        procedure, pass(self) :: Output_vtk_vector => input_output_Overall_Output_vtk_vector
 
     end type
 
     interface
-        module subroutine Inout_Output_Overall_initialize(self, Input, Coordinate, Domain)
+        module subroutine input_output_Overall_initialize(self, Input, Coordinate, Domain)
             implicit none
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
             type(type_dp_3d), intent(in) :: Coordinate
             type(type_domain), intent(inout) :: Domain
 
-        end subroutine Inout_Output_Overall_initialize
+        end subroutine input_output_Overall_initialize
 
-        module subroutine Inout_Output_Overall_initialize_vtk(self, Input, Coordinate, Domain)
+        module subroutine input_output_Overall_initialize_vtk(self, Input, Coordinate, Domain)
             implicit none
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
             type(type_dp_3d), intent(in) :: Coordinate
             type(type_domain), intent(inout) :: Domain
 
-        end subroutine Inout_Output_Overall_initialize_vtk
+        end subroutine input_output_Overall_initialize_vtk
 
-        module subroutine Inout_Output_Overall_initialize_vtu(self, Input, Coordinate, Domain)
+        module subroutine input_output_Overall_initialize_vtu(self, Input, Coordinate, Domain)
             implicit none
             class(Output_Overall), intent(inout) :: self
             type(Type_Input), intent(in) :: Input
             type(type_dp_3d), intent(in) :: Coordinate
             type(type_domain), intent(inout) :: Domain
 
-        end subroutine Inout_Output_Overall_initialize_vtu
+        end subroutine input_output_Overall_initialize_vtu
 
-        module subroutine Inout_Output_Overall_Output(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
+        module subroutine input_output_Overall_Output(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in) :: fc
@@ -266,9 +266,9 @@ module Inout_Output
             type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
-        end subroutine Inout_Output_Overall_Output
+        end subroutine input_output_Overall_Output
 
-        module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
+        module subroutine input_output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
@@ -279,9 +279,9 @@ module Inout_Output
             type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
-        end subroutine Inout_Output_Overall_Output_vtk
+        end subroutine input_output_Overall_Output_vtk
 
-        module subroutine Inout_Output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
+        module subroutine input_output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in), optional :: iperm(:)
@@ -289,9 +289,9 @@ module Inout_Output
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:)
 
-        end subroutine Inout_Output_Overall_Output_vtk_scalar_real64
+        end subroutine input_output_Overall_Output_vtk_scalar_real64
 
-        module subroutine Inout_Output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
+        module subroutine input_output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in), optional :: iperm(:)
@@ -299,9 +299,9 @@ module Inout_Output
             character(*), intent(in) :: data_name
             integer(int32), intent(in) :: x(:)
 
-        end subroutine Inout_Output_Overall_Output_vtk_scalar_int32
+        end subroutine input_output_Overall_Output_vtk_scalar_int32
 
-        module subroutine Inout_Output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
+        module subroutine input_output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
             implicit none
             class(Output_Overall) :: self
             integer(int32), intent(in), optional :: iperm(:)
@@ -309,9 +309,9 @@ module Inout_Output
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:), y(:), z(:)
 
-        end subroutine Inout_Output_Overall_Output_vtk_vector
+        end subroutine input_output_Overall_Output_vtk_vector
 
-        module subroutine Inout_Output_Overall_Output_vtu(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
+        module subroutine input_output_Overall_Output_vtu(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
             implicit none
             class(Output_Overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
@@ -322,7 +322,7 @@ module Inout_Output
             type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
-        end subroutine Inout_Output_Overall_Output_vtu
+        end subroutine input_output_Overall_Output_vtu
 
     end interface
 
@@ -350,11 +350,11 @@ module Inout_Output
         character(:), allocatable :: logFileName
 
     contains
-        ! procedure, pass(self) :: Output_All_vtu => Inout_Output_All_vtu
-        ! procedure, pass(self) :: Output_All_vtk => Inout_Output_All_vtk
-        ! procedure, pass(self) :: Output_All_vtk_Scalar => Inout_Output_All_vtk_Scalar_Field
-        ! procedure, pass(self) :: Output_All_vtk_Vector => Inout_Output_All_vtk_Vector_Field
-        ! procedure, pass(self), public :: Output_All => Inout_Output_All
+        ! procedure, pass(self) :: Output_All_vtu => input_output_All_vtu
+        ! procedure, pass(self) :: Output_All_vtk => input_output_All_vtk
+        ! procedure, pass(self) :: Output_All_vtk_Scalar => input_output_All_vtk_Scalar_Field
+        ! procedure, pass(self) :: Output_All_vtk_Vector => input_output_All_vtk_Vector_Field
+        ! procedure, pass(self), public :: Output_All => input_output_All
 
         ! procedure, pass(self) :: Write_Observation_Header
         ! procedure, pass(self) :: Initialize_Observation_Header
@@ -507,4 +507,4 @@ contains
 
     end function Type_Output_Construct
 
-end module Inout_Output
+end module input_output
