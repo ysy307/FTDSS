@@ -1,14 +1,12 @@
 submodule(input_output) input_output_system_logger
     implicit none
 contains
-    module subroutine Output_SystemLog(self, time, Matrix, Domain)
-        use :: stdlib_strings, only:to_string
-        use :: thermal_thermal_assemble
+    module subroutine output_system_log(self, time, Matrix, domain)
         implicit none
-        class(Type_Output) :: self
+        class(type_output), intent(inout) :: self
         type(type_time), intent(in) :: time
         type(Type_CRS), intent(in) :: Matrix
-        type(type_domain), intent(inout) :: Domain
+        type(type_domain), intent(inout) :: domain
 
         character(:), allocatable :: username
         character(:), allocatable :: hostname
@@ -50,9 +48,9 @@ contains
         ! フォーマット文字列の構築
         write (fmt, '(a,i0,a)') '(a,f', width, '.4,a)'
 
-        open (newunit=num_unit, file=self%logFileName, status='replace', action='write', iostat=ios)
+        open (newunit=num_unit, file=self%log_file_name, status='replace', action='write', iostat=ios)
         if (ios /= 0) then
-            write (*, *) "Error opening log file: ", self%logFileName
+            write (*, *) "Error opening log file: ", self%log_file_name
             stop
         end if
         write (num_unit, '(a)') repeat('=', nRepeat)
@@ -126,6 +124,6 @@ contains
         write (num_unit, '(a)') repeat('=', nRepeat)
 
         close (num_unit)
-    end subroutine Output_SystemLog
+    end subroutine output_system_log
 
 end submodule input_output_system_logger

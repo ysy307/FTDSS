@@ -6,10 +6,11 @@ module input_output
     use :: inout_project_settings, only:get_project_path
     use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state, & !&
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
-                             get_cpu_architecture, get_os, get_openmp_version, get_memory_usage !&
+                             get_cpu_architecture, get_os, get_openmp_version, get_memory_usage, & !&
+                             filter, type_dp_vector_3d
 
     use :: module_input
-    use :: module_domain, only:holder_elements, create_element, type_domain, type_reordering
+    use :: module_domain, only:holder_elements, create_element, type_domain, type_reordering, abst_element
     use :: module_control, only:type_time, type_iteration
     use :: module_properties, only:type_proereties_manager
     use :: module_matrix
@@ -18,32 +19,41 @@ module input_output
     implicit none
     private
 
-    ! 個々の観測変数を管理するクラス
-    type :: type_oservations
+    ! ! 個々の観測変数を管理するクラス
+    ! type :: type_oservations
+    !     character(:), allocatable :: name
+    !     character(:), allocatable :: unit
+    !     character(:), allocatable :: file_name
+    !     integer(int32) :: num_unit
+
+    !     class(abst_element), allocatable :: elemnt
+    !     type(type_dp_vector_3d) :: coordinate
+    !     real(real64) :: xi, eta
+
+    !     ! procedure(abst_calculate_obs_values), pointer, nopass :: get_values => null()
+    ! contains
+    !     procedure, pass(self) :: initialize => initialize_type_oservations
+    ! end type type_oservations
+
+    ! interface
+    !     module subroutine initialize_type_oservations(self, dir_output, variable_name, variable_unit, file_name)
+    !         implicit none
+    !         class(type_oservations), intent(inout) :: self
+    !         character(*), intent(in) :: dir_output
+    !         character(*), intent(in) :: variable_name
+    !         character(*), intent(in) :: variable_unit
+    !         character(*), intent(in) :: file_name
+
+    !     end subroutine initialize_type_oservations
+
+    ! end interface
+
+    type :: type_output_observation
+        ! type(type_oservations), allocatable :: variables(:)
         character(:), allocatable :: name
         character(:), allocatable :: unit
         character(:), allocatable :: file_name
-        integer(int32) :: num_unit = -1
-        procedure(abst_calculate_obs_values), pointer, nopass :: get_values => null()
-    contains
-        procedure, pass(self) :: initialize => initialize_type_oservations
-    end type type_oservations
-
-    interface
-        module subroutine initialize_type_oservations(self, dir_output, variable_name, variable_unit, file_name)
-            implicit none
-            class(type_oservations), intent(inout) :: self
-            character(*), intent(in) :: dir_output
-            character(*), intent(in) :: variable_name
-            character(*), intent(in) :: variable_unit
-            character(*), intent(in) :: file_name
-
-        end subroutine initialize_type_oservations
-
-    end interface
-
-    type :: type_output_observation
-        type(type_oservations), allocatable :: variables(:)
+        integer(int32) :: num_unit
 
         character(:), allocatable :: type
         integer(int32) :: num_observations
@@ -54,136 +64,58 @@ module input_output
         real(real64), allocatable :: eta(:)
         !!
         integer(int32), allocatable :: node_ids(:)
+        procedure(abst_output_line), pointer, nopass :: output_line => null()
+        procedure(abst_get_values), pointer, pass(self) :: get_values => null()
     contains
         procedure, pass(self) :: initialize => initialize_type_output_observation
-        procedure, pass(self) :: Write_Header => type_output_observation_write_header
-        ! procedure, pass(self) :: Interpolate => interpolate_observations
+        procedure, pass(self) :: write_header => write_obeservation_header
     end type type_output_observation
 
+    abstract interface
+        subroutine abst_output_line(unit, time, values)
+            import :: real64, int32
+            implicit none
+            integer(int32), intent(in) :: unit
+            real(real64), intent(in) :: time
+            real(real64), intent(in) :: values(:)
+
+        end subroutine abst_output_line
+
+        subroutine abst_get_values(self, obs_values, domain, properties, &
+                                   nodal_temperature, nodal_porosity, nodal_pw)
+            import :: type_output_observation, type_domain, type_proereties_manager, real64, int32
+            implicit none
+            class(type_output_observation), intent(inout) :: self
+            real(real64), intent(out) :: obs_values(:)
+            type(type_domain), intent(inout), optional :: domain
+            type(type_proereties_manager), intent(inout), optional :: properties
+            real(real64), intent(in), optional :: nodal_temperature(:)
+            real(real64), intent(in), optional :: nodal_porosity(:)
+            real(real64), intent(in), optional :: nodal_pw(:)
+        end subroutine abst_get_values
+    end interface
+
     interface
-        module subroutine initialize_type_output_observation(self, input, coordinate, domain)
+        module subroutine initialize_type_output_observation(self, input, coordinate, domain, dir_output, variable_name)
             implicit none
             class(type_output_observation), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_dp_3d), intent(inout), pointer :: coordinate
             type(type_domain), intent(inout) :: domain
+            character(*), intent(in) :: dir_output
+            character(*), intent(in) :: variable_name
 
         end subroutine initialize_type_output_observation
 
-        module subroutine type_output_observation_write_header(self, variable, time_unit)
+        module subroutine write_obeservation_header(self, time_unit)
             implicit none
             class(type_output_observation), intent(inout) :: self
-            class(type_oservations), intent(inout) :: variable
             character(*), intent(in) :: time_unit
 
-        end subroutine type_output_observation_write_header
-
-        module subroutine interpolate_observations_temperature(obs_values, observation_data, nodal_temperature, &
-                                                               nodal_porosity, nodal_Pw, properties, domain)
-            implicit none
-            real(real64), intent(out) :: obs_values(:)
-            type(type_output_observation), intent(in) :: observation_data
-            real(real64), intent(in), optional :: nodal_temperature(:)
-            real(real64), intent(in), optional :: nodal_porosity(:)
-            real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(inout), optional :: properties
-            type(type_domain), intent(inout), optional :: domain
-
-        end subroutine interpolate_observations_temperature
-
-        module subroutine interpolate_observations_si(obs_values, observation_data, nodal_temperature, &
-                                                      nodal_porosity, nodal_Pw, properties, domain)
-            implicit none
-            real(real64), intent(out) :: obs_values(:)
-            type(type_output_observation), intent(in) :: observation_data
-            real(real64), intent(in), optional :: nodal_temperature(:)
-            real(real64), intent(in), optional :: nodal_porosity(:)
-            real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(inout), optional :: properties
-            type(type_domain), intent(inout), optional :: domain
-
-        end subroutine interpolate_observations_si
-
-        module subroutine interpolate_observations_thc(obs_values, observation_data, nodal_temperature, &
-                                                       nodal_porosity, nodal_Pw, properties, domain)
-            implicit none
-            real(real64), intent(out) :: obs_values(:)
-            type(type_output_observation), intent(in) :: observation_data
-            real(real64), intent(in), optional :: nodal_temperature(:)
-            real(real64), intent(in), optional :: nodal_porosity(:)
-            real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(inout), optional :: properties
-            type(type_domain), intent(inout), optional :: domain
-
-        end subroutine interpolate_observations_thc
-
-        module subroutine interpolate_observations_VHC(obs_values, observation_data, nodal_temperature, &
-                                                       nodal_porosity, nodal_Pw, properties, domain)
-            implicit none
-            real(real64), intent(out) :: obs_values(:)
-            type(type_output_observation), intent(in) :: observation_data
-            real(real64), intent(in), optional :: nodal_temperature(:)
-            real(real64), intent(in), optional :: nodal_porosity(:)
-            real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(inout), optional :: properties
-            type(type_domain), intent(inout), optional :: domain
-
-        end subroutine interpolate_observations_VHC
-
-        module subroutine interpolate_observations_Pw(obs_values, observation_data, nodal_temperature, &
-                                                      nodal_porosity, nodal_Pw, properties, domain)
-            implicit none
-            real(real64), intent(out) :: obs_values(:)
-            type(type_output_observation), intent(in) :: observation_data
-            real(real64), intent(in), optional :: nodal_temperature(:)
-            real(real64), intent(in), optional :: nodal_porosity(:)
-            real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(inout), optional :: properties
-            type(type_domain), intent(inout), optional :: domain
-
-        end subroutine interpolate_observations_Pw
-
-        ! module subroutine interpolate_observations_wFlux(obs_values, observation_data, nodal_temperature, &
-        !                                               nodal_porosity, nodal_Pw, properties)
-        !     implicit none
-        !     real(real64), intent(out) :: obs_values(:)
-        !     type(type_output_observation), intent(in) :: observation_data
-        !     real(real64), intent(in), optional :: nodal_temperature(:)
-        !     real(real64), intent(in), optional :: nodal_porosity(:)
-        !     real(real64), intent(in), optional :: nodal_Pw(:)
-        !     type(type_proereties_manager), intent(inout), optional :: properties
-
-        ! end subroutine interpolate_observations_wFlux
-
-        ! module subroutine interpolate_observations_K(obs_values, observation_data, nodal_temperature, &
-        !                                           nodal_porosity, nodal_Pw, properties)
-        !     implicit none
-        !     real(real64), intent(out) :: obs_values(:)
-        !     type(type_output_observation), intent(in) :: observation_data
-        !     real(real64), intent(in), optional :: nodal_temperature(:)
-        !     real(real64), intent(in), optional :: nodal_porosity(:)
-        !     real(real64), intent(in), optional :: nodal_Pw(:)
-        !     type(type_proereties_manager), intent(inout), optional :: properties
-
-        ! end subroutine interpolate_observations_K
+        end subroutine write_obeservation_header
     end interface
 
 ! In a new or existing module
-    abstract interface
-        ! This is the "contract" for the procedure pointer.
-        subroutine abst_calculate_obs_values(obs_values, observation_data, nodal_temperature, &
-                                             nodal_porosity, nodal_Pw, properties, domain)
-            import :: real64, type_proereties_manager, type_output_observation, type_domain
-            implicit none
-            real(real64), intent(out) :: obs_values(:)
-            type(type_output_observation), intent(in) :: observation_data
-            real(real64), intent(in), optional :: nodal_temperature(:)
-            real(real64), intent(in), optional :: nodal_porosity(:)
-            real(real64), intent(in), optional :: nodal_Pw(:)
-            type(type_proereties_manager), intent(inout), optional :: properties
-            type(type_domain), intent(inout), optional :: domain
-        end subroutine abst_calculate_obs_values
-    end interface
 
     type :: Output_VTK_Series
         integer(int32) :: nPoints
@@ -194,7 +126,7 @@ module input_output
         integer(int8), allocatable :: CellType(:)
     end type
 
-    type :: Output_Overall
+    type :: type_output_overall
         private
         ! Output format
         character(:), allocatable :: dir_FileOutput
@@ -203,51 +135,51 @@ module input_output
         ! DATA
         type(Output_VTK_Series) :: VTK
     contains
-        procedure, pass(self), public :: initialize => input_output_Overall_initialize
-        procedure, pass(self) :: initialize_vtk => input_output_Overall_initialize_vtk
-        procedure, pass(self) :: initialize_vtu => input_output_Overall_initialize_vtu
-        procedure, pass(self), public :: Output => input_output_Overall_Output
-        procedure, pass(self) :: Output_vtu => input_output_Overall_Output_vtu
-        procedure, pass(self) :: Output_vtk => input_output_Overall_Output_vtk
-        procedure, pass(self) :: Output_vtk_scalar_int32 => input_output_Overall_Output_vtk_scalar_int32
-        procedure, pass(self) :: Output_vtk_scalar_real64 => input_output_Overall_Output_vtk_scalar_real64
+        procedure, pass(self), public :: initialize => initialize_input_type_output_overall
+        procedure, pass(self) :: initialize_vtk => initialize_output_overall_vtk
+        procedure, pass(self) :: initialize_vtu => initialize_output_overall_vtu
+        procedure, pass(self), public :: Output => input_type_output_overall_Output
+        procedure, pass(self) :: Output_vtu => input_type_output_overall_Output_vtu
+        procedure, pass(self) :: Output_vtk => input_type_output_overall_Output_vtk
+        procedure, pass(self) :: Output_vtk_scalar_int32 => input_type_output_overall_Output_vtk_scalar_int32
+        procedure, pass(self) :: Output_vtk_scalar_real64 => input_type_output_overall_Output_vtk_scalar_real64
         generic :: Output_vtk_scalar => Output_vtk_scalar_int32, & !&
                                         Output_vtk_scalar_real64 !&
-        procedure, pass(self) :: Output_vtk_vector => input_output_Overall_Output_vtk_vector
+        procedure, pass(self) :: Output_vtk_vector => input_type_output_overall_Output_vtk_vector
 
     end type
 
     interface
-        module subroutine input_output_Overall_initialize(self, input, coordinate, domain)
+        module subroutine initialize_input_type_output_overall(self, input, coordinate, domain)
             implicit none
-            class(Output_Overall), intent(inout) :: self
+            class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_dp_3d), intent(in) :: coordinate
             type(type_domain), intent(inout) :: domain
 
-        end subroutine input_output_Overall_initialize
+        end subroutine initialize_input_type_output_overall
 
-        module subroutine input_output_Overall_initialize_vtk(self, input, coordinate, domain)
+        module subroutine initialize_output_overall_vtk(self, input, coordinate, domain)
             implicit none
-            class(Output_Overall), intent(inout) :: self
+            class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_dp_3d), intent(in) :: coordinate
             type(type_domain), intent(inout) :: domain
 
-        end subroutine input_output_Overall_initialize_vtk
+        end subroutine initialize_output_overall_vtk
 
-        module subroutine input_output_Overall_initialize_vtu(self, input, coordinate, domain)
+        module subroutine initialize_output_overall_vtu(self, input, coordinate, domain)
             implicit none
-            class(Output_Overall), intent(inout) :: self
+            class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_dp_3d), intent(in) :: coordinate
             type(type_domain), intent(inout) :: domain
 
-        end subroutine input_output_Overall_initialize_vtu
+        end subroutine initialize_output_overall_vtu
 
-        module subroutine input_output_Overall_Output(self, fc, reordering, Temp, Si, Pres, wFlux, Colors)
+        module subroutine input_type_output_overall_Output(self, fc, reordering, Temp, Si, Pres, wFlux, Colors)
             implicit none
-            class(Output_Overall) :: self
+            class(type_output_overall) :: self
             integer(int32), intent(in) :: fc
             type(type_reordering), intent(in) :: reordering
             real(real64), intent(in), optional :: Temp(:)
@@ -256,11 +188,11 @@ module input_output
             type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
-        end subroutine input_output_Overall_Output
+        end subroutine input_type_output_overall_Output
 
-        module subroutine input_output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
+        module subroutine input_type_output_overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
             implicit none
-            class(Output_Overall), intent(inout) :: self
+            class(type_output_overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
             integer(int32), intent(in), optional :: iperm(:)
             real(real64), intent(in), optional :: Temp(:)
@@ -269,41 +201,41 @@ module input_output
             type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
-        end subroutine input_output_Overall_Output_vtk
+        end subroutine input_type_output_overall_Output_vtk
 
-        module subroutine input_output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
+        module subroutine input_type_output_overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
             implicit none
-            class(Output_Overall) :: self
+            class(type_output_overall) :: self
             integer(int32), intent(in), optional :: iperm(:)
             integer(int32), intent(in) :: unit_num
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:)
 
-        end subroutine input_output_Overall_Output_vtk_scalar_real64
+        end subroutine input_type_output_overall_Output_vtk_scalar_real64
 
-        module subroutine input_output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
+        module subroutine input_type_output_overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
             implicit none
-            class(Output_Overall) :: self
+            class(type_output_overall) :: self
             integer(int32), intent(in), optional :: iperm(:)
             integer(int32), intent(in) :: unit_num
             character(*), intent(in) :: data_name
             integer(int32), intent(in) :: x(:)
 
-        end subroutine input_output_Overall_Output_vtk_scalar_int32
+        end subroutine input_type_output_overall_Output_vtk_scalar_int32
 
-        module subroutine input_output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
+        module subroutine input_type_output_overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
             implicit none
-            class(Output_Overall) :: self
+            class(type_output_overall) :: self
             integer(int32), intent(in), optional :: iperm(:)
             integer(int32), intent(in) :: unit_num
             character(*), intent(in) :: data_name
             real(real64), intent(in) :: x(:), y(:), z(:)
 
-        end subroutine input_output_Overall_Output_vtk_vector
+        end subroutine input_type_output_overall_Output_vtk_vector
 
-        module subroutine input_output_Overall_Output_vtu(self, fc, reordering, Temp, Si, Pres, wFlux, Colors)
+        module subroutine input_type_output_overall_Output_vtu(self, fc, reordering, Temp, Si, Pres, wFlux, Colors)
             implicit none
-            class(Output_Overall), intent(inout) :: self
+            class(type_output_overall), intent(inout) :: self
             integer(int32), intent(in) :: fc
             type(type_reordering), intent(in) :: reordering
             real(real64), intent(in), optional :: Temp(:)
@@ -312,16 +244,16 @@ module input_output
             type(type_dp_3d), intent(in), optional :: wFlux
             integer(int32), intent(in), optional :: Colors(:)
 
-        end subroutine input_output_Overall_Output_vtu
+        end subroutine input_type_output_overall_Output_vtu
 
     end interface
 
     type :: type_output
         ! private
         ! character(:), allocatable :: fextend
-        type(type_output_observation) :: Observation
+        type(type_output_observation), allocatable :: observations(:)
 
-        type(Output_Overall) :: Overall
+        type(type_output_overall) :: Overall
 
         logical(4) :: doOutput_stdout
 
@@ -337,7 +269,7 @@ module input_output
         logical(4) :: doPressure
         logical(4) :: doStress
 
-        character(:), allocatable :: logfile_name
+        character(:), allocatable :: log_file_name
 
     contains
         procedure, pass(self), public :: initialize => initialize_type_output
@@ -347,12 +279,8 @@ module input_output
         ! procedure, pass(self) :: Output_All_vtk_Vector => input_output_All_vtk_Vector_Field
         ! procedure, pass(self), public :: Output_All => input_output_All
 
-        ! procedure, pass(self) :: Write_Observation_Header
-        ! procedure, pass(self) :: Initialize_Observation_Header
-        ! procedure, pass(self) :: interpolate_observations
-        procedure, pass(self), public :: type_output_observation => Output_Process_Observation
-
-        procedure, pass(self), public :: Output_SystemLog
+        procedure, pass(self), public :: output_history
+        procedure, pass(self), public :: output_system_log
     end type type_output
 
     ! interface type_output
@@ -365,41 +293,35 @@ module input_output
     ! Base interface
     !-----------------------------------------------------------------------
     interface
-        module subroutine setup_directory(dir_path, file_extension)
+        module subroutine setup_directory(dir_path, file_extensions)
             implicit none
             character(*), intent(in) :: dir_path
-            character(*), intent(in) :: file_extension(:)
+            character(*), intent(in) :: file_extensions(:)
         end subroutine setup_directory
     end interface
 
     interface
-        module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi, Propeties, domain)
+        module subroutine output_history(self, time, domain, propeties, porosity, temperature, pressure)
             implicit none
-            class(type_output) :: self
+            class(Type_Output) :: self
             real(real64), intent(in) :: time
-            real(real64), intent(in), optional :: Temp(:)
-            real(real64), intent(in), optional :: Si(:)
-            real(real64), intent(in), optional :: TC(:)
-            real(real64), intent(in), optional :: C(:)
-            real(real64), intent(in), optional :: Pres(:)
-            real(real64), intent(in), optional :: wFlux(:)
-            real(real64), intent(in), optional :: K(:)
-            class(abst_thermal), intent(inout), optional :: Thermal
-            real(real64), intent(in), optional :: phi(:)
-            type(type_proereties_manager), intent(inout), optional :: Propeties
             type(type_domain), intent(inout), optional :: domain
+            type(type_proereties_manager), intent(inout), optional :: propeties
+            real(real64), intent(in), optional :: porosity(:)
+            real(real64), intent(in), optional :: temperature(:)
+            real(real64), intent(in), optional :: pressure(:)
 
-        end subroutine Output_Process_Observation
+        end subroutine output_history
     end interface
 
     interface
-        module subroutine Output_SystemLog(self, time, Matrix, domain)
+        module subroutine output_system_log(self, time, Matrix, domain)
             implicit none
             class(type_output), intent(inout) :: self
             type(type_time), intent(in) :: time
             type(Type_CRS), intent(in) :: Matrix
             type(type_domain), intent(inout) :: domain
-        end subroutine Output_SystemLog
+        end subroutine output_system_log
     end interface
 
 contains
@@ -436,7 +358,7 @@ contains
         self%Overall%dir_FileOutput = trim(adjustl(dir_Path))//"Output/Files/"
         call setup_directory(self%Overall%dir_FileOutput, output_file_extentions)
 
-        self%logfile_name = trim(adjustl(self%dir_output))//"run.log"
+        self%log_file_name = trim(adjustl(self%dir_output))//"run.log"
 
         ! self%Output_TimeUnit = input%OutputSettings%Output_TimeUnit
         ! self%Interval_TimeUnit = input%OutputSettings%Interval_TimeUnit
@@ -480,15 +402,15 @@ contains
         ! end if
 
         ! if (self%doHeat) then
-        !     call self%Observation%Write_Header(self%Observation%Variables(1), self%Output_TimeUnit)
-        !     call self%Observation%Write_Header(self%Observation%Variables(2), self%Output_TimeUnit)
-        !     call self%Observation%Write_Header(self%Observation%Variables(3), self%Output_TimeUnit)
-        !     call self%Observation%Write_Header(self%Observation%Variables(4), self%Output_TimeUnit)
+        !     call self%Observation%write_header(self%Observation%Variables(1), self%Output_TimeUnit)
+        !     call self%Observation%write_header(self%Observation%Variables(2), self%Output_TimeUnit)
+        !     call self%Observation%write_header(self%Observation%Variables(3), self%Output_TimeUnit)
+        !     call self%Observation%write_header(self%Observation%Variables(4), self%Output_TimeUnit)
         ! end if
         ! if (self%doPressure) then
-        !     call self%Observation%Write_Header(self%Observation%Variables(5), self%Output_TimeUnit)
-        !     call self%Observation%Write_Header(self%Observation%Variables(6), self%Output_TimeUnit)
-        !     call self%Observation%Write_Header(self%Observation%Variables(7), self%Output_TimeUnit)
+        !     call self%Observation%write_header(self%Observation%Variables(5), self%Output_TimeUnit)
+        !     call self%Observation%write_header(self%Observation%Variables(6), self%Output_TimeUnit)
+        !     call self%Observation%write_header(self%Observation%Variables(7), self%Output_TimeUnit)
         ! end if
 
         ! self%Overall%format_output = '(a,a,i5.5,a)'

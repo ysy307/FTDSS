@@ -45,6 +45,8 @@ module domain_reordering
         generic, public :: to_reordered => to_reordered_index, & !&
                                            to_reordered_indices !&
 
+        procedure, public :: get_algorithm_name
+
         final :: finalize_type_reordering
     end type type_reordering
 
@@ -165,6 +167,19 @@ contains
         end select
 
     end subroutine initialize_type_reordering
+
+    function get_algorithm_name(self) result(name)
+        implicit none
+        class(type_reordering), intent(in) :: self
+        character(:), allocatable :: name
+
+        if (allocated(self%algorithm_name)) then
+            name = self%algorithm_name
+        else
+            name = "none"
+        end if
+
+    end function get_algorithm_name
 
     !================================================================!
     ! finalizer

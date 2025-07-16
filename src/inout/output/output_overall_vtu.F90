@@ -1,63 +1,10 @@
-submodule(input_output) input_output_overall
+submodule(input_output) input_output_overall_vtu
     implicit none
 
 contains
-    module subroutine input_output_Overall_initialize(self, Input, Coordinate, Domain)
+    module subroutine initialize_output_overall_vtu(self, Input, Coordinate, Domain)
         implicit none
-        class(Output_Overall), intent(inout) :: self
-        type(Type_Input), intent(in) :: Input
-        type(type_dp_3d), intent(in) :: Coordinate
-        type(type_domain), intent(inout) :: Domain
-
-        select case (self%fextend)
-        case (".vtk")
-            call self%initialize_vtk(Input, Coordinate, Domain)
-        case (".vtu")
-            call self%initialize_vtu(Input, Coordinate, Domain)
-        case default
-            write (*, '(a)') "Error: Unsupported file format for Overall output."
-            stop
-        end select
-
-    end subroutine input_output_Overall_initialize
-
-    module subroutine input_output_Overall_initialize_vtk(self, Input, Coordinate, Domain)
-        implicit none
-        class(Output_Overall), intent(inout) :: self
-        type(Type_Input), intent(in) :: Input
-        type(type_dp_3d), intent(in) :: Coordinate
-        type(type_domain), intent(inout) :: Domain
-
-        integer(int32) :: i, j, idx, total
-
-        self%VTK%nPoints = Input%VTK%num_points
-        self%VTK%nCell = Input%VTK%num_total_cells
-        call self%VTK%Coordinates%initialize(self%VTK%nPoints)
-        self%VTK%Coordinates = Input%VTK%POINTS
-
-        call Allocate_Array(self%VTK%offset, self%VTK%nCell)
-        call Allocate_Array(self%VTK%CellType, self%VTK%nCell)
-
-        do i = 1, self%VTK%nCell
-            self%VTK%offset(i) = Input%VTK%CELLS(i)%num_nodes_in_cell
-            self%VTK%CellType(i) = Input%VTK%CELLS(i)%cell_type
-        end do
-        total = sum(self%VTK%offset(:))
-
-        call Allocate_Array(self%VTK%connectivity, total)
-        idx = 0
-        do i = 1, self%VTK%nCell
-            do j = 1, Input%VTK%CELLS(i)%num_nodes_in_cell
-                idx = idx + 1
-                self%VTK%connectivity(idx) = Input%VTK%CELLS(i)%connectivity(j) - 1
-            end do
-        end do
-
-    end subroutine input_output_Overall_initialize_vtk
-
-    module subroutine input_output_Overall_initialize_vtu(self, Input, Coordinate, Domain)
-        implicit none
-        class(Output_Overall), intent(inout) :: self
+        class(type_output_overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         type(type_dp_3d), intent(in) :: Coordinate
         type(type_domain), intent(inout) :: Domain
@@ -105,11 +52,11 @@ contains
             end do
         end do
 
-    end subroutine input_output_Overall_initialize_vtu
+    end subroutine initialize_output_overall_vtu
 
     module subroutine input_output_Overall_Output(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
         implicit none
-        class(Output_Overall) :: self
+        class(type_output_overall) :: self
         integer(int32), intent(in) :: fc
         type(type_rcm), intent(in), optional :: rcm
         real(real64), intent(in), optional :: Temp(:)
@@ -135,7 +82,7 @@ contains
     module subroutine input_output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
         use :: stdlib_strings, only:to_string
         implicit none
-        class(Output_Overall), intent(inout) :: self
+        class(type_output_overall), intent(inout) :: self
         integer(int32), intent(in) :: fc
         integer(int32), intent(in), optional :: iperm(:)
         real(real64), intent(in), optional :: Temp(:)
@@ -212,7 +159,7 @@ contains
 
     module subroutine input_output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
         implicit none
-        class(Output_Overall) :: self
+        class(type_output_overall) :: self
         integer(int32), intent(in), optional :: iperm(:)
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
@@ -236,7 +183,7 @@ contains
 
     module subroutine input_output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
         implicit none
-        class(Output_Overall) :: self
+        class(type_output_overall) :: self
         integer(int32), intent(in), optional :: iperm(:)
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
@@ -259,7 +206,7 @@ contains
 
     module subroutine input_output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
         implicit none
-        class(Output_Overall) :: self
+        class(type_output_overall) :: self
         integer(int32), intent(in), optional :: iperm(:)
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
@@ -288,7 +235,7 @@ contains
     module subroutine input_output_Overall_Output_vtu(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
         use :: vtk_fortran, only:vtk_file
         implicit none
-        class(Output_Overall), intent(inout) :: self
+        class(type_output_overall), intent(inout) :: self
         integer(int32), intent(in) :: fc
         type(type_rcm), intent(in), optional :: rcm
         real(real64), intent(in), optional :: Temp(:)
@@ -376,4 +323,4 @@ contains
 
     end subroutine input_output_Overall_Output_vtu
 
-end submodule input_output_Overall
+end submodule input_output_overall_vtu

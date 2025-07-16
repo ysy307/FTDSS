@@ -2,7 +2,9 @@ add_library(Output OBJECT
     output_interface.F90
     output_base.F90
     output_observation.F90
-    output_overall.F90
+    output_overall_base.F90
+    output_overall_vtk.F90
+    output_overall_vtu.F90
     output_system_logger.F90
     output.F90
 )

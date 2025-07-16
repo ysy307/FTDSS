@@ -10,9 +10,9 @@ contains
     ! extensions will be deleted.
     !
     ! Arguments:
-    !   dirPath        : Input string specifying the directory path to check
+    !   dir_path        : Input string specifying the directory path to check
     !                    or create.
-    !   fileExtensions : Input array of file extension strings (e.g. ".txt",
+    !   file_extensions : Input array of file extension strings (e.g. ".txt",
     !                    ".dat") used to identify which files to delete if
     !                    the directory exists.
     !
@@ -24,34 +24,34 @@ contains
     !   - File deletion only occurs if the directory already exists.
     !
     !----------------------------------------------------------------------!
-    module subroutine setup_directory(dir_path, file_extension)
+    module subroutine setup_directory(dir_path, file_extensions)
         implicit none
         character(*), intent(in) :: dir_path
-        character(*), intent(in) :: file_extension(:)
+        character(*), intent(in) :: file_extensions(:)
 
-        character(len=512) :: command
+        character(512) :: command
         logical :: exists
         integer :: i
 
-        inquire (DIRECTORY=trim(adjustl(dirPath)), exist=exists)
+        inquire (DIRECTORY=trim(adjustl(dir_path)), exist=exists)
 
         if (.not. exists) then
 #ifdef _WIN32
-            command = "mkdir "//'"'//trim(adjustl(dirPath))//'"'
+            command = "mkdir "//'"'//trim(adjustl(dir_path))//'"'
             call system(command)
 #endif
 #ifdef __linux__
-            command = "mkdir -p "//'"'//trim(adjustl(dirPath))//'"'
+            command = "mkdir -p "//'"'//trim(adjustl(dir_path))//'"'
             call system(command)
 #endif
         else
-            do i = 1, size(fileExtensions)
+            do i = 1, size(file_extensions)
 #ifdef _WIN32
-                command = "del /Q "//'"'//trim(adjustl(dirPath))//"*"//trim(fileExtensions(i))//'"'
+                command = "del /Q "//'"'//trim(adjustl(dir_path))//"*"//trim(file_extensions(i))//'"'
                 call system(command)
 #endif
 #ifdef __linux__
-                command = "rm -f "//trim(adjustl(dirPath))//"*"//trim(fileExtensions(i))
+                command = "rm -f "//trim(adjustl(dir_path))//"*"//trim(file_extensions(i))
                 call system(command)
 #endif
             end do
