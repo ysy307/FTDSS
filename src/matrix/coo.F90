@@ -13,13 +13,13 @@ module matrix_coo
         integer(int32), allocatable :: col(:)
         real(real64), allocatable :: val(:) ! non-zero values
     contains
-        procedure, public, pass(self) :: initialize => initialize_coo
+        procedure, public, pass(self) :: initialize => initialize_type_coo
         procedure, public, pass(self) :: destory => destory_coo
     end type
 
 contains
 
-    subroutine initialize_coo(self, domain)
+    subroutine initialize_type_coo(self, domain)
         implicit none
         class(type_coo), intent(inout) :: self
         class(type_domain), intent(inout) :: domain
@@ -127,7 +127,7 @@ contains
         call deallocate_array(row_indices)
         call deallocate_array(col_indices)
 
-    end subroutine initialize_coo
+    end subroutine initialize_type_coo
 
     subroutine destory_coo(self)
         implicit none

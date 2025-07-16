@@ -1,9 +1,9 @@
 add_library(Boundary OBJECT
-    bc_interface.F90
-    bc_base.F90
-    bc_adiabatic.F90
-    bc_dirichlet.F90
-    bc_manager.F90
+    boundary_interface.F90
+    boundary_base.F90
+    boundary_adiabatic.F90
+    boundary_dirichlet.F90
+    boundary_manager.F90
     boundary.F90
 )
 target_link_libraries(Boundary PRIVATE

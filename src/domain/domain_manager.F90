@@ -30,7 +30,8 @@ module domain_manager
         integer(int32), private :: computaion_dimension
         ! ...
     contains
-        procedure, pass(self) :: initialize
+        procedure, pass(self) :: initialize => initialize_type_domain
+        procedure, pass(self) :: apply_reordering
 
         procedure, pass(self) :: get_num_elements
         procedure, pass(self) :: get_num_sides
@@ -40,7 +41,7 @@ module domain_manager
     end type type_domain
 
 contains
-    subroutine initialize(self, input, Coordinate, ierr)
+    subroutine initialize_type_domain(self, input, Coordinate, ierr)
         implicit none
         class(type_domain), intent(inout) :: self
         type(type_input), intent(in) :: input
@@ -132,7 +133,10 @@ contains
         ! 4. RCM並べ替えの実行
         !===============================================================
         call self%reordering%initialize(input%basic%solver_settings%reordering, self%elements)
-        call global_logger%log_information(message="RCM reordering completed.")
+        if (input%basic%solver_settings%reordering /= "none") then
+            call self%apply_reordering()
+            call global_logger%log_information(message="RCM reordering completed.")
+        end if
 
         !===============================================================
         ! 5. グラフ彩色の実行
@@ -146,7 +150,7 @@ contains
         !===============================================================
         call global_logger%log_information(message="Initialization process completed successfully.")
 
-    end subroutine initialize
+    end subroutine initialize_type_domain
 
     function get_num_elements(self) result(num_elements)
         implicit none
@@ -192,5 +196,31 @@ contains
         computaion_dimension = self%computaion_dimension
 
     end function get_computation_dimension
+
+    subroutine apply_reordering(self)
+        implicit none
+        class(type_domain), intent(inout) :: self
+
+        integer(int32) :: iElem, iSide
+
+        if (self%computaion_dimension >= 3) then
+            !! TBI: Handle 3D reordering if necessary
+        end if
+        if (self%computaion_dimension >= 2) then
+            do iElem = 1, self%num_elements
+                call allocate_array(self%elements(iElem)%e%connectivity_reordered, self%elements(iElem)%e%get_num_nodes())
+                call self%reordering%to_reordered(self%elements(iElem)%e%connectivity, &
+                                                  self%elements(iElem)%e%connectivity_reordered)
+            end do
+        end if
+        if (self%computaion_dimension >= 1) then
+            do iSide = 1, self%num_sides
+                call allocate_array(self%sides(iSide)%s%connectivity_reordered, self%sides(iSide)%s%get_num_nodes())
+                call self%reordering%to_reordered(self%sides(iSide)%s%connectivity, &
+                                                  self%sides(iSide)%s%connectivity_reordered)
+            end do
+        end if
+
+    end subroutine apply_reordering
 
 end module domain_manager

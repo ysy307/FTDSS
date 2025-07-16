@@ -1,32 +1,47 @@
-submodule(Condition_Boundary) Condition_Boundary_Adiabatic
-    ! use, intrinsic :: iso_fortran_env
-    ! use :: Domain_Module, only:type_domain
-    ! use :: Matrix_CRS, only:Type_CRS
-    ! use :: Inout_Input, only:Input_Boundary
+submodule(conditions_boundary) conditions_boundary_adiabatic
     implicit none
 contains
 
-    module subroutine setup_Thermal_Adiabatic(self, Input_BC, time_conv, iGroup, Domain)
+    module subroutine initialize_type_bc_thermal_adiabatic(self, input, domain, i_material, time_conv)
         implicit none
-        class(BC_Thermal_Adiabatic), intent(inout) :: self
-        type(Input_Boundary), intent(in) :: Input_BC
+        class(type_bc_thermal_adiabatic), intent(inout) :: self
+        type(type_input), intent(in) :: input
+        type(type_domain), intent(in) :: domain
+        integer(int32), intent(in) :: i_material
         real(real64), intent(in) :: time_conv
-        integer(int32), intent(in) :: iGroup
-        type(type_domain), intent(in) :: Domain
 
-        self%is_uniform = Input_BC%Heat(iGroup)%isUniform
-        allocate (self%time_points, source=Input_BC%Time)
+        integer(int32) :: i
+        integer(int32), allocatable :: tmp_indices(:)
+
+        self%material_id = input%conditions%boundary_conditions(i_material)%id
+        self%boundary_name = input%conditions%boundary_conditions(i_material)%thermal%type
+
+        !! Time settings
+        if (allocated(self%time_points)) deallocate (self%time_points)
+        allocate (self%time_points, source=input%conditions%time_control%boundary_time_points)
         self%time_points = self%time_points * time_conv
-        allocate (self%values, source=Input_BC%Heat(iGroup)%value)
 
-        call Find_Target_Edges_By_Group(Domain, Input_BC, iGroup, self%target_edges)
+        if (allocated(self%values)) deallocate (self%values)
+        allocate (self%values, source=input%conditions%boundary_conditions(i_material)%thermal%values)
+
+        call find_target_edges_by_group(domain, i_material, self%target_edges)
         self%num_target_edges = size(self%target_edges, 2)
 
-    end subroutine setup_Thermal_Adiabatic
+        select case (input%basic%solver_settings%reordering)
+        case ("cm", "rcm")
+            call allocate_array(tmp_indices, 2_int32)
+            do i = 1, self%num_target_edges
+                call domain%reordering%to_reordered(self%target_edges(:, i), tmp_indices)
+                self%target_edges(:, i) = tmp_indices(:)
+            end do
+            call deallocate_array(tmp_indices)
+        end select
+
+    end subroutine initialize_type_bc_thermal_adiabatic
 
     module subroutine apply_Dense_Thermal_Adiabatic(self, current_time, A, b, Domain, mode)
         implicit none
-        class(BC_Thermal_Adiabatic), intent(in) :: self
+        class(type_bc_thermal_adiabatic), intent(in) :: self
         real(real64), intent(in) :: current_time
         real(real64), intent(inout), optional :: A(:, :)
         real(real64), intent(inout) :: b(:)
@@ -37,7 +52,7 @@ contains
 
     module subroutine apply_CRS_Thermal_Adiabatic(self, current_time, A, b, Domain, mode)
         implicit none
-        class(BC_Thermal_Adiabatic), intent(in) :: self
+        class(type_bc_thermal_adiabatic), intent(in) :: self
         real(real64), intent(in) :: current_time
         type(Type_CRS), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
@@ -150,4 +165,4 @@ contains
 
     end subroutine apply_Dense_Adiabatic_base
 
-end submodule Condition_Boundary_Adiabatic
+end submodule conditions_boundary_adiabatic

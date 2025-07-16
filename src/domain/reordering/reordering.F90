@@ -18,7 +18,7 @@ module domain_reordering
         logical :: is_reordered_perm = .false.
         logical :: is_reordered_iperm = .false.
     contains
-        procedure, public, pass(self) :: initialize => type_reordering_initialize
+        procedure, public, pass(self) :: initialize => initialize_type_reordering
 
         procedure, private, pass(self) :: rcm_reorder_method
         procedure, private, pass(self) :: rcm_inverse_method
@@ -45,7 +45,7 @@ module domain_reordering
         generic, public :: to_reordered => to_reordered_index, & !&
                                            to_reordered_indices !&
 
-        final :: type_reordering_finalize
+        final :: finalize_type_reordering
     end type type_reordering
 
     interface
@@ -148,7 +148,7 @@ module domain_reordering
 
 contains
 
-    subroutine type_reordering_initialize(self, algorithm_name, elements)
+    subroutine initialize_type_reordering(self, algorithm_name, elements)
         implicit none
         class(type_reordering), intent(inout) :: self
         character(*), intent(in) :: algorithm_name
@@ -164,17 +164,17 @@ contains
             call self%cm_inverse_method()
         end select
 
-    end subroutine type_reordering_initialize
+    end subroutine initialize_type_reordering
 
     !================================================================!
     ! finalizer
     !================================================================!
-    subroutine type_reordering_finalize(self)
+    subroutine finalize_type_reordering(self)
         implicit none
         type(type_reordering), intent(inout) :: self
 
         call deallocate_array(self%perm)
         call deallocate_array(self%iperm)
-    end subroutine type_reordering_finalize
+    end subroutine finalize_type_reordering
 
 end module domain_reordering
