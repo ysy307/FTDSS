@@ -1,4 +1,4 @@
-submodule(Inout_Output) Inout_Output_Base
+submodule(input_output) input_output_base
     implicit none
 contains
     !----------------------------------------------------------------------!
@@ -58,4 +58,4 @@ contains
         end if
     end subroutine Setup_Directory
 
-end submodule Inout_Output_Base
+end submodule input_output_base

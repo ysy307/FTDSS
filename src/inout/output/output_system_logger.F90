@@ -1,5 +1,4 @@
-submodule(Inout_Output) Inout_Output_SystemLogger
-    use, intrinsic :: iso_fortran_env
+submodule(input_output) input_output_system_logger
     implicit none
 contains
     module subroutine Output_SystemLog(self, time, Matrix, Domain)
@@ -116,15 +115,6 @@ contains
             write (num_unit, '(a10, f15.4, a)') "Total", component_total_time, ""
         end if
 
-!$      write (num_unit, *) '========= Accumulated Timing (over all time steps) ========='
-!$      write (num_unit, *) 'Total time             :', time_total
-!$      write (num_unit, *) ' Interpolation         :', time_interp
-!$      write (num_unit, *) ' Property evaluation   :', time_get_prop
-!$      write (num_unit, *) ' Integration           :', time_integration
-!$      write (num_unit, *) ' Matrix index lookup   :', time_find_index
-!$      write (num_unit, *) ' Matrix add            :', time_add_val
-!$      write (num_unit, *) '============================================================'
-
         write (num_unit, '(a)') repeat('=', nRepeat)
         write (num_unit, '(a)') "Matrix Information"
         write (num_unit, '(a)') repeat('-', nRepeat)
@@ -138,4 +128,4 @@ contains
         close (num_unit)
     end subroutine Output_SystemLog
 
-end submodule Inout_Output_SystemLogger
+end submodule input_output_system_logger

@@ -10,7 +10,7 @@ module input_output
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                              get_cpu_architecture, get_os, get_openmp_version, get_memory_usage !&
 
-    use :: Inout_Input
+    use :: module_input
     use :: module_domain, only:holder_elements, create_element, type_domain, type_rcm
     use :: module_control, only:type_time, type_iteration
     use :: module_properties, only:type_proereties_manager

@@ -87,6 +87,13 @@ contains
             element%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
         end select
 
+        ! Initialize the interpolation function pointer
+        if (associated(element%interpolate)) nullify (element%interpolate)
+        element%interpolate => interpolate
+
+        if (associated(element%get_connectivity)) nullify (element%get_connectivity)
+        element%get_connectivity => get_connectivity
+
     end function construct_triangle_first
 
     !----------------------------------------------------------------------!
@@ -554,9 +561,9 @@ contains
         end if
     end subroutine is_in_triangle_first
 
-    module function Interpolate_triangle_first(self, xi, eta, value) result(interpolated_value)
+    module function interpolate_triangle_first(self, xi, eta, value) result(interpolated_value)
         implicit none
-        class(type_triangle_first), intent(in) :: self
+        class(abst_element), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
@@ -567,6 +574,21 @@ contains
             interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
         end do
 
-    end function Interpolate_triangle_first
+    end function interpolate_triangle_first
+
+    module function interpolate_reordered_triangle_first(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(abst_element), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%num_nodes
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity_reordered(i))
+        end do
+
+    end function interpolate_reordered_triangle_first
 
 end submodule domain_element_triangle_first

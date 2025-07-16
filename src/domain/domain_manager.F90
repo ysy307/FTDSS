@@ -3,7 +3,7 @@ module domain_manager
     use :: stdlib_logger
     use :: module_core, only:type_dp_3d
     use :: module_input, only:type_input
-    use :: domain_element, only:holder_elements
+    use :: domain_element
     use :: domain_side, only:holder_sides
     use :: domain_element_factory, only:create_element
     use :: domain_side_factory, only:create_side
@@ -211,6 +211,15 @@ contains
                 call allocate_array(self%elements(iElem)%e%connectivity_reordered, self%elements(iElem)%e%get_num_nodes())
                 call self%reordering%to_reordered(self%elements(iElem)%e%connectivity, &
                                                   self%elements(iElem)%e%connectivity_reordered)
+                if (associated(self%elements(iElem)%e%interpolate)) then
+                    nullify (self%elements(iElem)%e%interpolate)
+                end if
+                self%elements(iElem)%e%interpolate => interpolate_reordered
+
+                if (associated(self%elements(iElem)%e%get_connectivity)) then
+                    nullify (self%elements(iElem)%e%get_connectivity)
+                end if
+                self%elements(iElem)%e%get_connectivity => get_connectivity_reordered
             end do
         end if
         if (self%computaion_dimension >= 1) then

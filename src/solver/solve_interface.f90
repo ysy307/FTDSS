@@ -3,7 +3,7 @@ module Solver_Solve
 !$  use omp_lib
     use :: module_core, only:allocate_array, deallocate_array, error_message
     use :: module_calculate, only:norm => norm_2, dot => inner_product
-    use :: Matrix_CRS
+    use :: module_matrix, only:type_crs, operator(*), operator(+)
     implicit none
     private
 #ifdef _MKL

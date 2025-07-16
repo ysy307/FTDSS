@@ -1,4 +1,4 @@
-submodule(Inout_Output) Inout_Output_Obaservation
+submodule(input_output) input_output_obaservation
     implicit none
 contains
 
@@ -491,4 +491,4 @@ contains
 
     end subroutine Output_Process_Observation
 
-end submodule Inout_Output_Obaservation
+end submodule input_output_obaservation

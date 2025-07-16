@@ -1,0 +1,108 @@
+module main_thermal
+    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d
+    use :: module_domain, only:type_domain
+    use :: module_properties, only:type_proereties_manager
+    use :: module_input, only:type_input
+    use :: module_matrix, only:type_crs, operator(*), operator(+)
+    use :: module_boundary
+    use :: Solver_Solve
+    use :: module_control, only:type_time
+    use :: thermal_thermal_assemble
+    implicit none
+
+    type, abstract :: abst_thermal
+        type(type_variable) :: T
+        type(type_variable) :: Qw
+        type(type_variable) :: Qice
+        type(type_variable) :: D_Qice
+        type(type_variable) :: Si
+
+        type(type_crs) :: KT_star_0
+        type(type_crs) :: KT_l
+        type(type_crs) :: KT_old
+        type(type_crs) :: CT_l
+        type(type_crs), allocatable :: CT_old(:)
+
+        real(real64), allocatable :: FT(:)
+        real(real64), allocatable :: FT_old(:)
+        real(real64), allocatable :: PHIT(:)
+        real(real64), allocatable :: PHIT_old(:)
+
+        !! Solver
+        class(Abstract_Solver_CRS), allocatable :: solver
+        integer(int32) :: order
+    contains
+        ! procedure(Abstract_Update), pass(self), deferred :: Update
+        procedure(abst_assemble), pass(self), deferred :: assemble
+    end type abst_thermal
+
+    type, extends(abst_thermal) :: type_thermal_3phase_2d
+    contains
+        ! procedure :: Update => type_thermal_3phase_2d_Update
+        procedure :: assemble => assemble_type_thermal_3phase_2d
+    end type type_thermal_3phase_2d
+
+    abstract interface
+        ! subroutine Abstract_Update(self, arr_phi)
+        !     import :: abst_thermal, real64
+        !     implicit none
+        !     class(abst_thermal), intent(inout) :: self
+        !     ! type(Belonging), intent(inout), optional :: NodeBelonging(:)
+        !     real(real64), intent(inout) :: arr_phi(:)
+
+        ! end subroutine Abstract_Update
+
+        subroutine abst_assemble(self, domain, Property, Porosity, dt, step, iter)
+            import :: abst_thermal, int32, real64, type_domain, type_proereties_manager
+            implicit none
+            class(abst_thermal), intent(inout) :: self
+            type(type_domain), intent(inout) :: domain
+            type(type_proereties_manager), intent(inout) :: Property
+            real(real64), intent(in) :: Porosity(:)
+            real(real64), intent(in) :: dt
+            integer(int32), intent(in) :: step
+            integer(int32), intent(in) :: iter
+
+        end subroutine abst_assemble
+    end interface
+
+    interface
+        module function construct_type_thermal_3phase_2d(Input, coordinate, domain) result(structure)
+            implicit none
+            class(abst_thermal), allocatable :: structure
+            type(type_input), intent(inout) :: Input
+            type(type_dp_3d), intent(inout), pointer :: coordinate
+            type(type_domain), intent(inout) :: domain
+
+        end function construct_type_thermal_3phase_2d
+
+        ! module subroutine type_thermal_3phase_2d_Update(self, NodeBelonging, arr_phi)
+        !     implicit none
+        !     class(type_thermal_3phase_2d), intent(inout) :: self
+        !     type(Belonging), intent(inout), optional :: NodeBelonging(:)
+        !     real(real64), intent(inout) :: arr_phi(:)
+
+        ! end subroutine type_thermal_3phase_2d_Update
+
+        module subroutine assemble_type_thermal_3phase_2d(self, domain, Property, Porosity, dt, step, iter)
+            implicit none
+            class(type_thermal_3phase_2d), intent(inout) :: self
+            type(type_domain), intent(inout) :: domain
+            type(type_proereties_manager), intent(inout) :: Property
+            real(real64), intent(in) :: Porosity(:)
+            real(real64), intent(in) :: dt
+            integer(int32), intent(in) :: step
+            integer(int32), intent(in) :: iter
+
+        end subroutine assemble_type_thermal_3phase_2d
+
+    end interface
+
+    interface type_thermal_3phase_2d
+        module procedure :: construct_type_thermal_3phase_2d
+    end interface
+
+contains
+
+end module main_thermal

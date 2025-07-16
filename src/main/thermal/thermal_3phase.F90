@@ -1,65 +1,65 @@
 submodule(Main_Thermal) Main_Thermal_3Phase
     implicit none
 contains
-    module function Type_Thermal_3Phase_2D_Construct(Input, Coordinate, Domain) result(Structure)
+    module function construct_type_thermal_3phase_2d(input, coordinate, domain) result(structure)
         implicit none
-        class(Abstract_Thermal), allocatable :: Structure
-        type(Type_Input), intent(inout) :: Input
-        type(type_dp_3d), intent(inout), pointer :: Coordinate
-        type(type_domain), intent(inout) :: Domain
+        class(abst_thermal), allocatable :: structure
+        type(type_input), intent(inout) :: input
+        type(type_dp_3d), intent(inout), pointer :: coordinate
+        type(type_domain), intent(inout) :: domain
 
         integer(int32) :: i
         integer(int32) :: nNode
 
         integer(int32) :: ierr
 
-        if (allocated(Structure)) deallocate (Structure)
-        allocate (Type_Thermal_3Phase_2D :: Structure)
+        if (allocated(structure)) deallocate (structure)
+        allocate (Type_Thermal_3Phase_2D :: structure)
 
-        nNode = Domain%get_num_nodes()
+        nNode = domain%get_num_nodes()
 
-        call Structure%KT_star_0%initialize(Domain)
+        call structure%KT_star_0%initialize(domain)
 
-        Structure%KT_l = Structure%KT_star_0%Copy()
-        Structure%KT_old = Structure%KT_star_0%Copy()
-        Structure%CT_l = Structure%KT_star_0%Copy()
-        Structure%Order = Input%Basic%Order
+        structure%KT_l = structure%KT_star_0%copy()
+        structure%KT_old = structure%KT_star_0%copy()
+        structure%CT_l = structure%KT_star_0%copy()
+        structure%order = input%basic%solver_settings%bdf_order
 
-        allocate (Structure%CT_old(Input%Basic%Order))
-        do i = 1, Input%Basic%Order
-            Structure%CT_old(i) = Structure%KT_star_0%Copy()
+        allocate (structure%CT_old(structure%order))
+        do i = 1, structure%order
+            structure%CT_old(i) = structure%KT_star_0%copy()
         end do
 
-        call allocate_array(Structure%FT, nNode)
-        call allocate_array(Structure%FT_old, nNode)
-        call allocate_array(Structure%PHIT, nNode)
-        call allocate_array(Structure%PHIT_old, nNode)
+        call allocate_array(structure%FT, nNode)
+        call allocate_array(structure%FT_old, nNode)
+        call allocate_array(structure%PHIT, nNode)
+        call allocate_array(structure%PHIT_old, nNode)
 
-        call Structure%T%initialize(nNode, Input%Basic%Order)
+        call structure%T%initialize(nNode, structure%order)
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! 線形求解ソルバーの設定
         !---------------------------------------------------------------------------------------------------------------------------
-        if (Input%Solver_Thermal%useSolver == 1) then
-            Structure%Solver = Solver_CRS_LU_Constructor(N=nNode, &
-                                                         MAXFCT=1, &
-                                                         MNUM=1, &
-                                                         MTYPE=1, &
-                                                         PHASE=13, &
-                                                         NRHS=1, &
-                                                         MSGVLV=0, &
-                                                         a=Structure%KT_star_0)
-        else if (Input%Solver_Thermal%useSolver == 2) then
-            if (Input%Solver_Thermal%useSolverType == 4) then
-                Structure%Solver = Solver_CRS_BiCGSTAB_Constructor(N=nNode, &
-                                                                   tol=Input%Solver_Thermal%tolerance, &
-                                                                   maxiter=Input%Solver_Thermal%maxIteration, &
-                                                                   Preconditioner=Input%Solver_Thermal%usePreconditionerType)
-            end if
-        end if
+        ! if (input%Solver_Thermal%useSolver == 1) then
+        !     structure%Solver = Solver_CRS_LU_Constructor(N=nNode, &
+        !                                                  MAXFCT=1, &
+        !                                                  MNUM=1, &
+        !                                                  MTYPE=1, &
+        !                                                  PHASE=13, &
+        !                                                  NRHS=1, &
+        !                                                  MSGVLV=0, &
+        !                                                  a=structure%KT_star_0)
+        ! else if (input%Solver_Thermal%useSolver == 2) then
+        !     if (input%Solver_Thermal%useSolverType == 4) then
+        !         structure%Solver = Solver_CRS_BiCGSTAB_Constructor(N=nNode, &
+        !                                                            tol=input%Solver_Thermal%tolerance, &
+        !                                                            maxiter=input%Solver_Thermal%maxIteration, &
+        !                                                            Preconditioner=input%Solver_Thermal%usePreconditionerType)
+        !     end if
+        ! end if
         !---------------------------------------------------------------------------------------------------------------------------
 
-    end function Type_Thermal_3Phase_2D_Construct
+    end function construct_type_thermal_3phase_2d
 
     ! module subroutine Type_Thermal_3Phase_2D_Update(self, NodeBelonging, arr_phi)
     !     implicit none
@@ -87,25 +87,24 @@ contains
     !                          Temperature=self%T%pre(:), &
     !                          Density=self%DEN)
     ! end subroutine Type_Thermal_3Phase_2D_Update
-
-    module subroutine Type_Thermal_3Phase_2D_Assemble(self, Domain, Property, Porosity, dt, step, iter)
+    module subroutine assemble_type_thermal_3phase_2d(self, domain, property, porosity, dt, step, iter)
         implicit none
-        class(Type_Thermal_3Phase_2D), intent(inout) :: self
-        type(type_domain), intent(inout) :: Domain
-        type(type_proereties_manager), intent(inout) :: Property
-        real(real64), intent(in) :: Porosity(:)
+        class(type_thermal_3phase_2d), intent(inout) :: self
+        type(type_domain), intent(inout) :: domain
+        type(type_proereties_manager), intent(inout) :: property
+        real(real64), intent(in) :: porosity(:)
         real(real64), intent(in) :: dt
         integer(int32), intent(in) :: step
         integer(int32), intent(in) :: iter
 
         ! if (step >= 2) then
-        !     self%CT_old(2)%Val(:) = self%CT_old(1)%Val(:)
-        !     self%CT_old(1)%Val(:) = self%CT_l%Val(:)
+        !     self%CT_old(2)%val(:) = self%CT_old(1)%val(:)
+        !     self%CT_old(1)%val(:) = self%CT_l%val(:)
         ! end if
 
-        self%CT_l%Val(:) = 0.0d0
-        self%KT_l%Val(:) = 0.0d0
-        self%KT_star_0%Val(:) = 0.0d0
+        self%CT_l%val(:) = 0.0d0
+        self%KT_l%val(:) = 0.0d0
+        self%KT_star_0%val(:) = 0.0d0
         ! ! if (step == 1) then
 
         ! ! end if
@@ -113,12 +112,12 @@ contains
         ! 各剛性行列の組み立て
         !---------------------------------------------------------------------------------------------------------------------------
         !!!-----------------------------------------------------------------------
-        ! (A, Domain, Temperature, Porosity, Propeties)
-        call Assemble_Mass_Heat_1_Parallel(self%CT_l, Domain, self%T%new, Porosity, Property)
-        ! call Assemble_Mass_Heat_1(self%CT_l, Domain, self%T%new, Porosity, Property)
+        ! (A, domain, Temperature, porosity, Propeties)
+        call Assemble_Mass_Heat_1_Parallel(self%CT_l, domain, self%T%new, porosity, property)
+        ! call Assemble_Mass_Heat_1(self%CT_l, domain, self%T%new, porosity, property)
         !
-        call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, Domain, self%T%new, Porosity, Property)
-        ! call Assemble_Diffusion_Heat_1(self%KT_l, Domain, self%T%new, Porosity, Property)
+        call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, domain, self%T%new, porosity, property)
+        ! call Assemble_Diffusion_Heat_1(self%KT_l, domain, self%T%new, porosity, property)
         ! モジュール変数へ反映
 
 !$      t_total = t_total + time_total
@@ -135,8 +134,8 @@ contains
         self%KT_star_0 = dt * self%KT_l + self%CT_l
 
         !     if (iter == 1) then
-        ! self%CT_old(1)%Val(:) = self%CT_l%Val(:)
-        !         self%KT_old%Val(:) = self%KT_l%Val(:)
+        ! self%CT_old(1)%val(:) = self%CT_l%val(:)
+        !         self%KT_old%val(:) = self%KT_l%val(:)
         !         self%PHIT(:) = 0.0d0
         ! self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
         !     end if
@@ -146,13 +145,13 @@ contains
         ! self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
         ! self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
         ! else
-        !     self%KT_star_0%Val(:) = 2.0d0 * dt * self%KT_l%Val(:) + 3.0d0 * self%CT_l%Val(:)
+        !     self%KT_star_0%val(:) = 2.0d0 * dt * self%KT_l%val(:) + 3.0d0 * self%CT_l%val(:)
         !     if (iter == 1) then
         !         self%PHIT_old(:) = -4.0d0 * (self%CT_old(1) * self%T%old(:, 1)) + self%CT_old(2) * self%T%old(:, 2)
         !     end if
         !     self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
         ! end if
         ! self%PHIT(:) = self%PHIT_old(:)
-    end subroutine Type_Thermal_3Phase_2D_Assemble
+    end subroutine assemble_type_thermal_3phase_2d
 
 end submodule Main_Thermal_3Phase

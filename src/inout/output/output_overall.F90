@@ -1,8 +1,8 @@
-submodule(Inout_Output) Inout_Output_Overall
+submodule(input_output) input_output_overall
     implicit none
 
 contains
-    module subroutine Inout_Output_Overall_initialize(self, Input, Coordinate, Domain)
+    module subroutine input_output_Overall_initialize(self, Input, Coordinate, Domain)
         implicit none
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
@@ -19,9 +19,9 @@ contains
             stop
         end select
 
-    end subroutine Inout_Output_Overall_initialize
+    end subroutine input_output_Overall_initialize
 
-    module subroutine Inout_Output_Overall_initialize_vtk(self, Input, Coordinate, Domain)
+    module subroutine input_output_Overall_initialize_vtk(self, Input, Coordinate, Domain)
         implicit none
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
@@ -53,9 +53,9 @@ contains
             end do
         end do
 
-    end subroutine Inout_Output_Overall_initialize_vtk
+    end subroutine input_output_Overall_initialize_vtk
 
-    module subroutine Inout_Output_Overall_initialize_vtu(self, Input, Coordinate, Domain)
+    module subroutine input_output_Overall_initialize_vtu(self, Input, Coordinate, Domain)
         implicit none
         class(Output_Overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
@@ -105,9 +105,9 @@ contains
             end do
         end do
 
-    end subroutine Inout_Output_Overall_initialize_vtu
+    end subroutine input_output_Overall_initialize_vtu
 
-    module subroutine Inout_Output_Overall_Output(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
+    module subroutine input_output_Overall_Output(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in) :: fc
@@ -130,9 +130,9 @@ contains
             end if
         end select
 
-    end subroutine Inout_Output_Overall_Output
+    end subroutine input_output_Overall_Output
 
-    module subroutine Inout_Output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
+    module subroutine input_output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
         use :: stdlib_strings, only:to_string
         implicit none
         class(Output_Overall), intent(inout) :: self
@@ -208,9 +208,9 @@ contains
                                         z=wFlux%z)
         end if
 
-    end subroutine Inout_Output_Overall_Output_vtk
+    end subroutine input_output_Overall_Output_vtk
 
-    module subroutine Inout_Output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
+    module subroutine input_output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in), optional :: iperm(:)
@@ -232,9 +232,9 @@ contains
 
         deallocate (Original)
 
-    end subroutine Inout_Output_Overall_Output_vtk_scalar_real64
+    end subroutine input_output_Overall_Output_vtk_scalar_real64
 
-    module subroutine Inout_Output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
+    module subroutine input_output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in), optional :: iperm(:)
@@ -255,9 +255,9 @@ contains
 
         deallocate (Original)
 
-    end subroutine Inout_Output_Overall_Output_vtk_scalar_int32
+    end subroutine input_output_Overall_Output_vtk_scalar_int32
 
-    module subroutine Inout_Output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
+    module subroutine input_output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
         implicit none
         class(Output_Overall) :: self
         integer(int32), intent(in), optional :: iperm(:)
@@ -283,9 +283,9 @@ contains
         end do
         write (unit_num, '(a)') ""
 
-    end subroutine Inout_Output_Overall_Output_vtk_vector
+    end subroutine input_output_Overall_Output_vtk_vector
 
-    module subroutine Inout_Output_Overall_Output_vtu(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
+    module subroutine input_output_Overall_Output_vtu(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
         use :: vtk_fortran, only:vtk_file
         implicit none
         class(Output_Overall), intent(inout) :: self
@@ -374,6 +374,6 @@ contains
         ! Finalize VTK file
         status = vtu%finalize()
 
-    end subroutine Inout_Output_Overall_Output_vtu
+    end subroutine input_output_Overall_Output_vtu
 
-end submodule Inout_Output_Overall
+end submodule input_output_Overall
