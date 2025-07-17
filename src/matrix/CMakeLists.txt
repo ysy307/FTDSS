@@ -1,6 +1,8 @@
 add_library(Matrix OBJECT
-    coo.F90
-    crs.F90
+matrix_base.F90
+    matrix_dense.F90
+    matrix_coo.F90
+    matrix_crs.F90
     matrix.F90
 )
 target_link_libraries(Matrix PRIVATE
