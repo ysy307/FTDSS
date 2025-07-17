@@ -61,7 +61,7 @@ contains
         max_file_counts_digit = int(log10(simulation_period_second / output_step_second), kind=int32) + 1_int32
         if (max_file_counts_digit < 1) max_file_counts_digit = 1
 
-        self%format_output = "'(2a,i"//to_string(max_file_counts_digit)//"."//to_string(max_file_counts_digit)//"a)'"
+        self%format_output = "(a,a,i"//to_string(max_file_counts_digit)//"."//to_string(max_file_counts_digit)//",a)"
 
     end subroutine initialize_input_type_output_overall
 

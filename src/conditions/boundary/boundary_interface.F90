@@ -42,12 +42,13 @@ module conditions_boundary
     end type type_bc_thermal_adiabatic
 
     abstract interface
-        subroutine abst_initialize_bc(self, input, domain, i_material, time_conv)
+        subroutine abst_initialize_bc(self, input, domain, id, i_material, time_conv)
             import :: abst_bc_thermal, type_input, int32, type_domain, real64
             implicit none
             class(abst_bc_thermal), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_domain), intent(in) :: domain
+            integer(int32), intent(in) :: id
             integer(int32), intent(in) :: i_material
             real(real64), intent(in) :: time_conv
         end subroutine abst_initialize_bc
@@ -76,11 +77,12 @@ module conditions_boundary
     end interface
 
     interface
-        module subroutine initialize_type_bc_thermal_dirichlet(self, input, domain, i_material, time_conv)
+        module subroutine initialize_type_bc_thermal_dirichlet(self, input, domain, id, i_material, time_conv)
             implicit none
             class(type_bc_thermal_dirichlet), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_domain), intent(in) :: domain
+            integer(int32), intent(in) :: id
             integer(int32), intent(in) :: i_material
             real(real64), intent(in) :: time_conv
 
@@ -110,11 +112,12 @@ module conditions_boundary
     end interface
 
     interface
-        module subroutine initialize_type_bc_thermal_adiabatic(self, input, domain, i_material, time_conv)
+        module subroutine initialize_type_bc_thermal_adiabatic(self, input, domain, id, i_material, time_conv)
             implicit none
             class(type_bc_thermal_adiabatic), intent(inout) :: self
             type(type_input), intent(in) :: input
             type(type_domain), intent(in) :: domain
+            integer(int32), intent(in) :: id
             integer(int32), intent(in) :: i_material
             real(real64), intent(in) :: time_conv
 

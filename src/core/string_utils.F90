@@ -87,11 +87,7 @@ contains
         character(64), allocatable :: packed_array(:)
         logical, allocatable :: mask(:)
 
-        print *, "filter_character_array called"
-
         ! --- 処理 ---
-        print *, size(input_array) == 0, size(input_array)
-        print *, "valid_list:", input_array(:)
         if (size(input_array) == 0) then
             if (allocated(filtered_array)) deallocate (filtered_array)
             allocate (character(len=0) :: filtered_array(0))
@@ -103,7 +99,6 @@ contains
         ! input_arrayの各要素がvalid_listに存在するかチェックし、マスクを作成
         mask = .false.
         do i = 1, size(input_array)
-            print *, input_array(i), any(valid_list(:) == trim(adjustl(input_array(i))))
             mask(i) = any(valid_list(:) == trim(adjustl(input_array(i))))
         end do
 

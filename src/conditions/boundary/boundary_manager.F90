@@ -62,10 +62,10 @@ contains
                 select case (input%conditions%boundary_conditions(i)%thermal%type)
                 case ("dirichlet")
                     allocate (type_bc_thermal_dirichlet :: self%bc(i)%t)
-                    call self%bc(i)%t%initialize(input, domain, i_material, time_conv)
+                    call self%bc(i)%t%initialize(input, domain, i, i_material, time_conv)
                 case ("adiabatic")
                     allocate (type_bc_thermal_adiabatic :: self%bc(i)%t)
-                    call self%bc(i)%t%initialize(input, domain, i_material, time_conv)
+                    call self%bc(i)%t%initialize(input, domain, i, i_material, time_conv)
                 end select
             end if
             if (input%basic%analysis_controls%calculate_hydraulic) then

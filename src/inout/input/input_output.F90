@@ -343,35 +343,22 @@ contains
         ! ==========================================================================
         ! STEP 1: active_categories に基づいて、有効な変数リストを動的に作成
         ! ==========================================================================
-        print *, "configure_output_variables called", size(master_valid_variables)
         allocate (mask(size(master_valid_variables)))
         mask(:) = .false.
         ! ★DOループで要素ごとに比較
         do i = 1, size(master_valid_variables)
             do j = 1, size(active_categories)
-                print *, trim(master_valid_variables(i)%category), "  ", trim(active_categories(j))
                 if (trim(master_valid_variables(i)%category) == trim(active_categories(j))) then
                     mask(i) = .true.
                 end if
             end do
         end do
 
-        print *, mask(:)
-
         ! ★組み込み関数count()を使う
         n_valid = count(mask)
-        print *, "Number of valid variables:", n_valid
         if (n_valid > 0) then
             allocate (current_valid_names(n_valid))
-            do i = 1, size(master_valid_variables)
-                print *, i, mask(i)
-                if (mask(i)) then
-                    current_valid_names(i) = master_valid_variables(i)%name
-                end if
-                ! current_valid_names(i) = master_valid_variables(i)%name
-            end do
-            ! ★配列内包表記で要素を抽出
-            ! current_valid_names = pack([(master_valid_variables(j)%name, j=1, size(master_valid_variables))], mask)
+            current_valid_names = pack([(master_valid_variables(j)%name, j=1, size(master_valid_variables))], mask)
         else
             allocate (current_valid_names(0))
         end if
@@ -380,12 +367,6 @@ contains
         ! ==========================================================================
         ! STEP 2: 作成した有効リストを使い、ユーザーが要求した変数をフィルタリング
         ! ==========================================================================
-        ! (この部分は変更なし)
-        print *, "Valid variables:", current_valid_names(:)
-        ! print *, trim(current_valid_names(1))
-        ! print *, trim(current_valid_names(2))
-        ! print *, trim(current_valid_names(3))
-        ! print *, trim(current_valid_names(4))
         call filter(input_categories, current_valid_names, target_variable_list)
 
         if (size(target_variable_list) == 0) then

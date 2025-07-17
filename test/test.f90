@@ -127,6 +127,7 @@ program test
 
             call FTDSS%time%Profile_Start("Solve")
             call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
+            call FTDSS%Thermal%solver%check(stat, FTDSS%time%time)
 
             call FTDSS%time%Profile_Stop("Solve")
             ! open (unit=30, file='log/debug3.txt', status='replace')
@@ -181,10 +182,10 @@ program test
         end if
         call FTDSS%time%Profile_Stop("IO")
 
-        if (was_interrupted()) then
-            call global_logger%log_warning(message="Program interrupted by user.")
-            stop
-        end if
+        ! if (was_interrupted()) then
+        !     call global_logger%log_warning(message="Program interrupted by user.")
+        !     stop
+        ! end if
 
     end do TIME_LOOP
 

@@ -92,22 +92,22 @@ contains
         end if
 
         ! debug
-        print *, "Geometry file read successfully:", self%geometry_file_name
-        print *, "Number of initial condition fields read:", size(self%geometry%point_data_names)
-        if (allocated(self%geometry%point_data_names)) then
-            print *, "Fields:", self%geometry%point_data_names
-        else
-            print *, "No initial condition fields read."
-        end if
-        print *, "Total number of cells in geometry:", self%geometry%vtk%num_total_cells
-        print *, "Total number of points in geometry:", self%geometry%vtk%num_points
-        print *, "Geometry initialization complete."
-        if (allocated(self%geometry%initial_values)) then
-            print *, "Initial values array size:", size(self%geometry%initial_values)
-        else
-            print *, "No initial values array allocated."
-        end if
-        stop
+        ! print *, "Geometry file read successfully:", self%geometry_file_name
+        ! print *, "Number of initial condition fields read:", size(self%geometry%point_data_names)
+        ! if (allocated(self%geometry%point_data_names)) then
+        !     print *, "Fields:", self%geometry%point_data_names
+        ! else
+        !     print *, "No initial condition fields read."
+        ! end if
+        ! print *, "Total number of cells in geometry:", self%geometry%vtk%num_total_cells
+        ! print *, "Total number of points in geometry:", self%geometry%vtk%num_points
+        ! print *, "Geometry initialization complete."
+        ! if (allocated(self%geometry%initial_values)) then
+        !     print *, "Initial values array size:", size(self%geometry%initial_values)
+        ! else
+        !     print *, "No initial values array allocated."
+        ! end if
+        ! stop
 
     end subroutine inout_read_geometry
 end submodule inout_input_geometry

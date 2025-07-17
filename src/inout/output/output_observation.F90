@@ -108,7 +108,7 @@ contains
                 self%get_values => interpolate_observations_temperature
             end select
             self%get_values => interpolate_observations_temperature
-        case ("ice_content")
+        case ("ice_saturation")
             self%name = trim(adjustl(variable_name))
             self%unit = "-"
             self%file_name = trim(adjustl(dir_output))//"obsf_Si."//trim(adjustl(input%output_settings%history_output%file_format))

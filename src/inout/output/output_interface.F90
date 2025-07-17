@@ -249,8 +249,8 @@ contains
 
         self%dir_output = trim(adjustl(dir_path))//"Output/"
         call setup_directory(self%dir_output, output_extentions)
-        self%Overall%dir_output_field = trim(adjustl(dir_path))//"Output/Files/"
-        call setup_directory(self%Overall%dir_output_field, output_file_extentions)
+        self%dir_output_field = trim(adjustl(dir_path))//"Output/Files/"
+        call setup_directory(self%dir_output_field, output_file_extentions)
 
         self%log_file_name = trim(adjustl(self%dir_output))//"run.log"
 

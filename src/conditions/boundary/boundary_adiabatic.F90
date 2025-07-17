@@ -2,19 +2,20 @@ submodule(conditions_boundary) conditions_boundary_adiabatic
     implicit none
 contains
 
-    module subroutine initialize_type_bc_thermal_adiabatic(self, input, domain, i_material, time_conv)
+    module subroutine initialize_type_bc_thermal_adiabatic(self, input, domain, id, i_material, time_conv)
         implicit none
         class(type_bc_thermal_adiabatic), intent(inout) :: self
         type(type_input), intent(in) :: input
         type(type_domain), intent(in) :: domain
+        integer(int32), intent(in) :: id
         integer(int32), intent(in) :: i_material
         real(real64), intent(in) :: time_conv
 
         integer(int32) :: i
         integer(int32), allocatable :: tmp_indices(:)
 
-        self%material_id = input%conditions%boundary_conditions(i_material)%id
-        self%boundary_name = input%conditions%boundary_conditions(i_material)%thermal%type
+        self%material_id = input%conditions%boundary_conditions(id)%id
+        self%boundary_name = input%conditions%boundary_conditions(id)%thermal%type
 
         !! Time settings
         if (allocated(self%time_points)) deallocate (self%time_points)
@@ -22,7 +23,7 @@ contains
         self%time_points = self%time_points * time_conv
 
         if (allocated(self%values)) deallocate (self%values)
-        allocate (self%values, source=input%conditions%boundary_conditions(i_material)%thermal%values)
+        allocate (self%values, source=input%conditions%boundary_conditions(id)%thermal%values)
 
         call find_target_edges_by_group(domain, i_material, self%target_edges)
         self%num_target_edges = size(self%target_edges, 2)
