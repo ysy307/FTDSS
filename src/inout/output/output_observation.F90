@@ -152,6 +152,8 @@ contains
             self%unit = "m/s"
             self%file_name = trim(adjustl(dir_output))//"obsf_Flux."//trim(adjustl(input%output_settings%history_output%file_format))
             self%num_unit = 99999999
+
+            self%num_observations = self%num_observations * 3
         case ("hydraulic_conductivity")
             self%name = trim(adjustl(variable_name))
             self%unit = "m/s"
@@ -159,12 +161,15 @@ contains
             self%num_unit = 99999999
         end select
 
-        if (associated(self%output_line)) nullify (self%output_line)
+        if (associated(self%write_line)) nullify (self%write_line)
+        if (associated(self%write_header)) nullify (self%write_header)
         select case (trim(adjustl(input%output_settings%history_output%file_format)))
         case ("dat")
-            self%output_line => output_observation_line_dat
+            self%write_header => write_obeservation_header_dat
+            self%write_line => output_observation_line_dat
         case ("csv")
-            self%output_line => output_observation_line_csv
+            self%write_header => write_obeservation_header_csv
+            self%write_line => output_observation_line_csv
         end select
 
     end subroutine initialize_type_output_observation
@@ -193,12 +198,12 @@ contains
     !   - Uses the `to_string` procedure from stdlib_strings to build output format.
     !
     !----------------------------------------------------------------------!
-    module subroutine write_obeservation_header(self, time_unit)
+    subroutine write_obeservation_header_dat(self, time_unit)
         implicit none
         class(type_output_observation), intent(inout) :: self
         character(*), intent(in) :: time_unit
 
-        integer(int32) :: iObs, num_observations
+        integer(int32) :: iObs, num_observations, idim
         integer(int32) :: local_id
 
         num_observations = self%num_observations
@@ -232,10 +237,68 @@ contains
         write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(adjustl(time_unit))//"], " & !&
                                         //trim(self%name)//" ["//trim(self%unit)//"]" !&
         write (self%num_unit, '(a)') "#"
-        write (self%num_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
-            "Time", ("Obs"//to_string(iObs), iObs=1, num_observations)
+        select case (self%name)
+        case ("water_flux")
+            write (self%num_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
+                "Time", (("Obs"//to_string(iObs)//"_x", "Obs"//to_string(iObs)//"_y", "Obs"//to_string(iObs)//"_z"), &
+                         iObs=1, num_observations / 3)
+        case default
+            write (self%num_unit, '(a,'//to_string(num_observations)//'(2x,a))') &
+                "Time", ("Obs"//to_string(iObs), iObs=1, num_observations)
+        end select
 
-    end subroutine write_obeservation_header
+    end subroutine write_obeservation_header_dat
+
+    subroutine write_obeservation_header_csv(self, time_unit)
+        implicit none
+        class(type_output_observation), intent(inout) :: self
+        character(*), intent(in) :: time_unit
+
+        integer(int32) :: iObs, num_observations, idim
+        integer(int32) :: local_id
+
+        num_observations = self%num_observations
+
+        open (newunit=self%num_unit, file=trim(adjustl(self%file_name)), status='replace', action='write')
+
+        write (self%num_unit, '(a)') "# "//trim(self%name)//" time variation"
+        write (self%num_unit, '(a)') "#"
+
+        select case (self%type)
+        case ("node_ids")
+            write (self%num_unit, '(a)') "# Observation Node ID"
+            do iObs = 1, num_observations
+                write (self%num_unit, '(a,i0,a,x,i0)') "# Node ID ", iObs, ":", self%node_ids(iObs)
+            end do
+        case ("coordinates")
+            write (self%num_unit, '(a)') "# Observation Coordinate (x,y,z)"
+            do iObs = 1, num_observations
+                local_id = self%elements(iObs)%e%get_id()
+                write (self%num_unit, '(a,x,i0,a,3(x,es18.11,a),a,i0)') &
+                    "#    Point", iObs, ": (", &
+                    self%coordinate%x(iObs), ",", &
+                    self%coordinate%y(iObs), ",", &
+                    self%coordinate%z(iObs), ")", &
+                    " => Element ID: ", &
+                    local_id
+            end do
+        end select
+
+        write (self%num_unit, '(a)') "#"
+        write (self%num_unit, '(a)') "# Output Unit: Time ["//trim(adjustl(time_unit))//"], " & !&
+                                        //trim(self%name)//" ["//trim(self%unit)//"]" !&
+        write (self%num_unit, '(a)') "#"
+        select case (self%name)
+        case ("water_flux")
+            write (self%num_unit, '(a,'//to_string(num_observations)//'(",",a))') &
+                "Time", (("Obs"//to_string(iObs)//"_x", "Obs"//to_string(iObs)//"_y", "Obs"//to_string(iObs)//"_z"), &
+                         iObs=1, num_observations / 3)
+        case default
+            write (self%num_unit, '(a,'//to_string(num_observations)//'(",",a))') &
+                "Time", ("Obs"//to_string(iObs), iObs=1, num_observations)
+        end select
+
+    end subroutine write_obeservation_header_csv
 
     !----------------------------------------------------------------------!
     ! interpolate_observations:
@@ -704,23 +767,25 @@ contains
     !       <time>  <value1>  <value2>  ... <valueN>
     !
 !----------------------------------------------------------------------!
-    subroutine output_observation_line_dat(unit, time, values)
+    subroutine output_observation_line_dat(self, unit, time, values)
         implicit none
+        class(type_output_observation), intent(in) :: self
         integer(int32), intent(in) :: unit
         real(real64), intent(in) :: time
         real(real64), intent(in) :: values(:)
 
-        write (unit, '(es22.15,*(2x,es22.15))') time, values
+        write (unit, '(*(es22.15,:,2x))') time, values(1:self%num_observations)
 
     end subroutine output_observation_line_dat
 
-    subroutine output_observation_line_csv(unit, time, values)
+    subroutine output_observation_line_csv(self, unit, time, values)
         implicit none
+        class(type_output_observation), intent(in) :: self
         integer(int32), intent(in) :: unit
         real(real64), intent(in) :: time
         real(real64), intent(in) :: values(:)
 
-        write (unit, '(es22.15,*(",",es22.15))') time, values
+        write (unit, '(*(es22.15,:,","))') time, values(1:self%num_observations)
 
     end subroutine output_observation_line_csv
 
@@ -760,7 +825,7 @@ contains
                                                     nodal_porosity=porosity, &
                                                     properties=propeties, &
                                                     domain=domain)
-            call self%observations(iObs)%output_line( &
+            call self%observations(iObs)%write_line( &
                 unit=self%observations(iObs)%num_unit, &
                 time=time, &
                 values=obsValues)

@@ -14,42 +14,11 @@ module input_output
     use :: module_control, only:type_time, type_iteration
     use :: module_properties, only:type_proereties_manager
     use :: module_matrix
-    use :: module_thermal
 
     implicit none
     private
 
-    ! ! 個々の観測変数を管理するクラス
-    ! type :: type_oservations
-    !     character(:), allocatable :: name
-    !     character(:), allocatable :: unit
-    !     character(:), allocatable :: file_name
-    !     integer(int32) :: num_unit
-
-    !     class(abst_element), allocatable :: elemnt
-    !     type(type_dp_vector_3d) :: coordinate
-    !     real(real64) :: xi, eta
-
-    !     ! procedure(abst_calculate_obs_values), pointer, nopass :: get_values => null()
-    ! contains
-    !     procedure, pass(self) :: initialize => initialize_type_oservations
-    ! end type type_oservations
-
-    ! interface
-    !     module subroutine initialize_type_oservations(self, dir_output, variable_name, variable_unit, file_name)
-    !         implicit none
-    !         class(type_oservations), intent(inout) :: self
-    !         character(*), intent(in) :: dir_output
-    !         character(*), intent(in) :: variable_name
-    !         character(*), intent(in) :: variable_unit
-    !         character(*), intent(in) :: file_name
-
-    !     end subroutine initialize_type_oservations
-
-    ! end interface
-
     type :: type_output_observation
-        ! type(type_oservations), allocatable :: variables(:)
         character(:), allocatable :: name
         character(:), allocatable :: unit
         character(:), allocatable :: file_name
@@ -64,22 +33,24 @@ module input_output
         real(real64), allocatable :: eta(:)
         !!
         integer(int32), allocatable :: node_ids(:)
-        procedure(abst_output_line), pointer, nopass :: output_line => null()
+        procedure(abst_write_line), pointer, pass(self) :: write_line => null()
+        procedure(abst_write_obeservation_header), pointer, pass(self) :: write_header => null()
         procedure(abst_get_values), pointer, pass(self) :: get_values => null()
     contains
         procedure, pass(self) :: initialize => initialize_type_output_observation
-        procedure, pass(self) :: write_header => write_obeservation_header
+        ! procedure, pass(self) :: write_header => write_obeservation_header
     end type type_output_observation
 
     abstract interface
-        subroutine abst_output_line(unit, time, values)
-            import :: real64, int32
+        subroutine abst_write_line(self, unit, time, values)
+            import :: type_output_observation, real64, int32
             implicit none
+            class(type_output_observation), intent(in) :: self
             integer(int32), intent(in) :: unit
             real(real64), intent(in) :: time
             real(real64), intent(in) :: values(:)
 
-        end subroutine abst_output_line
+        end subroutine abst_write_line
 
         subroutine abst_get_values(self, obs_values, domain, properties, &
                                    nodal_temperature, nodal_porosity, nodal_pw)
@@ -93,6 +64,14 @@ module input_output
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_pw(:)
         end subroutine abst_get_values
+
+        subroutine abst_write_obeservation_header(self, time_unit)
+            import :: type_output_observation
+            implicit none
+            class(type_output_observation), intent(inout) :: self
+            character(*), intent(in) :: time_unit
+
+        end subroutine abst_write_obeservation_header
     end interface
 
     interface
@@ -107,12 +86,12 @@ module input_output
 
         end subroutine initialize_type_output_observation
 
-        module subroutine write_obeservation_header(self, time_unit)
-            implicit none
-            class(type_output_observation), intent(inout) :: self
-            character(*), intent(in) :: time_unit
+        ! module subroutine write_obeservation_header(self, time_unit)
+        !     implicit none
+        !     class(type_output_observation), intent(inout) :: self
+        !     character(*), intent(in) :: time_unit
 
-        end subroutine write_obeservation_header
+        ! end subroutine write_obeservation_header
     end interface
 
 ! In a new or existing module
@@ -255,8 +234,6 @@ module input_output
 
         type(type_output_overall) :: Overall
 
-        logical(4) :: doOutput_stdout
-
         character(:), allocatable :: dir_output
         ! character(:), allocatable :: dir_FileOutput
         ! character(:), allocatable :: format_output
@@ -264,10 +241,6 @@ module input_output
         type(Output_VTK_Series) :: VTKInfo
         character(:), allocatable :: Output_TimeUnit
         character(:), allocatable :: Interval_TimeUnit
-
-        logical(4) :: doHeat
-        logical(4) :: doPressure
-        logical(4) :: doStress
 
         character(:), allocatable :: log_file_name
 
