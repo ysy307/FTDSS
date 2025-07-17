@@ -20,14 +20,12 @@ program test
     !     stop
     ! end if
     call FTDSS%time%Profile_Start("Setup")
-    call FTDSS%IC%apply(physics="Thermal", &
-                        domain=FTDSS%Domain, &
-                        var=FTDSS%Thermal%T)
-    call FTDSS%BC%apply_CRS(BC_Type='T', &
+    call FTDSS%IC%apply("thermal", FTDSS%Domain, FTDSS%Thermal%T)
+    call FTDSS%BC%apply_CRS(boundary_target='thermal', &
                             current_time=0.0d0, &
                             b=FTDSS%Thermal%T%new, &
                             Domain=FTDSS%Domain, &
-                            mode=2) ! mode=2 for initial conditions
+                            mode=-1)
     ! FTDSS%phi%pre(:)
 
     ! call FTDSS%Thermal%HTC% phi, Temperature, Pw, Ice, Density
@@ -39,11 +37,20 @@ program test
     call FTDSS%time%Profile_Stop("Setup")
 
     call FTDSS%time%Profile_Start("IO")
-    call FTDSS%Output%Overall%Output(fc=count, &
-                                     rcm=FTDSS%Domain%rcm, &
-                                     Temp=FTDSS%Thermal%T%pre, &
-                                     Si=FTDSS%Thermal%Qice%pre)
-    call FTDSS%Output%Output_Observation(time=0.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
+    call FTDSS%Output%output_fields(file_counts=0, &
+                                    domain=FTDSS%Domain, &
+                                    porosity=FTDSS%phi%pre, &
+                                    temperature=FTDSS%Thermal%T%pre, &
+                                    si=FTDSS%Thermal%Qice%pre)
+    ! call FTDSS%Output%Overall%Output(fc=count, &
+    !                                  rcm=FTDSS%Domain%rcm, &
+    !                                  Temp=FTDSS%Thermal%T%pre, &
+    !                                  Si=FTDSS%Thermal%Qice%pre)
+    call FTDSS%Output%output_history(time=0.0d0, &
+                                     temperature=FTDSS%Thermal%T%pre, &
+                                     porosity=FTDSS%phi%pre, &
+                                     Propeties=FTDSS%Property, &
+                                     Domain=FTDSS%Domain)
     call FTDSS%time%Profile_Stop("IO")
     FTDSS%Iteration%step = 0
     FTDSS%Iteration%max_iter = 100
@@ -89,8 +96,8 @@ program test
             ! call FTDSS%Thermal%BC%
             call FTDSS%time%Profile_Stop("Assemble")
             call FTDSS%time%Profile_Start("Setup")
-            BC_Type = 'T'
-            call FTDSS%BC%apply_CRS(BC_Type=BC_Type, &
+            BC_Type = 'thermal'
+            call FTDSS%BC%apply_CRS(boundary_target=BC_Type, &
                                     current_time=FTDSS%time%time, &
                                     A=FTDSS%Thermal%KT_star_0, &
                                     b=FTDSS%Thermal%PHIT, &
@@ -158,27 +165,32 @@ program test
         ! end if
 
         call FTDSS%time%Profile_Start("IO")
-        call FTDSS%Output%Output_Observation(time=FTDSS%time%time / 86400.0d0, Temp=FTDSS%Thermal%T%pre, Si=FTDSS%Thermal%Qice%pre, Thermal=FTDSS%Thermal, phi=FTDSS%phi%pre, Propeties=FTDSS%Property, Domain=FTDSS%Domain)
+        call FTDSS%Output%output_history(time=FTDSS%time%time / 86400.0d0, &
+                                         temperature=FTDSS%Thermal%T%pre, &
+                                         porosity=FTDSS%phi%pre, &
+                                         Propeties=FTDSS%Property, &
+                                         Domain=FTDSS%Domain)
         ! print *, mod(FTDSS%Iteration%step, 100)
         if (mod(FTDSS%Iteration%step, 10) == 0) then
             count = count + 1
-            call FTDSS%Output%Overall%Output(fc=count, &
-                                             rcm=FTDSS%Domain%rcm, &
-                                             Temp=FTDSS%Thermal%T%pre, &
-                                             Si=FTDSS%Thermal%Qice%pre)
+            call FTDSS%Output%output_fields(file_counts=count, &
+                                            domain=FTDSS%Domain, &
+                                            porosity=FTDSS%phi%pre, &
+                                            temperature=FTDSS%Thermal%T%pre, &
+                                            si=FTDSS%Thermal%Qice%pre)
         end if
         call FTDSS%time%Profile_Stop("IO")
 
-        ! if (was_interrupted()) then
-        !     call global_logger%log_warning(message="Program interrupted by user.")
-        !     stop
-        ! end if
+        if (was_interrupted()) then
+            call global_logger%log_warning(message="Program interrupted by user.")
+            stop
+        end if
 
     end do TIME_LOOP
 
     call FTDSS%time%Profile_Stop("Total")
     call FTDSS%time%Record("End")
-    call FTDSS%Output%Output_SystemLog(FTDSS%time, FTDSS%Thermal%KT_star_0, FTDSS%Domain)
+    call FTDSS%Output%output_system_log(FTDSS%time, FTDSS%Thermal%KT_star_0, FTDSS%Domain)
 
     stop
 

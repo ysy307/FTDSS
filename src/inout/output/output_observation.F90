@@ -19,7 +19,12 @@ contains
         logical :: inside
 
         self%type = input%output_settings%history_output%observation_type
-        if (self%type == "none") return
+        if (self%type == "none") then
+            self%do_output = .false.
+            return
+        else
+            self%do_output = .true.
+        end if
 
         self%num_observations = input%output_settings%history_output%num_observations
         select case (self%type)
@@ -182,7 +187,7 @@ contains
     ! and variable units.
     !
     ! Arguments:
-    !   self       : Object of Type_Output class containing observation data.
+    !   self       : Object of type_output class containing observation data.
     !   data_label : String label describing the type of observation data.
     !   var_unit   : String representing the unit of the observed variable.
     !   num_unit   : Integer I/O variable to hold the unit number for the file.
@@ -205,6 +210,8 @@ contains
 
         integer(int32) :: iObs, num_observations, idim
         integer(int32) :: local_id
+
+        if (.not. self%do_output) return
 
         num_observations = self%num_observations
 
@@ -257,6 +264,8 @@ contains
         integer(int32) :: iObs, num_observations, idim
         integer(int32) :: local_id
 
+        if (.not. self%do_output) return
+
         num_observations = self%num_observations
 
         open (newunit=self%num_unit, file=trim(adjustl(self%file_name)), status='replace', action='write')
@@ -307,7 +316,7 @@ contains
     ! using nodal values from the finite element mesh and shape functions.
     !
     ! Arguments:
-    !   self         : Object of Type_Output class containing observation data.
+    !   self         : Object of type_output class containing observation data.
     !   nodal_values : Array of real values at nodes (e.g., temperature, pressure).
     !   obs_values   : Array to store interpolated values at observation points.
     !                  This is modified in-place (intent inout).
@@ -788,49 +797,5 @@ contains
         write (unit, '(*(es22.15,:,","))') time, values(1:self%num_observations)
 
     end subroutine output_observation_line_csv
-
-    !----------------------------------------------------------------------!
-    ! output_history:
-    !----------------------------------------------------------------------!
-    ! This subroutine handles the processing and output of observation
-    ! data at a given time step. It supports both nodal and interpolated
-    ! observation types and multiple physical variables.
-    !
-    ! Subroutine Details:
-    !   - For each enabled observation type and available input, performs:
-    !       * Initialization of observation header (if needed)
-    !       * Selection between direct node ID or interpolated values
-    !       * Optional post-processing (e.g., ice content calculations via Thermal model)
-    !   - Writes the results to the corresponding output files with time-stamped lines.
-    !   - Supports extensibility by checking optional arguments and types (e.g., GCC, EXP models).
-    !
-    !----------------------------------------------------------------------!
-    module subroutine output_history(self, time, domain, propeties, porosity, temperature, pressure)
-        implicit none
-        class(Type_Output) :: self
-        real(real64), intent(in) :: time
-        type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: propeties
-        real(real64), intent(in), optional :: porosity(:)
-        real(real64), intent(in), optional :: temperature(:)
-        real(real64), intent(in), optional :: pressure(:)
-
-        real(real64) :: obsValues(2 * size(self%observations))
-
-        integer(int32) :: iObs
-
-        do iObs = 1, size(self%observations)
-            call self%observations(iObs)%get_values(obs_values=obsValues, &
-                                                    nodal_temperature=temperature, &
-                                                    nodal_porosity=porosity, &
-                                                    properties=propeties, &
-                                                    domain=domain)
-            call self%observations(iObs)%write_line( &
-                unit=self%observations(iObs)%num_unit, &
-                time=time, &
-                values=obsValues)
-        end do
-
-    end subroutine output_history
 
 end submodule input_output_obaservation

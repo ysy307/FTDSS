@@ -21,6 +21,9 @@ contains
         case ('hydraulic')
             self%type = input%conditions%initial_conditions%hydraulic%type
             self%value = input%conditions%initial_conditions%hydraulic%value
+        case ('porosity')
+            self%type = input%conditions%initial_conditions%porosity%type
+            self%value = input%conditions%initial_conditions%porosity%value
         end select
     end subroutine initialize_type_ic_uniform
 

@@ -2,18 +2,21 @@ module matrix_coo
     use, intrinsic :: iso_fortran_env
     use :: module_core, only:allocate_array, deallocate_array, unique
     use :: module_domain, only:type_domain
+    use :: matrix_base, only:abst_matrix
     implicit none
     private
 
     public :: type_coo
 
-    type :: type_coo
+    type, extends(abst_matrix) :: type_coo
         integer(int32) :: nnz = 0 ! number of non-zero elements
         integer(int32), allocatable :: row(:)
         integer(int32), allocatable :: col(:)
         real(real64), allocatable :: val(:) ! non-zero values
     contains
         procedure, public, pass(self) :: initialize => initialize_type_coo
+        procedure, public, pass(self) :: find => find_coo
+        procedure, public, pass(self) :: copy => copy_coo
         procedure, public, pass(self) :: destory => destory_coo
     end type
 
@@ -22,7 +25,7 @@ contains
     subroutine initialize_type_coo(self, domain)
         implicit none
         class(type_coo), intent(inout) :: self
-        class(type_domain), intent(inout) :: domain
+        type(type_domain), intent(inout) :: domain
 
         ! --- ローカル変数宣言 ---
         integer(int32) :: num_nodes, num_elements, num_sides, computation_dimension
@@ -128,6 +131,47 @@ contains
         call deallocate_array(col_indices)
 
     end subroutine initialize_type_coo
+
+    subroutine find_coo(self, row, col, index)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32), intent(in) :: row, col
+        integer(int32), intent(inout) :: index
+
+        integer(int32) :: i
+
+        if (self%nnz == 0) then
+            index = -1
+            return
+        end if
+
+        ! --- 二分探索で行と列の組み合わせを探す ---
+        index = -1
+        do i = 1, self%nnz
+            if (self%row(i) == row .and. self%col(i) == col) then
+                index = i
+                return
+            end if
+        end do
+    end subroutine find_coo
+
+    function copy_coo(self) result(B)
+        implicit none
+        class(type_coo), intent(in) :: self
+        class(abst_matrix), allocatable :: B
+
+        allocate (type_coo :: B)
+        select type (matrix => B)
+        type is (type_coo)
+            matrix%nnz = self%nnz
+            call allocate_array(matrix%row, self%nnz)
+            call allocate_array(matrix%col, self%nnz)
+            call allocate_array(matrix%val, self%nnz)
+            matrix%row(:) = self%row(:)
+            matrix%col(:) = self%col(:)
+            matrix%val(:) = self%val(:)
+        end select
+    end function copy_coo
 
     subroutine destory_coo(self)
         implicit none

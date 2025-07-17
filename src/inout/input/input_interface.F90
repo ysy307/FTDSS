@@ -206,6 +206,7 @@ module inout_input
     type :: type_initail_conditions
         type(type_initial_local) :: thermal
         type(type_initial_local) :: hydraulic
+        type(type_initial_local) :: porosity
     end type type_initail_conditions
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_conditions

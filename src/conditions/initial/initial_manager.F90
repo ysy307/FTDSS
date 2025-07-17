@@ -15,6 +15,7 @@ module conditions_initial_manager
     type :: type_ic
         class(abst_ic), allocatable :: t
         class(abst_ic), allocatable :: h
+        class(abst_ic), allocatable :: p
     contains
         procedure :: initialize => initialize_type_ic
         procedure :: apply
@@ -54,6 +55,16 @@ contains
             call self%t%initialize(input, 'hydraulic')
         end if
 
+        select case (trim(adjustl(input%conditions%initial_conditions%porosity%type)))
+        case ("uniform")
+            allocate (type_ic_uniform :: self%p)
+        case ("laplace")
+            allocate (type_ic_laplace :: self%p)
+        case ("file")
+            !     allocate (IC_File :: self%T)
+        end select
+        call self%p%initialize(input, 'porosity')
+
     end subroutine initialize_type_ic
 
     subroutine apply(self, initial_target, domain, variable)
@@ -70,6 +81,10 @@ contains
         case ("hydraulic")
             if (allocated(self%H)) then
                 call self%h%apply(domain, variable)
+            end if
+        case ("porosity")
+            if (allocated(self%P)) then
+                call self%p%apply(domain, variable)
             end if
         case default
             ! Error or no action

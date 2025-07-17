@@ -15,6 +15,10 @@ contains
         integer(int32) :: i
 
         if (size(vector_reordered) /= self%num_nodes .or. size(vector_original) /= self%num_nodes) error stop "Size mismatch"
+        if (self%algorithm_name == "none") then
+            vector_original(:) = vector_reordered(:)
+            return
+        end if
         if (.not. self%is_reordered_perm) error stop "'perm' not ready. Call 'reorder' first."
 
         do i = 1, self%num_nodes
@@ -32,6 +36,10 @@ contains
         integer(int32) :: i
 
         if (size(vector_reordered) /= self%num_nodes .or. size(vector_original) /= self%num_nodes) error stop "Size mismatch"
+        if (self%algorithm_name == "none") then
+            vector_original(:) = vector_reordered(:)
+            return
+        end if
         if (.not. self%is_reordered_perm) error stop "'perm' not ready. Call 'reorder' first."
 
         do i = 1, self%num_nodes
@@ -46,6 +54,10 @@ contains
         integer(int32), intent(in) :: index_reordered
         integer(int32), intent(inout) :: index_original
 
+        if (self%algorithm_name == "none") then
+            index_original = index_reordered
+            return
+        end if
         if (.not. self%is_reordered_perm) error stop "'perm' not ready. Call 'reorder' first."
 
         index_original = self%perm(index_reordered)
@@ -60,8 +72,13 @@ contains
 
         integer(int32) :: i
 
-        if (.not. self%is_reordered_perm) error stop "'perm' not ready. Call 'reorder' first."
         if (size(indices_reordered) /= size(indices_original)) error stop "Size mismatch"
+        if (self%algorithm_name == "none") then
+            indices_original(:) = indices_reordered(:)
+            return
+        end if
+
+        if (.not. self%is_reordered_perm) error stop "'perm' not ready. Call 'reorder' first."
 
         do i = 1, size(indices_reordered)
             indices_original(i) = self%perm(indices_reordered(i))

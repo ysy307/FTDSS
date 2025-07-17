@@ -15,6 +15,10 @@ contains
         integer(int32) :: i
 
         if (size(vector_original) /= self%num_nodes .or. size(vector_reordered) /= self%num_nodes) error stop "Size mismatch"
+        if (self%algorithm_name == "none") then
+            vector_reordered(:) = vector_original(:)
+            return
+        end if
         if (.not. self%is_reordered_iperm) error stop "'iperm' not ready. Call 'invert' first."
 
         do i = 1, self%num_nodes
@@ -32,6 +36,10 @@ contains
         integer(int32) :: i
 
         if (size(vector_original) /= self%num_nodes .or. size(vector_reordered) /= self%num_nodes) error stop "Size mismatch"
+        if (self%algorithm_name == "none") then
+            vector_reordered(:) = vector_original(:)
+            return
+        end if
         if (.not. self%is_reordered_iperm) error stop "'iperm' not ready. Call 'invert' first."
 
         do i = 1, self%num_nodes
@@ -45,6 +53,11 @@ contains
         class(type_reordering), intent(in) :: self
         integer(int32), intent(in) :: index_original
         integer(int32), intent(inout) :: index_reordered
+
+        if (self%algorithm_name == "none") then
+            index_reordered = index_original
+            return
+        end if
 
         if (.not. self%is_reordered_iperm) error stop "'iperm' not ready. Call 'invert' first."
 
@@ -60,8 +73,14 @@ contains
 
         integer(int32) :: i
 
-        if (.not. self%is_reordered_iperm) error stop "'iperm' not ready. Call 'invert' first."
         if (size(indices_original) /= size(indices_reordered)) error stop "Size mismatch"
+
+        if (self%algorithm_name == "none") then
+            indices_reordered(:) = indices_original(:)
+            return
+        end if
+
+        if (.not. self%is_reordered_iperm) error stop "'iperm' not ready. Call 'invert' first."
 
         do i = 1, size(indices_original)
             indices_reordered(i) = self%iperm(indices_original(i))

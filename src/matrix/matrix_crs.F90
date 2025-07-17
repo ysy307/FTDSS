@@ -1,8 +1,9 @@
-module Matrix_CRS
+module matrix_crs
     use, intrinsic :: iso_fortran_env
     use :: stdlib_sorting, only:sort
     use :: module_core, only:allocate_array, deallocate_array
     use :: module_domain, only:type_domain
+    use :: matrix_base, only:abst_matrix
     use :: matrix_coo, only:type_coo
     implicit none
     private
@@ -12,7 +13,7 @@ module Matrix_CRS
     public :: operator(+)
     ! public :: Transpose_CRS
 
-    type :: type_crs
+    type, extends(abst_matrix) :: type_crs
         integer(int32) :: nnz ! number of non-zero elements
         integer(int32) :: num_row ! number of rows
         integer(int32) :: num_ptr ! size of ptr (num_row+1 entries)
@@ -21,13 +22,14 @@ module Matrix_CRS
         real(real64), allocatable :: val(:) ! non-zero values
     contains
         procedure, public, pass(self) :: initialize => initialize_type_crs
-        procedure, public, pass(self) :: find => type_crs_find
-        procedure, public, pass(self) :: Copy => type_crs_copy
+        procedure, public, pass(self) :: find => find_crs
+        procedure, public, pass(self) :: copy => copy_crs
+        procedure, public, pass(self) :: destory => destory_crs
     end type type_crs
 
     interface operator(*)
         module procedure type_crs_matrix_vector_product
-        module procedure Multiplication_Scalar_Matrix_CRS
+        module procedure Multiplication_Scalar_matrix_crs
         module procedure Multiplication_Matrix_Scalar_CRS
     end interface
     interface operator(+)
@@ -135,57 +137,68 @@ contains
     function Matrix_Addition_CRS(A, B) result(C)
         implicit none
         type(type_crs), intent(in) :: A, B
-        type(type_crs) :: C
+        class(abst_matrix), allocatable :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
+
         C = A%Copy()
-        do k = 1, A%nnz
-            C%val(k) = A%val(k) + B%val(k)
-        end do
+        select type (matrix => C)
+        type is (type_crs)
+            do k = 1, A%nnz
+                matrix%val(k) = A%val(k) + B%val(k)
+            end do
+        end select
     end function Matrix_Addition_CRS
 
-    function Multiplication_Scalar_Matrix_CRS(A, b) result(C)
+    function Multiplication_Scalar_matrix_crs(A, b) result(C)
         implicit none
         type(type_crs), intent(in) :: A
         real(real64), intent(in) :: b
-        type(type_crs) :: C
+        class(abst_matrix), allocatable :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
+
         C = A%Copy()
-        do k = 1, A%nnz
-            C%val(k) = A%val(k) * b
-        end do
-    end function Multiplication_Scalar_Matrix_CRS
+        select type (matrix => C)
+        type is (type_crs)
+            do k = 1, A%nnz
+                matrix%val(k) = A%val(k) * b
+            end do
+        end select
+    end function Multiplication_Scalar_matrix_crs
 
     function Multiplication_Matrix_Scalar_CRS(a, B) result(C)
         implicit none
         real(real64), intent(in) :: a
         type(type_crs), intent(in) :: B
-        type(type_crs) :: C
+        class(abst_matrix), allocatable :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
         C = B%Copy()
-        do k = 1, B%nnz
-            C%val(k) = B%val(k) * a
-        end do
+        select type (matrix => C)
+        type is (type_crs)
+            do k = 1, B%nnz
+                matrix%val(k) = B%val(k) * a
+            end do
+        end select
     end function Multiplication_Matrix_Scalar_CRS
 
-    subroutine type_crs_find(self, column, indes, location)
+    subroutine find_crs(self, row, col, index)
         implicit none
         class(type_crs), intent(in) :: self
-        integer(int32), intent(in) :: column, indes
-        integer(int32), intent(out) :: location
+        integer(int32), intent(in) :: row, col
+        integer(int32), intent(inout) :: index
 
         integer(int32) :: low, high, mid
 
-        location = 0 ! 見つからなかった場合のデフォルト値
+        index = 0 ! 見つからなかった場合のデフォルト値
 
         ! 検索範囲を設定
-        low = self%ptr(column)
-        high = self%ptr(column + 1) - 1
+        low = self%ptr(row)
+        high = self%ptr(row + 1) - 1
 
         ! 範囲が存在しない場合は終了
         if (low > high) return
@@ -194,32 +207,49 @@ contains
         do while (low <= high)
             mid = low + (high - low) / 2 ! オーバーフローを防ぐための計算
 
-            if (self%ind(mid) < indes) then
+            if (self%ind(mid) < col) then
                 low = mid + 1
-            else if (self%ind(mid) > indes) then
+            else if (self%ind(mid) > col) then
                 high = mid - 1
             else
-                location = mid
+                index = mid
                 return
             end if
         end do
 
-    end subroutine type_crs_find
+    end subroutine find_crs
 
-    function type_crs_copy(self) result(B)
+    function copy_crs(self) result(B)
         implicit none
-        class(type_crs) :: self
-        type(type_crs) :: B
+        class(type_crs), intent(in) :: self
+        class(abst_matrix), allocatable :: B
 
-        B%num_row = self%num_row
-        B%num_ptr = self%num_ptr
-        B%nnz = self%nnz
-        call allocate_array(B%ptr, self%num_ptr)
-        call allocate_array(B%ind, self%nnz)
-        call allocate_array(B%val, self%nnz)
-        B%ptr(:) = self%ptr(:)
-        B%ind(:) = self%ind(:)
-        B%val(:) = self%val(:)
-    end function type_crs_copy
+        allocate (type_crs :: B)
+        select type (matrix => B)
+        type is (type_crs)
+            matrix%num_row = self%num_row
+            matrix%num_ptr = self%num_ptr
+            matrix%nnz = self%nnz
+            call allocate_array(matrix%ptr, self%num_ptr)
+            call allocate_array(matrix%ind, self%nnz)
+            call allocate_array(matrix%val, self%nnz)
+            matrix%ptr(:) = self%ptr(:)
+            matrix%ind(:) = self%ind(:)
+            matrix%val(:) = self%val(:)
+        end select
+    end function copy_crs
 
-end module Matrix_CRS
+    subroutine destory_crs(self)
+        implicit none
+        class(type_crs), intent(inout) :: self
+
+        call deallocate_array(self%ptr)
+        call deallocate_array(self%ind)
+        call deallocate_array(self%val)
+
+        self%nnz = 0
+        self%num_row = 0
+        self%num_ptr = 0
+    end subroutine destory_crs
+
+end module matrix_crs

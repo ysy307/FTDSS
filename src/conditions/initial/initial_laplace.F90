@@ -19,6 +19,8 @@ contains
             self%type = input%conditions%initial_conditions%thermal%type
         case ('hydraulic')
             self%type = input%conditions%initial_conditions%hydraulic%type
+        case ('porosity')
+
         end select
     end subroutine initialize_type_ic_laplace
 

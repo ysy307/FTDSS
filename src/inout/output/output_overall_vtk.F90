@@ -1,6 +1,18 @@
 submodule(input_output) input_output_overall_vtk
     implicit none
 
+    interface write_field
+        module procedure :: output_vtk_points_scalar_real64
+        module procedure :: output_vtk_points_scalar_int32
+        module procedure :: output_vtk_vector_real64
+        module procedure :: output_vtk_vector_int32
+    end interface
+
+    interface write_cell
+        module procedure :: output_vtk_cell_real64
+        module procedure :: output_vtk_cell_int32
+    end interface
+
 contains
 
     module subroutine initialize_output_overall_vtk(self, input, coordinate, domain)
@@ -12,298 +24,254 @@ contains
 
         integer(int32) :: i, j, idx, total
 
-        self%VTK%nPoints = input%VTK%num_points
-        self%VTK%nCell = input%VTK%num_total_cells
-        call self%VTK%coordinates%initialize(self%VTK%nPoints)
-        self%VTK%coordinates = input%VTK%POINTS
+        self%vtk%num_points = input%geometry%vtk%num_points
+        self%vtk%num_cells = input%geometry%vtk%num_total_cells
+        call self%vtk%coordinate%initialize(self%vtk%num_points)
+        self%vtk%coordinate = input%geometry%vtk%POINTS
 
-        call Allocate_Array(self%VTK%offset, self%VTK%nCell)
-        call Allocate_Array(self%VTK%CellType, self%VTK%nCell)
+        call allocate_array(self%vtk%offsets, self%vtk%num_cells)
+        call allocate_array(self%vtk%cell_types, self%vtk%num_cells)
 
-        do i = 1, self%VTK%nCell
-            self%VTK%offset(i) = input%VTK%CELLS(i)%num_nodes_in_cell
-            self%VTK%CellType(i) = input%VTK%CELLS(i)%cell_type
+        do i = 1, self%vtk%num_cells
+            self%vtk%offsets(i) = input%geometry%vtk%CELLS(i)%num_nodes_in_cell
+            self%vtk%cell_types(i) = input%geometry%vtk%CELLS(i)%cell_type
         end do
-        total = sum(self%VTK%offset(:))
+        total = sum(self%vtk%offsets(:))
 
-        call Allocate_Array(self%VTK%connectivity, total)
+        call allocate_array(self%vtk%connectivities, total)
         idx = 0
-        do i = 1, self%VTK%nCell
-            do j = 1, input%VTK%CELLS(i)%num_nodes_in_cell
+        do i = 1, self%vtk%num_cells
+            do j = 1, input%geometry%vtk%CELLS(i)%num_nodes_in_cell
                 idx = idx + 1
-                self%VTK%connectivity(idx) = input%VTK%CELLS(i)%connectivity(j) - 1
+                self%vtk%connectivities(idx) = input%geometry%vtk%CELLS(i)%connectivity(j) - 1
             end do
         end do
 
-    end subroutine initialize_input_type_output_overall_vtk
+        if (associated(self%write_fields)) nullify (self%write_fields)
+        self%write_fields => output_overall_vtk_fields
 
-    module subroutine input_output_Overall_Output(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
+        if (associated(self%write_cell)) nullify (self%write_cell)
+        self%write_cell => output_overall_vtk_cell
+
+    end subroutine initialize_output_overall_vtk
+
+    subroutine output_overall_vtk_fields(self, file_counts, domain, porosity, temperature, si, pressure, water_flux)
         implicit none
-        class(Output_Overall) :: self
-        integer(int32), intent(in) :: fc
-        type(type_rcm), intent(in), optional :: rcm
-        real(real64), intent(in), optional :: Temp(:)
-        real(real64), intent(in), optional :: Si(:)
-        real(real64), intent(in), optional :: Pres(:)
-        type(type_dp_3d), intent(in), optional :: wFlux
-        integer(int32), intent(in), optional :: Colors(:)
-
-        select case (trim(adjustl(self%fextend)))
-        case (".vtk")
-            call self%Output_vtk(fc=fc, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
-            ! call self%Output_vtk(fc=fc, iperm=rcm%iperm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
-        case (".vtu")
-            if (present(Colors)) then
-                call self%Output_vtu(fc=fc, Colors=Colors)
-            else
-                call self%Output_vtu(fc=fc, rcm=rcm, Temp=Temp, Si=Si, Pres=Pres, wFlux=wFlux)
-            end if
-        end select
-
-    end subroutine input_output_Overall_Output
-
-    module subroutine input_output_Overall_Output_vtk(self, fc, iperm, Temp, Si, Pres, wFlux, Colors)
-        use :: stdlib_strings, only:to_string
-        implicit none
-        class(Output_Overall), intent(inout) :: self
-        integer(int32), intent(in) :: fc
-        integer(int32), intent(in), optional :: iperm(:)
-        real(real64), intent(in), optional :: Temp(:)
-        real(real64), intent(in), optional :: Si(:)
-        real(real64), intent(in), optional :: Pres(:)
-        type(type_dp_3d), intent(in), optional :: wFlux
-        integer(int32), intent(in), optional :: Colors(:)
+        class(type_output_overall), intent(inout) :: self
+        integer(int32), intent(in) :: file_counts
+        type(type_domain), intent(in) :: domain
+        real(real64), intent(in), optional :: porosity(:)
+        real(real64), intent(in), optional :: temperature(:)
+        real(real64), intent(in), optional :: si(:)
+        real(real64), intent(in), optional :: pressure(:)
+        type(type_dp_3d), intent(in), optional :: water_flux
 
         integer(int32) :: status
         integer(int32) :: unit_num
-        integer(int32) :: iN, iE, idx
+        integer(int32) :: iN, iE, idx, i
 
-        character(256) :: outName
+        character(256) :: output_name
+        real(real64), allocatable :: original(:), original_vector(:, :)
 
         ! Initialize VTK file
-        write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
-        open (newunit=unit_num, file=outName, status='replace', action='write', iostat=status)
+        write (output_name, self%format_output) trim(self%dir_output_field), "Out_", file_counts, self%file_extension
+        open (newunit=unit_num, file=output_name, status='replace', action='write', iostat=status)
         if (status /= 0) call error_message(931)
 
         write (unit_num, '(a)') "# vtk DataFile Version 2.0"
         write (unit_num, '(a)') "Analysis ASCII VTK file"
         write (unit_num, '(a)') "ASCII"
         write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
-        write (unit_num, '(a,i0,a)') "POINTS ", self%VTK%nPoints, " double"
+        write (unit_num, '(a,i0,a)') "POINTS ", self%vtk%num_points, " double"
 
-        do iN = 1, self%VTK%nPoints
-            write (unit_num, '(3(es22.15,x))') self%VTK%coordinates%x(iN), self%VTK%coordinates%y(iN), self%VTK%coordinates%z(iN)
+        do iN = 1, self%vtk%num_points
+            write (unit_num, '(3(es22.15,x))') self%vtk%coordinate%x(iN), self%vtk%coordinate%y(iN), self%vtk%coordinate%z(iN)
         end do
         write (unit_num, '(a)') ""
 
-        write (unit_num, '(a,i0,x,i0,a)') "CELLS ", self%VTK%nCell, sum(self%VTK%offset(:)) + self%VTK%nCell
+        write (unit_num, '(a,i0,x,i0,a)') "CELLS ", self%vtk%num_cells, sum(self%vtk%offsets(:)) + self%vtk%num_cells
         idx = 1
-        do iE = 1, self%VTK%nCell
-            write (unit_num, '(i0,'//to_string(self%VTK%offset(iE))//'(x,i0))') self%VTK%offset(iE), self%VTK%connectivity(idx:idx + self%VTK%offset(iE) - 1)
-            idx = idx + self%VTK%offset(iE)
+        do iE = 1, self%vtk%num_cells
+            write (unit_num, '(i0,'//to_string(self%vtk%offsets(iE))//'(x,i0))') self%vtk%offsets(iE), &
+                self%vtk%connectivities(idx:idx + self%vtk%offsets(iE) - 1)
+            idx = idx + self%vtk%offsets(iE)
         end do
         write (unit_num, '(a)') ""
 
-        write (unit_num, '(a,i0)') "CELL_TYPES ", self%VTK%nCell
-        do iE = 1, self%VTK%nCell
-            write (unit_num, '(i0)') self%VTK%CellType(iE)
-        end do
+        write (unit_num, '(a,i0)') "CELL_TYPES ", self%vtk%num_cells
+        write (unit_num, '(i0)') self%vtk%cell_types(:)
         write (unit_num, '(a)') ""
 
-        write (unit_num, '(a, i0)') "POINT_DATA ", self%VTK%nPoints
-        if (present(Temp)) then
-            call self%Output_vtk_scalar(iperm=iperm, &
-                                        unit_num=unit_num, &
-                                        data_name='Temperature', &
-                                        x=Temp)
-        end if
-        if (present(Si)) then
-            call self%Output_vtk_scalar(iperm=iperm, &
-                                        unit_num=unit_num, &
-                                        data_name='Si', &
-                                        x=Si)
-        end if
-        if (present(Pres)) then
-            call self%Output_vtk_scalar(iperm=iperm, &
-                                        unit_num=unit_num, &
-                                        data_name='Pressure', &
-                                        x=Pres)
-        end if
-        if (present(wFlux)) then
-            call self%Output_vtk_vector(iperm=iperm, &
-                                        unit_num=unit_num, &
-                                        data_name='waterFlux', &
-                                        x=wFlux%x, &
-                                        y=wFlux%y, &
-                                        z=wFlux%z)
-        end if
+        do i = 1, size(self%variable_names)
+            if (i == 1) write (unit_num, '(a, i0)') "POINT_DATA ", self%vtk%num_points
+            select case (self%variable_names(i))
+            case ("temperature")
+                if (present(temperature)) then
+                    call allocate_array(original, self%vtk%num_points)
+                    call domain%reordering%to_original_value(temperature, original)
+                    call write_field(unit_num, "Temperature", original)
+                    call deallocate_array(original)
+                end if
+            case ("ice_saturation")
+                if (present(si)) then
+                    call allocate_array(original, self%vtk%num_points)
+                    call domain%reordering%to_original_value(si, original)
+                    call write_field(unit_num, "Si", original)
+                    call deallocate_array(original)
+                end if
+            case ("thermal_conductivity")
+                print *, "Warning: 'thermal_conductivity' is not implemented in VTK output."
+            case ("volumetric_heat_capacity")
+                print *, "Warning: 'volumetric_heat_capacity' is not implemented in VTK output."
+            case ("pressure")
+                if (present(pressure)) then
+                    call allocate_array(original, self%vtk%num_points)
+                    call domain%reordering%to_original_value(pressure, original)
+                    call write_field(unit_num, "Pressure", original)
+                    call deallocate_array(original)
+                end if
+            case ("water_flux")
+                if (present(water_flux)) then
+                    call allocate_array(original_vector, 3_int32, self%vtk%num_points)
+                    call domain%reordering%to_original_value(water_flux%x, original_vector(:, 1))
+                    call domain%reordering%to_original_value(water_flux%y, original_vector(:, 2))
+                    call domain%reordering%to_original_value(water_flux%z, original_vector(:, 3))
+                    call write_field(unit_num, "waterFlux", original_vector(:, 1), original_vector(:, 2), original_vector(:, 3))
+                    call deallocate_array(original_vector)
+                end if
+            case ("hydraulic_conductivity")
+                print *, "Warning: 'hydraulic_conductivity' is not implemented in VTK output."
+            end select
+        end do
 
-    end subroutine input_output_Overall_Output_vtk
+    end subroutine output_overall_vtk_fields
 
-    module subroutine input_output_Overall_Output_vtk_scalar_real64(self, iperm, unit_num, data_name, x)
+    subroutine output_overall_vtk_cell(self, file_name, variable_name, variable)
         implicit none
-        class(Output_Overall) :: self
-        integer(int32), intent(in), optional :: iperm(:)
+        class(type_output_overall), intent(inout) :: self
+        character(*), intent(in) :: file_name
+        character(*), intent(in) :: variable_name
+        integer(int32), intent(in) :: variable(:)
+
+        integer(int32) :: status
+        integer(int32) :: unit_num
+        integer(int32) :: iN, iE, idx, i
+
+        open (newunit=unit_num, file=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension), &
+              status='replace', action='write', iostat=status)
+        if (status /= 0) call error_message(931)
+
+        write (unit_num, '(a)') "# vtk DataFile Version 2.0"
+        write (unit_num, '(a)') "Analysis ASCII VTK file"
+        write (unit_num, '(a)') "ASCII"
+        write (unit_num, '(a)') "DATASET UNSTRUCTURED_GRID"
+        write (unit_num, '(a,i0,a)') "POINTS ", self%vtk%num_points, " double"
+
+        do iN = 1, self%vtk%num_points
+            write (unit_num, '(3(es22.15,x))') self%vtk%coordinate%x(iN), self%vtk%coordinate%y(iN), self%vtk%coordinate%z(iN)
+        end do
+        write (unit_num, '(a)') ""
+
+        write (unit_num, '(a,i0,x,i0,a)') "CELLS ", self%vtk%num_cells, sum(self%vtk%offsets(:)) + self%vtk%num_cells
+        idx = 1
+        do iE = 1, self%vtk%num_cells
+            write (unit_num, '(i0,'//to_string(self%vtk%offsets(iE))//'(x,i0))') self%vtk%offsets(iE), &
+                self%vtk%connectivities(idx:idx + self%vtk%offsets(iE) - 1)
+            idx = idx + self%vtk%offsets(iE)
+        end do
+        write (unit_num, '(a)') ""
+
+        write (unit_num, '(a,i0)') "CELL_TYPES ", self%vtk%num_cells
+        write (unit_num, '(i0)') self%vtk%cell_types(:)
+        write (unit_num, '(a)') ""
+
+        write (unit_num, '(a,i0)') "CELL_DATA ", self%vtk%num_cells
+        call write_cell(unit_num, variable_name, variable)
+
+    end subroutine output_overall_vtk_cell
+
+    subroutine output_vtk_points_scalar_real64(unit_num, data_name, x)
+        implicit none
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
         real(real64), intent(in) :: x(:)
 
-        real(real64), allocatable :: Original(:)
-        integer(int32) :: status
-
-        call Allocate_Array(Original, self%VTK%nPoints)
-        ! call rcm
-        ! call Reorder_to_Original(x, Original, iperm, status)
-
         write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
         write (unit_num, '(a)') "LOOKUP_TABLE default"
-        write (unit_num, '(es22.15)') Original(:)
+        write (unit_num, '(es22.15)') x(:)
         write (unit_num, '(a)') ""
 
-        deallocate (Original)
+    end subroutine output_vtk_points_scalar_real64
 
-    end subroutine input_output_Overall_Output_vtk_scalar_real64
-
-    module subroutine input_output_Overall_Output_vtk_scalar_int32(self, iperm, unit_num, data_name, x)
+    subroutine output_vtk_points_scalar_int32(unit_num, data_name, x)
         implicit none
-        class(Output_Overall) :: self
-        integer(int32), intent(in), optional :: iperm(:)
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
         integer(int32), intent(in) :: x(:)
 
-        integer(int32), allocatable :: Original(:)
-        integer(int32) :: status
-
-        call Allocate_Array(Original, self%VTK%nPoints)
-        ! call Reorder_to_Original(x, Original, iperm, status)
-
         write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " int 1"
         write (unit_num, '(a)') "LOOKUP_TABLE default"
-        write (unit_num, '(es22.15)') Original(:)
+        write (unit_num, '(i0)') x(:)
         write (unit_num, '(a)') ""
 
-        deallocate (Original)
+    end subroutine output_vtk_points_scalar_int32
 
-    end subroutine input_output_Overall_Output_vtk_scalar_int32
-
-    module subroutine input_output_Overall_Output_vtk_vector(self, iperm, unit_num, data_name, x, y, z)
+    subroutine output_vtk_vector_real64(unit_num, data_name, x, y, z)
         implicit none
-        class(Output_Overall) :: self
-        integer(int32), intent(in), optional :: iperm(:)
         integer(int32), intent(in) :: unit_num
         character(*), intent(in) :: data_name
         real(real64), intent(in) :: x(:), y(:), z(:)
 
-        real(real64), allocatable :: Original_x(:), Original_y(:), Original_z(:)
         integer(int32) :: i
-        integer(int32) :: status
-
-        call Allocate_Array(Original_x, self%VTK%nPoints)
-        call Allocate_Array(Original_y, self%VTK%nPoints)
-        call Allocate_Array(Original_z, self%VTK%nPoints)
-
-        ! call Reorder_to_Original(x, Original_x, iperm, status)
-        ! call Reorder_to_Original(y, Original_y, iperm, status)
-        ! call Reorder_to_Original(z, Original_z, iperm, status)
 
         write (unit_num, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
-        do i = 1, self%VTK%nPoints
-            write (unit_num, '(3(es22.15,x))') Original_x(i), Original_y(i), Original_z(i)
+        do i = 1, size(x)
+            write (unit_num, '(3(es22.15,x))') x(i), y(i), z(i)
         end do
         write (unit_num, '(a)') ""
 
-    end subroutine input_output_Overall_Output_vtk_vector
+    end subroutine output_vtk_vector_real64
 
-    module subroutine input_output_Overall_Output_vtu(self, fc, rcm, Temp, Si, Pres, wFlux, Colors)
-        use :: vtk_fortran, only:vtk_file
+    subroutine output_vtk_vector_int32(unit_num, data_name, x, y, z)
         implicit none
-        class(Output_Overall), intent(inout) :: self
-        integer(int32), intent(in) :: fc
-        type(type_rcm), intent(in), optional :: rcm
-        real(real64), intent(in), optional :: Temp(:)
-        real(real64), intent(in), optional :: Si(:)
-        real(real64), intent(in), optional :: Pres(:)
-        type(type_dp_3d), intent(in), optional :: wFlux
-        integer(int32), intent(in), optional :: Colors(:)
+        integer(int32), intent(in) :: unit_num
+        character(*), intent(in) :: data_name
+        integer(int32), intent(in) :: x(:), y(:), z(:)
 
-        type(vtk_file) :: vtu
-        integer(int32) :: status
+        integer(int32) :: i
 
-        real(real64), allocatable :: Original(:), Original_vector(:, :)
-        integer(int32), allocatable :: Cell_add_Colors(:)
-        integer(int32) :: nsize
+        write (unit_num, '(3a)') "VECTORS ", trim(adjustl(data_name)), " double"
+        do i = 1, size(x)
+            write (unit_num, '(3(i0,x))') x(i), y(i), z(i)
+        end do
+        write (unit_num, '(a)') ""
 
-        character(256) :: outName
+    end subroutine output_vtk_vector_int32
 
-        call Allocate_Array(Original, self%VTK%nPoints)
-        call Allocate_Array(Original_vector, 3_int32, self%VTK%nPoints)
+    subroutine output_vtk_cell_real64(unit_num, data_name, x)
+        implicit none
+        integer(int32), intent(in) :: unit_num
+        character(*), intent(in) :: data_name
+        real(real64), intent(in) :: x(:)
 
-        ! Initialize VTK file
-        if (present(Colors)) then
-            write (outName, '(3a)') trim(self%dir_FileOutput), "Coloring", self%fextend
-        else
-            write (outName, self%format_output) trim(self%dir_FileOutput), "Out_", fc, self%fextend
-        end if
-        status = vtu%initialize(format='binary', filename=trim(outName), mesh_topology='UnstructuredGrid')
+        write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
+        write (unit_num, '(a)') "LOOKUP_TABLE default"
+        write (unit_num, '(es22.15)') x(:)
+        write (unit_num, '(a)') ""
 
-        ! Write data
-        status = vtu%xml_writer%write_piece(np=self%VTK%nPoints, &
-                                            nc=self%VTK%nCell)
-        status = vtu%xml_writer%write_geo(np=self%VTK%nPoints, &
-                                          nc=self%VTK%nCell, &
-                                          x=self%VTK%coordinates%x, &
-                                          y=self%VTK%coordinates%y, &
-                                          z=self%VTK%coordinates%z)
-        status = vtu%xml_writer%write_connectivity(nc=self%VTK%nCell, &
-                                                   connectivity=self%VTK%connectivity, &
-                                                   offset=self%VTK%offset, &
-                                                   cell_type=self%VTK%CellType)
+    end subroutine output_vtk_cell_real64
 
-        ! --- データセクション ---
-        if (present(Colors)) then
-            call Allocate_Array(Cell_add_Colors, self%VTK%nCell)
-            nsize = size(Colors)
-            Cell_add_Colors(:) = 0
-            Cell_add_Colors(1:self%VTK%nCell - nsize) = 0
-            Cell_add_Colors(self%VTK%nCell - nsize + 1:self%VTK%nCell) = Colors(:)
-            status = vtu%xml_writer%write_dataarray(location='cell', action='open')
-            status = vtu%xml_writer%write_dataarray(data_name='Colors', x=Cell_add_Colors)
-            status = vtu%xml_writer%write_dataarray(location='cell', action='close')
-            deallocate (Cell_add_Colors)
-        else
-            status = vtu%xml_writer%write_dataarray(location='node', action='open')
-            if (present(Temp)) then
-                call rcm%reorder_to_original(Temp, Original)
-                status = vtu%xml_writer%write_dataarray(data_name='Temperature', &
-                                                        x=Original)
-            end if
-            if (present(Si)) then
-                call rcm%reorder_to_original(Si, Original)
-                status = vtu%xml_writer%write_dataarray(data_name='Si', &
-                                                        x=Original)
-            end if
-            if (present(Pres)) then
-                call rcm%reorder_to_original(Pres, Original)
-                status = vtu%xml_writer%write_dataarray(data_name='Pressure', &
-                                                        x=Original)
-            end if
-            if (present(wFlux)) then
-                call rcm%reorder_to_original(wFlux%x, Original_vector(:, 1))
-                call rcm%reorder_to_original(wFlux%y, Original_vector(:, 2))
-                call rcm%reorder_to_original(wFlux%z, Original_vector(:, 3))
-                status = vtu%xml_writer%write_dataarray(data_name='waterFlux', &
-                                                        x=Original_vector(:, 1), &
-                                                        y=Original_vector(:, 2), &
-                                                        z=Original_vector(:, 3))
-            end if
-            status = vtu%xml_writer%write_dataarray(location='node', action='close')
-        end if
-        status = vtu%xml_writer%write_piece()
+    subroutine output_vtk_cell_int32(unit_num, data_name, x)
+        implicit none
+        integer(int32), intent(in) :: unit_num
+        character(*), intent(in) :: data_name
+        integer(int32), intent(in) :: x(:)
 
-        ! Finalize VTK file
-        status = vtu%finalize()
+        write (unit_num, '(3a)') "SCALARS ", trim(adjustl(data_name)), " double 1"
+        write (unit_num, '(a)') "LOOKUP_TABLE default"
+        write (unit_num, '(i0)') x(:)
+        write (unit_num, '(a)') ""
 
-    end subroutine input_output_Overall_Output_vtu
+    end subroutine output_vtk_cell_int32
 
 end submodule input_output_overall_vtk
