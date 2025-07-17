@@ -37,7 +37,8 @@ contains
     module subroutine solve_sparse_crs_bicgstab(self, A, b, x, status)
         implicit none
         class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-        type(Type_CRS), intent(in) :: A
+        class(abst_matrix), intent(in) :: A
+        ! type(Type_CRS), intent(in) :: A
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
         integer(int32), intent(inout) :: status
@@ -46,89 +47,94 @@ contains
         real(real64) :: resid
         integer(int32) :: iter, iN
 
-        ! 1:Initialize
-        rho = 1.0d0
-        rho_old = 1.0d0
-        alpha = 1.0d0
-        beta = 1.0d0
-        omega = 1.0d0
+        select type (matrix => A)
+        type is (type_crs)
 
-        self%p(:) = 0.0d0
-        self%s(:) = 0.0d0
-        self%phat(:) = 0.0d0
-        self%shat(:) = 0.0d0
+            ! 1:Initialize
+            rho = 1.0d0
+            rho_old = 1.0d0
+            alpha = 1.0d0
+            beta = 1.0d0
+            omega = 1.0d0
 
-        ! 2: Set an initial value x0
-        self%x(:) = 0.0d0
+            self%p(:) = 0.0d0
+            self%s(:) = 0.0d0
+            self%phat(:) = 0.0d0
+            self%shat(:) = 0.0d0
 
-        ! 3: r0 = b-Ax0
-        self%r(:) = A * self%x(:)
-        self%r(:) = b(:) - self%r(:)
-        ! 4: Create preconditioned matrix
-        call self%Create_Preconditioner(A)
+            ! 2: Set an initial value x0
+            self%x(:) = 0.0d0
 
-        ! 5: ^r0 = r0, (r*0, r0)!=0
-        self%r0(:) = self%r(:)
+            ! 3: r0 = b-Ax0
+            self%r(:) = matrix * self%x(:)
+            self%r(:) = b(:) - self%r(:)
+            ! 4: Create preconditioned matrix
+            call self%Create_Preconditioner(matrix)
 
-        do iter = 1, self%max_iterations
-            ! 7: (^r0, rk)
-            rho = dot(self%N, self%r(:), self%r0(:))
-            ! 8: rho check
-            if (rho == 0.0d0) then
-                status = 0
-                x(:) = self%x(:)
-                return
-            end if
+            ! 5: ^r0 = r0, (r*0, r0)!=0
+            self%r0(:) = self%r(:)
 
-            if (iter == 1) then
-                ! 10: p0 = r0
-                self%p(:) = self%r(:)
-            else
-                ! 12: beta = (rho / rho_old) * (alpha_k / omega_k)
-                beta = (rho / rho_old) * (alpha / omega)
-                ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
-                self%p(:) = self%r(:) + beta * (self%p(:) - omega * self%v(:))
-            end if
-            ! 15: phat = M^-1 * p
-            call self%Apply_Preconditioner(self%p(:), self%phat(:))
-            ! 16: v = A * phat
-            self%v(:) = A * self%phat(:)
-            ! call SpMV(self%CRS_A, self%phat, self%v)
-            ! 17: alpha_k = rho / (^r0, v)
-            alpha = rho / dot(self%N, self%r0(:), self%v(:))
-            ! 18: s = r_k - alpha_k * v
-            self%s(:) = self%r(:) - alpha * self%v(:)
+            do iter = 1, self%max_iterations
+                ! 7: (^r0, rk)
+                rho = dot(self%N, self%r(:), self%r0(:))
+                ! 8: rho check
+                if (rho == 0.0d0) then
+                    status = 0
+                    x(:) = self%x(:)
+                    return
+                end if
 
-            ! 19: shat = M^-1 * s
-            call self%Apply_Preconditioner(self%s(:), self%shat(:))
-            ! 20: t = A * shat
-            self%t(:) = A * self%shat(:)
+                if (iter == 1) then
+                    ! 10: p0 = r0
+                    self%p(:) = self%r(:)
+                else
+                    ! 12: beta = (rho / rho_old) * (alpha_k / omega_k)
+                    beta = (rho / rho_old) * (alpha / omega)
+                    ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
+                    self%p(:) = self%r(:) + beta * (self%p(:) - omega * self%v(:))
+                end if
+                ! 15: phat = M^-1 * p
+                call self%Apply_Preconditioner(self%p(:), self%phat(:))
+                ! 16: v = A * phat
+                self%v(:) = matrix * self%phat(:)
+                ! call SpMV(self%CRS_A, self%phat, self%v)
+                ! 17: alpha_k = rho / (^r0, v)
+                alpha = rho / dot(self%N, self%r0(:), self%v(:))
+                ! 18: s = r_k - alpha_k * v
+                self%s(:) = self%r(:) - alpha * self%v(:)
 
-            ! 21: omega_k = (t,s)/(t,t)
-            omega = dot(self%N, self%t(:), self%s(:)) / dot(self%N, self%t(:), self%t(:))
+                ! 19: shat = M^-1 * s
+                call self%Apply_Preconditioner(self%s(:), self%shat(:))
+                ! 20: t = A * shat
+                self%t(:) = matrix * self%shat(:)
 
-            ! 22: omega breakdown check
-            if (omega == 0.0d0) then
-                status = -1
-                return
-            end if
+                ! 21: omega_k = (t,s)/(t,t)
+                omega = dot(self%N, self%t(:), self%s(:)) / dot(self%N, self%t(:), self%t(:))
 
-            ! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i)
-            self%x(:) = self%x(:) + alpha * self%phat(:) + omega * self%shat(:)
-            ! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)
-            self%r(:) = self%s(:) - omega * self%t(:)
+                ! 22: omega breakdown check
+                if (omega == 0.0d0) then
+                    status = -1
+                    return
+                end if
 
-            ! 25: ||r_k+1||_2
-            resid = norm(self%N, self%r(:))
-            if (resid < self%tolerance) then
-                status = 0
-                x(:) = self%x(:)
-                return
-            end if
+                ! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i)
+                self%x(:) = self%x(:) + alpha * self%phat(:) + omega * self%shat(:)
+                ! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)
+                self%r(:) = self%s(:) - omega * self%t(:)
 
-            rho_old = rho
-        end do
-        status = -2
+                ! 25: ||r_k+1||_2
+                resid = norm(self%N, self%r(:))
+                if (resid < self%tolerance) then
+                    status = 0
+                    x(:) = self%x(:)
+                    return
+                end if
+
+                rho_old = rho
+            end do
+            status = -2
+
+        end select
     end subroutine solve_sparse_crs_bicgstab
 
     module subroutine check_sparse_crs_bicgstab(self, status, time)

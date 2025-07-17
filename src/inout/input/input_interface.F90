@@ -6,7 +6,7 @@ module inout_input
     use :: json_module, only:json_file
     use :: inout_project_settings, only:get_project_path
     use :: module_core, only:type_vtk, type_dp_3d, type_dp_vector_3d, allocate_array, deallocate_array, & !&
-                             error_message, join, value_in_range
+                             error_message, join, value_in_range, filter
     implicit none
     public
 

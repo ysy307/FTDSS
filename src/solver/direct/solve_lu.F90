@@ -46,13 +46,17 @@ contains
     module subroutine solve_sparse_crs_lu(self, A, b, x, status)
         implicit none
         class(type_solver_sparse_crs_lu), intent(inout) :: self
-        type(type_crs), intent(in) :: A
+        class(abst_matrix), intent(in) :: A
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
         integer(int32), intent(inout) :: status
 
-        call PARDISO(self%PT, self%MAXFCT, self%MNUM, self%MTYPE, self%PHASE, self%N, A%Val, self%IA, self%JA, self%PERM, self%NRHS, self%IPARM, self%MSGLVL, b, x, self%ERROR)
-        status = transfer(self%ERROR, status)
+        select type (matrix => A)
+        type is (type_crs)
+            call PARDISO(self%PT, self%MAXFCT, self%MNUM, self%MTYPE, self%PHASE, self%N, matrix%val, self%IA, self%JA, &
+                         self%PERM, self%NRHS, self%IPARM, self%MSGLVL, b, x, self%ERROR)
+            status = transfer(self%ERROR, status)
+        end select
 
     end subroutine solve_sparse_crs_lu
 
@@ -87,22 +91,24 @@ contains
     module subroutine solve_dense_lu(self, A, b, x, status)
         implicit none
         class(type_solver_dense_lu), intent(inout) :: self
-        real(real64), intent(in) :: A(:, :)
+        class(abst_matrix), intent(in) :: A
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
         integer(int32), intent(inout) :: status
         !* LU decomposition
-        call dgetrf(self%N, self%N, A, self%N, self%IPIV, self%ERROR)
-        if (self%ERROR /= 0) call error_message(942)
+        select type (matrix => A)
+        type is (type_dense)
+            call dgetrf(self%N, self%N, matrix%val, self%N, self%IPIV, self%ERROR)
+            if (self%ERROR /= 0) call error_message(942)
 
-        !* solve linear equation
-        call dgetrs('N', self%N, 1, A, self%N, self%IPIV, b, self%N, self%ERROR)
-        if (self%ERROR /= 0) call error_message(943)
+            !* solve linear equation
+            call dgetrs('N', self%N, 1, matrix%val, self%N, self%IPIV, b, self%N, self%ERROR)
+            if (self%ERROR /= 0) call error_message(943)
 
-        x(:) = b(:)
+            x(:) = b(:)
 
-        status = transfer(self%ERROR, status)
-
+            status = transfer(self%ERROR, status)
+        end select
     end subroutine solve_dense_lu
 
     module subroutine check_dense_lu(self, status, time)

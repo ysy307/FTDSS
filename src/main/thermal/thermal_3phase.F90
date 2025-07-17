@@ -20,14 +20,14 @@ contains
 
         call structure%KT_star_0%initialize(domain)
 
-        structure%KT_l = structure%KT_star_0%copy()
-        structure%KT_old = structure%KT_star_0%copy()
-        structure%CT_l = structure%KT_star_0%copy()
+        structure%KT_l = structure%KT_star_0
+        structure%KT_old = structure%KT_star_0
+        structure%CT_l = structure%KT_star_0
         structure%order = input%basic%solver_settings%bdf_order
 
         allocate (structure%CT_old(structure%order))
         do i = 1, structure%order
-            structure%CT_old(i) = structure%KT_star_0%copy()
+            structure%CT_old(i) = structure%KT_star_0
         end do
 
         call allocate_array(structure%FT, nNode)

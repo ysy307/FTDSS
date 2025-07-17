@@ -127,10 +127,12 @@ contains
                 call json%destroy()
                 call error_message(905, c_opt=key)
             else
-                active_categories(:) = pack(variable_keys, mask=[self%basic%analysis_controls%calculate_thermal, &
-                                                                 any(self%basic%materials(:)%is_frozen), &
-                                                                 self%basic%analysis_controls%calculate_hydraulic])
-                call configure_output_variables(self%output_settings%history_output%variable_names, & ! 更新対象のリスト
+
+                active_categories = pack(variable_keys, mask=[self%basic%analysis_controls%calculate_thermal, &
+                                                              any(self%basic%materials(:)%is_frozen), &
+                                                              self%basic%analysis_controls%calculate_hydraulic])
+                call configure_output_variables(self%output_settings%field_output%variable_names, & ! 更新対象のリスト
+                                                tmp_variable_names, & ! 入力された変数名リスト
                                                 active_categories, & ! 有効なカテゴリ
                                                 json, & ! エラー処理用のjsonオブジェクト
                                                 key)
@@ -208,10 +210,13 @@ contains
                 call json%destroy()
                 call error_message(905, c_opt=key)
             else
-                active_categories(:) = pack(variable_keys, mask=[self%basic%analysis_controls%calculate_thermal, &
-                                                                 any(self%basic%materials(:)%is_frozen), &
-                                                                 self%basic%analysis_controls%calculate_hydraulic])
+
+                active_categories = pack(variable_keys, mask=[self%basic%analysis_controls%calculate_thermal, &
+                                                              any(self%basic%materials(:)%is_frozen), &
+                                                              self%basic%analysis_controls%calculate_hydraulic])
+
                 call configure_output_variables(self%output_settings%history_output%variable_names, & ! 更新対象のリスト
+                                                tmp_variable_names, & ! 入力された変数名リスト
                                                 active_categories, & ! 有効なカテゴリ
                                                 json, & ! エラー処理用のjsonオブジェクト
                                                 key)
@@ -321,40 +326,52 @@ contains
 !   マスターリストと有効カテゴリに基づき、出力対象の変数リストを検証・更新する。
 !   有効な変数が一つも無かった場合はエラー処理を呼び出す。
 !-
-    subroutine configure_output_variables(target_variable_list, active_categories, json, key)
+    subroutine configure_output_variables(target_variable_list, input_categories, active_categories, json, key)
         implicit none
         ! --- 引数 ---
         character(:), allocatable, intent(inout) :: target_variable_list(:)
+        character(len=*), intent(in) :: input_categories(:)
         character(len=*), intent(in) :: active_categories(:)
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
 
         ! --- ローカル変数 ---
         character(len=40), allocatable :: current_valid_names(:)
-        character(len=40), allocatable :: tmp_variable_names(:)
         logical, allocatable :: mask(:)
         integer :: i, j, n_valid ! ★「count」を「n_valid」に変更
 
         ! ==========================================================================
         ! STEP 1: active_categories に基づいて、有効な変数リストを動的に作成
         ! ==========================================================================
+        print *, "configure_output_variables called", size(master_valid_variables)
         allocate (mask(size(master_valid_variables)))
-        mask = .false.
-        do i = 1, size(active_categories)
-            ! ★DOループで要素ごとに比較
-            do j = 1, size(master_valid_variables)
-                if (master_valid_variables(j)%category == active_categories(i)) then
-                    mask(j) = .true.
+        mask(:) = .false.
+        ! ★DOループで要素ごとに比較
+        do i = 1, size(master_valid_variables)
+            do j = 1, size(active_categories)
+                print *, trim(master_valid_variables(i)%category), "  ", trim(active_categories(j))
+                if (trim(master_valid_variables(i)%category) == trim(active_categories(j))) then
+                    mask(i) = .true.
                 end if
             end do
         end do
 
+        print *, mask(:)
+
         ! ★組み込み関数count()を使う
         n_valid = count(mask)
+        print *, "Number of valid variables:", n_valid
         if (n_valid > 0) then
             allocate (current_valid_names(n_valid))
+            do i = 1, size(master_valid_variables)
+                print *, i, mask(i)
+                if (mask(i)) then
+                    current_valid_names(i) = master_valid_variables(i)%name
+                end if
+                ! current_valid_names(i) = master_valid_variables(i)%name
+            end do
             ! ★配列内包表記で要素を抽出
-            current_valid_names = pack([(master_valid_variables(j)%name, j=1, size(master_valid_variables))], mask)
+            ! current_valid_names = pack([(master_valid_variables(j)%name, j=1, size(master_valid_variables))], mask)
         else
             allocate (current_valid_names(0))
         end if
@@ -364,17 +381,20 @@ contains
         ! STEP 2: 作成した有効リストを使い、ユーザーが要求した変数をフィルタリング
         ! ==========================================================================
         ! (この部分は変更なし)
-        call filter(target_variable_list, current_valid_names, tmp_variable_names)
+        print *, "Valid variables:", current_valid_names(:)
+        ! print *, trim(current_valid_names(1))
+        ! print *, trim(current_valid_names(2))
+        ! print *, trim(current_valid_names(3))
+        ! print *, trim(current_valid_names(4))
+        call filter(input_categories, current_valid_names, target_variable_list)
 
-        if (size(tmp_variable_names) == 0) then
+        if (size(target_variable_list) == 0) then
             call json%destroy()
             call error_message(905, c_opt=key)
-        else
-            if (allocated(target_variable_list)) deallocate (target_variable_list)
-            allocate (target_variable_list, source=tmp_variable_names)
+
         end if
 
-        deallocate (current_valid_names, tmp_variable_names)
+        deallocate (current_valid_names)
 
     end subroutine configure_output_variables
 

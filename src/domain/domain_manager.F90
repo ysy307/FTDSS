@@ -1,7 +1,7 @@
 module domain_manager
     use, intrinsic :: iso_fortran_env, only: int32
     use :: stdlib_logger
-    use :: module_core, only:type_dp_3d
+    use :: module_core, only:type_dp_3d, allocate_array, deallocate_array
     use :: module_input, only:type_input
     use :: domain_element
     use :: domain_side, only:holder_sides

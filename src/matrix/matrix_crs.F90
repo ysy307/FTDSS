@@ -137,53 +137,45 @@ contains
     function Matrix_Addition_CRS(A, B) result(C)
         implicit none
         type(type_crs), intent(in) :: A, B
-        class(abst_matrix), allocatable :: C
+        type(type_crs) :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
 
-        C = A%Copy()
-        select type (matrix => C)
-        type is (type_crs)
-            do k = 1, A%nnz
-                matrix%val(k) = A%val(k) + B%val(k)
-            end do
-        end select
+        C = A
+        C%val(:) = 0.0d0
+        do k = 1, A%nnz
+            C%val(k) = A%val(k) + B%val(k)
+        end do
     end function Matrix_Addition_CRS
 
     function Multiplication_Scalar_matrix_crs(A, b) result(C)
         implicit none
         type(type_crs), intent(in) :: A
         real(real64), intent(in) :: b
-        class(abst_matrix), allocatable :: C
+        type(type_crs) :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
 
-        C = A%Copy()
-        select type (matrix => C)
-        type is (type_crs)
-            do k = 1, A%nnz
-                matrix%val(k) = A%val(k) * b
-            end do
-        end select
+        C = A
+        do k = 1, A%nnz
+            C%val(k) = A%val(k) * b
+        end do
     end function Multiplication_Scalar_matrix_crs
 
     function Multiplication_Matrix_Scalar_CRS(a, B) result(C)
         implicit none
         real(real64), intent(in) :: a
         type(type_crs), intent(in) :: B
-        class(abst_matrix), allocatable :: C
+        type(type_crs) :: C
         integer(int32) :: k
 
         ! Assume same sparsity structure
-        C = B%Copy()
-        select type (matrix => C)
-        type is (type_crs)
-            do k = 1, B%nnz
-                matrix%val(k) = B%val(k) * a
-            end do
-        end select
+        C = B
+        do k = 1, B%nnz
+            C%val(k) = B%val(k) * a
+        end do
     end function Multiplication_Matrix_Scalar_CRS
 
     subroutine find_crs(self, row, col, index)

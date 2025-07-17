@@ -3,7 +3,7 @@ module solver_solve
 !$  use omp_lib
     use :: module_core, only:allocate_array, deallocate_array, error_message
     use :: module_calculate, only:norm => norm_2, dot => inner_product
-    use :: module_matrix, only:type_crs, operator(*), operator(+)
+    use :: module_matrix, only:type_crs, operator(*), operator(+), type_dense, abst_matrix
     implicit none
     private
 #ifdef _MKL
@@ -11,28 +11,42 @@ module solver_solve
 #endif
 
     public :: abst_solver
-    public :: abst_solver_sparse_crs
-    public :: abst_solver_dense
+    ! public :: abst_solver
+    ! public :: abst_solver
     public :: type_solver_sparse_crs_bicgstab
     public :: type_solver_sparse_crs_lu
     public :: type_solver_dense_lu
 
     type, abstract :: abst_solver
+    contains
+        procedure(abst_solve), pass(self), deferred :: solve
+        procedure(abst_check), pass(self), deferred :: check
+        ! generic :: solve => solve_sparse_crs
+        ! generic :: check => check_sparse_crs
+        ! final :: destruct_type_abst_solver
     end type abst_solver
 
-    type, extends(abst_solver), abstract :: abst_solver_sparse_crs
-    contains
-        procedure(abst_solve_sparse_crs), public, pass(self), deferred :: solve
-        procedure(abst_check_sparse_crs), public, pass(self), deferred :: check
-    end type abst_solver_sparse_crs
+    abstract interface
+        subroutine abst_solve(self, A, b, x, status)
+            import :: abst_solver, abst_matrix, int32, real64
+            implicit none
+            class(abst_solver), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            real(real64), intent(inout) :: b(:)
+            real(real64), intent(inout) :: x(:)
+            integer(int32), intent(inout) :: status
+        end subroutine abst_solve
 
-    type, extends(abst_solver), abstract :: abst_solver_dense
-    contains
-        procedure(abst_solve_dense), public, pass(self), deferred :: solve
-        procedure(abst_check_dense), public, pass(self), deferred :: check
-    end type abst_solver_dense
+        subroutine abst_check(self, status, time)
+            import :: abst_solver, int32, real64
+            implicit none
+            class(abst_solver), intent(inout) :: self
+            integer(int32), intent(in) :: status
+            real(real64), intent(in) :: time
+        end subroutine abst_check
+    end interface
 
-    type, extends(abst_solver_sparse_crs) :: type_solver_sparse_crs_bicgstab
+    type, extends(abst_solver) :: type_solver_sparse_crs_bicgstab
         integer(int32) :: n
         real(real64), allocatable :: m(:)
         real(real64), allocatable :: p(:)
@@ -60,7 +74,37 @@ module solver_solve
         final :: destruct_type_solver_sparse_crs_bicgstab
     end type type_solver_sparse_crs_bicgstab
 
-    type, extends(abst_solver_sparse_crs) :: type_solver_sparse_crs_lu
+    interface
+        module function construct_type_solver_sparse_crs_bicgstab(N, tolerance, max_iterations, preconditioner) result(structure)
+            implicit none
+            integer(int32), intent(in) :: N
+            real(real64), intent(in) :: tolerance
+            integer(int32), intent(in) :: max_iterations
+            integer(int32), intent(in) :: preconditioner
+            class(abst_solver), allocatable :: structure
+
+        end function construct_type_solver_sparse_crs_bicgstab
+
+        module subroutine solve_sparse_crs_bicgstab(self, A, b, x, status)
+            implicit none
+            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            real(real64), intent(inout) :: b(:)
+            real(real64), intent(inout) :: x(:)
+            integer(int32), intent(inout) :: status
+
+        end subroutine solve_sparse_crs_bicgstab
+
+        module subroutine check_sparse_crs_bicgstab(self, status, time)
+            implicit none
+            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+            integer(int32), intent(in) :: status
+            real(real64), intent(in) :: time
+
+        end subroutine check_sparse_crs_bicgstab
+    end interface
+
+    type, extends(abst_solver) :: type_solver_sparse_crs_lu
         integer :: N
         integer :: MAXFCT
         !! Maximum number of factors with identical sparsity structure that must be kept in memory at the same time. In most
@@ -144,7 +188,42 @@ module solver_solve
         procedure :: check => check_sparse_crs_lu
     end type type_solver_sparse_crs_lu
 
-    type, extends(abst_solver_dense) :: type_solver_dense_lu
+    interface
+        module function construct_type_solver_sparse_crs_lu(N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV, A) result(structure)
+            implicit none
+            integer(int32), intent(in) :: N
+            integer(int32), intent(in) :: MAXFCT
+            integer(int32), intent(in) :: MNUM
+            integer(int32), intent(in) :: MTYPE
+            integer(int32), intent(in) :: PHASE
+            integer(int32), intent(in) :: NRHS
+            integer(int32), intent(in) :: MSGVLV
+            type(type_crs), intent(in) :: A
+            class(abst_solver), allocatable :: structure
+
+        end function construct_type_solver_sparse_crs_lu
+
+        module subroutine solve_sparse_crs_lu(self, A, b, x, status)
+            implicit none
+            class(type_solver_sparse_crs_lu), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            real(real64), intent(inout) :: b(:)
+            real(real64), intent(inout) :: x(:)
+            integer(int32), intent(inout) :: status
+
+        end subroutine solve_sparse_crs_lu
+
+        module subroutine check_sparse_crs_lu(self, status, time)
+            implicit none
+            class(type_solver_sparse_crs_lu), intent(inout) :: self
+            integer(int32), intent(in) :: status
+            real(real64), intent(in) :: time
+
+        end subroutine check_sparse_crs_lu
+
+    end interface
+
+    type, extends(abst_solver) :: type_solver_dense_lu
         integer :: N
         integer :: ERROR
         integer, allocatable :: IPIV(:)
@@ -152,63 +231,48 @@ module solver_solve
         procedure :: solve => solve_dense_lu
         procedure :: check => check_dense_lu
     end type
+
+    interface
+
+        module function construct_type_solver_dense_lu(N) result(structure)
+            implicit none
+            integer(int32), intent(in) :: N
+            class(abst_solver), allocatable :: structure
+
+        end function construct_type_solver_dense_lu
+
+        module subroutine solve_dense_lu(self, A, b, x, status)
+            implicit none
+            class(type_solver_dense_lu), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            real(real64), intent(inout) :: b(:)
+            real(real64), intent(inout) :: x(:)
+            integer(int32), intent(inout) :: status
+
+        end subroutine solve_dense_lu
+
+        module subroutine check_dense_lu(self, status, time)
+            implicit none
+            class(type_solver_dense_lu), intent(inout) :: self
+            integer(int32), intent(in) :: status
+            real(real64), intent(in) :: time
+
+        end subroutine check_dense_lu
+    end interface
+
     interface type_solver_sparse_crs_bicgstab
-        module procedure construct_type_solver_sparse_crs_bicgstab
+        module procedure :: construct_type_solver_sparse_crs_bicgstab
     end interface
+
     interface type_solver_sparse_crs_lu
-        module procedure construct_type_solver_sparse_crs_lu
+        module procedure :: construct_type_solver_sparse_crs_lu
     end interface
+
     interface type_solver_dense_lu
-        module procedure construct_type_solver_dense_lu
-    end interface
-
-    abstract interface
-        subroutine abst_solve_sparse_crs(self, A, b, x, status)
-            import :: abst_solver_sparse_crs, type_crs, int32, real64
-            implicit none
-            class(abst_solver_sparse_crs), intent(inout) :: self
-            type(type_crs), intent(in) :: A
-            real(real64), intent(inout) :: b(:)
-            real(real64), intent(inout) :: x(:)
-            integer(int32), intent(inout) :: status
-        end subroutine abst_solve_sparse_crs
-
-        subroutine abst_check_sparse_crs(self, status, time)
-            import :: abst_solver_sparse_crs, int32, real64
-            implicit none
-            class(abst_solver_sparse_crs), intent(inout) :: self
-            integer(int32), intent(in) :: status
-            real(real64), intent(in) :: time
-        end subroutine abst_check_sparse_crs
-
-        subroutine abst_solve_dense(self, A, b, x, status)
-            import :: abst_solver_dense, int32, real64
-            implicit none
-            class(abst_solver_dense), intent(inout) :: self
-            real(real64), intent(in) :: A(:, :)
-            real(real64), intent(inout) :: b(:)
-            real(real64), intent(inout) :: x(:)
-            integer(int32), intent(inout) :: status
-        end subroutine abst_solve_dense
-
-        subroutine abst_check_dense(self, status, time)
-            import :: abst_solver_dense, int32, real64
-            implicit none
-            class(abst_solver_dense), intent(inout) :: self
-            integer(int32), intent(in) :: status
-            real(real64), intent(in) :: time
-        end subroutine abst_check_dense
+        module procedure :: construct_type_solver_dense_lu
     end interface
 
     interface
-        module function construct_type_solver_sparse_crs_bicgstab(N, tolerance, max_iterations, preconditioner) result(structure)
-            implicit none
-            integer(int32), intent(in) :: N
-            real(real64), intent(in) :: tolerance
-            integer(int32), intent(in) :: max_iterations
-            integer(int32), intent(in) :: preconditioner
-            class(abst_solver), allocatable :: structure
-        end function construct_type_solver_sparse_crs_bicgstab
 
         module subroutine create_preconditioner_jacobi(N, A, M)
             implicit none
@@ -247,73 +311,5 @@ module solver_solve
 
         end subroutine destruct_type_solver_sparse_crs_bicgstab
 
-        module subroutine solve_sparse_crs_bicgstab(self, A, b, x, status)
-            implicit none
-            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-            type(type_crs), intent(in) :: A
-            real(real64), intent(inout) :: b(:)
-            real(real64), intent(inout) :: x(:)
-            integer(int32), intent(inout) :: status
-        end subroutine solve_sparse_crs_bicgstab
-
-        module subroutine check_sparse_crs_bicgstab(self, status, time)
-            implicit none
-            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-            integer(int32), intent(in) :: status
-            real(real64), intent(in) :: time
-        end subroutine check_sparse_crs_bicgstab
-
-        module subroutine solve_sparse_crs_lu(self, A, b, x, status)
-            implicit none
-            class(type_solver_sparse_crs_lu), intent(inout) :: self
-            type(type_crs), intent(in) :: A
-            real(real64), intent(inout) :: b(:)
-            real(real64), intent(inout) :: x(:)
-            integer(int32), intent(inout) :: status
-        end subroutine solve_sparse_crs_lu
-
-        module subroutine check_sparse_crs_lu(self, status, time)
-            implicit none
-            class(type_solver_sparse_crs_lu), intent(inout) :: self
-            integer(int32), intent(in) :: status
-            real(real64), intent(in) :: time
-        end subroutine check_sparse_crs_lu
-
-        module function construct_type_solver_sparse_crs_lu(N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV, A) result(structure)
-            implicit none
-            integer(int32), intent(in) :: N
-            integer(int32), intent(in) :: MAXFCT
-            integer(int32), intent(in) :: MNUM
-            integer(int32), intent(in) :: MTYPE
-            integer(int32), intent(in) :: PHASE
-            integer(int32), intent(in) :: NRHS
-            integer(int32), intent(in) :: MSGVLV
-            type(type_crs), intent(in) :: A
-
-            class(abst_solver), allocatable :: structure
-        end function construct_type_solver_sparse_crs_lu
-
-        module subroutine solve_dense_lu(self, A, b, x, status)
-            implicit none
-            class(type_solver_dense_lu), intent(inout) :: self
-            real(real64), intent(in) :: A(:, :)
-            real(real64), intent(inout) :: b(:)
-            real(real64), intent(inout) :: x(:)
-            integer(int32), intent(inout) :: status
-        end subroutine solve_dense_lu
-
-        module subroutine check_dense_lu(self, status, time)
-            implicit none
-            class(type_solver_dense_lu), intent(inout) :: self
-            integer(int32), intent(in) :: status
-            real(real64), intent(in) :: time
-        end subroutine check_dense_lu
-
-        module function construct_type_solver_dense_lu(N) result(structure)
-            implicit none
-            integer(int32), intent(in) :: N
-
-            class(abst_solver), allocatable :: structure
-        end function construct_type_solver_dense_lu
     end interface
 end module solver_solve

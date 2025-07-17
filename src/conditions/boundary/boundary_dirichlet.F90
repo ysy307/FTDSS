@@ -65,7 +65,7 @@ contains
 
         if (present(A)) then
             if (.not. present(mode)) then
-                call calc_time_coefficient(current_time, self%time_points, timeCoe, idx)
+                call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                 value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
 
                 do iEdge = 1, self%num_target_edges
@@ -78,7 +78,7 @@ contains
             else
                 select case (mode)
                 case (1)
-                    call calc_time_coefficient(current_time, self%time_points, timeCoe, idx)
+                    call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
                 case (0)
                     !! Newton-Raphson step
@@ -98,7 +98,7 @@ contains
             end if
         else
             if (.not. present(mode)) then
-                call calc_time_coefficient(current_time, self%time_points, timeCoe, idx)
+                call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                 value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
 
                 do iEdge = 1, self%num_target_edges
@@ -110,7 +110,7 @@ contains
             else
                 select case (mode)
                 case (1)
-                    call calc_time_coefficient(current_time, self%time_points, timeCoe, idx)
+                    call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
                 case (0)
                 !! Newton-Raphson step

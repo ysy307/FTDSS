@@ -55,12 +55,12 @@ contains
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
-                            call create_elements(self%elements(iObs)%e, &
-                                                 local_id, &
-                                                 coordinate, &
-                                                 input%geometry%vtk%cells(local_id), &
-                                                 input%basic%geometry_settings, &
-                                                 ierr)
+                            call create_element(self%elements(iObs)%e, &
+                                                local_id, &
+                                                coordinate, &
+                                                input%geometry%vtk%cells(local_id), &
+                                                input%basic%geometry_settings, &
+                                                ierr)
                             self%xi(iObs) = tmp_xi
                             self%eta(iObs) = tmp_eta
                             exit
@@ -78,12 +78,12 @@ contains
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
-                            call create_elements(self%elements(iObs)%e, &
-                                                 local_id, &
-                                                 coordinate, &
-                                                 input%geometry%vtk%cells(local_id), &
-                                                 input%basic%geometry_settings, &
-                                                 ierr)
+                            call create_element(self%elements(iObs)%e, &
+                                                local_id, &
+                                                coordinate, &
+                                                input%geometry%vtk%cells(local_id), &
+                                                input%basic%geometry_settings, &
+                                                ierr)
                             self%xi(iObs) = tmp_xi
                             self%eta(iObs) = tmp_eta
                             exit
