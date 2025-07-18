@@ -1,5 +1,7 @@
-name: Build and Deploy Documentations
+# Workflow name
+name: Build and Deploy Documentation
 
+# Triggers for the workflow
 on:
   push:
     branches:
@@ -8,9 +10,16 @@ on:
     branches:
       - main
 
+# Concurrency control ensures that only one workflow run for this group is processed at a time.
+# If a new commit is pushed to a branch, any in-progress run for that same branch will be cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   documentation:
     runs-on: ubuntu-22.04
+    # Permissions are required for the deploy step to push to the gh-pages branch.
     permissions:
       contents: write
 
@@ -19,37 +28,67 @@ jobs:
       GCC_V: 12
 
     steps:
+      # Step 1: Check out the repository's code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Set up Python for installing dependencies
+      # Using a dedicated setup action makes the environment more explicit.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # Step 3: Cache pip dependencies to speed up subsequent runs
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          # Create a unique key for the cache based on the runner's OS and the hash of the Ford version.
+          # This ensures the cache is invalidated if Ford's requirements change.
+          key: ${{ runner.os }}-pip-ford-v1
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # Step 4: Install system-level dependencies required for building the documentation
       - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gfortran-${GCC_V} python3-dev graphviz
 
+      # Step 5: Install required Python packages
       - name: Upgrade pip & Install Python Dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          # 最新版の Ford を強制的にインストール
-          python3 -m pip install --upgrade ford
-          # Markdown はプロジェクト要件に合わせて固定
-          python3 -m pip install markdown==3.3.4
+          python -m pip install --upgrade pip
+          # Install Ford for documentation generation
+          python -m pip install --upgrade ford
+          # Pin the Markdown version for consistent output
+          python -m pip install markdown==3.3.4
 
+      # Step 6: Verify the installed Ford version for debugging purposes
       - name: Verify Ford Version
         run: ford --version
 
+      # Step 7: Build the documentation using the specified Ford settings file
       - name: Build Developer Documentation
         run: ford api-docs-ford-settings.md
 
-      - name: Upload Documentation
+      # Step 8: Upload the generated documentation as a build artifact.
+      # This is useful for debugging and for previewing changes in pull requests.
+      - name: Upload Documentation as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: documentation
           path: ./docs/api-docs
-          if-no-files-found: error
+          if-no-files-found: error # Fail the workflow if no documentation was generated
 
-      - name: Deploy API Documentation
-        uses: JamesIves/github-pages-deploy-action@4.1.0
+      # Step 9: Deploy the documentation to the gh-pages branch.
+      # This step is conditional and will ONLY run on a push to the 'main' branch.
+      # It will NOT run for pull requests, preventing premature deployments.
+      - name: Deploy API Documentation to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        # Use a more recent and secure version of the deployment action
+        uses: JamesIves/github-pages-deploy-action@v4.6.3
         with:
-          branch: gh-pages
-          folder: ./docs/api-docs
+          branch: gh-pages # The branch to deploy to
+          folder: ./docs/api-docs # The folder containing the documentation to deploy
