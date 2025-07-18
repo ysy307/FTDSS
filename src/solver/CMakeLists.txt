@@ -1,5 +1,5 @@
 add_library(Solver OBJECT
-    solve_interface.f90
+    solve_interface.F90
     direct/solve_lu.F90
     iterative/solve_bicgstab.F90
     iterative/prconditioner/solve_preconditioner.F90
