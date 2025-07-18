@@ -87,6 +87,7 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "ulimit -s unlimited" >> ~/.zshrc & \
     echo 'export LANG=C.UTF-8' >> ~/.zshrc
 
+
 # デフォルトのシェルをZshに設定
 RUN echo "export SHELL=/usr/bin/zsh" >> /root/.bashrc && \
     ln -sf /usr/bin/zsh /etc/alternatives/shell && \

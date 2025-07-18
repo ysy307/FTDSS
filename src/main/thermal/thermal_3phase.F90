@@ -103,6 +103,7 @@ contains
         call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, domain, self%T%new, porosity, property)
         ! call Assemble_Diffusion_Heat_1(self%KT_l, domain, self%T%new, porosity, property)
 
+
         !---------------------------------------------------------------------------------------------------------------------------
         ! if (step == 1) then
         self%KT_star_0 = dt * self%KT_l + self%CT_l
