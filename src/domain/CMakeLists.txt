@@ -16,7 +16,10 @@ add_library(Domain OBJECT
     multicoloring/welch_powell.F90
     multicoloring/dsatur.F90
     multicoloring/lfo.F90
-    rcm/rcm.F90
+    reordering/reordering.F90
+    reordering/methods.F90
+    reordering/to_original.F90
+    reordering/to_reordered.F90
     domain_manager.F90
     domain.F90
 )

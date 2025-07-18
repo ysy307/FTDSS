@@ -1,0 +1,22 @@
+add_library(Thermal OBJECT
+    thermal_assemble.F90
+    thermal_interface.F90
+    thermal_3Phase.F90
+    thermal.F90
+
+)
+target_link_libraries(Thermal PRIVATE
+    Core
+    Input
+    Domain
+    Calc_THC
+    Calc_VHC
+    Calc_DEN
+    Calc_SPH
+    Properties
+    Matrix
+    Boundary
+    Initial
+    Solver
+)
+enable_build_flags(Thermal)

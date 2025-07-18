@@ -1,7 +1,6 @@
 module calculate_wrf
     use, intrinsic :: iso_fortran_env
-!$  use omp_lib
-    use :: Inout_Input
+    use :: module_input, only:type_input, type_materials_wrf
     implicit none
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)
@@ -114,19 +113,19 @@ module calculate_wrf
     end interface
 
     interface
-        module subroutine initialize_holder_wrfs(self, iRegion, Input)
+        module subroutine initialize_holder_wrfs(self, input, i_material)
             implicit none
             class(holder_wrfs), intent(inout) :: self
-            integer(int32), intent(in) :: iRegion
-            type(type_Input), intent(in) :: Input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
 
         end subroutine initialize_holder_wrfs
     end interface
 
     interface
-        module function construct_type_wrf_bc(Input) result(property)
+        module function construct_type_wrf_bc(input) result(property)
             implicit none
-            type(Input_Region), intent(in) :: Input
+            type(type_materials_wrf), intent(in) :: input
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_bc
@@ -149,9 +148,9 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_vg(Input) result(property)
+        module function construct_type_wrf_vg(input) result(property)
             implicit none
-            type(Input_Region), intent(in) :: Input
+            type(type_materials_wrf), intent(in) :: input
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_vg
@@ -174,9 +173,9 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_ko(Input) result(property)
+        module function construct_type_wrf_ko(input) result(property)
             implicit none
-            type(Input_Region), intent(in) :: Input
+            type(type_materials_wrf), intent(in) :: input
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_ko
@@ -200,9 +199,9 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_mvg(Input) result(property)
+        module function construct_type_wrf_mvg(input) result(property)
             implicit none
-            type(Input_Region), intent(in) :: Input
+            type(type_materials_wrf), intent(in) :: input
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_mvg
@@ -225,9 +224,9 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_durner(Input) result(property)
+        module function construct_type_wrf_durner(input) result(property)
             implicit none
-            type(Input_Region), intent(in) :: Input
+            type(type_materials_wrf), intent(in) :: input
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_durner
@@ -250,9 +249,9 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_dvgch(Input) result(property)
+        module function construct_type_wrf_dvgch(input) result(property)
             implicit none
-            type(Input_Region), intent(in) :: Input
+            type(type_materials_wrf), intent(in) :: input
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_dvgch

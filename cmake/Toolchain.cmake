@@ -77,9 +77,13 @@ if(NOT TARGET jsonfortran-intelllvm::jsonfortran-static)
 endif()
 
 # --- VTK (Fortranラッパーではなく、本体ライブラリ) ---
-if(NOT TARGET VTK::CommonCore)
-    find_package(VTK REQUIRED COMPONENTS CommonCore IOLegacy)
-endif()
+find_package(VTK REQUIRED
+    COMPONENTS
+        CommonCore
+        CommonDataModel
+        IOLegacy         # .vtkリーダーのために必要
+        IOXML            # .vtuリーダーのために必要
+)
 
 # --- VTKFortran (静的ライブラリとしてインポート) ---
 if(NOT TARGET VTK::VTKFortran)

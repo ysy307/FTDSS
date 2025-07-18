@@ -5,7 +5,7 @@ module module_domain
     use :: domain_side_Factory, only:create_side
     use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element
     use :: domain_multicoloring, only:type_coloring
-    use :: domain_rcm, only:type_rcm
+    use :: domain_reordering, only:type_reordering
     use :: domain_manager, only:type_domain
     implicit none
     private
@@ -15,6 +15,6 @@ module module_domain
     public :: type_crs_adjacency_element, type_node_adjacency
     public :: type_domain
     public :: type_coloring
-    public :: type_rcm
+    public :: type_reordering
 
 end module module_domain

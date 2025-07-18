@@ -4,18 +4,23 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function construct_type_vhc_3phase(iRegion, Input) result(property)
+    module function construct_type_vhc_3phase(input, i_material) result(property)
         implicit none
-        class(Abst_VHC), allocatable :: property
-        integer(int32), intent(in) :: iRegion
-        type(Type_Input), intent(in) :: Input
+        class(abst_vhc), allocatable :: property
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
 
         if (allocated(property)) deallocate (property)
         allocate (type_vhc_3phase :: property)
 
-        property%material1 = Input%Regions(iRegion)%Thermal%Cp(1)
-        property%material2 = Input%Regions(iRegion)%Thermal%Cp(2)
-        property%material3 = Input%Regions(iRegion)%Thermal%Cp(3)
+        property%material_id = i_material
+
+        property%material1 = input%basic%materials(i_material)%thermal%density(1) * &
+                             input%basic%materials(i_material)%thermal%specific_heat(1)
+        property%material2 = input%basic%materials(i_material)%thermal%density(2) * &
+                             input%basic%materials(i_material)%thermal%specific_heat(2)
+        property%material3 = input%basic%materials(i_material)%thermal%density(3) * &
+                             input%basic%materials(i_material)%thermal%specific_heat(3)
 
     end function construct_type_vhc_3phase
 

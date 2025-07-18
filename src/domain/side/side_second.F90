@@ -2,11 +2,12 @@ submodule(domain_side) domain_side_second
     implicit none
 contains
 
-    module function construct_side_second(id, global_coordinate, cell_info) result(side)
+    module function construct_side_second(id, global_coordinate, cell_info, integration) result(side)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
         type(type_vtk_cell), intent(in) :: cell_info
+        type(type_geometry_settings), intent(in) :: integration
         class(abst_side), allocatable :: side
 
         integer(int32) :: i
@@ -36,11 +37,27 @@ contains
             side%z(i)%val => global_coordinate%z(side%connectivity(i))
         end do
 
-        side%num_gauss = 2_int32
-        call allocate_array(side%weight, side%num_gauss)
-        call allocate_array(side%gauss, side%num_gauss)
-        side%weight(:) = [1.0d0, 1.0d0]
-        side%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+        select case (integration%integration_type)
+        case ("full")
+            side%num_gauss = 2_int32
+            call allocate_array(side%weight, side%num_gauss)
+            call allocate_array(side%gauss, side%num_gauss)
+            side%weight(:) = [1.0d0, 1.0d0]
+            side%gauss(:) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+        case ("reduced")
+            side%num_gauss = 1_int32
+            call allocate_array(side%weight, side%num_gauss)
+            call allocate_array(side%gauss, side%num_gauss)
+            side%weight(:) = [2.0d0]
+            side%gauss(:) = [0.0d0]
+        case ("free")
+            side%num_gauss = 2_int32
+            call allocate_array(side%weight, side%num_gauss)
+            call allocate_array(side%gauss, side%num_gauss)
+            side%weight(:) = [1.0d0, 1.0d0]
+            side%gauss(:) = [-integration%integration_points, integration%integration_points]
+        end select
+
     end function construct_side_second
 
     module function get_id_side_second(self) result(id)

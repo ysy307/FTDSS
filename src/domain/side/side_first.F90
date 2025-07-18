@@ -2,11 +2,12 @@ submodule(domain_side) domain_side_first
     implicit none
 contains
 
-    module function construct_side_first(id, global_coordinate, cell_info) result(side)
+    module function construct_side_first(id, global_coordinate, cell_info, integration) result(side)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
         type(type_vtk_cell), intent(in) :: cell_info
+        type(type_geometry_settings), intent(in) :: integration
         class(abst_side), allocatable :: side
 
         integer(int32) :: i
@@ -36,11 +37,28 @@ contains
             side%z(i)%val => global_coordinate%z(side%connectivity(i))
         end do
 
-        side%num_Gauss = 1_int32
-        call allocate_array(side%weight, side%num_Gauss)
-        call allocate_array(side%gauss, side%num_Gauss)
-        side%weight(:) = [0.0d0]
-        side%gauss(:) = [2.0d0]
+        select case (integration%integration_type)
+        case ("full")
+            side%num_Gauss = 1_int32
+            call allocate_array(side%weight, side%num_Gauss)
+            call allocate_array(side%gauss, side%num_Gauss)
+            side%weight(:) = [0.0d0]
+            side%gauss(:) = [2.0d0]
+        case ("reduced")
+            call global_logger%log_warning(message="Reduced-type integration is not implemented for first order sides.")
+            side%num_Gauss = 1_int32
+            call allocate_array(side%weight, side%num_Gauss)
+            call allocate_array(side%gauss, side%num_Gauss)
+            side%weight(:) = [2.0d0]
+            side%gauss(:) = [0.0d0]
+        case ("free")
+            call global_logger%log_warning(message="Free-type integration is not implemented for first order sides.")
+            side%num_Gauss = 1_int32
+            call allocate_array(side%weight, side%num_Gauss)
+            call allocate_array(side%gauss, side%num_Gauss)
+            side%weight(:) = [2.0d0]
+            side%gauss(:) = [0.0d0]
+        end select
     end function construct_side_first
 
     module function get_id_side_first(self) result(id)

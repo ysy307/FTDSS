@@ -1,6 +1,7 @@
 module domain_element_factory
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_dp_3d, type_vtk_cell
+    use :: module_input, only:type_geometry_settings
     use :: domain_element, only:abst_element, & !&
                                 type_triangle_first, type_triangle_second, & !&
                                 type_square_first, type_square_second !&
@@ -11,12 +12,13 @@ module domain_element_factory
 
 contains
     ! 要素オブジェクトを生成して返す、独立したファクトリサブルーチン
-    subroutine create_element(new_element, id, global_coordinate, cell_info, ierr)
+    subroutine create_element(new_element, id, global_coordinate, cell_info, integration, ierr)
         implicit none
         class(abst_element), allocatable, intent(inout) :: new_element
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
         type(type_vtk_cell), intent(in) :: cell_info
+        type(type_geometry_settings), intent(in) :: integration
         integer(int32), intent(inout) :: ierr
 
         character(:), allocatable :: type_name
@@ -29,13 +31,13 @@ contains
 
         select case (type_name)
         case ("Triangle")
-            new_element = type_triangle_first(id, global_coordinate, cell_info)
+            new_element = type_triangle_first(id, global_coordinate, cell_info, integration)
         case ("Quad")
-            new_element = type_square_first(id, global_coordinate, cell_info)
+            new_element = type_square_first(id, global_coordinate, cell_info, integration)
         case ("QuadraticTriangle")
-            new_element = type_triangle_second(id, global_coordinate, cell_info)
+            new_element = type_triangle_second(id, global_coordinate, cell_info, integration)
         case ("QuadraticQuad")
-            new_element = type_square_second(id, global_coordinate, cell_info)
+            new_element = type_square_second(id, global_coordinate, cell_info, integration)
         case default
             write (*, '(a)') "Error: Unknown side shape type = "//type_name
             ierr = -1

@@ -4,20 +4,20 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of heat conductivity
     !----------------------------------------------------------------------------------------------------
-    module function construct_thc_3(iRegion, Input) result(property)
+    module function construct_thc_3(input, i_material) result(property)
         implicit none
-        class(Abst_THC), allocatable :: property
-        integer(int32), intent(in) :: iRegion
-        type(Type_Input), intent(in) :: Input
+        class(abst_thc), allocatable :: property
+        type(type_input), intent(in) :: Input
+        integer(int32), intent(in) :: i_material
 
         if (allocated(property)) deallocate (property)
         allocate (type_thc_3phase :: property)
 
-        property%region_id = iRegion
+        property%material_id = i_material
 
-        property%material1 = Input%Regions(iRegion)%Thermal%lambda(1)
-        property%material2 = Input%Regions(iRegion)%Thermal%lambda(2)
-        property%material3 = Input%Regions(iRegion)%Thermal%lambda(3)
+        property%material1 = input%basic%materials(i_material)%thermal%thermal_conductivity(1)
+        property%material2 = input%basic%materials(i_material)%thermal%thermal_conductivity(2)
+        property%material3 = input%basic%materials(i_material)%thermal%thermal_conductivity(3)
 
     end function construct_thc_3
 

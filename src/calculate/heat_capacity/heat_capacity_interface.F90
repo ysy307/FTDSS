@@ -20,7 +20,7 @@ module calculate_volumetric_heat_capacity
     end type holder_vhcs
 
     type, abstract :: abst_vhc
-        integer(int32) :: region_id
+        integer(int32) :: material_id
         real(real64) :: material1 !! soil, rock, concrete
         real(real64) :: material2 !! water
         real(real64) :: material3 !! ice
@@ -28,20 +28,17 @@ module calculate_volumetric_heat_capacity
     contains
         procedure(abst_calc_vhc_gauss_point_holder), pass(self), deferred :: calc_gauss_point_holder
         procedure(abst_calc_vhc_gauss_point_ptr), pass(self), deferred :: calc_gauss_point_ptr
-
     end type abst_vhc
 
     ! --- 3相モデルの具象クラス ---
     type, extends(abst_vhc) :: type_vhc_3phase
     contains
-        ! calcの具体的な実装としてcalc_vhc_3_Wrapをバインドする
         procedure :: calc_gauss_point_holder => calc_vhc_gauss_point_3phase_holder
         procedure :: calc_gauss_point_ptr => calc_vhc_gauss_point_3phase_ptr
 
     end type type_vhc_3phase
     type, extends(abst_vhc) :: type_vhc_3phase_apparent
     contains
-        ! calcの具体的な実装としてcalc_vhc_3_Wrapをバインドする
         procedure :: calc_gauss_point_holder => calc_vhc_gauss_point_3phase_apparent_holder
         procedure :: calc_gauss_point_ptr => calc_vhc_gauss_point_3phase_apparent_ptr
     end type type_vhc_3phase_apparent
@@ -73,18 +70,18 @@ module calculate_volumetric_heat_capacity
     end interface
 
     interface
-        module subroutine initialize_holder_vhcs(self, iRegion, Input)
+        module subroutine initialize_holder_vhcs(self, input, i_material)
             implicit none
             class(holder_vhcs), intent(inout) :: self
-            integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
         end subroutine initialize_holder_vhcs
 
-        module function construct_type_vhc_3phase(iRegion, Input) result(property)
+        module function construct_type_vhc_3phase(input, i_material) result(property)
             implicit none
             class(abst_vhc), allocatable :: property
-            integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
         end function construct_type_vhc_3phase
 
         module function calc_vhc_gauss_point_3phase_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
@@ -107,12 +104,11 @@ module calculate_volumetric_heat_capacity
             real(real64) :: VHC
         end function calc_vhc_gauss_point_3phase_ptr
 
-        module function construct_type_vhc_3phase_apparent(iRegion, Input) result(property)
-            import :: abst_vhc, Type_Input
+        module function construct_type_vhc_3phase_apparent(input, i_material) result(property)
             implicit none
             class(abst_vhc), allocatable :: property
-            integer(int32), intent(in) :: iRegion
-            type(Type_Input), intent(in) :: Input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
         end function construct_type_vhc_3phase_apparent
 
         module function calc_vhc_gauss_point_3phase_apparent_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)

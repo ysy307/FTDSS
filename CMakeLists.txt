@@ -53,7 +53,7 @@ add_subdirectory(src/matrix)
 add_subdirectory(src/domain)
 add_subdirectory(src/calculate/blas)
 add_subdirectory(src/calculate/wrf)
-add_subdirectory(src/calculate/HCF)
+# add_subdirectory(src/calculate/HCF)
 add_subdirectory(src/calculate/gcc)
 add_subdirectory(src/calculate/thermal_conductivity)
 add_subdirectory(src/calculate/density)
@@ -61,12 +61,12 @@ add_subdirectory(src/calculate/specific_heat)
 add_subdirectory(src/calculate/heat_capacity)
 add_subdirectory(src/calculate)
 add_subdirectory(src/properties)
-add_subdirectory(src/conditions/Boundary)
-add_subdirectory(src/conditions/Initial)
+add_subdirectory(src/conditions/boundary)
+add_subdirectory(src/conditions/initial)
 add_subdirectory(src/solver)
 add_subdirectory(src/control)
-add_subdirectory(src/main/Thermal)
-add_subdirectory(src/inout/Output)
+add_subdirectory(src/main/thermal)
+add_subdirectory(src/inout/output)
 add_subdirectory(src/main/FTDSS)
 
 # =========================================================================
@@ -79,7 +79,7 @@ set(COMMON_LIBS
     Matrix 
     Domain 
     Calc_WRF
-    Calc_HCF
+    # Calc_HCF
     Calc_GCC
     Calc_THC
     Calc_DEN

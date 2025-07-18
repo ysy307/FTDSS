@@ -1,9 +1,15 @@
 module core_string_utils
     use, intrinsic :: iso_fortran_env, only: int32
+    use :: core_allocate, only:allocate_array
     implicit none
     private
 
     public :: join
+    public :: filter
+
+    interface filter
+        module procedure :: filter_character_array
+    end interface
 
 contains
 
@@ -60,4 +66,52 @@ contains
         end do
 
     end function join
+
+    !+
+    ! 概要:
+    !   入力文字配列(input_array)から、有効な文字列リスト(valid_list)に
+    !   含まれる要素だけを抽出し、新しい配列(filtered_array)に格納する。
+    !-
+    subroutine filter_character_array(input_array, valid_list, filtered_array)
+        implicit none
+        ! --- 引数 ---
+        ! IN: フィルタリング対象の配列
+        character(*), intent(in) :: input_array(:)
+        ! IN: 有効な文字列のリスト
+        character(*), intent(in) :: valid_list(:)
+        ! OUT: フィルタリング結果を格納する配列
+        character(:), allocatable, intent(inout) :: filtered_array(:)
+
+        ! --- ローカル変数 ---
+        integer(int32) :: i
+        character(64), allocatable :: packed_array(:)
+        logical, allocatable :: mask(:)
+
+        ! --- 処理 ---
+        if (size(input_array) == 0) then
+            if (allocated(filtered_array)) deallocate (filtered_array)
+            allocate (character(len=0) :: filtered_array(0))
+            return
+        end if
+
+        allocate (mask(size(input_array)))
+
+        ! input_arrayの各要素がvalid_listに存在するかチェックし、マスクを作成
+        mask = .false.
+        do i = 1, size(input_array)
+            mask(i) = any(valid_list(:) == trim(adjustl(input_array(i))))
+        end do
+
+        ! マスクを使って有効な要素だけを抽出
+        packed_array = pack(input_array, mask)
+
+        ! 結果を出力引数にコピー
+        ! (source= を使うことで、文字長も自動で合わせてくれる)
+        if (allocated(filtered_array)) deallocate (filtered_array)
+        allocate (filtered_array, source=packed_array)
+
+        ! ローカル配列の解放
+        deallocate (mask, packed_array)
+
+    end subroutine filter_character_array
 end module core_string_utils

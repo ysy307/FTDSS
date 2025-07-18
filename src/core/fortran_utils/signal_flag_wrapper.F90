@@ -1,6 +1,7 @@
 module core_fortran_utils_signal_flag_wrapper
     use, intrinsic :: iso_fortran_env, only: logical32
     use, intrinsic :: iso_c_binding, only: c_ptr, c_associated
+    use :: stdlib_logger
     use :: core_c_utils_signal_flag, only:c_setup_signal_handler, c_get_interrupted_flag
     implicit none
 
@@ -21,6 +22,7 @@ contains
 
         if (c_get_interrupted_flag() /= 0) then
             interrupted = .true.
+            call global_logger%log_warning(message="Program interrupted by user.")
         else
             interrupted = .false.
         end if

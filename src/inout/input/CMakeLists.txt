@@ -3,6 +3,8 @@ add_library(Input OBJECT
     input_basic.F90
     input_conditions.F90
     input_output.F90
+    input_geometry.F90
+    input.F90
 )
 target_link_libraries(Input PRIVATE
     Core

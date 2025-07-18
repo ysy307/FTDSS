@@ -30,11 +30,12 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function construct_square_second(id, global_coordinate, cell_info) result(element)
+    module function construct_square_second(id, global_coordinate, cell_info, integration) result(element)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
         type(type_vtk_cell), intent(in) :: cell_info
+        type(type_geometry_settings), intent(in) :: integration
         class(abst_element), allocatable :: element
 
         integer(int32) :: i
@@ -64,22 +65,51 @@ contains
             element%z(i)%val => global_coordinate%z(element%connectivity(i))
         end do
 
-        element%num_gauss = 9_int32
-        call allocate_array(element%weight, element%num_gauss)
-        call allocate_array(element%gauss, element%dimension, element%num_gauss)
+        select case (integration%integration_type)
+        case ("full")
+            element%num_gauss = 9_int32
+            call allocate_array(element%weight, element%num_gauss)
+            call allocate_array(element%gauss, element%dimension, element%num_gauss)
 
-        element%weight(:) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
-                             64.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
-                             25.0d0 / 81.0d0]
-        element%gauss(:, 1) = [-sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
-        element%gauss(:, 2) = [0.0d0, -sqrt(3.0d0 / 5.0d0)]
-        element%gauss(:, 3) = [sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
-        element%gauss(:, 4) = [-sqrt(3.0d0 / 5.0d0), 0.0d0]
-        element%gauss(:, 5) = [0.0d0, 0.0d0]
-        element%gauss(:, 6) = [sqrt(3.0d0 / 5.0d0), 0.0d0]
-        element%gauss(:, 7) = [-sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
-        element%gauss(:, 8) = [0.0d0, sqrt(3.0d0 / 5.0d0)]
-        element%gauss(:, 9) = [sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
+            element%weight(:) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                                 64.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                                 25.0d0 / 81.0d0]
+            element%gauss(:, 1) = [-sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
+            element%gauss(:, 2) = [0.0d0, -sqrt(3.0d0 / 5.0d0)]
+            element%gauss(:, 3) = [sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)]
+            element%gauss(:, 4) = [-sqrt(3.0d0 / 5.0d0), 0.0d0]
+            element%gauss(:, 5) = [0.0d0, 0.0d0]
+            element%gauss(:, 6) = [sqrt(3.0d0 / 5.0d0), 0.0d0]
+            element%gauss(:, 7) = [-sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
+            element%gauss(:, 8) = [0.0d0, sqrt(3.0d0 / 5.0d0)]
+            element%gauss(:, 9) = [sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]
+        case ("reduced")
+            element%num_gauss = 4_int32
+            call allocate_array(element%weight, element%num_gauss)
+            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+
+            element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
+            element%gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
+            element%gauss(:, 2) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+            element%gauss(:, 3) = [sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
+            element%gauss(:, 4) = [sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
+        case ("free")
+            element%num_gauss = 4_int32
+            call allocate_array(element%weight, element%num_gauss)
+            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+
+            element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
+            element%gauss(:, 1) = [-integration%integration_points, -integration%integration_points]
+            element%gauss(:, 2) = [-integration%integration_points, integration%integration_points]
+            element%gauss(:, 3) = [integration%integration_points, integration%integration_points]
+            element%gauss(:, 4) = [integration%integration_points, -integration%integration_points]
+        end select
+
+        if (associated(element%interpolate)) nullify (element%interpolate)
+        element%interpolate => interpolate
+
+        if (associated(element%get_connectivity)) nullify (element%get_connectivity)
+        element%get_connectivity => get_connectivity
 
     end function construct_square_second
 
@@ -602,9 +632,9 @@ contains
         end if
     end subroutine is_in_square_second
 
-    module function Interpolate_square_second(self, xi, eta, value) result(interpolated_value)
+    module function interpolate_square_second(self, xi, eta, value) result(interpolated_value)
         implicit none
-        class(type_square_second), intent(in) :: self
+        class(abst_element), intent(in) :: self
         real(real64), intent(in) :: xi, eta
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
@@ -615,7 +645,22 @@ contains
             interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
         end do
 
-    end function Interpolate_square_second
+    end function interpolate_square_second
+
+    module function interpolate_reordered_square_second(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(abst_element), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%num_nodes
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity_reordered(i))
+        end do
+
+    end function interpolate_reordered_square_second
 
 end submodule domain_element_square_second
 

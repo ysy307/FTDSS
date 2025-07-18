@@ -21,6 +21,7 @@ submodule(inout_input) inout_input_conditions
     character(*), parameter :: id = "id"
     character(*), parameter :: thermal = "thermal"
     character(*), parameter :: hydraulic = "hydraulic"
+    character(*), parameter :: porosity = "porosity"
     character(*), parameter :: type = "type"
     character(*), parameter :: is_uniform = "is_uniform"
     character(*), parameter :: values = "values"
@@ -408,6 +409,10 @@ contains
                                                               self%conditions%num_boundaries)
         end if
 
+        key = join([initial_conditions, porosity])
+        call read_conditions_initial_conditions_porosity(self%conditions%initial_conditions%porosity, json, key, &
+                                                         self%conditions%num_boundaries)
+
     end subroutine read_conditions_initial_conditions
 
     subroutine read_conditions_initial_conditions_thermal(initial_condition, json, key_base, num_boundaries)
@@ -459,6 +464,50 @@ contains
         end select
 
     end subroutine read_conditions_initial_conditions_thermal
+
+    subroutine read_conditions_initial_conditions_porosity(initial_condition, json, key_base, num_boundaries)
+        implicit none
+        type(type_initial_local), intent(inout) :: initial_condition
+        type(json_file), intent(inout) :: json !! JSON parser
+        character(*), intent(in) :: key_base !! Base key for the initial condition
+        integer(int32), intent(in), optional :: num_boundaries !! Number of boundaries for the initial condition
+
+        character(:), allocatable :: key
+        logical :: found
+        integer(int32) :: i
+
+        key = join([key_base, type])
+        call json%get(key, initial_condition%type, found=found)
+        if (.not. found) then
+            call json%destroy()
+            call error_message(904, c_opt=key)
+        end if
+
+        if (.not. any(valid_initial_condition_types(:) == initial_condition%type)) then
+            call json%destroy()
+            call error_message(905, c_opt=key)
+        end if
+
+        select case (initial_condition%type)
+        case (valid_initial_condition_types(1)) ! uniform
+            key = join([key_base, value])
+            call json%get(key, initial_condition%value, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        case (valid_initial_condition_types(2)) ! laplace
+
+        case (valid_initial_condition_types(3)) ! file
+            key = join([key_base, field_name])
+            call json%get(key, initial_condition%field_name, found=found)
+            if (.not. found) then
+                call json%destroy()
+                call error_message(904, c_opt=key)
+            end if
+        end select
+
+    end subroutine read_conditions_initial_conditions_porosity
 
     subroutine read_conditions_initial_conditions_hydraulic(initial_condition, json, key_base, num_boundaries)
         implicit none

@@ -9,7 +9,9 @@ module domain_element
     !    - Preserve original function and type names<br>
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_logger
     use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
+    use :: module_input, only:type_geometry_settings
     implicit none
     private
 
@@ -19,6 +21,17 @@ module domain_element
     public :: type_square_first
     public :: type_square_second
     public :: holder_elements
+
+    public :: interpolate_reordered_triangle_first
+    public :: interpolate_reordered_triangle_second
+    public :: interpolate_reordered_square_first
+    public :: interpolate_reordered_square_second
+
+    public :: interpolate
+    public :: interpolate_reordered
+
+    public :: get_connectivity
+    public :: get_connectivity_reordered
 
     !--------------------------------------------------------------------------------------
     ! Holder for polymorphic element objects
@@ -38,6 +51,7 @@ module domain_element
         integer(int32), private :: dimension
         integer(int32), private :: order
         integer(int32), allocatable :: connectivity(:) !! connectivity information
+        integer(int32), allocatable :: connectivity_reordered(:) !! reordered connectivity information
         type(type_dp_pointer), allocatable :: x(:) !! X coordinate
         type(type_dp_pointer), allocatable :: y(:) !! Y coordinate
         type(type_dp_pointer), allocatable :: z(:) !! Z coordinate
@@ -52,6 +66,10 @@ module domain_element
         real(real64), allocatable :: weight(:) !! Gauss weight
         real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
         !----------------------------------------------------------------------------------
+        ! Interpolation functions
+        !----------------------------------------------------------------------------------
+        procedure(abst_interpolate),      pass(self), pointer :: interpolate => null() !&
+        procedure(abst_get_connectivity), pass(self), pointer :: get_connectivity => null() !&
     contains
         procedure(abst_get_id),        pass(self), deferred :: get_id !&
         procedure(abst_get_type),      pass(self), deferred :: get_type !&
@@ -67,7 +85,6 @@ module domain_element
         procedure(abst_jacobian),      pass(self), deferred :: jacobian !&
         procedure(abst_jacobian_det),  pass(self), deferred :: jacobian_det !&
         procedure(abst_is_inside),     pass(self), deferred :: is_inside !&
-        procedure(abst_interpolate),   pass(self), deferred :: interpolate !&
     end type abst_element
 
     !--------------------------------------------------------------------------------------
@@ -89,7 +106,6 @@ module domain_element
         procedure, pass(self) :: jacobian      => jacobian_triangle_first !&
         procedure, pass(self) :: jacobian_det  => jacobian_det_triangle_first !&
         procedure, pass(self) :: is_inside     => is_in_triangle_first !&
-        procedure, pass(self) :: interpolate   => interpolate_triangle_first !&
     end type type_triangle_first
 
     !--------------------------------------------------------------------------------------
@@ -111,7 +127,6 @@ module domain_element
         procedure, pass(self) :: jacobian      => jacobian_square_first !&
         procedure, pass(self) :: jacobian_det  => jacobian_det_square_first !&
         procedure, pass(self) :: is_inside     => is_in_square_first !&
-        procedure, pass(self) :: interpolate   => interpolate_square_first !&
     end type type_square_first
 
     !--------------------------------------------------------------------------------------
@@ -133,7 +148,6 @@ module domain_element
         procedure, pass(self) :: jacobian      => jacobian_triangle_second !&
         procedure, pass(self) :: jacobian_det  => jacobian_det_triangle_second !&
         procedure, pass(self) :: is_inside     => is_in_triangle_second !&
-        procedure, pass(self) :: interpolate   => interpolate_triangle_second !&
     end type type_triangle_second
 
     !--------------------------------------------------------------------------------------
@@ -155,7 +169,6 @@ module domain_element
         procedure, pass(self) :: jacobian      => jacobian_square_second !&
         procedure, pass(self) :: jacobian_det  => jacobian_det_square_second !&
         procedure, pass(self) :: is_inside     => is_in_square_second !&
-        procedure, pass(self) :: interpolate   => interpolate_square_second !&
     end type type_square_second
 
     !
@@ -212,6 +225,15 @@ module domain_element
             integer(int32) :: num_gauss
 
         end function abst_get_num_gauss
+
+        function abst_get_connectivity(self, index) result(connectivity)
+            import :: abst_element, int32
+            implicit none
+            class(abst_element), intent(in) :: self
+            integer(int32), intent(in) :: index
+            integer(int32) :: connectivity
+
+        end function abst_get_connectivity
 
         function abst_psi(self, i, xi, eta) result(psi)
             import :: abst_element, int32, real64
@@ -281,11 +303,12 @@ module domain_element
     !   三角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_triangle_first(id, global_coordinate, cell_info) result(element)
+        module function construct_triangle_first(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_triangle_first
@@ -394,23 +417,33 @@ module domain_element
 
         module function interpolate_triangle_first(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(type_triangle_first), intent(in) :: self
+            class(abst_element), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
         end function interpolate_triangle_first
+
+        module function interpolate_reordered_triangle_first(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(abst_element), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function interpolate_reordered_triangle_first
     end interface
 
     !--------------------------------------------------------------------------------------
     !   四角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_square_first(id, global_coordinate, cell_info) result(element)
+        module function construct_square_first(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_square_first
@@ -519,23 +552,33 @@ module domain_element
 
         module function interpolate_square_first(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(type_square_first), intent(in) :: self
+            class(abst_element), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
         end function interpolate_square_first
+
+        module function interpolate_reordered_square_first(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(abst_element), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function interpolate_reordered_square_first
     end interface
 
     !--------------------------------------------------------------------------------------
     !   三角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_triangle_second(id, global_coordinate, cell_info) result(element)
+        module function construct_triangle_second(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_triangle_second
@@ -644,23 +687,33 @@ module domain_element
 
         module function interpolate_triangle_second(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(type_triangle_second), intent(in) :: self
+            class(abst_element), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
         end function interpolate_triangle_second
+
+        module function interpolate_reordered_triangle_second(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(abst_element), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function interpolate_reordered_triangle_second
     end interface
 
     !--------------------------------------------------------------------------------------
     !   四角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_square_second(id, global_coordinate, cell_info) result(element)
+        module function construct_square_second(id, global_coordinate, cell_info, integration) result(element)
             implicit none
             integer(int32), intent(in) :: id
             type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_vtk_cell), intent(in) :: cell_info
+            type(type_geometry_settings), intent(in) :: integration
             class(abst_element), allocatable :: element
 
         end function construct_square_second
@@ -768,12 +821,21 @@ module domain_element
 
         module function interpolate_square_second(self, xi, eta, value) result(interpolated_value)
             implicit none
-            class(type_square_second), intent(in) :: self
+            class(abst_element), intent(in) :: self
             real(real64), intent(in) :: xi, eta
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
 
         end function interpolate_square_second
+
+        module function interpolate_reordered_square_second(self, xi, eta, value) result(interpolated_value)
+            implicit none
+            class(abst_element), intent(in) :: self
+            real(real64), intent(in) :: xi, eta
+            real(real64), intent(in) :: value(:)
+            real(real64) :: interpolated_value
+
+        end function interpolate_reordered_square_second
     end interface
 
     interface type_triangle_first
@@ -791,5 +853,60 @@ module domain_element
     interface type_square_second
         module procedure :: construct_square_second
     end interface
+
+contains
+    function interpolate(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(abst_element), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%num_nodes
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
+        end do
+    end function interpolate
+
+    function interpolate_reordered(self, xi, eta, value) result(interpolated_value)
+        implicit none
+        class(abst_element), intent(in) :: self
+        real(real64), intent(in) :: xi, eta
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+        do i = 1, self%num_nodes
+            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity_reordered(i))
+        end do
+    end function interpolate_reordered
+
+    function get_connectivity(self, index) result(connectivity)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32), intent(in) :: index
+        integer(int32) :: connectivity
+
+        if (index < 1 .or. index > self%num_nodes) then
+            error stop 'Index out of bounds in get_connectivity'
+        end if
+
+        connectivity = self%connectivity(index)
+    end function get_connectivity
+
+    function get_connectivity_reordered(self, index) result(connectivity)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32), intent(in) :: index
+        integer(int32) :: connectivity
+
+        if (index < 1 .or. index > self%num_nodes) then
+            error stop 'Index out of bounds in get_connectivity_reordered'
+        end if
+
+        connectivity = self%connectivity_reordered(index)
+    end function get_connectivity_reordered
 
 end module domain_element

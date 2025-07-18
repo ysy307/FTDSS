@@ -1,7 +1,7 @@
 module calculate_thermal_conductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
-    use :: Inout_Input
+    use :: module_input, only:type_input
     implicit none
     private
 
@@ -17,11 +17,12 @@ module calculate_thermal_conductivity
     end type holder_thcs
 
     type, abstract :: abst_thc
-        integer(int32) :: region_id
+        integer(int32) :: material_id
         real(real64) :: material1 !! like a soil or a rock, a concrete
         real(real64) :: material2 !! like a water
         real(real64) :: material3 !! like a ice
         real(real64) :: material4 !! like a gas
+        real(real64), allocatable :: dispersity(:)
     contains
         procedure(abst_calc_thc_gauss_point), pass(self), deferred :: calc_gauss_point !&
     end type abst_thc
@@ -44,21 +45,21 @@ module calculate_thermal_conductivity
     end interface
 
     interface
-        module subroutine initialize_holder_thcs(self, iRegion, Input)
+        module subroutine initialize_holder_thcs(self, input, i_material)
             implicit none
             class(holder_thcs), intent(inout) :: self
-            integer(int32), intent(in) :: iRegion
             type(type_Input), intent(in) :: Input
+            integer(int32), intent(in) :: i_material
 
         end subroutine initialize_holder_thcs
     end interface
 
     interface
-        module function construct_thc_3(iRegion, Input) result(property)
+        module function construct_thc_3(input, i_material) result(property)
             implicit none
             class(abst_thc), allocatable :: property
-            integer(int32), intent(in) :: iRegion
             type(type_Input), intent(in) :: Input
+            integer(int32), intent(in) :: i_material
 
         end function construct_thc_3
 

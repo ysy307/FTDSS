@@ -1,9 +1,9 @@
 submodule(calculate_wrf) calculate_wrf_durner
     implicit none
 contains
-    module function construct_type_wrf_durner(Input) result(property)
+    module function construct_type_wrf_durner(input) result(property)
         implicit none
-        type(Input_Region), intent(in) :: Input
+        type(type_materials_wrf), intent(in) :: input
         class(abst_wrf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
@@ -11,14 +11,14 @@ contains
 
         select type (this => property)
         type is (type_wrf_durner)
-            this%theta_r = Input%Ice%thetaR
-            this%theta_s = Input%Ice%thetaS
-            this%alpha1 = Input%Ice%alpha1
-            this%n1 = Input%Ice%n1
+            this%theta_r = input%theta_r
+            this%theta_s = input%theta_s
+            this%alpha1 = input%alpha1
+            this%n1 = input%n1
             this%m1 = 1.0d0 - 1.0d0 / this%n1
-            this%w1 = Input%Ice%w1
-            this%alpha2 = Input%Ice%alpha2
-            this%n2 = Input%Ice%n2
+            this%w1 = input%w1
+            this%alpha2 = input%alpha2
+            this%n2 = input%n2
             this%m2 = 1.0d0 - 1.0d0 / this%n2
             this%w2 = 1.0d0 - this%w1
         end select

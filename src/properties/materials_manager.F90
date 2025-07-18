@@ -1,6 +1,6 @@
 module properties_material_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Inout_Input, only:Type_Input
+    use :: module_input, only:Type_input
     use :: module_calculate, only:holder_gccs, holder_wrfs, holder_dens, holder_sphs, holder_vhcs, holder_thcs, & !&
                                   abst_gcc, abst_wrf, abst_den, abst_sph, abst_vhc, abst_thc
 
@@ -50,20 +50,20 @@ module properties_material_manager
 
 contains
     ! Managerを初期化するサブルーチン (シミュレーション開始時に一度だけ呼ぶ)
-    subroutine initialize(self, Input, ierr)
+    subroutine initialize(self, input, ierr)
         class(type_material_manager), intent(inout) :: self
-        type(Type_Input), intent(in) :: Input
+        type(type_input), intent(in) :: input
         integer(int32), intent(inout) :: ierr
 
         integer(int32) :: i, model_idx
         integer(int32) :: num_unique_regions, num_id
-        integer(int32), allocatable :: unique_region_ids(:)
+        integer(int32), allocatable :: unique_material_ids(:)
 
-        integer(int32) :: current_region_id
+        integer(int32) :: current_material_id
 
         ierr = 0
-        call Input%VTK%get_active_region_info(unique_region_ids, ierr)
-        num_unique_regions = Input%Basic%numRegion
+        call input%geometry%vtk%get_active_region_info(unique_material_ids, ierr)
+        num_unique_regions = input%basic%num_materials
 
         ! ステップ2: 配列を確保
         allocate (self%thc(num_unique_regions))
@@ -74,21 +74,21 @@ contains
         allocate (self%wrf(num_unique_regions))
 
         ! allocate (self%region_id_map(num_unique_regions))
-        allocate (self%region_id_map, source=unique_region_ids)
+        allocate (self%region_id_map, source=unique_material_ids)
         ! self%region_id_map = 0 ! 0は無効なインデックスとする
 
         ! ステップ3: 事前にあなたのFactoryを呼び出してモデルを生成し、マッピングする
         do model_idx = 1, num_unique_regions
-            current_region_id = unique_region_ids(model_idx)
+            current_material_id = unique_material_ids(model_idx)
 
-            call self%thc(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%den(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%sph(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%vhc(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%gcc(model_idx)%initialize(iRegion=current_region_id, Input=Input)
-            call self%wrf(model_idx)%initialize(iRegion=current_region_id, Input=Input)
+            call self%thc(model_idx)%initialize(input, current_material_id)
+            call self%den(model_idx)%initialize(input, current_material_id)
+            call self%sph(model_idx)%initialize(input, current_material_id)
+            call self%vhc(model_idx)%initialize(input, current_material_id)
+            call self%gcc(model_idx)%initialize(input, current_material_id)
+            call self%wrf(model_idx)%initialize(input, current_material_id)
 
-            self%region_id_map(current_region_id) = model_idx
+            self%region_id_map(current_material_id) = model_idx
         end do
     end subroutine initialize
 
@@ -129,9 +129,6 @@ contains
         thc_ptr => self%thc(model_index)%p
 
     end subroutine get_thc_ptr
-
-    ! 以下の関数は、region_idを使って特定のモデルを取得するためのものです。
-    ! これらの関数は、ポインタではなく、モデルのコピーを返します。
 
     subroutine get_den_holder(self, region_id, model_holder)
         class(type_material_manager), intent(inout) :: self

@@ -1,15 +1,16 @@
 submodule(calculate_thermal_conductivity) calc_thc_base
     implicit none
 contains
-    module subroutine initialize_holder_thcs(self, iRegion, Input)
+    module subroutine initialize_holder_thcs(self, input, i_material)
         implicit none
         class(holder_thcs), intent(inout) :: self
-        integer(int32), intent(in) :: iRegion
-        type(Type_Input), intent(in) :: Input
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
 
-        if (Input%Regions(iRegion)%Flag%is3Phase) then
-            self%p = Type_THC_3Phase(iRegion, Input)
-        end if
+        select case (input%basic%materials(i_material)%phase)
+        case (3)
+            self%p = type_thc_3phase(input, i_material)
+        end select
 
     end subroutine initialize_holder_thcs
 

@@ -1,6 +1,5 @@
 module core_c_utils_signal_flag
     use :: iso_c_binding, only:c_int
-    use, intrinsic :: iso_fortran_env, only: logical32
     implicit none
     private
 

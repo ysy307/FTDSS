@@ -3,9 +3,8 @@
 #    VTKへの依存をこのライブラリに閉じ込めます。
 # --------------------------------------------------------------------
 add_library(vtk_c_wrapper STATIC
-    # C++ソースファイルはここに記述します。
-    # パスはプロジェクトの構成に合わせてください。
-    vtk/reader.cpp
+    vtk/reader_vtk.cpp
+    vtk/reader_vtu.cpp
     vtk/c_wrapper.cpp
 )
 # VTKのインクルードディレクトリとライブラリをリンク
@@ -13,10 +12,12 @@ enable_build_flags(vtk_c_wrapper)
 
 # <--- [新規追加] C++ラッパーが公式VTKライブラリに依存することを明記します
 target_link_libraries(vtk_c_wrapper PUBLIC
+    VTK::IOXML
     VTK::CommonCore
+    VTK::CommonDataModel
     VTK::IOLegacy
 )
-set_target_properties(vtk_c_wrapper PROPERTIES CXX_STANDARD 14)
+set_target_properties(vtk_c_wrapper PROPERTIES CXX_STANDARD 17)
 # --------------------------------------------------------------------
 # Fortran/C Core OBJECTライブラリ
 # --------------------------------------------------------------------
@@ -45,6 +46,7 @@ add_library(Core OBJECT
     types/gauss.F90
     types/types.F90
     vtk/vtk_wrapper.F90
+    vtk/vtu_wrapper.F90
     vtk/vtk_constants.F90
     vtk/vtk.F90
     unique.F90
