@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="description" content="Documentation for FTDSS">
-    <meta name="author" content="" >
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="./favicon.png">
 
     <title> FTDSS </title>
@@ -52,17 +52,12 @@
 
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="page/index.html">Read Me</a></li>
                   <li class="nav-item">
                     <a class="nav-link" href="./lists/files.html">Source Files</a>
                   </li>
                 <li class="nav-item">
                   <a class="nav-link" href="./lists/modules.html">Modules</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="./lists/procedures.html">Procedures</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="./lists/types.html">Derived Types</a>
                 </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
@@ -77,33 +72,22 @@
 
     <div class="container">
   <!-- Main component for a primary marketing message or call to action -->
+    <div class="p-5 mb-4 bg-light border rounded-3" id="jumbotron">
+      <p>This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.</p>
+        <p> Find us on&hellip;</p>
+      <p>
+        <a class="btn btn-lg btn-primary" href="https://github.com/ysy307/FTDSS.git" role="button">GitHub</a>
+        
+        
+        
+        
+      </p>
+    </div>
 
       <div class="row" id='text'>
-        <div class=col-md-12>
+        <div class=col-md-8>
           <h1>FTDSS</h1>
-          <p>/opt/intel/oneapi/mpi/latest/include
-  /opt/intel/oneapi/mkl/latest/include
-extensions:F90
-summary: This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.
-author: Kikuchi Shun
-email: shungiku1012@gmail.com
-project_github: https://github.com/ysy307/FTDSS.git
-page_dir: ./docs
-graph: true
-coloured_edges: true
-print_creation_date: true
-creation_date: %Y-%m-%d %H:%M %z
-predocmark_alt: &gt;
-predocmark: &lt;
-docmark_alt: *
-docmark: !
-display:public protected private
-extra_mods:json_module: http://jacobwilliams.github.io/json-fortran/
-graph_maxnodes: 250
-graph_maxdepth: 10
-preprocess: true
-fpp_extensions: fpp FPP
-土壌凍結融解過程における数値計算ソルバーへの実装</p>
+          <p>土壌凍結融解過程における数値計算ソルバーへの実装</p>
 <div class="alert alert-warning">
 <p class="alert-title h4">Warning</p>
 <p>Work in progress</p>
@@ -127,10 +111,28 @@ fpp_extensions: fpp FPP
 <p>現在の所バグは見つかっていない．</p>
 </div>
         </div>
+          <div class="col-md-4">
+            <div class="card card-body bg-light">
+              <h2 class="card-title">Developer Info</h2>
+              <h4 class="card-text">Kikuchi Shun</h4>
+              <p class="card-text"></p>
+                <div class="text-center"><div class="btn-group" role="group">
+                      <a class="btn btn-lg btn-primary" href="mailto:shungiku1012@gmail.com"><i class="fa fa-envelope fa-lg"></i></a>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                </div></div>
+            </div>
+          </div>
       </div>
         <div class="row">
           <hr>
-          <div class="col-xs-6 col-sm-3">
+          <div class="col-xs-6 col-sm-6">
             <div>
               <h3>Source Files</h3>
               <ul><li><a href='sourcefile/adjacency.f90.html'>adjacency.F90</a></li><li><a href='sourcefile/adjacency_element.f90.html'>adjacency_element.F90</a></li><li><a href='sourcefile/adjacency_node.f90.html'>adjacency_node.F90</a></li><li><a href='sourcefile/allocate.f90.html'>allocate.F90</a></li><li><a href='sourcefile/array.f90.html'>array.F90</a></li><li><a href='sourcefile/boundary.f90.html'>boundary.F90</a></li><li><a href='sourcefile/boundary_adiabatic.f90.html'>boundary_adiabatic.F90</a></li><li><a href='sourcefile/boundary_base.f90.html'>boundary_base.F90</a></li><li><a href='sourcefile/boundary_dirichlet.f90.html'>boundary_dirichlet.F90</a></li><li><a href='sourcefile/boundary_interface.f90.html'>boundary_interface.F90</a></li></ul>
@@ -141,36 +143,14 @@ fpp_extensions: fpp FPP
               </ul>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-3">
+          <div class="col-xs-6 col-sm-6">
             <div>
               <h3>Modules</h3>
-              <ul><li><a href='module/calculate_density.html'>calculate_density</a></li><li><a href='module/calculate_gcc.html'>calculate_gcc</a></li><li><a href='module/calculate_hcf.html'>Calculate_HCF</a></li><li><a href='module/calculate_specific_heat.html'>calculate_specific_heat</a></li><li><a href='module/calculate_thermal_conductivity.html'>calculate_thermal_conductivity</a></li><li><a href='module/calculate_volumetric_heat_capacity.html'>calculate_volumetric_heat_capacity</a></li><li><a href='module/calculate_wrf.html'>calculate_wrf</a></li><li><a href='module/conditions_boundary.html'>conditions_boundary</a></li><li><a href='module/conditions_boundary_manager.html'>conditions_boundary_manager</a></li><li><a href='module/conditions_initial.html'>conditions_initial</a></li></ul>
+              <ul><li><a href='module/calculate_density.html'>calculate_density</a></li><li><a href='module/calculate_gcc.html'>calculate_gcc</a></li><li><a href='module/calculate_hcf.html'>Calculate_HCF</a></li><li><a href='module/calculate_specific_heat.html'>calculate_specific_heat</a></li><li><a href='module/calculate_thermal_conductivity.html'>calculate_thermal_conductivity</a></li><li><a href='module/calculate_volumetric_heat_capacity.html'>calculate_volumetric_heat_capacity</a></li><li><a href='module/conditions_boundary.html'>conditions_boundary</a></li><li><a href='module/conditions_boundary_manager.html'>conditions_boundary_manager</a></li><li><a href='module/conditions_initial.html'>conditions_initial</a></li><li><a href='module/conditions_initial_manager.html'>conditions_initial_manager</a></li></ul>
             </div>
             <div>
               <ul>
                 <li><a href="./lists/modules.html"><em>All modules&hellip;</em></a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-xs-6 col-sm-3">
-            <div>
-              <h3>Procedures</h3>
-              <ul><li><a href='interface/allocate_array.html'>allocate_array</a></li><li><a href='interface/allocate_pointer.html'>allocate_pointer</a></li><li><a href='proc/assemble_diffusion_heat_1.html'>Assemble_Diffusion_Heat_1</a></li><li><a href='proc/assemble_diffusion_heat_1_parallel.html'>Assemble_Diffusion_Heat_1_Parallel</a></li><li><a href='proc/assemble_mass_heat_1.html'>Assemble_Mass_Heat_1</a></li><li><a href='proc/assemble_mass_heat_1_parallel.html'>Assemble_Mass_Heat_1_Parallel</a></li><li><a href='interface/assignment(=).html'>assignment(=)</a></li><li><a href='interface/assignment(=)~2.html'>assignment(=)</a></li><li><a href='interface/c_get_cpu_architecture.html'>c_get_cpu_architecture</a></li><li><a href='interface/c_get_interrupted_flag.html'>c_get_interrupted_flag</a></li></ul>
-            </div>
-            <div>
-              <ul>
-                <li><a href="./lists/procedures.html"><em>All procedures&hellip;</em></a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-xs-6 col-sm-3">
-            <div>
-              <h3>Derived Types</h3>
-              <ul><li><a href='type/abst_bc_thermal.html'>abst_bc_thermal</a></li><li><a href='type/abst_den.html'>abst_den</a></li><li><a href='type/abst_element.html'>abst_element</a></li><li><a href='type/abst_gcc.html'>abst_gcc</a></li><li><a href='type/abst_ic.html'>abst_ic</a></li><li><a href='type/abst_matrix.html'>abst_matrix</a></li><li><a href='type/abst_side.html'>abst_side</a></li><li><a href='type/abst_sph.html'>abst_sph</a></li><li><a href='type/abst_thc.html'>abst_thc</a></li><li><a href='type/abst_thermal.html'>abst_thermal</a></li></ul>
-            </div>
-            <div>
-              <ul>
-                <li><a href="./lists/types.html"><em>All derived types&hellip;</em></a></li>
               </ul>
             </div>
           </div>
@@ -183,14 +163,14 @@ fpp_extensions: fpp FPP
           <div class="col">
             <p>
               FTDSS
-              &copy; 2025 
+ was developed by Kikuchi Shun<br>              &copy; 2025 
 </p>
           </div>
           <div class="col">
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            </p>
+ on 2025-07-18 06:40 +0000             </p>
           </div>
         </div>
         <br>
