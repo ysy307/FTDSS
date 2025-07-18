@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Core_Unique &ndash; FTDSS</title>
+    <title>core_unique &ndash; FTDSS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Core_Unique
+    <h1>core_unique
       <small>Module</small>
       
     </h1>
@@ -91,20 +88,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.9% of total for modules and submodules.">117 statements</a>
+                 title=" 0.7% of total for modules and submodules.">119 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/Unique.F90"> Source File</a>
+              <a href="../src/unique.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/unique.f90.html'>Unique.F90</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Core_Unique</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/unique.f90.html'>unique.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">core_unique</li>
           </ol>
         </nav>
       </div>
@@ -139,7 +136,7 @@
       </a>
       <div id="inters-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/core_unique.html#interface-unique">Unique</a>
+            <a class="list-group-item" href="../module/core_unique.html#interface-unique">unique</a>
         </div>
       </div>
     </div>
@@ -147,21 +144,7 @@
   
   
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#subs-0"
-         aria-expanded="false" aria-controls="subs-0">
-         <h4 class="card-header bg-primary text-white">Subroutines</h4>
-      </a>
-      <div id="subs-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/core_unique.html#proc-unique_int8">Unique_int8</a>
-            <a class="list-group-item" href="../module/core_unique.html#proc-unique_int16">Unique_int16</a>
-            <a class="list-group-item" href="../module/core_unique.html#proc-unique_int32">Unique_int32</a>
-            <a class="list-group-item" href="../module/core_unique.html#proc-unique_int64">Unique_int64</a>
-        </div>
-      </div>
-    </div>
-
+  
   
   
   
@@ -184,7 +167,7 @@
             <li class="list-group-item">
               <ul class="list-inline">
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='core_allocate.html'>Core_Allocate</a></li>
+                  <li class="list-inline-item"><a href='core_allocate.html'>core_allocate</a></li>
                   <li class="list-inline-item">stdlib_sorting</li>
               </ul>
             </li>
@@ -203,16 +186,15 @@
               <div class="card">
     <div class="card-header bg-light codesum">
       <span class="anchor" id="interface-unique"></span>
-      <h3>public        interface <a href='../interface/unique.html'>Unique</a> 
+      <h3>public        interface <a href='../interface/unique.html'>unique</a> 
       </h3>
     </div>
     <ul class="list-group">
           <li class="list-group-item">
                 <h3>
-    public  subroutine <a href='../proc/unique_int8.html'>Unique_int8</a>(array, unique_array)  
+    private  subroutine unique_int8(array, unique_array)  
 
     </h3>
-    
   <p>整数型の配列からユニークな要素を取得する関数</p>
 
   <h4>Arguments</h4>
@@ -228,7 +210,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-array~39"></span>
+              <span class="anchor" id="variable-array~57"></span>
               integer(kind=int8),
             </td>
 <td>intent(in)</td>
@@ -238,7 +220,7 @@
             <td>::</td>
             <td><strong>array</strong>(:)</td>
             <td>
-<p>入力配列</p>
+                <p>入力配列</p>
             </td>
         </tr>
         <tr>
@@ -253,7 +235,7 @@
             <td>::</td>
             <td><strong>unique_array</strong>(:)</td>
             <td>
-<p>ユニークな要素の配列</p>
+                <p>ユニークな要素の配列</p>
             </td>
         </tr>
     </tbody>
@@ -263,10 +245,9 @@
           </li>
           <li class="list-group-item">
                 <h3>
-    public  subroutine <a href='../proc/unique_int16.html'>Unique_int16</a>(array, unique_array)  
+    private  subroutine unique_int16(array, unique_array)  
 
     </h3>
-    
   <p>整数型の配列からユニークな要素を取得する関数</p>
 
   <h4>Arguments</h4>
@@ -282,7 +263,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-array~40"></span>
+              <span class="anchor" id="variable-array~58"></span>
               integer(kind=int16),
             </td>
 <td>intent(in)</td>
@@ -292,7 +273,7 @@
             <td>::</td>
             <td><strong>array</strong>(:)</td>
             <td>
-<p>入力配列</p>
+                <p>入力配列</p>
             </td>
         </tr>
         <tr>
@@ -307,7 +288,7 @@
             <td>::</td>
             <td><strong>unique_array</strong>(:)</td>
             <td>
-<p>ユニークな要素の配列</p>
+                <p>ユニークな要素の配列</p>
             </td>
         </tr>
     </tbody>
@@ -317,10 +298,9 @@
           </li>
           <li class="list-group-item">
                 <h3>
-    public  subroutine <a href='../proc/unique_int32.html'>Unique_int32</a>(array, unique_array)  
+    private  subroutine unique_int32(array, unique_array)  
 
     </h3>
-    
   <p>整数型の配列からユニークな要素を取得する関数</p>
 
   <h4>Arguments</h4>
@@ -336,7 +316,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-array~41"></span>
+              <span class="anchor" id="variable-array~59"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -346,7 +326,7 @@
             <td>::</td>
             <td><strong>array</strong>(:)</td>
             <td>
-<p>入力配列</p>
+                <p>入力配列</p>
             </td>
         </tr>
         <tr>
@@ -361,7 +341,7 @@
             <td>::</td>
             <td><strong>unique_array</strong>(:)</td>
             <td>
-<p>ユニークな要素の配列</p>
+                <p>ユニークな要素の配列</p>
             </td>
         </tr>
     </tbody>
@@ -371,10 +351,9 @@
           </li>
           <li class="list-group-item">
                 <h3>
-    public  subroutine <a href='../proc/unique_int64.html'>Unique_int64</a>(array, unique_array)  
+    private  subroutine unique_int64(array, unique_array)  
 
     </h3>
-    
   <p>整数型の配列からユニークな要素を取得する関数</p>
 
   <h4>Arguments</h4>
@@ -390,7 +369,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-array~42"></span>
+              <span class="anchor" id="variable-array~60"></span>
               integer(kind=int64),
             </td>
 <td>intent(in)</td>
@@ -400,7 +379,7 @@
             <td>::</td>
             <td><strong>array</strong>(:)</td>
             <td>
-<p>入力配列</p>
+                <p>入力配列</p>
             </td>
         </tr>
         <tr>
@@ -415,7 +394,7 @@
             <td>::</td>
             <td><strong>unique_array</strong>(:)</td>
             <td>
-<p>ユニークな要素の配列</p>
+                <p>ユニークな要素の配列</p>
             </td>
         </tr>
     </tbody>
@@ -432,230 +411,6 @@
 
 
 
-        <section>
-          <h2>Subroutines</h2>
-              <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-unique_int8"></span> <h3>public  subroutine <a href='../proc/unique_int8.html'>Unique_int8</a>(array, unique_array)  
-</h3></div>
-    <div class="card-body">
-          
-  <p>整数型の配列からユニークな要素を取得する関数</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-array~39"></span>
-              integer(kind=int8),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>array</strong>(:)</td>
-            <td>
-<p>入力配列</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-unique_array"></span>
-              integer(kind=int8),
-            </td>
-<td>intent(inout),</td>
-              <td></td>            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>unique_array</strong>(:)</td>
-            <td>
-<p>ユニークな要素の配列</p>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-    </div>
-  </div>
-
-              <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-unique_int16"></span> <h3>public  subroutine <a href='../proc/unique_int16.html'>Unique_int16</a>(array, unique_array)  
-</h3></div>
-    <div class="card-body">
-          
-  <p>整数型の配列からユニークな要素を取得する関数</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-array~40"></span>
-              integer(kind=int16),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>array</strong>(:)</td>
-            <td>
-<p>入力配列</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-unique_array~2"></span>
-              integer(kind=int16),
-            </td>
-<td>intent(inout),</td>
-              <td></td>            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>unique_array</strong>(:)</td>
-            <td>
-<p>ユニークな要素の配列</p>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-    </div>
-  </div>
-
-              <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-unique_int32"></span> <h3>public  subroutine <a href='../proc/unique_int32.html'>Unique_int32</a>(array, unique_array)  
-</h3></div>
-    <div class="card-body">
-          
-  <p>整数型の配列からユニークな要素を取得する関数</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-array~41"></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>array</strong>(:)</td>
-            <td>
-<p>入力配列</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-unique_array~3"></span>
-              integer(kind=int32),
-            </td>
-<td>intent(inout),</td>
-              <td></td>            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>unique_array</strong>(:)</td>
-            <td>
-<p>ユニークな要素の配列</p>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-    </div>
-  </div>
-
-              <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-unique_int64"></span> <h3>public  subroutine <a href='../proc/unique_int64.html'>Unique_int64</a>(array, unique_array)  
-</h3></div>
-    <div class="card-body">
-          
-  <p>整数型の配列からユニークな要素を取得する関数</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-array~42"></span>
-              integer(kind=int64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>array</strong>(:)</td>
-            <td>
-<p>入力配列</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-unique_array~4"></span>
-              integer(kind=int64),
-            </td>
-<td>intent(inout),</td>
-              <td></td>            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>unique_array</strong>(:)</td>
-            <td>
-<p>ユニークな要素の配列</p>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-    </div>
-  </div>
-
-        </section>
-        <br>
 
 
 

@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Type_Output &ndash; FTDSS </title>
+    <title>type_output &ndash; FTDSS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Type_Output
+    <h1>type_output
       <small>Derived Type</small>
       
     </h1>
@@ -91,21 +88,21 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.9% of total for derived types.</p>Including implementation: 16 statements,  1.0% of total for derived types.">19 statements</a>
+                 title="<p> 1.2% of total for derived types.</p>Including implementation: 109 statements,  3.5% of total for derived types.">16 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/Output.F90"> Source File</a>
+              <a href="../src/output_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/output.f90.html'>Output.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/inout_output.html'>Inout_Output</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Type_Output</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/output_interface.f90.html'>output_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/input_output.html'>input_output</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_output</li>
           </ol>
         </nav>
       </div>
@@ -126,41 +123,9 @@
       <div id="sidebar">
       <h3>Contents</h3>
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#vars-0"
-         aria-expanded="false" aria-controls="vars-0">
-         <h4 class="card-header bg-primary text-white">Variables</h4>
-      </a>
-      <div id="vars-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_output.html#variable-observation">Observation</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-overall">Overall</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-dooutput_stdout">doOutput_stdout</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-dir_output~3">dir_Output</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-vtkinfo">VTKInfo</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-output_timeunit">Output_TimeUnit</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-interval_timeunit">Interval_TimeUnit</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-doheat">doHeat</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-dopressure">doPressure</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-dostress">doStress</a>
-            <a class="list-group-item" href="../type/type_output.html#variable-logfilename">logFileName</a>
-        </div>
-      </div>
-    </div>
-
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#cons-0"
-         aria-expanded="false" aria-controls="cons-0">
-         <h4 class="card-header bg-primary text-white">Constructor</h4>
-      </a>
-      <div id="cons-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_output.html#interface-type_output">Type_Output</a>
-        </div>
-      </div>
-    </div>
-
+  
+  
   
   
   
@@ -181,8 +146,11 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_output.html#boundprocedure-output_observation">Output_Observation</a>
-            <a class="list-group-item" href="../type/type_output.html#boundprocedure-output_systemlog">Output_SystemLog</a>
+            <a class="list-group-item" href="../type/type_output.html#boundprocedure-initialize~3">initialize</a>
+            <a class="list-group-item" href="../type/type_output.html#boundprocedure-output_fields">output_fields</a>
+            <a class="list-group-item" href="../type/type_output.html#boundprocedure-output_coloring">output_coloring</a>
+            <a class="list-group-item" href="../type/type_output.html#boundprocedure-output_history">output_history</a>
+            <a class="list-group-item" href="../type/type_output.html#boundprocedure-output_system_log">output_system_log</a>
         </div>
       </div>
     </div>
@@ -197,302 +165,11 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public :: Type_Output</h2>
+        type, public :: type_output</h2>
     
     <br>
 
-    <section>
-    <h2>Components</h2>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-<th></th><th scope="col">Initial</th>        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-observation"></span>
-              type(Output_Observation),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Observation</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-overall"></span>
-              type(Output_Overall),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Overall</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-dooutput_stdout"></span>
-              logical(kind=4),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>doOutput_stdout</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-dir_output~3"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>dir_Output</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-vtkinfo"></span>
-              type(Output_VTK_Series),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>VTKInfo</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-output_timeunit"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>Output_TimeUnit</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-interval_timeunit"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>Interval_TimeUnit</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-doheat"></span>
-              logical(kind=4),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>doHeat</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-dopressure"></span>
-              logical(kind=4),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>doPressure</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-dostress"></span>
-              logical(kind=4),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>doStress</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-logfilename"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>logFileName</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    </section>
-    <br>
     
-      <section>
-        <h2>Constructor</h2>
-            <div class="card">
-    <div class="card-header bg-light codesum">
-      <span class="anchor" id="interface-type_output"></span>
-      <h3>public        interface <a href='../interface/type_output.html'>Type_Output</a> 
-      </h3>
-    </div>
-    <ul class="list-group">
-          <li class="list-group-item">
-                <h3>
-    private  function Type_Output_Construct(Input, Domain, Coordinate) result(Structure)  
-
-    </h3>
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-input~31"></span>
-              type(<a href='type_input.html'>Type_Input</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Input</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-domain~34"></span>
-              class(<a href='domain_t.html'>Domain_t</a>),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Domain</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-coordinate~9"></span>
-              type(<a href='dp3d.html'>DP3d</a>),
-            </td>
-<td>intent(inout),</td>
-              <td></td>            <td>
-              pointer
-            </td>
-            <td>::</td>
-            <td><strong>Coordinate</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>type(<a href='type_output.html'>Type_Output</a>)</small>
-    </h4>
-    
-
-          </li>
-    </ul>
-  </div>
-
-      </section>
-      <br>
 
 
       <section>
@@ -500,18 +177,17 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-output_observation"></span>
+      <span class="anchor" id="boundprocedure-initialize~3"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>Output_Observation</strong> => Output_Process_Observation
+  <strong>initialize</strong> => initialize_type_output
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module subroutine Output_Process_Observation(self, time, Temp, Si, TC, C, Pres, wFlux, K, Thermal, phi, Propeties, Domain)  
+    private  subroutine initialize_type_output(self, input, domain, coordinate)  
 </h3>
 
   
@@ -530,9 +206,9 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_output.html'>Type_Output</a>)
+              class(<a href='type_output.html'>type_output</a>),
             </td>
-<td></td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
@@ -545,14 +221,14 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_input.html'>type_input</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>time</strong></td>
+            <td><strong>input</strong></td>
             <td>
                 
             </td>
@@ -560,119 +236,14 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Temp</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Si</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>TC</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>C</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pres</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>wFlux</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>K</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='abstract_thermal.html'>Abstract_Thermal</a>),
+              class(<a href='type_domain.html'>type_domain</a>),
             </td>
 <td>intent(inout),</td>
               <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>Thermal</strong></td>
+            <td><strong>domain</strong></td>
             <td>
                 
             </td>
@@ -680,44 +251,14 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>phi</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='proereties_model_t.html'>Proereties_Model_t</a>),
+              type(<a href='type_dp_3d.html'>type_dp_3d</a>),
             </td>
 <td>intent(inout),</td>
-              <td>optional</td>            <td>
-              
+              <td></td>            <td>
+              pointer
             </td>
             <td>::</td>
-            <td><strong>Propeties</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='domain_t.html'>Domain_t</a>),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Domain</strong></td>
+            <td><strong>coordinate</strong></td>
             <td>
                 
             </td>
@@ -734,18 +275,17 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-output_systemlog"></span>
+      <span class="anchor" id="boundprocedure-output_fields"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>Output_SystemLog</strong>
+  <strong>output_fields</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module subroutine Output_SystemLog(self, time, Matrix)  
+    private  subroutine output_fields(self, file_counts, domain, porosity, temperature, si, pressure, water_flux)  
 </h3>
 
   
@@ -764,7 +304,233 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_output.html'>Type_Output</a>)
+              class(<a href='type_output.html'>type_output</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>file_counts</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>porosity</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>si</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_dp_3d.html'>type_dp_3d</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_flux</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-output_coloring"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>output_coloring</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine output_coloring(self, domain)  
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output.html'>type_output</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-output_history"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>output_history</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine output_history(self, time, domain, propeties, porosity, temperature, pressure)  
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output.html'>type_output</a>)
             </td>
 <td></td>
               <td></td>            <td>
@@ -779,7 +545,7 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_time.html'>Type_Time</a>),
+              real(kind=real64),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -794,7 +560,151 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_crs.html'>Type_CRS</a>),
+              type(<a href='type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_proereties_manager.html'>type_proereties_manager</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>propeties</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>porosity</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pressure</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-output_system_log"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>output_system_log</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine output_system_log(self, time, Matrix, domain)  
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_output.html'>type_output</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_time.html'>type_time</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_crs.html'>type_crs</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -802,6 +712,21 @@
             </td>
             <td>::</td>
             <td><strong>Matrix</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
             <td>
                 
             </td>

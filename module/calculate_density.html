@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Calculate_Density &ndash; FTDSS</title>
+    <title>calculate_density &ndash; FTDSS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Calculate_Density
+    <h1>calculate_density
       <small>Module</small>
       
     </h1>
@@ -91,20 +88,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.6% of total for modules and submodules.">74 statements</a>
+                 title=" 0.4% of total for modules and submodules.">74 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/Interface.F90"> Source File</a>
+              <a href="../src/density_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/interface.f90~3.html'>Interface.F90</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Calculate_Density</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/density_interface.f90.html'>density_interface.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calculate_density</li>
           </ol>
         </nav>
       </div>
@@ -139,7 +136,7 @@
       </a>
       <div id="inters-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/calculate_density.html#interface-type_den_3phase">Type_DEN_3Phase</a>
+            <a class="list-group-item" href="../module/calculate_density.html#interface-type_den_3phase">type_den_3phase</a>
         </div>
       </div>
     </div>
@@ -152,9 +149,9 @@
       </a>
       <div id="types-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/calculate_density.html#type-denholder">DENHolder</a>
-            <a class="list-group-item" href="../module/calculate_density.html#type-abst_den">Abst_DEN</a>
-            <a class="list-group-item" href="../module/calculate_density.html#type-type_den_3phase">Type_DEN_3Phase</a>
+            <a class="list-group-item" href="../module/calculate_density.html#type-holder_dens">holder_dens</a>
+            <a class="list-group-item" href="../module/calculate_density.html#type-abst_den">abst_den</a>
+            <a class="list-group-item" href="../module/calculate_density.html#type-type_den_3phase">type_den_3phase</a>
         </div>
       </div>
     </div>
@@ -182,9 +179,9 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
+                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
-                  <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
+                  <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
               </ul>
             </li>
         </ul>
@@ -198,8 +195,8 @@
             <li class="list-group-item">
               <ul class="list-inline">
                 <li class="list-inline-item"><h5>Descendants:</h5></li>
-                  <li class="list-inline-item"><a href='calc_den_3.html'>Calc_DEN_3</a></li>
-                  <li class="list-inline-item"><a href='calc_den_base.html'>Calc_DEN_Base</a></li>
+                  <li class="list-inline-item"><a href='calc_den_3phase.html'>calc_den_3phase</a></li>
+                  <li class="list-inline-item"><a href='calc_den_base.html'>calc_den_base</a></li>
               </ul>
             </li>
         </ul>
@@ -216,13 +213,13 @@
               <div class="card">
     <div class="card-header bg-light codesum">
       <span class="anchor" id="interface-type_den_3phase"></span>
-      <h3>public        interface <a href='../interface/type_den_3phase.html'>Type_DEN_3Phase</a> 
+      <h3>public        interface <a href='../interface/type_den_3phase.html'>type_den_3phase</a> 
       </h3>
     </div>
     <ul class="list-group">
           <li class="list-group-item">
                 <h3>
-    private  interface DEN_3_Construct()  
+    private  interface construct_den_3phase()  
 
     </h3>
   
@@ -242,10 +239,10 @@
           <h2>Derived Types</h2>
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-denholder"></span>
+      <span class="anchor" id="type-holder_dens"></span>
       <h3>
         type, public&nbsp;::&nbsp;
-        <a href='../type/denholder.html'>DENHolder</a>
+        <a href='../type/holder_dens.html'>holder_dens</a>
         
       </h3>
     </div>
@@ -265,15 +262,15 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-d"></span>
-              class(<a href='../type/abst_den.html'>Abst_DEN</a>),
+              <span class="anchor" id="variable-p~2"></span>
+              class(<a href='../type/abst_den.html'>abst_den</a>),
             </td>
               <td>public,</td>
             <td>
               allocatable
             </td>
             <td>::</td>
-            <td><strong>d</strong></td>
+            <td><strong>p</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -291,7 +288,7 @@
           <tbody>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/denholder.html#boundprocedure-initialize~4'>initialize</a></strong> => DENHolder_initialize</td>
+  <strong><a href='../type/holder_dens.html#boundprocedure-initialize~8'>initialize</a></strong> => initialize_holder_dens</td>
                   <td></td>
               </tr>
           </tbody>
@@ -304,7 +301,7 @@
       <span class="anchor" id="type-abst_den"></span>
       <h3>
         type, public, abstract&nbsp;::&nbsp;
-        <a href='../type/abst_den.html'>Abst_DEN</a>
+        <a href='../type/abst_den.html'>abst_den</a>
         
       </h3>
     </div>
@@ -324,7 +321,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-region_id~2"></span>
+              <span class="anchor" id="variable-material_id"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -332,7 +329,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>region_id</strong></td>
+            <td><strong>material_id</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -341,7 +338,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material1~2"></span>
+              <span class="anchor" id="variable-material1"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -349,7 +346,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material1</strong></td>
+            <td><strong>material1</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -358,7 +355,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material2~2"></span>
+              <span class="anchor" id="variable-material2"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -366,7 +363,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material2</strong></td>
+            <td><strong>material2</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -375,7 +372,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material3~2"></span>
+              <span class="anchor" id="variable-material3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -383,7 +380,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material3</strong></td>
+            <td><strong>material3</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -392,7 +389,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material4~2"></span>
+              <span class="anchor" id="variable-material4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -400,7 +397,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material4</strong></td>
+            <td><strong>material4</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -417,8 +414,8 @@
         <table class="table table-striped varlist">
           <tbody>
               <tr>
-                <td>  procedure(Abst_Calc_DEN_GaussPoint), public, deferred, pass(self) ::
-  <strong><a href='../type/abst_den.html#boundprocedure-calc_gausspoint~4'>Calc_GaussPoint</a></strong></td>
+                <td>  procedure(abst_calc_den_gauss_point), public, deferred, pass(self) ::
+  <strong><a href='../type/abst_den.html#boundprocedure-calc_gausspoint'>Calc_GaussPoint</a></strong></td>
                   <td></td>
               </tr>
           </tbody>
@@ -430,8 +427,8 @@
     <div class="card-header codesum">
       <span class="anchor" id="type-type_den_3phase"></span>
       <h3>
-        type, public, extends(<a href='../type/abst_den.html'>Abst_DEN</a>)&nbsp;::&nbsp;
-        <a href='../type/type_den_3phase.html'>Type_DEN_3Phase</a>
+        type, public, extends(<a href='../type/abst_den.html'>abst_den</a>)&nbsp;::&nbsp;
+        <a href='../type/type_den_3phase.html'>type_den_3phase</a>
         
       </h3>
     </div>
@@ -451,7 +448,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-region_id~2"></span>
+              <span class="anchor" id="variable-material_id"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -459,7 +456,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>region_id</strong></td>
+            <td><strong>material_id</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -468,7 +465,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material1~2"></span>
+              <span class="anchor" id="variable-material1"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -476,7 +473,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material1</strong></td>
+            <td><strong>material1</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -485,7 +482,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material2~2"></span>
+              <span class="anchor" id="variable-material2"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -493,7 +490,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material2</strong></td>
+            <td><strong>material2</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -502,7 +499,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material3~2"></span>
+              <span class="anchor" id="variable-material3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -510,7 +507,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material3</strong></td>
+            <td><strong>material3</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -519,7 +516,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material4~2"></span>
+              <span class="anchor" id="variable-material4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -527,7 +524,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>Material4</strong></td>
+            <td><strong>material4</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -548,7 +545,7 @@
 
                     
                     interface
-                    <strong>DEN_3_Construct</strong>
+                    <strong>construct_den_3phase</strong>
                     ()
                   </td>
                   <td></td>
@@ -562,7 +559,7 @@
           <tbody>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/type_den_3phase.html#boundprocedure-calc_gausspoint~5'>Calc_GaussPoint</a></strong> => Calc_DEN_GaussPoint_3Phase</td>
+  <strong><a href='../type/type_den_3phase.html#boundprocedure-calc_gausspoint~2'>Calc_GaussPoint</a></strong> => calc_den_gauss_point_3phase</td>
                   <td></td>
               </tr>
           </tbody>

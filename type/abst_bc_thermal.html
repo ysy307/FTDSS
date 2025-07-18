@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Abst_BC_Thermal &ndash; FTDSS </title>
+    <title>abst_bc_thermal &ndash; FTDSS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Abst_BC_Thermal
+    <h1>abst_bc_thermal
       <small>Derived Type</small>
       
     </h1>
@@ -91,21 +88,21 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.0% of total for derived types.</p>Including implementation: 10 statements,  0.6% of total for derived types.">10 statements</a>
+                 title="<p> 0.9% of total for derived types.</p>Including implementation: 12 statements,  0.4% of total for derived types.">12 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/Interface.F90"> Source File</a>
+              <a href="../src/boundary_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/interface.f90~2.html'>Interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/condition_boundary.html'>Condition_Boundary</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Abst_BC_Thermal</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/boundary_interface.f90.html'>boundary_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/conditions_boundary.html'>conditions_boundary</a></li>
+            <li class="breadcrumb-item active" aria-current="page">abst_bc_thermal</li>
           </ol>
         </nav>
       </div>
@@ -126,7 +123,19 @@
       <div id="sidebar">
       <h3>Contents</h3>
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/abst_bc_thermal.html#variable-material_id~5">material_id</a>
+            <a class="list-group-item" href="../type/abst_bc_thermal.html#variable-boundary_name">boundary_name</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -149,9 +158,9 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/abst_bc_thermal.html#boundprocedure-setup~2">setup</a>
-            <a class="list-group-item" href="../type/abst_bc_thermal.html#boundprocedure-apply_dense">apply_Dense</a>
-            <a class="list-group-item" href="../type/abst_bc_thermal.html#boundprocedure-apply_crs~2">apply_CRS</a>
+            <a class="list-group-item" href="../type/abst_bc_thermal.html#boundprocedure-initialize~30">initialize</a>
+            <a class="list-group-item" href="../type/abst_bc_thermal.html#boundprocedure-apply_dense">apply_dense</a>
+            <a class="list-group-item" href="../type/abst_bc_thermal.html#boundprocedure-apply_crs~2">apply_crs</a>
         </div>
       </div>
     </div>
@@ -166,10 +175,61 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public, abstract :: Abst_BC_Thermal</h2>
+        type, public, abstract :: abst_bc_thermal</h2>
     
     <br>
 
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~5"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-boundary_name"></span>
+              character(len=:),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>boundary_name</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
     
 
 
@@ -178,17 +238,17 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-setup~2"></span>
+      <span class="anchor" id="boundprocedure-initialize~30"></span>
       <h3>
-          procedure(<a href='../interface/abst_setup_bc.html'>Abst_Setup_BC</a>), public, deferred, pass(self) ::
-  <strong>setup</strong>
+          procedure(abst_initialize_bc), public, deferred, pass(self) ::
+  <strong>initialize</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-     subroutine Abst_Setup_BC(self, Input_BC, time_conv, iGroup, Domain)  
+     subroutine abst_initialize_bc(self, input, domain, id, i_material, time_conv)  
 <small>Prototype</small></h3>
 
   
@@ -207,7 +267,7 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_bc_thermal.html'>Abst_BC_Thermal</a>),
+              class(<a href='abst_bc_thermal.html'>abst_bc_thermal</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
@@ -222,14 +282,59 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='input_boundary.html'>Input_Boundary</a>),
+              type(<a href='type_input.html'>type_input</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>Input_BC</strong></td>
+            <td><strong>input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i_material</strong></td>
             <td>
                 
             </td>
@@ -249,36 +354,6 @@
                 
             </td>
         </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>iGroup</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='domain_t.html'>Domain_t</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Domain</strong></td>
-            <td>
-                
-            </td>
-        </tr>
     </tbody>
   </table>
 
@@ -293,15 +368,15 @@
     <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-apply_dense"></span>
       <h3>
-          procedure(<a href='../interface/abst_apply_bc_dence.html'>Abst_Apply_BC_Dence</a>), public, deferred, pass(self) ::
-  <strong>apply_Dense</strong>
+          procedure(abst_apply_bc_dence), public, deferred, pass(self) ::
+  <strong>apply_dense</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-     subroutine Abst_Apply_BC_Dence(self, current_time, A, b, Domain, mode)  
+     subroutine abst_apply_bc_dence(self, current_time, A, b, domain, mode)  
 <small>Prototype</small></h3>
 
   
@@ -320,7 +395,7 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_bc_thermal.html'>Abst_BC_Thermal</a>),
+              class(<a href='abst_bc_thermal.html'>abst_bc_thermal</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -380,14 +455,14 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='domain_t.html'>Domain_t</a>),
+              type(<a href='type_domain.html'>type_domain</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>Domain</strong></td>
+            <td><strong>domain</strong></td>
             <td>
                 
             </td>
@@ -421,15 +496,15 @@
     <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-apply_crs~2"></span>
       <h3>
-          procedure(<a href='../interface/abst_apply_bc_sparse_crs.html'>Abst_Apply_BC_Sparse_CRS</a>), public, deferred, pass(self) ::
-  <strong>apply_CRS</strong>
+          procedure(abst_apply_bc_sparse_crs), public, deferred, pass(self) ::
+  <strong>apply_crs</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-     subroutine Abst_Apply_BC_Sparse_CRS(self, current_time, A, b, Domain, mode)  
+     subroutine abst_apply_bc_sparse_crs(self, current_time, A, b, domain, mode)  
 <small>Prototype</small></h3>
 
   
@@ -448,7 +523,7 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='abst_bc_thermal.html'>Abst_BC_Thermal</a>),
+              class(<a href='abst_bc_thermal.html'>abst_bc_thermal</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -478,7 +553,7 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_crs.html'>Type_CRS</a>),
+              type(<a href='type_crs.html'>type_crs</a>),
             </td>
 <td>intent(inout),</td>
               <td>optional</td>            <td>
@@ -508,14 +583,14 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='domain_t.html'>Domain_t</a>),
+              type(<a href='type_domain.html'>type_domain</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>Domain</strong></td>
+            <td><strong>domain</strong></td>
             <td>
                 
             </td>

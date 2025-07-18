@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -91,19 +88,19 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.5% of total for modules and submodules.">56 statements</a>
+                 title=" 0.4% of total for modules and submodules.">71 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/FTDSS.F90"> Source File</a>
+              <a href="../src/ftdss.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/ftdss.f90.html'>FTDSS.F90</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/ftdss.f90.html'>ftdss.F90</a></li>
             <li class="breadcrumb-item active" aria-current="page">Main_FTDSS</li>
           </ol>
         </nav>
@@ -141,7 +138,7 @@
       </a>
       <div id="types-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/main_ftdss.html#type-type_ftdss">Type_FTDSS</a>
+            <a class="list-group-item" href="../module/main_ftdss.html#type-type_ftdss">type_ftdss</a>
         </div>
       </div>
     </div>
@@ -154,7 +151,7 @@
       </a>
       <div id="subs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/main_ftdss.html#proc-fdtss_initialize">FDTSS_initialize</a>
+            <a class="list-group-item" href="../module/main_ftdss.html#proc-initialize_type_ftdss">initialize_type_ftdss</a>
         </div>
       </div>
     </div>
@@ -180,16 +177,17 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='properties_model_base.html'>Properties_Model_Base</a></li>
+                  <li class="list-inline-item"><a href='inout_input.html'>inout_input</a></li>
+                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
+                  <li class="list-inline-item"><a href='module_control.html'>module_control</a></li>
+                  <li class="list-inline-item"><a href='module_initial.html'>module_initial</a></li>
+                  <li class="list-inline-item"><a href='module_domain.html'>module_domain</a></li>
+                  <li class="list-inline-item">stdlib_logger</li>
+                  <li class="list-inline-item"><a href='module_output.html'>module_output</a></li>
+                  <li class="list-inline-item"><a href='module_properties.html'>module_properties</a></li>
+                  <li class="list-inline-item"><a href='main_thermal.html'>main_thermal</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='conditions_boundary_manager.html'>Conditions_Boundary_Manager</a></li>
-                  <li class="list-inline-item"><a href='inout_output.html'>Inout_Output</a></li>
-                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
-                  <li class="list-inline-item"><a href='domain_module.html'>Domain_Module</a></li>
-                  <li class="list-inline-item"><a href='main_thermal.html'>Main_Thermal</a></li>
-                  <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
-                  <li class="list-inline-item"><a href='conditions_initial_manager.html'>Conditions_Initial_Manager</a></li>
-                  <li class="list-inline-item"><a href='time_time.html'>Time_Time</a></li>
+                  <li class="list-inline-item"><a href='module_boundary.html'>module_boundary</a></li>
               </ul>
             </li>
         </ul>
@@ -211,7 +209,7 @@
       <span class="anchor" id="type-type_ftdss"></span>
       <h3>
         type, public&nbsp;::&nbsp;
-        <a href='../type/type_ftdss.html'>Type_FTDSS</a>
+        <a href='../type/type_ftdss.html'>type_ftdss</a>
         
       </h3>
     </div>
@@ -231,32 +229,15 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-input~44"></span>
-              type(<a href='../type/type_input.html'>Type_Input</a>),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Input</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-coordinate~13"></span>
-              type(<a href='../type/dp3d.html'>DP3d</a>),
+              <span class="anchor" id="variable-coordinate~12"></span>
+              type(<a href='../type/type_dp_3d.html'>type_dp_3d</a>),
             </td>
               <td>public,</td>
             <td>
               pointer
             </td>
             <td>::</td>
-            <td><strong>Coordinate</strong></td>
+            <td><strong>coordinate</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -265,15 +246,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-domain~41"></span>
-              type(<a href='../type/domain_t.html'>Domain_t</a>),
+              <span class="anchor" id="variable-domain~45"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>Domain</strong></td>
+            <td><strong>domain</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -282,8 +263,8 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-thermal~3"></span>
-              class(<a href='../type/abstract_thermal.html'>Abstract_Thermal</a>),
+              <span class="anchor" id="variable-thermal"></span>
+              class(<a href='../type/abst_thermal.html'>abst_thermal</a>),
             </td>
               <td>public,</td>
             <td>
@@ -299,15 +280,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-property~4"></span>
-              type(<a href='../type/proereties_model_t.html'>Proereties_Model_t</a>),
+              <span class="anchor" id="variable-property~21"></span>
+              type(<a href='../type/type_proereties_manager.html'>type_proereties_manager</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>Property</strong></td>
+            <td><strong>property</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -316,15 +297,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-bc"></span>
-              type(<a href='../type/bcmanager.html'>BCManager</a>),
+              <span class="anchor" id="variable-bc~2"></span>
+              type(<a href='../type/type_bc.html'>type_bc</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>BC</strong></td>
+            <td><strong>bc</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -334,14 +315,14 @@
         <tr>
             <td>
               <span class="anchor" id="variable-ic"></span>
-              type(<a href='../type/icmanager.html'>ICManager</a>),
+              type(<a href='../type/type_ic.html'>type_ic</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>IC</strong></td>
+            <td><strong>ic</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -350,8 +331,8 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-phi~3"></span>
-              type(<a href='../type/variables.html'>Variables</a>),
+              <span class="anchor" id="variable-phi"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
             </td>
               <td>public</td>
             <td>
@@ -368,7 +349,7 @@
         <tr>
             <td>
               <span class="anchor" id="variable-time~11"></span>
-              type(<a href='../type/type_time.html'>Type_Time</a>),
+              type(<a href='../type/type_time.html'>type_time</a>),
             </td>
               <td>public</td>
             <td>
@@ -385,7 +366,7 @@
         <tr>
             <td>
               <span class="anchor" id="variable-iteration"></span>
-              type(<a href='../type/type_iteration.html'>Type_Iteration</a>),
+              type(<a href='../type/type_iteration.html'>type_iteration</a>),
             </td>
               <td>public</td>
             <td>
@@ -401,15 +382,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-output~2"></span>
-              type(<a href='../type/type_output.html'>Type_Output</a>),
+              <span class="anchor" id="variable-output"></span>
+              type(<a href='../type/type_output.html'>type_output</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>Output</strong></td>
+            <td><strong>output</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -427,7 +408,7 @@
           <tbody>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_ftdss.html#boundprocedure-initialize~11'>initialize</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/fdtss_initialize.html'>FDTSS_initialize</a></td>
+  <strong><a href='../type/type_ftdss.html#boundprocedure-initialize~28'>initialize</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_ftdss.html'>initialize_type_ftdss</a></td>
                   <td></td>
               </tr>
           </tbody>
@@ -442,7 +423,7 @@
         <section>
           <h2>Subroutines</h2>
               <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-fdtss_initialize"></span> <h3>public  subroutine <a href='../proc/fdtss_initialize.html'>FDTSS_initialize</a>(self)  
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_type_ftdss"></span> <h3>public  subroutine <a href='../proc/initialize_type_ftdss.html'>initialize_type_ftdss</a>(self)  
 </h3></div>
     <div class="card-body">
           
@@ -461,8 +442,8 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~362"></span>
-              class(<a href='../type/type_ftdss.html'>Type_FTDSS</a>),
+              <span class="anchor" id="variable-self~550"></span>
+              class(<a href='../type/type_ftdss.html'>type_ftdss</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>

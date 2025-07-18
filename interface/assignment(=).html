@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -91,20 +88,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for procedures.</p>Including implementation: 10 statements,  0.7% of total for procedures.">3 statements</a>
+                 title="<p> 0.2% of total for procedures.</p>Including implementation: 36 statements,  1.4% of total for procedures.">6 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/BaseTypes.F90"> Source File</a>
+              <a href="../src/array.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/basetypes.f90.html'>BaseTypes.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/core_basetypes.html'>Core_BaseTypes</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/array.f90.html'>array.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_array.html'>core_types_array</a></li>
             <li class="breadcrumb-item active" aria-current="page">assignment(=)</li>
           </ol>
         </nav>
@@ -150,7 +147,10 @@
       </a>
       <div id="modprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../interface/assignment(=).html#moduleprocedure-dp3d_assignment">DP3d_Assignment</a>
+            <a class="list-group-item" href="../interface/assignment(=).html#moduleprocedure-type_dp_2d_assignment">type_dp_2d_assignment</a>
+            <a class="list-group-item" href="../interface/assignment(=).html#moduleprocedure-type_dp_3d_assignment">type_dp_3d_assignment</a>
+            <a class="list-group-item" href="../interface/assignment(=).html#moduleprocedure-type_int_2d_assignment">type_int_2d_assignment</a>
+            <a class="list-group-item" href="../interface/assignment(=).html#moduleprocedure-type_int_3d_assignment">type_int_3d_assignment</a>
         </div>
       </div>
     </div>
@@ -170,7 +170,7 @@
 
         <h2>Module Procedures</h2>
             <div class="card">
-    <div class="card-header codesum"><span class="anchor" id="proc-dp3d_assignment"></span> <h3>private  subroutine DP3d_Assignment(X, Y)  
+    <div class="card-header codesum"><span class="anchor" id="proc-type_dp_2d_assignment"></span> <h3>private  subroutine type_dp_2d_assignment(a, b)  
 </h3></div>
     <div class="card-body">
         
@@ -188,30 +188,192 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-x"></span>
-              class(<a href='../type/dp3d.html'>DP3d</a>),
+              <span class="anchor" id="variable-a"></span>
+              class(<a href='../type/type_dp_2d.html'>type_dp_2d</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>X</strong></td>
+            <td><strong>a</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-y"></span>
-              class(<a href='../type/dp3d.html'>DP3d</a>),
+              <span class="anchor" id="variable-b~4"></span>
+              class(<a href='../type/type_dp_2d.html'>type_dp_2d</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>Y</strong></td>
+            <td><strong>b</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-type_dp_3d_assignment"></span> <h3>private  subroutine type_dp_3d_assignment(a, b)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~2"></span>
+              class(<a href='../type/type_dp_3d.html'>type_dp_3d</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>a</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~5"></span>
+              class(<a href='../type/type_dp_3d.html'>type_dp_3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-type_int_2d_assignment"></span> <h3>private  subroutine type_int_2d_assignment(a, b)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~3"></span>
+              class(<a href='../type/type_int_2d.html'>type_int_2d</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>a</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~6"></span>
+              class(<a href='../type/type_int_2d.html'>type_int_2d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-type_int_3d_assignment"></span> <h3>private  subroutine type_int_3d_assignment(a, b)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~4"></span>
+              class(<a href='../type/type_int_3d.html'>type_int_3d</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>a</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~7"></span>
+              class(<a href='../type/type_int_3d.html'>type_int_3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong></td>
             <td>
                 
             </td>

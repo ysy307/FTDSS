@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Type_CRS &ndash; FTDSS </title>
+    <title>type_crs &ndash; FTDSS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Type_CRS
+    <h1>type_crs
       <small>Derived Type</small>
       
     </h1>
@@ -91,21 +88,21 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.4% of total for derived types.</p>Including implementation: 42 statements,  2.7% of total for derived types.">14 statements</a>
+                 title="<p> 0.9% of total for derived types.</p>Including implementation: 105 statements,  3.3% of total for derived types.">13 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/CRS.F90"> Source File</a>
+              <a href="../src/matrix_crs.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/crs.f90.html'>CRS.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/matrix_crs.html'>Matrix_CRS</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Type_CRS</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_crs.f90.html'>matrix_crs.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/matrix_crs.html'>matrix_crs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_crs</li>
           </ol>
         </nav>
       </div>
@@ -133,29 +130,18 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_crs.html#variable-nnz">nnz</a>
-            <a class="list-group-item" href="../type/type_crs.html#variable-nrow">nrow</a>
-            <a class="list-group-item" href="../type/type_crs.html#variable-nptr">nptr</a>
-            <a class="list-group-item" href="../type/type_crs.html#variable-ptr">Ptr</a>
-            <a class="list-group-item" href="../type/type_crs.html#variable-ind">Ind</a>
-            <a class="list-group-item" href="../type/type_crs.html#variable-val">Val</a>
+            <a class="list-group-item" href="../type/type_crs.html#variable-nnz~2">nnz</a>
+            <a class="list-group-item" href="../type/type_crs.html#variable-num_row~10">num_row</a>
+            <a class="list-group-item" href="../type/type_crs.html#variable-num_ptr">num_ptr</a>
+            <a class="list-group-item" href="../type/type_crs.html#variable-ptr~5">ptr</a>
+            <a class="list-group-item" href="../type/type_crs.html#variable-ind~2">ind</a>
+            <a class="list-group-item" href="../type/type_crs.html#variable-val~13">val</a>
         </div>
       </div>
     </div>
 
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#cons-0"
-         aria-expanded="false" aria-controls="cons-0">
-         <h4 class="card-header bg-primary text-white">Constructor</h4>
-      </a>
-      <div id="cons-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_crs.html#interface-type_crs">Type_CRS</a>
-        </div>
-      </div>
-    </div>
-
+  
   
   
   
@@ -176,8 +162,10 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_crs.html#boundprocedure-find">Find</a>
-            <a class="list-group-item" href="../type/type_crs.html#boundprocedure-copy">Copy</a>
+            <a class="list-group-item" href="../type/type_crs.html#boundprocedure-initialize~29">initialize</a>
+            <a class="list-group-item" href="../type/type_crs.html#boundprocedure-find~4">find</a>
+            <a class="list-group-item" href="../type/type_crs.html#boundprocedure-copy~4">copy</a>
+            <a class="list-group-item" href="../type/type_crs.html#boundprocedure-destory~5">destory</a>
         </div>
       </div>
     </div>
@@ -192,7 +180,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public :: Type_CRS</h2>
+        type, public, extends(<a href='abst_matrix.html'>abst_matrix</a>) :: type_crs</h2>
     
     <br>
 
@@ -210,7 +198,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-nnz"></span>
+              <span class="anchor" id="variable-nnz~2"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -227,7 +215,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nrow"></span>
+              <span class="anchor" id="variable-num_row~10"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -235,7 +223,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>nrow</strong></td>
+            <td><strong>num_row</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -244,7 +232,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-nptr"></span>
+              <span class="anchor" id="variable-num_ptr"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -252,7 +240,7 @@
               
             </td>
             <td>::</td>
-            <td><strong>nptr</strong></td>
+            <td><strong>num_ptr</strong></td>
                 <td></td>
                 <td></td>
             <td>
@@ -261,7 +249,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ptr"></span>
+              <span class="anchor" id="variable-ptr~5"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -269,7 +257,7 @@
               allocatable
             </td>
             <td>::</td>
-            <td><strong>Ptr</strong>(:)</td>
+            <td><strong>ptr</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -278,7 +266,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ind"></span>
+              <span class="anchor" id="variable-ind~2"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -286,7 +274,7 @@
               allocatable
             </td>
             <td>::</td>
-            <td><strong>Ind</strong>(:)</td>
+            <td><strong>ind</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -295,7 +283,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-val"></span>
+              <span class="anchor" id="variable-val~13"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -303,7 +291,7 @@
               allocatable
             </td>
             <td>::</td>
-            <td><strong>Val</strong>(:)</td>
+            <td><strong>val</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -316,63 +304,6 @@
     </section>
     <br>
     
-      <section>
-        <h2>Constructor</h2>
-            <div class="card">
-    <div class="card-header bg-light codesum">
-      <span class="anchor" id="interface-type_crs"></span>
-      <h3>public        interface <a href='../interface/type_crs.html'>Type_CRS</a> 
-      </h3>
-    </div>
-    <ul class="list-group">
-          <li class="list-group-item">
-                <h3>
-    private  function Initialize_CRS(Domain) result(A)  
-
-    </h3>
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-domain~45"></span>
-              class(<a href='domain_t.html'>Domain_t</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Domain</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>type(<a href='type_crs.html'>Type_CRS</a>)</small>
-    </h4>
-    
-
-          </li>
-    </ul>
-  </div>
-
-      </section>
-      <br>
 
 
       <section>
@@ -380,17 +311,17 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-find"></span>
+      <span class="anchor" id="boundprocedure-initialize~29"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>Find</strong> => Find_CRS_Location
+  <strong>initialize</strong> => initialize_type_crs
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine Find_CRS_Location(self, column, index_in, loc)  
+    private  subroutine initialize_type_crs(self, domain)  
 </h3>
 
   
@@ -409,9 +340,9 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_crs.html'>Type_CRS</a>),
+              class(<a href='type_crs.html'>type_crs</a>),
             </td>
-<td>intent(in)</td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
@@ -424,44 +355,14 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              integer(kind=int32),
+              type(<a href='type_domain.html'>type_domain</a>),
             </td>
-<td>intent(in)</td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>column</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>index_in</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(out)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>loc</strong></td>
+            <td><strong>domain</strong></td>
             <td>
                 
             </td>
@@ -478,17 +379,17 @@
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-copy"></span>
+      <span class="anchor" id="boundprocedure-find~4"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>Copy</strong> => Copy_CRS
+  <strong>find</strong> => find_crs
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  function Copy_CRS(self) result(B)  
+    private  subroutine find_crs(self, row, col, index)  
 </h3>
 
   
@@ -507,9 +408,107 @@
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_crs.html'>Type_CRS</a>)
+              class(<a href='type_crs.html'>type_crs</a>),
             </td>
-<td></td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>index</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-copy~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>copy</strong> => copy_crs
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function copy_crs(self) result(B)  
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
               <td></td>            <td>
               
             </td>
@@ -524,9 +523,62 @@
 
     <h4>
     Return Value
-    <small>type(<a href='type_crs.html'>Type_CRS</a>)</small>
+    <small>class(<a href='abst_matrix.html'>abst_matrix</a>), allocatable</small>
     </h4>
     
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-destory~5"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>destory</strong> => destory_crs
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine destory_crs(self)  
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
 
           </li>
       </ul>

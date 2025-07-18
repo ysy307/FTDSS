@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Conditions_Boundary_Manager &ndash; FTDSS</title>
+    <title>conditions_boundary_manager &ndash; FTDSS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Conditions_Boundary_Manager
+    <h1>conditions_boundary_manager
       <small>Module</small>
       
     </h1>
@@ -91,20 +88,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.8% of total for modules and submodules.">97 statements</a>
+                 title=" 0.7% of total for modules and submodules.">118 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/BC_Manager.F90"> Source File</a>
+              <a href="../src/boundary_manager.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/bc_manager.f90.html'>BC_Manager.F90</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Conditions_Boundary_Manager</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/boundary_manager.f90.html'>boundary_manager.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">conditions_boundary_manager</li>
           </ol>
         </nav>
       </div>
@@ -141,7 +138,8 @@
       </a>
       <div id="types-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/conditions_boundary_manager.html#type-bcmanager">BCManager</a>
+            <a class="list-group-item" href="../module/conditions_boundary_manager.html#type-holder_bcs">holder_bcs</a>
+            <a class="list-group-item" href="../module/conditions_boundary_manager.html#type-type_bc">type_bc</a>
         </div>
       </div>
     </div>
@@ -169,9 +167,12 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
+                  <li class="list-inline-item"><a href='module_matrix.html'>module_matrix</a></li>
+                  <li class="list-inline-item"><a href='conditions_boundary.html'>conditions_boundary</a></li>
+                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
+                  <li class="list-inline-item"><a href='module_domain.html'>module_domain</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='condition_boundary.html'>Condition_Boundary</a></li>
-                  <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
+                  <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
               </ul>
             </li>
         </ul>
@@ -190,10 +191,10 @@
           <h2>Derived Types</h2>
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-bcmanager"></span>
+      <span class="anchor" id="type-holder_bcs"></span>
       <h3>
         type, public&nbsp;::&nbsp;
-        <a href='../type/bcmanager.html'>BCManager</a>
+        <a href='../type/holder_bcs.html'>holder_bcs</a>
         
       </h3>
     </div>
@@ -213,15 +214,81 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-groups"></span>
-              type(BoundaryGroup),
+              <span class="anchor" id="variable-t~2"></span>
+              class(<a href='../type/abst_bc_thermal.html'>abst_bc_thermal</a>),
             </td>
               <td>public,</td>
             <td>
               allocatable
             </td>
             <td>::</td>
-            <td><strong>groups</strong>(:)</td>
+            <td><strong>t</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_bc"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/type_bc.html'>type_bc</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_boundaries"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_boundaries</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc"></span>
+              type(<a href='../type/holder_bcs.html'>holder_bcs</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>bc</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
@@ -239,12 +306,12 @@
           <tbody>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/bcmanager.html#boundprocedure-setup'>setup</a></strong> => setup_BC_Manager</td>
+  <strong><a href='../type/type_bc.html#boundprocedure-initialize~6'>initialize</a></strong> => initialize_type_bc</td>
                   <td></td>
               </tr>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/bcmanager.html#boundprocedure-apply_crs'>apply_CRS</a></strong> => apply_BC_Manager_CRS</td>
+  <strong><a href='../type/type_bc.html#boundprocedure-apply_crs'>apply_crs</a></strong> => apply_type_bc_crs</td>
                   <td></td>
               </tr>
           </tbody>

@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Properties_Material_Manager &ndash; FTDSS</title>
+    <title>properties_material_manager &ndash; FTDSS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Properties_Material_Manager
+    <h1>properties_material_manager
       <small>Module</small>
       
     </h1>
@@ -91,20 +88,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 1.1% of total for modules and submodules.">133 statements</a>
+                 title=" 1.2% of total for modules and submodules.">218 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/Material_Manager.F90"> Source File</a>
+              <a href="../src/materials_manager.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/material_manager.f90.html'>Material_Manager.F90</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Properties_Material_Manager</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/materials_manager.f90.html'>materials_manager.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">properties_material_manager</li>
           </ol>
         </nav>
       </div>
@@ -141,7 +138,7 @@
       </a>
       <div id="types-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/properties_material_manager.html#type-materialmanager_t">MaterialManager_t</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#type-type_material_manager">type_material_manager</a>
         </div>
       </div>
     </div>
@@ -169,14 +166,9 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='calculate_specificheat.html'>Calculate_SpecificHeat</a></li>
+                  <li class="list-inline-item"><a href='module_calculate.html'>module_calculate</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='calculate_thermalconductivity.html'>Calculate_ThermalConductivity</a></li>
-                  <li class="list-inline-item"><a href='calculate_density.html'>Calculate_Density</a></li>
-                  <li class="list-inline-item"><a href='calculate_wrf.html'>Calculate_WRF</a></li>
-                  <li class="list-inline-item"><a href='calculate_gcc.html'>Calculate_GCC</a></li>
-                  <li class="list-inline-item"><a href='calculate_volumetricheatcapacity.html'>Calculate_VolumetricHeatCapacity</a></li>
-                  <li class="list-inline-item"><a href='inout_input.html'>Inout_Input</a></li>
+                  <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
               </ul>
             </li>
         </ul>
@@ -195,10 +187,10 @@
           <h2>Derived Types</h2>
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-materialmanager_t"></span>
+      <span class="anchor" id="type-type_material_manager"></span>
       <h3>
         type, public&nbsp;::&nbsp;
-        <a href='../type/materialmanager_t.html'>MaterialManager_t</a>
+        <a href='../type/type_material_manager.html'>type_material_manager</a>
         
       </h3>
     </div>
@@ -213,37 +205,37 @@
           <tbody>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/materialmanager_t.html#boundprocedure-initialize~6'>initialize</a></strong></td>
+  <strong><a href='../type/type_material_manager.html#boundprocedure-initialize~7'>initialize</a></strong></td>
                   <td></td>
               </tr>
               <tr>
-                <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/materialmanager_t.html#boundprocedure-get_thc'>get_THC</a></strong></td>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_thc'>get_thc</a></strong> => get_thc_holder, get_thc_ptr</td>
                   <td></td>
               </tr>
               <tr>
-                <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/materialmanager_t.html#boundprocedure-get_den'>get_DEN</a></strong></td>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_den'>get_den</a></strong> => get_den_holder, get_den_ptr</td>
                   <td></td>
               </tr>
               <tr>
-                <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/materialmanager_t.html#boundprocedure-get_sph'>get_SPH</a></strong></td>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_sph'>get_sph</a></strong> => get_sph_holder, get_sph_ptr</td>
                   <td></td>
               </tr>
               <tr>
-                <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/materialmanager_t.html#boundprocedure-get_vhc'>get_VHC</a></strong></td>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_vhc'>get_vhc</a></strong> => get_vhc_holder, get_vhc_ptr</td>
                   <td></td>
               </tr>
               <tr>
-                <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/materialmanager_t.html#boundprocedure-get_gcc'>get_GCC</a></strong></td>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_gcc'>get_gcc</a></strong> => get_gcc_holder, get_gcc_ptr</td>
                   <td></td>
               </tr>
               <tr>
-                <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/materialmanager_t.html#boundprocedure-get_wrf'>get_WRF</a></strong></td>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_wrf'>get_wrf</a></strong> => get_wrf_holder, get_wrf_ptr</td>
                   <td></td>
               </tr>
           </tbody>

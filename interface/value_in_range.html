@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -91,20 +88,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.3% of total for procedures.</p>Including implementation: 22 statements,  1.5% of total for procedures.">4 statements</a>
+                 title="<p> 0.4% of total for procedures.</p>Including implementation: 51 statements,  2.0% of total for procedures.">9 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/error.F90"> Source File</a>
+              <a href="../src/check_range.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/error.f90.html'>error.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/core_error.html'>Core_Error</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/check_range.f90.html'>check_range.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_check_range.html'>core_check_range</a></li>
             <li class="breadcrumb-item active" aria-current="page">value_in_range</li>
           </ol>
         </nav>
@@ -150,8 +147,13 @@
       </a>
       <div id="modprocs-0" class="collapse">
         <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../interface/value_in_range.html#moduleprocedure-value_in_range_int8">value_in_range_int8</a>
+            <a class="list-group-item" href="../interface/value_in_range.html#moduleprocedure-value_in_range_int16">value_in_range_int16</a>
             <a class="list-group-item" href="../interface/value_in_range.html#moduleprocedure-value_in_range_int32">value_in_range_int32</a>
+            <a class="list-group-item" href="../interface/value_in_range.html#moduleprocedure-value_in_range_int64">value_in_range_int64</a>
+            <a class="list-group-item" href="../interface/value_in_range.html#moduleprocedure-value_in_range_real32">value_in_range_real32</a>
             <a class="list-group-item" href="../interface/value_in_range.html#moduleprocedure-value_in_range_real64">value_in_range_real64</a>
+            <a class="list-group-item" href="../interface/value_in_range.html#moduleprocedure-value_in_range_real128">value_in_range_real128</a>
         </div>
       </div>
     </div>
@@ -171,6 +173,154 @@
 
         <h2>Module Procedures</h2>
             <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-value_in_range_int8"></span> <h3>private  function value_in_range_int8(value, min, max) result(in_range)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~24"></span>
+              integer(kind=int8),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-min"></span>
+              integer(kind=int8),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>min</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max"></span>
+              integer(kind=int8),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-value_in_range_int16"></span> <h3>private  function value_in_range_int16(value, min, max) result(in_range)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~25"></span>
+              integer(kind=int16),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-min~2"></span>
+              integer(kind=int16),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>min</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max~2"></span>
+              integer(kind=int16),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+            <div class="card">
     <div class="card-header codesum"><span class="anchor" id="proc-value_in_range_int32"></span> <h3>private  function value_in_range_int32(value, min, max) result(in_range)  
 </h3></div>
     <div class="card-body">
@@ -189,7 +339,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-value~4"></span>
+              <span class="anchor" id="variable-value~26"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -204,7 +354,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-min"></span>
+              <span class="anchor" id="variable-min~3"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -219,8 +369,156 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max"></span>
+              <span class="anchor" id="variable-max~3"></span>
               integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-value_in_range_int64"></span> <h3>private  function value_in_range_int64(value, min, max) result(in_range)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~27"></span>
+              integer(kind=int64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-min~4"></span>
+              integer(kind=int64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>min</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max~4"></span>
+              integer(kind=int64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-value_in_range_real32"></span> <h3>private  function value_in_range_real32(value, min, max) result(in_range)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~28"></span>
+              real(kind=real32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-min~5"></span>
+              real(kind=real32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>min</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max~5"></span>
+              real(kind=real32),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -263,7 +561,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-value~5"></span>
+              <span class="anchor" id="variable-value~29"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -278,7 +576,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-min~2"></span>
+              <span class="anchor" id="variable-min~6"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -293,8 +591,82 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max~2"></span>
+              <span class="anchor" id="variable-max~6"></span>
               real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+            <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-value_in_range_real128"></span> <h3>private  function value_in_range_real128(value, min, max) result(in_range)  
+</h3></div>
+    <div class="card-body">
+        
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~30"></span>
+              real(kind=real128),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-min~7"></span>
+              real(kind=real128),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>min</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max~7"></span>
+              real(kind=real128),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>

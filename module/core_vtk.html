@@ -10,7 +10,7 @@
     <meta name="author" content="" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Core_VTK &ndash; FTDSS</title>
+    <title>core_vtk &ndash; FTDSS</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -62,9 +62,6 @@
                   <a class="nav-link" href="../lists/procedures.html">Procedures</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="../lists/types.html">Derived Types</a>
                 </li>
             </ul>
@@ -80,7 +77,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Core_VTK
+    <h1>core_vtk
       <small>Module</small>
       
     </h1>
@@ -91,20 +88,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 2.7% of total for modules and submodules.">335 statements</a>
+                 title=" 3.6% of total for modules and submodules.">636 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/VTK.F90"> Source File</a>
+              <a href="../src/vtk.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/vtk.f90.html'>VTK.F90</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Core_VTK</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/vtk.f90.html'>vtk.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">core_vtk</li>
           </ol>
         </nav>
       </div>
@@ -132,18 +129,7 @@
   
   
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#inters-0"
-         aria-expanded="false" aria-controls="inters-0">
-         <h4 class="card-header bg-primary text-white">Interfaces</h4>
-      </a>
-      <div id="inters-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/core_vtk.html#interface-type_vtk">Type_VTK</a>
-        </div>
-      </div>
-    </div>
-
+  
   
       <div class="card mb-4">
       <a data-bs-toggle="collapse" href="#types-0"
@@ -152,7 +138,8 @@
       </a>
       <div id="types-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../module/core_vtk.html#type-type_vtk">Type_VTK</a>
+            <a class="list-group-item" href="../module/core_vtk.html#type-type_vtk_cell">type_vtk_cell</a>
+            <a class="list-group-item" href="../module/core_vtk.html#type-type_vtk">type_vtk</a>
         </div>
       </div>
     </div>
@@ -180,12 +167,16 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='core_allocate.html'>Core_Allocate</a></li>
+                  <li class="list-inline-item"><a href='core_unique.html'>core_unique</a></li>
+                  <li class="list-inline-item"><a href='core_types_array.html'>core_types_array</a></li>
+                  <li class="list-inline-item"><a href='core_deallocate.html'>core_deallocate</a></li>
+                  <li class="list-inline-item"><a href='core_vtk_vtk_wrapper.html'>core_vtk_vtk_wrapper</a></li>
+                  <li class="list-inline-item"><a href='core_allocate.html'>core_allocate</a></li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_c_binding'>iso_c_binding</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='core_unique.html'>Core_Unique</a></li>
-                  <li class="list-inline-item"><a href='core_basetypes.html'>Core_BaseTypes</a></li>
-                  <li class="list-inline-item"><a href='core_vtk_constants.html'>Core_VTK_Constants</a></li>
                   <li class="list-inline-item">stdlib_sorting</li>
+                  <li class="list-inline-item"><a href='core_vtk_vtk_constants.html'>core_vtk_vtk_constants</a></li>
+                  <li class="list-inline-item"><a href='core_vtk_vtu_wrapper.html'>core_vtk_vtu_wrapper</a></li>
               </ul>
             </li>
         </ul>
@@ -198,73 +189,16 @@
 
 
 
-        <section>
-          <h2>Interfaces</h2>
-              <div class="card">
-    <div class="card-header bg-light codesum">
-      <span class="anchor" id="interface-type_vtk"></span>
-      <h3>public        interface <a href='../interface/type_vtk.html'>Type_VTK</a> 
-      </h3>
-    </div>
-    <ul class="list-group">
-          <li class="list-group-item">
-                <h3>
-    private  function Core_VTK_Read(filename) result(vtk)  
-
-    </h3>
-  <p>Read VTK file</p>
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-filename"></span>
-              character(len=*),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>filename</strong></td>
-            <td>
-                <p>***.VTK file name</p>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>type(<a href='../type/type_vtk.html'>Type_VTK</a>)</small>
-    </h4>
-    <p>VTK data</p>
-
-          </li>
-    </ul>
-  </div>
-
-        </section>
-        <br>
 
 
         <section>
           <h2>Derived Types</h2>
               <div class="card">
     <div class="card-header codesum">
-      <span class="anchor" id="type-type_vtk"></span>
+      <span class="anchor" id="type-type_vtk_cell"></span>
       <h3>
         type, public&nbsp;::&nbsp;
-        <a href='../type/type_vtk.html'>Type_VTK</a>
+        <a href='../type/type_vtk_cell.html'>type_vtk_cell</a>
         
       </h3>
     </div>
@@ -284,7 +218,178 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-format"></span>
+              <span class="anchor" id="variable-cell_type"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_type</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_type_name"></span>
+              character(len=:),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>cell_type_name</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes_in_cell"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes_in_cell</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_entity_id"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_entity_id</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_dimension"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_dimension</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cell_order"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cell_order</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-connectivity~7"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>connectivity</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_vtk_cell.html#boundprocedure-set'>set</a></strong> => type_vtk_cell_set</td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_vtk_cell.html#boundprocedure-get_dimension~9'>get_dimension</a></strong> => type_vtk_cell_get_dimension</td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_vtk_cell.html#boundprocedure-get_order~9'>get_order</a></strong> => type_vtk_cell_get_order</td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_vtk"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/type_vtk.html'>type_vtk</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-format~2"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -296,12 +401,12 @@
                 <td></td>
                 <td></td>
             <td>
-<p>ASCII or BINARY</p>
+
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dataset"></span>
+              <span class="anchor" id="variable-dataset~2"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -313,29 +418,12 @@
                 <td></td>
                 <td></td>
             <td>
-<p>STRUCTURED_POINTS, STRUCTURED_GRID, RECTILINEAR_GRID, POLYDATA, UNSTRUCTURED_GRID</p>
+
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-points_datatype"></span>
-              character(len=:),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>POINTS_DATATYPE</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-<p>dataType is one of the types bit, unsigned_char, char, unsigned_short, short, unsigned_int, int,  unsigned_long, long, float, or double.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-numpoints"></span>
+              <span class="anchor" id="variable-num_points~3"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -343,33 +431,33 @@
               
             </td>
             <td>::</td>
-            <td><strong>numPoints</strong></td>
+            <td><strong>num_points</strong></td>
                 <td></td>
                 <td></td>
             <td>
-<p>Number of points</p>
+
             </td>
         </tr>
         <tr>
             <td>
               <span class="anchor" id="variable-points"></span>
-              type(<a href='../type/dp3d.html'>DP3d</a>),
+              type(<a href='../type/type_dp_3d.html'>type_dp_3d</a>),
             </td>
               <td>public</td>
             <td>
               
             </td>
             <td>::</td>
-            <td><strong>POINTS</strong></td>
+            <td><strong>points</strong></td>
                 <td></td>
                 <td></td>
             <td>
-<p>VTK 3D geometry coordinates</p>
+
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-numtotalcells"></span>
+              <span class="anchor" id="variable-num_total_cells"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -377,76 +465,56 @@
               
             </td>
             <td>::</td>
-            <td><strong>numTotalCells</strong></td>
+            <td><strong>num_total_cells</strong></td>
                 <td></td>
                 <td></td>
             <td>
-<p>Number of cells</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-numcelltypes"></span>
-              integer(kind=int32),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>numCellTypes</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-<p>Number of cell types</p>
+
             </td>
         </tr>
         <tr>
             <td>
               <span class="anchor" id="variable-cells"></span>
-              type(Type_VTK_CELLS),
+              type(<a href='../type/type_vtk_cell.html'>type_vtk_cell</a>),
             </td>
               <td>public,</td>
             <td>
               allocatable
             </td>
             <td>::</td>
-            <td><strong>CELLS</strong>(:)</td>
+            <td><strong>cells</strong>(:)</td>
                 <td></td>
                 <td></td>
             <td>
-<p>Cell information</p>
+
             </td>
         </tr>
     </tbody>
   </table>
 
 
-        <h4>Constructor</h4>
-          
+
+        <h4>Finalizations Procedures</h4>
         <table class="table table-striped varlist">
           <tbody>
-                <tr>
-                  <td>
-                        private
-
-                    
-                    function
-                    <strong>Core_VTK_Read</strong>
-                    (filename)
-                  </td>
-                  <td><p>Read VTK file</p></td>
-                </tr>
+              <tr>
+                <td>final :: <strong>finalize_vtk_object</strong></td>
+                <td></td>
+              </tr>
           </tbody>
         </table>
-
 
         <h4>Type-Bound Procedures</h4>
         <table class="table table-striped varlist">
           <tbody>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/type_vtk.html#boundprocedure-is_in'>Is_In</a></strong> => Core_VTK_IN_CellType</td>
+  <strong><a href='../type/type_vtk.html#boundprocedure-initialize_vtk~2'>initialize_vtk</a></strong> => type_vtk_vtk_initialize</td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_vtk.html#boundprocedure-initialize_vtu~2'>initialize_vtu</a></strong> => type_vtk_vtu_initialize</td>
                   <td></td>
               </tr>
               <tr>
