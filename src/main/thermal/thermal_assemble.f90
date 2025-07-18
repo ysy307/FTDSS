@@ -194,7 +194,7 @@ contains
         class(abst_element), pointer :: element
 
         do c = 1, domain%colors%num_colors
-            !$omp parallel do private(ie_idx, element) shared(domain, A, temperature, porosity, propeties)
+            !$omp parallel do private(ie_idx, element) shared(domain, A, temperature, porosity, propeties) schedule(guided)
             do ie_idx = 1, domain%colors%Colored(c)%num_elements
                 element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
                 call process_single_element_mass(A, element, temperature, porosity, propeties)
@@ -238,7 +238,7 @@ contains
         class(abst_element), pointer :: element
 
         do c = 1, domain%colors%num_colors
-            !$omp parallel do private(ie_idx, element) shared(domain, A, temperature, porosity, propeties)
+            !$omp parallel do private(ie_idx, element) shared(domain, A, temperature, porosity, propeties) schedule(guided)
             do ie_idx = 1, domain%colors%Colored(c)%num_elements
                 element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
                 call process_single_element_diffusion(A, element, temperature, porosity, propeties)
