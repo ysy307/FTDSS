@@ -26,7 +26,7 @@ module core_types_array
         real(real64), allocatable :: y(:)
     contains
         procedure, pass(self) :: initialize => type_dp_2d_initialize
-        procedure, pass(self) :: destory => type_dp_2d_destroy
+        procedure, pass(self) :: destroy => type_dp_2d_destroy
     end type type_dp_2d
 
     type :: type_dp_3d
