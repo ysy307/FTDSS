@@ -24,6 +24,9 @@ RUN apt-get update -y && apt-get install -y \
     software-properties-common \
     ninja-build \
     graphviz \
+    linux-tools-common linux-tools-generic \
+    libx11-dev libxext-dev libxrender-dev libxt-dev \
+    valgrind kcachegrind \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -54,36 +57,7 @@ RUN pip3 install --upgrade pip && \
     pip3 install --force-reinstall git+https://github.com/fortran-lang/fortls && \
     pip3 install --upgrade fprettify && \
     pip3 install --upgrade fypp && \
-    pip3 install --upgrade ford && \
-    echo '{' > /root/.fortls && \
-    echo '  "include_dirs": [' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/CMakeBuild/.mod",' >> /root/.fortls && \
-    echo '    "/opt/intel/oneapi/mpi/2021.14/include/mpi",' >> /root/.fortls && \
-    echo '    "/opt/intel/oneapi/2025.0/include/mpi",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.1.1",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/third_party/.local/VTKFortran/include"' >> /root/.fortls && \
-    echo '  ],' >> /root/.fortls && \
-    echo '  "excl_paths": [' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/.git",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/.vscode",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/.devcontainer",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/CMakeBuild/",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/github",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/docs",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/fpm",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/Inout",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/log",' >> /root/.fortls && \
-    echo '    "/workspaces/FTDSS/Scripts"' >> /root/.fortls && \
-    echo '  ],' >> /root/.fortls && \
-    echo '  "incremental_sync": true,' >> /root/.fortls && \
-    echo '  "lowercase_intrinsics": true,' >> /root/.fortls && \
-    echo '  "hover_signature": true,' >> /root/.fortls && \
-    echo '  "use_signature_help": true' >> /root/.fortls && \
-    echo '}' >> /root/.fortls
-
-
-
+    pip3 install --upgrade ford 
 
 # ZshとPreztoの設定
 ENV SHELL=/usr/bin/zsh
@@ -99,7 +73,6 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     sed -i "/'prompt'/c \\\ 'contrib-prompt' \\\\\n  'prompt'" /root/.zpreztorc && \
     sed -i "s/theme 'sorin'/theme 'bart'/g" /root/.zpreztorc && \
     echo 'export PS1="%~ %# "' >> /root/.zshrc && \
-    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
     echo "export FC=ifx" >> ~/.zshrc && \
     echo "export F90=ifx" >> ~/.zshrc && \
     echo "export F77=ifx" >> ~/.zshrc && \
@@ -110,6 +83,7 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "export MPIF77=mpiifx" >> ~/.zshrc && \
     echo "export MPICC=mpiicc" >> ~/.zshrc && \
     echo "export MPICXX=mpiicpc" >> ~/.zshrc &&\
+    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
     echo "ulimit -s unlimited" >> ~/.zshrc
 
 # デフォルトのシェルをZshに設定

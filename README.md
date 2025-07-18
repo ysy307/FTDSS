@@ -16,27 +16,13 @@
 ## Install
 ### Software environment
 * Fortran 90 and later
-* Intel(R) Fortran Compiler for applications running on Intel(R) 64, Version 2024.1.0 Build 20240308
-* Lis version 2.1.3
-* GNU Make 3.81
-
-### Operation System
-#### Host OS
-エディション	Windows 11 Pro <br>
-バージョン	23H2 <br>
-インストール日	2024/05/24 <br>
-OS ビルド	22631.3958 <br>
-エクスペリエンス	Windows Feature Experience Pack 1000.22700.1026.0
-
-#### Windows subsytem for linux (WSL2)
-Ubuntu 24.04.1 LTS <br>
-Red Hat Enterprise Linux release 9.4 (Plow)
-
-### Execution environment
-* CPU Intel Core i9 14900K
-* MB Z790 Steel Legend WiFi
-* Memory DDR5-5600 32GB×4
-* GPU NVIDIA GeForce RTX 4060Ti
+* Intel(R) Fortran Compiler for applications running on Intel(R) 64, Version 2025.2.0 Build 20250605
+* CMake version 4.0.3
+* GNU Make 4.3
+* Fortran Standard Library 0.7.0
+* JSON-Fortran 9.0.3
+* VTKFortran 2.0.3
+* VTK - The Visualization Toolkit 9.5.0
 
 
 ## Usage
@@ -47,6 +33,6 @@ Red Hat Enterprise Linux release 9.4 (Plow)
 [Documents](https://ysy307.github.io/FTDSS/)
 
 
-bfe41abf0975# code --install-extension /root/fortran-lang.linter-gfortran-3.2.0.vsix 
-開発コンテナー: FTDSS @ desktop-linux に拡張機能をインストールしています...
-拡張機能 'fortran-lang.linter-gfortran-3.2.0.vsix' が正常にインストールされました。
+<!-- bfe41abf0975# code --install-extension /root/fortran-lang.linter-gfortran-3.2.0.vsix  -->
+<!-- 開発コンテナー: FTDSS @ desktop-linux に拡張機能をインストールしています... -->
+<!-- 拡張機能 'fortran-lang.linter-gfortran-3.2.0.vsix' が正常にインストールされました。 -->

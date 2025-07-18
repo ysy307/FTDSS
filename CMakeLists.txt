@@ -1,24 +1,23 @@
 # CMake Minimum Version
-cmake_minimum_required(VERSION 3.30)
-
-# コンパイラ指定
-if(DEFINED COMPILER)
-    if(COMPILER STREQUAL "intel")
-        set(CMAKE_Fortran_COMPILER ifx CACHE STRING "" FORCE)
-        set(CMAKE_C_COMPILER icx CACHE STRING "" FORCE)
-        set(CMAKE_CXX_COMPILER icpx CACHE STRING "" FORCE)
-    elseif(COMPILER STREQUAL "gnu")
-        set(CMAKE_Fortran_COMPILER gfortran CACHE STRING "" FORCE)
-        set(CMAKE_C_COMPILER gcc CACHE STRING "" FORCE)
-        set(CMAKE_CXX_COMPILER g++ CACHE STRING "" FORCE)
-    else()
-        message(FATAL_ERROR "Unknown COMPILER specified: ${COMPILER}")
-    endif()
-endif()
+cmake_minimum_required(VERSION 3.20)
 
 # Project Name and Language
 project(YSY_FC LANGUAGES Fortran C CXX)
 enable_language(Fortran C CXX)
+
+if(NOT CMAKE_Fortran_COMPILER)
+    message(STATUS "Fortran compiler not specified, defaulting to 'ifx'.")
+    set(CMAKE_Fortran_COMPILER ifx)
+endif()
+if(NOT CMAKE_CXX_COMPILER)
+    message(STATUS "CXX compiler not specified, defaulting to 'icpx'.")
+    set(CMAKE_CXX_COMPILER icpx)
+endif()
+if(NOT CMAKE_C_COMPILER)
+    message(STATUS "C compiler not specified, defaulting to 'icx'.")
+    set(CMAKE_C_COMPILER icx)
+endif()
+
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -27,11 +26,11 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Options
-option(ENABLE_OPTIMIZE "Enable optimization flags" ON)
+option(ENABLE_OPTIMIZE "Enable optimization flags" OFF)
 option(ENABLE_OPENMP   "Enable OpenMP support"     ON)
 option(ENABLE_MKL      "Enable MKL support"        ON)
 option(ENABLE_MPI      "Enable MPI support"        OFF)
-option(ENABLE_DEBUG    "Enable debug flags"        OFF)
+option(ENABLE_DEBUG    "Enable debug flags"        ON)
 
 # Select the application to build
 set(BUILD_APP "" CACHE STRING "Specify the application to build: ysy_fc or test")
@@ -47,26 +46,55 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
 
 # Source Files
-add_subdirectory(src/Core)
-add_subdirectory(src/Inout/Input)
-add_subdirectory(src/Domain)
-add_subdirectory(src/Matrix)
-add_subdirectory(src/Calculate/BLAS)
-add_subdirectory(src/Calculate/WRF)
-add_subdirectory(src/Calculate/HCF)
-add_subdirectory(src/Calculate/GCC)
-add_subdirectory(src/Calculate/ThermalConductivity)
-add_subdirectory(src/Properties)
-add_subdirectory(src/Calculate/Density)
-add_subdirectory(src/Calculate/SpecificHeat)
-add_subdirectory(src/Calculate/HeatCapacity)
-add_subdirectory(src/Conditions/Boundary)
-add_subdirectory(src/Conditions/Initial)
-add_subdirectory(src/Solver)
-add_subdirectory(src/Time)
-add_subdirectory(src/Main/Thermal)
-add_subdirectory(src/Inout/Output)
-add_subdirectory(src/Main/FTDSS)
+add_subdirectory(src/core)
+add_subdirectory(src/inout)
+add_subdirectory(src/inout/input)
+add_subdirectory(src/matrix)
+add_subdirectory(src/domain)
+add_subdirectory(src/calculate/blas)
+add_subdirectory(src/calculate/wrf)
+# add_subdirectory(src/calculate/HCF)
+add_subdirectory(src/calculate/gcc)
+add_subdirectory(src/calculate/thermal_conductivity)
+add_subdirectory(src/calculate/density)
+add_subdirectory(src/calculate/specific_heat)
+add_subdirectory(src/calculate/heat_capacity)
+add_subdirectory(src/calculate)
+add_subdirectory(src/properties)
+add_subdirectory(src/conditions/boundary)
+add_subdirectory(src/conditions/initial)
+add_subdirectory(src/solver)
+add_subdirectory(src/control)
+add_subdirectory(src/main/thermal)
+add_subdirectory(src/inout/output)
+add_subdirectory(src/main/FTDSS)
+
+# =========================================================================
+# ★改善点1: 全ての共通ライブラリをグループ化するINTERFACEライブラリを定義
+# =========================================================================
+set(COMMON_LIBS
+    Core
+    Inout
+    Input
+    Matrix 
+    Domain 
+    Calc_WRF
+    # Calc_HCF
+    Calc_GCC
+    Calc_THC
+    Calc_DEN
+    Calc_SPH
+    Calc_VHC
+    Properties
+    Calc_BLAS
+    Boundary
+    Initial
+    Solver
+    control
+    Thermal
+    Output
+    FTDSS
+)
 
 # Debug Information
 message(STATUS "Fortran Compiler ID: ${CMAKE_Fortran_COMPILER_ID}")
@@ -78,30 +106,10 @@ set(TEST_FILE "${PROJECT_SOURCE_DIR}/test/test.F90")
 if(BUILD_APP STREQUAL "ysy_fc")
     # ysy_fc Target
     add_executable(ysy_fc ${MAIN_FILE})
-    target_link_libraries(ysy_fc PRIVATE
-        Core
-        Input
-        Domain
-        Calc_WRF
-        Calc_HCF
-        Calc_GCC
-        Calc_THC
-        Calc_DEN
-        Calc_SPH
-        Calc_VHC
-        Properties
-        Matrix
-        Calc_BLAS
-        Boundary
-        Initial
-        Solver
-        Time
-        Thermal
-        Output
-        FTDSS
-    )
+    target_link_libraries(ysy_fc PRIVATE ${COMMON_LIBS})
     enable_build_flags(ysy_fc)
     enable_thirdparty (ysy_fc)
+    set_target_properties(ysy_fc PROPERTIES LINKER_LANGUAGE Fortran)
 
 
     # Custom Run Target
@@ -113,32 +121,12 @@ if(BUILD_APP STREQUAL "ysy_fc")
 
 elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_FILE})
-    target_link_libraries(test PRIVATE
-        Core
-        Input
-        Domain
-        Calc_WRF
-        Calc_HCF
-        Calc_GCC
-        Calc_THC
-        Calc_DEN
-        Calc_SPH
-        Calc_VHC
-        Properties
-        Matrix
-        Calc_BLAS
-        Boundary
-        Initial
-        Solver
-        Time
-        Thermal
-        Output
-        FTDSS
-    )
+    target_link_libraries(test PRIVATE ${COMMON_LIBS})
     enable_build_flags(test)
     enable_thirdparty (test)
-
+    set_target_properties(test PROPERTIES LINKER_LANGUAGE Fortran)
 endif()
+
 
 # Final Messages
 if(BUILD_APP STREQUAL "")
