@@ -1,13 +1,4 @@
 module domain_element
-    !*---------------------------------------------------------------------------------------<br>
-    !  Module: domain_element<br>
-    !  Purpose: Define 2D finite element types (square and triangle) and their<br>
-    !           associated operations (shape functions, jacobian, Gauss points).<br>
-    !  Ford Coding Standard:<br>
-    !    - Use ISO_FORTRAN_ENV for portable kinds<br>
-    !    - Maintain explicit interfaces and consistent indentation<br>
-    !    - Preserve original function and type names<br>
-    !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
     use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
