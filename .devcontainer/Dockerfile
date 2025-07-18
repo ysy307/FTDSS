@@ -64,11 +64,12 @@ ENV SHELL=/usr/bin/zsh
 SHELL ["/bin/zsh", "-c"]
 
 # Preztoをクローンして設定
+# Preztoをクローンして設定
 RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zprezto && \
     git clone --recurse https://github.com/belak/prezto-contrib $HOME/.zprezto/contrib && \
     setopt EXTENDED_GLOB && \
     for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do \
-    ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"; \
+    ln -sf "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"; \
     done && \
     sed -i "/'prompt'/c \\\ 'contrib-prompt' \\\\\n  'prompt'" /root/.zpreztorc && \
     sed -i "s/theme 'sorin'/theme 'bart'/g" /root/.zpreztorc && \
@@ -82,9 +83,9 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "export MPIF90=mpiifx" >> ~/.zshrc && \
     echo "export MPIF77=mpiifx" >> ~/.zshrc && \
     echo "export MPICC=mpiicc" >> ~/.zshrc && \
-    echo "export MPICXX=mpiicpc" >> ~/.zshrc &&\
-    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
-    echo "ulimit -s unlimited" >> ~/.zshrc & \
+    echo "export MPICXX=mpiicpc" >> ~/.zshrc && \
+    echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc && \
+    echo "ulimit -s unlimited" >> ~/.zshrc && \
     echo 'export LANG=C.UTF-8' >> ~/.zshrc
 
 
