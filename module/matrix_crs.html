@@ -59,6 +59,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
                 <form action="../search.html" role="search" class="ms-auto">
@@ -124,11 +133,62 @@
   
   
   
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#inters-0"
+         aria-expanded="false" aria-controls="inters-0">
+         <h4 class="card-header bg-primary text-white">Interfaces</h4>
+      </a>
+      <div id="inters-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/matrix_crs.html#interface-operator%28ASTERISK%29">operator(*)</a>
+            <a class="list-group-item" href="../module/matrix_crs.html#interface-operator%28%2B%29">operator(+)</a>
+        </div>
+      </div>
+    </div>
+
   
-  
-  
-  
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#types-0"
+         aria-expanded="false" aria-controls="types-0">
+         <h4 class="card-header bg-primary text-white">Derived Types</h4>
+      </a>
+      <div id="types-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/matrix_crs.html#type-type_crs">type_crs</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#funcs-0"
+         aria-expanded="false" aria-controls="funcs-0">
+         <h4 class="card-header bg-primary text-white">Functions</h4>
+      </a>
+      <div id="funcs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-matrix_addition_crs">Matrix_Addition_CRS</a>
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-multiplication_matrix_scalar_crs">Multiplication_Matrix_Scalar_CRS</a>
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-multiplication_scalar_matrix_crs">Multiplication_Scalar_matrix_crs</a>
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-copy_crs">copy_crs</a>
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-type_crs_matrix_vector_product">type_crs_matrix_vector_product</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-destory_crs">destory_crs</a>
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-find_crs">find_crs</a>
+            <a class="list-group-item" href="../module/matrix_crs.html#proc-initialize_type_crs">initialize_type_crs</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -137,7 +197,6 @@
   
   
 
-    <em>None</em>
 
   </div>
 
@@ -151,11 +210,11 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
                   <li class="list-inline-item"><a href='module_domain.html'>module_domain</a></li>
+                  <li class="list-inline-item">stdlib_sorting</li>
                   <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
                   <li class="list-inline-item"><a href='matrix_base.html'>matrix_base</a></li>
-                  <li class="list-inline-item">stdlib_sorting</li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
                   <li class="list-inline-item"><a href='matrix_coo.html'>matrix_coo</a></li>
               </ul>
             </li>
@@ -1412,8 +1471,11 @@
 <!-- json_module -->
 <g id="module~~matrix_crs~~UsesGraph_node46" class="node">
 <title>json_module</title>
+<g id="a_module~~matrix_crs~~UsesGraph_node46"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
 <polygon fill="#337ab7" stroke="#337ab7" points="1245.5,-522.2 1165.5,-522.2 1165.5,-498.2 1245.5,-498.2 1245.5,-522.2"/>
 <text text-anchor="middle" x="1205.5" y="-507.8" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
 </g>
 <!-- module~inout_input&#45;&gt;json_module -->
 <g id="module~~matrix_crs~~UsesGraph_edge134" class="edge">
@@ -2094,10 +2156,906 @@ large graphs.</div>
 
 
 
+        <section>
+          <h2>Interfaces</h2>
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-operator%28ASTERISK%29"></span>
+      <h3>public        interface <a href='../interface/operator(ASTERISK).html'>operator(*)</a> 
+      </h3>
+    </div>
+    <ul class="list-group">
+          <li class="list-group-item">
+                <h3>
+    private  function <a href='../proc/type_crs_matrix_vector_product.html'>type_crs_matrix_vector_product</a>(A, x) result(y)  
+
+    </h3>
+    
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~4"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x</strong>(A%num_row)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64), (A%num_row)</small>
+    </h4>
+    
+
+          </li>
+          <li class="list-group-item">
+                <h3>
+    private  function <a href='../proc/multiplication_scalar_matrix_crs.html'>Multiplication_Scalar_matrix_crs</a>(A, b) result(C)  
+
+    </h3>
+    
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~6"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_crs.html'>type_crs</a>)</small>
+    </h4>
+    
+
+          </li>
+          <li class="list-group-item">
+                <h3>
+    private  function <a href='../proc/multiplication_matrix_scalar_crs.html'>Multiplication_Matrix_Scalar_CRS</a>(a, B) result(C)  
+
+    </h3>
+    
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>a</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~3"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>B</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_crs.html'>type_crs</a>)</small>
+    </h4>
+    
+
+          </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-operator%28%2B%29"></span>
+      <h3>public        interface <a href='../interface/operator(+).html'>operator(+)</a> 
+      </h3>
+    </div>
+    <ul class="list-group">
+          <li class="list-group-item">
+                <h3>
+    private  function <a href='../proc/matrix_addition_crs.html'>Matrix_Addition_CRS</a>(A, B) result(C)  
+
+    </h3>
+    
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~5"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~2"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>B</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_crs.html'>type_crs</a>)</small>
+    </h4>
+    
+
+          </li>
+    </ul>
+  </div>
+
+        </section>
+        <br>
+
+
+        <section>
+          <h2>Derived Types</h2>
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_crs"></span>
+      <h3>
+        type, public, extends(<a href='../type/abst_matrix.html'>abst_matrix</a>)&nbsp;::&nbsp;
+        <a href='../type/type_crs.html'>type_crs</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ind"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>ind</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nnz"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nnz</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_ptr"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_ptr</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_row~10"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_row</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ptr~2"></span>
+              integer(kind=int32),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>ptr</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-val~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>val</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
 
 
 
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs.html#boundprocedure-copy~3'>copy</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/copy_crs.html'>copy_crs</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs.html#boundprocedure-destory~3'>destory</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destory_crs.html'>destory_crs</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs.html#boundprocedure-find~3'>find</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/find_crs.html'>find_crs</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs.html#boundprocedure-initialize~14'>initialize</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_crs.html'>initialize_type_crs</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-matrix_addition_crs"></span> <h3>private  function <a href='../proc/matrix_addition_crs.html'>Matrix_Addition_CRS</a>(A, B) result(C)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~5"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~2"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>B</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_crs.html'>type_crs</a>)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-multiplication_matrix_scalar_crs"></span> <h3>private  function <a href='../proc/multiplication_matrix_scalar_crs.html'>Multiplication_Matrix_Scalar_CRS</a>(a, B) result(C)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>a</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~3"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>B</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_crs.html'>type_crs</a>)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-multiplication_scalar_matrix_crs"></span> <h3>private  function <a href='../proc/multiplication_scalar_matrix_crs.html'>Multiplication_Scalar_matrix_crs</a>(A, b) result(C)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~6"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='../type/type_crs.html'>type_crs</a>)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-copy_crs"></span> <h3>private  function <a href='../proc/copy_crs.html'>copy_crs</a>(self) result(B)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~329"></span>
+              class(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>class(<a href='../type/abst_matrix.html'>abst_matrix</a>), allocatable</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-type_crs_matrix_vector_product"></span> <h3>private  function <a href='../proc/type_crs_matrix_vector_product.html'>type_crs_matrix_vector_product</a>(A, x) result(y)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~4"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x</strong>(A%num_row)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64), (A%num_row)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-destory_crs"></span> <h3>private  subroutine <a href='../proc/destory_crs.html'>destory_crs</a>(self)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~330"></span>
+              class(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-find_crs"></span> <h3>private  subroutine <a href='../proc/find_crs.html'>find_crs</a>(self, row, col, index)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~328"></span>
+              class(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-index~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>index</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_type_crs"></span> <h3>private  subroutine <a href='../proc/initialize_type_crs.html'>initialize_type_crs</a>(self, domain)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~327"></span>
+              class(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~11"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -2119,7 +3077,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 06:42 +0000             </p>
+ on 2025-07-18 08:09 +0000             </p>
           </div>
         </div>
         <br>

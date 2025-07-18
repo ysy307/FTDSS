@@ -1,0 +1,1681 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_type_reordering &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_type_reordering
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">15 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/reordering.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/reordering.f90.html'>reordering.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_reordering.html'>domain_reordering</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_type_reordering</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_type_reordering.html#src">initialize_type_reordering</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine initialize_type_reordering(self, algorithm_name, elements)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_reordering.html'>type_reordering</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~621"></span>
+              class(<a href='../type/type_reordering.html'>type_reordering</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-algorithm_name~4"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>algorithm_name</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-elements~10"></span>
+              type(<a href='../type/holder_elements.html'>holder_elements</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>elements</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_reordering~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_type_reorderingCallsGraph" width="641pt" height="510pt"
+ viewBox="0.00 0.00 641.00 510.15" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_reordering~~CallsGraph" class="graph" transform="scale(0.29 0.29) rotate(0) translate(4 1773.96)">
+<title>proc~~initialize_type_reordering~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1773.96 2230,-1773.96 2230,4 -4,4"/>
+<!-- proc~initialize_type_reordering -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node1" class="node">
+<title>proc~initialize_type_reordering</title>
+<polygon fill="none" stroke="black" points="241,-927.29 0,-927.29 0,-903.29 241,-903.29 241,-927.29"/>
+<text text-anchor="middle" x="120.5" y="-912.89" font-family="Helvetica,sans-Serif" font-size="10.50">type_reordering%initialize_type_reordering</text>
+</g>
+<!-- interface~cm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node2" class="node">
+<title>interface~cm_inverse_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node2"><a xlink:href="../interface/cm_inverse_method.html" xlink:title="type_reordering%cm_inverse_method">
+<polygon fill="#a7506f" stroke="#a7506f" points="493.5,-1071.29 279.5,-1071.29 279.5,-1047.29 493.5,-1047.29 493.5,-1071.29"/>
+<text text-anchor="middle" x="386.5" y="-1056.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%cm_inverse_method</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_reordering&#45;&gt;interface~cm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_type_reordering&#45;&gt;interface~cm_inverse_method</title>
+<path fill="none" stroke="#ff0000" d="M143.55,-927.32C190.53,-952.94 300.57,-1012.96 354.54,-1042.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="352.87,-1045.48 363.32,-1047.19 356.22,-1039.33 352.87,-1045.48"/>
+</g>
+<!-- interface~cm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node3" class="node">
+<title>interface~cm_reorder_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node3"><a xlink:href="../interface/cm_reorder_method.html" xlink:title="type_reordering%cm_reorder_method">
+<polygon fill="#a7506f" stroke="#a7506f" points="494,-959.29 279,-959.29 279,-935.29 494,-935.29 494,-959.29"/>
+<text text-anchor="middle" x="386.5" y="-944.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%cm_reorder_method</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_reordering&#45;&gt;interface~cm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_type_reordering&#45;&gt;interface~cm_reorder_method</title>
+<path fill="none" stroke="#ff0000" d="M220.55,-927.3C238.7,-929.5 257.74,-931.8 276.16,-934.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="275.98,-937.54 286.33,-935.27 276.82,-930.59 275.98,-937.54"/>
+</g>
+<!-- interface~rcm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node4" class="node">
+<title>interface~rcm_inverse_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node4"><a xlink:href="../interface/rcm_inverse_method.html" xlink:title="type_reordering%rcm_inverse_method">
+<polygon fill="#a7506f" stroke="#a7506f" points="750,-736.29 532,-736.29 532,-712.29 750,-712.29 750,-736.29"/>
+<text text-anchor="middle" x="641" y="-721.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%rcm_inverse_method</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_reordering&#45;&gt;interface~rcm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge3" class="edge">
+<title>proc~initialize_type_reordering&#45;&gt;interface~rcm_inverse_method</title>
+<path fill="none" stroke="#ff0000" d="M154.33,-903.2C244.7,-869.91 497.12,-776.92 597.78,-739.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="599.14,-743.07 607.32,-736.33 596.72,-736.5 599.14,-743.07"/>
+</g>
+<!-- interface~rcm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node5" class="node">
+<title>interface~rcm_reorder_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node5"><a xlink:href="../interface/rcm_reorder_method.html" xlink:title="type_reordering%rcm_reorder_method">
+<polygon fill="#a7506f" stroke="#a7506f" points="496,-896.29 277,-896.29 277,-872.29 496,-872.29 496,-896.29"/>
+<text text-anchor="middle" x="386.5" y="-881.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%rcm_reorder_method</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_reordering&#45;&gt;interface~rcm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge4" class="edge">
+<title>proc~initialize_type_reordering&#45;&gt;interface~rcm_reorder_method</title>
+<path fill="none" stroke="#ff0000" d="M223.95,-903.26C240.03,-901.37 256.73,-899.41 273.03,-897.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="273.59,-900.96 283.11,-896.31 272.77,-894 273.59,-900.96"/>
+</g>
+<!-- proc~cm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node6" class="node">
+<title>proc~cm_inverse_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node6"><a xlink:href="../proc/cm_inverse_method.html" xlink:title="cm_inverse_method">
+<polygon fill="#d9534f" stroke="#d9534f" points="1506.5,-1172.29 1386.5,-1172.29 1386.5,-1148.29 1506.5,-1148.29 1506.5,-1172.29"/>
+<text text-anchor="middle" x="1446.5" y="-1157.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cm_inverse_method</text>
+</a>
+</g>
+</g>
+<!-- interface~cm_inverse_method&#45;&gt;proc~cm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge5" class="edge">
+<title>interface~cm_inverse_method&#45;&gt;proc~cm_inverse_method</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M493.79,-1069.44C709.94,-1090.07 1195.54,-1136.43 1376.12,-1153.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1376,-1157.17 1386.29,-1154.64 1376.67,-1150.2 1376,-1157.17"/>
+</g>
+<!-- proc~cm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node7" class="node">
+<title>proc~cm_reorder_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node7"><a xlink:href="../proc/cm_reorder_method.html" xlink:title="cm_reorder_method">
+<polygon fill="#d9534f" stroke="#d9534f" points="701.5,-970.29 580.5,-970.29 580.5,-946.29 701.5,-946.29 701.5,-970.29"/>
+<text text-anchor="middle" x="641" y="-955.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cm_reorder_method</text>
+</a>
+</g>
+</g>
+<!-- interface~cm_reorder_method&#45;&gt;proc~cm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge6" class="edge">
+<title>interface~cm_reorder_method&#45;&gt;proc~cm_reorder_method</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M494.22,-951.94C519.89,-953.06 546.67,-954.22 570.17,-955.25"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="570.23,-958.75 580.38,-955.69 570.54,-951.76 570.23,-958.75"/>
+</g>
+<!-- proc~rcm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node8" class="node">
+<title>proc~rcm_inverse_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node8"><a xlink:href="../proc/rcm_inverse_method.html" xlink:title="rcm_inverse_method">
+<polygon fill="#d9534f" stroke="#d9534f" points="1508.5,-626.29 1384.5,-626.29 1384.5,-602.29 1508.5,-602.29 1508.5,-626.29"/>
+<text text-anchor="middle" x="1446.5" y="-611.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rcm_inverse_method</text>
+</a>
+</g>
+</g>
+<!-- interface~rcm_inverse_method&#45;&gt;proc~rcm_inverse_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge7" class="edge">
+<title>interface~rcm_inverse_method&#45;&gt;proc~rcm_inverse_method</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M656.82,-712.26C681.72,-692.87 734.32,-655.36 786,-640.29 992.77,-579.99 1251.44,-594.22 1374.33,-606.05"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1374.07,-609.54 1384.37,-607.04 1374.76,-602.57 1374.07,-609.54"/>
+</g>
+<!-- proc~rcm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node9" class="node">
+<title>proc~rcm_reorder_method</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node9"><a xlink:href="../proc/rcm_reorder_method.html" xlink:title="rcm_reorder_method">
+<polygon fill="#d9534f" stroke="#d9534f" points="703,-886.29 579,-886.29 579,-862.29 703,-862.29 703,-886.29"/>
+<text text-anchor="middle" x="641" y="-871.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rcm_reorder_method</text>
+</a>
+</g>
+</g>
+<!-- interface~rcm_reorder_method&#45;&gt;proc~rcm_reorder_method -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge8" class="edge">
+<title>interface~rcm_reorder_method&#45;&gt;proc~rcm_reorder_method</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M496.05,-879.99C520.62,-879.02 546.11,-878.01 568.68,-877.11"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="568.98,-880.61 578.84,-876.71 568.71,-873.61 568.98,-880.61"/>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node10" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node10"><a xlink:href="../interface/allocate_array.html" xlink:title="allocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="1734.5,-1130.29 1645.5,-1130.29 1645.5,-1106.29 1734.5,-1106.29 1734.5,-1130.29"/>
+<text text-anchor="middle" x="1690" y="-1115.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_inverse_method&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge9" class="edge">
+<title>proc~cm_inverse_method&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M1506.76,-1149.83C1525.97,-1146.46 1547.39,-1142.7 1567,-1139.29 1589.29,-1135.41 1613.88,-1131.17 1635.11,-1127.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1635.97,-1130.93 1645.23,-1125.79 1634.78,-1124.03 1635.97,-1130.93"/>
+</g>
+<!-- interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node11" class="node">
+<title>interface~deallocate_array</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node11"><a xlink:href="../interface/deallocate_array.html" xlink:title="deallocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="1741.5,-626.29 1638.5,-626.29 1638.5,-602.29 1741.5,-602.29 1741.5,-626.29"/>
+<text text-anchor="middle" x="1690" y="-611.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_inverse_method&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge10" class="edge">
+<title>proc~cm_inverse_method&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M1506.55,-1155.09C1515.87,-1151.76 1524.55,-1146.75 1531,-1139.29 1582.44,-1079.82 1539.44,-860.93 1567,-787.29 1590.41,-724.73 1642.08,-663.8 1670.08,-633.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1672.65,-636.08 1676.98,-626.41 1667.57,-631.28 1672.65,-636.08"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node13" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node13"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="2129,-899.29 2037,-899.29 2037,-875.29 2129,-875.29 2129,-899.29"/>
+<text text-anchor="middle" x="2083" y="-884.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_inverse_method&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge11" class="edge">
+<title>proc~cm_inverse_method&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M1452.47,-1172.32C1492.62,-1267.89 1768.35,-1895.52 2001,-1685.29 2060.24,-1631.76 2078.35,-1033.69 2081.47,-909.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2084.98,-909.6 2081.72,-899.51 2077.98,-909.43 2084.98,-909.6"/>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge12" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#7fff00" d="M654.98,-970.53C678.76,-992.07 731.86,-1036.18 786,-1054.29 943.26,-1106.9 1365.92,-1081.58 1531,-1097.29 1565.77,-1100.6 1604.67,-1105.75 1635.17,-1110.12"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1634.77,-1113.6 1645.17,-1111.57 1635.78,-1106.67 1634.77,-1113.6"/>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge13" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#7fff00" d="M662.55,-970.55C689.7,-985.96 739.52,-1011.57 786,-1021.29 886.06,-1042.22 918.01,-1050.4 1016,-1021.29 1173.64,-974.46 1195.29,-919.08 1326,-819.29 1343.02,-806.3 1343.09,-797.32 1362,-787.29 1430.46,-750.96 1461.86,-779.31 1531,-744.29 1588.35,-715.24 1643.58,-662.29 1671.02,-633.75"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1673.66,-636.06 1678.01,-626.39 1668.59,-631.24 1673.66,-636.06"/>
+</g>
+<!-- proc~build_node_adjacency_from_elements -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node12" class="node">
+<title>proc~build_node_adjacency_from_elements</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node12"><a xlink:href="../proc/build_node_adjacency_from_elements.html" xlink:title="build_node_adjacency_from_elements">
+<polygon fill="#d9534f" stroke="#d9534f" points="1009,-806.29 793,-806.29 793,-782.29 1009,-782.29 1009,-806.29"/>
+<text text-anchor="middle" x="901" y="-791.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">build_node_adjacency_from_elements</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;proc~build_node_adjacency_from_elements -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge14" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;proc~build_node_adjacency_from_elements</title>
+<path fill="none" stroke="#7fff00" d="M667.99,-946.23C690.9,-934.91 724.49,-916.56 750,-895.29 768.88,-879.54 766.73,-868.55 786,-853.29 808.32,-835.61 836.75,-820.89 859.64,-810.57"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="861.33,-813.65 869.07,-806.42 858.51,-807.24 861.33,-813.65"/>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge15" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7fff00" d="M644.02,-970.29C661.41,-1068.93 794.48,-1742.29 1188,-1742.29 1188,-1742.29 1188,-1742.29 1691,-1742.29 1829.12,-1742.29 1902.07,-1816.68 2001,-1720.29 2060.86,-1661.97 2078.55,-1035.75 2081.52,-909.42"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="2085.02,-909.46 2081.75,-899.38 2078.02,-909.3 2085.02,-909.46"/>
+</g>
+<!-- proc~execute_cm_ordering -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node14" class="node">
+<title>proc~execute_cm_ordering</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node14"><a xlink:href="../proc/execute_cm_ordering.html" xlink:title="execute_cm_ordering">
+<polygon fill="#d9534f" stroke="#d9534f" points="964.5,-1012.29 837.5,-1012.29 837.5,-988.29 964.5,-988.29 964.5,-1012.29"/>
+<text text-anchor="middle" x="901" y="-997.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">execute_cm_ordering</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;proc~execute_cm_ordering -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge16" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;proc~execute_cm_ordering</title>
+<path fill="none" stroke="#7fff00" d="M701.51,-967.98C738.97,-974.08 787.56,-981.99 827.29,-988.45"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="826.75,-991.91 837.19,-990.06 827.88,-985 826.75,-991.91"/>
+</g>
+<!-- proc~find_start_node -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node15" class="node">
+<title>proc~find_start_node</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node15"><a xlink:href="../proc/find_start_node.html" xlink:title="find_start_node">
+<polygon fill="#d9534f" stroke="#d9534f" points="948,-970.29 854,-970.29 854,-946.29 948,-946.29 948,-970.29"/>
+<text text-anchor="middle" x="901" y="-955.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">find_start_node</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;proc~find_start_node -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge17" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;proc~find_start_node</title>
+<path fill="none" stroke="#7fff00" d="M701.51,-958.29C744.27,-958.29 801.54,-958.29 843.58,-958.29"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="843.65,-961.79 853.65,-958.29 843.65,-954.79 843.65,-961.79"/>
+</g>
+<!-- proc~get_node_degree -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node16" class="node">
+<title>proc~get_node_degree</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node16"><a xlink:href="../proc/get_node_degree.html" xlink:title="type_node_adjacency%get_node_degree">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1016,-928.29 786,-928.29 786,-904.29 1016,-904.29 1016,-928.29"/>
+<text text-anchor="middle" x="901" y="-913.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_node_adjacency%get_node_degree</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;proc~get_node_degree -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge18" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;proc~get_node_degree</title>
+<path fill="none" stroke="#7fff00" d="M701.51,-948.6C735.53,-943.06 778.73,-936.03 816.14,-929.94"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="816.71,-933.39 826.02,-928.33 815.59,-926.49 816.71,-933.39"/>
+</g>
+<!-- proc~get_num_nodes~2 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node17" class="node">
+<title>proc~get_num_nodes~2</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node17"><a xlink:href="../proc/get_num_nodes~2.html" xlink:title="type_node_adjacency%get_num_nodes">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1012,-886.29 790,-886.29 790,-862.29 1012,-862.29 1012,-886.29"/>
+<text text-anchor="middle" x="901" y="-871.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_node_adjacency%get_num_nodes</text>
+</a>
+</g>
+</g>
+<!-- proc~cm_reorder_method&#45;&gt;proc~get_num_nodes~2 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge19" class="edge">
+<title>proc~cm_reorder_method&#45;&gt;proc~get_num_nodes~2</title>
+<path fill="none" stroke="#7fff00" d="M665.31,-946.09C693.27,-931.93 741.91,-908.8 786,-895.29 794.18,-892.78 802.78,-890.53 811.45,-888.52"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="812.23,-891.93 821.24,-886.34 810.72,-885.09 812.23,-891.93"/>
+</g>
+<!-- proc~rcm_inverse_method&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge20" class="edge">
+<title>proc~rcm_inverse_method&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#00ffff" d="M1453.39,-626.45C1467.06,-654.67 1501.99,-726.86 1531,-787.29 1587.06,-904.07 1653.8,-1044.28 1678.84,-1096.93"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1675.82,-1098.73 1683.28,-1106.26 1682.15,-1095.72 1675.82,-1098.73"/>
+</g>
+<!-- proc~rcm_inverse_method&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge21" class="edge">
+<title>proc~rcm_inverse_method&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#00ffff" d="M1508.75,-614.29C1545.41,-614.29 1591.82,-614.29 1628.37,-614.29"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1628.4,-617.79 1638.4,-614.29 1628.4,-610.79 1628.4,-617.79"/>
+</g>
+<!-- proc~rcm_inverse_method&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge22" class="edge">
+<title>proc~rcm_inverse_method&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffff" d="M1452.47,-602.26C1492.62,-506.69 1768.35,120.94 2001,-89.29 2060.24,-142.82 2078.35,-740.89 2081.47,-864.87"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2077.98,-865.15 2081.72,-875.07 2084.98,-864.98 2077.98,-865.15"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge23" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#7f00ff" d="M700.88,-862.25C775.05,-849.08 906.11,-832.43 1016,-853.29 1276.61,-902.75 1565.38,-1051.03 1658.38,-1101.36"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1656.8,-1104.49 1667.26,-1106.19 1660.15,-1098.34 1656.8,-1104.49"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge24" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#7f00ff" d="M655.61,-862.02C679.95,-840.72 733.35,-796.93 786,-773.29 896.83,-723.52 932.72,-733.36 1052,-710.29 1162.2,-688.97 1491.21,-642.06 1628.15,-622.8"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1628.65,-626.27 1638.06,-621.41 1627.67,-619.33 1628.65,-626.27"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;proc~build_node_adjacency_from_elements -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge25" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;proc~build_node_adjacency_from_elements</title>
+<path fill="none" stroke="#7f00ff" d="M670.57,-862.27C699.35,-850.48 745.21,-832.53 786,-820.29 800.14,-816.05 815.44,-812.12 830.11,-808.66"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="831.18,-812.01 840.14,-806.35 829.61,-805.19 831.18,-812.01"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge26" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7f00ff" d="M653.37,-861.97C673.79,-839.57 717.58,-790.33 750,-745.29 967.28,-443.46 816.09,-32.29 1188,-32.29 1188,-32.29 1188,-32.29 1691,-32.29 1828.92,-32.29 1901.03,48.72 2001,-46.29 2062.15,-104.41 2078.81,-737.25 2081.56,-864.92"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="2078.06,-865.14 2081.77,-875.07 2085.06,-865 2078.06,-865.14"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;proc~execute_cm_ordering -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge27" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;proc~execute_cm_ordering</title>
+<path fill="none" stroke="#7f00ff" d="M667.99,-886.35C690.9,-897.67 724.49,-916.02 750,-937.29 768.88,-953.04 764.69,-967.03 786,-979.29 798.54,-986.51 813.03,-991.33 827.39,-994.53"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="826.79,-997.98 837.28,-996.49 828.15,-991.11 826.79,-997.98"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;proc~find_start_node -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge28" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;proc~find_start_node</title>
+<path fill="none" stroke="#7f00ff" d="M665.31,-886.49C693.27,-900.65 741.91,-923.78 786,-937.29 804.51,-942.96 825.2,-947.33 843.83,-950.59"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="843.49,-954.08 853.93,-952.28 844.65,-947.17 843.49,-954.08"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;proc~get_node_degree -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge29" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;proc~get_node_degree</title>
+<path fill="none" stroke="#7f00ff" d="M703.14,-884.24C736.79,-889.72 779.04,-896.6 815.76,-902.58"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="815.53,-906.08 825.96,-904.24 816.65,-899.18 815.53,-906.08"/>
+</g>
+<!-- proc~rcm_reorder_method&#45;&gt;proc~get_num_nodes~2 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge30" class="edge">
+<title>proc~rcm_reorder_method&#45;&gt;proc~get_num_nodes~2</title>
+<path fill="none" stroke="#7f00ff" d="M703.14,-874.29C726.13,-874.29 753.14,-874.29 779.66,-874.29"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="779.8,-877.79 789.8,-874.29 779.8,-870.79 779.8,-877.79"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="allocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1987,-1424.29 1863,-1424.29 1863,-1400.29 1987,-1400.29 1987,-1424.29"/>
+<text text-anchor="middle" x="1925" y="-1409.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge31" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.63,-1113.98C1760.93,-1113.92 1793.08,-1118.79 1813,-1139.29 1891.85,-1220.42 1774.41,-1306.22 1849,-1391.29 1850.59,-1393.11 1852.33,-1394.77 1854.18,-1396.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1852.69,-1399.51 1862.95,-1402.14 1856.57,-1393.69 1852.69,-1399.51"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1987,-1382.29 1863,-1382.29 1863,-1358.29 1987,-1358.29 1987,-1382.29"/>
+<text text-anchor="middle" x="1925" y="-1367.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge32" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.73,-1114.17C1760.9,-1114.23 1792.87,-1119.15 1813,-1139.29 1879.94,-1206.27 1785.58,-1278.97 1849,-1349.29 1850.58,-1351.04 1852.3,-1352.66 1854.12,-1354.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1852.45,-1357.23 1862.72,-1359.84 1856.32,-1351.4 1852.45,-1357.23"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="allocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1987,-1340.29 1863,-1340.29 1863,-1316.29 1987,-1316.29 1987,-1340.29"/>
+<text text-anchor="middle" x="1925" y="-1325.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge33" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.74,-1114.47C1760.74,-1114.67 1792.54,-1119.64 1813,-1139.29 1868.08,-1192.18 1796.7,-1251.65 1849,-1307.29 1850.62,-1309.01 1852.36,-1310.59 1854.21,-1312.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1852.61,-1315.18 1862.91,-1317.67 1856.41,-1309.3 1852.61,-1315.18"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="allocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1983.5,-1298.29 1866.5,-1298.29 1866.5,-1274.29 1983.5,-1274.29 1983.5,-1298.29"/>
+<text text-anchor="middle" x="1925" y="-1283.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge34" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.58,-1114.96C1760.35,-1115.39 1791.97,-1120.41 1813,-1139.29 1856.34,-1178.19 1807.71,-1224.22 1849,-1265.29 1851.52,-1267.8 1854.32,-1270.01 1857.3,-1271.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1855.7,-1275.08 1866.15,-1276.81 1859.06,-1268.94 1855.7,-1275.08"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="allocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1994.5,-1256.29 1855.5,-1256.29 1855.5,-1232.29 1994.5,-1232.29 1994.5,-1256.29"/>
+<text text-anchor="middle" x="1925" y="-1241.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge35" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.63,-1115.96C1759.95,-1116.83 1791.07,-1121.98 1813,-1139.29 1844.88,-1164.45 1818.45,-1196.52 1849,-1223.29 1850.53,-1224.63 1852.13,-1225.88 1853.8,-1227.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1852.22,-1230.19 1862.61,-1232.28 1855.8,-1224.17 1852.22,-1230.19"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="allocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1994.5,-1214.29 1855.5,-1214.29 1855.5,-1190.29 1994.5,-1190.29 1994.5,-1214.29"/>
+<text text-anchor="middle" x="1925" y="-1199.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge36" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.63,-1118.65C1759.05,-1120.54 1789.26,-1125.81 1813,-1139.29 1834.38,-1151.43 1828.27,-1168.07 1849,-1181.29 1851.74,-1183.03 1854.62,-1184.64 1857.6,-1186.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1856.2,-1189.32 1866.76,-1190.14 1859.02,-1182.91 1856.2,-1189.32"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node25" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node25"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="allocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1994.5,-1172.29 1855.5,-1172.29 1855.5,-1148.29 1994.5,-1148.29 1994.5,-1172.29"/>
+<text text-anchor="middle" x="1925" y="-1157.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge37" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.51,-1125.6C1757.81,-1129.56 1786.99,-1134.59 1813,-1139.29 1825.41,-1141.53 1838.59,-1143.97 1851.37,-1146.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1851.04,-1149.87 1861.51,-1148.28 1852.33,-1142.99 1851.04,-1149.87"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node26" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node26"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="allocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1993.5,-1130.29 1856.5,-1130.29 1856.5,-1106.29 1993.5,-1106.29 1993.5,-1130.29"/>
+<text text-anchor="middle" x="1925" y="-1115.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge38" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.55,-1118.29C1765.86,-1118.29 1808.92,-1118.29 1846.07,-1118.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1846.38,-1121.79 1856.38,-1118.29 1846.38,-1114.79 1846.38,-1121.79"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node27" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node27"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="allocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1990,-1088.29 1860,-1088.29 1860,-1064.29 1990,-1064.29 1990,-1088.29"/>
+<text text-anchor="middle" x="1925" y="-1073.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge39" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.55,-1110.44C1766.96,-1104.6 1811.96,-1096.49 1849.97,-1089.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1850.76,-1093.05 1859.98,-1087.83 1849.52,-1086.16 1850.76,-1093.05"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node28" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node28"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1990,-1046.29 1860,-1046.29 1860,-1022.29 1990,-1022.29 1990,-1046.29"/>
+<text text-anchor="middle" x="1925" y="-1031.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge40" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1718.64,-1106.23C1749.92,-1092.82 1802.56,-1071 1849,-1055.29 1855.28,-1053.16 1861.91,-1051.08 1868.52,-1049.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1869.53,-1052.46 1878.15,-1046.29 1867.57,-1045.74 1869.53,-1052.46"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node29" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node29"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="allocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1987,-1004.29 1863,-1004.29 1863,-980.29 1987,-980.29 1987,-1004.29"/>
+<text text-anchor="middle" x="1925" y="-989.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge41" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1705.75,-1106.15C1732.63,-1084.57 1792.11,-1039.36 1849,-1013.29 1853.57,-1011.2 1858.39,-1009.27 1863.3,-1007.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1864.44,-1010.81 1872.8,-1004.3 1862.2,-1004.18 1864.44,-1010.81"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node30" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node30"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="allocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1987,-962.29 1863,-962.29 1863,-938.29 1987,-938.29 1987,-962.29"/>
+<text text-anchor="middle" x="1925" y="-947.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge42" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1700.65,-1105.95C1723.38,-1077.74 1783.32,-1008.13 1849,-971.29 1852.42,-969.37 1856.02,-967.62 1859.73,-966.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1861.07,-969.25 1869.1,-962.35 1858.52,-962.74 1861.07,-969.25"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node31" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node31"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="allocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1987,-920.29 1863,-920.29 1863,-896.29 1987,-896.29 1987,-920.29"/>
+<text text-anchor="middle" x="1925" y="-905.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge43" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1697.7,-1105.94C1716.68,-1072.17 1774.29,-977.57 1849,-929.29 1851.73,-927.53 1854.6,-925.91 1857.57,-924.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1858.99,-927.63 1866.72,-920.37 1856.16,-921.23 1858.99,-927.63"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node32" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node32"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="allocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1983.5,-878.29 1866.5,-878.29 1866.5,-854.29 1983.5,-854.29 1983.5,-878.29"/>
+<text text-anchor="middle" x="1925" y="-863.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge44" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1695.76,-1106.03C1711.36,-1067.46 1764.89,-947.59 1849,-887.29 1851.56,-885.46 1854.26,-883.79 1857.08,-882.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1858.83,-885.3 1866.37,-877.86 1855.83,-878.98 1858.83,-885.3"/>
+</g>
+<!-- proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node33" class="node">
+<title>proc~allocate_rank2_logical1</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node33"><a xlink:href="../proc/allocate_rank2_logical1.html" xlink:title="allocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1994.5,-1676.29 1855.5,-1676.29 1855.5,-1652.29 1994.5,-1652.29 1994.5,-1676.29"/>
+<text text-anchor="middle" x="1925" y="-1661.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge45" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.54,-1113.51C1761.15,-1113.19 1793.67,-1117.94 1813,-1139.29 1888.37,-1222.52 1778,-1556.3 1849,-1643.29 1849.62,-1644.05 1850.26,-1644.78 1850.92,-1645.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1848.93,-1648.37 1858.84,-1652.12 1853.42,-1643.01 1848.93,-1648.37"/>
+</g>
+<!-- proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node34" class="node">
+<title>proc~allocate_rank2_logical4</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node34"><a xlink:href="../proc/allocate_rank2_logical4.html" xlink:title="allocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1994.5,-1634.29 1855.5,-1634.29 1855.5,-1610.29 1994.5,-1610.29 1994.5,-1634.29"/>
+<text text-anchor="middle" x="1925" y="-1619.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge46" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.79,-1113.55C1761.33,-1113.28 1793.67,-1118.08 1813,-1139.29 1882.36,-1215.4 1783.63,-1521.72 1849,-1601.29 1849.62,-1602.04 1850.26,-1602.77 1850.93,-1603.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1848.94,-1606.38 1858.87,-1610.1 1853.43,-1601 1848.94,-1606.38"/>
+</g>
+<!-- proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node35" class="node">
+<title>proc~allocate_rank2_logical8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node35"><a xlink:href="../proc/allocate_rank2_logical8.html" xlink:title="allocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1994.5,-1592.29 1855.5,-1592.29 1855.5,-1568.29 1994.5,-1568.29 1994.5,-1592.29"/>
+<text text-anchor="middle" x="1925" y="-1577.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge47" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.74,-1113.6C1761.25,-1113.36 1793.59,-1118.16 1813,-1139.29 1876.37,-1208.28 1789.25,-1487.14 1849,-1559.29 1849.62,-1560.04 1850.27,-1560.77 1850.94,-1561.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1848.97,-1564.38 1858.9,-1568.07 1853.43,-1558.99 1848.97,-1564.38"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node36" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node36"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="allocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1993.5,-1550.29 1856.5,-1550.29 1856.5,-1526.29 1993.5,-1526.29 1993.5,-1550.29"/>
+<text text-anchor="middle" x="1925" y="-1535.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge48" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.67,-1113.66C1761.15,-1113.44 1793.49,-1118.25 1813,-1139.29 1870.37,-1201.17 1794.88,-1452.56 1849,-1517.29 1849.74,-1518.17 1850.51,-1519.02 1851.31,-1519.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1849.29,-1522.7 1859.27,-1526.26 1853.69,-1517.25 1849.29,-1522.7"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node37" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node37"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="allocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1990,-1508.29 1860,-1508.29 1860,-1484.29 1990,-1484.29 1990,-1508.29"/>
+<text text-anchor="middle" x="1925" y="-1493.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge49" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.59,-1113.74C1761.03,-1113.55 1793.37,-1118.37 1813,-1139.29 1915.76,-1248.82 1751.99,-1360.64 1849,-1475.29 1849.88,-1476.33 1850.82,-1477.33 1851.79,-1478.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1849.95,-1481.28 1860,-1484.65 1854.25,-1475.75 1849.95,-1481.28"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node38" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node38"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="allocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1990,-1466.29 1860,-1466.29 1860,-1442.29 1990,-1442.29 1990,-1466.29"/>
+<text text-anchor="middle" x="1925" y="-1451.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge50" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1734.77,-1113.84C1761.13,-1113.73 1793.29,-1118.59 1813,-1139.29 1903.8,-1234.61 1763.21,-1333.44 1849,-1433.29 1849.87,-1434.3 1850.78,-1435.26 1851.73,-1436.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1849.67,-1439.02 1859.72,-1442.39 1853.97,-1433.49 1849.67,-1439.02"/>
+</g>
+<!-- proc~deallocate_rank1_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node39" class="node">
+<title>proc~deallocate_rank1_int32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node39"><a xlink:href="../proc/deallocate_rank1_int32.html" xlink:title="deallocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1993.5,-248.29 1856.5,-248.29 1856.5,-224.29 1993.5,-224.29 1993.5,-248.29"/>
+<text text-anchor="middle" x="1925" y="-233.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge51" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1692.6,-602.28C1699.96,-551.92 1735.24,-355.78 1849,-257.29 1850.53,-255.96 1852.14,-254.72 1853.82,-253.55"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1855.81,-256.44 1862.65,-248.35 1852.26,-250.41 1855.81,-256.44"/>
+</g>
+<!-- proc~deallocate_rank1_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node40" class="node">
+<title>proc~deallocate_rank1_int64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node40"><a xlink:href="../proc/deallocate_rank1_int64.html" xlink:title="deallocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1993.5,-206.29 1856.5,-206.29 1856.5,-182.29 1993.5,-182.29 1993.5,-206.29"/>
+<text text-anchor="middle" x="1925" y="-191.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge52" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1692.01,-602.02C1697.16,-547.71 1725.29,-326.75 1849,-215.29 1850.35,-214.08 1851.76,-212.93 1853.22,-211.85"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1855.46,-214.59 1862.14,-206.37 1851.79,-208.63 1855.46,-214.59"/>
+</g>
+<!-- proc~deallocate_rank1_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node41" class="node">
+<title>proc~deallocate_rank1_int8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node41"><a xlink:href="../proc/deallocate_rank1_int8.html" xlink:title="deallocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1990,-164.29 1860,-164.29 1860,-140.29 1990,-140.29 1990,-164.29"/>
+<text text-anchor="middle" x="1925" y="-149.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge53" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1691.5,-601.94C1694.52,-544.16 1715.1,-298.01 1849,-173.29 1850.29,-172.09 1851.65,-170.95 1853.06,-169.88"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1855.08,-172.74 1861.65,-164.42 1851.33,-166.83 1855.08,-172.74"/>
+</g>
+<!-- proc~deallocate_rank1_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node42" class="node">
+<title>proc~deallocate_rank1_logical1</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node42"><a xlink:href="../proc/deallocate_rank1_logical1.html" xlink:title="deallocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="2001,-122.29 1849,-122.29 1849,-98.29 2001,-98.29 2001,-122.29"/>
+<text text-anchor="middle" x="1925" y="-107.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge54" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1691.06,-602.03C1692.06,-541.24 1704.68,-269.51 1849,-131.29 1850.28,-130.07 1851.62,-128.92 1853.01,-127.83"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1855.05,-130.68 1861.54,-122.31 1851.24,-124.81 1855.05,-130.68"/>
+</g>
+<!-- proc~deallocate_rank1_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node43" class="node">
+<title>proc~deallocate_rank1_logical4</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node43"><a xlink:href="../proc/deallocate_rank1_logical4.html" xlink:title="deallocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="2001,-836.29 1849,-836.29 1849,-812.29 2001,-812.29 2001,-836.29"/>
+<text text-anchor="middle" x="1925" y="-821.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge55" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1697.7,-626.64C1716.68,-660.41 1774.29,-755 1849,-803.29 1851.73,-805.05 1854.6,-806.67 1857.57,-808.15"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1856.16,-811.35 1866.72,-812.2 1858.99,-804.95 1856.16,-811.35"/>
+</g>
+<!-- proc~deallocate_rank1_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node44" class="node">
+<title>proc~deallocate_rank1_logical8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node44"><a xlink:href="../proc/deallocate_rank1_logical8.html" xlink:title="deallocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="2001,-794.29 1849,-794.29 1849,-770.29 2001,-770.29 2001,-794.29"/>
+<text text-anchor="middle" x="1925" y="-779.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge56" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1700.65,-626.63C1723.38,-654.84 1783.32,-724.45 1849,-761.29 1852.42,-763.21 1856.02,-764.96 1859.73,-766.56"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1858.52,-769.84 1869.1,-770.23 1861.07,-763.32 1858.52,-769.84"/>
+</g>
+<!-- proc~deallocate_rank1_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node45" class="node">
+<title>proc~deallocate_rank1_real128</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node45"><a xlink:href="../proc/deallocate_rank1_real128.html" xlink:title="deallocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="2000.5,-752.29 1849.5,-752.29 1849.5,-728.29 2000.5,-728.29 2000.5,-752.29"/>
+<text text-anchor="middle" x="1925" y="-737.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge57" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1705.75,-626.43C1732.63,-648.01 1792.11,-693.22 1849,-719.29 1853.57,-721.38 1858.39,-723.31 1863.3,-725.08"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1862.2,-728.4 1872.8,-728.28 1864.44,-721.77 1862.2,-728.4"/>
+</g>
+<!-- proc~deallocate_rank1_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node46" class="node">
+<title>proc~deallocate_rank1_real32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node46"><a xlink:href="../proc/deallocate_rank1_real32.html" xlink:title="deallocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1997,-710.29 1853,-710.29 1853,-686.29 1997,-686.29 1997,-710.29"/>
+<text text-anchor="middle" x="1925" y="-695.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge58" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1718.64,-626.35C1749.92,-639.75 1802.56,-661.58 1849,-677.29 1855.28,-679.42 1861.91,-681.5 1868.52,-683.47"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1867.57,-686.84 1878.15,-686.29 1869.53,-680.12 1867.57,-686.84"/>
+</g>
+<!-- proc~deallocate_rank1_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node47" class="node">
+<title>proc~deallocate_rank1_real64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node47"><a xlink:href="../proc/deallocate_rank1_real64.html" xlink:title="deallocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1997,-668.29 1853,-668.29 1853,-644.29 1997,-644.29 1997,-668.29"/>
+<text text-anchor="middle" x="1925" y="-653.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge59" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1741.56,-623.4C1772.38,-628.96 1812.38,-636.17 1847.07,-642.42"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1846.71,-645.91 1857.17,-644.24 1847.95,-639.02 1846.71,-645.91"/>
+</g>
+<!-- proc~deallocate_rank2_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node48" class="node">
+<title>proc~deallocate_rank2_int32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node48"><a xlink:href="../proc/deallocate_rank2_int32.html" xlink:title="deallocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1993.5,-626.29 1856.5,-626.29 1856.5,-602.29 1993.5,-602.29 1993.5,-626.29"/>
+<text text-anchor="middle" x="1925" y="-611.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge60" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1741.56,-614.29C1772.13,-614.29 1811.75,-614.29 1846.24,-614.29"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1846.3,-617.79 1856.3,-614.29 1846.3,-610.79 1846.3,-617.79"/>
+</g>
+<!-- proc~deallocate_rank2_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node49" class="node">
+<title>proc~deallocate_rank2_int64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node49"><a xlink:href="../proc/deallocate_rank2_int64.html" xlink:title="deallocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1993.5,-584.29 1856.5,-584.29 1856.5,-560.29 1993.5,-560.29 1993.5,-584.29"/>
+<text text-anchor="middle" x="1925" y="-569.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge61" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1741.56,-605.18C1772.38,-599.62 1812.38,-592.41 1847.07,-586.16"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1847.95,-589.55 1857.17,-584.34 1846.71,-582.67 1847.95,-589.55"/>
+</g>
+<!-- proc~deallocate_rank2_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node50" class="node">
+<title>proc~deallocate_rank2_int8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node50"><a xlink:href="../proc/deallocate_rank2_int8.html" xlink:title="deallocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1990,-542.29 1860,-542.29 1860,-518.29 1990,-518.29 1990,-542.29"/>
+<text text-anchor="middle" x="1925" y="-527.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge62" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1718.64,-602.23C1749.92,-588.82 1802.56,-567 1849,-551.29 1855.28,-549.16 1861.91,-547.08 1868.52,-545.11"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1869.53,-548.46 1878.15,-542.29 1867.57,-541.74 1869.53,-548.46"/>
+</g>
+<!-- proc~deallocate_rank2_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node51" class="node">
+<title>proc~deallocate_rank2_logical1</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node51"><a xlink:href="../proc/deallocate_rank2_logical1.html" xlink:title="deallocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="2001,-500.29 1849,-500.29 1849,-476.29 2001,-476.29 2001,-500.29"/>
+<text text-anchor="middle" x="1925" y="-485.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge63" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1705.75,-602.15C1732.63,-580.57 1792.11,-535.36 1849,-509.29 1853.57,-507.2 1858.39,-505.27 1863.3,-503.5"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1864.44,-506.81 1872.8,-500.3 1862.2,-500.18 1864.44,-506.81"/>
+</g>
+<!-- proc~deallocate_rank2_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node52" class="node">
+<title>proc~deallocate_rank2_logical4</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node52"><a xlink:href="../proc/deallocate_rank2_logical4.html" xlink:title="deallocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="2001,-458.29 1849,-458.29 1849,-434.29 2001,-434.29 2001,-458.29"/>
+<text text-anchor="middle" x="1925" y="-443.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge64" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1700.65,-601.95C1723.38,-573.74 1783.32,-504.13 1849,-467.29 1852.42,-465.37 1856.02,-463.62 1859.73,-462.02"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1861.07,-465.25 1869.1,-458.35 1858.52,-458.74 1861.07,-465.25"/>
+</g>
+<!-- proc~deallocate_rank2_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node53" class="node">
+<title>proc~deallocate_rank2_logical8</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node53"><a xlink:href="../proc/deallocate_rank2_logical8.html" xlink:title="deallocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="2001,-416.29 1849,-416.29 1849,-392.29 2001,-392.29 2001,-416.29"/>
+<text text-anchor="middle" x="1925" y="-401.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge65" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1697.7,-601.94C1716.68,-568.17 1774.29,-473.57 1849,-425.29 1851.73,-423.53 1854.6,-421.91 1857.57,-420.43"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1858.99,-423.63 1866.72,-416.37 1856.16,-417.23 1858.99,-423.63"/>
+</g>
+<!-- proc~deallocate_rank2_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node54" class="node">
+<title>proc~deallocate_rank2_real128</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node54"><a xlink:href="../proc/deallocate_rank2_real128.html" xlink:title="deallocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="2000.5,-374.29 1849.5,-374.29 1849.5,-350.29 2000.5,-350.29 2000.5,-374.29"/>
+<text text-anchor="middle" x="1925" y="-359.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge66" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1695.76,-602.03C1711.36,-563.46 1764.89,-443.59 1849,-383.29 1851.24,-381.68 1853.6,-380.2 1856.05,-378.83"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1857.77,-381.88 1865.22,-374.35 1854.7,-375.59 1857.77,-381.88"/>
+</g>
+<!-- proc~deallocate_rank2_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node55" class="node">
+<title>proc~deallocate_rank2_real32</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node55"><a xlink:href="../proc/deallocate_rank2_real32.html" xlink:title="deallocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1997,-332.29 1853,-332.29 1853,-308.29 1997,-308.29 1997,-332.29"/>
+<text text-anchor="middle" x="1925" y="-317.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge67" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1694.35,-602.28C1706.86,-559.63 1755.09,-414.11 1849,-341.29 1850.87,-339.84 1852.83,-338.49 1854.86,-337.24"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1856.98,-340.08 1864.18,-332.31 1853.7,-333.89 1856.98,-340.08"/>
+</g>
+<!-- proc~deallocate_rank2_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node56" class="node">
+<title>proc~deallocate_rank2_real64</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node56"><a xlink:href="../proc/deallocate_rank2_real64.html" xlink:title="deallocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1997,-290.29 1853,-290.29 1853,-266.29 1997,-266.29 1997,-290.29"/>
+<text text-anchor="middle" x="1925" y="-275.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64 -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge68" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1693.4,-602.12C1703.29,-555.23 1745.38,-384.71 1849,-299.29 1850.74,-297.86 1852.57,-296.52 1854.47,-295.28"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1856.19,-298.32 1863.21,-290.38 1852.77,-292.22 1856.19,-298.32"/>
+</g>
+<!-- proc~build_node_adjacency_from_elements&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge69" class="edge">
+<title>proc~build_node_adjacency_from_elements&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#7fff00" d="M972.14,-806.3C1131.15,-833.71 1507.13,-899.65 1531,-914.29 1605.59,-960.04 1658.34,-1054.75 1679.16,-1097.06"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1676.05,-1098.68 1683.54,-1106.18 1682.36,-1095.65 1676.05,-1098.68"/>
+</g>
+<!-- proc~build_node_adjacency_from_elements&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge70" class="edge">
+<title>proc~build_node_adjacency_from_elements&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#7fff00" d="M967.58,-782.29C1106.09,-756.75 1424.48,-697.03 1531,-668.29 1571.28,-657.42 1616.21,-641.71 1647.83,-630.03"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1649.45,-633.16 1657.6,-626.39 1647.01,-626.6 1649.45,-633.16"/>
+</g>
+<!-- proc~initialize_node_adjacency -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node57" class="node">
+<title>proc~initialize_node_adjacency</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node57"><a xlink:href="../proc/initialize_node_adjacency.html" xlink:title="type_node_adjacency%initialize_node_adjacency">
+<polygon fill="#d9534f" stroke="#d9534f" points="1326,-810.29 1052,-810.29 1052,-786.29 1326,-786.29 1326,-810.29"/>
+<text text-anchor="middle" x="1189" y="-795.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_node_adjacency%initialize_node_adjacency</text>
+</a>
+</g>
+</g>
+<!-- proc~build_node_adjacency_from_elements&#45;&gt;proc~initialize_node_adjacency -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge71" class="edge">
+<title>proc~build_node_adjacency_from_elements&#45;&gt;proc~initialize_node_adjacency</title>
+<path fill="none" stroke="#7fff00" d="M1009.31,-795.79C1019.76,-795.94 1030.48,-796.09 1041.23,-796.24"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1041.49,-799.74 1051.54,-796.38 1041.59,-792.74 1041.49,-799.74"/>
+</g>
+<!-- log_error -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node18" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="2226,-899.29 2165,-899.29 2165,-875.29 2226,-875.29 2226,-899.29"/>
+<text text-anchor="middle" x="2195.5" y="-884.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge72" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#00ff3f" d="M2129.26,-887.29C2137.73,-887.29 2146.52,-887.29 2154.8,-887.29"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="2154.95,-890.79 2164.95,-887.29 2154.95,-883.79 2154.95,-890.79"/>
+</g>
+<!-- proc~sort_and_enqueue_neighbors -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node58" class="node">
+<title>proc~sort_and_enqueue_neighbors</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node58"><a xlink:href="../proc/sort_and_enqueue_neighbors.html" xlink:title="sort_and_enqueue_neighbors">
+<polygon fill="#d9534f" stroke="#d9534f" points="1531,-1130.29 1362,-1130.29 1362,-1106.29 1531,-1106.29 1531,-1130.29"/>
+<text text-anchor="middle" x="1446.5" y="-1115.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">sort_and_enqueue_neighbors</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_cm_ordering&#45;&gt;proc~sort_and_enqueue_neighbors -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge73" class="edge">
+<title>proc~execute_cm_ordering&#45;&gt;proc~sort_and_enqueue_neighbors</title>
+<path fill="none" stroke="#00ffff" d="M957.36,-1012.31C1058.37,-1034.24 1272.1,-1080.64 1380.11,-1104.09"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1379.39,-1107.52 1389.91,-1106.22 1380.88,-1100.68 1379.39,-1107.52"/>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge74" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff2500" d="M1987.32,-1401.88C1992.44,-1399.1 1997.13,-1395.63 2001,-1391.29 2066.01,-1318.44 2079.12,-997.62 2081.51,-909.66"/>
+<polygon fill="#ff2500" stroke="#ff2500" points="2085.01,-909.56 2081.76,-899.48 2078.01,-909.39 2085.01,-909.56"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge75" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff4a00" d="M1987.26,-1359.82C1992.39,-1357.06 1997.1,-1353.6 2001,-1349.29 2060.82,-1283.2 2077.57,-992.25 2081.16,-909.38"/>
+<polygon fill="#ff4a00" stroke="#ff4a00" points="2084.66,-909.45 2081.58,-899.32 2077.67,-909.16 2084.66,-909.45"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge76" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff6f00" d="M1987.18,-1317.75C1992.33,-1315 1997.06,-1311.57 2001,-1307.29 2055.53,-1248.06 2075.8,-987.84 2080.72,-909.61"/>
+<polygon fill="#ff6f00" stroke="#ff6f00" points="2084.23,-909.63 2081.34,-899.44 2077.24,-909.21 2084.23,-909.63"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge77" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff9500" d="M1983.8,-1277.3C1990.23,-1274.32 1996.18,-1270.41 2001,-1265.29 2050.3,-1212.84 2073.86,-982.86 2080.19,-909.71"/>
+<polygon fill="#ff9500" stroke="#ff9500" points="2083.71,-909.63 2081.06,-899.37 2076.74,-909.04 2083.71,-909.63"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge78" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffba00" d="M1989.48,-1232.18C1993.71,-1229.73 1997.62,-1226.79 2001,-1223.29 2045.19,-1177.46 2071.77,-976.77 2079.58,-909.42"/>
+<polygon fill="#ffba00" stroke="#ffba00" points="2083.06,-909.79 2080.71,-899.46 2076.1,-909 2083.06,-909.79"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge79" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffdf00" d="M1989,-1190.26C1993.39,-1187.79 1997.47,-1184.83 2001,-1181.29 2077.03,-1104.94 2083.37,-964.17 2082.77,-909.66"/>
+<polygon fill="#ffdf00" stroke="#ffdf00" points="2086.26,-909.32 2082.56,-899.39 2079.26,-909.46 2086.26,-909.32"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge80" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f8ff00" d="M1988.84,-1148.1C1993.27,-1145.67 1997.4,-1142.76 2001,-1139.29 2067.03,-1075.72 2079.34,-958.23 2081.56,-909.43"/>
+<polygon fill="#f8ff00" stroke="#f8ff00" points="2085.06,-909.45 2081.91,-899.34 2078.06,-909.21 2085.06,-909.45"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge81" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#d3ff00" d="M1987.9,-1106.25C1992.64,-1103.79 1997.1,-1100.84 2001,-1097.29 2057,-1046.38 2074.63,-952.29 2079.89,-909.51"/>
+<polygon fill="#d3ff00" stroke="#d3ff00" points="2083.4,-909.66 2081.03,-899.33 2076.44,-908.88 2083.4,-909.66"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge82" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#aeff00" d="M1986.85,-1064.27C1991.94,-1061.81 1996.75,-1058.85 2001,-1055.29 2047.12,-1016.66 2068.96,-945.62 2077.47,-909.56"/>
+<polygon fill="#aeff00" stroke="#aeff00" points="2080.94,-910.08 2079.7,-899.56 2074.11,-908.56 2080.94,-910.08"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge83" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#88ff00" d="M1985.27,-1022.21C1990.86,-1019.77 1996.21,-1016.82 2001,-1013.29 2037.7,-986.18 2062.14,-937.04 2073.89,-908.81"/>
+<polygon fill="#88ff00" stroke="#88ff00" points="2077.18,-910.02 2077.64,-899.43 2070.68,-907.42 2077.18,-910.02"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge84" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#63ff00" d="M1981.87,-980.26C1988.54,-977.79 1995.08,-974.83 2001,-971.29 2028.45,-954.9 2052.84,-926.79 2067.51,-907.64"/>
+<polygon fill="#63ff00" stroke="#63ff00" points="2070.37,-909.66 2073.54,-899.55 2064.76,-905.48 2070.37,-909.66"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge85" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3eff00" d="M1974.5,-938.29C1983.42,-935.64 1992.57,-932.61 2001,-929.29 2018.69,-922.31 2037.61,-912.64 2052.71,-904.33"/>
+<polygon fill="#3eff00" stroke="#3eff00" points="2054.55,-907.31 2061.57,-899.38 2051.14,-901.2 2054.55,-907.31"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge86" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#18ff00" d="M1987.21,-900.05C2000.27,-898.29 2014,-896.44 2026.83,-894.72"/>
+<polygon fill="#18ff00" stroke="#18ff00" points="2027.44,-898.17 2036.89,-893.36 2026.51,-891.23 2027.44,-898.17"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge87" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff0c" d="M1983.65,-874.05C1997.75,-875.95 2012.82,-877.98 2026.81,-879.86"/>
+<polygon fill="#00ff0c" stroke="#00ff0c" points="2026.4,-883.34 2036.78,-881.2 2027.33,-876.4 2026.4,-883.34"/>
+</g>
+<!-- proc~allocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge88" class="edge">
+<title>proc~allocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff31" d="M1990.68,-1652.22C1994.53,-1649.75 1998.03,-1646.8 2001,-1643.29 2049.73,-1585.69 2076.03,-1028.01 2081.09,-909.4"/>
+<polygon fill="#00ff31" stroke="#00ff31" points="2084.59,-909.46 2081.52,-899.32 2077.6,-909.17 2084.59,-909.46"/>
+</g>
+<!-- proc~allocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge89" class="edge">
+<title>proc~allocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff57" d="M1990.66,-1610.2C1994.51,-1607.73 1998.02,-1604.79 2001,-1601.29 2047.03,-1547.23 2075.25,-1024.61 2080.93,-909.6"/>
+<polygon fill="#00ff57" stroke="#00ff57" points="2084.44,-909.66 2081.43,-899.5 2077.44,-909.32 2084.44,-909.66"/>
+</g>
+<!-- proc~allocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge90" class="edge">
+<title>proc~allocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff7c" d="M1990.63,-1568.18C1994.49,-1565.71 1998.01,-1562.78 2001,-1559.29 2044.4,-1508.68 2074.51,-1019.64 2080.78,-909.32"/>
+<polygon fill="#00ff7c" stroke="#00ff7c" points="2084.28,-909.51 2081.35,-899.33 2077.29,-909.12 2084.28,-909.51"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge91" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffa1" d="M1990.6,-1526.15C1994.46,-1523.69 1997.99,-1520.77 2001,-1517.29 2081.81,-1423.81 2083.21,-1011.17 2082.3,-909.83"/>
+<polygon fill="#00ffa1" stroke="#00ffa1" points="2085.8,-909.49 2082.19,-899.53 2078.8,-909.57 2085.8,-909.49"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge92" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffc7" d="M1990.22,-1484.33C1994.23,-1481.84 1997.89,-1478.86 2001,-1475.29 2076.59,-1388.64 2081.94,-1006.23 2082.07,-909.55"/>
+<polygon fill="#00ffc7" stroke="#00ffc7" points="2085.57,-909.45 2082.07,-899.45 2078.57,-909.45 2085.57,-909.45"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge93" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffec" d="M1990.18,-1442.3C1994.19,-1439.81 1997.87,-1436.84 2001,-1433.29 2071.26,-1353.59 2080.58,-1002.28 2081.81,-909.71"/>
+<polygon fill="#00ffec" stroke="#00ffec" points="2085.31,-909.56 2081.93,-899.52 2078.31,-909.48 2085.31,-909.56"/>
+</g>
+<!-- proc~deallocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge94" class="edge">
+<title>proc~deallocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ecff" d="M1990.6,-248.43C1994.46,-250.89 1997.99,-253.81 2001,-257.29 2081.81,-350.77 2083.21,-763.41 2082.3,-864.75"/>
+<polygon fill="#00ecff" stroke="#00ecff" points="2078.8,-865.01 2082.19,-875.05 2085.8,-865.08 2078.8,-865.01"/>
+</g>
+<!-- proc~deallocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge95" class="edge">
+<title>proc~deallocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00c7ff" d="M1990.63,-206.4C1994.49,-208.87 1998.01,-211.8 2001,-215.29 2044.4,-265.9 2074.51,-754.94 2080.78,-865.26"/>
+<polygon fill="#00c7ff" stroke="#00c7ff" points="2077.29,-865.46 2081.35,-875.25 2084.28,-865.07 2077.29,-865.46"/>
+</g>
+<!-- proc~deallocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge96" class="edge">
+<title>proc~deallocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00a1ff" d="M1990.32,-164.16C1994.3,-166.68 1997.93,-169.69 2001,-173.29 2047.03,-227.35 2075.25,-749.97 2080.93,-864.98"/>
+<polygon fill="#00a1ff" stroke="#00a1ff" points="2077.44,-865.26 2081.43,-875.08 2084.44,-864.92 2077.44,-865.26"/>
+</g>
+<!-- proc~deallocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge97" class="edge">
+<title>proc~deallocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#007cff" d="M1990.68,-122.36C1994.53,-124.83 1998.03,-127.78 2001,-131.29 2049.73,-188.88 2076.03,-746.57 2081.09,-865.18"/>
+<polygon fill="#007cff" stroke="#007cff" points="2077.6,-865.41 2081.52,-875.26 2084.59,-865.12 2077.6,-865.41"/>
+</g>
+<!-- proc~deallocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge98" class="edge">
+<title>proc~deallocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0057ff" d="M1974.5,-836.29C1983.42,-838.94 1992.57,-841.97 2001,-845.29 2018.69,-852.27 2037.61,-861.94 2052.71,-870.24"/>
+<polygon fill="#0057ff" stroke="#0057ff" points="2051.14,-873.38 2061.57,-875.2 2054.55,-867.27 2051.14,-873.38"/>
+</g>
+<!-- proc~deallocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge99" class="edge">
+<title>proc~deallocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0031ff" d="M1981.87,-794.32C1988.54,-796.79 1995.08,-799.75 2001,-803.29 2028.45,-819.68 2052.84,-847.79 2067.51,-866.94"/>
+<polygon fill="#0031ff" stroke="#0031ff" points="2064.76,-869.1 2073.54,-875.03 2070.37,-864.92 2064.76,-869.1"/>
+</g>
+<!-- proc~deallocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge100" class="edge">
+<title>proc~deallocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#000cff" d="M1985.27,-752.37C1990.86,-754.81 1996.21,-757.75 2001,-761.29 2037.7,-788.4 2062.14,-837.53 2073.89,-865.77"/>
+<polygon fill="#000cff" stroke="#000cff" points="2070.68,-867.16 2077.64,-875.15 2077.18,-864.56 2070.68,-867.16"/>
+</g>
+<!-- proc~deallocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge101" class="edge">
+<title>proc~deallocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1800ff" d="M1986.85,-710.31C1991.94,-712.77 1996.75,-715.73 2001,-719.29 2047.12,-757.92 2068.96,-828.96 2077.47,-865.02"/>
+<polygon fill="#1800ff" stroke="#1800ff" points="2074.11,-866.02 2079.7,-875.02 2080.94,-864.5 2074.11,-866.02"/>
+</g>
+<!-- proc~deallocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge102" class="edge">
+<title>proc~deallocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3e00ff" d="M1987.9,-668.33C1992.64,-670.79 1997.1,-673.74 2001,-677.29 2057,-728.2 2074.63,-822.29 2079.89,-865.07"/>
+<polygon fill="#3e00ff" stroke="#3e00ff" points="2076.44,-865.69 2081.03,-875.25 2083.4,-864.92 2076.44,-865.69"/>
+</g>
+<!-- proc~deallocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge103" class="edge">
+<title>proc~deallocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#6300ff" d="M1988.84,-626.48C1993.27,-628.91 1997.4,-631.82 2001,-635.29 2067.03,-698.86 2079.34,-816.35 2081.56,-865.15"/>
+<polygon fill="#6300ff" stroke="#6300ff" points="2078.06,-865.37 2081.91,-875.24 2085.06,-865.13 2078.06,-865.37"/>
+</g>
+<!-- proc~deallocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge104" class="edge">
+<title>proc~deallocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#8800ff" d="M1989,-584.32C1993.39,-586.79 1997.47,-589.74 2001,-593.29 2077.03,-669.64 2083.37,-810.41 2082.77,-864.92"/>
+<polygon fill="#8800ff" stroke="#8800ff" points="2079.26,-865.12 2082.56,-875.19 2086.26,-865.26 2079.26,-865.12"/>
+</g>
+<!-- proc~deallocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge105" class="edge">
+<title>proc~deallocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ae00ff" d="M1989.48,-542.4C1993.71,-544.85 1997.62,-547.79 2001,-551.29 2045.19,-597.12 2071.77,-797.81 2079.58,-865.16"/>
+<polygon fill="#ae00ff" stroke="#ae00ff" points="2076.1,-865.58 2080.71,-875.12 2083.06,-864.79 2076.1,-865.58"/>
+</g>
+<!-- proc~deallocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge106" class="edge">
+<title>proc~deallocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#d300ff" d="M1989.58,-500.3C1993.79,-502.78 1997.67,-505.74 2001,-509.29 2050.3,-561.74 2073.86,-791.72 2080.19,-864.87"/>
+<polygon fill="#d300ff" stroke="#d300ff" points="2076.74,-865.54 2081.06,-875.21 2083.71,-864.95 2076.74,-865.54"/>
+</g>
+<!-- proc~deallocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge107" class="edge">
+<title>proc~deallocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f800ff" d="M1990.01,-458.44C1994.06,-460.89 1997.79,-463.81 2001,-467.29 2055.53,-526.52 2075.8,-786.73 2080.72,-864.97"/>
+<polygon fill="#f800ff" stroke="#f800ff" points="2077.24,-865.37 2081.34,-875.14 2084.23,-864.95 2077.24,-865.37"/>
+</g>
+<!-- proc~deallocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge108" class="edge">
+<title>proc~deallocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00df" d="M1990.08,-416.38C1994.11,-418.84 1997.82,-421.78 2001,-425.29 2060.82,-491.38 2077.57,-782.33 2081.16,-865.2"/>
+<polygon fill="#ff00df" stroke="#ff00df" points="2077.67,-865.42 2081.58,-875.26 2084.66,-865.13 2077.67,-865.42"/>
+</g>
+<!-- proc~deallocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge109" class="edge">
+<title>proc~deallocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00ba" d="M1990.13,-374.32C1994.16,-376.8 1997.85,-379.76 2001,-383.29 2066.01,-456.14 2079.12,-776.96 2081.51,-864.92"/>
+<polygon fill="#ff00ba" stroke="#ff00ba" points="2078.01,-865.19 2081.76,-875.1 2085.01,-865.02 2078.01,-865.19"/>
+</g>
+<!-- proc~deallocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge110" class="edge">
+<title>proc~deallocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0095" d="M1990.52,-332.5C1994.4,-334.94 1997.96,-337.84 2001,-341.29 2071.26,-420.99 2080.58,-772.29 2081.81,-864.87"/>
+<polygon fill="#ff0095" stroke="#ff0095" points="2078.31,-865.1 2081.93,-875.06 2085.31,-865.02 2078.31,-865.1"/>
+</g>
+<!-- proc~deallocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge111" class="edge">
+<title>proc~deallocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff006f" d="M1990.56,-290.46C1994.44,-292.91 1997.98,-295.83 2001,-299.29 2076.59,-385.94 2081.94,-768.35 2082.07,-865.03"/>
+<polygon fill="#ff006f" stroke="#ff006f" points="2078.57,-865.13 2082.07,-875.13 2085.57,-865.13 2078.57,-865.13"/>
+</g>
+<!-- proc~initialize_node_adjacency&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge112" class="edge">
+<title>proc~initialize_node_adjacency&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff004a" d="M1237.51,-786.21C1324.68,-763.95 1503.77,-717.66 1531,-706.29 1580.32,-685.7 1633.12,-652.4 1663.48,-632.01"/>
+<polygon fill="#ff004a" stroke="#ff004a" points="1665.47,-634.88 1671.79,-626.37 1661.55,-629.09 1665.47,-634.88"/>
+</g>
+<!-- proc~build_csr_from_edges -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node59" class="node">
+<title>proc~build_csr_from_edges</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node59"><a xlink:href="../proc/build_csr_from_edges.html" xlink:title="build_csr_from_edges">
+<polygon fill="#d9534f" stroke="#d9534f" points="1510,-820.29 1383,-820.29 1383,-796.29 1510,-796.29 1510,-820.29"/>
+<text text-anchor="middle" x="1446.5" y="-805.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">build_csr_from_edges</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_node_adjacency&#45;&gt;proc~build_csr_from_edges -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge113" class="edge">
+<title>proc~initialize_node_adjacency&#45;&gt;proc~build_csr_from_edges</title>
+<path fill="none" stroke="#ff004a" d="M1326.35,-803.63C1342.24,-804.25 1357.94,-804.86 1372.48,-805.43"/>
+<polygon fill="#ff004a" stroke="#ff004a" points="1372.72,-808.94 1382.85,-805.84 1372.99,-801.95 1372.72,-808.94"/>
+</g>
+<!-- proc~generate_all_edges -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node60" class="node">
+<title>proc~generate_all_edges</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node60"><a xlink:href="../proc/generate_all_edges.html" xlink:title="generate_all_edges">
+<polygon fill="#d9534f" stroke="#d9534f" points="1505,-862.29 1388,-862.29 1388,-838.29 1505,-838.29 1505,-862.29"/>
+<text text-anchor="middle" x="1446.5" y="-847.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_all_edges</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_node_adjacency&#45;&gt;proc~generate_all_edges -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge114" class="edge">
+<title>proc~initialize_node_adjacency&#45;&gt;proc~generate_all_edges</title>
+<path fill="none" stroke="#ff004a" d="M1249.26,-810.35C1287.72,-818.18 1337.94,-828.4 1377.94,-836.54"/>
+<polygon fill="#ff004a" stroke="#ff004a" points="1377.38,-840 1387.88,-838.56 1378.78,-833.14 1377.38,-840"/>
+</g>
+<!-- proc~sort_and_enqueue_neighbors&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge115" class="edge">
+<title>proc~sort_and_enqueue_neighbors&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0025" d="M1531.29,-1118.29C1565.8,-1118.29 1604.78,-1118.29 1635.35,-1118.29"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="1635.37,-1121.79 1645.37,-1118.29 1635.37,-1114.79 1635.37,-1121.79"/>
+</g>
+<!-- proc~sort_and_enqueue_neighbors&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge116" class="edge">
+<title>proc~sort_and_enqueue_neighbors&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff0025" d="M1451.38,-1106.22C1468.21,-1054.03 1535.52,-847.7 1567,-787.29 1597.89,-728 1646.48,-665.63 1672.02,-634.48"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="1674.9,-636.49 1678.57,-626.55 1669.5,-632.03 1674.9,-636.49"/>
+</g>
+<!-- proc~get_node_neighbors -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node61" class="node">
+<title>proc~get_node_neighbors</title>
+<g id="a_proc~~initialize_type_reordering~~CallsGraph_node61"><a xlink:href="../proc/get_node_neighbors.html" xlink:title="type_node_adjacency%get_node_neighbors">
+<polygon fill="#d9534f" stroke="#d9534f" points="1813,-1172.29 1567,-1172.29 1567,-1148.29 1813,-1148.29 1813,-1172.29"/>
+<text text-anchor="middle" x="1690" y="-1157.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_node_adjacency%get_node_neighbors</text>
+</a>
+</g>
+</g>
+<!-- proc~sort_and_enqueue_neighbors&#45;&gt;proc~get_node_neighbors -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge117" class="edge">
+<title>proc~sort_and_enqueue_neighbors&#45;&gt;proc~get_node_neighbors</title>
+<path fill="none" stroke="#ff0025" d="M1515.74,-1130.32C1532.5,-1133.27 1550.4,-1136.4 1567,-1139.29 1580.55,-1141.65 1594.94,-1144.14 1608.91,-1146.55"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="1608.55,-1150.03 1618.99,-1148.28 1609.73,-1143.14 1608.55,-1150.03"/>
+</g>
+<!-- sort_index -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node62" class="node">
+<title>sort_index</title>
+<polygon fill="#777777" stroke="#777777" points="1723.5,-1214.29 1656.5,-1214.29 1656.5,-1190.29 1723.5,-1190.29 1723.5,-1214.29"/>
+<text text-anchor="middle" x="1690" y="-1199.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">sort_index</text>
+</g>
+<!-- proc~sort_and_enqueue_neighbors&#45;&gt;sort_index -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge118" class="edge">
+<title>proc~sort_and_enqueue_neighbors&#45;&gt;sort_index</title>
+<path fill="none" stroke="#ff0025" d="M1512.51,-1130.36C1518.99,-1132.8 1525.28,-1135.75 1531,-1139.29 1551.9,-1152.23 1545.62,-1169.15 1567,-1181.29 1591.04,-1194.94 1621.72,-1200.17 1646.3,-1202"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="1646.24,-1205.5 1656.43,-1202.59 1646.65,-1198.52 1646.24,-1205.5"/>
+</g>
+<!-- proc~build_csr_from_edges&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge119" class="edge">
+<title>proc~build_csr_from_edges&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M1510.35,-817.98C1517.76,-820.84 1524.85,-824.53 1531,-829.29 1623.24,-900.65 1668.79,-1041.73 1683.5,-1096.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1680.19,-1097.33 1686.11,-1106.12 1686.96,-1095.56 1680.19,-1097.33"/>
+</g>
+<!-- proc~build_csr_from_edges&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge120" class="edge">
+<title>proc~build_csr_from_edges&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M1500.54,-796.29C1511.07,-792.68 1521.73,-788.09 1531,-782.29 1594.88,-742.33 1650.22,-670.34 1675.06,-635"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1678.16,-636.67 1680.97,-626.45 1672.4,-632.69 1678.16,-636.67"/>
+</g>
+<!-- sort -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_node63" class="node">
+<title>sort</title>
+<polygon fill="#777777" stroke="#777777" points="1717,-820.29 1663,-820.29 1663,-796.29 1717,-796.29 1717,-820.29"/>
+<text text-anchor="middle" x="1690" y="-805.89" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">sort</text>
+</g>
+<!-- proc~build_csr_from_edges&#45;&gt;sort -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge121" class="edge">
+<title>proc~build_csr_from_edges&#45;&gt;sort</title>
+<path fill="none" stroke="#ff0000" d="M1510.01,-808.29C1555.36,-808.29 1615.12,-808.29 1652.81,-808.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1652.83,-811.79 1662.83,-808.29 1652.83,-804.79 1652.83,-811.79"/>
+</g>
+<!-- proc~generate_all_edges&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_reordering~~CallsGraph_edge122" class="edge">
+<title>proc~generate_all_edges&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#7fff00" d="M1504.87,-862.34C1514.15,-865.88 1523.25,-870.43 1531,-876.29 1610.64,-936.47 1661.92,-1049.28 1680.82,-1096.56"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1677.66,-1098.07 1684.55,-1106.11 1684.18,-1095.53 1677.66,-1098.07"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_type_reorderingCallsGraph = svgPanZoom('#procinitialize_type_reorderingCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">initialize_type_reordering</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">algorithm_name</span><span class="p">,</span><span class="w"> </span><span class="n">elements</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_reordering</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">algorithm_name</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">holder_elements</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">elements</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">))</span>
+<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;rcm&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">rcm_reorder_method</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">rcm_inverse_method</span><span class="p">()</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;cm&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">cm_reorder_method</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">cm_inverse_method</span><span class="p">()</span>
+<span class="w">        </span><span class="k">end select</span>
+
+<span class="k">    end subroutine </span><span class="n">initialize_type_reordering</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-07-18 08:09 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

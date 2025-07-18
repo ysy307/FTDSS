@@ -59,6 +59,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
                 <form action="../search.html" role="search" class="ms-auto">
@@ -124,7 +133,27 @@
   
   
   
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#inters-0"
+         aria-expanded="false" aria-controls="inters-0">
+         <h4 class="card-header bg-primary text-white">Interfaces</h4>
+      </a>
+      <div id="inters-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_finalize">vtu_finalize</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_get_cell_ids">vtu_get_cell_ids</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_get_cell_info">vtu_get_cell_info</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_get_num_cells">vtu_get_num_cells</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_get_num_points">vtu_get_num_points</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_get_point_data">vtu_get_point_data</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_get_points">vtu_get_points</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_get_total_connectivity_size">vtu_get_total_connectivity_size</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_initialize">vtu_initialize</a>
+            <a class="list-group-item" href="../module/core_vtk_vtu_wrapper.html#interface-vtu_read_header">vtu_read_header</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -137,7 +166,6 @@
   
   
 
-    <em>None</em>
 
   </div>
 
@@ -2221,6 +2249,765 @@ large graphs.</div>
 
 
 
+        <section>
+          <h2>Interfaces</h2>
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_finalize"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_finalize(handle) bind(C, name='c_vtu_finalize')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_get_cell_ids"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_get_cell_ids(handle, array_name, ids) bind(C, name='c_vtu_get_cell_ids')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~8"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-array_name"></span>
+              character(kind=c_char, len=1),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>array_name</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ids"></span>
+              integer(kind=c_int),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ids</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_get_cell_info"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_get_cell_info(handle, connectivity, offsets, types) bind(C, name='c_vtu_get_cell_info')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~7"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-connectivity~5"></span>
+              integer(kind=c_long_long),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>connectivity</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-offsets"></span>
+              integer(kind=c_long_long),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>offsets</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-types"></span>
+              integer(kind=c_int),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>types</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_get_num_cells"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_get_num_cells(handle, num_cells) bind(C, name='c_vtu_get_num_cells')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~5"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_cells"></span>
+              integer(kind=c_int),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_cells</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_get_num_points"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_get_num_points(handle, num_points) bind(C, name='c_vtu_get_num_points')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~3"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_points"></span>
+              integer(kind=c_int),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_points</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_get_point_data"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_get_point_data(handle, array_name, point_data) bind(C, name='c_vtu_get_point_data')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~9"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-array_name~2"></span>
+              character(kind=c_char, len=1),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>array_name</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-point_data"></span>
+              real(kind=c_double),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>point_data</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_get_points"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_get_points(handle, x, y, z) bind(C, name='c_vtu_get_points')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~4"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~21"></span>
+              real(kind=c_double),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>x</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-y~13"></span>
+              real(kind=c_double),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>y</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z~9"></span>
+              real(kind=c_double),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_get_total_connectivity_size"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_get_total_connectivity_size(handle, size_val) bind(C, name='c_vtu_get_total_connectivity_size')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~6"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-size_val"></span>
+              integer(kind=c_long_long),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>size_val</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_initialize"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  function vtu_initialize(filename, error_code) bind(C, name='c_vtu_initialize')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-filename"></span>
+              character(kind=c_char, len=1),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>filename</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-error_code"></span>
+              integer(kind=c_int),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>error_code</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(c_ptr)</small>
+    </h4>
+    
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-vtu_read_header"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    public  subroutine vtu_read_header(handle, format, format_len, dataset, dataset_len) bind(C, name='c_vtu_read_header')  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-handle~2"></span>
+              type(c_ptr),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>handle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-format"></span>
+              character(kind=c_char, len=1),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>format</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-format_len"></span>
+              integer(kind=c_int),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>format_len</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dataset"></span>
+              character(kind=c_char, len=1),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dataset</strong>(*)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dataset_len"></span>
+              integer(kind=c_int),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              value
+            </td>
+            <td>::</td>
+            <td><strong>dataset_len</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -2246,7 +3033,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 06:42 +0000             </p>
+ on 2025-07-18 08:09 +0000             </p>
           </div>
         </div>
         <br>

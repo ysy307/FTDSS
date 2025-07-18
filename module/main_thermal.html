@@ -59,6 +59,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
                 <form action="../search.html" role="search" class="ms-auto">
@@ -124,9 +133,45 @@
   
   
   
-  
-  
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#inters-0"
+         aria-expanded="false" aria-controls="inters-0">
+         <h4 class="card-header bg-primary text-white">Interfaces</h4>
+      </a>
+      <div id="inters-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/main_thermal.html#interface-assemble_type_thermal_3phase_2d">assemble_type_thermal_3phase_2d</a>
+            <a class="list-group-item" href="../module/main_thermal.html#interface-construct_type_thermal_3phase_2d">construct_type_thermal_3phase_2d</a>
+            <a class="list-group-item" href="../module/main_thermal.html#interface-type_thermal_3phase_2d">type_thermal_3phase_2d</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#absints-0"
+         aria-expanded="false" aria-controls="absints-0">
+         <h4 class="card-header bg-primary text-white">Abstract Interfaces</h4>
+      </a>
+      <div id="absints-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/main_thermal.html#interface-abst_assemble">abst_assemble</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#types-0"
+         aria-expanded="false" aria-controls="types-0">
+         <h4 class="card-header bg-primary text-white">Derived Types</h4>
+      </a>
+      <div id="types-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/main_thermal.html#type-abst_thermal">abst_thermal</a>
+            <a class="list-group-item" href="../module/main_thermal.html#type-type_thermal_3phase_2d">type_thermal_3phase_2d</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -137,7 +182,6 @@
   
   
 
-    <em>None</em>
 
   </div>
 
@@ -151,16 +195,16 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='module_boundary.html'>module_boundary</a></li>
-                  <li class="list-inline-item"><a href='module_solver.html'>module_solver</a></li>
                   <li class="list-inline-item"><a href='module_domain.html'>module_domain</a></li>
                   <li class="list-inline-item"><a href='module_control.html'>module_control</a></li>
-                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
-                  <li class="list-inline-item"><a href='module_properties.html'>module_properties</a></li>
-                  <li class="list-inline-item">thermal_thermal_assemble</li>
-                  <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
+                  <li class="list-inline-item"><a href='module_solver.html'>module_solver</a></li>
                   <li class="list-inline-item"><a href='module_matrix.html'>module_matrix</a></li>
+                  <li class="list-inline-item">thermal_thermal_assemble</li>
+                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
+                  <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
+                  <li class="list-inline-item"><a href='module_properties.html'>module_properties</a></li>
+                  <li class="list-inline-item"><a href='module_boundary.html'>module_boundary</a></li>
               </ul>
             </li>
             <li class="list-group-item">
@@ -1480,8 +1524,11 @@
 <!-- json_module -->
 <g id="module~~main_thermal~~UsesGraph_node45" class="node">
 <title>json_module</title>
+<g id="a_module~~main_thermal~~UsesGraph_node45"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
 <polygon fill="#337ab7" stroke="#337ab7" points="1245.5,-380.41 1165.5,-380.41 1165.5,-356.41 1245.5,-356.41 1245.5,-380.41"/>
 <text text-anchor="middle" x="1205.5" y="-366.01" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
 </g>
 <!-- module~inout_input&#45;&gt;json_module -->
 <g id="module~~main_thermal~~UsesGraph_edge130" class="edge">
@@ -2362,8 +2409,1046 @@ large graphs.</div>
 
 
 
+        <section>
+          <h2>Interfaces</h2>
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-assemble_type_thermal_3phase_2d"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    private module subroutine assemble_type_thermal_3phase_2d(self, domain, Property, Porosity, dt, step, iter)  
+    <a href="../proc/assemble_type_thermal_3phase_2d.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~356"></span>
+              class(<a href='../type/type_thermal_3phase_2d.html'>type_thermal_3phase_2d</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~16"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-property~2"></span>
+              type(<a href='../type/type_proereties_manager.html'>type_proereties_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Property</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-porosity~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Porosity</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-step~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>step</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iter~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
 
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-construct_type_thermal_3phase_2d"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    private module function construct_type_thermal_3phase_2d(Input, coordinate, domain) result(structure)  
+    <a href="../proc/construct_type_thermal_3phase_2d.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~4"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-coordinate~3"></span>
+              type(<a href='../type/type_dp_3d.html'>type_dp_3d</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>coordinate</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~15"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>class(<a href='../type/abst_thermal.html'>abst_thermal</a>), allocatable</small>
+    </h4>
+    
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-type_thermal_3phase_2d"></span>
+      <h3>public        interface <a href='../interface/type_thermal_3phase_2d.html'>type_thermal_3phase_2d</a> 
+      </h3>
+    </div>
+    <ul class="list-group">
+          <li class="list-group-item">
+                <h3>
+    private  interface <a href='../interface/construct_type_thermal_3phase_2d.html'>construct_type_thermal_3phase_2d</a>()  
+
+    </h3>
+    
+  
+
+  <h4>Arguments</h4>
+    <em>None</em>
+
+          </li>
+    </ul>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Abstract Interfaces</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="interface-abst_assemble"></span><h3>abstract interface
+        
+    </h3></div>
+    <ul class="list-group">
+      <li class="list-group-item">
+            <h3>
+    private  subroutine abst_assemble(self, domain, Property, Porosity, dt, step, iter)  
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~355"></span>
+              class(<a href='../type/abst_thermal.html'>abst_thermal</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~14"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-property"></span>
+              type(<a href='../type/type_proereties_manager.html'>type_proereties_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Property</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-porosity"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Porosity</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dt~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dt</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-step~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>step</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iter~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+      </li>
+    </ul>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Derived Types</h2>
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-abst_thermal"></span>
+      <h3>
+        type, public, abstract&nbsp;::&nbsp;
+        <a href='../type/abst_thermal.html'>abst_thermal</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ct_l"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>CT_l</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ct_old"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>CT_old</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-d_qice"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>D_Qice</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ft"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>FT</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ft_old"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>FT_old</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kt_l"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>KT_l</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kt_old"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>KT_old</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kt_star_0"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>KT_star_0</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phit"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>PHIT</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phit_old"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>PHIT_old</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+<p>Solver</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-qice"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Qice</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-qw"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Qw</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-si"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Si</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-t~24"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>T</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-order~9"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>order</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-solver"></span>
+              class(abst_solver),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>solver</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure(<a href='../interface/abst_assemble.html'>abst_assemble</a>), public, deferred, pass(self) ::
+  <strong><a href='../type/abst_thermal.html#boundprocedure-assemble'>assemble</a></strong></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_thermal_3phase_2d"></span>
+      <h3>
+        type, public, extends(<a href='../type/abst_thermal.html'>abst_thermal</a>)&nbsp;::&nbsp;
+        <a href='../type/type_thermal_3phase_2d.html'>type_thermal_3phase_2d</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ct_l"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>CT_l</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ct_old"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>CT_old</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-d_qice"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>D_Qice</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ft"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>FT</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ft_old"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>FT_old</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kt_l"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>KT_l</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kt_old"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>KT_old</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kt_star_0"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>KT_star_0</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phit"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>PHIT</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-phit_old"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>PHIT_old</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+<p>Solver</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-qice"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Qice</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-qw"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Qw</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-si"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Si</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-t~24"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>T</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-order~9"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>order</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-solver"></span>
+              class(abst_solver),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>solver</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        <h4>Constructor</h4>
+          
+        <table class="table table-striped varlist">
+          <tbody>
+                <tr>
+                  <td>
+                        private
+
+                    
+                    interface
+                    <strong><a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/construct_type_thermal_3phase_2d.html'>construct_type_thermal_3phase_2d</a></strong>
+                    ()
+                  </td>
+                  <td></td>
+                </tr>
+          </tbody>
+        </table>
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_thermal_3phase_2d.html#boundprocedure-assemble~2'>assemble</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/assemble_type_thermal_3phase_2d.html'>assemble_type_thermal_3phase_2d</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -2387,7 +3472,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 06:42 +0000             </p>
+ on 2025-07-18 08:09 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,0 +1,1621 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_type_bc_thermal_dirichlet &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_type_bc_thermal_dirichlet
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">30 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/boundary_dirichlet.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/boundary_dirichlet.f90.html'>boundary_dirichlet.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/conditions_boundary_dirichlet.html'>conditions_boundary_dirichlet</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_type_bc_thermal_dirichlet</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_type_bc_thermal_dirichlet.html#src">initialize_type_bc_thermal_dirichlet</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine initialize_type_bc_thermal_dirichlet(self, input, domain, id, i_material, time_conv)  
+    <a href="../interface/initialize_type_bc_thermal_dirichlet.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Time settings</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~642"></span>
+              class(<a href='../type/type_bc_thermal_dirichlet.html'>type_bc_thermal_dirichlet</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~50"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~58"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-id~40"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-i_material~29"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i_material</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time_conv~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time_conv</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_type_bc_thermal_dirichletCallsGraph" width="641pt" height="787pt"
+ viewBox="0.00 0.00 641.00 787.47" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph" class="graph" transform="scale(0.5 0.5) rotate(0) translate(4 1582)">
+<title>proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1582 1287,-1582 1287,4 -4,4"/>
+<!-- proc~initialize_type_bc_thermal_dirichlet -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node1" class="node">
+<title>proc~initialize_type_bc_thermal_dirichlet</title>
+<polygon fill="none" stroke="black" points="199,-339 0,-339 0,-315 199,-315 199,-339"/>
+<text text-anchor="middle" x="99.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_bc_thermal_dirichlet</text>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node2" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node2"><a xlink:href="../interface/allocate_array.html" xlink:title="allocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="829.5,-444 740.5,-444 740.5,-420 829.5,-420 829.5,-444"/>
+<text text-anchor="middle" x="785" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_dirichlet&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_type_bc_thermal_dirichlet&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M177.31,-339.03C196.17,-341.98 216.32,-345.11 235,-348 416.54,-376.06 631.92,-408.88 730.23,-423.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="729.81,-427.31 740.23,-425.35 730.87,-420.39 729.81,-427.31"/>
+</g>
+<!-- interface~deallocate_array -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node3" class="node">
+<title>interface~deallocate_array</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node3"><a xlink:href="../interface/deallocate_array.html" xlink:title="deallocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="836.5,-1200 733.5,-1200 733.5,-1176 836.5,-1176 836.5,-1200"/>
+<text text-anchor="middle" x="785" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_dirichlet&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_type_bc_thermal_dirichlet&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M110.16,-339.17C185.12,-433.59 673.33,-1048.59 768.08,-1167.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="765.49,-1170.31 774.45,-1175.96 770.97,-1165.96 765.49,-1170.31"/>
+</g>
+<!-- interface~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node4" class="node">
+<title>interface~find_target_edges_by_group</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node4"><a xlink:href="../interface/find_target_edges_by_group.html" xlink:title="find_target_edges_by_group">
+<polygon fill="#a7506f" stroke="#a7506f" points="403.5,-339 241.5,-339 241.5,-315 403.5,-315 403.5,-339"/>
+<text text-anchor="middle" x="322.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">find_target_edges_by_group</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_dirichlet&#45;&gt;interface~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge3" class="edge">
+<title>proc~initialize_type_bc_thermal_dirichlet&#45;&gt;interface~find_target_edges_by_group</title>
+<path fill="none" stroke="#ff0000" d="M199.04,-327C209.77,-327 220.65,-327 231.28,-327"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="231.37,-330.5 241.37,-327 231.37,-323.5 231.37,-330.5"/>
+</g>
+<!-- none~to_reordered -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node5" class="node">
+<title>none~to_reordered</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node5"><a xlink:href="../type/type_reordering.html#boundprocedure-to_reordered" xlink:title="type_reordering%to_reordered">
+<polygon fill="#a7506f" stroke="#a7506f" points="410,-266 235,-266 235,-242 410,-242 410,-266"/>
+<text text-anchor="middle" x="322.5" y="-251.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%to_reordered</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_dirichlet&#45;&gt;none~to_reordered -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge4" class="edge">
+<title>proc~initialize_type_bc_thermal_dirichlet&#45;&gt;none~to_reordered</title>
+<path fill="none" stroke="#ff0000" d="M136.99,-314.95C174.9,-302.42 234.32,-282.8 275.44,-269.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="276.55,-272.53 284.95,-266.07 274.36,-265.89 276.55,-272.53"/>
+</g>
+<!-- target_edges -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node6" class="node">
+<title>target_edges</title>
+<polygon fill="#777777" stroke="#777777" points="363.5,-224 281.5,-224 281.5,-200 363.5,-200 363.5,-224"/>
+<text text-anchor="middle" x="322.5" y="-209.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">target_edges</text>
+</g>
+<!-- proc~initialize_type_bc_thermal_dirichlet&#45;&gt;target_edges -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge5" class="edge">
+<title>proc~initialize_type_bc_thermal_dirichlet&#45;&gt;target_edges</title>
+<path fill="none" stroke="#ff0000" d="M113.96,-314.97C137.06,-294.97 186.45,-254.92 235,-233 246.33,-227.88 259.09,-223.91 271.25,-220.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="272.34,-224.2 281.29,-218.52 270.75,-217.39 272.34,-224.2"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="allocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-822 920,-822 920,-798 1044,-798 1044,-822"/>
+<text text-anchor="middle" x="982" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M786.23,-444.27C787.86,-494.85 801,-689.25 906,-789 907.51,-790.43 909.1,-791.77 910.77,-793.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="909.32,-796.23 919.66,-798.52 913.01,-790.28 909.32,-796.23"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-780 920,-780 920,-756 1044,-756 1044,-780"/>
+<text text-anchor="middle" x="982" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M786.84,-444.1C790.73,-490.72 811.13,-660.39 906,-747 907.54,-748.4 909.16,-749.71 910.85,-750.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="909.45,-754.18 919.82,-756.35 913.07,-748.19 909.45,-754.18"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="allocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-738 920,-738 920,-714 1044,-714 1044,-738"/>
+<text text-anchor="middle" x="982" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M787.64,-444.25C794.05,-487.07 821.35,-631.53 906,-705 907.53,-706.33 909.14,-707.58 910.81,-708.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="909.25,-711.88 919.64,-713.95 912.81,-705.86 909.25,-711.88"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="allocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1040.5,-696 923.5,-696 923.5,-672 1040.5,-672 1040.5,-696"/>
+<text text-anchor="middle" x="982" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M788.7,-444.22C797.83,-482.69 831.29,-602.3 906,-663 908.57,-665.09 911.34,-666.97 914.24,-668.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="912.77,-671.85 923.28,-673.21 915.91,-665.59 912.77,-671.85"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="allocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1051.5,-654 912.5,-654 912.5,-630 1051.5,-630 1051.5,-654"/>
+<text text-anchor="middle" x="982" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M790.23,-444.36C802.45,-478.15 841.11,-572.78 906,-621 908.09,-622.55 910.29,-623.99 912.57,-625.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="911.21,-628.56 921.71,-629.95 914.37,-622.31 911.21,-628.56"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="allocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1051.5,-612 912.5,-612 912.5,-588 1051.5,-588 1051.5,-612"/>
+<text text-anchor="middle" x="982" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M792.56,-444.42C808.22,-472.8 850.6,-542.73 906,-579 908.72,-580.78 911.58,-582.41 914.54,-583.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="913.12,-587.09 923.68,-587.98 915.97,-580.7 913.12,-587.09"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="allocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1051.5,-570 912.5,-570 912.5,-546 1051.5,-546 1051.5,-570"/>
+<text text-anchor="middle" x="982" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M796.29,-444C815.59,-465.77 859.5,-511.84 906,-537 909.51,-538.9 913.21,-540.64 917.01,-542.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="916.01,-545.6 926.6,-545.9 918.51,-539.06 916.01,-545.6"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="allocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050.5,-528 913.5,-528 913.5,-504 1050.5,-504 1050.5,-528"/>
+<text text-anchor="middle" x="982" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M805.77,-444.04C829.06,-457.83 869.26,-480.4 906,-495 911.18,-497.06 916.64,-499 922.16,-500.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="921.5,-504.27 932.09,-503.91 923.59,-497.59 921.5,-504.27"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="allocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047,-486 917,-486 917,-462 1047,-462 1047,-486"/>
+<text text-anchor="middle" x="982" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.76,-441.43C854.97,-446.86 887.16,-453.79 915.35,-459.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="914.63,-463.28 925.14,-461.97 916.1,-456.44 914.63,-463.28"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047,-444 917,-444 917,-420 1047,-420 1047,-444"/>
+<text text-anchor="middle" x="982" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.76,-432C852.36,-432 880.57,-432 906.48,-432"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="906.66,-435.5 916.66,-432 906.66,-428.5 906.66,-435.5"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="allocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-402 920,-402 920,-378 1044,-378 1044,-402"/>
+<text text-anchor="middle" x="982" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.76,-422.57C854.97,-417.14 887.16,-410.21 915.35,-404.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="916.1,-407.56 925.14,-402.03 914.63,-400.72 916.1,-407.56"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="allocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-360 920,-360 920,-336 1044,-336 1044,-360"/>
+<text text-anchor="middle" x="982" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.9,-426.34C843.46,-423.23 857.98,-418.43 870,-411 890.91,-398.07 885.27,-382.22 906,-369 908.74,-367.26 911.62,-365.65 914.6,-364.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="916.02,-367.38 923.76,-360.15 913.2,-360.97 916.02,-367.38"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="allocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-318 920,-318 920,-294 1044,-294 1044,-318"/>
+<text text-anchor="middle" x="982" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.68,-428.79C843.85,-425.87 858.78,-420.55 870,-411 900.92,-384.66 875.45,-353.77 906,-327 907.56,-325.63 909.21,-324.35 910.92,-323.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="913.13,-325.91 919.98,-317.83 909.58,-319.88 913.13,-325.91"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="allocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1040.5,-276 923.5,-276 923.5,-252 1040.5,-252 1040.5,-276"/>
+<text text-anchor="middle" x="982" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.52,-429.75C844.01,-426.94 859.2,-421.45 870,-411 911.86,-370.51 864.71,-326.07 906,-285 908.52,-282.49 911.32,-280.28 914.3,-278.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="916.06,-281.35 923.15,-273.48 912.7,-275.21 916.06,-281.35"/>
+</g>
+<!-- proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank2_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank2_logical1.html" xlink:title="allocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1051.5,-234 912.5,-234 912.5,-210 1051.5,-210 1051.5,-234"/>
+<text text-anchor="middle" x="982" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.92,-430.15C844.45,-427.38 859.55,-421.81 870,-411 923.07,-356.1 853.7,-298.64 906,-243 907.04,-241.89 908.14,-240.84 909.28,-239.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="911.33,-242.68 917.42,-234.01 907.25,-236.99 911.33,-242.68"/>
+</g>
+<!-- proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank2_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank2_logical4.html" xlink:title="allocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1051.5,-192 912.5,-192 912.5,-168 1051.5,-168 1051.5,-192"/>
+<text text-anchor="middle" x="982" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.74,-430.47C844.42,-427.75 859.68,-422.13 870,-411 934.39,-341.57 842.58,-271.32 906,-201 906.89,-200.01 907.83,-199.07 908.8,-198.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="911.02,-200.88 916.91,-192.07 906.81,-195.28 911.02,-200.88"/>
+</g>
+<!-- proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node25" class="node">
+<title>proc~allocate_rank2_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node25"><a xlink:href="../proc/allocate_rank2_logical8.html" xlink:title="allocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1051.5,-150 912.5,-150 912.5,-126 1051.5,-126 1051.5,-150"/>
+<text text-anchor="middle" x="982" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.91,-430.63C844.61,-427.92 859.83,-422.27 870,-411 945.77,-326.98 831.41,-244.07 906,-159 906.76,-158.14 907.55,-157.31 908.37,-156.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="910.73,-159.1 916.46,-150.19 906.42,-153.59 910.73,-159.1"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node26" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node26"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="allocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050.5,-108 913.5,-108 913.5,-84 1050.5,-84 1050.5,-108"/>
+<text text-anchor="middle" x="982" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge23" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.6,-430.82C844.45,-428.16 859.85,-422.49 870,-411 957.18,-312.36 820.21,-216.85 906,-117 906.75,-116.13 907.53,-115.29 908.34,-114.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="910.71,-117.07 916.38,-108.12 906.37,-111.59 910.71,-117.07"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node27" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node27"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="allocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047,-66 917,-66 917,-42 1047,-42 1047,-66"/>
+<text text-anchor="middle" x="982" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge24" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.69,-430.9C844.55,-428.25 859.93,-422.56 870,-411 968.61,-297.72 808.99,-189.65 906,-75 906.88,-73.95 907.82,-72.96 908.79,-72.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="911.25,-74.54 917,-65.64 906.95,-69.01 911.25,-74.54"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node28" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node28"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="allocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047,-24 917,-24 917,0 1047,0 1047,-24"/>
+<text text-anchor="middle" x="982" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge25" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M829.77,-430.96C844.63,-428.32 860,-422.62 870,-411 925.03,-347.03 851.88,-97.73 906,-33 906.88,-31.95 907.8,-30.95 908.77,-30"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="911.23,-32.52 916.95,-23.6 906.92,-27 911.23,-32.52"/>
+</g>
+<!-- proc~deallocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node29" class="node">
+<title>proc~deallocate_rank1_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node29"><a xlink:href="../proc/deallocate_rank1_int32.html" xlink:title="deallocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050.5,-1494 913.5,-1494 913.5,-1470 1050.5,-1470 1050.5,-1494"/>
+<text text-anchor="middle" x="982" y="-1479.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge26" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M787.64,-1200.25C794.05,-1243.07 821.35,-1387.53 906,-1461 907.53,-1462.33 909.14,-1463.58 910.81,-1464.74"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="909.25,-1467.88 919.64,-1469.95 912.81,-1461.86 909.25,-1467.88"/>
+</g>
+<!-- proc~deallocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node30" class="node">
+<title>proc~deallocate_rank1_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node30"><a xlink:href="../proc/deallocate_rank1_int64.html" xlink:title="deallocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050.5,-1452 913.5,-1452 913.5,-1428 1050.5,-1428 1050.5,-1452"/>
+<text text-anchor="middle" x="982" y="-1437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge27" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M788.7,-1200.22C797.83,-1238.69 831.29,-1358.3 906,-1419 907.75,-1420.42 909.59,-1421.74 911.49,-1422.98"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="909.82,-1426.05 920.26,-1427.84 913.21,-1419.93 909.82,-1426.05"/>
+</g>
+<!-- proc~deallocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node31" class="node">
+<title>proc~deallocate_rank1_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node31"><a xlink:href="../proc/deallocate_rank1_int8.html" xlink:title="deallocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047,-1410 917,-1410 917,-1386 1047,-1386 1047,-1410"/>
+<text text-anchor="middle" x="982" y="-1395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge28" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M790.23,-1200.36C802.45,-1234.15 841.11,-1328.78 906,-1377 908.09,-1378.55 910.29,-1379.99 912.57,-1381.32"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="911.21,-1384.56 921.71,-1385.95 914.37,-1378.31 911.21,-1384.56"/>
+</g>
+<!-- proc~deallocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node32" class="node">
+<title>proc~deallocate_rank1_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node32"><a xlink:href="../proc/deallocate_rank1_logical1.html" xlink:title="deallocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1058,-1368 906,-1368 906,-1344 1058,-1344 1058,-1368"/>
+<text text-anchor="middle" x="982" y="-1353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge29" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M792.56,-1200.42C808.22,-1228.8 850.6,-1298.73 906,-1335 908.72,-1336.78 911.58,-1338.41 914.54,-1339.9"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="913.12,-1343.09 923.68,-1343.98 915.97,-1336.7 913.12,-1343.09"/>
+</g>
+<!-- proc~deallocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node33" class="node">
+<title>proc~deallocate_rank1_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node33"><a xlink:href="../proc/deallocate_rank1_logical4.html" xlink:title="deallocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1058,-1326 906,-1326 906,-1302 1058,-1302 1058,-1326"/>
+<text text-anchor="middle" x="982" y="-1311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge30" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M796.29,-1200C815.59,-1221.77 859.5,-1267.84 906,-1293 909.51,-1294.9 913.21,-1296.64 917.01,-1298.23"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="916.01,-1301.6 926.6,-1301.9 918.51,-1295.06 916.01,-1301.6"/>
+</g>
+<!-- proc~deallocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node34" class="node">
+<title>proc~deallocate_rank1_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node34"><a xlink:href="../proc/deallocate_rank1_logical8.html" xlink:title="deallocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1058,-1284 906,-1284 906,-1260 1058,-1260 1058,-1284"/>
+<text text-anchor="middle" x="982" y="-1269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge31" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M805.77,-1200.04C829.06,-1213.83 869.26,-1236.4 906,-1251 911.18,-1253.06 916.64,-1255 922.16,-1256.81"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="921.5,-1260.27 932.09,-1259.91 923.59,-1253.59 921.5,-1260.27"/>
+</g>
+<!-- proc~deallocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node35" class="node">
+<title>proc~deallocate_rank1_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node35"><a xlink:href="../proc/deallocate_rank1_real128.html" xlink:title="deallocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-1242 906.5,-1242 906.5,-1218 1057.5,-1218 1057.5,-1242"/>
+<text text-anchor="middle" x="982" y="-1227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge32" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M836.72,-1198.93C860.63,-1204.08 889.46,-1210.28 915.04,-1215.79"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="914.53,-1219.26 925.04,-1217.95 916,-1212.42 914.53,-1219.26"/>
+</g>
+<!-- proc~deallocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node36" class="node">
+<title>proc~deallocate_rank1_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node36"><a xlink:href="../proc/deallocate_rank1_real32.html" xlink:title="deallocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1054,-1200 910,-1200 910,-1176 1054,-1176 1054,-1200"/>
+<text text-anchor="middle" x="982" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge33" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M836.72,-1188C856.01,-1188 878.5,-1188 899.91,-1188"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="899.98,-1191.5 909.98,-1188 899.98,-1184.5 899.98,-1191.5"/>
+</g>
+<!-- proc~deallocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node37" class="node">
+<title>proc~deallocate_rank1_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node37"><a xlink:href="../proc/deallocate_rank1_real64.html" xlink:title="deallocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1054,-1158 910,-1158 910,-1134 1054,-1134 1054,-1158"/>
+<text text-anchor="middle" x="982" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge34" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M836.72,-1177.07C860.63,-1171.92 889.46,-1165.72 915.04,-1160.21"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="916,-1163.58 925.04,-1158.05 914.53,-1156.74 916,-1163.58"/>
+</g>
+<!-- proc~deallocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node38" class="node">
+<title>proc~deallocate_rank2_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node38"><a xlink:href="../proc/deallocate_rank2_int32.html" xlink:title="deallocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050.5,-1116 913.5,-1116 913.5,-1092 1050.5,-1092 1050.5,-1116"/>
+<text text-anchor="middle" x="982" y="-1101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge35" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M805.77,-1175.96C829.06,-1162.17 869.26,-1139.6 906,-1125 911.18,-1122.94 916.64,-1121 922.16,-1119.19"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="923.59,-1122.41 932.09,-1116.09 921.5,-1115.73 923.59,-1122.41"/>
+</g>
+<!-- proc~deallocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node39" class="node">
+<title>proc~deallocate_rank2_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node39"><a xlink:href="../proc/deallocate_rank2_int64.html" xlink:title="deallocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050.5,-1074 913.5,-1074 913.5,-1050 1050.5,-1050 1050.5,-1074"/>
+<text text-anchor="middle" x="982" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge36" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M796.29,-1176C815.59,-1154.23 859.5,-1108.16 906,-1083 909.51,-1081.1 913.21,-1079.36 917.01,-1077.77"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="918.51,-1080.94 926.6,-1074.1 916.01,-1074.4 918.51,-1080.94"/>
+</g>
+<!-- proc~deallocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node40" class="node">
+<title>proc~deallocate_rank2_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node40"><a xlink:href="../proc/deallocate_rank2_int8.html" xlink:title="deallocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047,-1032 917,-1032 917,-1008 1047,-1008 1047,-1032"/>
+<text text-anchor="middle" x="982" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge37" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M792.56,-1175.58C808.22,-1147.2 850.6,-1077.27 906,-1041 908.72,-1039.22 911.58,-1037.59 914.54,-1036.1"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="915.97,-1039.3 923.68,-1032.02 913.12,-1032.91 915.97,-1039.3"/>
+</g>
+<!-- proc~deallocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node41" class="node">
+<title>proc~deallocate_rank2_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node41"><a xlink:href="../proc/deallocate_rank2_logical1.html" xlink:title="deallocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1058,-990 906,-990 906,-966 1058,-966 1058,-990"/>
+<text text-anchor="middle" x="982" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge38" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M790.23,-1175.64C802.45,-1141.85 841.11,-1047.22 906,-999 908.09,-997.45 910.29,-996.01 912.57,-994.68"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="914.37,-997.69 921.71,-990.05 911.21,-991.44 914.37,-997.69"/>
+</g>
+<!-- proc~deallocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node42" class="node">
+<title>proc~deallocate_rank2_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node42"><a xlink:href="../proc/deallocate_rank2_logical4.html" xlink:title="deallocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1058,-948 906,-948 906,-924 1058,-924 1058,-948"/>
+<text text-anchor="middle" x="982" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge39" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M788.7,-1175.78C797.83,-1137.31 831.29,-1017.7 906,-957 907.75,-955.58 909.59,-954.26 911.49,-953.02"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="913.21,-956.07 920.26,-948.16 909.82,-949.95 913.21,-956.07"/>
+</g>
+<!-- proc~deallocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node43" class="node">
+<title>proc~deallocate_rank2_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node43"><a xlink:href="../proc/deallocate_rank2_logical8.html" xlink:title="deallocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1058,-906 906,-906 906,-882 1058,-882 1058,-906"/>
+<text text-anchor="middle" x="982" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge40" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M787.64,-1175.75C794.05,-1132.93 821.35,-988.47 906,-915 907.53,-913.67 909.14,-912.42 910.81,-911.26"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="912.81,-914.14 919.64,-906.05 909.25,-908.12 912.81,-914.14"/>
+</g>
+<!-- proc~deallocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node44" class="node">
+<title>proc~deallocate_rank2_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node44"><a xlink:href="../proc/deallocate_rank2_real128.html" xlink:title="deallocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-864 906.5,-864 906.5,-840 1057.5,-840 1057.5,-864"/>
+<text text-anchor="middle" x="982" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge41" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M786.84,-1175.9C790.73,-1129.28 811.13,-959.61 906,-873 907.34,-871.78 908.74,-870.63 910.2,-869.54"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="912.44,-872.27 919.09,-864.02 908.75,-866.33 912.44,-872.27"/>
+</g>
+<!-- proc~deallocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node45" class="node">
+<title>proc~deallocate_rank2_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node45"><a xlink:href="../proc/deallocate_rank2_real32.html" xlink:title="deallocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1054,-1578 910,-1578 910,-1554 1054,-1554 1054,-1578"/>
+<text text-anchor="middle" x="982" y="-1563.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge42" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M786.23,-1200.27C787.86,-1250.85 801,-1445.25 906,-1545 907.28,-1546.22 908.63,-1547.36 910.03,-1548.45"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="908.27,-1551.48 918.57,-1553.95 912.06,-1545.59 908.27,-1551.48"/>
+</g>
+<!-- proc~deallocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node46" class="node">
+<title>proc~deallocate_rank2_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node46"><a xlink:href="../proc/deallocate_rank2_real64.html" xlink:title="deallocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1054,-1536 910,-1536 910,-1512 1054,-1512 1054,-1536"/>
+<text text-anchor="middle" x="982" y="-1521.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge43" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M786.84,-1200.1C790.73,-1246.72 811.13,-1416.39 906,-1503 907.34,-1504.22 908.74,-1505.37 910.2,-1506.46"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="908.75,-1509.67 919.09,-1511.98 912.44,-1503.73 908.75,-1509.67"/>
+</g>
+<!-- proc~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node47" class="node">
+<title>proc~find_target_edges_by_group</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node47"><a xlink:href="../proc/find_target_edges_by_group.html" xlink:title="find_target_edges_by_group">
+<polygon fill="#d9534f" stroke="#d9534f" points="636,-339 474,-339 474,-315 636,-315 636,-339"/>
+<text text-anchor="middle" x="555" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">find_target_edges_by_group</text>
+</a>
+</g>
+</g>
+<!-- interface~find_target_edges_by_group&#45;&gt;proc~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge44" class="edge">
+<title>interface~find_target_edges_by_group&#45;&gt;proc~find_target_edges_by_group</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M403.79,-327C423.16,-327 443.97,-327 463.76,-327"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="463.99,-330.5 473.99,-327 463.99,-323.5 463.99,-330.5"/>
+</g>
+<!-- interface~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node7" class="node">
+<title>interface~to_reordered_index</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node7"><a xlink:href="../interface/to_reordered_index.html" xlink:title="type_reordering%to_reordered_index">
+<polygon fill="#a7506f" stroke="#a7506f" points="659.5,-192 450.5,-192 450.5,-168 659.5,-168 659.5,-192"/>
+<text text-anchor="middle" x="555" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%to_reordered_index</text>
+</a>
+</g>
+</g>
+<!-- none~to_reordered&#45;&gt;interface~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge45" class="edge">
+<title>none~to_reordered&#45;&gt;interface~to_reordered_index</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M379.76,-241.9C389.92,-239.28 400.35,-236.29 410,-233 426.57,-227.36 429.7,-223.4 446,-217 465.64,-209.29 487.62,-201.59 506.6,-195.23"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="507.83,-198.51 516.22,-192.04 505.62,-191.87 507.83,-198.51"/>
+</g>
+<!-- interface~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node8" class="node">
+<title>interface~to_reordered_indices</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node8"><a xlink:href="../interface/to_reordered_indices.html" xlink:title="type_reordering%to_reordered_indices">
+<polygon fill="#a7506f" stroke="#a7506f" points="664,-250 446,-250 446,-226 664,-226 664,-250"/>
+<text text-anchor="middle" x="555" y="-235.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%to_reordered_indices</text>
+</a>
+</g>
+</g>
+<!-- none~to_reordered&#45;&gt;interface~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge46" class="edge">
+<title>none~to_reordered&#45;&gt;interface~to_reordered_indices</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M410.31,-247.97C418.66,-247.39 427.22,-246.8 435.8,-246.2"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="436.14,-249.69 445.87,-245.51 435.65,-242.71 436.14,-249.69"/>
+</g>
+<!-- proc~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node53" class="node">
+<title>proc~to_reordered_index</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node53"><a xlink:href="../proc/to_reordered_index.html" xlink:title="to_reordered_index">
+<polygon fill="#d9534f" stroke="#d9534f" points="842.5,-150 727.5,-150 727.5,-126 842.5,-126 842.5,-150"/>
+<text text-anchor="middle" x="785" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_reordered_index</text>
+</a>
+</g>
+</g>
+<!-- interface~to_reordered_index&#45;&gt;proc~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge47" class="edge">
+<title>interface~to_reordered_index&#45;&gt;proc~to_reordered_index</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M621.34,-167.96C651.36,-162.43 686.94,-155.88 717.15,-150.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="717.98,-153.72 727.18,-148.47 716.71,-146.84 717.98,-153.72"/>
+</g>
+<!-- proc~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node54" class="node">
+<title>proc~to_reordered_indices</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node54"><a xlink:href="../proc/to_reordered_indices.html" xlink:title="to_reordered_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="847,-192 723,-192 723,-168 847,-168 847,-192"/>
+<text text-anchor="middle" x="785" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_reordered_indices</text>
+</a>
+</g>
+</g>
+<!-- interface~to_reordered_indices&#45;&gt;proc~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge48" class="edge">
+<title>interface~to_reordered_indices&#45;&gt;proc~to_reordered_indices</title>
+<path fill="none" stroke="#ff2500" stroke-dasharray="5,2" d="M602.67,-225.93C630.85,-218.66 667.47,-209.24 700,-201 708.27,-198.9 717.01,-196.7 725.6,-194.55"/>
+<polygon fill="#ff2500" stroke="#ff2500" points="726.72,-197.88 735.57,-192.05 725.02,-191.09 726.72,-197.88"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node51" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node51"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="1186,-801 1094,-801 1094,-777 1186,-777 1186,-801"/>
+<text text-anchor="middle" x="1140" y="-786.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge49" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff4a00" d="M1044.21,-801.76C1057.27,-800 1071,-798.15 1083.83,-796.43"/>
+<polygon fill="#ff4a00" stroke="#ff4a00" points="1084.44,-799.88 1093.89,-795.07 1083.51,-792.94 1084.44,-799.88"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge50" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff6f00" d="M1044.21,-776.24C1057.27,-778 1071,-779.85 1083.83,-781.57"/>
+<polygon fill="#ff6f00" stroke="#ff6f00" points="1083.51,-785.06 1093.89,-782.93 1084.44,-778.12 1083.51,-785.06"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge51" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff9500" d="M1031.5,-738C1040.42,-740.65 1049.57,-743.68 1058,-747 1075.69,-753.98 1094.61,-763.65 1109.71,-771.96"/>
+<polygon fill="#ff9500" stroke="#ff9500" points="1108.14,-775.09 1118.57,-776.91 1111.55,-768.98 1108.14,-775.09"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge52" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffba00" d="M1038.87,-696.03C1045.54,-698.5 1052.08,-701.46 1058,-705 1085.45,-721.39 1109.84,-749.5 1124.51,-768.65"/>
+<polygon fill="#ffba00" stroke="#ffba00" points="1121.76,-770.81 1130.54,-776.74 1127.37,-766.63 1121.76,-770.81"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge53" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffdf00" d="M1042.27,-654.08C1047.86,-656.52 1053.21,-659.46 1058,-663 1094.7,-690.11 1119.14,-739.24 1130.89,-767.48"/>
+<polygon fill="#ffdf00" stroke="#ffdf00" points="1127.68,-768.87 1134.64,-776.86 1134.18,-766.27 1127.68,-768.87"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge54" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f8ff00" d="M1043.85,-612.02C1048.94,-614.48 1053.75,-617.44 1058,-621 1104.12,-659.63 1125.96,-730.67 1134.47,-766.73"/>
+<polygon fill="#f8ff00" stroke="#f8ff00" points="1131.11,-767.73 1136.7,-776.73 1137.94,-766.21 1131.11,-767.73"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge55" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#d3ff00" d="M1044.9,-570.04C1049.64,-572.5 1054.1,-575.45 1058,-579 1114,-629.91 1131.63,-724 1136.89,-766.78"/>
+<polygon fill="#d3ff00" stroke="#d3ff00" points="1133.44,-767.41 1138.03,-776.96 1140.4,-766.63 1133.44,-767.41"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge56" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#aeff00" d="M1045.84,-528.19C1050.27,-530.62 1054.4,-533.53 1058,-537 1124.03,-600.57 1136.34,-718.06 1138.56,-766.86"/>
+<polygon fill="#aeff00" stroke="#aeff00" points="1135.06,-767.08 1138.91,-776.95 1142.06,-766.84 1135.06,-767.08"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge57" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#88ff00" d="M1046,-486.03C1050.39,-488.5 1054.47,-491.45 1058,-495 1134.03,-571.35 1140.37,-712.12 1139.77,-766.63"/>
+<polygon fill="#88ff00" stroke="#88ff00" points="1136.26,-766.83 1139.56,-776.9 1143.26,-766.97 1136.26,-766.83"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge58" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#63ff00" d="M1046.48,-444.11C1050.71,-446.56 1054.62,-449.5 1058,-453 1102.19,-498.83 1128.77,-699.52 1136.58,-766.87"/>
+<polygon fill="#63ff00" stroke="#63ff00" points="1133.1,-767.29 1137.71,-776.83 1140.06,-766.5 1133.1,-767.29"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge59" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3eff00" d="M1044.09,-400.62C1049.26,-403.36 1054.02,-406.76 1058,-411 1107.3,-463.45 1130.86,-693.43 1137.19,-766.58"/>
+<polygon fill="#3eff00" stroke="#3eff00" points="1133.74,-767.25 1138.06,-776.92 1140.71,-766.66 1133.74,-767.25"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge60" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#18ff00" d="M1044.18,-358.54C1049.33,-361.29 1054.06,-364.72 1058,-369 1112.53,-428.23 1132.8,-688.45 1137.72,-766.68"/>
+<polygon fill="#18ff00" stroke="#18ff00" points="1134.24,-767.08 1138.34,-776.85 1141.23,-766.66 1134.24,-767.08"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge61" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff0c" d="M1044.26,-316.47C1049.39,-319.23 1054.1,-322.69 1058,-327 1117.82,-393.09 1134.57,-684.04 1138.16,-766.91"/>
+<polygon fill="#00ff0c" stroke="#00ff0c" points="1134.67,-767.13 1138.58,-776.97 1141.66,-766.84 1134.67,-767.13"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge62" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff31" d="M1040.69,-272.59C1047.22,-275.62 1053.23,-279.65 1058,-285 1123.01,-357.85 1136.12,-678.67 1138.51,-766.63"/>
+<polygon fill="#00ff31" stroke="#00ff31" points="1135.01,-766.9 1138.76,-776.81 1142.01,-766.73 1135.01,-766.9"/>
+</g>
+<!-- proc~allocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge63" class="edge">
+<title>proc~allocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff57" d="M1047.52,-234.21C1051.4,-236.65 1054.96,-239.55 1058,-243 1128.26,-322.7 1137.58,-674.01 1138.81,-766.58"/>
+<polygon fill="#00ff57" stroke="#00ff57" points="1135.31,-766.81 1138.93,-776.77 1142.31,-766.73 1135.31,-766.81"/>
+</g>
+<!-- proc~allocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge64" class="edge">
+<title>proc~allocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff7c" d="M1047.56,-192.17C1051.44,-194.62 1054.98,-197.54 1058,-201 1133.59,-287.65 1138.94,-670.06 1139.07,-766.74"/>
+<polygon fill="#00ff7c" stroke="#00ff7c" points="1135.57,-766.84 1139.07,-776.84 1142.57,-766.84 1135.57,-766.84"/>
+</g>
+<!-- proc~allocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge65" class="edge">
+<title>proc~allocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffa1" d="M1047.6,-150.14C1051.46,-152.6 1054.99,-155.52 1058,-159 1138.81,-252.48 1140.21,-665.12 1139.3,-766.46"/>
+<polygon fill="#00ffa1" stroke="#00ffa1" points="1135.8,-766.72 1139.19,-776.76 1142.8,-766.8 1135.8,-766.72"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge66" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffc7" d="M1047.63,-108.11C1051.49,-110.58 1055.01,-113.51 1058,-117 1101.4,-167.61 1131.51,-656.65 1137.78,-766.97"/>
+<polygon fill="#00ffc7" stroke="#00ffc7" points="1134.29,-767.17 1138.35,-776.96 1141.28,-766.78 1134.29,-767.17"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge67" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffec" d="M1047.32,-65.87C1051.3,-68.39 1054.93,-71.4 1058,-75 1104.03,-129.06 1132.25,-651.68 1137.93,-766.69"/>
+<polygon fill="#00ffec" stroke="#00ffec" points="1134.44,-766.97 1138.43,-776.79 1141.44,-766.63 1134.44,-766.97"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge68" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ecff" d="M1047,-23.64C1051.11,-26.2 1054.86,-29.28 1058,-33 1106.73,-90.59 1133.03,-648.28 1138.09,-766.89"/>
+<polygon fill="#00ecff" stroke="#00ecff" points="1134.6,-767.12 1138.52,-776.97 1141.59,-766.83 1134.6,-767.12"/>
+</g>
+<!-- proc~deallocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge69" class="edge">
+<title>proc~deallocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00c7ff" d="M1047.63,-1469.89C1051.49,-1467.42 1055.01,-1464.49 1058,-1461 1101.4,-1410.39 1131.51,-921.35 1137.78,-811.03"/>
+<polygon fill="#00c7ff" stroke="#00c7ff" points="1141.28,-811.22 1138.35,-801.04 1134.29,-810.83 1141.28,-811.22"/>
+</g>
+<!-- proc~deallocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge70" class="edge">
+<title>proc~deallocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00a1ff" d="M1047.6,-1427.86C1051.46,-1425.4 1054.99,-1422.48 1058,-1419 1138.81,-1325.52 1140.21,-912.88 1139.3,-811.54"/>
+<polygon fill="#00a1ff" stroke="#00a1ff" points="1142.8,-811.2 1139.19,-801.24 1135.8,-811.28 1142.8,-811.2"/>
+</g>
+<!-- proc~deallocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge71" class="edge">
+<title>proc~deallocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#007cff" d="M1047.22,-1386.04C1051.23,-1383.55 1054.89,-1380.57 1058,-1377 1133.59,-1290.35 1138.94,-907.94 1139.07,-811.26"/>
+<polygon fill="#007cff" stroke="#007cff" points="1142.57,-811.16 1139.07,-801.16 1135.57,-811.16 1142.57,-811.16"/>
+</g>
+<!-- proc~deallocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge72" class="edge">
+<title>proc~deallocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0057ff" d="M1047.52,-1343.79C1051.4,-1341.35 1054.96,-1338.45 1058,-1335 1128.26,-1255.3 1137.58,-903.99 1138.81,-811.42"/>
+<polygon fill="#0057ff" stroke="#0057ff" points="1142.31,-811.27 1138.93,-801.23 1135.31,-811.19 1142.31,-811.27"/>
+</g>
+<!-- proc~deallocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge73" class="edge">
+<title>proc~deallocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0031ff" d="M1047.13,-1301.96C1051.16,-1299.49 1054.85,-1296.53 1058,-1293 1123.01,-1220.15 1136.12,-899.33 1138.51,-811.37"/>
+<polygon fill="#0031ff" stroke="#0031ff" points="1142.01,-811.27 1138.76,-801.19 1135.01,-811.1 1142.01,-811.27"/>
+</g>
+<!-- proc~deallocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge74" class="edge">
+<title>proc~deallocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#000cff" d="M1047.08,-1259.91C1051.11,-1257.45 1054.82,-1254.51 1058,-1251 1117.82,-1184.91 1134.57,-893.96 1138.16,-811.09"/>
+<polygon fill="#000cff" stroke="#000cff" points="1141.66,-811.16 1138.58,-801.03 1134.67,-810.87 1141.66,-811.16"/>
+</g>
+<!-- proc~deallocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge75" class="edge">
+<title>proc~deallocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1800ff" d="M1047.01,-1217.85C1051.06,-1215.4 1054.79,-1212.48 1058,-1209 1112.53,-1149.77 1132.8,-889.55 1137.72,-811.32"/>
+<polygon fill="#1800ff" stroke="#1800ff" points="1141.23,-811.34 1138.34,-801.15 1134.24,-810.92 1141.23,-811.34"/>
+</g>
+<!-- proc~deallocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge76" class="edge">
+<title>proc~deallocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3e00ff" d="M1046.58,-1175.99C1050.79,-1173.51 1054.67,-1170.55 1058,-1167 1107.3,-1114.55 1130.86,-884.57 1137.19,-811.42"/>
+<polygon fill="#3e00ff" stroke="#3e00ff" points="1140.71,-811.34 1138.06,-801.08 1133.74,-810.75 1140.71,-811.34"/>
+</g>
+<!-- proc~deallocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge77" class="edge">
+<title>proc~deallocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#6300ff" d="M1046.48,-1133.89C1050.71,-1131.44 1054.62,-1128.5 1058,-1125 1102.19,-1079.17 1128.77,-878.48 1136.58,-811.13"/>
+<polygon fill="#6300ff" stroke="#6300ff" points="1140.06,-811.5 1137.71,-801.17 1133.1,-810.71 1140.06,-811.5"/>
+</g>
+<!-- proc~deallocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge78" class="edge">
+<title>proc~deallocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#8800ff" d="M1046,-1091.97C1050.39,-1089.5 1054.47,-1086.55 1058,-1083 1134.03,-1006.65 1140.37,-865.88 1139.77,-811.37"/>
+<polygon fill="#8800ff" stroke="#8800ff" points="1143.26,-811.03 1139.56,-801.1 1136.26,-811.17 1143.26,-811.03"/>
+</g>
+<!-- proc~deallocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge79" class="edge">
+<title>proc~deallocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ae00ff" d="M1045.84,-1049.81C1050.27,-1047.38 1054.4,-1044.47 1058,-1041 1124.03,-977.43 1136.34,-859.94 1138.56,-811.14"/>
+<polygon fill="#ae00ff" stroke="#ae00ff" points="1142.06,-811.16 1138.91,-801.05 1135.06,-810.92 1142.06,-811.16"/>
+</g>
+<!-- proc~deallocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge80" class="edge">
+<title>proc~deallocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#d300ff" d="M1044.9,-1007.96C1049.64,-1005.5 1054.1,-1002.55 1058,-999 1114,-948.09 1131.63,-854 1136.89,-811.22"/>
+<polygon fill="#d300ff" stroke="#d300ff" points="1140.4,-811.37 1138.03,-801.04 1133.44,-810.59 1140.4,-811.37"/>
+</g>
+<!-- proc~deallocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge81" class="edge">
+<title>proc~deallocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f800ff" d="M1043.85,-965.98C1048.94,-963.52 1053.75,-960.56 1058,-957 1104.12,-918.37 1125.96,-847.33 1134.47,-811.27"/>
+<polygon fill="#f800ff" stroke="#f800ff" points="1137.94,-811.79 1136.7,-801.27 1131.11,-810.27 1137.94,-811.79"/>
+</g>
+<!-- proc~deallocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge82" class="edge">
+<title>proc~deallocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00df" d="M1042.27,-923.92C1047.86,-921.48 1053.21,-918.54 1058,-915 1094.7,-887.89 1119.14,-838.76 1130.89,-810.52"/>
+<polygon fill="#ff00df" stroke="#ff00df" points="1134.18,-811.73 1134.64,-801.14 1127.68,-809.13 1134.18,-811.73"/>
+</g>
+<!-- proc~deallocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge83" class="edge">
+<title>proc~deallocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00ba" d="M1038.87,-881.97C1045.54,-879.5 1052.08,-876.54 1058,-873 1085.45,-856.61 1109.84,-828.5 1124.51,-809.35"/>
+<polygon fill="#ff00ba" stroke="#ff00ba" points="1127.37,-811.37 1130.54,-801.26 1121.76,-807.19 1127.37,-811.37"/>
+</g>
+<!-- proc~deallocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge84" class="edge">
+<title>proc~deallocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0095" d="M1031.5,-840C1040.42,-837.35 1049.57,-834.32 1058,-831 1075.69,-824.02 1094.61,-814.35 1109.71,-806.04"/>
+<polygon fill="#ff0095" stroke="#ff0095" points="1111.55,-809.02 1118.57,-801.09 1108.14,-802.91 1111.55,-809.02"/>
+</g>
+<!-- proc~deallocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge85" class="edge">
+<title>proc~deallocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff006f" d="M1047.68,-1553.93C1051.53,-1551.46 1055.03,-1548.51 1058,-1545 1106.73,-1487.41 1133.03,-929.72 1138.09,-811.11"/>
+<polygon fill="#ff006f" stroke="#ff006f" points="1141.59,-811.17 1138.52,-801.03 1134.6,-810.88 1141.59,-811.17"/>
+</g>
+<!-- proc~deallocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge86" class="edge">
+<title>proc~deallocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff004a" d="M1047.66,-1511.91C1051.51,-1509.44 1055.02,-1506.5 1058,-1503 1104.03,-1448.94 1132.25,-926.32 1137.93,-811.31"/>
+<polygon fill="#ff004a" stroke="#ff004a" points="1141.44,-811.37 1138.43,-801.21 1134.44,-811.03 1141.44,-811.37"/>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge89" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0025" d="M580.54,-339.01C602.78,-350.16 636.22,-367.61 664,-385 680.73,-395.47 682.1,-402.68 700,-411 709.5,-415.42 720.06,-418.99 730.39,-421.84"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="729.63,-425.26 740.19,-424.37 731.38,-418.48 729.63,-425.26"/>
+</g>
+<!-- get_group -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node48" class="node">
+<title>get_group</title>
+<polygon fill="#777777" stroke="#777777" points="818,-234 752,-234 752,-210 818,-210 818,-234"/>
+<text text-anchor="middle" x="785" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_group</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;get_group -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge87" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;get_group</title>
+<path fill="none" stroke="#ff0025" d="M572.91,-314.98C599.01,-296.94 651.21,-262.86 700,-243 713.2,-237.63 728.15,-233.35 741.74,-230.1"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="742.84,-233.44 751.81,-227.81 741.29,-226.61 742.84,-233.44"/>
+</g>
+<!-- get_order -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node49" class="node">
+<title>get_order</title>
+<polygon fill="#777777" stroke="#777777" points="817,-402 753,-402 753,-378 817,-378 817,-402"/>
+<text text-anchor="middle" x="785" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_order</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;get_order -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge88" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;get_order</title>
+<path fill="none" stroke="#ff0025" d="M595.61,-339C624.47,-347.64 664.56,-359.4 700,-369 713.88,-372.76 729.1,-376.64 742.74,-380.02"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="742.26,-383.51 752.81,-382.51 743.94,-376.71 742.26,-383.51"/>
+</g>
+<!-- log_warning -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node50" class="node">
+<title>log_warning</title>
+<polygon fill="#777777" stroke="#777777" points="823.5,-360 746.5,-360 746.5,-336 823.5,-336 823.5,-360"/>
+<text text-anchor="middle" x="785" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_warning</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;log_warning -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge90" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;log_warning</title>
+<path fill="none" stroke="#ff0025" d="M636.06,-334.37C669.43,-337.45 707.07,-340.91 736.03,-343.58"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="736.01,-347.09 746.28,-344.53 736.65,-340.12 736.01,-347.09"/>
+</g>
+<!-- proc~get_num_sides -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node52" class="node">
+<title>proc~get_num_sides</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node52"><a xlink:href="../proc/get_num_sides.html" xlink:title="type_domain%get_num_sides">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="870,-318 700,-318 700,-294 870,-294 870,-318"/>
+<text text-anchor="middle" x="785" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_sides</text>
+</a>
+</g>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;proc~get_num_sides -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge91" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;proc~get_num_sides</title>
+<path fill="none" stroke="#ff0025" d="M636.06,-319.63C653.33,-318.04 671.74,-316.34 689.51,-314.7"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="690.24,-318.15 699.87,-313.75 689.6,-311.18 690.24,-318.15"/>
+</g>
+<!-- to_string -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node55" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="814,-276 756,-276 756,-252 814,-252 814,-276"/>
+<text text-anchor="middle" x="785" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;to_string -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge92" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0025" d="M595.61,-315C624.47,-306.36 664.56,-294.6 700,-285 714.95,-280.95 731.46,-276.76 745.87,-273.2"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="747.05,-276.51 755.93,-270.73 745.38,-269.72 747.05,-276.51"/>
+</g>
+<!-- log_error -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_node56" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="1283,-801 1222,-801 1222,-777 1283,-777 1283,-801"/>
+<text text-anchor="middle" x="1252.5" y="-786.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CallsGraph_edge93" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#00ff3f" d="M1186.26,-789C1194.73,-789 1203.52,-789 1211.8,-789"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1211.95,-792.5 1221.95,-789 1211.95,-785.5 1211.95,-792.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_type_bc_thermal_dirichletCallsGraph = svgPanZoom('#procinitialize_type_bc_thermal_dirichletCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_bc_thermal_dirichlet~~CalledByGraph Pages: 1 -->
+<svg id="procinitialize_type_bc_thermal_dirichletCalledByGraph" width="589pt" height="32pt"
+ viewBox="0.00 0.00 589.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~initialize_type_bc_thermal_dirichlet~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 585,-28 585,4 -4,4"/>
+<!-- proc~initialize_type_bc_thermal_dirichlet -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CalledByGraph_node1" class="node">
+<title>proc~initialize_type_bc_thermal_dirichlet</title>
+<polygon fill="none" stroke="black" points="581,-24 382,-24 382,0 581,0 581,-24"/>
+<text text-anchor="middle" x="481.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_bc_thermal_dirichlet</text>
+</g>
+<!-- interface~initialize_type_bc_thermal_dirichlet -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CalledByGraph_node2" class="node">
+<title>interface~initialize_type_bc_thermal_dirichlet</title>
+<g id="a_proc~~initialize_type_bc_thermal_dirichlet~~CalledByGraph_node2"><a xlink:href="../interface/initialize_type_bc_thermal_dirichlet.html" xlink:title="type_bc_thermal_dirichlet%initialize_type_bc_thermal_dirichlet">
+<polygon fill="#a7506f" stroke="#a7506f" points="346,-24 0,-24 0,0 346,0 346,-24"/>
+<text text-anchor="middle" x="173" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_bc_thermal_dirichlet%initialize_type_bc_thermal_dirichlet</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_bc_thermal_dirichlet&#45;&gt;proc~initialize_type_bc_thermal_dirichlet -->
+<g id="proc~~initialize_type_bc_thermal_dirichlet~~CalledByGraph_edge1" class="edge">
+<title>interface~initialize_type_bc_thermal_dirichlet&#45;&gt;proc~initialize_type_bc_thermal_dirichlet</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M346.06,-12C354.7,-12 363.25,-12 371.61,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="371.71,-15.5 381.71,-12 371.71,-8.5 371.71,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">initialize_type_bc_thermal_dirichlet</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">,</span><span class="w"> </span><span class="n">time_conv</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_bc_thermal_dirichlet</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_input</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">input</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">id</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i_material</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">time_conv</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp_indices</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">material_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">id</span><span class="p">)%</span><span class="n">id</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">boundary_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">id</span><span class="p">)%</span><span class="n">thermal</span><span class="p">%</span><span class="k">type</span>
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">is_uniform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">id</span><span class="p">)%</span><span class="n">thermal</span><span class="p">%</span><span class="n">is_uniform</span>
+
+<span class="w">        </span><span class="c">!! Time settings</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">boundary_time_points</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">time_conv</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">id</span><span class="p">)%</span><span class="n">thermal</span><span class="p">%</span><span class="n">values</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">find_target_edges_by_group</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_target_edges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">reordering</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;cm&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rcm&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">tmp_indices</span><span class="p">,</span><span class="w"> </span><span class="mi">2_int32</span><span class="p">)</span>
+<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_target_edges</span>
+<span class="w">                </span><span class="k">call </span><span class="n">domain</span><span class="p">%</span><span class="n">reordering</span><span class="p">%</span><span class="n">to_reordered</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">tmp_indices</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp_indices</span><span class="p">(:)</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">tmp_indices</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end select</span>
+
+<span class="k">    end subroutine </span><span class="n">initialize_type_bc_thermal_dirichlet</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-07-18 08:09 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

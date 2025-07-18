@@ -59,6 +59,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
                 <form action="../search.html" role="search" class="ms-auto">
@@ -127,17 +136,49 @@
   
   
   
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#funcs-0"
+         aria-expanded="false" aria-controls="funcs-0">
+         <h4 class="card-header bg-primary text-white">Functions</h4>
+      </a>
+      <div id="funcs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/multicoloring_welch_powell.html#proc-find_smallest_available_color">find_smallest_available_color</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/multicoloring_welch_powell.html#proc-get_welsh_powell_order">get_welsh_powell_order</a>
+        </div>
+      </div>
+    </div>
+
   
-  
-  
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modsubs-0"
+         aria-expanded="false" aria-controls="modsubs-0">
+         <h4 class="card-header bg-primary text-white">Module Subroutines</h4>
+      </a>
+      <div id="modsubs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/multicoloring_welch_powell.html#proc-coloring_welsh_powell">coloring_welsh_powell</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
   
   
 
-    <em>None</em>
 
   </div>
 
@@ -996,8 +1037,11 @@
 <!-- json_module -->
 <g id="module~~multicoloring_welch_powell~~UsesGraph_node36" class="node">
 <title>json_module</title>
+<g id="a_module~~multicoloring_welch_powell~~UsesGraph_node36"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
 <polygon fill="#337ab7" stroke="#337ab7" points="1207,-433.22 1127,-433.22 1127,-409.22 1207,-409.22 1207,-433.22"/>
 <text text-anchor="middle" x="1167" y="-418.82" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
 </g>
 <!-- module~inout_input&#45;&gt;json_module -->
 <g id="module~~multicoloring_welch_powell~~UsesGraph_edge82" class="edge">
@@ -1135,9 +1179,207 @@ large graphs.</div>
 
 
 
+        <section>
+          <h2>Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-find_smallest_available_color"></span> <h3> function <a href='../proc/find_smallest_available_color.html'>find_smallest_available_color</a>(v, graph, colors) result(color_id)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-v~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>v</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-graph~3"></span>
+              class(<a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>graph</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-colors~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>colors</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_welsh_powell_order"></span> <h3> subroutine <a href='../proc/get_welsh_powell_order.html'>get_welsh_powell_order</a>(graph, perm)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-graph~2"></span>
+              class(<a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>graph</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-perm~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>perm</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
 
+    </div>
+  </div>
 
+        </section>
+        <br>
+
+
+        <section>
+          <h2>Module Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-coloring_welsh_powell"></span> <h3>module subroutine <a href='../proc/coloring_welsh_powell.html'>coloring_welsh_powell</a>(self, graph)  
+    <a href="../interface/coloring_welsh_powell.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~158"></span>
+              class(<a href='../type/type_coloring.html'>type_coloring</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-graph"></span>
+              class(<a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>graph</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
     </div>
   </div>
@@ -1157,7 +1399,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 06:42 +0000             </p>
+ on 2025-07-18 08:09 +0000             </p>
           </div>
         </div>
         <br>

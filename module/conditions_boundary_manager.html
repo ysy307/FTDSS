@@ -59,6 +59,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
                 <form action="../search.html" role="search" class="ms-auto">
@@ -126,9 +135,33 @@
   
   
   
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#types-0"
+         aria-expanded="false" aria-controls="types-0">
+         <h4 class="card-header bg-primary text-white">Derived Types</h4>
+      </a>
+      <div id="types-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/conditions_boundary_manager.html#type-holder_bcs">holder_bcs</a>
+            <a class="list-group-item" href="../module/conditions_boundary_manager.html#type-type_bc">type_bc</a>
+        </div>
+      </div>
+    </div>
+
   
-  
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/conditions_boundary_manager.html#proc-apply_type_bc_crs">apply_type_bc_crs</a>
+            <a class="list-group-item" href="../module/conditions_boundary_manager.html#proc-initialize_type_bc">initialize_type_bc</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -137,7 +170,6 @@
   
   
 
-    <em>None</em>
 
   </div>
 
@@ -151,11 +183,11 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
                   <li class="list-inline-item"><a href='module_domain.html'>module_domain</a></li>
-                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
-                  <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
                   <li class="list-inline-item"><a href='module_matrix.html'>module_matrix</a></li>
+                  <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
+                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
                   <li class="list-inline-item"><a href='conditions_boundary.html'>conditions_boundary</a></li>
               </ul>
             </li>
@@ -1251,8 +1283,11 @@
 <!-- json_module -->
 <g id="module~~conditions_boundary_manager~~UsesGraph_node35" class="node">
 <title>json_module</title>
+<g id="a_module~~conditions_boundary_manager~~UsesGraph_node35"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
 <polygon fill="#337ab7" stroke="#337ab7" points="1245.5,-828 1165.5,-828 1165.5,-804 1245.5,-804 1245.5,-828"/>
 <text text-anchor="middle" x="1205.5" y="-813.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
 </g>
 <!-- module~inout_input&#45;&gt;json_module -->
 <g id="module~~conditions_boundary_manager~~UsesGraph_edge108" class="edge">
@@ -1986,8 +2021,346 @@ large graphs.</div>
 
 
 
+        <section>
+          <h2>Derived Types</h2>
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-holder_bcs"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/holder_bcs.html'>holder_bcs</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-t~2"></span>
+              class(<a href='../type/abst_bc_thermal.html'>abst_bc_thermal</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>t</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
 
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_bc"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/type_bc.html'>type_bc</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc~2"></span>
+              type(<a href='../type/holder_bcs.html'>holder_bcs</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>bc</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_boundaries~2"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_boundaries</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_bc.html#boundprocedure-apply_crs'>apply_crs</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/apply_type_bc_crs.html'>apply_type_bc_crs</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/type_bc.html#boundprocedure-initialize~22'>initialize</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_bc.html'>initialize_type_bc</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-apply_type_bc_crs"></span> <h3>private  subroutine <a href='../proc/apply_type_bc_crs.html'>apply_type_bc_crs</a>(self, boundary_target, current_time, A, b, domain, mode)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~456"></span>
+              class(<a href='../type/type_bc.html'>type_bc</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-boundary_target"></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>boundary_target</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-current_time"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~10"></span>
+              type(<a href='../type/type_crs.html'>type_crs</a>),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-b~14"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~22"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mode"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>mode</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_type_bc"></span> <h3>private  subroutine <a href='../proc/initialize_type_bc.html'>initialize_type_bc</a>(self, input, domain)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~455"></span>
+              class(<a href='../type/type_bc.html'>type_bc</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~30"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>input</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~21"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -2009,7 +2382,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 06:42 +0000             </p>
+ on 2025-07-18 08:09 +0000             </p>
           </div>
         </div>
         <br>

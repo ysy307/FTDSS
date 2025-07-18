@@ -1,0 +1,1620 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_type_bc_thermal_adiabatic &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_type_bc_thermal_adiabatic
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">29 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/boundary_adiabatic.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/boundary_adiabatic.f90.html'>boundary_adiabatic.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/conditions_boundary_adiabatic.html'>conditions_boundary_adiabatic</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_type_bc_thermal_adiabatic</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_type_bc_thermal_adiabatic.html#src">initialize_type_bc_thermal_adiabatic</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine initialize_type_bc_thermal_adiabatic(self, input, domain, id, i_material, time_conv)  
+    <a href="../interface/initialize_type_bc_thermal_adiabatic.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Time settings</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~517"></span>
+              class(<a href='../type/type_bc_thermal_adiabatic.html'>type_bc_thermal_adiabatic</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~39"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~45"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-id~30"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-i_material~23"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i_material</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-time_conv~5"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>time_conv</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_type_bc_thermal_adiabaticCallsGraph" width="641pt" height="784pt"
+ viewBox="0.00 0.00 641.00 783.83" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph" class="graph" transform="scale(0.49 0.49) rotate(0) translate(4 1582)">
+<title>proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1582 1293,-1582 1293,4 -4,4"/>
+<!-- proc~initialize_type_bc_thermal_adiabatic -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node1" class="node">
+<title>proc~initialize_type_bc_thermal_adiabatic</title>
+<polygon fill="none" stroke="black" points="205,-339 0,-339 0,-315 205,-315 205,-339"/>
+<text text-anchor="middle" x="102.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_bc_thermal_adiabatic</text>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node2" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node2"><a xlink:href="../interface/allocate_array.html" xlink:title="allocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="835.5,-444 746.5,-444 746.5,-420 835.5,-420 835.5,-444"/>
+<text text-anchor="middle" x="791" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_adiabatic&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_type_bc_thermal_adiabatic&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M182.25,-339.04C323.24,-360.61 615.31,-405.28 736,-423.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="735.7,-427.23 746.11,-425.29 736.75,-420.32 735.7,-427.23"/>
+</g>
+<!-- interface~deallocate_array -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node3" class="node">
+<title>interface~deallocate_array</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node3"><a xlink:href="../interface/deallocate_array.html" xlink:title="deallocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="842.5,-1200 739.5,-1200 739.5,-1176 842.5,-1176 842.5,-1200"/>
+<text text-anchor="middle" x="791" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_adiabatic&#45;&gt;interface~deallocate_array -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_type_bc_thermal_adiabatic&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M113.2,-339.17C188.49,-433.59 678.85,-1048.59 774.01,-1167.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="771.43,-1170.33 780.4,-1175.96 776.91,-1165.96 771.43,-1170.33"/>
+</g>
+<!-- interface~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node4" class="node">
+<title>interface~find_target_edges_by_group</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node4"><a xlink:href="../interface/find_target_edges_by_group.html" xlink:title="find_target_edges_by_group">
+<polygon fill="#a7506f" stroke="#a7506f" points="409.5,-339 247.5,-339 247.5,-315 409.5,-315 409.5,-339"/>
+<text text-anchor="middle" x="328.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">find_target_edges_by_group</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_adiabatic&#45;&gt;interface~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge3" class="edge">
+<title>proc~initialize_type_bc_thermal_adiabatic&#45;&gt;interface~find_target_edges_by_group</title>
+<path fill="none" stroke="#ff0000" d="M205.01,-327C215.8,-327 226.72,-327 237.37,-327"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="237.48,-330.5 247.48,-327 237.48,-323.5 237.48,-330.5"/>
+</g>
+<!-- none~to_reordered -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node5" class="node">
+<title>none~to_reordered</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node5"><a xlink:href="../type/type_reordering.html#boundprocedure-to_reordered" xlink:title="type_reordering%to_reordered">
+<polygon fill="#a7506f" stroke="#a7506f" points="416,-266 241,-266 241,-242 416,-242 416,-266"/>
+<text text-anchor="middle" x="328.5" y="-251.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%to_reordered</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_bc_thermal_adiabatic&#45;&gt;none~to_reordered -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge4" class="edge">
+<title>proc~initialize_type_bc_thermal_adiabatic&#45;&gt;none~to_reordered</title>
+<path fill="none" stroke="#ff0000" d="M140.49,-314.95C178.91,-302.42 239.13,-282.8 280.81,-269.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="282.03,-272.5 290.46,-266.07 279.86,-265.84 282.03,-272.5"/>
+</g>
+<!-- target_edges -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node6" class="node">
+<title>target_edges</title>
+<polygon fill="#777777" stroke="#777777" points="369.5,-224 287.5,-224 287.5,-200 369.5,-200 369.5,-224"/>
+<text text-anchor="middle" x="328.5" y="-209.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">target_edges</text>
+</g>
+<!-- proc~initialize_type_bc_thermal_adiabatic&#45;&gt;target_edges -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge5" class="edge">
+<title>proc~initialize_type_bc_thermal_adiabatic&#45;&gt;target_edges</title>
+<path fill="none" stroke="#ff0000" d="M117.32,-314.99C141,-295.01 191.6,-255 241,-233 252.36,-227.94 265.13,-223.99 277.29,-220.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="278.38,-224.28 287.32,-218.6 276.79,-217.47 278.38,-224.28"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="allocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050,-822 926,-822 926,-798 1050,-798 1050,-822"/>
+<text text-anchor="middle" x="988" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M792.23,-444.27C793.86,-494.85 807,-689.25 912,-789 913.51,-790.43 915.1,-791.77 916.77,-793.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="915.32,-796.23 925.66,-798.52 919.01,-790.28 915.32,-796.23"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050,-780 926,-780 926,-756 1050,-756 1050,-780"/>
+<text text-anchor="middle" x="988" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M792.84,-444.1C796.73,-490.72 817.13,-660.39 912,-747 913.54,-748.4 915.16,-749.71 916.85,-750.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="915.45,-754.18 925.82,-756.35 919.07,-748.19 915.45,-754.18"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="allocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050,-738 926,-738 926,-714 1050,-714 1050,-738"/>
+<text text-anchor="middle" x="988" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M793.64,-444.25C800.05,-487.07 827.35,-631.53 912,-705 913.53,-706.33 915.14,-707.58 916.81,-708.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="915.25,-711.88 925.64,-713.95 918.81,-705.86 915.25,-711.88"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="allocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1046.5,-696 929.5,-696 929.5,-672 1046.5,-672 1046.5,-696"/>
+<text text-anchor="middle" x="988" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M794.7,-444.22C803.83,-482.69 837.29,-602.3 912,-663 914.57,-665.09 917.34,-666.97 920.24,-668.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="918.77,-671.85 929.28,-673.21 921.91,-665.59 918.77,-671.85"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="allocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-654 918.5,-654 918.5,-630 1057.5,-630 1057.5,-654"/>
+<text text-anchor="middle" x="988" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M796.23,-444.36C808.45,-478.15 847.11,-572.78 912,-621 914.09,-622.55 916.29,-623.99 918.57,-625.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="917.21,-628.56 927.71,-629.95 920.37,-622.31 917.21,-628.56"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="allocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-612 918.5,-612 918.5,-588 1057.5,-588 1057.5,-612"/>
+<text text-anchor="middle" x="988" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M798.56,-444.42C814.22,-472.8 856.6,-542.73 912,-579 914.72,-580.78 917.58,-582.41 920.54,-583.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="919.12,-587.09 929.68,-587.98 921.97,-580.7 919.12,-587.09"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="allocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-570 918.5,-570 918.5,-546 1057.5,-546 1057.5,-570"/>
+<text text-anchor="middle" x="988" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M802.29,-444C821.59,-465.77 865.5,-511.84 912,-537 915.51,-538.9 919.21,-540.64 923.01,-542.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="922.01,-545.6 932.6,-545.9 924.51,-539.06 922.01,-545.6"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="allocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-528 919.5,-528 919.5,-504 1056.5,-504 1056.5,-528"/>
+<text text-anchor="middle" x="988" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M811.77,-444.04C835.06,-457.83 875.26,-480.4 912,-495 917.18,-497.06 922.64,-499 928.16,-500.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="927.5,-504.27 938.09,-503.91 929.59,-497.59 927.5,-504.27"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="allocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1053,-486 923,-486 923,-462 1053,-462 1053,-486"/>
+<text text-anchor="middle" x="988" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.76,-441.43C860.97,-446.86 893.16,-453.79 921.35,-459.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="920.63,-463.28 931.14,-461.97 922.1,-456.44 920.63,-463.28"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1053,-444 923,-444 923,-420 1053,-420 1053,-444"/>
+<text text-anchor="middle" x="988" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.76,-432C858.36,-432 886.57,-432 912.48,-432"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="912.66,-435.5 922.66,-432 912.66,-428.5 912.66,-435.5"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="allocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050,-402 926,-402 926,-378 1050,-378 1050,-402"/>
+<text text-anchor="middle" x="988" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.76,-422.57C860.97,-417.14 893.16,-410.21 921.35,-404.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="922.1,-407.56 931.14,-402.03 920.63,-400.72 922.1,-407.56"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="allocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050,-360 926,-360 926,-336 1050,-336 1050,-360"/>
+<text text-anchor="middle" x="988" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.9,-426.34C849.46,-423.23 863.98,-418.43 876,-411 896.91,-398.07 891.27,-382.22 912,-369 914.74,-367.26 917.62,-365.65 920.6,-364.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="922.02,-367.38 929.76,-360.15 919.2,-360.97 922.02,-367.38"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="allocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1050,-318 926,-318 926,-294 1050,-294 1050,-318"/>
+<text text-anchor="middle" x="988" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.68,-428.79C849.85,-425.87 864.78,-420.55 876,-411 906.92,-384.66 881.45,-353.77 912,-327 913.56,-325.63 915.21,-324.35 916.92,-323.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="919.13,-325.91 925.98,-317.83 915.58,-319.88 919.13,-325.91"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="allocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1046.5,-276 929.5,-276 929.5,-252 1046.5,-252 1046.5,-276"/>
+<text text-anchor="middle" x="988" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.52,-429.75C850.01,-426.94 865.2,-421.45 876,-411 917.86,-370.51 870.71,-326.07 912,-285 914.52,-282.49 917.32,-280.28 920.3,-278.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="922.06,-281.35 929.15,-273.48 918.7,-275.21 922.06,-281.35"/>
+</g>
+<!-- proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank2_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank2_logical1.html" xlink:title="allocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-234 918.5,-234 918.5,-210 1057.5,-210 1057.5,-234"/>
+<text text-anchor="middle" x="988" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.92,-430.15C850.45,-427.38 865.55,-421.81 876,-411 929.07,-356.1 859.7,-298.64 912,-243 913.04,-241.89 914.14,-240.84 915.28,-239.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="917.33,-242.68 923.42,-234.01 913.25,-236.99 917.33,-242.68"/>
+</g>
+<!-- proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank2_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank2_logical4.html" xlink:title="allocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-192 918.5,-192 918.5,-168 1057.5,-168 1057.5,-192"/>
+<text text-anchor="middle" x="988" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.74,-430.47C850.42,-427.75 865.68,-422.13 876,-411 940.39,-341.57 848.58,-271.32 912,-201 912.89,-200.01 913.83,-199.07 914.8,-198.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="917.02,-200.88 922.91,-192.07 912.81,-195.28 917.02,-200.88"/>
+</g>
+<!-- proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node25" class="node">
+<title>proc~allocate_rank2_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node25"><a xlink:href="../proc/allocate_rank2_logical8.html" xlink:title="allocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1057.5,-150 918.5,-150 918.5,-126 1057.5,-126 1057.5,-150"/>
+<text text-anchor="middle" x="988" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.91,-430.63C850.61,-427.92 865.83,-422.27 876,-411 951.77,-326.98 837.41,-244.07 912,-159 912.76,-158.14 913.55,-157.31 914.37,-156.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="916.73,-159.1 922.46,-150.19 912.42,-153.59 916.73,-159.1"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node26" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node26"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="allocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-108 919.5,-108 919.5,-84 1056.5,-84 1056.5,-108"/>
+<text text-anchor="middle" x="988" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge23" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.6,-430.82C850.45,-428.16 865.85,-422.49 876,-411 963.18,-312.36 826.21,-216.85 912,-117 912.75,-116.13 913.53,-115.29 914.34,-114.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="916.71,-117.07 922.38,-108.12 912.37,-111.59 916.71,-117.07"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node27" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node27"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="allocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1053,-66 923,-66 923,-42 1053,-42 1053,-66"/>
+<text text-anchor="middle" x="988" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge24" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.69,-430.9C850.55,-428.25 865.93,-422.56 876,-411 974.61,-297.72 814.99,-189.65 912,-75 912.88,-73.95 913.82,-72.96 914.79,-72.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="917.25,-74.54 923,-65.64 912.95,-69.01 917.25,-74.54"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node28" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node28"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="allocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1053,-24 923,-24 923,0 1053,0 1053,-24"/>
+<text text-anchor="middle" x="988" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge25" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M835.77,-430.96C850.63,-428.32 866,-422.62 876,-411 931.03,-347.03 857.88,-97.73 912,-33 912.88,-31.95 913.8,-30.95 914.77,-30"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="917.23,-32.52 922.95,-23.6 912.92,-27 917.23,-32.52"/>
+</g>
+<!-- proc~deallocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node29" class="node">
+<title>proc~deallocate_rank1_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node29"><a xlink:href="../proc/deallocate_rank1_int32.html" xlink:title="deallocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1494 919.5,-1494 919.5,-1470 1056.5,-1470 1056.5,-1494"/>
+<text text-anchor="middle" x="988" y="-1479.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge26" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M793.64,-1200.25C800.05,-1243.07 827.35,-1387.53 912,-1461 913.53,-1462.33 915.14,-1463.58 916.81,-1464.74"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="915.25,-1467.88 925.64,-1469.95 918.81,-1461.86 915.25,-1467.88"/>
+</g>
+<!-- proc~deallocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node30" class="node">
+<title>proc~deallocate_rank1_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node30"><a xlink:href="../proc/deallocate_rank1_int64.html" xlink:title="deallocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1452 919.5,-1452 919.5,-1428 1056.5,-1428 1056.5,-1452"/>
+<text text-anchor="middle" x="988" y="-1437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge27" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M794.7,-1200.22C803.83,-1238.69 837.29,-1358.3 912,-1419 913.75,-1420.42 915.59,-1421.74 917.49,-1422.98"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="915.82,-1426.05 926.26,-1427.84 919.21,-1419.93 915.82,-1426.05"/>
+</g>
+<!-- proc~deallocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node31" class="node">
+<title>proc~deallocate_rank1_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node31"><a xlink:href="../proc/deallocate_rank1_int8.html" xlink:title="deallocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1053,-1410 923,-1410 923,-1386 1053,-1386 1053,-1410"/>
+<text text-anchor="middle" x="988" y="-1395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge28" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M796.23,-1200.36C808.45,-1234.15 847.11,-1328.78 912,-1377 914.09,-1378.55 916.29,-1379.99 918.57,-1381.32"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="917.21,-1384.56 927.71,-1385.95 920.37,-1378.31 917.21,-1384.56"/>
+</g>
+<!-- proc~deallocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node32" class="node">
+<title>proc~deallocate_rank1_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node32"><a xlink:href="../proc/deallocate_rank1_logical1.html" xlink:title="deallocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-1368 912,-1368 912,-1344 1064,-1344 1064,-1368"/>
+<text text-anchor="middle" x="988" y="-1353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge29" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M798.56,-1200.42C814.22,-1228.8 856.6,-1298.73 912,-1335 914.72,-1336.78 917.58,-1338.41 920.54,-1339.9"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="919.12,-1343.09 929.68,-1343.98 921.97,-1336.7 919.12,-1343.09"/>
+</g>
+<!-- proc~deallocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node33" class="node">
+<title>proc~deallocate_rank1_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node33"><a xlink:href="../proc/deallocate_rank1_logical4.html" xlink:title="deallocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-1326 912,-1326 912,-1302 1064,-1302 1064,-1326"/>
+<text text-anchor="middle" x="988" y="-1311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge30" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M802.29,-1200C821.59,-1221.77 865.5,-1267.84 912,-1293 915.51,-1294.9 919.21,-1296.64 923.01,-1298.23"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="922.01,-1301.6 932.6,-1301.9 924.51,-1295.06 922.01,-1301.6"/>
+</g>
+<!-- proc~deallocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node34" class="node">
+<title>proc~deallocate_rank1_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node34"><a xlink:href="../proc/deallocate_rank1_logical8.html" xlink:title="deallocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-1284 912,-1284 912,-1260 1064,-1260 1064,-1284"/>
+<text text-anchor="middle" x="988" y="-1269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge31" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M811.77,-1200.04C835.06,-1213.83 875.26,-1236.4 912,-1251 917.18,-1253.06 922.64,-1255 928.16,-1256.81"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="927.5,-1260.27 938.09,-1259.91 929.59,-1253.59 927.5,-1260.27"/>
+</g>
+<!-- proc~deallocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node35" class="node">
+<title>proc~deallocate_rank1_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node35"><a xlink:href="../proc/deallocate_rank1_real128.html" xlink:title="deallocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1063.5,-1242 912.5,-1242 912.5,-1218 1063.5,-1218 1063.5,-1242"/>
+<text text-anchor="middle" x="988" y="-1227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge32" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M842.72,-1198.93C866.63,-1204.08 895.46,-1210.28 921.04,-1215.79"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="920.53,-1219.26 931.04,-1217.95 922,-1212.42 920.53,-1219.26"/>
+</g>
+<!-- proc~deallocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node36" class="node">
+<title>proc~deallocate_rank1_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node36"><a xlink:href="../proc/deallocate_rank1_real32.html" xlink:title="deallocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-1200 916,-1200 916,-1176 1060,-1176 1060,-1200"/>
+<text text-anchor="middle" x="988" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge33" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M842.72,-1188C862.01,-1188 884.5,-1188 905.91,-1188"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="905.98,-1191.5 915.98,-1188 905.98,-1184.5 905.98,-1191.5"/>
+</g>
+<!-- proc~deallocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node37" class="node">
+<title>proc~deallocate_rank1_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node37"><a xlink:href="../proc/deallocate_rank1_real64.html" xlink:title="deallocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-1158 916,-1158 916,-1134 1060,-1134 1060,-1158"/>
+<text text-anchor="middle" x="988" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge34" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M842.72,-1177.07C866.63,-1171.92 895.46,-1165.72 921.04,-1160.21"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="922,-1163.58 931.04,-1158.05 920.53,-1156.74 922,-1163.58"/>
+</g>
+<!-- proc~deallocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node38" class="node">
+<title>proc~deallocate_rank2_int32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node38"><a xlink:href="../proc/deallocate_rank2_int32.html" xlink:title="deallocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1116 919.5,-1116 919.5,-1092 1056.5,-1092 1056.5,-1116"/>
+<text text-anchor="middle" x="988" y="-1101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge35" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M811.77,-1175.96C835.06,-1162.17 875.26,-1139.6 912,-1125 917.18,-1122.94 922.64,-1121 928.16,-1119.19"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="929.59,-1122.41 938.09,-1116.09 927.5,-1115.73 929.59,-1122.41"/>
+</g>
+<!-- proc~deallocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node39" class="node">
+<title>proc~deallocate_rank2_int64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node39"><a xlink:href="../proc/deallocate_rank2_int64.html" xlink:title="deallocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-1074 919.5,-1074 919.5,-1050 1056.5,-1050 1056.5,-1074"/>
+<text text-anchor="middle" x="988" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge36" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M802.29,-1176C821.59,-1154.23 865.5,-1108.16 912,-1083 915.51,-1081.1 919.21,-1079.36 923.01,-1077.77"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="924.51,-1080.94 932.6,-1074.1 922.01,-1074.4 924.51,-1080.94"/>
+</g>
+<!-- proc~deallocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node40" class="node">
+<title>proc~deallocate_rank2_int8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node40"><a xlink:href="../proc/deallocate_rank2_int8.html" xlink:title="deallocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1053,-1032 923,-1032 923,-1008 1053,-1008 1053,-1032"/>
+<text text-anchor="middle" x="988" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge37" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M798.56,-1175.58C814.22,-1147.2 856.6,-1077.27 912,-1041 914.72,-1039.22 917.58,-1037.59 920.54,-1036.1"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="921.97,-1039.3 929.68,-1032.02 919.12,-1032.91 921.97,-1039.3"/>
+</g>
+<!-- proc~deallocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node41" class="node">
+<title>proc~deallocate_rank2_logical1</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node41"><a xlink:href="../proc/deallocate_rank2_logical1.html" xlink:title="deallocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-990 912,-990 912,-966 1064,-966 1064,-990"/>
+<text text-anchor="middle" x="988" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge38" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M796.23,-1175.64C808.45,-1141.85 847.11,-1047.22 912,-999 914.09,-997.45 916.29,-996.01 918.57,-994.68"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="920.37,-997.69 927.71,-990.05 917.21,-991.44 920.37,-997.69"/>
+</g>
+<!-- proc~deallocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node42" class="node">
+<title>proc~deallocate_rank2_logical4</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node42"><a xlink:href="../proc/deallocate_rank2_logical4.html" xlink:title="deallocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-948 912,-948 912,-924 1064,-924 1064,-948"/>
+<text text-anchor="middle" x="988" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge39" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M794.7,-1175.78C803.83,-1137.31 837.29,-1017.7 912,-957 913.75,-955.58 915.59,-954.26 917.49,-953.02"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="919.21,-956.07 926.26,-948.16 915.82,-949.95 919.21,-956.07"/>
+</g>
+<!-- proc~deallocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node43" class="node">
+<title>proc~deallocate_rank2_logical8</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node43"><a xlink:href="../proc/deallocate_rank2_logical8.html" xlink:title="deallocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="1064,-906 912,-906 912,-882 1064,-882 1064,-906"/>
+<text text-anchor="middle" x="988" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge40" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M793.64,-1175.75C800.05,-1132.93 827.35,-988.47 912,-915 913.53,-913.67 915.14,-912.42 916.81,-911.26"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="918.81,-914.14 925.64,-906.05 915.25,-908.12 918.81,-914.14"/>
+</g>
+<!-- proc~deallocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node44" class="node">
+<title>proc~deallocate_rank2_real128</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node44"><a xlink:href="../proc/deallocate_rank2_real128.html" xlink:title="deallocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="1063.5,-864 912.5,-864 912.5,-840 1063.5,-840 1063.5,-864"/>
+<text text-anchor="middle" x="988" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge41" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M792.84,-1175.9C796.73,-1129.28 817.13,-959.61 912,-873 913.34,-871.78 914.74,-870.63 916.2,-869.54"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="918.44,-872.27 925.09,-864.02 914.75,-866.33 918.44,-872.27"/>
+</g>
+<!-- proc~deallocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node45" class="node">
+<title>proc~deallocate_rank2_real32</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node45"><a xlink:href="../proc/deallocate_rank2_real32.html" xlink:title="deallocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-1578 916,-1578 916,-1554 1060,-1554 1060,-1578"/>
+<text text-anchor="middle" x="988" y="-1563.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge42" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M792.23,-1200.27C793.86,-1250.85 807,-1445.25 912,-1545 913.28,-1546.22 914.63,-1547.36 916.03,-1548.45"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="914.27,-1551.48 924.57,-1553.95 918.06,-1545.59 914.27,-1551.48"/>
+</g>
+<!-- proc~deallocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node46" class="node">
+<title>proc~deallocate_rank2_real64</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node46"><a xlink:href="../proc/deallocate_rank2_real64.html" xlink:title="deallocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="1060,-1536 916,-1536 916,-1512 1060,-1512 1060,-1536"/>
+<text text-anchor="middle" x="988" y="-1521.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64 -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge43" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M792.84,-1200.1C796.73,-1246.72 817.13,-1416.39 912,-1503 913.34,-1504.22 914.74,-1505.37 916.2,-1506.46"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="914.75,-1509.67 925.09,-1511.98 918.44,-1503.73 914.75,-1509.67"/>
+</g>
+<!-- proc~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node47" class="node">
+<title>proc~find_target_edges_by_group</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node47"><a xlink:href="../proc/find_target_edges_by_group.html" xlink:title="find_target_edges_by_group">
+<polygon fill="#d9534f" stroke="#d9534f" points="642,-339 480,-339 480,-315 642,-315 642,-339"/>
+<text text-anchor="middle" x="561" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">find_target_edges_by_group</text>
+</a>
+</g>
+</g>
+<!-- interface~find_target_edges_by_group&#45;&gt;proc~find_target_edges_by_group -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge44" class="edge">
+<title>interface~find_target_edges_by_group&#45;&gt;proc~find_target_edges_by_group</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M409.79,-327C429.16,-327 449.97,-327 469.76,-327"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="469.99,-330.5 479.99,-327 469.99,-323.5 469.99,-330.5"/>
+</g>
+<!-- interface~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node7" class="node">
+<title>interface~to_reordered_index</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node7"><a xlink:href="../interface/to_reordered_index.html" xlink:title="type_reordering%to_reordered_index">
+<polygon fill="#a7506f" stroke="#a7506f" points="665.5,-192 456.5,-192 456.5,-168 665.5,-168 665.5,-192"/>
+<text text-anchor="middle" x="561" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%to_reordered_index</text>
+</a>
+</g>
+</g>
+<!-- none~to_reordered&#45;&gt;interface~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge45" class="edge">
+<title>none~to_reordered&#45;&gt;interface~to_reordered_index</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M385.76,-241.9C395.92,-239.28 406.35,-236.29 416,-233 432.57,-227.36 435.7,-223.4 452,-217 471.64,-209.29 493.62,-201.59 512.6,-195.23"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="513.83,-198.51 522.22,-192.04 511.62,-191.87 513.83,-198.51"/>
+</g>
+<!-- interface~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node8" class="node">
+<title>interface~to_reordered_indices</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node8"><a xlink:href="../interface/to_reordered_indices.html" xlink:title="type_reordering%to_reordered_indices">
+<polygon fill="#a7506f" stroke="#a7506f" points="670,-250 452,-250 452,-226 670,-226 670,-250"/>
+<text text-anchor="middle" x="561" y="-235.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%to_reordered_indices</text>
+</a>
+</g>
+</g>
+<!-- none~to_reordered&#45;&gt;interface~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge46" class="edge">
+<title>none~to_reordered&#45;&gt;interface~to_reordered_indices</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M416.31,-247.97C424.66,-247.39 433.22,-246.8 441.8,-246.2"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="442.14,-249.69 451.87,-245.51 441.65,-242.71 442.14,-249.69"/>
+</g>
+<!-- proc~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node53" class="node">
+<title>proc~to_reordered_index</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node53"><a xlink:href="../proc/to_reordered_index.html" xlink:title="to_reordered_index">
+<polygon fill="#d9534f" stroke="#d9534f" points="848.5,-150 733.5,-150 733.5,-126 848.5,-126 848.5,-150"/>
+<text text-anchor="middle" x="791" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_reordered_index</text>
+</a>
+</g>
+</g>
+<!-- interface~to_reordered_index&#45;&gt;proc~to_reordered_index -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge47" class="edge">
+<title>interface~to_reordered_index&#45;&gt;proc~to_reordered_index</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M627.34,-167.96C657.36,-162.43 692.94,-155.88 723.15,-150.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="723.98,-153.72 733.18,-148.47 722.71,-146.84 723.98,-153.72"/>
+</g>
+<!-- proc~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node54" class="node">
+<title>proc~to_reordered_indices</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node54"><a xlink:href="../proc/to_reordered_indices.html" xlink:title="to_reordered_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="853,-192 729,-192 729,-168 853,-168 853,-192"/>
+<text text-anchor="middle" x="791" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_reordered_indices</text>
+</a>
+</g>
+</g>
+<!-- interface~to_reordered_indices&#45;&gt;proc~to_reordered_indices -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge48" class="edge">
+<title>interface~to_reordered_indices&#45;&gt;proc~to_reordered_indices</title>
+<path fill="none" stroke="#ff2500" stroke-dasharray="5,2" d="M608.67,-225.93C636.85,-218.66 673.47,-209.24 706,-201 714.27,-198.9 723.01,-196.7 731.6,-194.55"/>
+<polygon fill="#ff2500" stroke="#ff2500" points="732.72,-197.88 741.57,-192.05 731.02,-191.09 732.72,-197.88"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node51" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node51"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="1192,-801 1100,-801 1100,-777 1192,-777 1192,-801"/>
+<text text-anchor="middle" x="1146" y="-786.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge49" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff4a00" d="M1050.21,-801.76C1063.27,-800 1077,-798.15 1089.83,-796.43"/>
+<polygon fill="#ff4a00" stroke="#ff4a00" points="1090.44,-799.88 1099.89,-795.07 1089.51,-792.94 1090.44,-799.88"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge50" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff6f00" d="M1050.21,-776.24C1063.27,-778 1077,-779.85 1089.83,-781.57"/>
+<polygon fill="#ff6f00" stroke="#ff6f00" points="1089.51,-785.06 1099.89,-782.93 1090.44,-778.12 1089.51,-785.06"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge51" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff9500" d="M1037.5,-738C1046.42,-740.65 1055.57,-743.68 1064,-747 1081.69,-753.98 1100.61,-763.65 1115.71,-771.96"/>
+<polygon fill="#ff9500" stroke="#ff9500" points="1114.14,-775.09 1124.57,-776.91 1117.55,-768.98 1114.14,-775.09"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge52" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffba00" d="M1044.87,-696.03C1051.54,-698.5 1058.08,-701.46 1064,-705 1091.45,-721.39 1115.84,-749.5 1130.51,-768.65"/>
+<polygon fill="#ffba00" stroke="#ffba00" points="1127.76,-770.81 1136.54,-776.74 1133.37,-766.63 1127.76,-770.81"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge53" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffdf00" d="M1048.27,-654.08C1053.86,-656.52 1059.21,-659.46 1064,-663 1100.7,-690.11 1125.14,-739.24 1136.89,-767.48"/>
+<polygon fill="#ffdf00" stroke="#ffdf00" points="1133.68,-768.87 1140.64,-776.86 1140.18,-766.27 1133.68,-768.87"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge54" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f8ff00" d="M1049.85,-612.02C1054.94,-614.48 1059.75,-617.44 1064,-621 1110.12,-659.63 1131.96,-730.67 1140.47,-766.73"/>
+<polygon fill="#f8ff00" stroke="#f8ff00" points="1137.11,-767.73 1142.7,-776.73 1143.94,-766.21 1137.11,-767.73"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge55" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#d3ff00" d="M1050.9,-570.04C1055.64,-572.5 1060.1,-575.45 1064,-579 1120,-629.91 1137.63,-724 1142.89,-766.78"/>
+<polygon fill="#d3ff00" stroke="#d3ff00" points="1139.44,-767.41 1144.03,-776.96 1146.4,-766.63 1139.44,-767.41"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge56" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#aeff00" d="M1051.84,-528.19C1056.27,-530.62 1060.4,-533.53 1064,-537 1130.03,-600.57 1142.34,-718.06 1144.56,-766.86"/>
+<polygon fill="#aeff00" stroke="#aeff00" points="1141.06,-767.08 1144.91,-776.95 1148.06,-766.84 1141.06,-767.08"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge57" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#88ff00" d="M1052,-486.03C1056.39,-488.5 1060.47,-491.45 1064,-495 1140.03,-571.35 1146.37,-712.12 1145.77,-766.63"/>
+<polygon fill="#88ff00" stroke="#88ff00" points="1142.26,-766.83 1145.56,-776.9 1149.26,-766.97 1142.26,-766.83"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge58" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#63ff00" d="M1052.48,-444.11C1056.71,-446.56 1060.62,-449.5 1064,-453 1108.19,-498.83 1134.77,-699.52 1142.58,-766.87"/>
+<polygon fill="#63ff00" stroke="#63ff00" points="1139.1,-767.29 1143.71,-776.83 1146.06,-766.5 1139.1,-767.29"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge59" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3eff00" d="M1050.09,-400.62C1055.26,-403.36 1060.02,-406.76 1064,-411 1113.3,-463.45 1136.86,-693.43 1143.19,-766.58"/>
+<polygon fill="#3eff00" stroke="#3eff00" points="1139.74,-767.25 1144.06,-776.92 1146.71,-766.66 1139.74,-767.25"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge60" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#18ff00" d="M1050.18,-358.54C1055.33,-361.29 1060.06,-364.72 1064,-369 1118.53,-428.23 1138.8,-688.45 1143.72,-766.68"/>
+<polygon fill="#18ff00" stroke="#18ff00" points="1140.24,-767.08 1144.34,-776.85 1147.23,-766.66 1140.24,-767.08"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge61" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff0c" d="M1050.26,-316.47C1055.39,-319.23 1060.1,-322.69 1064,-327 1123.82,-393.09 1140.57,-684.04 1144.16,-766.91"/>
+<polygon fill="#00ff0c" stroke="#00ff0c" points="1140.67,-767.13 1144.58,-776.97 1147.66,-766.84 1140.67,-767.13"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge62" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff31" d="M1046.69,-272.59C1053.22,-275.62 1059.23,-279.65 1064,-285 1129.01,-357.85 1142.12,-678.67 1144.51,-766.63"/>
+<polygon fill="#00ff31" stroke="#00ff31" points="1141.01,-766.9 1144.76,-776.81 1148.01,-766.73 1141.01,-766.9"/>
+</g>
+<!-- proc~allocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge63" class="edge">
+<title>proc~allocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff57" d="M1053.52,-234.21C1057.4,-236.65 1060.96,-239.55 1064,-243 1134.26,-322.7 1143.58,-674.01 1144.81,-766.58"/>
+<polygon fill="#00ff57" stroke="#00ff57" points="1141.31,-766.81 1144.93,-776.77 1148.31,-766.73 1141.31,-766.81"/>
+</g>
+<!-- proc~allocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge64" class="edge">
+<title>proc~allocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff7c" d="M1053.56,-192.17C1057.44,-194.62 1060.98,-197.54 1064,-201 1139.59,-287.65 1144.94,-670.06 1145.07,-766.74"/>
+<polygon fill="#00ff7c" stroke="#00ff7c" points="1141.57,-766.84 1145.07,-776.84 1148.57,-766.84 1141.57,-766.84"/>
+</g>
+<!-- proc~allocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge65" class="edge">
+<title>proc~allocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffa1" d="M1053.6,-150.14C1057.46,-152.6 1060.99,-155.52 1064,-159 1144.81,-252.48 1146.21,-665.12 1145.3,-766.46"/>
+<polygon fill="#00ffa1" stroke="#00ffa1" points="1141.8,-766.72 1145.19,-776.76 1148.8,-766.8 1141.8,-766.72"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge66" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffc7" d="M1053.63,-108.11C1057.49,-110.58 1061.01,-113.51 1064,-117 1107.4,-167.61 1137.51,-656.65 1143.78,-766.97"/>
+<polygon fill="#00ffc7" stroke="#00ffc7" points="1140.29,-767.17 1144.35,-776.96 1147.28,-766.78 1140.29,-767.17"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge67" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffec" d="M1053.32,-65.87C1057.3,-68.39 1060.93,-71.4 1064,-75 1110.03,-129.06 1138.25,-651.68 1143.93,-766.69"/>
+<polygon fill="#00ffec" stroke="#00ffec" points="1140.44,-766.97 1144.43,-776.79 1147.44,-766.63 1140.44,-766.97"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge68" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ecff" d="M1053,-23.64C1057.11,-26.2 1060.86,-29.28 1064,-33 1112.73,-90.59 1139.03,-648.28 1144.09,-766.89"/>
+<polygon fill="#00ecff" stroke="#00ecff" points="1140.6,-767.12 1144.52,-776.97 1147.59,-766.83 1140.6,-767.12"/>
+</g>
+<!-- proc~deallocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge69" class="edge">
+<title>proc~deallocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00c7ff" d="M1053.63,-1469.89C1057.49,-1467.42 1061.01,-1464.49 1064,-1461 1107.4,-1410.39 1137.51,-921.35 1143.78,-811.03"/>
+<polygon fill="#00c7ff" stroke="#00c7ff" points="1147.28,-811.22 1144.35,-801.04 1140.29,-810.83 1147.28,-811.22"/>
+</g>
+<!-- proc~deallocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge70" class="edge">
+<title>proc~deallocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00a1ff" d="M1053.6,-1427.86C1057.46,-1425.4 1060.99,-1422.48 1064,-1419 1144.81,-1325.52 1146.21,-912.88 1145.3,-811.54"/>
+<polygon fill="#00a1ff" stroke="#00a1ff" points="1148.8,-811.2 1145.19,-801.24 1141.8,-811.28 1148.8,-811.2"/>
+</g>
+<!-- proc~deallocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge71" class="edge">
+<title>proc~deallocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#007cff" d="M1053.22,-1386.04C1057.23,-1383.55 1060.89,-1380.57 1064,-1377 1139.59,-1290.35 1144.94,-907.94 1145.07,-811.26"/>
+<polygon fill="#007cff" stroke="#007cff" points="1148.57,-811.16 1145.07,-801.16 1141.57,-811.16 1148.57,-811.16"/>
+</g>
+<!-- proc~deallocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge72" class="edge">
+<title>proc~deallocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0057ff" d="M1053.52,-1343.79C1057.4,-1341.35 1060.96,-1338.45 1064,-1335 1134.26,-1255.3 1143.58,-903.99 1144.81,-811.42"/>
+<polygon fill="#0057ff" stroke="#0057ff" points="1148.31,-811.27 1144.93,-801.23 1141.31,-811.19 1148.31,-811.27"/>
+</g>
+<!-- proc~deallocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge73" class="edge">
+<title>proc~deallocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0031ff" d="M1053.13,-1301.96C1057.16,-1299.49 1060.85,-1296.53 1064,-1293 1129.01,-1220.15 1142.12,-899.33 1144.51,-811.37"/>
+<polygon fill="#0031ff" stroke="#0031ff" points="1148.01,-811.27 1144.76,-801.19 1141.01,-811.1 1148.01,-811.27"/>
+</g>
+<!-- proc~deallocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge74" class="edge">
+<title>proc~deallocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#000cff" d="M1053.08,-1259.91C1057.11,-1257.45 1060.82,-1254.51 1064,-1251 1123.82,-1184.91 1140.57,-893.96 1144.16,-811.09"/>
+<polygon fill="#000cff" stroke="#000cff" points="1147.66,-811.16 1144.58,-801.03 1140.67,-810.87 1147.66,-811.16"/>
+</g>
+<!-- proc~deallocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge75" class="edge">
+<title>proc~deallocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1800ff" d="M1053.01,-1217.85C1057.06,-1215.4 1060.79,-1212.48 1064,-1209 1118.53,-1149.77 1138.8,-889.55 1143.72,-811.32"/>
+<polygon fill="#1800ff" stroke="#1800ff" points="1147.23,-811.34 1144.34,-801.15 1140.24,-810.92 1147.23,-811.34"/>
+</g>
+<!-- proc~deallocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge76" class="edge">
+<title>proc~deallocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3e00ff" d="M1052.58,-1175.99C1056.79,-1173.51 1060.67,-1170.55 1064,-1167 1113.3,-1114.55 1136.86,-884.57 1143.19,-811.42"/>
+<polygon fill="#3e00ff" stroke="#3e00ff" points="1146.71,-811.34 1144.06,-801.08 1139.74,-810.75 1146.71,-811.34"/>
+</g>
+<!-- proc~deallocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge77" class="edge">
+<title>proc~deallocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#6300ff" d="M1052.48,-1133.89C1056.71,-1131.44 1060.62,-1128.5 1064,-1125 1108.19,-1079.17 1134.77,-878.48 1142.58,-811.13"/>
+<polygon fill="#6300ff" stroke="#6300ff" points="1146.06,-811.5 1143.71,-801.17 1139.1,-810.71 1146.06,-811.5"/>
+</g>
+<!-- proc~deallocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge78" class="edge">
+<title>proc~deallocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#8800ff" d="M1052,-1091.97C1056.39,-1089.5 1060.47,-1086.55 1064,-1083 1140.03,-1006.65 1146.37,-865.88 1145.77,-811.37"/>
+<polygon fill="#8800ff" stroke="#8800ff" points="1149.26,-811.03 1145.56,-801.1 1142.26,-811.17 1149.26,-811.03"/>
+</g>
+<!-- proc~deallocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge79" class="edge">
+<title>proc~deallocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ae00ff" d="M1051.84,-1049.81C1056.27,-1047.38 1060.4,-1044.47 1064,-1041 1130.03,-977.43 1142.34,-859.94 1144.56,-811.14"/>
+<polygon fill="#ae00ff" stroke="#ae00ff" points="1148.06,-811.16 1144.91,-801.05 1141.06,-810.92 1148.06,-811.16"/>
+</g>
+<!-- proc~deallocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge80" class="edge">
+<title>proc~deallocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#d300ff" d="M1050.9,-1007.96C1055.64,-1005.5 1060.1,-1002.55 1064,-999 1120,-948.09 1137.63,-854 1142.89,-811.22"/>
+<polygon fill="#d300ff" stroke="#d300ff" points="1146.4,-811.37 1144.03,-801.04 1139.44,-810.59 1146.4,-811.37"/>
+</g>
+<!-- proc~deallocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge81" class="edge">
+<title>proc~deallocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#f800ff" d="M1049.85,-965.98C1054.94,-963.52 1059.75,-960.56 1064,-957 1110.12,-918.37 1131.96,-847.33 1140.47,-811.27"/>
+<polygon fill="#f800ff" stroke="#f800ff" points="1143.94,-811.79 1142.7,-801.27 1137.11,-810.27 1143.94,-811.79"/>
+</g>
+<!-- proc~deallocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge82" class="edge">
+<title>proc~deallocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00df" d="M1048.27,-923.92C1053.86,-921.48 1059.21,-918.54 1064,-915 1100.7,-887.89 1125.14,-838.76 1136.89,-810.52"/>
+<polygon fill="#ff00df" stroke="#ff00df" points="1140.18,-811.73 1140.64,-801.14 1133.68,-809.13 1140.18,-811.73"/>
+</g>
+<!-- proc~deallocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge83" class="edge">
+<title>proc~deallocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00ba" d="M1044.87,-881.97C1051.54,-879.5 1058.08,-876.54 1064,-873 1091.45,-856.61 1115.84,-828.5 1130.51,-809.35"/>
+<polygon fill="#ff00ba" stroke="#ff00ba" points="1133.37,-811.37 1136.54,-801.26 1127.76,-807.19 1133.37,-811.37"/>
+</g>
+<!-- proc~deallocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge84" class="edge">
+<title>proc~deallocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0095" d="M1037.5,-840C1046.42,-837.35 1055.57,-834.32 1064,-831 1081.69,-824.02 1100.61,-814.35 1115.71,-806.04"/>
+<polygon fill="#ff0095" stroke="#ff0095" points="1117.55,-809.02 1124.57,-801.09 1114.14,-802.91 1117.55,-809.02"/>
+</g>
+<!-- proc~deallocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge85" class="edge">
+<title>proc~deallocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff006f" d="M1053.68,-1553.93C1057.53,-1551.46 1061.03,-1548.51 1064,-1545 1112.73,-1487.41 1139.03,-929.72 1144.09,-811.11"/>
+<polygon fill="#ff006f" stroke="#ff006f" points="1147.59,-811.17 1144.52,-801.03 1140.6,-810.88 1147.59,-811.17"/>
+</g>
+<!-- proc~deallocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge86" class="edge">
+<title>proc~deallocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff004a" d="M1053.66,-1511.91C1057.51,-1509.44 1061.02,-1506.5 1064,-1503 1110.03,-1448.94 1138.25,-926.32 1143.93,-811.31"/>
+<polygon fill="#ff004a" stroke="#ff004a" points="1147.44,-811.37 1144.43,-801.21 1140.44,-811.03 1147.44,-811.37"/>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge89" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0025" d="M586.54,-339.01C608.78,-350.16 642.22,-367.61 670,-385 686.73,-395.47 688.1,-402.68 706,-411 715.5,-415.42 726.06,-418.99 736.39,-421.84"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="735.63,-425.26 746.19,-424.37 737.38,-418.48 735.63,-425.26"/>
+</g>
+<!-- get_group -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node48" class="node">
+<title>get_group</title>
+<polygon fill="#777777" stroke="#777777" points="824,-234 758,-234 758,-210 824,-210 824,-234"/>
+<text text-anchor="middle" x="791" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_group</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;get_group -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge87" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;get_group</title>
+<path fill="none" stroke="#ff0025" d="M578.91,-314.98C605.01,-296.94 657.21,-262.86 706,-243 719.2,-237.63 734.15,-233.35 747.74,-230.1"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="748.84,-233.44 757.81,-227.81 747.29,-226.61 748.84,-233.44"/>
+</g>
+<!-- get_order -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node49" class="node">
+<title>get_order</title>
+<polygon fill="#777777" stroke="#777777" points="823,-402 759,-402 759,-378 823,-378 823,-402"/>
+<text text-anchor="middle" x="791" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_order</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;get_order -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge88" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;get_order</title>
+<path fill="none" stroke="#ff0025" d="M601.61,-339C630.47,-347.64 670.56,-359.4 706,-369 719.88,-372.76 735.1,-376.64 748.74,-380.02"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="748.26,-383.51 758.81,-382.51 749.94,-376.71 748.26,-383.51"/>
+</g>
+<!-- log_warning -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node50" class="node">
+<title>log_warning</title>
+<polygon fill="#777777" stroke="#777777" points="829.5,-360 752.5,-360 752.5,-336 829.5,-336 829.5,-360"/>
+<text text-anchor="middle" x="791" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_warning</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;log_warning -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge90" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;log_warning</title>
+<path fill="none" stroke="#ff0025" d="M642.06,-334.37C675.43,-337.45 713.07,-340.91 742.03,-343.58"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="742.01,-347.09 752.28,-344.53 742.65,-340.12 742.01,-347.09"/>
+</g>
+<!-- proc~get_num_sides -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node52" class="node">
+<title>proc~get_num_sides</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node52"><a xlink:href="../proc/get_num_sides.html" xlink:title="type_domain%get_num_sides">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="876,-318 706,-318 706,-294 876,-294 876,-318"/>
+<text text-anchor="middle" x="791" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_sides</text>
+</a>
+</g>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;proc~get_num_sides -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge91" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;proc~get_num_sides</title>
+<path fill="none" stroke="#ff0025" d="M642.06,-319.63C659.33,-318.04 677.74,-316.34 695.51,-314.7"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="696.24,-318.15 705.87,-313.75 695.6,-311.18 696.24,-318.15"/>
+</g>
+<!-- to_string -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node55" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="820,-276 762,-276 762,-252 820,-252 820,-276"/>
+<text text-anchor="middle" x="791" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~find_target_edges_by_group&#45;&gt;to_string -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge92" class="edge">
+<title>proc~find_target_edges_by_group&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0025" d="M601.61,-315C630.47,-306.36 670.56,-294.6 706,-285 720.95,-280.95 737.46,-276.76 751.87,-273.2"/>
+<polygon fill="#ff0025" stroke="#ff0025" points="753.05,-276.51 761.93,-270.73 751.38,-269.72 753.05,-276.51"/>
+</g>
+<!-- log_error -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_node56" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="1289,-801 1228,-801 1228,-777 1289,-777 1289,-801"/>
+<text text-anchor="middle" x="1258.5" y="-786.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CallsGraph_edge93" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#00ff3f" d="M1192.26,-789C1200.73,-789 1209.52,-789 1217.8,-789"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1217.95,-792.5 1227.95,-789 1217.95,-785.5 1217.95,-792.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_type_bc_thermal_adiabaticCallsGraph = svgPanZoom('#procinitialize_type_bc_thermal_adiabaticCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_type_bc_thermal_adiabatic~~CalledByGraph Pages: 1 -->
+<svg id="procinitialize_type_bc_thermal_adiabaticCalledByGraph" width="607pt" height="32pt"
+ viewBox="0.00 0.00 607.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~initialize_type_bc_thermal_adiabatic~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 603,-28 603,4 -4,4"/>
+<!-- proc~initialize_type_bc_thermal_adiabatic -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CalledByGraph_node1" class="node">
+<title>proc~initialize_type_bc_thermal_adiabatic</title>
+<polygon fill="none" stroke="black" points="599,-24 394,-24 394,0 599,0 599,-24"/>
+<text text-anchor="middle" x="496.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_type_bc_thermal_adiabatic</text>
+</g>
+<!-- interface~initialize_type_bc_thermal_adiabatic -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CalledByGraph_node2" class="node">
+<title>interface~initialize_type_bc_thermal_adiabatic</title>
+<g id="a_proc~~initialize_type_bc_thermal_adiabatic~~CalledByGraph_node2"><a xlink:href="../interface/initialize_type_bc_thermal_adiabatic.html" xlink:title="type_bc_thermal_adiabatic%initialize_type_bc_thermal_adiabatic">
+<polygon fill="#a7506f" stroke="#a7506f" points="358,-24 0,-24 0,0 358,0 358,-24"/>
+<text text-anchor="middle" x="179" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_bc_thermal_adiabatic%initialize_type_bc_thermal_adiabatic</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_bc_thermal_adiabatic&#45;&gt;proc~initialize_type_bc_thermal_adiabatic -->
+<g id="proc~~initialize_type_bc_thermal_adiabatic~~CalledByGraph_edge1" class="edge">
+<title>interface~initialize_type_bc_thermal_adiabatic&#45;&gt;proc~initialize_type_bc_thermal_adiabatic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M358.03,-12C366.68,-12 375.24,-12 383.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="383.73,-15.5 393.73,-12 383.73,-8.5 383.73,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">initialize_type_bc_thermal_adiabatic</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">,</span><span class="w"> </span><span class="n">time_conv</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_bc_thermal_adiabatic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_input</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">input</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">id</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i_material</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">time_conv</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp_indices</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">material_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">id</span><span class="p">)%</span><span class="n">id</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">boundary_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">id</span><span class="p">)%</span><span class="n">thermal</span><span class="p">%</span><span class="k">type</span>
+
+<span class="w">        </span><span class="c">!! Time settings</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">time_control</span><span class="p">%</span><span class="n">boundary_time_points</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">time_conv</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="o">=</span><span class="n">input</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">boundary_conditions</span><span class="p">(</span><span class="n">id</span><span class="p">)%</span><span class="n">thermal</span><span class="p">%</span><span class="n">values</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">find_target_edges_by_group</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">)</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_target_edges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">solver_settings</span><span class="p">%</span><span class="n">reordering</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;cm&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rcm&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">tmp_indices</span><span class="p">,</span><span class="w"> </span><span class="mi">2_int32</span><span class="p">)</span>
+<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_target_edges</span>
+<span class="w">                </span><span class="k">call </span><span class="n">domain</span><span class="p">%</span><span class="n">reordering</span><span class="p">%</span><span class="n">to_reordered</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">tmp_indices</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">target_edges</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp_indices</span><span class="p">(:)</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">tmp_indices</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end select</span>
+
+<span class="k">    end subroutine </span><span class="n">initialize_type_bc_thermal_adiabatic</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-07-18 08:09 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

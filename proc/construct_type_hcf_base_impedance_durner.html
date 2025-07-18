@@ -1,0 +1,1122 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Construct_Type_HCF_Base_Impedance_Durner &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Construct_Type_HCF_Base_Impedance_Durner
+      <small>Module Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">32 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/HCF_Durner.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hcf_durner.f90.html'>HCF_Durner.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/calculate_hcf_durner_implementation.html'>Calculate_HCF_Durner_Implementation</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Construct_Type_HCF_Base_Impedance_Durner</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/construct_type_hcf_base_impedance_durner.html#src">Construct_Type_HCF_Base_Impedance_Durner</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module function Construct_Type_HCF_Base_Impedance_Durner(Ks, alpha1, n1, w1, alpha2, n2, l, Omega, nsize) result(structure_HCF)  
+    <a href="../interface/construct_type_hcf_base_impedance_durner.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ks~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ks</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha1~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha1</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n1~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n1</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-w1~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>w1</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha2~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha2</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n2~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n2</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l~7"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>l</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-omega~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Omega</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nsize~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nsize</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-structure_hcf~11"></span>
+          class(<a href='../type/abstract_hcf.html'>Abstract_HCF</a>), allocatable
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~construct_type_hcf_base_impedance_durner~~CallsGraph Pages: 1 -->
+<svg id="procconstruct_type_hcf_base_impedance_durnerCallsGraph" width="641pt" height="672pt"
+ viewBox="0.00 0.00 641.00 671.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph" class="graph" transform="scale(0.81 0.81) rotate(0) translate(4 826)">
+<title>proc~~construct_type_hcf_base_impedance_durner~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-826 788,-826 788,4 -4,4"/>
+<!-- proc~construct_type_hcf_base_impedance_durner -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node1" class="node">
+<title>proc~construct_type_hcf_base_impedance_durner</title>
+<polygon fill="none" stroke="black" points="259,-402 0,-402 0,-378 259,-378 259,-402"/>
+<text text-anchor="middle" x="129.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50">Construct_Type_HCF_Base_Impedance_Durner</text>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node2" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node2"><a xlink:href="../interface/allocate_array.html" xlink:title="allocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="384,-423 295,-423 295,-399 384,-399 384,-423"/>
+<text text-anchor="middle" x="339.5" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_type_hcf_base_impedance_durner&#45;&gt;interface~allocate_array -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge1" class="edge">
+<title>proc~construct_type_hcf_base_impedance_durner&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M249.38,-402C261.66,-403.24 273.65,-404.45 284.66,-405.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="284.59,-409.07 294.89,-406.6 285.29,-402.11 284.59,-409.07"/>
+</g>
+<!-- kflh -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node3" class="node">
+<title>kflh</title>
+<polygon fill="#777777" stroke="#777777" points="366.5,-381 312.5,-381 312.5,-357 366.5,-357 366.5,-381"/>
+<text text-anchor="middle" x="339.5" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">kflh</text>
+</g>
+<!-- proc~construct_type_hcf_base_impedance_durner&#45;&gt;kflh -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge2" class="edge">
+<title>proc~construct_type_hcf_base_impedance_durner&#45;&gt;kflh</title>
+<path fill="none" stroke="#ff0000" d="M249.38,-378C268.42,-376.08 286.78,-374.22 301.84,-372.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="302.58,-376.14 312.18,-371.66 301.88,-369.18 302.58,-376.14"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node4" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node4"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="allocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="551.5,-822 427.5,-822 427.5,-798 551.5,-798 551.5,-822"/>
+<text text-anchor="middle" x="489.5" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge3" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M341.41,-423.05C346.06,-481.29 368.89,-733.06 420,-789 420.9,-789.98 421.84,-790.92 422.82,-791.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="420.89,-794.73 431.02,-797.84 425.04,-789.1 420.89,-794.73"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node5" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node5"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="551.5,-780 427.5,-780 427.5,-756 551.5,-756 551.5,-780"/>
+<text text-anchor="middle" x="489.5" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge4" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M341.76,-423.14C347.66,-477.5 374.1,-698.01 420,-747 421.04,-748.11 422.13,-749.15 423.27,-750.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="421.25,-753.01 431.43,-755.94 425.31,-747.3 421.25,-753.01"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node6" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node6"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="allocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="551.5,-738 427.5,-738 427.5,-714 551.5,-714 551.5,-738"/>
+<text text-anchor="middle" x="489.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge5" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M339.94,-423.03C338.56,-467.21 339.87,-622.14 420,-705 421.05,-706.09 422.16,-707.12 423.32,-708.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="421.35,-710.99 431.55,-713.83 425.34,-705.25 421.35,-710.99"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node7" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node7"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="allocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="548,-696 431,-696 431,-672 548,-672 548,-696"/>
+<text text-anchor="middle" x="489.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M340.58,-423.26C341.54,-463.61 350.14,-593.7 420,-663 421.1,-664.09 422.26,-665.13 423.47,-666.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="421.78,-669.2 432.04,-671.86 425.68,-663.39 421.78,-669.2"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node8" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node8"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="allocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="559,-654 420,-654 420,-630 559,-630 559,-654"/>
+<text text-anchor="middle" x="489.5" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M341.47,-423.22C344.97,-459.06 360.14,-564.87 420,-621 421.28,-622.2 422.62,-623.33 424.03,-624.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="422.26,-627.42 432.58,-629.82 426.01,-621.51 422.26,-627.42"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="allocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="559,-612 420,-612 420,-588 559,-588 559,-612"/>
+<text text-anchor="middle" x="489.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M342.75,-423.19C349.09,-454.03 369.97,-535.72 420,-579 421.52,-580.31 423.11,-581.54 424.78,-582.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="423.15,-585.8 433.55,-587.85 426.7,-579.76 423.15,-585.8"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="allocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="559,-570 420,-570 420,-546 559,-546 559,-570"/>
+<text text-anchor="middle" x="489.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M344.77,-423.06C354.26,-448.12 379.52,-506.05 420,-537 422.03,-538.55 424.18,-539.99 426.41,-541.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="424.88,-544.47 435.37,-545.96 428.1,-538.26 424.88,-544.47"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="allocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="558,-528 421,-528 421,-504 558,-504 558,-528"/>
+<text text-anchor="middle" x="489.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M348.8,-423.17C361.86,-441.41 388.94,-475.74 420,-495 422.8,-496.74 425.76,-498.34 428.8,-499.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="427.59,-503.11 438.16,-503.88 430.38,-496.69 427.59,-503.11"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="allocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="554.5,-486 424.5,-486 424.5,-462 554.5,-462 554.5,-486"/>
+<text text-anchor="middle" x="489.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M360.91,-423.15C376.67,-432.2 399.22,-444.42 420,-453 424.83,-455 429.93,-456.9 435.07,-458.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="434.35,-462.15 444.94,-462 436.57,-455.51 434.35,-462.15"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="554.5,-444 424.5,-444 424.5,-420 554.5,-420 554.5,-444"/>
+<text text-anchor="middle" x="489.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M384.1,-417.19C393.67,-418.54 404.05,-420.02 414.44,-421.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="413.97,-424.96 424.37,-422.9 414.96,-418.03 413.97,-424.96"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="allocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="551.5,-402 427.5,-402 427.5,-378 551.5,-378 551.5,-402"/>
+<text text-anchor="middle" x="489.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M384.1,-404.81C394.59,-403.33 406.06,-401.7 417.44,-400.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="417.98,-403.54 427.39,-398.67 417,-396.61 417.98,-403.54"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="allocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="551.5,-360 427.5,-360 427.5,-336 551.5,-336 551.5,-360"/>
+<text text-anchor="middle" x="489.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M366.43,-398.89C372.25,-396.06 378.37,-392.99 384,-390 400.35,-381.3 403.03,-376.43 420,-369 424.47,-367.04 429.17,-365.2 433.93,-363.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="435.42,-366.66 443.74,-360.09 433.14,-360.04 435.42,-366.66"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="allocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="551.5,-318 427.5,-318 427.5,-294 551.5,-294 551.5,-318"/>
+<text text-anchor="middle" x="489.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M371.48,-398.96C375.98,-396.41 380.32,-393.43 384,-390 407.58,-368 394.81,-347.14 420,-327 421.78,-325.58 423.65,-324.26 425.59,-323.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="427.41,-326.02 434.51,-318.16 424.06,-319.87 427.41,-326.02"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="allocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="548,-276 431,-276 431,-252 548,-252 548,-276"/>
+<text text-anchor="middle" x="489.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M373.4,-398.74C377.32,-396.28 380.99,-393.39 384,-390 416.74,-353.1 384.55,-319.31 420,-285 421.26,-283.78 422.59,-282.63 423.97,-281.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="425.97,-284.43 432.46,-276.05 422.17,-278.55 425.97,-284.43"/>
+</g>
+<!-- proc~allocate_rank2_logical1 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank2_logical1</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank2_logical1.html" xlink:title="allocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="559,-234 420,-234 420,-210 559,-210 559,-234"/>
+<text text-anchor="middle" x="489.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M373.69,-398.98C377.57,-396.49 381.15,-393.52 384,-390 426.33,-337.72 373.82,-291.91 420,-243 421.04,-241.9 422.14,-240.85 423.28,-239.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="425.32,-242.71 431.46,-234.08 421.28,-236.99 425.32,-242.71"/>
+</g>
+<!-- proc~allocate_rank2_logical4 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank2_logical4</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank2_logical4.html" xlink:title="allocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="559,-192 420,-192 420,-168 559,-168 559,-192"/>
+<text text-anchor="middle" x="489.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M374.29,-398.84C377.97,-396.38 381.34,-393.46 384,-390 436.06,-322.17 362.93,-264.68 420,-201 420.89,-200.01 421.82,-199.07 422.79,-198.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="425.02,-200.87 430.94,-192.09 420.83,-195.26 425.02,-200.87"/>
+</g>
+<!-- proc~allocate_rank2_logical8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank2_logical8</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank2_logical8.html" xlink:title="allocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="559,-150 420,-150 420,-126 559,-126 559,-150"/>
+<text text-anchor="middle" x="489.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M374.4,-398.92C378.07,-396.45 381.4,-393.5 384,-390 445.87,-306.52 351.96,-237.53 420,-159 420.75,-158.13 421.54,-157.3 422.36,-156.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="424.75,-159.07 430.5,-150.17 420.45,-153.55 424.75,-159.07"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="allocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="558,-108 421,-108 421,-84 558,-84 558,-108"/>
+<text text-anchor="middle" x="489.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M374.48,-398.98C378.13,-396.5 381.44,-393.53 384,-390 455.71,-290.83 340.95,-210.43 420,-117 420.74,-116.12 421.52,-115.28 422.33,-114.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="424.73,-117.04 430.41,-108.1 420.39,-111.55 424.73,-117.04"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="allocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="554.5,-66 424.5,-66 424.5,-42 554.5,-42 554.5,-66"/>
+<text text-anchor="middle" x="489.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M374.95,-398.73C378.43,-396.3 381.57,-393.42 384,-390 465.58,-275.1 329.92,-183.36 420,-75 420.74,-74.12 421.51,-73.27 422.31,-72.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="424.71,-75.02 430.34,-66.04 420.34,-69.55 424.71,-75.02"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="allocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="554.5,-24 424.5,-24 424.5,0 554.5,0 554.5,-24"/>
+<text text-anchor="middle" x="489.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M375,-398.76C378.47,-396.33 381.6,-393.43 384,-390 475.46,-259.36 318.87,-156.3 420,-33 420.62,-32.24 421.27,-31.51 421.94,-30.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="424.47,-33.26 429.97,-24.2 420.03,-27.85 424.47,-33.26"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node24" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node24"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="687,-423 595,-423 595,-399 687,-399 687,-423"/>
+<text text-anchor="middle" x="641" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge23" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M547.97,-797.83C552.05,-795.4 555.81,-792.48 559,-789 607.66,-735.95 631.65,-506.37 638.14,-433.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="641.66,-433.32 639.04,-423.05 634.69,-432.71 641.66,-433.32"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge24" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff4c00" d="M547.55,-755.93C551.77,-753.48 555.68,-750.53 559,-747 602.62,-700.63 629.58,-500.3 637.53,-433.08"/>
+<polygon fill="#ff4c00" stroke="#ff4c00" points="641.01,-433.48 638.68,-423.14 634.05,-432.67 641.01,-433.48"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge25" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff9900" d="M547.1,-714C551.48,-711.53 555.53,-708.57 559,-705 634.09,-627.72 640.98,-487.5 640.65,-433.26"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="644.15,-432.98 640.49,-423.04 637.15,-433.09 644.15,-432.98"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge26" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffe500" d="M546.94,-671.84C551.35,-669.41 555.46,-666.49 559,-663 624.1,-598.77 636.94,-482.13 639.42,-433.36"/>
+<polygon fill="#ffe500" stroke="#ffe500" points="642.92,-433.4 639.84,-423.26 635.93,-433.11 642.92,-433.4"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge27" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cbff00" d="M546.06,-629.98C550.77,-627.52 555.18,-624.56 559,-621 614.24,-569.53 632.24,-476.11 637.74,-433.4"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="641.25,-433.57 638.94,-423.23 634.29,-432.75 641.25,-433.57"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge28" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7fff00" d="M545.08,-587.98C550.1,-585.53 554.85,-582.57 559,-579 604.64,-539.81 626.7,-469.02 635.36,-433.14"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="638.82,-433.73 637.63,-423.2 631.99,-432.17 638.82,-433.73"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge29" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#33ff00" d="M543.6,-545.92C549.08,-543.47 554.34,-540.53 559,-537 595.37,-509.44 619.93,-460.47 631.79,-432.39"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="635.06,-433.64 635.58,-423.06 628.57,-431.01 635.06,-433.64"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge30" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff19" d="M540.45,-503.97C546.92,-501.48 553.28,-498.51 559,-495 586.25,-478.27 610.69,-450.24 625.42,-431.21"/>
+<polygon fill="#00ff19" stroke="#00ff19" points="628.26,-433.26 631.49,-423.16 622.67,-429.04 628.26,-433.26"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge31" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff66" d="M534.04,-461.95C542.42,-459.27 551.06,-456.25 559,-453 576.49,-445.85 595.26,-436.25 610.32,-428.03"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="612.13,-431.04 619.18,-423.13 608.74,-424.91 612.13,-431.04"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge32" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffb2" d="M554.77,-422.97C564.75,-421.57 574.99,-420.13 584.76,-418.76"/>
+<polygon fill="#00ffb2" stroke="#00ffb2" points="585.31,-422.22 594.73,-417.36 584.34,-415.28 585.31,-422.22"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge33" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffff" d="M551.74,-398.6C562.62,-400.13 573.89,-401.71 584.59,-403.22"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="584.26,-406.7 594.65,-404.63 585.23,-399.77 584.26,-406.7"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge34" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00b2ff" d="M534.04,-360.05C542.42,-362.73 551.06,-365.75 559,-369 576.49,-376.15 595.26,-385.75 610.32,-393.97"/>
+<polygon fill="#00b2ff" stroke="#00b2ff" points="608.74,-397.09 619.18,-398.87 612.13,-390.96 608.74,-397.09"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge35" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0066ff" d="M540.45,-318.03C546.92,-320.52 553.28,-323.49 559,-327 586.25,-343.73 610.69,-371.76 625.42,-390.79"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="622.67,-392.96 631.49,-398.84 628.26,-388.74 622.67,-392.96"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge36" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0019ff" d="M543.6,-276.08C549.08,-278.53 554.34,-281.47 559,-285 595.37,-312.56 619.93,-361.53 631.79,-389.61"/>
+<polygon fill="#0019ff" stroke="#0019ff" points="628.57,-390.99 635.58,-398.94 635.06,-388.36 628.57,-390.99"/>
+</g>
+<!-- proc~allocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge37" class="edge">
+<title>proc~allocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3200ff" d="M545.08,-234.02C550.1,-236.47 554.85,-239.43 559,-243 604.64,-282.19 626.7,-352.98 635.36,-388.86"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="631.99,-389.83 637.63,-398.8 638.82,-388.27 631.99,-389.83"/>
+</g>
+<!-- proc~allocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge38" class="edge">
+<title>proc~allocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7f00ff" d="M546.06,-192.02C550.77,-194.48 555.18,-197.44 559,-201 614.24,-252.47 632.24,-345.89 637.74,-388.6"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="634.29,-389.25 638.94,-398.77 641.25,-388.43 634.29,-389.25"/>
+</g>
+<!-- proc~allocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge39" class="edge">
+<title>proc~allocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cc00ff" d="M546.94,-150.16C551.35,-152.59 555.46,-155.51 559,-159 624.1,-223.23 636.94,-339.87 639.42,-388.64"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="635.93,-388.89 639.84,-398.74 642.92,-388.6 635.93,-388.89"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge40" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00e5" d="M547.1,-108C551.48,-110.47 555.53,-113.43 559,-117 634.09,-194.28 640.98,-334.5 640.65,-388.74"/>
+<polygon fill="#ff00e5" stroke="#ff00e5" points="637.15,-388.91 640.49,-398.96 644.15,-389.02 637.15,-388.91"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge41" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0098" d="M547.55,-66.07C551.77,-68.52 555.68,-71.47 559,-75 602.62,-121.37 629.58,-321.7 637.53,-388.92"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="634.05,-389.33 638.68,-398.86 641.01,-388.52 634.05,-389.33"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge42" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff004c" d="M547.97,-24.17C552.05,-26.6 555.81,-29.52 559,-33 607.66,-86.05 631.65,-315.63 638.14,-388.63"/>
+<polygon fill="#ff004c" stroke="#ff004c" points="634.69,-389.29 639.04,-398.95 641.66,-388.68 634.69,-389.29"/>
+</g>
+<!-- log_error -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_node25" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="784,-423 723,-423 723,-399 784,-399 784,-423"/>
+<text text-anchor="middle" x="753.5" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CallsGraph_edge43" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#ff0000" d="M687.26,-411C695.73,-411 704.52,-411 712.8,-411"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="712.95,-414.5 722.95,-411 712.95,-407.5 712.95,-414.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocconstruct_type_hcf_base_impedance_durnerCallsGraph = svgPanZoom('#procconstruct_type_hcf_base_impedance_durnerCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph Pages: 1 -->
+<svg id="procconstruct_type_hcf_base_impedance_durnerCalledByGraph" width="641pt" height="26pt"
+ viewBox="0.00 0.00 641.00 25.61" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph" class="graph" transform="scale(0.8 0.8) rotate(0) translate(4 28)">
+<title>proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 797,-28 797,4 -4,4"/>
+<!-- proc~construct_type_hcf_base_impedance_durner -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph_node1" class="node">
+<title>proc~construct_type_hcf_base_impedance_durner</title>
+<polygon fill="none" stroke="black" points="793,-24 534,-24 534,0 793,0 793,-24"/>
+<text text-anchor="middle" x="663.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Construct_Type_HCF_Base_Impedance_Durner</text>
+</g>
+<!-- interface~construct_type_hcf_base_impedance_durner -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph_node2" class="node">
+<title>interface~construct_type_hcf_base_impedance_durner</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph_node2"><a xlink:href="../interface/construct_type_hcf_base_impedance_durner.html" xlink:title="Construct_Type_HCF_Base_Impedance_Durner">
+<polygon fill="#a7506f" stroke="#a7506f" points="498,-24 239,-24 239,0 498,0 498,-24"/>
+<text text-anchor="middle" x="368.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Construct_Type_HCF_Base_Impedance_Durner</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_impedance_durner&#45;&gt;proc~construct_type_hcf_base_impedance_durner -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph_edge1" class="edge">
+<title>interface~construct_type_hcf_base_impedance_durner&#45;&gt;proc~construct_type_hcf_base_impedance_durner</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M498.01,-12C506.52,-12 515.12,-12 523.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="523.69,-15.5 533.69,-12 523.69,-8.5 523.69,-15.5"/>
+</g>
+<!-- interface~type_hcf_base_impedance_durner -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph_node3" class="node">
+<title>interface~type_hcf_base_impedance_durner</title>
+<g id="a_proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph_node3"><a xlink:href="../interface/type_hcf_base_impedance_durner.html" xlink:title="Type_HCF_Base_Impedance_Durner">
+<polygon fill="#a7506f" stroke="#a7506f" points="203,-24 0,-24 0,0 203,0 203,-24"/>
+<text text-anchor="middle" x="101.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type_HCF_Base_Impedance_Durner</text>
+</a>
+</g>
+</g>
+<!-- interface~type_hcf_base_impedance_durner&#45;&gt;interface~construct_type_hcf_base_impedance_durner -->
+<g id="proc~~construct_type_hcf_base_impedance_durner~~CalledByGraph_edge2" class="edge">
+<title>interface~type_hcf_base_impedance_durner&#45;&gt;interface~construct_type_hcf_base_impedance_durner</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M203.06,-12C211.48,-12 220.08,-12 228.72,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="228.87,-15.5 238.87,-12 228.87,-8.5 228.87,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocconstruct_type_hcf_base_impedance_durnerCalledByGraph = svgPanZoom('#procconstruct_type_hcf_base_impedance_durnerCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">Construct_Type_HCF_Base_Impedance_Durner</span><span class="p">(</span><span class="n">Ks</span><span class="p">,</span><span class="w"> </span><span class="n">alpha1</span><span class="p">,</span><span class="w"> </span><span class="n">n1</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">alpha2</span><span class="p">,</span><span class="w"> </span><span class="n">n2</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">Omega</span><span class="p">,</span><span class="w"> </span><span class="n">nsize</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">structure_HCF</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ks</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">alpha1</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n1</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">w1</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">alpha2</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n2</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">l</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Omega</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nsize</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">Abstract_HCF</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">structure_HCF</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">structure_HCF</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">structure_HCF</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Type_HCF_Base_Impedance_Durner</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">structure_HCF</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">select type</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">structure_HCF</span><span class="p">)</span>
+<span class="w">        </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">Type_HCF_Base_Impedance_Durner</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">Ks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Ks</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">alpha1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha1</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">n1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n1</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">m1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">n1</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">w1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w1</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">alpha2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha2</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">n2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n2</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">m2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">n2</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">w2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">w1</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">Omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Omega</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">nsize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nsize</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">Allocate_Array</span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">Kflh</span><span class="p">,</span><span class="w"> </span><span class="n">nsize</span><span class="p">)</span>
+<span class="w">            </span><span class="n">this</span><span class="p">%</span><span class="n">Kflh</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">end select</span>
+
+<span class="k">    end function </span><span class="n">Construct_Type_HCF_Base_Impedance_Durner</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-07-18 08:09 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

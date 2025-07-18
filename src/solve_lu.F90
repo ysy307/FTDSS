@@ -1,4 +1,4 @@
-submodule(Solver_Solve) Solve_LU
+submodule(solver_solve) solve_lu
     implicit none
 contains
     module function construct_type_solver_sparse_crs_lu(N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV, A) result(structure)
@@ -124,4 +124,4 @@ contains
 
     end subroutine check_dense_lu
 
-end submodule Solve_LU
+end submodule solve_lu

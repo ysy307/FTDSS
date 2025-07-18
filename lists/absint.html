@@ -1,0 +1,456 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>All Abstract Interfaces &ndash; FTDSS
+</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12" id='text'>
+			 <h1>Abstract Interfaces</h1>
+			 <table class="table table-striped nostretched">
+			 <thead>
+			 <tr><th>Abstract Interface</th><th>Location</th><th>Description</th></tr>
+			 </thead><tbody>
+			   <tr>
+                 <td><a href='../interface/abst_apply_bc_dence.html'>abst_apply_bc_dence</a></td>
+                 <td><a href='../module/conditions_boundary.html'>conditions_boundary</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_apply_bc_sparse_crs.html'>abst_apply_bc_sparse_crs</a></td>
+                 <td><a href='../module/conditions_boundary.html'>conditions_boundary</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_assemble.html'>abst_assemble</a></td>
+                 <td><a href='../module/main_thermal.html'>main_thermal</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_calc_den_gauss_point.html'>abst_calc_den_gauss_point</a></td>
+                 <td><a href='../module/calculate_density.html'>calculate_density</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_calc_sph_gauss_point.html'>abst_calc_sph_gauss_point</a></td>
+                 <td><a href='../module/calculate_specific_heat.html'>calculate_specific_heat</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_calc_thc_gauss_point.html'>abst_calc_thc_gauss_point</a></td>
+                 <td><a href='../module/calculate_thermal_conductivity.html'>calculate_thermal_conductivity</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_calc_vhc_gauss_point_holder.html'>abst_calc_vhc_gauss_point_holder</a></td>
+                 <td><a href='../module/calculate_volumetric_heat_capacity.html'>calculate_volumetric_heat_capacity</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_calc_vhc_gauss_point_ptr.html'>abst_calc_vhc_gauss_point_ptr</a></td>
+                 <td><a href='../module/calculate_volumetric_heat_capacity.html'>calculate_volumetric_heat_capacity</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_copy.html'>abst_copy</a></td>
+                 <td><a href='../module/matrix_base.html'>matrix_base</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_destory.html'>abst_destory</a></td>
+                 <td><a href='../module/matrix_base.html'>matrix_base</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_dpsi_deta.html'>abst_dpsi_deta</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_dpsi_dxi.html'>abst_dpsi_dxi</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_dpsi_dxi~2.html'>abst_dpsi_dxi</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_find.html'>abst_find</a></td>
+                 <td><a href='../module/matrix_base.html'>matrix_base</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_gcc_calc.html'>abst_gcc_calc</a></td>
+                 <td><a href='../module/calculate_gcc.html'>calculate_gcc</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_gcc_calc_derivative.html'>abst_gcc_calc_derivative</a></td>
+                 <td><a href='../module/calculate_gcc.html'>calculate_gcc</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_connectivity.html'>abst_get_connectivity</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_dimension.html'>abst_get_dimension</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_dimension~2.html'>abst_get_dimension</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_group.html'>abst_get_group</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_group~2.html'>abst_get_group</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_id.html'>abst_get_id</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_id~2.html'>abst_get_id</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_num_gauss.html'>abst_get_num_gauss</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_num_gauss~2.html'>abst_get_num_gauss</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_num_nodes.html'>abst_get_num_nodes</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_num_nodes~2.html'>abst_get_num_nodes</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_order.html'>abst_get_order</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_order~2.html'>abst_get_order</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_type.html'>abst_get_type</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_type~2.html'>abst_get_type</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_value.html'>abst_get_value</a></td>
+                 <td><a href='../module/properties_properties_manager.html'>properties_properties_manager</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_get_values.html'>abst_get_values</a></td>
+                 <td><a href='../module/input_output.html'>input_output</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_ic_apply.html'>abst_ic_apply</a></td>
+                 <td><a href='../module/conditions_initial.html'>conditions_initial</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_ic_initialize.html'>abst_ic_initialize</a></td>
+                 <td><a href='../module/conditions_initial.html'>conditions_initial</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_initialize.html'>abst_initialize</a></td>
+                 <td><a href='../module/matrix_base.html'>matrix_base</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_initialize_bc.html'>abst_initialize_bc</a></td>
+                 <td><a href='../module/conditions_boundary.html'>conditions_boundary</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_interpolate.html'>abst_interpolate</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_is_inside.html'>abst_is_inside</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_jacobian.html'>abst_jacobian</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_jacobian_det.html'>abst_jacobian_det</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_output_overall_cell.html'>abst_output_overall_cell</a></td>
+                 <td><a href='../module/input_output.html'>input_output</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_output_overall_fields.html'>abst_output_overall_fields</a></td>
+                 <td><a href='../module/input_output.html'>input_output</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_psi.html'>abst_psi</a></td>
+                 <td><a href='../module/domain_element.html'>domain_element</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_psi~2.html'>abst_psi</a></td>
+                 <td><a href='../module/domain_side.html'>domain_side</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_write_line.html'>abst_write_line</a></td>
+                 <td><a href='../module/input_output.html'>input_output</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_write_obeservation_header.html'>abst_write_obeservation_header</a></td>
+                 <td><a href='../module/input_output.html'>input_output</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_impedance.html'>Abstract_Calculate_Impedance</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kflh_base.html'>Abstract_Calculate_Kflh_Base</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kflh_base_impedance.html'>Abstract_Calculate_Kflh_Base_Impedance</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kflh_base_impedance_viscosity.html'>Abstract_Calculate_Kflh_Base_Impedance_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kflh_base_viscosity.html'>Abstract_Calculate_Kflh_Base_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kflh_impedance.html'>Abstract_Calculate_Kflh_Impedance</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kflh_impedance_viscosity.html'>Abstract_Calculate_Kflh_Impedance_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kflh_viscosity.html'>Abstract_Calculate_Kflh_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kr_hcf_base.html'>Abstract_Calculate_kr_HCF_Base</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kr_hcf_base_impedance.html'>Abstract_Calculate_kr_HCF_Base_Impedance</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kr_hcf_base_impedance_viscosity.html'>Abstract_Calculate_kr_HCF_Base_Impedance_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_kr_hcf_base_viscosity.html'>Abstract_Calculate_kr_HCF_Base_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_calculate_viscosity.html'>Abstract_Calculate_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_set_calculate_hcf_viscosity.html'>Abstract_Set_Calculate_HCF_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_update_kflh_base.html'>Abstract_Update_Kflh_Base</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_update_kflh_base_impedance.html'>Abstract_Update_Kflh_Base_Impedance</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_update_kflh_base_impedance_viscosity.html'>Abstract_Update_Kflh_Base_Impedance_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_update_kflh_base_viscosity.html'>Abstract_Update_Kflh_Base_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_update_kflh_impedance.html'>Abstract_Update_Kflh_Impedance</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_update_kflh_impedance_viscosity.html'>Abstract_Update_Kflh_Impedance_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abstract_update_kflh_viscosity.html'>Abstract_Update_Kflh_Viscosity</a></td>
+                 <td><a href='../module/calculate_hcf.html'>Calculate_HCF</a></td>
+                 <td></td>
+               </tr>
+			 </tbody></table>
+        </div>
+      </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-07-18 08:09 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

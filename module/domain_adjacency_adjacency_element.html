@@ -59,6 +59,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
                 <form action="../search.html" role="search" class="ms-auto">
@@ -126,9 +135,45 @@
   
   
   
-  
-  
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#types-0"
+         aria-expanded="false" aria-controls="types-0">
+         <h4 class="card-header bg-primary text-white">Derived Types</h4>
+      </a>
+      <div id="types-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/domain_adjacency_adjacency_element.html#type-type_crs_adjacency_element">type_crs_adjacency_element</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#funcs-0"
+         aria-expanded="false" aria-controls="funcs-0">
+         <h4 class="card-header bg-primary text-white">Functions</h4>
+      </a>
+      <div id="funcs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/domain_adjacency_adjacency_element.html#proc-are_elements_adjacent">are_elements_adjacent</a>
+            <a class="list-group-item" href="../module/domain_adjacency_adjacency_element.html#proc-get_degree_impl">get_degree_impl</a>
+            <a class="list-group-item" href="../module/domain_adjacency_adjacency_element.html#proc-get_neighbors_impl">get_neighbors_impl</a>
+            <a class="list-group-item" href="../module/domain_adjacency_adjacency_element.html#proc-get_num_elements_impl">get_num_elements_impl</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/domain_adjacency_adjacency_element.html#proc-initialize_crs_adjacency">initialize_crs_adjacency</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -137,7 +182,6 @@
   
   
 
-    <em>None</em>
 
   </div>
 
@@ -151,9 +195,9 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
                   <li class="list-inline-item"><a href='domain_element.html'>domain_element</a></li>
+                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
+                  <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
               </ul>
             </li>
             <li class="list-group-item">
@@ -891,8 +935,11 @@
 <!-- json_module -->
 <g id="module~~domain_adjacency_adjacency_element~~UsesGraph_node31" class="node">
 <title>json_module</title>
+<g id="a_module~~domain_adjacency_adjacency_element~~UsesGraph_node31"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
 <polygon fill="#337ab7" stroke="#337ab7" points="1207,-624.49 1127,-624.49 1127,-600.49 1207,-600.49 1207,-624.49"/>
 <text text-anchor="middle" x="1167" y="-610.09" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
 </g>
 <!-- module~inout_input&#45;&gt;json_module -->
 <g id="module~~domain_adjacency_adjacency_element~~UsesGraph_edge72" class="edge">
@@ -1897,8 +1944,425 @@ large graphs.</div>
 
 
 
+        <section>
+          <h2>Derived Types</h2>
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_crs_adjacency_element"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ind~5"></span>
+              integer(kind=int32),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>ind</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nnz~3"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nnz</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_row~11"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_row</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ptr~6"></span>
+              integer(kind=int32),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>ptr</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
 
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs_adjacency_element.html#boundprocedure-get_degree~2'>get_degree</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_degree_impl.html'>get_degree_impl</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs_adjacency_element.html#boundprocedure-get_neighbors~2'>get_neighbors</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_neighbors_impl.html'>get_neighbors_impl</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs_adjacency_element.html#boundprocedure-get_num_elements~2'>get_num_elements</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/get_num_elements_impl.html'>get_num_elements_impl</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_crs_adjacency_element.html#boundprocedure-initialize~27'>initialize</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_crs_adjacency.html'>initialize_crs_adjacency</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-are_elements_adjacent"></span> <h3>private  function <a href='../proc/are_elements_adjacent.html'>are_elements_adjacent</a>(elem1, elem2) result(is_adjacent)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-elem1"></span>
+              class(<a href='../type/abst_element.html'>abst_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>elem1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-elem2"></span>
+              class(<a href='../type/abst_element.html'>abst_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>elem2</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_degree_impl"></span> <h3>private  function <a href='../proc/get_degree_impl.html'>get_degree_impl</a>(self, i) result(degree)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~562"></span>
+              class(<a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-i~149"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_neighbors_impl"></span> <h3>private  function <a href='../proc/get_neighbors_impl.html'>get_neighbors_impl</a>(self, i) result(neighbors)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~563"></span>
+              class(<a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-i~150"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>i</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32), allocatable, (:)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_num_elements_impl"></span> <h3>private  function <a href='../proc/get_num_elements_impl.html'>get_num_elements_impl</a>(self) result(num_row)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~561"></span>
+              class(<a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize_crs_adjacency"></span> <h3>private  subroutine <a href='../proc/initialize_crs_adjacency.html'>initialize_crs_adjacency</a>(self, elements)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~560"></span>
+              class(<a href='../type/type_crs_adjacency_element.html'>type_crs_adjacency_element</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-elements~6"></span>
+              type(<a href='../type/holder_elements.html'>holder_elements</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>elements</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -1920,7 +2384,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 06:42 +0000             </p>
+ on 2025-07-18 08:09 +0000             </p>
           </div>
         </div>
         <br>

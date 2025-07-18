@@ -1,0 +1,805 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>read_conditions_initial_conditions &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>read_conditions_initial_conditions
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">16 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/input_conditions.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/input_conditions.f90.html'>input_conditions.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/inout_input_conditions.html'>inout_input_conditions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">read_conditions_initial_conditions</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/read_conditions_initial_conditions.html#src">read_conditions_initial_conditions</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2> subroutine read_conditions_initial_conditions(self, json)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~630"></span>
+              class(<a href='../type/type_input.html'>type_input</a>)
+            </td>
+<td></td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~29"></span>
+              type(json_file),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                <p>JSON parser</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_conditions_initial_conditions~~CallsGraph Pages: 1 -->
+<svg id="procread_conditions_initial_conditionsCallsGraph" width="641pt" height="271pt"
+ viewBox="0.00 0.00 641.00 271.15" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph" class="graph" transform="scale(0.63 0.63) rotate(0) translate(4 423.24)">
+<title>proc~~read_conditions_initial_conditions~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-423.24 1006,-423.24 1006,4 -4,4"/>
+<!-- proc~read_conditions_initial_conditions -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node1" class="node">
+<title>proc~read_conditions_initial_conditions</title>
+<polygon fill="none" stroke="black" points="191,-318.03 0,-318.03 0,-294.03 191,-294.03 191,-318.03"/>
+<text text-anchor="middle" x="95.5" y="-303.63" font-family="Helvetica,sans-Serif" font-size="10.50">read_conditions_initial_conditions</text>
+</g>
+<!-- proc~join -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node2" class="node">
+<title>proc~join</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CallsGraph_node2"><a xlink:href="../proc/join.html" xlink:title="join">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="886,-360.03 832,-360.03 832,-336.03 886,-336.03 886,-360.03"/>
+<text text-anchor="middle" x="859" y="-345.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">join</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions&#45;&gt;proc~join -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge1" class="edge">
+<title>proc~read_conditions_initial_conditions&#45;&gt;proc~join</title>
+<path fill="none" stroke="#ff0000" d="M125.6,-318.11C220.85,-355.93 531.3,-465.57 777,-397.03 798.44,-391.05 819.86,-377.69 835.29,-366.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="837.77,-368.93 843.63,-360.11 833.55,-363.35 837.77,-368.93"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_hydraulic -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node3" class="node">
+<title>proc~read_conditions_initial_conditions_hydraulic</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CallsGraph_node3"><a xlink:href="../proc/read_conditions_initial_conditions_hydraulic.html" xlink:title="read_conditions_initial_conditions_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="473,-180.03 227,-180.03 227,-156.03 473,-156.03 473,-180.03"/>
+<text text-anchor="middle" x="350" y="-165.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_initial_conditions_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions_hydraulic -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge2" class="edge">
+<title>proc~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M118.47,-294.03C163.42,-269.46 266.04,-213.37 317.85,-185.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="319.81,-187.98 326.9,-180.11 316.45,-181.83 319.81,-187.98"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_porosity -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node4" class="node">
+<title>proc~read_conditions_initial_conditions_porosity</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CallsGraph_node4"><a xlink:href="../proc/read_conditions_initial_conditions_porosity.html" xlink:title="read_conditions_initial_conditions_porosity">
+<polygon fill="#d9534f" stroke="#d9534f" points="762,-340.03 524,-340.03 524,-316.03 762,-316.03 762,-340.03"/>
+<text text-anchor="middle" x="643" y="-325.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_initial_conditions_porosity</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions_porosity -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge3" class="edge">
+<title>proc~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions_porosity</title>
+<path fill="none" stroke="#ff0000" d="M191.21,-309.85C280.43,-313.45 414.81,-318.87 513.64,-322.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="513.56,-326.36 523.7,-323.26 513.85,-319.36 513.56,-326.36"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_thermal -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node5" class="node">
+<title>proc~read_conditions_initial_conditions_thermal</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CallsGraph_node5"><a xlink:href="../proc/read_conditions_initial_conditions_thermal.html" xlink:title="read_conditions_initial_conditions_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="469,-298.03 231,-298.03 231,-274.03 469,-274.03 469,-298.03"/>
+<text text-anchor="middle" x="350" y="-283.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_initial_conditions_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions_thermal -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge4" class="edge">
+<title>proc~read_conditions_initial_conditions&#45;&gt;proc~read_conditions_initial_conditions_thermal</title>
+<path fill="none" stroke="#ff0000" d="M191.24,-298.53C200.8,-297.77 210.61,-296.99 220.44,-296.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.99,-299.68 230.68,-295.4 220.44,-292.7 220.99,-299.68"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_hydraulic&#45;&gt;proc~join -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge8" class="edge">
+<title>proc~read_conditions_initial_conditions_hydraulic&#45;&gt;proc~join</title>
+<path fill="none" stroke="#7fff00" d="M372.2,-180.28C398.87,-196.61 444.6,-227.82 473,-265.03 497.64,-297.32 475.09,-326.67 509,-349.03 559.47,-382.31 743.3,-363.1 821.93,-353.01"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="822.4,-356.48 831.86,-351.71 821.49,-349.54 822.4,-356.48"/>
+</g>
+<!-- destroy -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node6" class="node">
+<title>destroy</title>
+<polygon fill="#777777" stroke="#777777" points="886,-138.03 832,-138.03 832,-114.03 886,-114.03 886,-138.03"/>
+<text text-anchor="middle" x="859" y="-123.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy</text>
+</g>
+<!-- proc~read_conditions_initial_conditions_hydraulic&#45;&gt;destroy -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge5" class="edge">
+<title>proc~read_conditions_initial_conditions_hydraulic&#45;&gt;destroy</title>
+<path fill="none" stroke="#7fff00" d="M360.02,-156C381.85,-128.02 440.79,-59.06 509,-34.03 620.82,7 668.46,15.02 777,-34.03 809.07,-48.53 833.51,-82.69 846.79,-105.06"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="843.8,-106.87 851.79,-113.83 849.88,-103.41 843.8,-106.87"/>
+</g>
+<!-- get -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node7" class="node">
+<title>get</title>
+<polygon fill="#777777" stroke="#777777" points="886,-298.03 832,-298.03 832,-274.03 886,-274.03 886,-298.03"/>
+<text text-anchor="middle" x="859" y="-283.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get</text>
+</g>
+<!-- proc~read_conditions_initial_conditions_hydraulic&#45;&gt;get -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge6" class="edge">
+<title>proc~read_conditions_initial_conditions_hydraulic&#45;&gt;get</title>
+<path fill="none" stroke="#7fff00" d="M406.27,-180.07C487.63,-197.9 644.34,-232.74 777,-265.03 791.77,-268.63 807.99,-272.79 822.01,-276.46"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="821.22,-279.87 831.78,-279.02 823,-273.1 821.22,-279.87"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node8" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CallsGraph_node8"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="905,-220.03 813,-220.03 813,-196.03 905,-196.03 905,-220.03"/>
+<text text-anchor="middle" x="859" y="-205.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions_hydraulic&#45;&gt;proc~error_message -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge7" class="edge">
+<title>proc~read_conditions_initial_conditions_hydraulic&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7fff00" d="M373.64,-156.02C439.59,-122.77 635.78,-36.43 777,-105.03 781.66,-107.29 820.64,-158.42 842.79,-187.77"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="839.99,-189.88 848.8,-195.76 845.58,-185.67 839.99,-189.88"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_hydraulic -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node9" class="node">
+<title>proc~read_conditions_boundary_conditions_hydraulic</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CallsGraph_node9"><a xlink:href="../proc/read_conditions_boundary_conditions_hydraulic.html" xlink:title="read_conditions_boundary_conditions_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="777,-138.03 509,-138.03 509,-114.03 777,-114.03 777,-138.03"/>
+<text text-anchor="middle" x="643" y="-123.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_boundary_conditions_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions_hydraulic&#45;&gt;proc~read_conditions_boundary_conditions_hydraulic -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge9" class="edge">
+<title>proc~read_conditions_initial_conditions_hydraulic&#45;&gt;proc~read_conditions_boundary_conditions_hydraulic</title>
+<path fill="none" stroke="#7fff00" d="M434.39,-156C470.08,-150.85 511.91,-144.81 548.64,-139.51"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="549.45,-142.93 558.85,-138.03 548.45,-136 549.45,-142.93"/>
+</g>
+<!-- to_string -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node11" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="672,-180.03 614,-180.03 614,-156.03 672,-156.03 672,-180.03"/>
+<text text-anchor="middle" x="643" y="-165.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~read_conditions_initial_conditions_hydraulic&#45;&gt;to_string -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge10" class="edge">
+<title>proc~read_conditions_initial_conditions_hydraulic&#45;&gt;to_string</title>
+<path fill="none" stroke="#7fff00" d="M473.15,-168.03C520.02,-168.03 570.22,-168.03 603.59,-168.03"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="603.8,-171.53 613.8,-168.03 603.8,-164.53 603.8,-171.53"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_porosity&#45;&gt;proc~join -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge14" class="edge">
+<title>proc~read_conditions_initial_conditions_porosity&#45;&gt;proc~join</title>
+<path fill="none" stroke="#00ffff" d="M762.27,-339.09C783.83,-341.1 804.79,-343.06 821.56,-344.63"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="821.66,-348.15 831.95,-345.6 822.32,-341.18 821.66,-348.15"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_porosity&#45;&gt;destroy -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge11" class="edge">
+<title>proc~read_conditions_initial_conditions_porosity&#45;&gt;destroy</title>
+<path fill="none" stroke="#00ffff" d="M762.08,-317.32C767.4,-314.43 772.42,-311.03 777,-307.03 818.94,-270.4 788.1,-236.84 813,-187.03 820.31,-172.4 831.14,-157.59 840.33,-146.23"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="843.25,-148.2 846.97,-138.28 837.87,-143.72 843.25,-148.2"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_porosity&#45;&gt;get -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge12" class="edge">
+<title>proc~read_conditions_initial_conditions_porosity&#45;&gt;get</title>
+<path fill="none" stroke="#00ffff" d="M728.3,-315.99C744.51,-313.31 761.32,-310.29 777,-307.03 791.88,-303.94 808.12,-299.86 822.13,-296.13"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="823.15,-299.48 831.89,-293.49 821.32,-292.72 823.15,-299.48"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_porosity&#45;&gt;proc~error_message -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge13" class="edge">
+<title>proc~read_conditions_initial_conditions_porosity&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffff" d="M757.73,-315.99C764.43,-313.48 770.92,-310.52 777,-307.03 781.34,-304.54 819.76,-256.43 842.1,-228.21"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="845,-230.18 848.45,-220.16 839.51,-225.84 845,-230.18"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_thermal&#45;&gt;proc~join -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge18" class="edge">
+<title>proc~read_conditions_initial_conditions_thermal&#45;&gt;proc~join</title>
+<path fill="none" stroke="#7f00ff" d="M366.43,-298.22C393.44,-318.69 451.87,-359.19 509,-374.03 624.29,-403.97 659.32,-392.46 777,-374.03 792.15,-371.66 808.33,-366.94 822.21,-362.16"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="823.64,-365.37 831.87,-358.7 821.28,-358.78 823.64,-365.37"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_thermal&#45;&gt;destroy -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge15" class="edge">
+<title>proc~read_conditions_initial_conditions_thermal&#45;&gt;destroy</title>
+<path fill="none" stroke="#7f00ff" d="M372.2,-273.79C398.87,-257.46 444.6,-226.24 473,-189.03 497.64,-156.75 475.09,-127.39 509,-105.03 606.56,-40.7 754.78,-85.01 822.27,-110.94"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="821.04,-114.21 831.63,-114.61 823.6,-107.7 821.04,-114.21"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_thermal&#45;&gt;get -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge16" class="edge">
+<title>proc~read_conditions_initial_conditions_thermal&#45;&gt;get</title>
+<path fill="none" stroke="#7f00ff" d="M373.2,-298.04C403.05,-313.43 458.25,-339.29 509,-349.03 625.97,-371.49 664.34,-387.69 777,-349.03 790.2,-344.5 817.57,-321.94 836.82,-305.1"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="839.34,-307.54 844.52,-298.3 834.71,-302.3 839.34,-307.54"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_thermal&#45;&gt;proc~error_message -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge17" class="edge">
+<title>proc~read_conditions_initial_conditions_thermal&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7f00ff" d="M429.11,-274.02C532.48,-258.11 712.18,-230.47 802.63,-216.55"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="803.33,-219.99 812.68,-215.01 802.26,-213.07 803.33,-219.99"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_thermal -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node10" class="node">
+<title>proc~read_conditions_boundary_conditions_thermal</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CallsGraph_node10"><a xlink:href="../proc/read_conditions_boundary_conditions_thermal.html" xlink:title="read_conditions_boundary_conditions_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="773,-298.03 513,-298.03 513,-274.03 773,-274.03 773,-298.03"/>
+<text text-anchor="middle" x="643" y="-283.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_conditions_boundary_conditions_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~read_conditions_initial_conditions_thermal&#45;&gt;proc~read_conditions_boundary_conditions_thermal -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge19" class="edge">
+<title>proc~read_conditions_initial_conditions_thermal&#45;&gt;proc~read_conditions_boundary_conditions_thermal</title>
+<path fill="none" stroke="#7f00ff" d="M469.36,-286.03C480.32,-286.03 491.5,-286.03 502.63,-286.03"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="502.83,-289.53 512.83,-286.03 502.83,-282.53 502.83,-289.53"/>
+</g>
+<!-- proc~read_conditions_initial_conditions_thermal&#45;&gt;to_string -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge20" class="edge">
+<title>proc~read_conditions_initial_conditions_thermal&#45;&gt;to_string</title>
+<path fill="none" stroke="#7f00ff" d="M367.59,-273.83C395.38,-253.98 453.75,-214.84 509,-194.03 539.71,-182.47 576.44,-175.79 603.51,-172.1"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="604.27,-175.53 613.74,-170.79 603.38,-168.59 604.27,-175.53"/>
+</g>
+<!-- log_error -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_node12" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="1002,-220.03 941,-220.03 941,-196.03 1002,-196.03 1002,-220.03"/>
+<text text-anchor="middle" x="971.5" y="-205.63" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge21" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#00ff00" d="M905.26,-208.03C913.73,-208.03 922.52,-208.03 930.8,-208.03"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="930.95,-211.53 940.95,-208.03 930.95,-204.53 930.95,-211.53"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;proc~join -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge25" class="edge">
+<title>proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;proc~join</title>
+<path fill="none" stroke="#00ffff" d="M765.41,-138.14C769.53,-140.73 773.42,-143.68 777,-147.03 830.18,-196.88 776.37,-244.02 813,-307.03 817.92,-315.49 825.16,-323.19 832.4,-329.57"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="830.21,-332.3 840.15,-335.96 834.66,-326.9 830.21,-332.3"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;destroy -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge22" class="edge">
+<title>proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;destroy</title>
+<path fill="none" stroke="#00ffff" d="M777.1,-126.03C793.3,-126.03 808.65,-126.03 821.54,-126.03"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="821.75,-129.53 831.75,-126.03 821.75,-122.53 821.75,-129.53"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;get -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge23" class="edge">
+<title>proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;get</title>
+<path fill="none" stroke="#00ffff" d="M762.77,-138.07C767.78,-140.64 772.56,-143.61 777,-147.03 808.52,-171.34 792.5,-194.91 813,-229.03 820.89,-242.17 831.43,-255.67 840.32,-266.24"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="837.85,-268.73 847.02,-274.02 843.15,-264.16 837.85,-268.73"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;proc~error_message -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge24" class="edge">
+<title>proc~read_conditions_boundary_conditions_hydraulic&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffff" d="M750.59,-138.05C759.68,-140.51 768.61,-143.47 777,-147.03 800.46,-156.98 823.29,-175.18 838.7,-189.13"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="836.34,-191.71 846.05,-195.96 841.11,-186.59 836.34,-191.71"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_thermal&#45;&gt;proc~join -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge29" class="edge">
+<title>proc~read_conditions_boundary_conditions_thermal&#45;&gt;proc~join</title>
+<path fill="none" stroke="#0000ff" d="M742.51,-298.03C754.26,-300.51 765.99,-303.47 777,-307.03 795.26,-312.93 814.47,-322.49 829.59,-330.9"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="828.02,-334.03 838.44,-335.94 831.49,-327.95 828.02,-334.03"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_thermal&#45;&gt;destroy -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge26" class="edge">
+<title>proc~read_conditions_boundary_conditions_thermal&#45;&gt;destroy</title>
+<path fill="none" stroke="#0000ff" d="M660.92,-273.95C686.3,-255.76 735.68,-220.16 777,-189.03 796.45,-174.38 818.22,-157.41 834.29,-144.78"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="836.89,-147.19 842.58,-138.25 832.56,-141.69 836.89,-147.19"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_thermal&#45;&gt;get -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge27" class="edge">
+<title>proc~read_conditions_boundary_conditions_thermal&#45;&gt;get</title>
+<path fill="none" stroke="#0000ff" d="M773.11,-286.03C790.84,-286.03 807.72,-286.03 821.69,-286.03"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="821.77,-289.53 831.77,-286.03 821.77,-282.53 821.77,-289.53"/>
+</g>
+<!-- proc~read_conditions_boundary_conditions_thermal&#45;&gt;proc~error_message -->
+<g id="proc~~read_conditions_initial_conditions~~CallsGraph_edge28" class="edge">
+<title>proc~read_conditions_boundary_conditions_thermal&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0000ff" d="M676.97,-274.02C714.12,-260.47 774.63,-238.42 815.35,-223.58"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="816.8,-226.78 824.99,-220.06 814.4,-220.2 816.8,-226.78"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_conditions_initial_conditionsCallsGraph = svgPanZoom('#procread_conditions_initial_conditionsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~read_conditions_initial_conditions~~CalledByGraph Pages: 1 -->
+<svg id="procread_conditions_initial_conditionsCalledByGraph" width="641pt" height="25pt"
+ viewBox="0.00 0.00 641.00 25.23" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph" class="graph" transform="scale(0.79 0.79) rotate(0) translate(4 28)">
+<title>proc~~read_conditions_initial_conditions~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 809,-28 809,4 -4,4"/>
+<!-- proc~read_conditions_initial_conditions -->
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph_node1" class="node">
+<title>proc~read_conditions_initial_conditions</title>
+<polygon fill="none" stroke="black" points="805,-24 614,-24 614,0 805,0 805,-24"/>
+<text text-anchor="middle" x="709.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_conditions_initial_conditions</text>
+</g>
+<!-- proc~inout_read_conditions -->
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph_node2" class="node">
+<title>proc~inout_read_conditions</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CalledByGraph_node2"><a xlink:href="../proc/inout_read_conditions.html" xlink:title="inout_read_conditions">
+<polygon fill="#d9534f" stroke="#d9534f" points="578,-24 449,-24 449,0 578,0 578,-24"/>
+<text text-anchor="middle" x="513.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">inout_read_conditions</text>
+</a>
+</g>
+</g>
+<!-- proc~inout_read_conditions&#45;&gt;proc~read_conditions_initial_conditions -->
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph_edge1" class="edge">
+<title>proc~inout_read_conditions&#45;&gt;proc~read_conditions_initial_conditions</title>
+<path fill="none" stroke="#ff0000" d="M578.02,-12C586.28,-12 594.91,-12 603.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="603.88,-15.5 613.88,-12 603.88,-8.5 603.88,-15.5"/>
+</g>
+<!-- interface~inout_read_conditions -->
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph_node3" class="node">
+<title>interface~inout_read_conditions</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CalledByGraph_node3"><a xlink:href="../interface/inout_read_conditions.html" xlink:title="type_input%inout_read_conditions">
+<polygon fill="#a7506f" stroke="#a7506f" points="413,-24 219,-24 219,0 413,0 413,-24"/>
+<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%inout_read_conditions</text>
+</a>
+</g>
+</g>
+<!-- interface~inout_read_conditions&#45;&gt;proc~inout_read_conditions -->
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph_edge2" class="edge">
+<title>interface~inout_read_conditions&#45;&gt;proc~inout_read_conditions</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M413.03,-12C421.68,-12 430.35,-12 438.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="438.89,-15.5 448.89,-12 438.89,-8.5 438.89,-15.5"/>
+</g>
+<!-- proc~initialize_type_input -->
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph_node4" class="node">
+<title>proc~initialize_type_input</title>
+<g id="a_proc~~read_conditions_initial_conditions~~CalledByGraph_node4"><a xlink:href="../proc/initialize_type_input.html" xlink:title="type_input%initialize_type_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="183,-24 0,-24 0,0 183,0 183,-24"/>
+<text text-anchor="middle" x="91.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%initialize_type_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input&#45;&gt;interface~inout_read_conditions -->
+<g id="proc~~read_conditions_initial_conditions~~CalledByGraph_edge3" class="edge">
+<title>proc~initialize_type_input&#45;&gt;interface~inout_read_conditions</title>
+<path fill="none" stroke="#ff0000" d="M183.32,-12C191.61,-12 200.05,-12 208.46,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="208.68,-15.5 218.68,-12 208.68,-8.5 208.68,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocread_conditions_initial_conditionsCalledByGraph = svgPanZoom('#procread_conditions_initial_conditionsCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">read_conditions_initial_conditions</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_input</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="c">!! JSON parser</span>
+
+<span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">key</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">analysis_controls</span><span class="p">%</span><span class="n">calculate_thermal</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">join</span><span class="p">([</span><span class="n">initial_conditions</span><span class="p">,</span><span class="w"> </span><span class="n">thermal</span><span class="p">])</span>
+<span class="w">            </span><span class="k">call </span><span class="n">read_conditions_initial_conditions_thermal</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">initial_conditions</span><span class="p">%</span><span class="n">thermal</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                            </span><span class="n">self</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">num_boundaries</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">analysis_controls</span><span class="p">%</span><span class="n">calculate_hydraulic</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">join</span><span class="p">([</span><span class="n">initial_conditions</span><span class="p">,</span><span class="w"> </span><span class="n">hydraulic</span><span class="p">])</span>
+<span class="w">            </span><span class="k">call </span><span class="n">read_conditions_initial_conditions_hydraulic</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">initial_conditions</span><span class="p">%</span><span class="n">hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                              </span><span class="n">self</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">num_boundaries</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">join</span><span class="p">([</span><span class="n">initial_conditions</span><span class="p">,</span><span class="w"> </span><span class="n">porosity</span><span class="p">])</span>
+<span class="w">        </span><span class="k">call </span><span class="n">read_conditions_initial_conditions_porosity</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">initial_conditions</span><span class="p">%</span><span class="n">porosity</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                         </span><span class="n">self</span><span class="p">%</span><span class="n">conditions</span><span class="p">%</span><span class="n">num_boundaries</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">read_conditions_initial_conditions</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-07-18 08:09 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

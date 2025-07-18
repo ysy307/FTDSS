@@ -59,6 +59,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
             </ul>
               <div class="d-flex align-items-end flex-grow-1">
                 <form action="../search.html" role="search" class="ms-auto">
@@ -126,9 +135,43 @@
   
   
   
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#types-0"
+         aria-expanded="false" aria-controls="types-0">
+         <h4 class="card-header bg-primary text-white">Derived Types</h4>
+      </a>
+      <div id="types-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/properties_material_manager.html#type-type_material_manager">type_material_manager</a>
+        </div>
+      </div>
+    </div>
+
   
-  
-  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_den_holder">get_den_holder</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_den_ptr">get_den_ptr</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_gcc_holder">get_gcc_holder</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_gcc_ptr">get_gcc_ptr</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_sph_holder">get_sph_holder</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_sph_ptr">get_sph_ptr</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_thc_holder">get_thc_holder</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_thc_ptr">get_thc_ptr</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_vhc_holder">get_vhc_holder</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_vhc_ptr">get_vhc_ptr</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_wrf_holder">get_wrf_holder</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-get_wrf_ptr">get_wrf_ptr</a>
+            <a class="list-group-item" href="../module/properties_material_manager.html#proc-initialize">initialize</a>
+        </div>
+      </div>
+    </div>
+
   
   
   
@@ -137,7 +180,6 @@
   
   
 
-    <em>None</em>
 
   </div>
 
@@ -151,9 +193,9 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
+                  <li class="list-inline-item"><a href='module_calculate.html'>module_calculate</a></li>
                   <li class="list-inline-item"><a href='module_input.html'>module_input</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item"><a href='module_calculate.html'>module_calculate</a></li>
               </ul>
             </li>
             <li class="list-group-item">
@@ -443,8 +485,11 @@
 <!-- json_module -->
 <g id="module~~properties_material_manager~~UsesGraph_node13" class="node">
 <title>json_module</title>
+<g id="a_module~~properties_material_manager~~UsesGraph_node13"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
 <polygon fill="#337ab7" stroke="#337ab7" points="1207,-599.55 1127,-599.55 1127,-575.55 1207,-575.55 1207,-599.55"/>
 <text text-anchor="middle" x="1167" y="-585.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
 </g>
 <!-- module~inout_input&#45;&gt;json_module -->
 <g id="module~~properties_material_manager~~UsesGraph_edge28" class="edge">
@@ -1587,8 +1632,1177 @@ large graphs.</div>
 
 
 
+        <section>
+          <h2>Derived Types</h2>
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-type_material_manager"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/type_material_manager.html'>type_material_manager</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-den"></span>
+              type(<a href='../type/holder_dens.html'>holder_dens</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>den</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gcc~2"></span>
+              type(<a href='../type/holder_gccs.html'>holder_gccs</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>gcc</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id_map"></span>
+              integer(kind=int32),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>region_id_map</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sph"></span>
+              type(<a href='../type/holder_sphs.html'>holder_sphs</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>sph</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-thc"></span>
+              type(<a href='../type/holder_thcs.html'>holder_thcs</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>thc</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vhc"></span>
+              type(<a href='../type/holder_vhcs.html'>holder_vhcs</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>vhc</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-wrf~3"></span>
+              type(holder_wrfs),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>wrf</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
 
 
+
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_den'>get_den</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_den_holder'>get_den_holder</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_den_ptr'>get_den_ptr</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_den_holder'>get_den_holder</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_den_ptr'>get_den_ptr</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_gcc'>get_gcc</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_gcc_holder'>get_gcc_holder</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_gcc_ptr'>get_gcc_ptr</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_gcc_holder'>get_gcc_holder</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_gcc_ptr'>get_gcc_ptr</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_sph'>get_sph</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_sph_holder'>get_sph_holder</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_sph_ptr'>get_sph_ptr</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_sph_holder'>get_sph_holder</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_sph_ptr'>get_sph_ptr</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_thc'>get_thc</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_thc_holder'>get_thc_holder</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_thc_ptr'>get_thc_ptr</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_thc_holder'>get_thc_holder</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_thc_ptr'>get_thc_ptr</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_vhc'>get_vhc</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_vhc_holder'>get_vhc_holder</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_vhc_ptr'>get_vhc_ptr</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_vhc_holder'>get_vhc_holder</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_vhc_ptr'>get_vhc_ptr</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  generic, public ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_wrf'>get_wrf</a></strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_wrf_holder'>get_wrf_holder</a>, <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/type/type_material_manager.html#boundprocedure-get_wrf_ptr'>get_wrf_ptr</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_wrf_holder'>get_wrf_holder</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-get_wrf_ptr'>get_wrf_ptr</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public, pass(self) ::
+  <strong><a href='../type/type_material_manager.html#boundprocedure-initialize~16'>initialize</a></strong></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_den_holder"></span> <h3>private  subroutine <a href='../proc/get_den_holder.html'>get_den_holder</a>(self, region_id, model_holder)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~365"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-model_holder~2"></span>
+              type(<a href='../type/holder_dens.html'>holder_dens</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>model_holder</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_den_ptr"></span> <h3>private  subroutine <a href='../proc/get_den_ptr.html'>get_den_ptr</a>(self, region_id, den_ptr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~366"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~4"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-den_ptr"></span>
+              class(<a href='../type/abst_den.html'>abst_den</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>den_ptr</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_gcc_holder"></span> <h3>private  subroutine <a href='../proc/get_gcc_holder.html'>get_gcc_holder</a>(self, region_id, model_holder)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~371"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~9"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-model_holder~5"></span>
+              type(<a href='../type/holder_gccs.html'>holder_gccs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>model_holder</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_gcc_ptr"></span> <h3>private  subroutine <a href='../proc/get_gcc_ptr.html'>get_gcc_ptr</a>(self, region_id, gcc_ptr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~372"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~10"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gcc_ptr"></span>
+              class(<a href='../type/abst_gcc.html'>abst_gcc</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>gcc_ptr</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_sph_holder"></span> <h3>private  subroutine <a href='../proc/get_sph_holder.html'>get_sph_holder</a>(self, region_id, model_holder)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~367"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-model_holder~3"></span>
+              type(<a href='../type/holder_sphs.html'>holder_sphs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>model_holder</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_sph_ptr"></span> <h3>private  subroutine <a href='../proc/get_sph_ptr.html'>get_sph_ptr</a>(self, region_id, sph_ptr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~368"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sph_ptr"></span>
+              class(<a href='../type/abst_sph.html'>abst_sph</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>sph_ptr</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_thc_holder"></span> <h3>private  subroutine <a href='../proc/get_thc_holder.html'>get_thc_holder</a>(self, region_id, model_holder)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~363"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-model_holder"></span>
+              type(<a href='../type/holder_thcs.html'>holder_thcs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>model_holder</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_thc_ptr"></span> <h3>private  subroutine <a href='../proc/get_thc_ptr.html'>get_thc_ptr</a>(self, region_id, thc_ptr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~364"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-thc_ptr"></span>
+              class(<a href='../type/abst_thc.html'>abst_thc</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>thc_ptr</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_vhc_holder"></span> <h3>private  subroutine <a href='../proc/get_vhc_holder.html'>get_vhc_holder</a>(self, region_id, model_holder)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~369"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~7"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-model_holder~4"></span>
+              type(<a href='../type/holder_vhcs.html'>holder_vhcs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>model_holder</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_vhc_ptr"></span> <h3>private  subroutine <a href='../proc/get_vhc_ptr.html'>get_vhc_ptr</a>(self, region_id, vhc_ptr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~370"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~8"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vhc_ptr"></span>
+              class(<a href='../type/abst_vhc.html'>abst_vhc</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>vhc_ptr</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_wrf_holder"></span> <h3>private  subroutine <a href='../proc/get_wrf_holder.html'>get_wrf_holder</a>(self, region_id, model_holder)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~373"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~11"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-model_holder~6"></span>
+              type(holder_wrfs),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>model_holder</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-get_wrf_ptr"></span> <h3>private  subroutine <a href='../proc/get_wrf_ptr.html'>get_wrf_ptr</a>(self, region_id, wrf_ptr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~374"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-region_id~12"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>region_id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-wrf_ptr"></span>
+              class(abst_wrf),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>wrf_ptr</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-initialize"></span> <h3>private  subroutine <a href='../proc/initialize.html'>initialize</a>(self, input, ierr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~362"></span>
+              class(<a href='../type/type_material_manager.html'>type_material_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~23"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>input</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ierr~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ierr</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
 
 
 
@@ -1610,7 +2824,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 06:42 +0000             </p>
+ on 2025-07-18 08:09 +0000             </p>
           </div>
         </div>
         <br>

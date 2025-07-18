@@ -1,4 +1,4 @@
-submodule(Solver_Solve) Solve_BiCGSTAB
+submodule(solver_solve) solve_bicgstab
     implicit none
 contains
     module function construct_type_solver_sparse_crs_bicgstab(N, tolerance, max_iterations, preconditioner) result(structure)
@@ -170,4 +170,4 @@ contains
         call deallocate_array(self%x)
 
     end subroutine destruct_type_solver_sparse_crs_bicgstab
-end submodule Solve_BiCGSTAB
+end submodule solve_bicgstab
