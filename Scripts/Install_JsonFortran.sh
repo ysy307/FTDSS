@@ -29,6 +29,9 @@ export FFLAGS="-O3 -xCORE-AVX2"
 # CMake構成
 cmake -B build \
       -G Ninja \
+      -DCMAKE_Fortran_COMPILER=ifx \
+      -DCMAKE_C_COMPILER=icx \
+      -DCMAKE_CXX_COMPILER=icpx \
       -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
       -DCMAKE_VERBOSE_MAKEFILE=On \
       -DCMAKE_BUILD_TYPE=Release \

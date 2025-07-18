@@ -1,8 +1,13 @@
 #!/bin/zsh
-set -e  # エラーで停止
+set -e
 set -o pipefail
-# cmake -S . -B CMakeBuild -DBUILD_APP=test -DCMAKE_BUILD_TYPE=Debug -G "Ninja" -DCOMPILER=intel
-cmake -S . -B CMakeBuild -DBUILD_APP=test -DCMAKE_BUILD_TYPE=Release -G "Ninja"
-# cmake -S . -B CMakeBuild -DBUILD_APP=test -DCMAKE_BUILD_TYPE=Debug -G "Ninja"
+
+cmake -S . -B CMakeBuild \
+    -DBUILD_APP=test \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_Fortran_COMPILER=ifx \
+    -DCMAKE_C_COMPILER=icx \
+    -DCMAKE_CXX_COMPILER=icpx \
+    -G "Ninja"
+
 cmake --build CMakeBuild --parallel
-# ./bin/test

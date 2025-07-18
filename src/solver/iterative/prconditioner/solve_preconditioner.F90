@@ -1,4 +1,4 @@
-submodule(Solver_Solve) Solve_Preconditioner
+submodule(solver_solve) solve_preconditioner
     implicit none
 
 contains
@@ -74,5 +74,5 @@ contains
         end select
 
     end subroutine apply_preconditioner_sparse_crs_bicgstab
-end submodule Solve_Preconditioner
+end submodule solve_preconditioner
 
