@@ -13,60 +13,105 @@ This application
 
 ## Scope
 
-## How to Install
-Development Environment Setup & Compilation (Markdown Source)  
-This guide shows the Markdown source for documenting the setup and compilation workflow.
 
-### 1. Clone the Repository 📂  
-To create a code block for cloning the repository, you would write the following in Markdown:
+## Development Environment Setup & Compilation
+
+Follow the steps below to set up your development environment and compile the project.
+
+---
+
+### 0. Configure Git (First Time Only)
+
+Before committing, configure your Git username and email for this repository:
+
+```bash
+git config --local user.name "Your Name"
+git config --local user.email "your.email@example.com"
+```
+
+This ensures Git commits inside the container will use your name and email.
+
+> ℹ️ If you're using a **Dev Container**, you may also bind your local `.gitconfig` into the container so it applies globally inside the container as well.
+
+In your `.devcontainer/devcontainer.json`, include the following under `mounts`:
+
+```json
+{
+  "mounts": [
+    "source=${localEnv:USERPROFILE}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached"
+  ]
+}
+```
+
+This allows Git inside the container to inherit your global Git config (e.g., aliases, signing, default email).
+
+---
+
+### 1. Clone the Repository 📂
+
+Clone the repository to your local machine:
 
 ```zsh
 git clone https://github.com/ysy307/FTDSS.git
 ```
 
-### 2. Launch with VS Code & Dev Containers 🐳  
-This section explains how to launch the development environment. It uses numbered lists and bold text.
+---
+
+### 2. Launch with VS Code & Dev Containers 🐳
+
+Use VS Code and Dev Containers to launch the development environment.
 
 1. Open the cloned `FTDSS` folder in **VS Code**  
-2. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the Command Palette and select **`Dev Containers: Reopen in Container`**  
-3. VS Code will automatically build the Docker image and reopen the project inside the container.
+2. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the Command Palette  
+3. Select **`Dev Containers: Reopen in Container`**  
+4. VS Code will automatically build the Docker image and reopen the project inside the container
 
-### 3. Install External Libraries 🛠️  
-For the library installation steps, you can create a code block that includes comments:
+---
+
+### 3. Install External Libraries 🛠️
+
+Run the provided scripts to install the required external libraries:
 
 ```bash
-# Add execute permissions
+# Grant execute permissions
 chmod +x Scripts/Install_VTKFortran.sh
 chmod +x Scripts/Install_VTK_CXX.sh
 chmod +x Scripts/Install_stdlib.sh
 chmod +x Scripts/Install_JsonFortran.sh
 
-# Run each script
+# Execute the scripts
 ./Scripts/Install_VTKFortran.sh
 ./Scripts/Install_VTK_CXX.sh
 ./Scripts/Install_stdlib.sh
 ./Scripts/Install_JsonFortran.sh
 ```
 
+---
+
 ### 4. Compile the Project ⚙️
 
-#### 4.1. Generate Build Files (CMake)
+#### 4.1. Generate Build Files with CMake
 
 ```bash
 cmake -S . -B CMakeBuild -DBUILD_APP=test -DCMAKE_BUILD_TYPE=Release -G "Ninja"
 ```
 
-#### 4.2. Run the Build
+#### 4.2. Build the Project
 
 ```bash
 cmake --build CMakeBuild --parallel
 ```
 
+---
+
 ### 5. Run the Application ▶️
+
+Run the compiled test application:
 
 ```bash
 ./bin/test
 ```
+
 
 ### Software environment
 * Fortran 90 and later
