@@ -84,7 +84,9 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "export MPICC=mpiicc" >> ~/.zshrc && \
     echo "export MPICXX=mpiicpc" >> ~/.zshrc &&\
     echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc & \
-    echo "ulimit -s unlimited" >> ~/.zshrc
+    echo "ulimit -s unlimited" >> ~/.zshrc & \
+    echo 'export LANG=C.UTF-8' >> ~/.zshrc
+
 
 # デフォルトのシェルをZshに設定
 RUN echo "export SHELL=/usr/bin/zsh" >> /root/.bashrc && \
