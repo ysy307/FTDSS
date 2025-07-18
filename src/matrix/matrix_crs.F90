@@ -184,28 +184,23 @@ contains
         integer(int32), intent(in) :: row, col
         integer(int32), intent(inout) :: index
 
-        integer(int32) :: low, high, mid
+        integer(int32) :: i
+        integer(int32) :: search_start, search_end
 
         index = 0 ! 見つからなかった場合のデフォルト値
 
         ! 検索範囲を設定
-        low = self%ptr(row)
-        high = self%ptr(row + 1) - 1
+        search_start = self%ptr(row)
+        search_end = self%ptr(row + 1) - 1
 
         ! 範囲が存在しない場合は終了
-        if (low > high) return
+        if (search_start > search_end) return
 
-        ! 二分探索
-        do while (low <= high)
-            mid = low + (high - low) / 2 ! オーバーフローを防ぐための計算
-
-            if (self%ind(mid) < col) then
-                low = mid + 1
-            else if (self%ind(mid) > col) then
-                high = mid - 1
-            else
-                index = mid
-                return
+        ! 線形探索 (最初から最後まで順番に探す)
+        do i = search_start, search_end
+            if (self%ind(i) == col) then
+                index = i
+                return ! 見つかったら即座に終了
             end if
         end do
 

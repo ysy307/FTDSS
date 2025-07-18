@@ -63,7 +63,6 @@ contains
                     state%porosity = interp_poro(iG)
                     state%water_content = propeties%get_qw(state, i_material)
                     Ca = propeties%get_vhc(state, i_material)
-
                     val = val + (element%psi(il, xi, eta) * &
                                  element%psi(jl, xi, eta) * &
                                  detJ * weight * Ca)

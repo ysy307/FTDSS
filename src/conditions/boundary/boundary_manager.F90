@@ -43,15 +43,15 @@ contains
         allocate (self%bc(self%num_boundaries))
 
         select case (input%conditions%time_control%simulation_period%unit)
-        case ("Second")
+        case ("second")
             time_conv = 1.0d0
-        case ("Minute")
+        case ("minute")
             time_conv = 60.0d0
-        case ("Hour")
+        case ("hour")
             time_conv = 3600.0d0
-        case ("Day")
+        case ("day")
             time_conv = 86400.0d0
-        case ("Year")
+        case ("year")
             time_conv = 31557600.0d0
         end select
 

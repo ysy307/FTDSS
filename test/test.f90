@@ -1,24 +1,16 @@
 program test
     use, intrinsic :: iso_fortran_env, only: int32, real64
+!$  use :: omp_lib
     use :: stdlib_logger
     use :: Main_FTDSS
-
-#ifdef _OPENMP
-    use :: omp_lib
-#endif
-
     implicit none
     type(Type_FTDSS) :: FTDSS
     real(real64) :: norm_old, norm_new
     integer(int32) :: stat, count
     integer(int32) :: i, j
-    character(1) :: BC_Type
 
     call FTDSS%initialize()
-    ! if (was_interrupted()) then
-    !     call global_logger%log_warning(message="Program interrupted by user.")
-    !     stop
-    ! end if
+    if (was_interrupted()) stop
     call FTDSS%time%Profile_Start("Setup")
     call FTDSS%IC%apply("thermal", FTDSS%Domain, FTDSS%Thermal%T)
     call FTDSS%BC%apply_CRS(boundary_target='thermal', &
@@ -58,7 +50,7 @@ program test
     ! stop
 
     FTDSS%Iteration%isConverged = .true.
-    print *, "Starting time loop"
+    call global_logger%log_information(message="Starting time loop")
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
         ! exit TIME_LOOP
         FTDSS%time%time_old = FTDSS%time%time
@@ -96,17 +88,12 @@ program test
             ! call FTDSS%Thermal%BC%
             call FTDSS%time%Profile_Stop("Assemble")
             call FTDSS%time%Profile_Start("Setup")
-            BC_Type = 'thermal'
-            call FTDSS%BC%apply_CRS(boundary_target=BC_Type, &
-                                    current_time=FTDSS%time%time, &
+            call FTDSS%BC%apply_CRS(boundary_target='thermal', &
+                                    current_time=0.0d0, &
                                     A=FTDSS%Thermal%KT_star_0, &
                                     b=FTDSS%Thermal%PHIT, &
                                     Domain=FTDSS%Domain, &
-                                    mode=0)
-            ! call FTDSS%Thermal%BC%Fix_BC(A=FTDSS%Thermal%KT_star_0, &
-            !                              b=FTDSS%Thermal%PHIT, &
-            !                              Sides=FTDSS%Thermal%Domain%Sides, &
-            !                              time=FTDSS%time%time)
+                                    mode=1)
 
             ! open (unit=10, file='log/debug4.txt', status='replace')
             ! do i = 1, FTDSS%Thermal%KT_star_0%num_row
@@ -135,7 +122,6 @@ program test
             !     write (30, '( i0,2x,f16.7)') i, FTDSS%Thermal%T%new(i)
             ! end do
             ! close (30)
-            ! call FTDSS%Thermal%Solver%Check(stat, FTDSS%time%time)
             ! stop
 
             ! call Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
@@ -182,10 +168,7 @@ program test
         end if
         call FTDSS%time%Profile_Stop("IO")
 
-        ! if (was_interrupted()) then
-        !     call global_logger%log_warning(message="Program interrupted by user.")
-        !     stop
-        ! end if
+        if (was_interrupted()) stop
 
     end do TIME_LOOP
 

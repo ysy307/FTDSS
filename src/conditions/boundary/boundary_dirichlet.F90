@@ -64,6 +64,10 @@ contains
         real(real64) :: value_dirichlet, timeCoe
         integer(int32) :: idx, iEdge
 
+        ! print *, "apply_crs_thermal_dirichlet"
+        ! print *, "current_time = ", current_time
+        ! print *, present(A), present(mode)
+
         if (present(A)) then
             if (.not. present(mode)) then
                 call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
@@ -81,6 +85,7 @@ contains
                 case (1)
                     call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
+                    ! print *, value_dirichlet
                 case (0)
                     !! Newton-Raphson step
                     value_dirichlet = 0.0d0
@@ -113,6 +118,7 @@ contains
                 case (1)
                     call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
+                    ! print *, value_dirichlet
                 case (0)
                 !! Newton-Raphson step
                     value_dirichlet = 0.0d0

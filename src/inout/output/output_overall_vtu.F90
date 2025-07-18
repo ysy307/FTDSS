@@ -84,7 +84,7 @@ contains
         ! Initialize VTK file
         write (output_name, self%format_output) trim(self%dir_output_field), "Out_", file_counts, self%file_extension
 
-        status = vtu%initialize(format='binary', filename=trim(output_name), mesh_topology='UnstructuredGrid')
+        status = vtu%initialize(format='ascii', filename=trim(output_name), mesh_topology='UnstructuredGrid')
 
         ! Write data
         status = vtu%xml_writer%write_piece(np=self%vtk%num_points, &
@@ -168,7 +168,7 @@ contains
         integer(int32) :: status
         integer(int32) :: iN, iE, idx, i
 
-        status = vtu%initialize(format='binary', filename=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension), &
+        status = vtu%initialize(format='ascii', filename=trim(self%dir_output_field)//trim(file_name)//trim(self%file_extension), &
                                 mesh_topology='UnstructuredGrid')
 
         ! Write data
@@ -187,6 +187,7 @@ contains
         status = vtu%xml_writer%write_dataarray(location='cell', action='open')
         status = vtu%xml_writer%write_dataarray(data_name=variable_name, x=variable)
         status = vtu%xml_writer%write_dataarray(location='cell', action='close')
+        status = vtu%xml_writer%write_piece()
 
         status = vtu%finalize()
 

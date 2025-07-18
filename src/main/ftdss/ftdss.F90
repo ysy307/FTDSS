@@ -13,7 +13,7 @@ module Main_FTDSS
     use :: Main_Thermal
     implicit none
 
-    type :: Type_FTDSS
+    type :: type_ftdss
         ! type(Type_Input) :: Input
 
         type(type_dp_3d), pointer :: coordinate
@@ -21,7 +21,7 @@ module Main_FTDSS
         ! type(Belonging), allocatable :: NodeBelonging(:)
         class(abst_thermal), allocatable :: Thermal
 
-        type(type_proereties_manager) :: Property
+        type(type_proereties_manager) :: property
         type(type_bc) :: bc
         type(type_ic) :: ic
 
@@ -32,13 +32,13 @@ module Main_FTDSS
         type(Type_output) :: output
 
     contains
-        procedure, pass(self) :: initialize => FDTSS_initialize
-    end type Type_FTDSS
+        procedure, pass(self) :: initialize => initialize_type_ftdss
+    end type type_ftdss
 
 contains
-    subroutine FDTSS_initialize(self)
+    subroutine initialize_type_ftdss(self)
         implicit none
-        class(Type_FTDSS), intent(inout) :: self
+        class(type_ftdss), intent(inout) :: self
 
         type(type_input) :: input
 
@@ -70,7 +70,7 @@ contains
                                          time_stamp=.false., &
                                          max_width=0)
         end if
-        ! call setup_handler()
+        call setup_handler()
 
         !---------------------------------------------------------------------------------------------------------------------------
         !
@@ -95,7 +95,7 @@ contains
 
         self%Thermal = Type_Thermal_3Phase_2D(input, self%coordinate, self%domain)
 
-        call self%Property%initialize(input, ierr)
+        call self%property%initialize(input, ierr)
 
         call self%output%initialize(input, self%domain, self%coordinate)
 
@@ -103,10 +103,9 @@ contains
         call self%ic%apply('porosity', self%domain, self%phi)
 
         call self%output%output_coloring(self%domain)
-        ! Colors = self%domain%Colors%Color)
 
         call self%time%Profile_Stop("IO")
         call global_logger%log_information(message="FTDSS module initialized successfully.")
-    end subroutine FDTSS_initialize
+    end subroutine initialize_type_ftdss
 
 end module Main_FTDSS
