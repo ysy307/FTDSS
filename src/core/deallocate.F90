@@ -36,7 +36,7 @@ contains
 
         if (allocated(array)) then
             deallocate (array, stat=stat)
-            if (stat /= 0) call error_message(961)
+            if (stat /= 0) call error_message(971)
         end if
 
     end subroutine deallocate_rank1_int8
