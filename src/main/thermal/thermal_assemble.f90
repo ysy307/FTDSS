@@ -40,6 +40,7 @@ contains
         num_gauss = element%get_num_gauss()
 
         ! 積分点での物理量を事前に補間
+        !$omp simd
         do iG = 1, num_gauss
             xi = element%gauss(1, iG)
             eta = element%gauss(2, iG)
@@ -53,6 +54,7 @@ contains
                 val = 0.0d0
 
                 ! 積分ループ
+                !$omp simd reduction(+:val)
                 do iG = 1, num_gauss
                     xi = element%gauss(1, iG)
                     eta = element%gauss(2, iG)
@@ -104,6 +106,7 @@ contains
         num_gauss = element%get_num_gauss()
 
         ! 積分点での物理量を事前に補間
+        !$omp simd
         do iG = 1, num_gauss
             xi = element%gauss(1, iG)
             eta = element%gauss(2, iG)
@@ -117,6 +120,7 @@ contains
                 val = 0.0d0
 
                 ! 積分ループ
+                !$omp simd reduction(+:val)
                 do iG = 1, num_gauss
                     xi = element%gauss(1, iG)
                     eta = element%gauss(2, iG)
@@ -193,14 +197,16 @@ contains
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element
 
+        !$omp parallel private(c, ie_idx, element) shared(domain, A, temperature, porosity, propeties)
         do c = 1, domain%colors%num_colors
-            !$omp parallel do private(ie_idx, element) shared(domain, A, temperature, porosity, propeties) schedule(guided)
+            !$omp do schedule(guided)
             do ie_idx = 1, domain%colors%Colored(c)%num_elements
                 element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
                 call process_single_element_mass(A, element, temperature, porosity, propeties)
             end do
-            !$omp end parallel do
+            !$omp end do
         end do
+        !$omp end parallel
 
     end subroutine Assemble_Mass_Heat_1_Parallel
 
@@ -237,14 +243,16 @@ contains
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element
 
+        !$omp parallel private(c, ie_idx, element) shared(domain, A, temperature, porosity, propeties)
         do c = 1, domain%colors%num_colors
-            !$omp parallel do private(ie_idx, element) shared(domain, A, temperature, porosity, propeties) schedule(guided)
+            !$omp  do schedule(guided)
             do ie_idx = 1, domain%colors%Colored(c)%num_elements
                 element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
                 call process_single_element_diffusion(A, element, temperature, porosity, propeties)
             end do
-            !$omp end parallel do
+            !$omp end do
         end do
+        !$omp end parallel
     end subroutine Assemble_Diffusion_Heat_1_Parallel
 
 end module thermal_thermal_assemble

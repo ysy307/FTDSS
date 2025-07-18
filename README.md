@@ -1,19 +1,73 @@
 # Freezing Thawing Dynamics Simulation Solver
 
-### Compiler Support
-<!-- <img src=""> -->
-<!-- [![Compiler](https://img.shields.io/badge/GNU-pass%20(v6.0.1+)-brightgreen.svg)]()https://img.shields.io/badge/ifx-2025.0.4-0071C5.svg?logo=intel&style=popout -->
-[![Compiler](https://img.shields.io/badge/ifx-2025.0.4-0071C5.svg?logo=intel&style=popout)]()
-<!-- [![Compiler](https://img.shields.io/badge/IBM%20XL-not%20tested-yellow.svg)]() -->
-<!-- [![Compiler](https://img.shields.io/badge/g95-not%20tested-yellow.svg)]() -->
-<!-- [![Compiler](https://img.shields.io/badge/NAG-not%20tested-yellow.svg)]() -->
-<!-- [![Compiler](https://img.shields.io/badge/PGI-not%20tested-yellow.svg)]() -->
+## About
+This application
+
+### 📋 Project Info
+
+| License | Environment | Compiler Support | Language | Editor |
+|---------|-------------|------------------|----------|--------|
+| [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](./LICENSE) | ![Docker](https://img.shields.io/badge/-Docker-EEE.svg?logo=docker&style=flat) <br> ![Ubuntu](https://img.shields.io/badge/-Ubuntu%2022.04-EEE.svg?logo=ubuntu&style=flat) | ![ifx](https://img.shields.io/badge/ifx-2025.2.0-0071C5.svg?logo=intel&style=flat) | ![Fortran](https://img.shields.io/badge/Fortran-734f96.svg?logo=fortran&style=flat) <br> ![C](https://img.shields.io/badge/C-00599C.svg?logo=c&style=flat) <br> ![C++](https://img.shields.io/badge/C++-00599C.svg?logo=cplusplus&style=flat) | ![VS Code](https://img.shields.io/badge/VS%20Code-2e8edb.svg?logo=visualstudiocode&style=flat) |
 
 ## Goals and Motivations
 
 ## Scope
 
-## Install
+## How to Install
+Development Environment Setup & Compilation (Markdown Source)  
+This guide shows the Markdown source for documenting the setup and compilation workflow.
+
+### 1. Clone the Repository 📂  
+To create a code block for cloning the repository, you would write the following in Markdown:
+
+```zsh
+git clone https://github.com/ysy307/FTDSS.git
+```
+
+### 2. Launch with VS Code & Dev Containers 🐳  
+This section explains how to launch the development environment. It uses numbered lists and bold text.
+
+1. Open the cloned `FTDSS` folder in **VS Code**  
+2. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the Command Palette and select **`Dev Containers: Reopen in Container`**  
+3. VS Code will automatically build the Docker image and reopen the project inside the container.
+
+### 3. Install External Libraries 🛠️  
+For the library installation steps, you can create a code block that includes comments:
+
+```bash
+# Add execute permissions
+chmod +x Scripts/Install_VTKFortran.sh
+chmod +x Scripts/Install_VTK_CXX.sh
+chmod +x Scripts/Install_stdlib.sh
+chmod +x Scripts/Install_JsonFortran.sh
+
+# Run each script
+./Scripts/Install_VTKFortran.sh
+./Scripts/Install_VTK_CXX.sh
+./Scripts/Install_stdlib.sh
+./Scripts/Install_JsonFortran.sh
+```
+
+### 4. Compile the Project ⚙️
+
+#### 4.1. Generate Build Files (CMake)
+
+```bash
+cmake -S . -B CMakeBuild -DBUILD_APP=test -DCMAKE_BUILD_TYPE=Release -G "Ninja"
+```
+
+#### 4.2. Run the Build
+
+```bash
+cmake --build CMakeBuild --parallel
+```
+
+### 5. Run the Application ▶️
+
+```bash
+./bin/test
+```
+
 ### Software environment
 * Fortran 90 and later
 * Intel(R) Fortran Compiler for applications running on Intel(R) 64, Version 2025.2.0 Build 20250605
