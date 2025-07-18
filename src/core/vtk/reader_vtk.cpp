@@ -129,7 +129,7 @@ void VtkReader::getCellInfo(long long *connectivity, long long *offsets, int *ty
         // 次のオフセットを、現在のオフセットに頂点数を足して計算
         current_offset += num_points_in_cell;
         // offsets配列の範囲外に書き込まないようにチェック
-        if (i < num_cells)
+        if (i + 1 <= num_cells)
         {
             offsets[i + 1] = current_offset;
         }
