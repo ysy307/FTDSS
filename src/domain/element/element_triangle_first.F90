@@ -97,81 +97,6 @@ contains
     end function construct_triangle_first
 
     !----------------------------------------------------------------------!
-    ! getNumNodes_triangle_first:
-    !----------------------------------------------------------------------!
-    ! This function returns the number of nodes associated with a
-    ! triangle_first element.
-    !
-    ! Arguments:
-    !   self : triangle_first type object.
-    !          Represents the current triangular element instance.
-    !
-    ! Return Value:
-    !   n    : Integer (int32) indicating the number of nodes used by the
-    !          element. This is typically 3 for a linear triangle.
-    !
-    ! Function Details:
-    !   - Retrieves the value stored in `self%size`, which represents
-    !     the number of nodes for the element.
-    !
-    !----------------------------------------------------------------------!
-    module function get_id_triangle_first(self) result(id)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32) :: id
-
-        id = self%id
-    end function get_id_triangle_first
-
-    module function get_type_triangle_first(self) result(type)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32) :: type
-
-        type = self%type
-    end function get_type_triangle_first
-
-    module function get_num_nodes_triangle_first(self) result(num_nodes)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32) :: num_nodes
-
-        num_nodes = self%num_nodes
-    end function get_num_nodes_triangle_first
-
-    module function get_group_triangle_first(self) result(group)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32) :: group
-
-        group = self%group
-    end function get_group_triangle_first
-
-    module function get_dimension_triangle_first(self) result(dimension)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32) :: dimension
-
-        dimension = self%dimension
-    end function get_dimension_triangle_first
-
-    module function get_order_triangle_first(self) result(order)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32) :: order
-
-        order = self%order
-    end function get_order_triangle_first
-
-    module function get_num_gauss_triangle_first(self) result(num_gauss)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32) :: num_gauss
-
-        num_gauss = self%num_gauss
-    end function get_num_gauss_triangle_first
-
-    !----------------------------------------------------------------------!
     ! psi_triangle_first:
     !----------------------------------------------------------------------!
     ! This function evaluates the shape function ψ_i(ξ, η) for a linear
@@ -560,35 +485,5 @@ contains
             peta = eta
         end if
     end subroutine is_in_triangle_first
-
-    module function interpolate_triangle_first(self, xi, eta, value) result(interpolated_value)
-        implicit none
-        class(abst_element), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
-        real(real64), intent(in) :: value(:)
-        real(real64) :: interpolated_value
-        integer(int32) :: i
-
-        interpolated_value = 0.0d0
-        do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
-        end do
-
-    end function interpolate_triangle_first
-
-    module function interpolate_reordered_triangle_first(self, xi, eta, value) result(interpolated_value)
-        implicit none
-        class(abst_element), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
-        real(real64), intent(in) :: value(:)
-        real(real64) :: interpolated_value
-        integer(int32) :: i
-
-        interpolated_value = 0.0d0
-        do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity_reordered(i))
-        end do
-
-    end function interpolate_reordered_triangle_first
 
 end submodule domain_element_triangle_first

@@ -9,15 +9,28 @@ module thermal_thermal_assemble
     implicit none
     private
 
+    public :: abst_assemble_local
+
     public :: Assemble_Mass_Heat_1, Assemble_Diffusion_Heat_1
     public :: Assemble_Mass_Heat_1_Parallel, Assemble_Diffusion_Heat_1_Parallel
 
+    abstract interface
+        subroutine abst_assemble_local(A, domain, temperature, porosity, propeties)
+            import :: type_crs, type_domain, type_proereties_manager, real64
+            implicit none
+            type(type_crs), intent(inout) :: A
+            type(type_domain), intent(inout), target :: domain
+            real(real64), intent(in) :: temperature(:)
+            real(real64), intent(in) :: porosity(:)
+            type(type_proereties_manager), intent(inout) :: propeties
+        end subroutine abst_assemble_local
+    end interface
 contains
 
     subroutine process_single_element_mass(A, element, temperature, porosity, propeties)
         implicit none
         ! --- 引数 ---
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: A
         class(abst_element), pointer, intent(inout) :: element
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
@@ -81,7 +94,7 @@ contains
     subroutine process_single_element_diffusion(A, element, temperature, porosity, propeties)
         implicit none
         ! --- 引数 ---
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: A
         class(abst_element), pointer, intent(inout) :: element
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
@@ -162,7 +175,7 @@ contains
 
     subroutine Assemble_Mass_Heat_1(A, domain, temperature, porosity, propeties)
         implicit none
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: A
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
@@ -188,7 +201,7 @@ contains
     ! ==============================================================================
     subroutine Assemble_Mass_Heat_1_Parallel(A, domain, temperature, porosity, propeties)
         implicit none
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: A
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
@@ -213,11 +226,11 @@ contains
     subroutine Assemble_Diffusion_Heat_1(A, domain, temperature, porosity, propeties)
         implicit none
         ! --- 引数 ---
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: A
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties ! MaterialManagerに相当
+        type(type_proereties_manager), intent(inout) :: propeties
 
         ! --- ローカル変数 ---
         class(abst_element), pointer :: element
@@ -234,7 +247,7 @@ contains
 
     subroutine Assemble_Diffusion_Heat_1_Parallel(A, domain, temperature, porosity, propeties)
         implicit none
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: A
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)

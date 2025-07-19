@@ -13,11 +13,6 @@ module domain_element
     public :: type_square_second
     public :: holder_elements
 
-    public :: interpolate_reordered_triangle_first
-    public :: interpolate_reordered_triangle_second
-    public :: interpolate_reordered_square_first
-    public :: interpolate_reordered_square_second
-
     public :: interpolate
     public :: interpolate_reordered
 
@@ -62,13 +57,13 @@ module domain_element
         procedure(abst_interpolate),      pass(self), pointer :: interpolate => null() !&
         procedure(abst_get_connectivity), pass(self), pointer :: get_connectivity => null() !&
     contains
-        procedure(abst_get_id),        pass(self), deferred :: get_id !&
-        procedure(abst_get_type),      pass(self), deferred :: get_type !&
-        procedure(abst_get_num_nodes), pass(self), deferred :: get_num_nodes !&
-        procedure(abst_get_group),     pass(self), deferred :: get_group !&
-        procedure(abst_get_order),     pass(self), deferred :: get_order !&
-        procedure(abst_get_dimension), pass(self), deferred :: get_dimension !&
-        procedure(abst_get_num_gauss), pass(self), deferred :: get_num_gauss !&
+        procedure, pass(self) :: get_id !&
+        procedure, pass(self) :: get_type !&
+        procedure, pass(self) :: get_num_nodes !&
+        procedure, pass(self) :: get_group !&
+        procedure, pass(self) :: get_order !&
+        procedure, pass(self) :: get_dimension !&
+        procedure, pass(self) :: get_num_gauss !&
         !----------------------------------------------------------------------------------
         procedure(abst_psi),           pass(self), deferred :: psi !&
         procedure(abst_dpsi_dxi),      pass(self), deferred :: dpsi_dxi !&
@@ -83,14 +78,6 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_triangle_first
     contains
-        procedure, pass(self) :: get_id        => get_id_triangle_first !&
-        procedure, pass(self) :: get_type      => get_type_triangle_first !&
-        procedure, pass(self) :: get_num_nodes => get_num_nodes_triangle_first !&
-        procedure, pass(self) :: get_group     => get_group_triangle_first !&
-        procedure, pass(self) :: get_order     => get_order_triangle_first !&
-        procedure, pass(self) :: get_dimension => get_dimension_triangle_first !&
-        procedure, pass(self) :: get_num_gauss => get_num_gauss_triangle_first !&
-        !----------------------------------------------------------------------------------
         procedure, pass(self) :: psi           => psi_triangle_first !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_triangle_first !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_triangle_first !&
@@ -104,14 +91,6 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_square_first
     contains
-        procedure, pass(self) :: get_id        => get_id_square_first !&
-        procedure, pass(self) :: get_type      => get_type_square_first !&
-        procedure, pass(self) :: get_num_nodes => get_num_nodes_square_first !&
-        procedure, pass(self) :: get_group     => get_group_square_first !&
-        procedure, pass(self) :: get_order     => get_order_square_first !&
-        procedure, pass(self) :: get_dimension => get_dimension_square_first !&
-        procedure, pass(self) :: get_num_gauss => get_num_gauss_square_first !&
-        !----------------------------------------------------------------------------------
         procedure, pass(self) :: psi           => psi_square_first !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_square_first !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_square_first !&
@@ -125,14 +104,6 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_triangle_second
     contains
-        procedure, pass(self) :: get_id        => get_id_triangle_second !&
-        procedure, pass(self) :: get_type      => get_type_triangle_second !&
-        procedure, pass(self) :: get_num_nodes => get_num_nodes_triangle_second !&
-        procedure, pass(self) :: get_group     => get_group_triangle_second !&
-        procedure, pass(self) :: get_order     => get_order_triangle_second !&
-        procedure, pass(self) :: get_dimension => get_dimension_triangle_second !&
-        procedure, pass(self) :: get_num_gauss => get_num_gauss_triangle_second !&
-        !----------------------------------------------------------------------------------
         procedure, pass(self) :: psi           => psi_triangle_second !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_triangle_second !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_triangle_second !&
@@ -146,14 +117,6 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_square_second
     contains
-        procedure, pass(self) :: get_id        => get_id_square_second !&
-        procedure, pass(self) :: get_type      => get_type_square_second !&
-        procedure, pass(self) :: get_num_nodes => get_num_nodes_square_second !&
-        procedure, pass(self) :: get_group     => get_group_square_second !&
-        procedure, pass(self) :: get_order     => get_order_square_second !&
-        procedure, pass(self) :: get_dimension => get_dimension_square_second !&
-        procedure, pass(self) :: get_num_gauss => get_num_gauss_square_second !&
-        !----------------------------------------------------------------------------------
         procedure, pass(self) :: psi           => psi_square_second !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_square_second !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_square_second !&
@@ -166,57 +129,6 @@ module domain_element
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
-        function abst_get_id(self) result(id)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32) :: id
-        end function abst_get_id
-
-        function abst_get_type(self) result(type)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32) :: type
-        end function abst_get_type
-
-        function abst_get_num_nodes(self) result(num_nodes)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32) :: num_nodes
-
-        end function abst_get_num_nodes
-
-        function abst_get_group(self) result(group)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32) :: group
-        end function abst_get_group
-
-        function abst_get_order(self) result(order)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32) :: order
-        end function abst_get_order
-
-        function abst_get_dimension(self) result(dimension)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32) :: dimension
-        end function abst_get_dimension
-
-        function abst_get_num_gauss(self) result(num_gauss)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32) :: num_gauss
-
-        end function abst_get_num_gauss
-
         function abst_get_connectivity(self, index) result(connectivity)
             import :: abst_element, int32
             implicit none
@@ -304,55 +216,6 @@ module domain_element
 
         end function construct_triangle_first
 
-        module function get_id_triangle_first(self) result(id)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32) :: id
-
-        end function get_id_triangle_first
-
-        module function get_type_triangle_first(self) result(type)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32) :: type
-
-        end function get_type_triangle_first
-
-        module function get_num_nodes_triangle_first(self) result(num_nodes)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32) :: num_nodes
-
-        end function get_num_nodes_triangle_first
-
-        module function get_group_triangle_first(self) result(group)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32) :: group
-
-        end function get_group_triangle_first
-
-        module function get_order_triangle_first(self) result(order)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32) :: order
-
-        end function get_order_triangle_first
-
-        module function get_dimension_triangle_first(self) result(dimension)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32) :: dimension
-
-        end function get_dimension_triangle_first
-
-        module function get_num_gauss_triangle_first(self) result(num_gauss)
-            implicit none
-            class(type_triangle_first), intent(in) :: self
-            integer(int32) :: num_gauss
-
-        end function get_num_gauss_triangle_first
-
         module function psi_triangle_first(self, i, xi, eta) result(N)
             implicit none
             class(type_triangle_first), intent(in) :: self
@@ -405,24 +268,6 @@ module domain_element
             logical, intent(inout) :: is_in
 
         end subroutine is_in_triangle_first
-
-        module function interpolate_triangle_first(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_triangle_first
-
-        module function interpolate_reordered_triangle_first(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_reordered_triangle_first
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -438,55 +283,6 @@ module domain_element
             class(abst_element), allocatable :: element
 
         end function construct_square_first
-
-        module function get_id_square_first(self) result(id)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32) :: id
-
-        end function get_id_square_first
-
-        module function get_type_square_first(self) result(type)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32) :: type
-
-        end function get_type_square_first
-
-        module function get_num_nodes_square_first(self) result(num_nodes)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32) :: num_nodes
-
-        end function get_num_nodes_square_first
-
-        module function get_group_square_first(self) result(group)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32) :: group
-
-        end function get_group_square_first
-
-        module function get_order_square_first(self) result(order)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32) :: order
-
-        end function get_order_square_first
-
-        module function get_dimension_square_first(self) result(dimension)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32) :: dimension
-
-        end function get_dimension_square_first
-
-        module function get_num_gauss_square_first(self) result(num_gauss)
-            implicit none
-            class(type_square_first), intent(in) :: self
-            integer(int32) :: num_gauss
-
-        end function get_num_gauss_square_first
 
         module function psi_square_first(self, i, xi, eta) result(psi)
             implicit none
@@ -540,24 +336,6 @@ module domain_element
             logical, intent(inout) :: is_in
 
         end subroutine is_in_square_first
-
-        module function interpolate_square_first(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_square_first
-
-        module function interpolate_reordered_square_first(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_reordered_square_first
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -573,55 +351,6 @@ module domain_element
             class(abst_element), allocatable :: element
 
         end function construct_triangle_second
-
-        module function get_id_triangle_second(self) result(id)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32) :: id
-
-        end function get_id_triangle_second
-
-        module function get_type_triangle_second(self) result(type)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32) :: type
-
-        end function get_type_triangle_second
-
-        module function get_num_nodes_triangle_second(self) result(num_nodes)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32) :: num_nodes
-
-        end function get_num_nodes_triangle_second
-
-        module function get_group_triangle_second(self) result(group)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32) :: group
-
-        end function get_group_triangle_second
-
-        module function get_order_triangle_second(self) result(order)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32) :: order
-
-        end function get_order_triangle_second
-
-        module function get_dimension_triangle_second(self) result(dimension)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32) :: dimension
-
-        end function get_dimension_triangle_second
-
-        module function get_num_gauss_triangle_second(self) result(num_gauss)
-            implicit none
-            class(type_triangle_second), intent(in) :: self
-            integer(int32) :: num_gauss
-
-        end function get_num_gauss_triangle_second
 
         module function psi_triangle_second(self, i, xi, eta) result(N)
             implicit none
@@ -676,23 +405,6 @@ module domain_element
 
         end subroutine is_in_triangle_second
 
-        module function interpolate_triangle_second(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_triangle_second
-
-        module function interpolate_reordered_triangle_second(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_reordered_triangle_second
     end interface
 
     !--------------------------------------------------------------------------------------
@@ -709,54 +421,6 @@ module domain_element
 
         end function construct_square_second
 
-        module function get_id_square_second(self) result(id)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32) :: id
-
-        end function get_id_square_second
-
-        module function get_type_square_second(self) result(type)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32) :: type
-
-        end function get_type_square_second
-
-        module function get_num_nodes_square_second(self) result(num_nodes)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32) :: num_nodes
-
-        end function get_num_nodes_square_second
-
-        module function get_group_square_second(self) result(group)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32) :: group
-
-        end function get_group_square_second
-
-        module function get_order_square_second(self) result(order)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32) :: order
-
-        end function get_order_square_second
-
-        module function get_dimension_square_second(self) result(dimension)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32) :: dimension
-
-        end function get_dimension_square_second
-
-        module function get_num_gauss_square_second(self) result(num_gauss)
-            implicit none
-            class(type_square_second), intent(in) :: self
-            integer(int32) :: num_gauss
-
-        end function get_num_gauss_square_second
         module function psi_square_second(self, i, xi, eta) result(psi)
             implicit none
             class(type_square_second), intent(in) :: self
@@ -809,24 +473,6 @@ module domain_element
             logical, intent(inout) :: is_in
 
         end subroutine is_in_square_second
-
-        module function interpolate_square_second(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_square_second
-
-        module function interpolate_reordered_square_second(self, xi, eta, value) result(interpolated_value)
-            implicit none
-            class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-
-        end function interpolate_reordered_square_second
     end interface
 
     interface type_triangle_first
@@ -846,6 +492,62 @@ module domain_element
     end interface
 
 contains
+    function get_id(self) result(id)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32) :: id
+
+        id = self%id
+    end function get_id
+
+    function get_type(self) result(type)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32) :: type
+
+        type = self%type
+    end function get_type
+
+    function get_num_nodes(self) result(num_nodes)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32) :: num_nodes
+
+        num_nodes = self%num_nodes
+    end function get_num_nodes
+
+    function get_group(self) result(group)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32) :: group
+
+        group = self%group
+    end function get_group
+
+    function get_order(self) result(order)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32) :: order
+
+        order = self%order
+    end function get_order
+
+    function get_dimension(self) result(dimension)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32) :: dimension
+
+        dimension = self%dimension
+    end function get_dimension
+
+    function get_num_gauss(self) result(num_gauss)
+        implicit none
+        class(abst_element), intent(in) :: self
+        integer(int32) :: num_gauss
+
+        num_gauss = self%num_gauss
+    end function get_num_gauss
+
     function interpolate(self, xi, eta, value) result(interpolated_value)
         implicit none
         class(abst_element), intent(in) :: self

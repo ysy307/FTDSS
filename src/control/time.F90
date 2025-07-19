@@ -10,7 +10,7 @@ module control_time
     public :: type_time
 
     type :: type_time_record
-        character(10) :: label
+        character(20) :: label
         character(10) :: date
         character(10) :: time
         character(10) :: zone
@@ -105,6 +105,86 @@ contains
             end select
 
             call Allocate_Array(self%dt_old, input%basic%solver_settings%bdf_order)
+
+            select case (trim(input%output_settings%field_output%output_interval_unit))
+            case ("second")
+                select case (trim(input%conditions%time_control%simulation_period%unit))
+                case ("second")
+                    self%time_conversion = 1.0d0
+                case ("minute")
+                    self%time_conversion = 1.0d0 / 60.0d0
+                case ("hour")
+                    self%time_conversion = 1.0d0 / 3600.0d0
+                case ("day")
+                    self%time_conversion = 1.0d0 / 86400.0d0
+                case ("year")
+                    self%time_conversion = 1.0d0 / 31557600.0d0
+                case default
+                    call error_message(981, c_opt="output interval time unit")
+                end select
+            case ("minute")
+                select case (trim(input%conditions%time_control%simulation_period%unit))
+                case ("second")
+                    self%time_conversion = 60.0d0
+                case ("minute")
+                    self%time_conversion = 1.0d0
+                case ("hour")
+                    self%time_conversion = 1.0d0 / 60.0d0
+                case ("day")
+                    self%time_conversion = 1.0d0 / 1440.0d0
+                case ("year")
+                    self%time_conversion = 1.0d0 / 525600.0d0
+                case default
+                    call error_message(981, c_opt="output interval time unit")
+                end select
+            case ("hour")
+                select case (trim(input%conditions%time_control%simulation_period%unit))
+                case ("second")
+                    self%time_conversion = 3600.0d0
+                case ("minute")
+                    self%time_conversion = 60.0d0
+                case ("hour")
+                    self%time_conversion = 1.0d0
+                case ("day")
+                    self%time_conversion = 1.0d0 / 24.0d0
+                case ("year")
+                    self%time_conversion = 1.0d0 / 8760.0d0
+                case default
+                    call error_message(981, c_opt="output interval time unit")
+                end select
+            case ("day")
+                select case (trim(input%conditions%time_control%simulation_period%unit))
+                case ("second")
+                    self%time_conversion = 86400.0d0
+                case ("minute")
+                    self%time_conversion = 1440.0d0
+                case ("hour")
+                    self%time_conversion = 24.0d0
+                case ("day")
+                    self%time_conversion = 1.0d0
+                case ("year")
+                    self%time_conversion = 1.0d0 / 365.0d0
+                case default
+                    call error_message(981, c_opt="output interval time unit")
+                end select
+            case ("year")
+                select case (trim(input%conditions%time_control%simulation_period%unit))
+                case ("second")
+                    self%time_conversion = 31557600.0d0
+                case ("minute")
+                    self%time_conversion = 525600.0d0
+                case ("hour")
+                    self%time_conversion = 8760.0d0
+                case ("day")
+                    self%time_conversion = 365.0d0
+                case ("year")
+                    self%time_conversion = 1.0d0
+                case default
+                    call error_message(981, c_opt="output interval time unit")
+                end select
+            case default
+                call error_message(981, c_opt="output interval time unit")
+            end select
         end if
 
         if (present(profiler_sections)) then
@@ -116,85 +196,6 @@ contains
             end if
         end if
 
-        select case (trim(input%output_settings%field_output%output_interval_unit))
-        case ("second")
-            select case (trim(input%conditions%time_control%simulation_period%unit))
-            case ("second")
-                self%time_conversion = 1.0d0
-            case ("minute")
-                self%time_conversion = 1.0d0 / 60.0d0
-            case ("hour")
-                self%time_conversion = 1.0d0 / 3600.0d0
-            case ("day")
-                self%time_conversion = 1.0d0 / 86400.0d0
-            case ("year")
-                self%time_conversion = 1.0d0 / 31557600.0d0
-            case default
-                call error_message(981, c_opt="output interval time unit")
-            end select
-        case ("minute")
-            select case (trim(input%conditions%time_control%simulation_period%unit))
-            case ("second")
-                self%time_conversion = 60.0d0
-            case ("minute")
-                self%time_conversion = 1.0d0
-            case ("hour")
-                self%time_conversion = 1.0d0 / 60.0d0
-            case ("day")
-                self%time_conversion = 1.0d0 / 1440.0d0
-            case ("year")
-                self%time_conversion = 1.0d0 / 525600.0d0
-            case default
-                call error_message(981, c_opt="output interval time unit")
-            end select
-        case ("hour")
-            select case (trim(input%conditions%time_control%simulation_period%unit))
-            case ("second")
-                self%time_conversion = 3600.0d0
-            case ("minute")
-                self%time_conversion = 60.0d0
-            case ("hour")
-                self%time_conversion = 1.0d0
-            case ("day")
-                self%time_conversion = 1.0d0 / 24.0d0
-            case ("year")
-                self%time_conversion = 1.0d0 / 8760.0d0
-            case default
-                call error_message(981, c_opt="output interval time unit")
-            end select
-        case ("day")
-            select case (trim(input%conditions%time_control%simulation_period%unit))
-            case ("second")
-                self%time_conversion = 86400.0d0
-            case ("minute")
-                self%time_conversion = 1440.0d0
-            case ("hour")
-                self%time_conversion = 24.0d0
-            case ("day")
-                self%time_conversion = 1.0d0
-            case ("year")
-                self%time_conversion = 1.0d0 / 365.0d0
-            case default
-                call error_message(981, c_opt="output interval time unit")
-            end select
-        case ("year")
-            select case (trim(input%conditions%time_control%simulation_period%unit))
-            case ("second")
-                self%time_conversion = 31557600.0d0
-            case ("minute")
-                self%time_conversion = 525600.0d0
-            case ("hour")
-                self%time_conversion = 8760.0d0
-            case ("day")
-                self%time_conversion = 365.0d0
-            case ("year")
-                self%time_conversion = 1.0d0
-            case default
-                call error_message(981, c_opt="output interval time unit")
-            end select
-        case default
-            call error_message(981, c_opt="output interval time unit")
-        end select
     end subroutine initialize_type_time
 
     subroutine record_timestamp(self, label)

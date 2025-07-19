@@ -72,10 +72,10 @@ module main_thermal
     end interface
 
     interface
-        module function construct_type_thermal_3phase_2d(Input, coordinate, domain) result(structure)
+        module function construct_type_thermal_3phase_2d(input, coordinate, domain) result(structure)
             implicit none
             class(abst_thermal), allocatable :: structure
-            type(type_input), intent(inout) :: Input
+            type(type_input), intent(inout) :: input
             type(type_dp_3d), intent(inout), pointer :: coordinate
             type(type_domain), intent(inout) :: domain
 

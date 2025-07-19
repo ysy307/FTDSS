@@ -104,57 +104,6 @@ contains
     end function construct_square_first
 
     !----------------------------------------------------------------------!
-    ! get_id_square_first:
-    !----------------------------------------------------------------------!
-    ! This function returns the number of nodes associated with a
-    ! square_first element.
-    !
-    ! Arguments:
-    !   self : square_first type object.
-    !          Represents the current square element instance.
-    !
-    ! Return Value:
-    !   n    : Integer (int32) indicating the number of nodes used by the
-    !          element. This is typically 4 for a linear square.
-    !
-    ! Function Details:
-    !   - Retrieves the value stored in `self%num_nodes`, which represents
-    !     the number of nodes for the element.
-    !
-    !----------------------------------------------------------------------!
-    module function get_id_square_first(self) result(id)
-        implicit none
-        class(type_square_first), intent(in) :: self
-        integer(int32) :: id
-
-        id = self%id
-    end function get_id_square_first
-
-    module function get_type_square_first(self) result(type)
-        implicit none
-        class(type_square_first), intent(in) :: self
-        integer(int32) :: type
-
-        type = self%type
-    end function get_type_square_first
-
-    module function get_num_nodes_square_first(self) result(num_nodes)
-        implicit none
-        class(type_square_first), intent(in) :: self
-        integer(int32) :: num_nodes
-
-        num_nodes = self%num_nodes
-    end function get_num_nodes_square_first
-
-    module function get_group_square_first(self) result(group)
-        implicit none
-        class(type_square_first), intent(in) :: self
-        integer(int32) :: group
-
-        group = self%group
-    end function get_group_square_first
-
-    !----------------------------------------------------------------------!
     ! psi_square_first:
     !----------------------------------------------------------------------!
     ! This function evaluates the shape function ψ_i(ξ, η) for a linear
@@ -558,36 +507,6 @@ contains
             peta = eta
         end if
     end subroutine is_in_square_first
-
-    module function interpolate_square_first(self, xi, eta, value) result(interpolated_value)
-        implicit none
-        class(abst_element), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
-        real(real64), intent(in) :: value(:)
-        real(real64) :: interpolated_value
-        integer(int32) :: i
-
-        interpolated_value = 0.0d0
-        do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
-        end do
-
-    end function interpolate_square_first
-
-    module function interpolate_reordered_square_first(self, xi, eta, value) result(interpolated_value)
-        implicit none
-        class(abst_element), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
-        real(real64), intent(in) :: value(:)
-        real(real64) :: interpolated_value
-        integer(int32) :: i
-
-        interpolated_value = 0.0d0
-        do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity_reordered(i))
-        end do
-
-    end function interpolate_reordered_square_first
 
 end submodule domain_element_square_first
 
