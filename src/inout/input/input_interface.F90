@@ -134,8 +134,6 @@ module inout_input
         logical :: is_parallel
         integer(int32) :: num_threads
         character(:), allocatable :: schedule
-        logical :: dynamic_adjustment
-        logical :: nested_parallelism
         integer(int32) :: max_active_levels
     end type type_parallel_threads
 

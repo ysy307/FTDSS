@@ -127,7 +127,6 @@ contains
         ! 3. 隣接行列の構築
         !===============================================================
         call element_adjacency%initialize(self%elements)
-        print *, "Step 3a: Element adjacency matrix created."
 
         !===============================================================
         ! 4. RCM並べ替えの実行

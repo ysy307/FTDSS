@@ -105,8 +105,6 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: num_threads = "num_threads"
     character(*), parameter :: schedule = "schedule"
     character(*), parameter :: valid_schedule_types(6) = ["affinity", "auto", "dynamic", "guided", "runtime", "static"]
-    character(*), parameter :: dynamic_adjustment = "dynamic_adjustment"
-    character(*), parameter :: nested_parallelism = "nested_parallelism"
     character(*), parameter :: max_active_levels = "max_active_levels"
     !!------------------------------------------------------------------------------------------------------------------------------
 
@@ -1103,22 +1101,6 @@ contains
             else if (.not. any(valid_schedule_types(:) == self%basic%solver_settings%parallel_settings%threads%schedule)) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
-            end if
-
-            key = join([solver_settings, parallel_settings, threads, dynamic_adjustment])
-            call json%get(key, self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment, found)
-            call json%print_error_message(output_unit)
-            if (.not. found) then
-                call global_logger%log_warning(message="Default dynamic adjustment is set to 'false'.")
-                self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment = .false.
-            end if
-
-            key = join([solver_settings, parallel_settings, threads, nested_parallelism])
-            call json%get(key, self%basic%solver_settings%parallel_settings%threads%nested_parallelism, found)
-            call json%print_error_message(output_unit)
-            if (.not. found) then
-                call global_logger%log_warning(message="Default nested parallelism is set to 'false'.")
-                self%basic%solver_settings%parallel_settings%threads%nested_parallelism = .false.
             end if
 
             key = join([solver_settings, parallel_settings, threads, max_active_levels])

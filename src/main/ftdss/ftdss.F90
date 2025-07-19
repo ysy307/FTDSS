@@ -3,7 +3,7 @@ module Main_FTDSS
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
-    use :: module_control, only:type_time, type_iteration
+    use :: module_control, only:type_time, type_iteration, initialize_openmp
     use :: module_output, only:type_output
     use :: module_domain, only:type_domain
     use :: module_properties, only:type_proereties_manager
@@ -50,10 +50,11 @@ contains
         call self%time%Profile_Start("Total")
         call self%time%Profile_Start("IO")
 
-        ! Initialize the FDTSS module
-        ! This is where you would set up any necessary parameters or configurations
+        call setup_handler()
+
         call input%initialize()
         call self%time%initialize(input=input)
+        call initialize_openmp(input)
 
         if (input%output_settings%standard_output%print_progress) then
             call global_logger%configure(level=information_level, &
@@ -64,7 +65,6 @@ contains
                                          time_stamp=.false., &
                                          max_width=0)
         end if
-        call setup_handler()
 
         !---------------------------------------------------------------------------------------------------------------------------
         !

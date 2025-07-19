@@ -212,7 +212,7 @@ contains
 
         !$omp parallel private(c, ie_idx, element) shared(domain, A, temperature, porosity, propeties)
         do c = 1, domain%colors%num_colors
-            !$omp do schedule(guided)
+            !$omp do
             do ie_idx = 1, domain%colors%Colored(c)%num_elements
                 element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
                 call process_single_element_mass(A, element, temperature, porosity, propeties)
@@ -258,7 +258,7 @@ contains
 
         !$omp parallel private(c, ie_idx, element) shared(domain, A, temperature, porosity, propeties)
         do c = 1, domain%colors%num_colors
-            !$omp  do schedule(guided)
+            !$omp do
             do ie_idx = 1, domain%colors%Colored(c)%num_elements
                 element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
                 call process_single_element_diffusion(A, element, temperature, porosity, propeties)
