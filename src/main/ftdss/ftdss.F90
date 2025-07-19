@@ -87,7 +87,7 @@ contains
 
         call global_logger%log_information(message="Boundary and Initial Conditions set up.")
 
-        self%thermal = Type_thermal_3Phase_2D(input, self%coordinate, self%domain)
+        self%thermal = type_thermal_crs(input, self%coordinate, self%domain)
 
         call self%property%initialize(input, ierr)
 

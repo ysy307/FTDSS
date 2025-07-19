@@ -13,7 +13,7 @@ module main_thermal
     private
 
     public :: abst_thermal
-    public :: type_thermal_3phase_2d
+    public :: type_thermal_crs
 
     type, abstract :: abst_thermal
         type(type_variable) :: T
@@ -36,16 +36,19 @@ module main_thermal
         !! Solver
         class(abst_solver), allocatable :: solver
         integer(int32) :: order
+
+        procedure(abst_assemble_local), pointer, nopass :: assemble_mass => null()
+        procedure(abst_assemble_local), pointer, nopass :: assemble_diffusive => null()
     contains
         ! procedure(Abstract_Update), pass(self), deferred :: Update
         procedure(abst_assemble), pass(self), deferred :: assemble
     end type abst_thermal
 
-    type, extends(abst_thermal) :: type_thermal_3phase_2d
+    type, extends(abst_thermal) :: type_thermal_crs
     contains
-        ! procedure :: Update => type_thermal_3phase_2d_Update
-        procedure :: assemble => assemble_type_thermal_3phase_2d
-    end type type_thermal_3phase_2d
+        ! procedure :: Update => type_thermal_crs_Update
+        procedure :: assemble => assemble_type_thermal_crs
+    end type type_thermal_crs
 
     abstract interface
         ! subroutine Abstract_Update(self, arr_phi)
@@ -72,26 +75,26 @@ module main_thermal
     end interface
 
     interface
-        module function construct_type_thermal_3phase_2d(input, coordinate, domain) result(structure)
+        module function construct_type_thermal_crs(input, coordinate, domain) result(structure)
             implicit none
             class(abst_thermal), allocatable :: structure
             type(type_input), intent(inout) :: input
             type(type_dp_3d), intent(inout), pointer :: coordinate
             type(type_domain), intent(inout) :: domain
 
-        end function construct_type_thermal_3phase_2d
+        end function construct_type_thermal_crs
 
-        ! module subroutine type_thermal_3phase_2d_Update(self, NodeBelonging, arr_phi)
+        ! module subroutine type_thermal_crs_Update(self, NodeBelonging, arr_phi)
         !     implicit none
-        !     class(type_thermal_3phase_2d), intent(inout) :: self
+        !     class(type_thermal_crs), intent(inout) :: self
         !     type(Belonging), intent(inout), optional :: NodeBelonging(:)
         !     real(real64), intent(inout) :: arr_phi(:)
 
-        ! end subroutine type_thermal_3phase_2d_Update
+        ! end subroutine type_thermal_crs_Update
 
-        module subroutine assemble_type_thermal_3phase_2d(self, domain, Property, Porosity, dt, step, iter)
+        module subroutine assemble_type_thermal_crs(self, domain, Property, Porosity, dt, step, iter)
             implicit none
-            class(type_thermal_3phase_2d), intent(inout) :: self
+            class(type_thermal_crs), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
             type(type_proereties_manager), intent(inout) :: Property
             real(real64), intent(in) :: Porosity(:)
@@ -99,12 +102,12 @@ module main_thermal
             integer(int32), intent(in) :: step
             integer(int32), intent(in) :: iter
 
-        end subroutine assemble_type_thermal_3phase_2d
+        end subroutine assemble_type_thermal_crs
 
     end interface
 
-    interface type_thermal_3phase_2d
-        module procedure :: construct_type_thermal_3phase_2d
+    interface type_thermal_crs
+        module procedure :: construct_type_thermal_crs
     end interface
 
 contains

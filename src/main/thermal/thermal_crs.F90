@@ -1,7 +1,7 @@
 submodule(Main_Thermal) Main_Thermal_3Phase
     implicit none
 contains
-    module function construct_type_thermal_3phase_2d(input, coordinate, domain) result(structure)
+    module function construct_type_thermal_crs(input, coordinate, domain) result(structure)
         implicit none
         class(abst_thermal), allocatable :: structure
         type(type_input), intent(inout) :: input
@@ -14,7 +14,7 @@ contains
         integer(int32) :: ierr
 
         if (allocated(structure)) deallocate (structure)
-        allocate (Type_Thermal_3Phase_2D :: structure)
+        allocate (type_thermal_crs :: structure)
 
         nNode = domain%get_num_nodes()
 
@@ -43,11 +43,11 @@ contains
         structure%solver = create_solver(input, "thermal", structure%KT_star_0, nNode)
         !---------------------------------------------------------------------------------------------------------------------------
 
-    end function construct_type_thermal_3phase_2d
+    end function construct_type_thermal_crs
 
-    ! module subroutine Type_Thermal_3Phase_2D_Update(self, NodeBelonging, arr_phi)
+    ! module subroutine type_thermal_crs_Update(self, NodeBelonging, arr_phi)
     !     implicit none
-    !     class(Type_Thermal_3Phase_2D), intent(inout) :: self
+    !     class(type_thermal_crs), intent(inout) :: self
     !     type(Belonging), intent(inout), optional :: NodeBelonging(:)
     !     real(real64), intent(inout) :: arr_phi(:)
 
@@ -70,10 +70,10 @@ contains
     !                          Ice=self%Ice(1)%f, &
     !                          Temperature=self%T%pre(:), &
     !                          Density=self%DEN)
-    ! end subroutine Type_Thermal_3Phase_2D_Update
-    module subroutine assemble_type_thermal_3phase_2d(self, domain, property, porosity, dt, step, iter)
+    ! end subroutine type_thermal_crs_Update
+    module subroutine assemble_type_thermal_crs(self, domain, property, porosity, dt, step, iter)
         implicit none
-        class(type_thermal_3phase_2d), intent(inout) :: self
+        class(type_thermal_crs), intent(inout) :: self
         type(type_domain), intent(inout) :: domain
         type(type_proereties_manager), intent(inout) :: property
         real(real64), intent(in) :: porosity(:)
@@ -125,6 +125,6 @@ contains
         !     self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
         ! end if
         ! self%PHIT(:) = self%PHIT_old(:)
-    end subroutine assemble_type_thermal_3phase_2d
+    end subroutine assemble_type_thermal_crs
 
 end submodule Main_Thermal_3Phase

@@ -1,7 +1,7 @@
 add_library(Thermal OBJECT
     thermal_assemble.F90
     thermal_interface.F90
-    thermal_3Phase.F90
+    thermal_crs.F90
     thermal.F90
 
 )
