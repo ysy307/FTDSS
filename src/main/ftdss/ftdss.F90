@@ -2,7 +2,7 @@ module Main_FTDSS
     use, intrinsic :: iso_fortran_env
     use :: stdlib_logger
     use :: module_core
-    use :: Inout_Input
+    use :: module_input, only:type_input
     use :: module_control, only:type_time, type_iteration
     use :: module_output, only:type_output
     use :: module_domain, only:type_domain
@@ -10,25 +10,22 @@ module Main_FTDSS
     use :: module_boundary, only:type_bc
     use :: module_initial, only:type_ic
 
-    use :: Main_Thermal
+    use :: Main_thermal
     implicit none
 
     type :: type_ftdss
-        ! type(Type_Input) :: Input
-
         type(type_dp_3d), pointer :: coordinate
         type(type_domain) :: domain
-        ! type(Belonging), allocatable :: NodeBelonging(:)
-        class(abst_thermal), allocatable :: Thermal
+
+        type(type_variable) :: phi
+        class(abst_thermal), allocatable :: thermal
 
         type(type_proereties_manager) :: property
         type(type_bc) :: bc
         type(type_ic) :: ic
 
-        type(type_variable) :: phi
-
         type(type_time) :: time
-        type(type_iteration) :: Iteration
+        type(type_iteration) :: iteration
         type(Type_output) :: output
 
     contains
@@ -41,12 +38,9 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         type(type_input) :: input
-
         integer(int32) :: nsize
         integer(int32) :: iN
-
         integer(int32) :: ierr
-
         character(len=10), allocatable :: profiler_labels(:)
 
         ! ★ 計測したいセクション名を定義
@@ -84,7 +78,7 @@ contains
 
         call self%domain%initialize(input, self%coordinate, ierr)
         if (ierr /= 0) then
-            print *, "Error initializing domain in Type_Thermal_3Phase_2D_Construct"
+            print *, "Error initializing domain in Type_thermal_3Phase_2D_Construct"
             return
         end if
 
@@ -93,7 +87,7 @@ contains
 
         call global_logger%log_information(message="Boundary and Initial Conditions set up.")
 
-        self%Thermal = Type_Thermal_3Phase_2D(input, self%coordinate, self%domain)
+        self%thermal = Type_thermal_3Phase_2D(input, self%coordinate, self%domain)
 
         call self%property%initialize(input, ierr)
 

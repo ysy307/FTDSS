@@ -45,9 +45,7 @@ RUN wget -qO- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PR
     echo 'export PATH=$NVCOMPILERS/$NVARCH/25.3/compilers/bin:$PATH' >> /etc/profile.d/nvhpc.sh && \
     echo 'export MANPATH=$MANPATH:$NVCOMPILERS/$NVARCH/25.3/compilers/man' >> /etc/profile.d/nvhpc.sh && \
     echo 'export PATH=$NVCOMPILERS/$NVARCH/25.3/comm_libs/mpi/bin:$PATH' >> /etc/profile.d/nvhpc.sh && \
-    echo 'export MANPATH=$MANPATH:$NVCOMPILERS/$NVARCH/25.3/comm_libs/mpi/man' >> /etc/profile.d/nvhpc.sh &&\
-    echo '[ -f /opt/intel/oneapi/setvars.sh ] && source /opt/intel/oneapi/setvars.sh' >> /root/.zprofile && \
-    echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> /root/.zshrc
+    echo 'export MANPATH=$MANPATH:$NVCOMPILERS/$NVARCH/25.3/comm_libs/mpi/man' >> /etc/profile.d/nvhpc.sh
 
 
 
@@ -86,7 +84,9 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo "export MPICXX=mpiicpc" >> ~/.zshrc && \
     echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc && \
     echo "ulimit -s unlimited" >> ~/.zshrc && \
-    echo 'export LANG=C.UTF-8' >> ~/.zshrc
+    echo 'export LANG=C.UTF-8' >> ~/.zshrc && \
+    echo '[ -f /opt/intel/oneapi/setvars.sh ] && source /opt/intel/oneapi/setvars.sh' >> /root/.zshrc && \
+    echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> /root/.zshrc
 
 
 # デフォルトのシェルをZshに設定
