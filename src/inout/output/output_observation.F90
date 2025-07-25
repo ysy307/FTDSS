@@ -489,6 +489,8 @@ contains
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
             state%water_content = properties%get_qw(state, group_id)
+            if (state%water_content > state%porosity) state%water_content = state%porosity
+            if (state%water_content < 0.0d0) state%water_content = 0.0d0
             obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
         end do
 

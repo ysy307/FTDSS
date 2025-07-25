@@ -11,31 +11,48 @@ module calculate_blas
     integer :: converter
 #endif
 
+    public :: norm_1
     public :: norm_2
+    public :: norm_infinity
     public :: inner_product
 
 contains
 
-    function norm_2(N, x) result(norm)
-        implicit none
-        integer(int32), intent(in) :: N
-        real(real64), intent(in) :: x(:)
+    function norm_1(x) result(norm)
+        real(real64), dimension(:), intent(in) :: x
         real(real64) :: norm
-        integer(int32) :: iN
-
-        norm = 0.0d0
-
 #ifdef _MKL
-        norm = dnrm2(int(N, kind=kind(converter)), x, 1)
+        norm = dasum(size(x), x, 1)
 #else
-        !$omp parallel do private(iN) reduction(+:norm)
-        do iN = 1, N
-            norm = norm + x(iN)**2
-        end do
-        !$omp end parallel do
-        norm = sqrt(norm)
+        norm = sum(abs(x)) ! 組込み関数の方がシンプルで高速な場合が多い
+#endif
+    end function norm_1
+
+    ! L2 ノルム
+    function norm_2(x) result(norm)
+        real(real64), dimension(:), intent(in) :: x
+        real(real64) :: norm
+#ifdef _MKL
+        norm = dnrm2(size(x), x, 1)
+#else
+        norm = norm2(x) ! 組込み関数を使用
 #endif
     end function norm_2
+
+    function norm_infinity(x) result(norm)
+        real(real64), dimension(:), intent(in) :: x
+        real(real64) :: norm
+#ifdef _MKL
+        ! idamaxは最大値の「インデックス」を返すため、そのインデックスの値を参照する
+        if (size(x) > 0) then
+            norm = abs(x(idamax(size(x), x, 1)))
+        else
+            norm = 0.0_real64
+        end if
+#else
+        norm = maxval(abs(x)) ! 組込み関数を使用
+#endif
+    end function norm_infinity
 
     function inner_product(N, x, y) result(d_dot)
         implicit none

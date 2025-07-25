@@ -1,5 +1,5 @@
 module module_calculate
-    use :: calculate_blas, only:norm_2, inner_product
+    use :: calculate_blas, only:norm_1, norm_2, norm_infinity, inner_product
     use :: calculate_gcc, only:holder_gccs, abst_gcc, type_gcc_non_segregation_m, type_gcc_non_segregation_pa, & !&
                                type_gcc_segregation_m, type_gcc_segregation_pa
     use :: calculate_wrf, only:holder_wrfs, abst_wrf, type_wrf_bc, type_wrf_vg, type_wrf_ko, & !&
@@ -14,7 +14,9 @@ module module_calculate
     !-------------------------------------------------------------------------------------------------------------------------------
     ! BLAS calculation module
     !-------------------------------------------------------------------------------------------------------------------------------
+    public :: norm_1
     public :: norm_2
+    public :: norm_infinity
     public :: inner_product
 
     !-------------------------------------------------------------------------------------------------------------------------------
