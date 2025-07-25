@@ -54,6 +54,7 @@ contains
 
         call input%initialize()
         call self%time%initialize(input=input)
+        call self%iteration%initialize(input)
         call initialize_openmp(input)
 
         if (input%output_settings%standard_output%print_progress) then

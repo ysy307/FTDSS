@@ -36,6 +36,9 @@ module main_thermal
         real(real64), allocatable :: PHIT(:)
         real(real64), allocatable :: PHIT_old(:)
 
+        !! Nonlinear solver
+        character(:), allocatable :: algorithm
+
         !! Solver
         class(abst_solver), allocatable :: solver
         integer(int32) :: order
@@ -45,12 +48,14 @@ module main_thermal
     contains
         ! procedure(Abstract_Update), pass(self), deferred :: Update
         procedure(abst_assemble), pass(self), deferred :: assemble
+        procedure(abst_solve), pass(self), deferred :: solve
     end type abst_thermal
 
     type, extends(abst_thermal) :: type_thermal_crs
     contains
         ! procedure :: Update => type_thermal_crs_Update
         procedure :: assemble => assemble_type_thermal_crs
+        procedure :: solve => solve_type_thermal_crs
     end type type_thermal_crs
 
     abstract interface
@@ -74,6 +79,14 @@ module main_thermal
             type(type_iteration), intent(in) :: iteration
 
         end subroutine abst_assemble
+
+        subroutine abst_solve(self, time, iteration)
+            import :: abst_thermal, type_time, type_iteration
+            implicit none
+            class(abst_thermal), intent(inout) :: self
+            type(type_time), intent(inout) :: time
+            type(type_iteration), intent(inout) :: iteration
+        end subroutine abst_solve
     end interface
 
     interface
@@ -104,6 +117,14 @@ module main_thermal
             type(type_iteration), intent(in) :: iteration
 
         end subroutine assemble_type_thermal_crs
+
+        module subroutine solve_type_thermal_crs(self, time, iteration)
+            implicit none
+            class(type_thermal_crs), intent(inout) :: self
+            type(type_time), intent(inout) :: time
+            type(type_iteration), intent(inout) :: iteration
+
+        end subroutine solve_type_thermal_crs
 
     end interface
 

@@ -31,6 +31,7 @@ module control_iteration
     contains
         procedure, pass(self), public :: initialize => initialize_type_iteration
         procedure, pass(self), public :: reset_step
+        procedure, pass(self), public :: set_initial_norms
         procedure, pass(self), public :: reset_timestep
         procedure, pass(self), public :: check_convergence
         procedure, pass(self), public :: increment_iter
@@ -38,6 +39,7 @@ module control_iteration
         procedure, pass(self), public :: should_continue => continue_loop
         procedure, pass(self), public :: get_iter
         procedure, pass(self), public :: get_step
+        procedure, pass(self), public :: get_algorithm_name
         procedure, pass(self), public :: has_converged => get_status
     end type type_iteration
 
@@ -54,26 +56,36 @@ contains
 
         self%algorithm = input%basic%solver_settings%nonlinear_solver%method
         select case (trim(self%algorithm))
-        case ("newton", "modified-newton")
+        case ("newton", "modified_newton")
             self%config%max_iterations = input%basic%solver_settings%nonlinear_solver%max_iterations
             self%config%update_frequency = input%basic%solver_settings%nonlinear_solver%update_frequency
             self%config%convergence = input%basic%solver_settings%nonlinear_solver%convergence
         end select
     end subroutine initialize_type_iteration
 
-    subroutine reset_step(self, res_vec, upd_vec)
+    subroutine reset_step(self)
         implicit none
         class(type_iteration), intent(inout) :: self
-        real(real64), intent(in) :: res_vec(:), upd_vec(:)
 
         self%step = 0
         self%is_converged = .false.
-
-        self%init_res_norm_l2 = norm_2(res_vec)
-        self%init_res_norm_inf = norm_infinity(res_vec)
-        self%init_upd_norm_l2 = norm_2(upd_vec)
-        self%init_upd_norm_inf = norm_infinity(upd_vec)
     end subroutine reset_step
+
+    subroutine set_initial_norms(self, res_vec, upd_vec)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+        real(real64), intent(in), optional :: res_vec(:), upd_vec(:)
+
+        ! 初期ノルム値設定
+        if (present(res_vec)) then
+            self%init_res_norm_l2 = norm_2(res_vec)
+            self%init_res_norm_inf = norm_infinity(res_vec)
+        end if
+        if (present(upd_vec)) then
+            self%init_upd_norm_l2 = norm_2(upd_vec)
+            self%init_upd_norm_inf = norm_infinity(upd_vec)
+        end if
+    end subroutine set_initial_norms
 
     subroutine reset_timestep(self)
         implicit none
@@ -180,7 +192,15 @@ contains
         class(type_iteration), intent(in) :: self
         logical :: should_continue_loop
 
-        should_continue_loop = (.not. self%is_converged) .and. (self%iter < self%config%max_iterations)
+        if (self%is_converged) then
+            should_continue_loop = .false.
+        else
+            if (self%step == 0) then
+                should_continue_loop = .true.
+            else
+                should_continue_loop = (self%step < self%config%max_iterations)
+            end if
+        end if
     end function continue_loop
 
     function get_iter(self) result(iter)
@@ -206,5 +226,13 @@ contains
 
         is_converged = self%is_converged
     end function get_status
+
+    function get_algorithm_name(self) result(algorithm_name)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        character(:), allocatable :: algorithm_name
+
+        algorithm_name = self%algorithm
+    end function get_algorithm_name
 
 end module control_iteration

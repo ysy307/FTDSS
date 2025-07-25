@@ -123,7 +123,7 @@ contains
                 self%r(:) = self%s(:) - omega * self%t(:)
 
                 ! 25: ||r_k+1||_2
-                resid = norm(self%N, self%r(:))
+                resid = norm(self%r(:))
                 if (resid < self%tolerance) then
                     status = 0
                     x(:) = self%x(:)

@@ -43,6 +43,7 @@ module control_time
         procedure, public, pass(self) :: get_record
         procedure, public, pass(self) :: get_time
         procedure, public, pass(self) :: shift => shift_time
+        procedure, public, pass(self) :: get_time_coefficients
     end type type_time
 
 contains
@@ -346,5 +347,355 @@ contains
         end if
 
     end subroutine shift_time
+
+    subroutine get_time_coefficients(self, order, coefficients)
+        implicit none
+        class(type_time), intent(in) :: self
+        integer(int32), intent(in) :: order
+        real(real64), intent(inout) :: coefficients(0:)
+
+        ! Local variables
+        real(real64) :: dt_n, dt_nm1, dt_nm2, dt_nm3, dt_nm4, dt_nm5
+        real(real64) :: rho1, rho2, rho3, rho4, rho5
+        real(real64) :: coef_k
+
+        select case (order)
+        case (1) ! BDF1 (Backward Euler)
+            dt_n = self%dt
+
+            coefficients(0) = 1.0d0
+            coefficients(1) = -1.0d0
+
+        case (2) ! BDF2
+            dt_n = self%dt
+            dt_nm1 = self%dt_old(1)
+            rho1 = dt_n / dt_nm1
+
+            coefficients(0) = (2.0d0 * rho1 + 1.0d0) / (rho1 + 1.0d0)
+            coefficients(1) = -(rho1 + 1.0d0)
+            coefficients(2) = rho1**2.0d0 / (rho1 + 1.0d0)
+
+        case (3)
+            dt_n = self%dt
+            dt_nm1 = self%dt_old(1)
+            dt_nm2 = self%dt_old(2)
+
+            rho1 = dt_n / dt_nm1
+            rho2 = dt_nm1 / dt_nm2
+
+            coefficients(0) = (3.0d0 * rho1**2.0d0 * rho2 + 4.0d0 * rho1 * rho2 + 2.0d0 * rho1 + rho2 + 1.0d0) &
+                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
+            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
+            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
+            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) / ((rho2 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
+
+        case (4)
+            dt_n = self%dt
+            dt_nm1 = self%dt_old(1)
+            dt_nm2 = self%dt_old(2)
+            dt_nm3 = self%dt_old(3)
+
+            rho1 = dt_n / dt_nm1
+            rho2 = dt_nm1 / dt_nm2
+            rho3 = dt_nm2 / dt_nm3
+            coefficients(0) = (4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + 9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
+                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + 3.0d0 * rho1**2.0d0 * rho2 + &
+                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + 8.0d0 * rho1 * rho2 * rho3 + &
+                               4.0d0 * rho1 * rho2 + 2.0d0 * rho1 * rho3 + 2.0d0 * rho1 + &
+                               rho2**2.0d0 * rho3 + 2.0d0 * rho2 * rho3 + rho2 + rho3 + 1.0d0) &
+                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
+            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
+                              / ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0))
+            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
+                              / ((rho1 + 1.0d0) * (rho3 + 1.0d0))
+            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
+                              / ((rho2 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
+            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) &
+                              / ((rho3 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
+
+        case (5)
+            dt_n = self%dt
+            dt_nm1 = self%dt_old(1)
+            dt_nm2 = self%dt_old(2)
+            dt_nm3 = self%dt_old(3)
+            dt_nm4 = self%dt_old(4)
+
+            rho1 = dt_n / dt_nm1
+            rho2 = dt_nm1 / dt_nm2
+            rho3 = dt_nm2 / dt_nm3
+            rho4 = dt_nm3 / dt_nm4
+            coefficients(0) = (5.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               16.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               8.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 + &
+                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + &
+                               18.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               18.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
+                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
+                               9.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 + &
+                               12.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 + &
+                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + &
+                               3.0d0 * rho1**2.00 * rho2 * rho4 + &
+                               3.0d0 * rho1**2.0d0 * rho2 + &
+                               8.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               18.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               12.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 + &
+                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + &
+                               12.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4 + &
+                               16.0d0 * rho1 * rho2 * rho3 * rho4 + &
+                               8.0d0 * rho1 * rho2 * rho3 + &
+                               4.0d0 * rho1 * rho2 * rho4 + &
+                               4.0d0 * rho1 * rho2 + &
+                               2.0d0 * rho1 * rho3**2.0d0 * rho4 + &
+                               4.0d0 * rho1 * rho3 * rho4 + &
+                               2.0d0 * rho1 * rho3 + &
+                               2.0d0 * rho1 * rho4 + &
+                               2.0d0 * rho1 + &
+                               rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
+                               rho2**2.0d0 * rho3 + &
+                               3.0d0 * rho2 * rho3**2.0d0 * rho4 + &
+                               4.0d0 * rho2 * rho3 * rho4 + &
+                               2.0d0 * rho2 * rho3 + &
+                               rho2 * rho4 + &
+                               rho2 + &
+                               rho3**2.0d0 * rho4 + &
+                               2.0d0 * rho3 * rho4 + &
+                               rho3 + &
+                               rho4 + 1.0d0) &
+                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
+                                 (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                                 (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
+            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
+                              / ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
+                                 (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
+            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
+                              / ((rho1 + 1.0d0) * (rho3 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0))
+            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
+                              / ((rho2 + 1.0d0) * (rho4 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
+            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * &
+                              (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
+                              / ((rho3 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
+                                 (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
+            coefficients(5) = -rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * (rho1 + 1.0d0) * &
+                              (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
+                              / ((rho4 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0) * &
+                                 (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                                 (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
+
+        case (6)
+            dt_n = self%dt
+            dt_nm1 = self%dt_old(1)
+            dt_nm2 = self%dt_old(2)
+            dt_nm3 = self%dt_old(3)
+            dt_nm4 = self%dt_old(4)
+            dt_nm5 = self%dt_old(5)
+
+            rho1 = dt_n / dt_nm1
+            rho2 = dt_nm1 / dt_nm2
+            rho3 = dt_nm2 / dt_nm3
+            rho4 = dt_nm3 / dt_nm4
+            rho5 = dt_nm4 / dt_nm5
+
+            coefficients(0) = (6.0d0 * rho1**5.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               25.0d0 * rho1**4.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               20.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               15.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               10.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               5.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               40.0d0 * rho1**3.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               64.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               48.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.00 * rho4**2.00 * rho5 + &
+                               32.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               16.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               24.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               36.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               24.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
+                               16.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
+                               8.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 + &
+                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho5 + &
+                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + &
+                               30.0d0 * rho1**2.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               72.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               54.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               36.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               18.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               54.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               81.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               54.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
+                               36.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
+                               18.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
+                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho5 + &
+                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
+                               12.0d0 * rho1**2.0d0 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               27.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               18.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 * rho5 + &
+                               9.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 + &
+                               18.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
+                               24.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 * rho5 + &
+                               12.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 + &
+                               6.0d0 * rho1**2.0d0 * rho2 * rho3 * rho5 + &
+                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + &
+                               3.0d0 * rho1**2.0d0 * rho2 * rho4**2.0d0 * rho5 + &
+                               6.0d0 * rho1**2.0d0 * rho2 * rho4 * rho5 + &
+                               3.0d0 * rho1**2.0d0 * rho2 * rho4 + &
+                               3.0d0 * rho1**2.0d0 * rho2 * rho5 + &
+                               3.0d0 * rho1**2.0d0 * rho2 + &
+                               10.0d0 * rho1 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               32.0d0 * rho1 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               24.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               16.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               8.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               36.0d0 * rho1 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               54.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               36.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               18.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               18.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
+                               24.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
+                               12.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 + &
+                               6.0d0 * rho1 * rho2**2.0d0 * rho3 * rho5 + &
+                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + &
+                               16.0d0 * rho1 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               36.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               24.0d0 * rho1 * rho2 * rho3**2.d0 * rho4 * rho5 + &
+                               12.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4 + &
+                               24.0d0 * rho1 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
+                               32.0d0 * rho1 * rho2 * rho3 * rho4 * rho5 + &
+                               16.0d0 * rho1 * rho2 * rho3 * rho4 + &
+                               8.0d0 * rho1 * rho2 * rho3 * rho5 + &
+                               8.0d0 * rho1 * rho2 * rho3 + &
+                               4.0d0 * rho1 * rho2 * rho4**2.0d0 * rho5 + &
+                               8.0d0 * rho1 * rho2 * rho4 * rho5 + &
+                               4.0d0 * rho1 * rho2 * rho4 + &
+                               4.0d0 * rho1 * rho2 * rho5 + &
+                               4.0d0 * rho1 * rho2 + &
+                               2.0d0 * rho1 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               6.0d0 * rho1 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               4.0d0 * rho1 * rho3**2.0d0 * rho4 * rho5 + &
+                               2.0d0 * rho1 * rho3**2.0d0 * rho4 + &
+                               6.0d0 * rho1 * rho3 * rho4**2.0d0 * rho5 + &
+                               8.0d0 * rho1 * rho3 * rho4 * rho5 + &
+                               4.0d0 * rho1 * rho3 * rho4 + &
+                               2.0d0 * rho1 * rho3 * rho5 + &
+                               2.0d0 * rho1 * rho3 + &
+                               2.0d0 * rho1 * rho4**2.0d0 * rho5 + &
+                               4.0d0 * rho1 * rho4 * rho5 + &
+                               2.0d0 * rho1 * rho4 + &
+                               2.0d0 * rho1 * rho5 + &
+                               2.0d0 * rho1 + &
+                               rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               4.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               rho2**3.0d0 * rho3**2.0d0 * rho4 + &
+                               6.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               9.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               6.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
+                               3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
+                               3.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
+                               4.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
+                               2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
+                               rho2**2.0d0 * rho3 * rho5 + &
+                               rho2**2.0d0 * rho3 + &
+                               4.0d0 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               9.0d0 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
+                               6.0d0 * rho2 * rho3**2.0d0 * rho4 * rho5 + &
+                               3.0d0 * rho2 * rho3**2.0d0 * rho4 + &
+                               6.0d0 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
+                               8.0d0 * rho2 * rho3 * rho4 * rho5 + &
+                               4.0d0 * rho2 * rho3 * rho4 + &
+                               2.0d0 * rho2 * rho3 * rho5 + &
+                               2.0d0 * rho2 * rho3 + &
+                               rho2 * rho4**2.0d0 * rho5 + &
+                               2.0d0 * rho2 * rho4 * rho5 + &
+                               rho2 * rho4 + &
+                               rho2 * rho5 + &
+                               rho2 + &
+                               rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
+                               2.0d0 * rho3**3.0d0 * rho4 * rho5 + &
+                               rho3**3.0d0 * rho4 + &
+                               3.0d0 * rho3 * rho4**2.0d0 * rho5 + &
+                               4.0d0 * rho3 * rho4 * rho5 + &
+                               2.0d0 * rho3 * rho4 + &
+                               rho3 * rho5 + &
+                               rho3 + &
+                               rho4**2.0d0 * rho5 + &
+                               2.0d0 * rho4 * rho5 + &
+                               rho4 + &
+                               rho5 + &
+                               1.0d0) / &
+                              ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
+                               (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                               (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                               (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
+                                rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
+
+            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
+                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
+                              ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
+                               (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                               (rho2 * rho3 * rho4 * rho5 + rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
+            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
+                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
+                              ((rho1 + 1.0d0) * (rho3 + 1.0d0) * &
+                               (rho3 * rho4 + rho4 + 1.0d0) * &
+                               (rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
+            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
+                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
+                              ((rho2 + 1.0d0) * (rho4 + 1.0d0) * &
+                               (rho1 * rho2 + rho2 + 1.0d0) * &
+                               (rho4 * rho5 + rho5 + 1.0d0))
+            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * &
+                              (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
+                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
+                              ((rho3 + 1.0d0) * (rho5 + 1.0d0) * &
+                               (rho2 * rho3 + rho3 + 1.0d0) * &
+                               (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
+            coefficients(5) = -rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * (rho1 + 1.0d0) * &
+                              (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
+                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
+                              ((rho4 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0) * &
+                               (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
+                               (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
+            coefficients(6) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * rho5**6.0d0 * (rho1 + 1.0d0) * &
+                              (rho1 * rho2 + rho2 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
+                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) / &
+                              ((rho5 + 1.0d0) * (rho4 * rho5 + rho5 + 1.0d0) * &
+                               (rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) * &
+                               (rho2 * rho3 * rho4 * rho5 + rho3 * rho4 * rho5 + &
+                                rho4 * rho5 + rho5 + 1.0d0) * &
+                               (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
+                                rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
+        end select
+
+    end subroutine get_time_coefficients
 
 end module control_time
