@@ -11,7 +11,7 @@ program test
 
     call FTDSS%initialize()
     if (was_interrupted()) stop
-    call FTDSS%time%Profile_Start("Setup")
+    call FTDSS%time%profile_start("Setup")
     call FTDSS%IC%apply("thermal", FTDSS%Domain, FTDSS%Thermal%T)
     call FTDSS%BC%apply_CRS(boundary_target='thermal', &
                             current_time=0.0d0, &
@@ -26,9 +26,9 @@ program test
     ! call FTDSS%Thermal%Update(FTDSS%NodeBelonging, FTDSS%phi%pre(:))
     call FTDSS%Thermal%T%Shift()
     count = 0
-    call FTDSS%time%Profile_Stop("Setup")
+    call FTDSS%time%profile_stop("Setup")
 
-    call FTDSS%time%Profile_Start("IO")
+    call FTDSS%time%profile_start("IO")
     call FTDSS%output%output_fields(file_counts=0, &
                                     domain=FTDSS%Domain, &
                                     porosity=FTDSS%phi%pre, &
@@ -43,7 +43,7 @@ program test
                                      porosity=FTDSS%phi%pre, &
                                      Propeties=FTDSS%Property, &
                                      Domain=FTDSS%Domain)
-    call FTDSS%time%Profile_Stop("IO")
+    call FTDSS%time%profile_stop("IO")
     FTDSS%iteration%step = 0
     FTDSS%iteration%max_iter = 100
 
@@ -53,41 +53,27 @@ program test
     call global_logger%log_information(message="Starting time loop")
     TIME_LOOP: do while (FTDSS%time%time < FTDSS%time%end_time)
         ! exit TIME_LOOP
-        FTDSS%time%time_old = FTDSS%time%time
-        FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
-        FTDSS%time%dt_old(1) = FTDSS%time%dt
+        call FTDSS%time%shift()
+        ! FTDSS%time%time_old = FTDSS%time%time
+        ! FTDSS%time%time = FTDSS%time%time + FTDSS%time%dt
+        ! FTDSS%time%dt_old(1) = FTDSS%time%dt
 
         FTDSS%iteration%iter = 0
 
         !! Thermal Newton-Raphson FTDSS%iteration
 
         NR_LOOP_THERMAL: do while (FTDSS%iteration%iter <= FTDSS%iteration%max_iter)
-            call FTDSS%time%Profile_Start("Assemble")
+            call FTDSS%time%profile_start("Assemble")
             ! print *, FTDSS%iteration%iter
             if (FTDSS%iteration%isConverged) then
                 FTDSS%iteration%step = FTDSS%iteration%step + 1
                 FTDSS%iteration%isConverged = .false.
             end if
             FTDSS%iteration%iter = FTDSS%iteration%iter + 1
-            ! print *, FTDSS%iteration%iter
-            ! if (FTDSS%iteration%iter == 1) then
-            !     if (FTDSS%iteration%step >= 2) then
-            !         Thermal%T%pre(:) = Thermal%T%old(:, 1) + (Thermal%T%old(:, 1) - Thermal%T%old(:, 2)) * (FTDSS%time%dt / FTDSS%time%dt_old(1))
-            !         ! Thermal%T%pre(:) = 2.0d0 * Thermal%T%old(:, 1) - Thermal%T%old(:, 2)
-            !         call Thermal%Update(Input%Regions(1)%Thermal%Porosity, Input%Regions(1)%Thermal%rho(3), FTDSS%iteration%iter)
-            !     end if
-            ! ! end if
-            ! print *, Thermal%KT_star_0%nnz
-            ! print *, Thermal%KT_star_0%ptr(:)
-            ! print *, Thermal%KT_star_0%ind(:)
-            ! stop
 
-            call FTDSS%Thermal%Assemble(FTDSS%Domain, FTDSS%Property, FTDSS%phi%pre, FTDSS%time%dt, FTDSS%iteration%step, FTDSS%iteration%iter)
-            ! call Thermal%BC%Fix_BoundaryConditions(Thermal%KT_star_0, Thermal%PHIT)
-            ! Thermal%PHIT(:) = -Thermal%PHIT(:)
-            ! call FTDSS%Thermal%BC%
-            call FTDSS%time%Profile_Stop("Assemble")
-            call FTDSS%time%Profile_Start("Setup")
+            call FTDSS%Thermal%Assemble(FTDSS%Domain, FTDSS%Property, FTDSS%phi%pre, FTDSS%time, FTDSS%iteration)
+            call FTDSS%time%profile_stop("Assemble")
+            call FTDSS%time%profile_start("Setup")
             call FTDSS%BC%apply_CRS(boundary_target='thermal', &
                                     current_time=FTDSS%time%get_time(), &
                                     A=FTDSS%Thermal%KT_star_0, &
@@ -109,13 +95,13 @@ program test
             ! close (20)
             ! stop
 
-            call FTDSS%time%Profile_Stop("Setup")
+            call FTDSS%time%profile_stop("Setup")
 
-            call FTDSS%time%Profile_Start("Solve")
+            call FTDSS%time%profile_start("Solve")
             call FTDSS%Thermal%Solver%Solve(FTDSS%Thermal%KT_star_0, FTDSS%Thermal%PHIT, FTDSS%Thermal%T%new(:), stat)
             call FTDSS%Thermal%solver%check(stat, FTDSS%time%time)
 
-            call FTDSS%time%Profile_Stop("Solve")
+            call FTDSS%time%profile_stop("Solve")
             ! open (unit=30, file='log/debug3.txt', status='replace')
             ! do i = 1, size(FTDSS%Thermal%T%new(:))
             !     write (30, '( i0,2x,f16.7)') i, FTDSS%Thermal%T%new(i)
@@ -150,7 +136,7 @@ program test
         !     call FTDSS%Thermal%T%Shift(reverse=.true.)
         ! end if
 
-        call FTDSS%time%Profile_Start("IO")
+        call FTDSS%time%profile_start("IO")
         call FTDSS%output%output_history(time=FTDSS%time%get_time(), &
                                          temperature=FTDSS%Thermal%T%pre, &
                                          porosity=FTDSS%phi%pre, &
@@ -165,14 +151,14 @@ program test
                                             temperature=FTDSS%Thermal%T%pre, &
                                             si=FTDSS%Thermal%Qice%pre)
         end if
-        call FTDSS%time%Profile_Stop("IO")
+        call FTDSS%time%profile_stop("IO")
 
         if (was_interrupted()) stop
 
     end do TIME_LOOP
 
-    call FTDSS%time%Profile_Stop("Total")
-    call FTDSS%time%Record("End")
+    call FTDSS%time%profile_stop("Total")
+    call FTDSS%time%record("End")
     call FTDSS%output%output_system_log(FTDSS%time, FTDSS%Thermal%KT_star_0, FTDSS%Domain)
 
     stop

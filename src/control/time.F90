@@ -35,9 +35,6 @@ module control_time
         type(type_time_record) :: start
         type(type_time_record) :: end
         type(type_profiler_section), allocatable :: sections(:)
-#ifndef _OPENMP
-        integer(int32) :: tick_rate = 0
-#endif
     contains
         procedure, public, pass(self) :: initialize    => initialize_type_time !&
         procedure, public, pass(self) :: record        => record_timestamp !&
@@ -45,6 +42,7 @@ module control_time
         procedure, public, pass(self) :: profile_stop  => profile_stop_timer !&
         procedure, public, pass(self) :: get_record
         procedure, public, pass(self) :: get_time
+        procedure, public, pass(self) :: shift => shift_time
     end type type_time
 
 contains
@@ -105,6 +103,7 @@ contains
             end select
 
             call Allocate_Array(self%dt_old, input%basic%solver_settings%bdf_order)
+            self%dt_old(:) = 0.0d0
 
             select case (trim(input%output_settings%field_output%output_interval_unit))
             case ("second")
@@ -293,5 +292,59 @@ contains
         time = self%time * self%time_conversion
 
     end function get_time
+
+    subroutine shift_time(self, reverse)
+        implicit none
+        class(type_time), intent(inout) :: self
+        logical, intent(in), optional :: reverse
+
+        integer(int32) :: n
+        logical :: do_reverse
+
+        ! reverse引数の有無と値を確認
+        do_reverse = .false.
+        if (present(reverse)) then
+            do_reverse = reverse
+        end if
+
+        ! 配列サイズを取得
+        n = size(self%dt_old)
+
+        if (do_reverse) then
+            ! --- 逆方向の更新 ---
+            ! ★★★ 時間を1ステップ前に戻す処理を追加 ★★★
+            self%time = self%time_old
+
+            ! dtを履歴の先頭の値に戻す
+            self%dt = self%dt_old(1)
+
+            ! dt_old配列を左に1つシフト（配列スライスを使用）
+            if (n > 1) then
+                self%dt_old(1:n - 1) = self%dt_old(2:n)
+            end if
+
+            ! 配列の末尾を0で埋める（元の仕様を踏襲）
+            if (n > 0) then
+                self%dt_old(n) = 0.0d0
+            end if
+
+        else
+            ! --- 順方向の更新 ---
+            ! 時間を更新
+            self%time_old = self%time
+            self%time = self%time + self%dt
+
+            ! dt_old配列を右に1つシフト（配列スライスを使用）
+            if (n > 1) then
+                self%dt_old(2:n) = self%dt_old(1:n - 1)
+            end if
+
+            ! 配列の先頭に現在のdtを格納
+            if (n > 0) then
+                self%dt_old(1) = self%dt
+            end if
+        end if
+
+    end subroutine shift_time
 
 end module control_time

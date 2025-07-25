@@ -30,7 +30,8 @@ contains
         real(real64) :: phi1, phi2, phi3
 
         phi1 = 1.0d0 - state%porosity
-        phi2 = state%water_content
+        if (phi2 > state%porosity) phi2 = state%porosity
+        if (phi2 < 0.0d0) phi2 = 0.0d0
         phi3 = 1.0d0 - phi1 - phi2
 
         lambda = calc_thc_3(self%material1, phi1, self%material2, phi2, self%material3, phi3)

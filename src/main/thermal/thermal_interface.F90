@@ -1,5 +1,7 @@
 module main_thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_logger
+    use :: stdlib_strings
     use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d
     use :: module_domain, only:type_domain
     use :: module_properties, only:type_proereties_manager
@@ -7,7 +9,7 @@ module main_thermal
     use :: module_matrix, only:type_crs, operator(*), operator(+)
     use :: module_boundary
     use :: module_solver
-    use :: module_control, only:type_time
+    use :: module_control, only:type_time, type_iteration
     use :: thermal_thermal_assemble
     implicit none
     private
@@ -23,6 +25,7 @@ module main_thermal
         type(type_variable) :: Si
 
         type(type_crs) :: KT_star_0
+        type(type_crs) :: KT_star
         type(type_crs) :: KT_l
         type(type_crs) :: KT_old
         type(type_crs) :: CT_l
@@ -60,16 +63,15 @@ module main_thermal
 
         ! end subroutine Abstract_Update
 
-        subroutine abst_assemble(self, domain, Property, Porosity, dt, step, iter)
-            import :: abst_thermal, int32, real64, type_domain, type_proereties_manager
+        subroutine abst_assemble(self, domain, property, porosity, time, iteration)
+            import :: abst_thermal, type_domain, type_proereties_manager, type_time, type_iteration, real64
             implicit none
             class(abst_thermal), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
-            type(type_proereties_manager), intent(inout) :: Property
-            real(real64), intent(in) :: Porosity(:)
-            real(real64), intent(in) :: dt
-            integer(int32), intent(in) :: step
-            integer(int32), intent(in) :: iter
+            type(type_proereties_manager), intent(inout) :: property
+            real(real64), intent(in) :: porosity(:)
+            type(type_time), intent(in) :: time
+            type(type_iteration), intent(in) :: iteration
 
         end subroutine abst_assemble
     end interface
@@ -92,15 +94,14 @@ module main_thermal
 
         ! end subroutine type_thermal_crs_Update
 
-        module subroutine assemble_type_thermal_crs(self, domain, Property, Porosity, dt, step, iter)
+        module subroutine assemble_type_thermal_crs(self, domain, property, porosity, time, iteration)
             implicit none
             class(type_thermal_crs), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
-            type(type_proereties_manager), intent(inout) :: Property
-            real(real64), intent(in) :: Porosity(:)
-            real(real64), intent(in) :: dt
-            integer(int32), intent(in) :: step
-            integer(int32), intent(in) :: iter
+            type(type_proereties_manager), intent(inout) :: property
+            real(real64), intent(in) :: porosity(:)
+            type(type_time), intent(in) :: time
+            type(type_iteration), intent(in) :: iteration
 
         end subroutine assemble_type_thermal_crs
 

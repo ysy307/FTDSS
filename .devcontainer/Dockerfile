@@ -26,6 +26,7 @@ RUN apt-get update -y && apt-get install -y \
     graphviz \
     linux-tools-common linux-tools-generic \
     libx11-dev libxext-dev libxrender-dev libxt-dev \
+    adwaita-icon-theme-full gnuplot \
     valgrind kcachegrind \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -85,8 +86,8 @@ RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git $HOME/.zpr
     echo 'export PATH=$PATH:/workspaces/FTDSS/fpm' >> ~/.zshrc && \
     echo "ulimit -s unlimited" >> ~/.zshrc && \
     echo 'export LANG=C.UTF-8' >> ~/.zshrc && \
-    echo '[ -f /opt/intel/oneapi/setvars.sh ] && source /opt/intel/oneapi/setvars.sh' >> /root/.zshrc && \
-    echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> /root/.zshrc
+    echo '[ -f /opt/intel/oneapi/setvars.sh ] && source /opt/intel/oneapi/setvars.sh' >> /root/.profile && \
+    echo '[ -f /etc/profile.d/nvhpc.sh ] && source /etc/profile.d/nvhpc.sh' >> /root/.profile
 
 
 # デフォルトのシェルをZshに設定

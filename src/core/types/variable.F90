@@ -45,36 +45,34 @@ contains
     subroutine type_variable_shift(self, reverse)
         class(type_variable), intent(inout) :: self
         logical, intent(in), optional :: reverse
-        integer(int32) :: i
+        logical :: do_reverse
 
-        ! ⏪ reverse オプションが指定され、かつ .true. の場合
+        do_reverse = .false.
         if (present(reverse)) then
-            if (reverse) then
-                ! ステップを1つ巻き戻す
-                self%new(:) = self%pre(:)
+            do_reverse = reverse
+        end if
 
-                if (self%rank > 0) then
-                    self%pre(:) = self%old(:, 1)
-                    ! 履歴を1つ未来へずらす (old(1) <- old(2), old(2) <- old(3), ...)
-                    do i = 1, self%rank - 1
-                        self%old(:, i) = self%old(:, i + 1)
-                    end do
-                    ! 最後の履歴はクリア
-                    self%old(:, self%rank) = 0.0d0
+        if (do_reverse) then
+            if (self%rank > 0) then
+                self%pre(:) = self%old(:, 1)
+                ! 履歴を左にシフト (old(:,1) <--- old(:,2), ...)
+                if (self%rank > 1) then
+                    self%old(:, 1:self%rank - 1) = self%old(:, 2:self%rank)
                 end if
-                return
+                ! 空いた最後の履歴をクリア
+                self%old(:, self%rank) = 0.0d0
+            end if
+
+        else
+            self%pre(:) = self%new(:)
+            if (self%rank > 0) then
+                ! 履歴を右にシフト (old(:,2) <--- old(:,1), ...)
+                if (self%rank > 1) then
+                    self%old(:, 2:self%rank) = self%old(:, 1:self%rank - 1)
+                end if
+                self%old(:, 1) = self%pre(:)
             end if
         end if
-        ! ⏩ 通常の順方向シフトの場合
-        ! 履歴を1つ過去へずらす (old(2) <- old(1), old(3) <- old(2), ...)
-        if (self%rank > 2) then
-            do i = self%rank, 2, -1
-                self%old(:, i) = self%old(:, i - 1)
-            end do
-        end if
-
-        self%old(:, 1) = self%pre(:)
-        self%pre(:) = self%new(:)
 
     end subroutine type_variable_shift
 

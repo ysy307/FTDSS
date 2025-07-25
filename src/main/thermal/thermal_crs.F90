@@ -9,14 +9,14 @@ contains
         type(type_domain), intent(inout) :: domain
 
         integer(int32) :: i
-        integer(int32) :: nNode
+        integer(int32) :: num_nodes
 
         integer(int32) :: ierr
 
         if (allocated(structure)) deallocate (structure)
         allocate (type_thermal_crs :: structure)
 
-        nNode = domain%get_num_nodes()
+        num_nodes = domain%get_num_nodes()
 
         call structure%KT_star_0%initialize(domain)
 
@@ -30,17 +30,28 @@ contains
             structure%CT_old(i) = structure%KT_star_0
         end do
 
-        call allocate_array(structure%FT, nNode)
-        call allocate_array(structure%FT_old, nNode)
-        call allocate_array(structure%PHIT, nNode)
-        call allocate_array(structure%PHIT_old, nNode)
+        call allocate_array(structure%FT, num_nodes)
+        call allocate_array(structure%FT_old, num_nodes)
+        call allocate_array(structure%PHIT, num_nodes)
+        call allocate_array(structure%PHIT_old, num_nodes)
 
-        call structure%T%initialize(nNode, structure%order)
+        call structure%T%initialize(num_nodes, structure%order)
+
+        if (associated(structure%assemble_mass)) nullify (structure%assemble_mass)
+        if (associated(structure%assemble_diffusive)) nullify (structure%assemble_diffusive)
+
+        if (input%basic%solver_settings%parallel_settings%threads%is_parallel) then
+            structure%assemble_mass => Assemble_Mass_Heat_1_Parallel
+            structure%assemble_diffusive => Assemble_Diffusion_Heat_1_Parallel
+        else
+            structure%assemble_mass => Assemble_Mass_Heat_1
+            structure%assemble_diffusive => Assemble_Diffusion_Heat_1
+        end if
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! 線形求解ソルバーの設定
         !---------------------------------------------------------------------------------------------------------------------------
-        structure%solver = create_solver(input, "thermal", structure%KT_star_0, nNode)
+        structure%solver = create_solver(input, "thermal", structure%KT_star_0, num_nodes)
         !---------------------------------------------------------------------------------------------------------------------------
 
     end function construct_type_thermal_crs
@@ -71,60 +82,101 @@ contains
     !                          Temperature=self%T%pre(:), &
     !                          Density=self%DEN)
     ! end subroutine type_thermal_crs_Update
-    module subroutine assemble_type_thermal_crs(self, domain, property, porosity, dt, step, iter)
+
+    module subroutine assemble_type_thermal_crs(self, domain, property, porosity, time, iteration)
         implicit none
+        ! Arguments
         class(type_thermal_crs), intent(inout) :: self
         type(type_domain), intent(inout) :: domain
         type(type_proereties_manager), intent(inout) :: property
         real(real64), intent(in) :: porosity(:)
-        real(real64), intent(in) :: dt
-        integer(int32), intent(in) :: step
-        integer(int32), intent(in) :: iter
+        type(type_time), intent(in) :: time
+        type(type_iteration), intent(in) :: iteration
 
-        ! if (step >= 2) then
-        !     self%CT_old(2)%val(:) = self%CT_old(1)%val(:)
-        !     self%CT_old(1)%val(:) = self%CT_l%val(:)
-        ! end if
+        ! Local variables
+        integer(int32) :: actual_order
+        real(real64) :: dt_n, dt_nm1, dt_nm2
+        real(real64) :: rho1, rho2
+        real(real64) :: coef_c0, coef_c1, coef_c2, coef_c3
+        real(real64) :: coef_k
 
-        self%CT_l%val(:) = 0.0d0
-        self%KT_l%val(:) = 0.0d0
+        ! Initialization
         self%KT_star_0%val(:) = 0.0d0
-        ! ! if (step == 1) then
+        self%PHIT(:) = 0.0d0
+        self%KT_l%val(:) = 0.0d0
+        self%CT_l%val(:) = 0.0d0
 
-        ! ! end if
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! 各剛性行列の組み立て
-        !---------------------------------------------------------------------------------------------------------------------------
-        !!!-----------------------------------------------------------------------
-        ! (A, domain, Temperature, porosity, Propeties)
-        call Assemble_Mass_Heat_1_Parallel(self%CT_l, domain, self%T%new, porosity, property)
-        ! call Assemble_Mass_Heat_1(self%CT_l, domain, self%T%new, porosity, property)
-        !
-        call Assemble_Diffusion_Heat_1_Parallel(self%KT_l, domain, self%T%new, porosity, property)
-        ! call Assemble_Diffusion_Heat_1(self%KT_l, domain, self%T%new, porosity, property)
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! if (step == 1) then
-        self%KT_star_0 = dt * self%KT_l + self%CT_l
+        ! --------------------------------------------------------------------------
+        ! 履歴に基づいて、このステップで使用する実際のBDF次数を決定する
+        ! --------------------------------------------------------------------------
+        actual_order = min(self%order, iteration%step)
+        ! print *, "actual_order = ", actual_order
 
-        !     if (iter == 1) then
-        ! self%CT_old(1)%val(:) = self%CT_l%val(:)
-        !         self%KT_old%val(:) = self%KT_l%val(:)
-        !         self%PHIT(:) = 0.0d0
-        ! self%PHIT_old(:) = -self%CT_old(1) * self%T%old(:, 1)
-        !     end if
-        ! print *, size(self%T%old(:, 1))
-        self%PHIT(:) = self%CT_l * self%T%old(:, 1)
-        ! stop
-        ! self%PHIT(:) = -self%CT_old(1) * self%T%old(:, 1)
-        ! self%PHIT(:) = dt * (self%KT_l * self%T%pre(:)) + self%CT_l * self%T%pre(:) + self%PHIT_old(:)
-        ! else
-        !     self%KT_star_0%val(:) = 2.0d0 * dt * self%KT_l%val(:) + 3.0d0 * self%CT_l%val(:)
-        !     if (iter == 1) then
-        !         self%PHIT_old(:) = -4.0d0 * (self%CT_old(1) * self%T%old(:, 1)) + self%CT_old(2) * self%T%old(:, 2)
-        !     end if
-        !     self%PHIT(:) = 2.0d0 * dt * (self%KT_l * self%T%pre(:)) + 3.0d0 * (self%CT_l * self%T%pre(:)) + self%PHIT_old(:)
-        ! end if
-        ! self%PHIT(:) = self%PHIT_old(:)
+        ! --------------------------------------------------------------------------
+        ! 剛性行列と質量行列を組み立てる
+        ! --------------------------------------------------------------------------
+        call self%assemble_mass(self%CT_l, domain, self%T%pre, porosity, property)
+        call self%assemble_diffusive(self%KT_l, domain, self%T%pre, porosity, property)
+
+        ! --------------------------------------------------------------------------
+        ! 決定されたBDFスキームに基づいて左辺行列(LHS)と右辺ベクトル(RHS)を構築する
+        ! --------------------------------------------------------------------------
+        select case (actual_order)
+        case (1) ! BDF1 (Backward Euler)
+            dt_n = time%dt
+
+            coef_c0 = 1.0d0
+            coef_c1 = 1.0d0
+
+            self%KT_star_0 = coef_c0 * self%CT_l + dt_n * self%KT_l
+            self%PHIT = coef_c1 * (self%CT_l * self%T%old(:, 1))
+
+        case (2) ! BDF2
+            dt_n = time%dt
+            dt_nm1 = time%dt_old(1)
+            rho1 = dt_n / dt_nm1
+
+            ! print *, "rho1 = ", rho1
+            ! print *, "dt_n = ", dt_n, " dt_nm1 = ", dt_nm1
+
+            coef_c0 = (2.0d0 * rho1 + 1.0d0) / (rho1 + 1.0d0)
+            coef_c1 = rho1 + 1.0d0
+            coef_c2 = -rho1**2.0d0 / (rho1 + 1.0d0)
+
+            ! print *, "coef_c0 = ", coef_c0
+            ! print *, "coef_c1 = ", coef_c1
+            ! print *, "coef_c2 = ", coef_c2
+
+            ! print *, self%T%old(1:30, 1)
+            ! print *, "-----------------------------"
+            ! print *, self%T%old(1:30, 2)
+            ! stop
+
+            self%KT_star_0 = coef_c0 * self%CT_l + dt_n * self%KT_l
+            self%PHIT = coef_c1 * (self%CT_l * self%T%old(:, 1)) + &
+                        coef_c2 * (self%CT_l * self%T%old(:, 2))
+
+        case (3)
+            dt_n = time%dt
+            dt_nm1 = time%dt_old(1)
+            dt_nm2 = time%dt_old(2)
+
+            rho1 = dt_n / dt_nm1
+            rho2 = dt_nm1 / dt_nm2
+
+            coef_c0 = (3.0d0 * rho1**2.0d0 * rho2 + 4.0d0 * rho1 * rho2 + 2.0d0 * rho1 + rho2 + 1.0d0) &
+                      / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
+            coef_c1 = (rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
+            coef_c2 = -rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
+            coef_c3 = rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) / ((rho2 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
+
+            self%KT_star_0 = coef_c0 * self%CT_l + dt_n * self%KT_l
+            self%PHIT = coef_c1 * (self%CT_l * self%T%old(:, 1)) + &
+                        coef_c2 * (self%CT_l * self%T%old(:, 2)) + &
+                        coef_c3 * (self%CT_l * self%T%old(:, 3))
+
+        end select
+
     end subroutine assemble_type_thermal_crs
 
 end submodule Main_Thermal_3Phase

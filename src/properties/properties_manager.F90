@@ -202,10 +202,10 @@ contains
         call self%materials%get_den(region_id, local_den)
 
         ! ... 水分量の計算ロジックをここに追加 ...
-        val = -local_wrf%calc(-local_gcc%calc(T=state%temperature, &
-                                              Pw=state%pressure, &
-                                              rhoW=local_den%material2, &
-                                              rhoI=local_den%material3))
+        val = local_wrf%calc(-local_gcc%calc(T=state%temperature, &
+                                             Pw=state%pressure, &
+                                             rhoW=local_den%material2, &
+                                             rhoI=local_den%material3))
     end function calculate_water_content_ptr
 
 end module properties_properties_manager

@@ -8,14 +8,22 @@ set tics font "Times New Roman, 15"
 set key  font "Times New Roman, 15"
 set grid
 
-# Directory variable
-dir = "./test/prj16/6pipe/L008"
+# パスを読み込む
+dir = system("tr -d '\\n' < /workspaces/FTDSS/ProjectPath.dir")
+datafile = dir."/Output/obsf_T.dat"
 
-# Plot commands using the directory variable
-plot dir."/Output/obsf_T.dat" using 1:2 with lines title "Obs1", \
-     dir."/Output/obsf_T.dat" using 1:3 with lines title "Obs2", \
-     dir."/Output/obsf_T.dat" using 1:4 with lines title "Obs3", \
-     dir."/Output/obsf_T.dat" using 1:5 with lines title "Obs4", \
-     dir."/Output/obsf_T.dat" using 1:6 with lines title "Obs5"
+# 実データ行の列数を取得
+col_count = int(system("awk '!/^#/ && NR > 6 {print; exit}' ".datafile." | tr -s '\t ' ' ' | wc -w"))
+print "Detected column count: ", col_count
 
-pause -1
+# プロットコマンド生成
+plotcmd = ""
+do for [i=2:col_count] {
+    if (i > 2) {
+        plotcmd = plotcmd . ", "
+    }
+    plotcmd = plotcmd . sprintf("'%s' using 1:%d with lines title 'Obs%d'", datafile, i, i-1)
+}
+eval("plot ".plotcmd)
+
+pause mouse close
