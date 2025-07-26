@@ -3,11 +3,12 @@
     "dockerFile": "Dockerfile",
     "build": {
         "args": {
+            // Dockerfile内のUSERNAME引数に値を渡す
             "USERNAME": "devuser"
         }
     },
     "mounts": [
-        // ✅ ターゲットパスを /root/ から /home/devuser/ に修正
+        // マウント先は devuser のホームディレクトリを指すようにする
         "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/devuser/.gitconfig,type=bind,consistency=cached",
         "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached"
     ],
@@ -19,7 +20,7 @@
         "-v",
         "/sys/kernel/debug:/sys/kernel/debug"
     ],
-    // ✅ コンテナに接続するユーザーを明示的に指定
+    // コンテナ内で作業するユーザーを明示的に指定
     "remoteUser": "devuser",
     "customizations": {
         "vscode": {
@@ -36,5 +37,8 @@
             ]
         }
     },
-    "postCreateCommand": "sudo apt-get update"
+    // ✅ postCreateCommand を修正
+    // コンテナ作成後にワークスペースフォルダの所有権を devuser に変更する
+    // これにより書き込み権限の問題が解決する
+    "postCreateCommand": "sudo chown -R devuser:devuser /workspaces"
 }
