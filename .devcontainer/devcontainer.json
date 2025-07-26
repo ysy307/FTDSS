@@ -1,9 +1,15 @@
 {
     "name": "FTDSS",
     "dockerFile": "Dockerfile",
+    "build": {
+        "args": {
+            "USERNAME": "devuser"
+        }
+    },
     "mounts": [
-        "source=${localEnv:USERPROFILE}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached",
-        "source=${localWorkspaceFolder}/.fortls,target=/root/.fortls,type=bind,consistency=cached"
+        // ✅ ターゲットパスを /root/ から /home/devuser/ に修正
+        "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/devuser/.gitconfig,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached"
     ],
     "runArgs": [
         "--hostname=ftdss-dev",
@@ -13,6 +19,8 @@
         "-v",
         "/sys/kernel/debug:/sys/kernel/debug"
     ],
+    // ✅ コンテナに接続するユーザーを明示的に指定
+    "remoteUser": "devuser",
     "customizations": {
         "vscode": {
             "extensions": [
