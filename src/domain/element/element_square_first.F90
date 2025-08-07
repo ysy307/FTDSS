@@ -41,7 +41,7 @@ contains
         integer(int32) :: i
 
         if (allocated(element)) deallocate (element)
-        allocate (type_square_second :: element)
+        allocate (type_square_first :: element)
 
         element%id = id
         element%type = cell_info%cell_type
@@ -67,7 +67,7 @@ contains
 
         select case (integration%integration_type)
         case ("full")
-            element%num_gauss = 4
+            element%num_gauss = 4_int32
             call allocate_array(element%weight, element%num_gauss)
             call allocate_array(element%gauss, element%dimension, element%num_gauss)
 
@@ -102,6 +102,28 @@ contains
         element%get_connectivity => get_connectivity
 
     end function construct_square_first
+
+    !----------------------------------------------------------------------!
+    ! get_area_square_first:
+    !----------------------------------------------------------------------!
+    module function get_area_square_first(self) result(area)
+        implicit none
+        class(type_square_first), intent(in) :: self
+        real(real64) :: area
+
+        integer(int32), parameter :: n_gauss_full = 4_int32
+        integer(int32) :: i
+        real(real64) :: weight(n_gauss_full) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
+        real(real64) :: gauss(n_gauss_full, 2) = [[-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)], &
+                                                  [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)], &
+                                                  [sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)], &
+                                                  [sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]]
+
+        area = 0.0d0
+        do i = 1, n_gauss_full
+            area = area + weight(i) * self%jacobian_det(gauss(i, 1), gauss(i, 2))
+        end do
+    end function get_area_square_first
 
     !----------------------------------------------------------------------!
     ! psi_square_first:

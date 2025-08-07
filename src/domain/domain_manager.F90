@@ -26,7 +26,7 @@ module domain_manager
 
         type(type_coloring) :: colors
         type(type_reordering) :: reordering
-
+        type(type_crs_adjacency_element) :: element_adjacency
         integer(int32), private :: computaion_dimension
         ! ...
     contains
@@ -48,7 +48,6 @@ contains
         type(type_dp_3d), intent(inout), pointer :: Coordinate
         integer(int32), intent(inout) :: ierr
 
-        type(type_crs_adjacency_element) :: element_adjacency
         type(type_node_adjacency) :: node_adjacency
 
         integer(int32) :: count_sides, count_elements, count_volumes
@@ -126,7 +125,7 @@ contains
         !===============================================================
         ! 3. 隣接行列の構築
         !===============================================================
-        call element_adjacency%initialize(self%elements)
+        call self%element_adjacency%initialize(self%elements)
 
         !===============================================================
         ! 4. RCM並べ替えの実行
@@ -140,13 +139,10 @@ contains
         !===============================================================
         ! 5. グラフ彩色の実行
         !===============================================================
-        call self%colors%initialize(input%basic%solver_settings%coloring, element_adjacency)
+        call self%colors%initialize(input%basic%solver_settings%coloring, self%element_adjacency)
         call global_logger%log_information(message="Graph coloring completed using " &
                                            //trim(self%colors%algorithm_name)//" algorithm.")
 
-        !===============================================================
-        ! 6. 後片付け
-        !===============================================================
         call global_logger%log_information(message="Initialization process completed successfully.")
 
     end subroutine initialize_type_domain

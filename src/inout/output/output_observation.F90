@@ -337,7 +337,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -371,7 +371,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -404,7 +404,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -455,7 +455,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -504,7 +504,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -540,6 +540,8 @@ contains
                                  self%xi(iObs), self%eta(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
                 state%water_content = properties%get_qw(state, group_id)
+                if (state%water_content > state%porosity) state%water_content = state%porosity
+                if (state%water_content < 0.0d0) state%water_content = 0.0d0
                 obs_values(iObs) = properties%get_thc(state, group_id)
             end do
 
@@ -555,7 +557,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -588,6 +590,8 @@ contains
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
             state%water_content = properties%get_qw(state, group_id)
+            if (state%water_content > state%porosity) state%water_content = state%porosity
+            if (state%water_content < 0.0d0) state%water_content = 0.0d0
             obs_values(iObs) = properties%get_thc(state, group_id)
         end do
 
@@ -602,7 +606,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -639,6 +643,8 @@ contains
                                  self%xi(iObs), self%eta(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
                 state%water_content = properties%get_qw(state, group_id)
+                if (state%water_content > state%porosity) state%water_content = state%porosity
+                if (state%water_content < 0.0d0) state%water_content = 0.0d0
                 obs_values(iObs) = properties%get_vhc(state, group_id)
             end do
 
@@ -653,7 +659,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -686,6 +692,8 @@ contains
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
             state%water_content = properties%get_qw(state, group_id)
+            if (state%water_content > state%porosity) state%water_content = state%porosity
+            if (state%water_content < 0.0d0) state%water_content = 0.0d0
             obs_values(iObs) = properties%get_vhc(state, group_id)
         end do
 
@@ -699,7 +707,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -734,7 +742,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)

@@ -13,7 +13,7 @@ module input_output
     use :: inout_project_settings, only:get_project_path
     use :: module_domain, only:holder_elements, create_element, type_domain, type_reordering, abst_element
     use :: module_control, only:type_time, type_iteration
-    use :: module_properties, only:type_proereties_manager
+    use :: module_properties, only:type_properties_manager
     use :: module_matrix
 
     implicit none
@@ -57,12 +57,12 @@ module input_output
 
         subroutine abst_get_values(self, obs_values, domain, properties, &
                                    nodal_temperature, nodal_porosity, nodal_pw)
-            import :: type_output_observation, type_domain, type_proereties_manager, real64, int32
+            import :: type_output_observation, type_domain, type_properties_manager, real64, int32
             implicit none
             class(type_output_observation), intent(inout) :: self
             real(real64), intent(out) :: obs_values(:)
             type(type_domain), intent(inout), optional :: domain
-            type(type_proereties_manager), intent(inout), optional :: properties
+            type(type_properties_manager), intent(inout), optional :: properties
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_pw(:)
@@ -347,7 +347,7 @@ contains
         class(type_output) :: self
         real(real64), intent(in) :: time
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: propeties
+        type(type_properties_manager), intent(inout), optional :: propeties
         real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: pressure(:)

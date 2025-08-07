@@ -6,7 +6,7 @@ module Main_FTDSS
     use :: module_control, only:type_time, type_iteration, initialize_openmp
     use :: module_output, only:type_output
     use :: module_domain, only:type_domain
-    use :: module_properties, only:type_proereties_manager
+    use :: module_properties, only:type_properties_manager
     use :: module_boundary, only:type_bc
     use :: module_initial, only:type_ic
 
@@ -20,7 +20,7 @@ module Main_FTDSS
         type(type_variable) :: phi
         class(abst_thermal), allocatable :: thermal
 
-        type(type_proereties_manager) :: property
+        type(type_properties_manager) :: property
         type(type_bc) :: bc
         type(type_ic) :: ic
 

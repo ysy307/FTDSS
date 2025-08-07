@@ -77,7 +77,7 @@ contains
             element%num_gauss = 1_int32
             call allocate_array(element%weight, element%num_gauss)
             call allocate_array(element%gauss, element%dimension, element%num_gauss)
-            element%weight(:) = [1.0d0 / 3.0d0]
+            element%weight(:) = [0.5d0]
             element%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
         case ("free")
             call global_logger%log_warning(message="Free-type integration is not implemented for triangles.")
@@ -98,6 +98,26 @@ contains
         element%get_connectivity => get_connectivity
 
     end function construct_triangle_second
+
+    module function get_area_triangle_second(self) result(area)
+        implicit none
+        class(type_triangle_second), intent(in) :: self
+        real(real64) :: area
+        integer(int32), parameter :: n_gauss_full = 3_int32
+        integer(int32) :: i
+
+        real(real64) :: weight(n_gauss_full) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+        real(real64) :: gauss(2, n_gauss_full) = [[1.0d0 / 6.0d0, 1.0d0 / 6.0d0], &
+                                                  [2.0d0 / 3.0d0, 1.0d0 / 6.0d0], &
+                                                  [1.0d0 / 6.0d0, 2.0d0 / 3.0d0]]
+
+        area = 0.0d0
+
+        do i = 1, n_gauss_full
+            area = area + weight(i) * self%jacobian_det(gauss(1, i), gauss(2, i))
+        end do
+
+    end function get_area_triangle_second
 
     !----------------------------------------------------------------------!
     ! psi_triangle_second:

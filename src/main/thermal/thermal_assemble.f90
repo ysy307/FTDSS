@@ -3,7 +3,7 @@ module thermal_thermal_assemble
 !$  use omp_lib
     use :: module_core, only:type_gauss_point_state
     use :: module_domain, only:type_domain, abst_element
-    use :: module_properties, only:type_proereties_manager
+    use :: module_properties, only:type_properties_manager
     use :: module_matrix, only:type_crs
 
     implicit none
@@ -16,13 +16,13 @@ module thermal_thermal_assemble
 
     abstract interface
         subroutine abst_assemble_local(A, domain, temperature, porosity, propeties)
-            import :: type_crs, type_domain, type_proereties_manager, real64
+            import :: type_crs, type_domain, type_properties_manager, real64
             implicit none
             type(type_crs), intent(inout) :: A
             type(type_domain), intent(inout), target :: domain
             real(real64), intent(in) :: temperature(:)
             real(real64), intent(in) :: porosity(:)
-            type(type_proereties_manager), intent(inout) :: propeties
+            type(type_properties_manager), intent(inout) :: propeties
         end subroutine abst_assemble_local
     end interface
 contains
@@ -34,7 +34,7 @@ contains
         class(abst_element), pointer, intent(inout) :: element
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(inout) :: propeties
 
         ! --- ローカル変数 ---
         integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG
@@ -98,7 +98,7 @@ contains
         class(abst_element), pointer, intent(inout) :: element
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(inout) :: propeties
 
         ! --- ローカル変数 ---
         integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, global_il, global_jl
@@ -179,7 +179,7 @@ contains
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(inout) :: propeties
 
         class(abst_element), pointer :: element
 
@@ -205,7 +205,7 @@ contains
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(inout) :: propeties
 
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element
@@ -230,7 +230,7 @@ contains
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(inout) :: propeties
 
         ! --- ローカル変数 ---
         class(abst_element), pointer :: element
@@ -251,7 +251,7 @@ contains
         type(type_domain), intent(inout), target :: domain
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(inout) :: propeties
 
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element

@@ -65,6 +65,7 @@ module domain_element
         procedure, pass(self) :: get_dimension !&
         procedure, pass(self) :: get_num_gauss !&
         !----------------------------------------------------------------------------------
+        procedure(abst_get_area),      pass(self), deferred :: get_area !&
         procedure(abst_psi),           pass(self), deferred :: psi !&
         procedure(abst_dpsi_dxi),      pass(self), deferred :: dpsi_dxi !&
         procedure(abst_dpsi_deta),     pass(self), deferred :: dpsi_deta !&
@@ -78,6 +79,7 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_triangle_first
     contains
+        procedure, pass(self) :: get_area      => get_area_triangle_first !&
         procedure, pass(self) :: psi           => psi_triangle_first !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_triangle_first !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_triangle_first !&
@@ -91,6 +93,7 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_square_first
     contains
+        procedure, pass(self) :: get_area      => get_area_square_first !&
         procedure, pass(self) :: psi           => psi_square_first !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_square_first !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_square_first !&
@@ -104,6 +107,7 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_triangle_second
     contains
+        procedure, pass(self) :: get_area      => get_area_triangle_second !&
         procedure, pass(self) :: psi           => psi_triangle_second !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_triangle_second !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_triangle_second !&
@@ -117,6 +121,7 @@ module domain_element
     !--------------------------------------------------------------------------------------
     type, extends(abst_element) :: type_square_second
     contains
+        procedure, pass(self) :: get_area      => get_area_square_second !&
         procedure, pass(self) :: psi           => psi_square_second !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_square_second !&
         procedure, pass(self) :: dpsi_deta     => dpsi_deta_square_second !&
@@ -137,6 +142,14 @@ module domain_element
             integer(int32) :: connectivity
 
         end function abst_get_connectivity
+
+        function abst_get_area(self) result(area)
+            import :: abst_element, real64
+            implicit none
+            class(abst_element), intent(in) :: self
+            real(real64) :: area
+
+        end function abst_get_area
 
         function abst_psi(self, i, xi, eta) result(psi)
             import :: abst_element, int32, real64
@@ -216,6 +229,13 @@ module domain_element
 
         end function construct_triangle_first
 
+        module function get_area_triangle_first(self) result(area)
+            implicit none
+            class(type_triangle_first), intent(in) :: self
+            real(real64) :: area
+
+        end function get_area_triangle_first
+
         module function psi_triangle_first(self, i, xi, eta) result(N)
             implicit none
             class(type_triangle_first), intent(in) :: self
@@ -283,6 +303,13 @@ module domain_element
             class(abst_element), allocatable :: element
 
         end function construct_square_first
+
+        module function get_area_square_first(self) result(area)
+            implicit none
+            class(type_square_first), intent(in) :: self
+            real(real64) :: area
+
+        end function get_area_square_first
 
         module function psi_square_first(self, i, xi, eta) result(psi)
             implicit none
@@ -352,6 +379,13 @@ module domain_element
 
         end function construct_triangle_second
 
+        module function get_area_triangle_second(self) result(area)
+            implicit none
+            class(type_triangle_second), intent(in) :: self
+            real(real64) :: area
+
+        end function get_area_triangle_second
+
         module function psi_triangle_second(self, i, xi, eta) result(N)
             implicit none
             class(type_triangle_second), intent(in) :: self
@@ -420,6 +454,13 @@ module domain_element
             class(abst_element), allocatable :: element
 
         end function construct_square_second
+
+        module function get_area_square_second(self) result(area)
+            implicit none
+            class(type_square_second), intent(in) :: self
+            real(real64) :: area
+
+        end function get_area_square_second
 
         module function psi_square_second(self, i, xi, eta) result(psi)
             implicit none

@@ -113,6 +113,36 @@ contains
 
     end function construct_square_second
 
+    module function get_area_square_second(self) result(area)
+        implicit none
+        class(type_square_second), intent(in) :: self
+        real(real64) :: area
+
+        integer(int32), parameter :: n_gauss_full = 9_int32
+        integer(int32) :: i
+
+        real(real64) :: weight(n_gauss_full) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                                                25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                                                64.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                                                25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                                                25.0d0 / 81.0d0]
+        real(real64) :: gauss(2, n_gauss_full) = [[-sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)], &
+                                                  [0.0d0, -sqrt(3.0d0 / 5.0d0)], &
+                                                  [sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0)], &
+                                                  [-sqrt(3.0d0 / 5.0d0), 0.0d0], &
+                                                  [0.0d0, 0.0d0], &
+                                                  [sqrt(3.0d0 / 5.0d0), 0.0d0], &
+                                                  [-sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)], &
+                                                  [0.0d0, sqrt(3.0d0 / 5.0d0)], &
+                                                  [sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0)]]
+
+        area = 0.0d0
+        do i = 1, n_gauss_full
+            area = area + weight(i) * self%jacobian_det(gauss(1, i), gauss(2, i))
+        end do
+
+    end function get_area_square_second
+
     !----------------------------------------------------------------------!
     ! psi_square_second:
     !----------------------------------------------------------------------!

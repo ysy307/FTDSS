@@ -96,6 +96,23 @@ contains
 
     end function construct_triangle_first
 
+    module function get_area_triangle_first(self) result(area)
+        implicit none
+        class(type_triangle_first), intent(in) :: self
+        real(real64) :: area
+
+        integer(int32) :: i, n_gauss_full
+        real(real64) :: weight(1) = [0.5d0]
+        real(real64) :: gauss(2, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
+
+        area = 0.0d0
+        n_gauss_full = 1_int32
+
+        do i = 1, n_gauss_full
+            area = area + weight(i) * self%jacobian_det(gauss(1, i), gauss(2, i))
+        end do
+    end function get_area_triangle_first
+
     !----------------------------------------------------------------------!
     ! psi_triangle_first:
     !----------------------------------------------------------------------!

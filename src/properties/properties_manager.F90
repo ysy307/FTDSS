@@ -8,23 +8,23 @@ module properties_properties_manager
 
     implicit none
     private
-    public :: type_proereties_manager
+    public :: type_properties_manager
 
-    type :: type_proereties_manager
+    type :: type_properties_manager
         type(type_material_manager) :: materials
         procedure(abst_get_value), pointer, pass(self) :: get_thc => null()
         procedure(abst_get_value), pointer, pass(self) :: get_vhc => null()
         ! procedure(abst_get_value), pointer, pass(self) :: get_dCa_dT => null()
         procedure(abst_get_value), pointer, pass(self) :: get_qw => null()
     contains
-        procedure, pass(self) :: initialize => type_proereties_manager_initialize
+        procedure, pass(self) :: initialize => type_properties_manager_initialize
     end type
 
     abstract interface
         function abst_get_value(self, state, region_id) result(val)
-            import :: type_proereties_manager, type_gauss_point_state, int32, real64
+            import :: type_properties_manager, type_gauss_point_state, int32, real64
             implicit none
-            class(type_proereties_manager), intent(inout) :: self
+            class(type_properties_manager), intent(inout) :: self
             type(type_gauss_point_state), intent(in) :: state
             integer(int32), intent(in) :: region_id
             real(real64) :: val
@@ -33,9 +33,9 @@ module properties_properties_manager
 
 contains
 
-    subroutine type_proereties_manager_initialize(self, Input, ierr)
+    subroutine type_properties_manager_initialize(self, Input, ierr)
         implicit none
-        class(type_proereties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
         integer(int32), intent(inout) :: ierr
 
@@ -61,11 +61,11 @@ contains
             self%get_qw => calculate_water_content_holder
         end if
 
-    end subroutine type_proereties_manager_initialize
+    end subroutine type_properties_manager_initialize
 
     function calculate_thc_holder(self, state, region_id) result(val)
         implicit none
-        class(type_proereties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(inout) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
@@ -79,7 +79,7 @@ contains
 
     function calculate_thc_ptr(self, state, region_id) result(val)
         implicit none
-        class(type_proereties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(inout) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
@@ -94,7 +94,7 @@ contains
 
     function calculate_heat_capacity_holder(self, state, region_id) result(val)
         implicit none
-        class(type_proereties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(inout) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
@@ -130,7 +130,7 @@ contains
 
     function calculate_heat_capacity_ptr(self, state, region_id) result(val)
         implicit none
-        class(type_proereties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(inout) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
@@ -157,7 +157,7 @@ contains
 
     ! function calculate_dcdt(self, state, region_id) result(dCa_dT)
     !     implicit none
-    !     class(type_proereties_manager), intent(in) :: self
+    !     class(type_properties_manager), intent(in) :: self
     !     type(type_gauss_point_state), intent(in) :: state
     !     integer(int32), intent(in) :: region_id
     !     real(real64) :: dCa_dT
@@ -166,7 +166,7 @@ contains
 
     function calculate_water_content_holder(self, state, region_id) result(val)
         implicit none
-        class(type_proereties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(inout) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
@@ -188,7 +188,7 @@ contains
 
     function calculate_water_content_ptr(self, state, region_id) result(val)
         implicit none
-        class(type_proereties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(inout) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
