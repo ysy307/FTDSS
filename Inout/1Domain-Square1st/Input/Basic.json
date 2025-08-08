@@ -1,87 +1,145 @@
 {
-    "Basic": {
-        "DimensionType": 1,
-        "Region": 1,
-        "Time": {
-            "Calculation": {
-                "Unit": "Second",
-                "Step": 30.0,
-                "StepMinimum": 30.0,
-                "StepMaximum": 30.0
-            },
-            "Input": {
-                "Unit": "Day",
-                "StartCalculation": 0.0,
-                "EndCalculation": 10.0
-            }
-        },
-        "shouldDisplayPrompt": false
+    "simulation_settings": {
+        "title": "1d triangle 1st order",
+        "calculate_type": 1
     },
-    "Region1": {
-        "Belong": {
-            "Surface": [
-                1
-            ],
-            "Edge": [
-                2,
-                3,
-                4,
-                5
-            ]
-        },
-        "CalculationType": 4,
-        "Modelnumber": 31,
-        "isFrozen": true,
-        "Thermal": {
-            "Porosity": 0.3,
-            "LatentHeat": 334560,
-            "Density": [
-                2800,
-                1000,
-                917
-            ],
-            "SpecificHeat": [
-                912,
-                4180,
-                2100
-            ],
-            "ThermalConductivity": [
-                3.78,
-                0.6,
-                2.2
-            ],
-            "ThermalConductivityDispersity": [
-                1.0,
-                0.1
-            ],
-            "Ice": {
-                "Tf": 0.0,
-                "QiceType": 2,
-                "Parameters": {
-                    "Model": 2,
-                    "thetaS": 0.30,
-                    "thetaR": 0.0,
-                    "alpha1": 0.2,
-                    "n1": 1.8
-                },
-                "Unit": "m"
-            }
+    "analysis_controls": {
+        "calculate_thermal": true,
+        "calculate_hydraulic": false,
+        "calculate_mechanical": false,
+        "coupling_mode": "weak"
+    },
+    "geometry_settings": {
+        "file_name": "Geometry_4.vtk",
+        "cell_id_array_name": "CellEntityIds",
+        "integration": {
+            "type": "full",
+            "points": 0.8165
         }
     },
-    "Solver": {
-        "Order": 1,
-        "MaxNonlinearIteration": 100,
-        "Thermal": {
-            "useSolver": 2,
-            "Parameters": {
-                "Solver": 4,
-                "Preconditioner": 1,
-                "MaxIteration": 50000,
-                "Tolerance": 1.0e-15
+    "materials": [
+        {
+            "id": 1,
+            "name": "soil",
+            "phase": 3,
+            "is_frozen": true,
+            "is_dispersed": false,
+            "thermal": {
+                "density": [
+                    2800.0,
+                    1000.0,
+                    917.0
+                ],
+                "specific_heat": [
+                    912.0,
+                    4180.0,
+                    2100.0
+                ],
+                "thermal_conductivity": [
+                    3.78,
+                    0.6,
+                    2.2
+                ],
+                "dispersivity": [
+                    1.0,
+                    0.1
+                ],
+                "phase_change": {
+                    "latent_heat": {
+                        "fusion": 334560.0
+                    },
+                    "freezing_temperature": 0.0,
+                    "unfrozen_water_model": {
+                        "model_number": 2,
+                        "theta_s": 0.30,
+                        "theta_r": 0.0,
+                        "alpha1": 0.2,
+                        "n1": 1.8,
+                        "alpha2": 0.2,
+                        "n2": 1.8,
+                        "h_crit": -10.0,
+                        "w1": 0.4
+                    },
+                    "equilibrium_model": {
+                        "segregation": false,
+                        "unit": "m"
+                    }
+                }
+            },
+            "hydraulic": {
+                "hydraulic_conductivity_model": {
+                    "model_number": 5,
+                    "saturated_conductivity": 1.96e-7
+                },
+                "impedance_factor": 10,
+                "water_retention_model": {
+                    "model_number": 2,
+                    "theta_s": 0.30,
+                    "theta_r": 0.0,
+                    "alpha1": 0.2,
+                    "n1": 1.8,
+                    "alpha2": 0.2,
+                    "n2": 1.8,
+                    "h_crit": -10.0,
+                    "w1": 0.4,
+                    "l": 0.5
+                },
+                "water_viscosity_model": 0
+            }
+        }
+    ],
+    "solver_settings": {
+        "bdf_order": 2,
+        "reordering": "rcm",
+        "coloring": "dsatur",
+        "nonlinear_solver": {
+            "method": "none",
+            "update_frequency": 5,
+            "max_iterations": 100,
+            "convergence": {
+                "use_criteria": "both",
+                "logic_between_criteria": "and",
+                "residual": {
+                    "criteria": "both",
+                    "logic": "or",
+                    "absolute_tolerance": 1.0e-8,
+                    "relative_tolerance": 1.0e-6
+                },
+                "update": {
+                    "criteria": "both",
+                    "logic": "or",
+                    "absolute_tolerance": 1.0e-9,
+                    "relative_tolerance": 1.0e-7
+                }
             }
         },
-        "Hydraulic": {
-            "useSolver": 1
+        "linear_solver": {
+            "thermal": {
+                "method": "direct",
+                "iterative_solver": {
+                    "solver_type": 4,
+                    "preconditioner_type": 1,
+                    "max_iterations": 50000,
+                    "tolerance": 1.0e-10
+                }
+            },
+            "hydraulic": {
+                "method": "direct",
+                "algorithm": {
+                    "solver_type": 4,
+                    "preconditioner_type": 1,
+                    "max_iterations": 50000,
+                    "tolerance": 1.0e-10
+                }
+            }
+        },
+        "parallel_settings": {
+            "threads": {
+                "is_parallel": true,
+                "num_threads": 16,
+                "schedule": "static",
+                "max_active_levels": 1
+            }
         }
     }
 }

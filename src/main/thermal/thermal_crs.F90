@@ -37,10 +37,9 @@ contains
 
         call structure%T%initialize(num_nodes, structure%order)
 
-        call allocate_array(structure%Qw, num_nodes)
-        call allocate_array(structure%D_Qice, num_nodes)
-        call allocate_array(structure%Qice, num_nodes)
-        call allocate_array(structure%Si, num_nodes)
+        call structure%Qw%initialize(num_nodes, structure%order)
+        call structure%Qice%initialize(num_nodes, structure%order)
+        call structure%Si%initialize(num_nodes, structure%order)
 
         if (associated(structure%assemble_mass)) nullify (structure%assemble_mass)
         if (associated(structure%assemble_diffusive)) nullify (structure%assemble_diffusive)
@@ -67,39 +66,104 @@ contains
     module subroutine update_type_thermal_crs(self, domain, property, porosity)
         implicit none
         class(type_thermal_crs), intent(inout) :: self
-        type(type_domain), intent(inout) :: domain
+        type(type_domain), intent(inout), target :: domain
         type(type_properties_manager), intent(inout) :: property
         real(real64), intent(in) :: porosity(:)
 
-        integer(int32) :: i
-        integer(int32) :: group_id
+        ! --- 変数宣言 ---
+        integer(int32) :: i, j, n_nodes
+        integer(int32) :: element_id, group_id, num_elem_nodes
+        integer(int32), pointer :: neighbor_list(:) => null()
 
-        real(real64), allocatable :: original_temperature(:)
-        real(real64), allocatable :: original_porosity(:)
+        real(real64) :: total_weighted_qw, total_weight, weight, temp_qw, element_area
+        real(real64), allocatable :: original_temperature(:), original_porosity(:), temp_Qws(:)
         type(type_gauss_point_state) :: state
 
+        ! --- 初期化 ---
+        n_nodes = domain%get_num_nodes()
+
+        ! --- 前処理：リオーダリング対応と一時配列の確保 ---
+        allocate (temp_Qws(n_nodes))
         if (domain%reordering%get_algorithm_name() == "none") then
             allocate (original_temperature, source=self%T%pre(:))
             allocate (original_porosity, source=porosity)
-
         else
-            allocate (original_temperature, mold=self%T%pre(:))
+            allocate (original_temperature, mold=self%T%pre)
             allocate (original_porosity, mold=porosity)
             call domain%reordering%to_original_value(self%T%pre(:), original_temperature)
             call domain%reordering%to_original_value(porosity, original_porosity)
         end if
 
-        do i = 1, size(original_porosity)
+        ! --- メイン計算ループ (OpenMPによる並列化) ---
+        !$omp parallel do private(j, state, neighbor_list, element_id, group_id, temp_qw, element_area, num_elem_nodes, weight) &
+        !$omp default(shared) schedule(static)
+        do i = 1, n_nodes
+            ! この節点の状態を設定
             state%temperature = original_temperature(i)
             state%porosity = original_porosity(i)
-            group_id = domain%elements(i)%e%get_group()
-            state%water_content = property%get_qw(state, group_id)
-            if (state%water_content > state%porosity) state%water_content = state%porosity
-            if (state%water_content < 0.0d0) state%water_content = 0.0d0
 
+            total_weighted_qw = 0.0d0
+            total_weight = 0.0d0
+
+            ! ★ domainオブジェクトから隣接要素リストへのポインタを取得
+            neighbor_list => domain%map_node_to_element%get_list(i)
+            if (.not. associated(neighbor_list)) cycle
+
+            ! 隣接する全要素でループし、重み付き和を計算
+            do j = 1, size(neighbor_list)
+                element_id = neighbor_list(j)
+
+                ! a) 重みを計算
+                element_area = domain%elements(element_id)%e%get_area()
+                num_elem_nodes = domain%elements(element_id)%e%get_num_nodes()
+                weight = element_area / dble(num_elem_nodes)
+
+                ! b) この要素の物性でQwを計算
+                group_id = domain%elements(element_id)%e%get_group()
+                temp_qw = property%get_qw(state, group_id)
+
+                ! 物理的な範囲に収める
+                if (temp_qw > state%porosity) temp_qw = state%porosity
+                if (temp_qw < 0.0d0) temp_qw = 0.0d0
+
+                ! c) 重み付き和と重みの合計を更新
+                total_weighted_qw = total_weighted_qw + temp_qw * weight
+                total_weight = total_weight + weight
+            end do
+
+            ! 重み付き平均を計算し、一時配列に格納
+            if (total_weight > 1.0d-12) then
+                temp_Qws(i) = total_weighted_qw / total_weight
+            else
+                temp_Qws(i) = 0.0d0
+            end if
         end do
+        !$omp end parallel do
+
+        ! --- 後処理：結果の格納とメモリ解放 ---
+        deallocate (original_temperature, original_porosity)
+
+        call domain%reordering%to_reordered_value(temp_Qws(:), self%Qw%pre)
+        ! end if
+        deallocate (temp_Qws)
+
+        self%Qw%dif(:) = self%Qw%pre(:) - self%Qw%old(:, 1)
+        self%Qice%pre(:) = porosity(:) - self%Qw%pre(:)
+        self%Qice%dif(:) = self%Qice%pre(:) - self%Qice%old(:, 1)
+        self%Si%pre(:) = (porosity(:) - self%Qice%pre(:)) / porosity(:)
 
     end subroutine update_type_thermal_crs
+
+    module subroutine shift_type_thermal_crs(self)
+        implicit none
+        class(type_thermal_crs), intent(inout) :: self
+
+        call self%T%shift()
+        call self%Qw%shift()
+        call self%Qice%shift()
+        call self%Si%shift()
+
+    end subroutine shift_type_thermal_crs
 
     module subroutine assemble_type_thermal_crs(self, domain, property, porosity, time, iteration)
         implicit none

@@ -8,11 +8,12 @@
         }
     },
     "mounts": [
-        // マウント先は devuser のホームディレクトリを指すようにする
+        // .gitconfigと.fortlsをdevuserのホームディレクトリにマウント
         "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/devuser/.gitconfig,type=bind,consistency=cached",
         "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached"
     ],
     "runArgs": [
+        // 権限問題を解決するため、--userの指定はここから削除
         "--hostname=ftdss-dev",
         "--privileged",
         "--cap-add=SYS_ADMIN",
@@ -20,7 +21,7 @@
         "-v",
         "/sys/kernel/debug:/sys/kernel/debug"
     ],
-    // コンテナ内で作業するユーザーを明示的に指定
+    // コンテナ内で作業するユーザーを 'devuser' に指定
     "remoteUser": "devuser",
     "customizations": {
         "vscode": {
@@ -37,8 +38,6 @@
             ]
         }
     },
-    // ✅ postCreateCommand を修正
-    // コンテナ作成後にワークスペースフォルダの所有権を devuser に変更する
-    // これにより書き込み権限の問題が解決する
+    // コンテナ作成後にワークスペースフォルダの所有権を devuser に変更し、書き込み権限を付与
     "postCreateCommand": "sudo chown -R devuser:devuser /workspaces"
 }

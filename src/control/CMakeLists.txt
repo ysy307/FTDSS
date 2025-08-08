@@ -7,5 +7,6 @@ add_library(control OBJECT
 target_link_libraries(control PRIVATE
     Core
     Input
+    Calc
 )
 enable_build_flags(control)

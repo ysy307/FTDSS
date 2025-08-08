@@ -19,10 +19,9 @@ module main_thermal
 
     type, abstract :: abst_thermal
         type(type_variable) :: T
-        real(real64), allocatable :: Qw(:)
-        real(real64), allocatable :: Qice(:)
-        real(real64), allocatable :: D_Qice(:)
-        real(real64), allocatable :: Si(:)
+        type(type_variable) :: Qw
+        type(type_variable) :: Qice
+        type(type_variable) :: Si
 
         type(type_crs) :: KT_star
         type(type_crs) :: KT_l
@@ -46,6 +45,7 @@ module main_thermal
         procedure(abst_assemble_local), pointer, nopass :: assemble_diffusive => null()
     contains
         procedure(abst_update), pass(self), deferred :: update
+        procedure(abst_shift), pass(self), deferred :: shift
         procedure(abst_assemble), pass(self), deferred :: assemble
         procedure(abst_solve), pass(self), deferred :: solve
     end type abst_thermal
@@ -53,6 +53,7 @@ module main_thermal
     type, extends(abst_thermal) :: type_thermal_crs
     contains
         procedure :: update => update_type_thermal_crs
+        procedure :: shift => shift_type_thermal_crs
         procedure :: assemble => assemble_type_thermal_crs
         procedure :: solve => solve_type_thermal_crs
     end type type_thermal_crs
@@ -62,11 +63,18 @@ module main_thermal
             import :: abst_thermal, type_domain, type_properties_manager, real64
             implicit none
             class(abst_thermal), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
+            type(type_domain), intent(inout), target :: domain
             type(type_properties_manager), intent(inout) :: property
             real(real64), intent(in) :: porosity(:)
 
         end subroutine abst_update
+
+        subroutine abst_shift(self)
+            import :: abst_thermal
+            implicit none
+            class(abst_thermal), intent(inout) :: self
+
+        end subroutine abst_shift
 
         subroutine abst_assemble(self, domain, property, porosity, time, iteration)
             import :: abst_thermal, type_domain, type_properties_manager, type_time, type_iteration, real64
@@ -102,11 +110,17 @@ module main_thermal
         module subroutine update_type_thermal_crs(self, domain, property, porosity)
             implicit none
             class(type_thermal_crs), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
+            type(type_domain), intent(inout), target :: domain
             type(type_properties_manager), intent(inout) :: property
             real(real64), intent(in) :: porosity(:)
 
         end subroutine update_type_thermal_crs
+
+        module subroutine shift_type_thermal_crs(self)
+            implicit none
+            class(type_thermal_crs), intent(inout) :: self
+
+        end subroutine shift_type_thermal_crs
 
         module subroutine assemble_type_thermal_crs(self, domain, property, porosity, time, iteration)
             implicit none

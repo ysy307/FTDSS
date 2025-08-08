@@ -119,8 +119,6 @@ contains
                     self%time_conversion = 1.0d0 / 86400.0d0
                 case ("year")
                     self%time_conversion = 1.0d0 / 31557600.0d0
-                case default
-                    call error_message(981, c_opt="output interval time unit")
                 end select
             case ("minute")
                 select case (trim(input%conditions%time_control%simulation_period%unit))
@@ -134,8 +132,6 @@ contains
                     self%time_conversion = 1.0d0 / 1440.0d0
                 case ("year")
                     self%time_conversion = 1.0d0 / 525600.0d0
-                case default
-                    call error_message(981, c_opt="output interval time unit")
                 end select
             case ("hour")
                 select case (trim(input%conditions%time_control%simulation_period%unit))
@@ -149,8 +145,6 @@ contains
                     self%time_conversion = 1.0d0 / 24.0d0
                 case ("year")
                     self%time_conversion = 1.0d0 / 8760.0d0
-                case default
-                    call error_message(981, c_opt="output interval time unit")
                 end select
             case ("day")
                 select case (trim(input%conditions%time_control%simulation_period%unit))
@@ -164,8 +158,6 @@ contains
                     self%time_conversion = 1.0d0
                 case ("year")
                     self%time_conversion = 1.0d0 / 365.0d0
-                case default
-                    call error_message(981, c_opt="output interval time unit")
                 end select
             case ("year")
                 select case (trim(input%conditions%time_control%simulation_period%unit))
@@ -179,11 +171,7 @@ contains
                     self%time_conversion = 365.0d0
                 case ("year")
                     self%time_conversion = 1.0d0
-                case default
-                    call error_message(981, c_opt="output interval time unit")
                 end select
-            case default
-                call error_message(981, c_opt="output interval time unit")
             end select
         end if
 

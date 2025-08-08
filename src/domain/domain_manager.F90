@@ -7,7 +7,7 @@ module domain_manager
     use :: domain_side, only:holder_sides
     use :: domain_element_factory, only:create_element
     use :: domain_side_factory, only:create_side
-    use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element
+    use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element, type_map_node_to_element
     use :: domain_multicoloring, only:type_coloring, type_colored_info
     use :: domain_reordering, only:type_reordering
     implicit none
@@ -27,6 +27,8 @@ module domain_manager
         type(type_coloring) :: colors
         type(type_reordering) :: reordering
         type(type_crs_adjacency_element) :: element_adjacency
+        type(type_map_node_to_element) :: map_node_to_element
+
         integer(int32), private :: computaion_dimension
         ! ...
     contains
@@ -126,6 +128,7 @@ contains
         ! 3. 隣接行列の構築
         !===============================================================
         call self%element_adjacency%initialize(self%elements)
+        call self%map_node_to_element%initialize(self%num_nodes, self%elements, "fast")
 
         !===============================================================
         ! 4. RCM並べ替えの実行

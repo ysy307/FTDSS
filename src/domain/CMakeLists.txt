@@ -11,6 +11,7 @@ add_library(Domain OBJECT
     side/side_factory.F90
     adjacency/adjacency_element.F90
     adjacency/adjacency_node.F90
+    adjacency/adjacency_node_element.F90
     adjacency/adjacency.F90
     multicoloring/multicoloring.F90
     multicoloring/welch_powell.F90

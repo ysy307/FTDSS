@@ -11,12 +11,12 @@ ENV SHELL=/usr/bin/zsh
 
 ARG USERNAME=devuser
 ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+ARG USER_GID=${USER_UID}
 
 # --- 1. 基本パッケージのインストール ---
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
-    wget gnupg lsb-release curl build-essential ca-certificates sudo vim git \
+    wget gnupg htop lsb-release curl build-essential ca-certificates sudo vim git \
     gfortran python3 python3-pip python3-dev zsh sed software-properties-common \
     ninja-build graphviz linux-tools-common linux-tools-generic \
     libx11-dev libxext-dev libxrender-dev libxt-dev \
@@ -55,14 +55,14 @@ RUN pip3 install --upgrade pip && \
     pip3 install --upgrade fprettify fypp ford
 
 # --- 6. 一般ユーザーの作成 ---
-RUN groupadd --gid $USER_GID $USERNAME && \
-    useradd --uid $USER_UID --gid $USER_GID -m -s $SHELL $USERNAME && \
-    echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME && \
-    chmod 0440 /etc/sudoers.d/$USERNAME
+RUN groupadd --gid ${USER_GID} ${USERNAME} && \
+    useradd --uid ${USER_UID} --gid ${USER_GID} -m -s ${SHELL} ${USERNAME} && \
+    echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} && \
+    chmod 0440 /etc/sudoers.d/${USERNAME}
 
 # --- 7. ZshとPreztoの設定（devuserで実行）---
-USER $USERNAME
-WORKDIR /home/$USERNAME
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
 
 RUN git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto" && \
     git clone --recurse https://github.com/belak/prezto-contrib "${ZDOTDIR:-$HOME}/.zprezto/contrib"
@@ -92,8 +92,8 @@ RUN echo 'export PS1="%~ %# "' >> .zshrc && \
 
 # --- 8. 所有権の修正（重要）---
 USER root
-RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
-USER $USERNAME
+RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
+USER ${USERNAME}
 
 # --- 9. コンテナ起動時のデフォルトコマンド ---
 CMD ["/usr/bin/zsh"]

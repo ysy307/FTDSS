@@ -8,6 +8,7 @@ program test
     real(real64) :: norm_old, norm_new
     integer(int32) :: stat, count
     integer(int32) :: i, j
+    character(256) :: out_char
 
     call FTDSS%initialize()
     if (was_interrupted()) stop
@@ -18,8 +19,9 @@ program test
                             b=FTDSS%Thermal%T%new, &
                             Domain=FTDSS%Domain, &
                             mode=-1)
+    call FTDSS%Thermal%shift()
+    call FTDSS%Thermal%update(FTDSS%domain, FTDSS%property, FTDSS%phi%pre)
 
-    call FTDSS%Thermal%T%Shift()
     count = 0
     call FTDSS%time%profile_stop("Setup")
 
@@ -28,7 +30,7 @@ program test
                                     domain=FTDSS%Domain, &
                                     porosity=FTDSS%phi%pre, &
                                     temperature=FTDSS%Thermal%T%pre, &
-                                    si=FTDSS%Thermal%Qice%pre)
+                                    si=FTDSS%Thermal%Si%pre)
     call FTDSS%output%output_history(time=0.0d0, &
                                      temperature=FTDSS%Thermal%T%pre, &
                                      porosity=FTDSS%phi%pre, &
@@ -53,7 +55,7 @@ program test
             call FTDSS%time%profile_start("Setup")
             call FTDSS%BC%apply_CRS(boundary_target='thermal', &
                                     current_time=FTDSS%time%get_time(), &
-                                    A=FTDSS%Thermal%KT_star_0, &
+                                    A=FTDSS%Thermal%KT_star, &
                                     b=FTDSS%Thermal%PHIT, &
                                     Domain=FTDSS%Domain, &
                                     mode=1)
@@ -115,10 +117,19 @@ program test
         !     FTDSS%time%dt = FTDSS%time%dt * 0.5d0
         !     call FTDSS%Thermal%T%Shift(reverse=.true.)
         ! end if
+        call FTDSS%time%profile_start("Setup")
+        call FTDSS%Thermal%update(FTDSS%domain, FTDSS%property, FTDSS%phi%pre)
+        call FTDSS%time%profile_stop("Setup")
 
-        print *, "Time:", FTDSS%time%get_time(), &
-            "Iter:", FTDSS%iteration%get_iter(), &
-            "Step:", FTDSS%iteration%get_step()
+        write (out_char, "(A, F10.6, A, I4, A, I3)") &
+            'Time: ', FTDSS%time%get_time(), &
+            ' Iter: ', FTDSS%iteration%get_iter(), &
+            ' Step: ', FTDSS%iteration%get_step()
+
+        ! "Time:", FTDSS%time%get_time(), &
+        !     "Iter:", FTDSS%iteration%get_iter(), &
+        !     "Step:", FTDSS%iteration%get_step()
+        call global_logger%log_information(message=trim(out_char))
 
         call FTDSS%time%profile_start("IO")
         call FTDSS%output%output_history(time=FTDSS%time%get_time(), &
@@ -127,7 +138,7 @@ program test
                                          Propeties=FTDSS%Property, &
                                          Domain=FTDSS%Domain)
         ! print *, mod(FTDSS%iteration%step, 100)
-        if (mod(FTDSS%iteration%get_step(), 10) == 0) then
+        if (mod(FTDSS%iteration%get_iter(), 10) == 0) then
             count = count + 1
             call FTDSS%output%output_fields(file_counts=count, &
                                             domain=FTDSS%Domain, &
@@ -137,7 +148,7 @@ program test
         end if
         call FTDSS%time%profile_stop("IO")
 
-        call FTDSS%Thermal%T%Shift()
+        call FTDSS%Thermal%shift()
 
         if (was_interrupted()) stop
 
@@ -145,7 +156,7 @@ program test
 
     call FTDSS%time%profile_stop("Total")
     call FTDSS%time%record("End")
-    call FTDSS%output%output_system_log(FTDSS%time, FTDSS%Thermal%KT_star_0, FTDSS%Domain)
+    call FTDSS%output%output_system_log(FTDSS%time, FTDSS%Thermal%KT_star, FTDSS%Domain)
 
     stop
 

@@ -10,7 +10,7 @@ module Main_FTDSS
     use :: module_boundary, only:type_bc
     use :: module_initial, only:type_ic
 
-    use :: Main_thermal
+    use :: module_thermal
     implicit none
 
     type :: type_ftdss
