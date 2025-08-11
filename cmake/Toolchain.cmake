@@ -141,9 +141,20 @@ function(enable_build_flags target)
         endif()
     endif()
 
-    # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    # ★★★         MKLとOpenMPのリンク競合を解決             ★★★
-    # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    # ================================
+    # ifx (IntelLLVM) 最適化レポート出力設定
+    # ================================
+    if(CMAKE_Fortran_COMPILER_ID MATCHES "IntelLLVM")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/opt_reports")
+        target_compile_options(${target} PUBLIC
+            $<$<COMPILE_LANGUAGE:Fortran>:
+                -qopt-report=3
+                -qopt-report-phase=loop,vec,par
+                -qopt-report-file=${CMAKE_BINARY_DIR}/opt_reports/${target}-$<CONFIG>.optrpt
+            >
+        )
+        message(STATUS "ifx optimization report enabled for target ${target}")
+    endif()
 
     # OpenMPのコンパイル定義は、MKLの有無に関わらず設定する
     if(ENABLE_OPENMP)

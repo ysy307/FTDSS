@@ -38,12 +38,12 @@ contains
 
         ! --- ローカル変数 ---
         integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG
-        real(real64) :: val, xi, eta, weight, detJ, Ca
+        real(real64) :: val, xi, eta, weight, detJ
         type(type_gauss_point_state) :: state
 
         ! 並列版のコードに合わせて、事前補間用の配列をローカルに用意
-        integer(int32), parameter :: MaxGauss = 10
-        real(real64) :: interp_temp(MaxGauss), interp_poro(MaxGauss)
+        integer(int32), parameter :: max_gauss = 10
+        real(real64) :: Ca(max_gauss)
 
         state%pressure = 101325.0d0
         state%water_content = 0.0d0
@@ -53,12 +53,14 @@ contains
         num_gauss = element%get_num_gauss()
 
         ! 積分点での物理量を事前に補間
-        !$omp simd
+        !$omp simd private(state)
         do iG = 1, num_gauss
             xi = element%gauss(1, iG)
             eta = element%gauss(2, iG)
-            interp_temp(iG) = element%interpolate(xi, eta, temperature)
-            interp_poro(iG) = element%interpolate(xi, eta, porosity)
+            state%temperature = element%interpolate(xi, eta, temperature)
+            state%porosity = element%interpolate(xi, eta, porosity)
+            state%water_content = propeties%get_qw(state, i_material)
+            Ca(iG) = propeties%get_vhc(state, i_material)
         end do
 
         ! 要素行列の計算とアセンブル
@@ -74,13 +76,9 @@ contains
                     weight = element%weight(iG)
                     detJ = element%jacobian_det(xi, eta)
 
-                    state%temperature = interp_temp(iG)
-                    state%porosity = interp_poro(iG)
-                    state%water_content = propeties%get_qw(state, i_material)
-                    Ca = propeties%get_vhc(state, i_material)
                     val = val + (element%psi(il, xi, eta) * &
                                  element%psi(jl, xi, eta) * &
-                                 detJ * weight * Ca)
+                                 detJ * weight * Ca(iG))
                 end do
 
                 ! 全体行列へのアセンブル
@@ -108,8 +106,9 @@ contains
         type(type_gauss_point_state) :: state
 
         ! 並列版のコードに合わせて、事前補間用の配列をローカルに用意
-        integer(int32), parameter :: MaxGauss = 10
-        real(real64) :: interp_temp(MaxGauss), interp_poro(MaxGauss)
+        integer(int32), parameter :: max_gauss = 10
+        real(real64) :: lambda(max_gauss)
+        real(real64) :: interp_temp(max_gauss), interp_poro(max_gauss)
 
         state%pressure = 101325.0d0
         state%water_content = 0.0d0
@@ -123,8 +122,10 @@ contains
         do iG = 1, num_gauss
             xi = element%gauss(1, iG)
             eta = element%gauss(2, iG)
-            interp_temp(iG) = element%interpolate(xi, eta, temperature)
-            interp_poro(iG) = element%interpolate(xi, eta, porosity)
+            state%temperature = element%interpolate(xi, eta, temperature)
+            state%porosity = element%interpolate(xi, eta, porosity)
+            state%water_content = propeties%get_qw(state, i_material)
+            lambda(iG) = propeties%get_thc(state, i_material)
         end do
 
         ! 要素行列の計算とアセンブル
@@ -156,14 +157,9 @@ contains
                               element%dpsi_dxi(jl, xi, eta) + &
                               element%jacobian(1, 1, xi, eta) * &
                               element%dpsi_deta(jl, xi, eta)) / detJ
-                    ! 状態の計算
-                    state%temperature = interp_temp(iG)
-                    state%porosity = interp_poro(iG)
-                    state%water_content = propeties%get_qw(state, i_material)
-                    ! 熱伝導率の取得
-                    lambda_gp = propeties%get_thc(state, i_material)
+
                     ! 行列要素の計算
-                    val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda_gp * weight * detJ
+                    val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda(iG) * weight * detJ
                 end do
                 ! 全体行列へのアセンブル
                 call A%find(element%get_connectivity(il), element%get_connectivity(jl), index)

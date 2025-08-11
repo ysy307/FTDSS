@@ -10,7 +10,7 @@
         "coupling_mode": "weak"
     },
     "geometry_settings": {
-        "file_name": "Geometry_1.vtk",
+        "file_name": "Geometry_4.vtk",
         "cell_id_array_name": "CellEntityIds",
         "integration": {
             "type": "full",
@@ -51,7 +51,7 @@
                     "freezing_temperature": 0.0,
                     "unfrozen_water_model": {
                         "model_number": 2,
-                        "theta_s": 0.30,
+                        "theta_s": 0.3,
                         "theta_r": 0.0,
                         "alpha1": 0.2,
                         "n1": 1.8,
@@ -69,12 +69,12 @@
             "hydraulic": {
                 "hydraulic_conductivity_model": {
                     "model_number": 5,
-                    "saturated_conductivity": 1.96e-7
+                    "saturated_conductivity": 1.96e-07
                 },
                 "impedance_factor": 10,
                 "water_retention_model": {
                     "model_number": 2,
-                    "theta_s": 0.30,
+                    "theta_s": 0.3,
                     "theta_r": 0.0,
                     "alpha1": 0.2,
                     "n1": 1.8,
@@ -102,14 +102,14 @@
                 "residual": {
                     "criteria": "both",
                     "logic": "or",
-                    "absolute_tolerance": 1.0e-8,
-                    "relative_tolerance": 1.0e-6
+                    "absolute_tolerance": 1e-08,
+                    "relative_tolerance": 1e-06
                 },
                 "update": {
                     "criteria": "both",
                     "logic": "or",
-                    "absolute_tolerance": 1.0e-9,
-                    "relative_tolerance": 1.0e-7
+                    "absolute_tolerance": 1e-09,
+                    "relative_tolerance": 1e-07
                 }
             }
         },
@@ -120,7 +120,7 @@
                     "solver_type": 4,
                     "preconditioner_type": 1,
                     "max_iterations": 50000,
-                    "tolerance": 1.0e-10
+                    "tolerance": 1e-10
                 }
             },
             "hydraulic": {
@@ -129,14 +129,14 @@
                     "solver_type": 4,
                     "preconditioner_type": 1,
                     "max_iterations": 50000,
-                    "tolerance": 1.0e-10
+                    "tolerance": 1e-10
                 }
             }
         },
         "parallel_settings": {
             "threads": {
                 "is_parallel": true,
-                "num_threads": 8,
+                "num_threads": 2,
                 "schedule": "static",
                 "max_active_levels": 1
             }
