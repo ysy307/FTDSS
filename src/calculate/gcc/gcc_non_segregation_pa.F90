@@ -19,53 +19,53 @@ contains
 
     end function type_GCC_NonSeg_Pa_Construct
 
-    module function Calc_GCC_NonSeg_Pa(self, T, Pw, rhoW, rhoI) result(Suction)
+    module function Calc_GCC_NonSeg_Pa(self, T, Pw, rhoW, rhoI) result(suction)
         implicit none
         class(type_gcc_non_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in), optional :: Pw
         real(real64), intent(in), optional :: rhoW
         real(real64), intent(in), optional :: rhoI
-        real(real64) :: Suction
+        real(real64) :: suction
 
         if (T <= self%Tf) then
-            Suction = -self%Lf * rhoW * log((T + self%TtoK) / (self%Tf + self%TtoK))
+            suction = -self%Lf * rhoW * log((T + self%TtoK) / (self%Tf + self%TtoK))
         else
-            Suction = 0.0d0
+            suction = 0.0d0
         end if
 
     end function Calc_GCC_NonSeg_Pa
 
-    module function Calc_GCC_NonSeg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
+    module function Calc_GCC_NonSeg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(suction_derivative)
         implicit none
         class(type_gcc_non_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in), optional :: Pw
         real(real64), intent(in), optional :: rhoW
         real(real64), intent(in), optional :: rhoI
-        real(real64) :: Suction_Derivative
+        real(real64) :: suction_derivative
 
         if (T <= self%Tf) then
-            Suction_Derivative = -self%Lf * rhoW / (T + self%TtoK)
+            suction_derivative = -self%Lf * rhoW / (T + self%TtoK)
         else
-            Suction_Derivative = 0.0d0
+            suction_derivative = 0.0d0
         end if
 
     end function Calc_GCC_NonSeg_Pa_Derivative
 
-    module function Calc_GCC_NonSeg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
+    module function Calc_GCC_NonSeg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(suction_derivative)
         implicit none
         class(type_gcc_non_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
         real(real64), intent(in), optional :: Pw
         real(real64), intent(in), optional :: rhoW
         real(real64), intent(in), optional :: rhoI
-        real(real64) :: Suction_Derivative
+        real(real64) :: suction_derivative
 
         if (T <= self%Tf) then
-            Suction_Derivative = self%Lf * rhoW / (T + self%TtoK)**2.0d0
+            suction_derivative = self%Lf * rhoW / (T + self%TtoK)**2.0d0
         else
-            Suction_Derivative = 0.0d0
+            suction_derivative = 0.0d0
         end if
 
     end function Calc_GCC_NonSeg_Pa_Derivative_2nd

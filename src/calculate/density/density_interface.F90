@@ -25,14 +25,14 @@ module calculate_density
         real(real64) :: material3 !! ice
         real(real64) :: material4 !! gas
     contains
-        procedure(abst_calc_den_gauss_point), pass(self), deferred :: Calc_GaussPoint
+        procedure(abst_calc_den_gauss_point), pass(self), deferred :: calc
     end type abst_den
 
     ! --- 3相モデルの具象クラス ---
     type, extends(abst_den) :: type_den_3phase
     contains
         ! Calcの具体的な実装としてcalc_den_3_Wrapをバインドする
-        procedure :: Calc_GaussPoint => calc_den_gauss_point_3phase
+        procedure :: calc => calc_den_gauss_point_3phase
     end type type_den_3phase
 
     ! ----------------------------------------------------------------

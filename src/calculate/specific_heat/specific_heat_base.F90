@@ -16,21 +16,21 @@ contains
 
     end subroutine initialize_holder_sphs
 
-    module function calc_sph_3(SpecificHeat_soil, phi_soil, &
-                               SpecificHeat_water, phi_water, &
-                               SpecificHeat_ice, phi_ice) result(SpecificHeat)
+    module function calc_sph_3(specific_heat_soil, phi_soil, &
+                               specific_heat_water, phi_water, &
+                               specific_heat_ice, phi_ice) result(specific_heat)
         implicit none
-        real(real64), intent(in) :: SpecificHeat_soil
+        real(real64), intent(in) :: specific_heat_soil
         real(real64), intent(in) :: phi_soil
-        real(real64), intent(in) :: SpecificHeat_water
+        real(real64), intent(in) :: specific_heat_water
         real(real64), intent(in) :: phi_water
-        real(real64), intent(in) :: SpecificHeat_ice
+        real(real64), intent(in) :: specific_heat_ice
         real(real64), intent(in) :: phi_ice
-        real(real64) :: SpecificHeat
+        real(real64) :: specific_heat
 
-        SpecificHeat = SpecificHeat_soil * phi_soil &
-                       + SpecificHeat_water * phi_water &
-                       + SpecificHeat_ice * phi_ice
+        specific_heat = specific_heat_soil * phi_soil &
+                        + specific_heat_water * phi_water &
+                        + specific_heat_ice * phi_ice
 
     end function calc_sph_3
 end submodule calc_sph_base

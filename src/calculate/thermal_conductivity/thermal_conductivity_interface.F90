@@ -24,13 +24,13 @@ module calculate_thermal_conductivity
         real(real64) :: material4 !! like a gas
         real(real64), allocatable :: dispersity(:)
     contains
-        procedure(abst_calc_thc_gauss_point), pass(self), deferred :: calc_gauss_point !&
+        procedure(abst_calc_thc_gauss_point), pass(self), deferred :: calc !&
     end type abst_thc
 
     !--------------------------------------------------------------------------------
     type, extends(abst_thc) :: type_thc_3phase
     contains
-        procedure, pass(self) :: calc_gauss_point => calc_thc_gauss_point_3phase !&
+        procedure, pass(self) :: calc => calc_thc_gauss_point_3phase !&
     end type type_thc_3phase
 
     abstract interface

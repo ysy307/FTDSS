@@ -1,136 +1,108 @@
 module properties_properties_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_gauss_point_state
-    use :: module_input
-    use :: module_calculate, only:holder_gccs, holder_wrfs, holder_dens, holder_vhcs, holder_thcs, & !&
-                                        abst_gcc, abst_wrf, abst_den, abst_vhc, abst_thc
-    use :: Properties_material_Manager, only:type_material_manager
+    use :: module_input, only:type_input
+    use :: module_calculate, only:abst_gcc, abst_wrf, abst_den, abst_vhc, abst_thc
+    use :: properties_material_manager, only:type_material_manager
 
     implicit none
     private
     public :: type_properties_manager
 
-    type :: type_properties_manager
-        type(type_material_manager) :: materials
-        procedure(abst_get_value), pointer, pass(self) :: get_thc => null()
-        procedure(abst_get_value), pointer, pass(self) :: get_vhc => null()
-        ! procedure(abst_get_value), pointer, pass(self) :: get_dCa_dT => null()
-        procedure(abst_get_value), pointer, pass(self) :: get_qw => null()
-    contains
-        procedure, pass(self) :: initialize => type_properties_manager_initialize
-    end type
+#ifdef USE_DEBUG
+    logical, parameter, private :: debug_mode = .true.
+#else
+    logical, parameter, private :: debug_mode = .false.
+#endif
 
-    abstract interface
-        function abst_get_value(self, state, region_id) result(val)
-            import :: type_properties_manager, type_gauss_point_state, int32, real64
-            implicit none
-            class(type_properties_manager), intent(inout) :: self
-            type(type_gauss_point_state), intent(in) :: state
-            integer(int32), intent(in) :: region_id
-            real(real64) :: val
-        end function abst_get_value
-    end interface
+    !====================================================================
+    ! Main Derived Type with Generic Type-Bound Procedures
+    !====================================================================
+    type :: type_properties_manager
+        private
+        type(type_material_manager) :: materials
+    contains
+        procedure, public :: initialize => initialize_properties_manager
+
+        procedure, private :: calculate_thc_scalar
+        procedure, private :: calculate_thc_array
+        generic, public :: get_thc => calculate_thc_scalar, calculate_thc_array
+
+        procedure, private :: calculate_heat_capacity_scalar
+        procedure, private :: calculate_heat_capacity_array
+        generic, public :: get_vhc => calculate_heat_capacity_scalar, calculate_heat_capacity_array
+
+        procedure, private :: calculate_water_content_scalar
+        procedure, private :: calculate_water_content_array
+        generic, public :: get_qw => calculate_water_content_scalar, calculate_water_content_array
+    end type type_properties_manager
 
 contains
 
-    subroutine type_properties_manager_initialize(self, Input, ierr)
+    !====================================================================
+    ! Initialization (simplified)
+    !====================================================================
+    subroutine initialize_properties_manager(self, input, ierr)
         implicit none
         class(type_properties_manager), intent(inout) :: self
-        type(Type_Input), intent(in) :: Input
+        type(type_input), intent(in) :: input
         integer(int32), intent(inout) :: ierr
 
-        logical :: is_ptr = .true.
-
-        ! Initialize the materials manager
-        call self%materials%initialize(Input, ierr)
-
+        ! ポインタ設定が不要になり、下位モジュールの初期化のみで完了
+        call self%materials%initialize(input, ierr)
         if (ierr /= 0) then
-            print *, "Error initializing materials manager."
-            return
+            print *, "Error: Failed to initialize materials manager."
         end if
+    end subroutine initialize_properties_manager
 
-        if (is_ptr) then
-            self%get_thc => calculate_thc_ptr
-            self%get_vhc => calculate_heat_capacity_ptr
-            ! self%get_dCa_dT => calculate_dcdt_ptr
-            self%get_qw => calculate_water_content_ptr
-        else
-            self%get_thc => calculate_thc_holder
-            self%get_vhc => calculate_heat_capacity_holder
-            ! self%get_dCa_dT => calculate_dcdt_holder
-            self%get_qw => calculate_water_content_holder
-        end if
-
-    end subroutine type_properties_manager_initialize
-
-    function calculate_thc_holder(self, state, region_id) result(val)
+    !====================================================================
+    ! Thermal Conductivity (THC) Implementation
+    !====================================================================
+    function calculate_thc_scalar(self, state, region_id) result(val)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
-        type(type_gauss_point_state), intent(in) :: state
-        integer(int32), intent(in) :: region_id
-        real(real64) :: val
-
-        type(holder_thcs) :: holder_thc
-
-        call self%materials%get_THC(region_id, holder_thc)
-        val = holder_thc%p%calc_gauss_point(state)
-
-    end function calculate_thc_holder
-
-    function calculate_thc_ptr(self, state, region_id) result(val)
-        implicit none
-        class(type_properties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(in) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
 
         class(abst_thc), pointer :: local_thc
 
-        call self%materials%get_THC(region_id, local_thc)
+        call self%materials%get_thc(region_id, local_thc)
 
-        val = local_thc%calc_gauss_point(state)
+        if (debug_mode) then
+            if (.not. associated(local_thc)) stop "Error: Failed to get thc pointer in calculate_thc_scalar."
+        end if
 
-    end function calculate_thc_ptr
+        val = local_thc%calc(state)
+    end function calculate_thc_scalar
 
-    function calculate_heat_capacity_holder(self, state, region_id) result(val)
+    function calculate_thc_array(self, state, region_id) result(val)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        class(type_properties_manager), intent(in) :: self
+        type(type_gauss_point_state), intent(in) :: state(:)
         integer(int32), intent(in) :: region_id
-        real(real64) :: val
+        real(real64) :: val(size(state))
 
-        real(real64) :: Lf, dQi_dT
+        integer :: i
+        class(abst_thc), pointer :: local_thc
 
-        type(holder_vhcs) :: holder_vhc
-        type(holder_gccs) :: holder_gcc
-        type(holder_dens) :: holder_den
-        type(holder_wrfs) :: holder_wrf
+        call self%materials%get_thc(region_id, local_thc)
 
-        call self%materials%get_vhc(region_id, holder_vhc)
-        call self%materials%get_den(region_id, holder_den)
-        call self%materials%get_gcc(region_id, holder_gcc)
-        call self%materials%get_wrf(region_id, holder_wrf)
+        if (debug_mode) then
+            if (.not. associated(local_thc)) stop "Error: Failed to get thc pointer in calculate_thc_array."
+        end if
 
-        Lf = holder_gcc%p%Lf
-        dQi_dT = holder_wrf%p%deriv(-holder_gcc%p%calc(T=state%temperature, &
-                                                       Pw=state%pressure, &
-                                                       rhoW=holder_den%p%material2, &
-                                                       rhoI=holder_den%p%material3)) &
-                 * holder_gcc%p%deriv(T=state%temperature, &
-                                      Pw=state%pressure, &
-                                      rhoW=holder_den%p%material2, &
-                                      rhoI=holder_den%p%material3)
+        do i = 1, size(state)
+            val(i) = local_thc%calc(state(i))
+        end do
+    end function calculate_thc_array
 
-        val = holder_vhc%p%calc_gauss_point_holder(state=state, &
-                                                   DEN=holder_den, &
-                                                   LatentHeat=Lf, &
-                                                   dQi_dT=dQi_dT)
-
-    end function calculate_heat_capacity_holder
-
-    function calculate_heat_capacity_ptr(self, state, region_id) result(val)
+    !====================================================================
+    ! Volumetric Heat Capacity (VHC) Implementation
+    !====================================================================
+    function calculate_heat_capacity_scalar(self, state, region_id) result(val)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(in) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
@@ -145,50 +117,64 @@ contains
         call self%materials%get_den(region_id, local_den)
         call self%materials%get_vhc(region_id, local_vhc)
 
-        val = local_vhc%calc_gauss_point_ptr(state=state, &
-                                             DEN=local_den, &
-                                             LatentHeat=local_gcc%Lf, &
-                                             dQi_dT=local_wrf%deriv(-local_gcc%calc(T=state%temperature, &
-                                                                                    Pw=state%pressure, &
-                                                                                    rhoW=local_den%material2, &
-                                                                                    rhoI=local_den%material3)))
+        if (debug_mode) then
+            if (.not. (associated(local_gcc) .and. associated(local_wrf) .and. &
+                       associated(local_den) .and. associated(local_vhc))) then
+                stop "Error: Failed to get pointers in calculate_heat_capacity_scalar."
+            end if
+        end if
 
-    end function calculate_heat_capacity_ptr
+        val = local_vhc%calc(state=state, &
+                             den=local_den, &
+                             latentheat=local_gcc%lf, &
+                             dqi_dt=local_wrf%deriv(-local_gcc%calc(t=state%temperature, &
+                                                                    pw=state%pressure, &
+                                                                    rhow=local_den%material2, &
+                                                                    rhoi=local_den%material3)))
+    end function calculate_heat_capacity_scalar
 
-    ! function calculate_dcdt(self, state, region_id) result(dCa_dT)
-    !     implicit none
-    !     class(type_properties_manager), intent(in) :: self
-    !     type(type_gauss_point_state), intent(in) :: state
-    !     integer(int32), intent(in) :: region_id
-    !     real(real64) :: dCa_dT
-    !     ! ... 熱容量の温度微分を計算 ...
-    ! end function
-
-    function calculate_water_content_holder(self, state, region_id) result(val)
+    function calculate_heat_capacity_array(self, state, region_id) result(val)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        class(type_properties_manager), intent(in) :: self
+        type(type_gauss_point_state), intent(in) :: state(:)
         integer(int32), intent(in) :: region_id
-        real(real64) :: val
+        real(real64) :: val(size(state))
 
-        type(holder_gccs) :: holder_gcc
-        type(holder_wrfs) :: holder_wrf
-        type(holder_dens) :: holder_den
+        integer :: i
+        class(abst_gcc), pointer :: local_gcc
+        class(abst_wrf), pointer :: local_wrf
+        class(abst_den), pointer :: local_den
+        class(abst_vhc), pointer :: local_vhc
 
-        call self%materials%get_gcc(region_id, holder_gcc)
-        call self%materials%get_wrf(region_id, holder_wrf)
-        call self%materials%get_den(region_id, holder_den)
+        call self%materials%get_gcc(region_id, local_gcc)
+        call self%materials%get_wrf(region_id, local_wrf)
+        call self%materials%get_den(region_id, local_den)
+        call self%materials%get_vhc(region_id, local_vhc)
 
-        ! ... 水分量の計算ロジックをここに追加 ...
-        val = holder_wrf%p%calc(-holder_gcc%p%calc(T=state%temperature, &
-                                                   Pw=state%pressure, &
-                                                   rhoW=holder_den%p%material2, &
-                                                   rhoI=holder_den%p%material3))
-    end function calculate_water_content_holder
+        if (debug_mode) then
+            if (.not. (associated(local_gcc) .and. associated(local_wrf) .and. &
+                       associated(local_den) .and. associated(local_vhc))) then
+                stop "Error: Failed to get pointers in calculate_heat_capacity_array."
+            end if
+        end if
 
-    function calculate_water_content_ptr(self, state, region_id) result(val)
+        do i = 1, size(state)
+            val(i) = local_vhc%calc(state=state(i), &
+                                    den=local_den, &
+                                    latentheat=local_gcc%lf, &
+                                    dqi_dt=local_wrf%deriv(-local_gcc%calc(t=state(i)%temperature, &
+                                                                           pw=state(i)%pressure, &
+                                                                           rhow=local_den%material2, &
+                                                                           rhoi=local_den%material3)))
+        end do
+    end function calculate_heat_capacity_array
+
+    !====================================================================
+    ! Water Content (qw) Implementation
+    !====================================================================
+    function calculate_water_content_scalar(self, state, region_id) result(val)
         implicit none
-        class(type_properties_manager), intent(inout) :: self
+        class(type_properties_manager), intent(in) :: self
         type(type_gauss_point_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
@@ -201,11 +187,46 @@ contains
         call self%materials%get_wrf(region_id, local_wrf)
         call self%materials%get_den(region_id, local_den)
 
-        ! ... 水分量の計算ロジックをここに追加 ...
-        val = local_wrf%calc(-local_gcc%calc(T=state%temperature, &
-                                             Pw=state%pressure, &
-                                             rhoW=local_den%material2, &
-                                             rhoI=local_den%material3))
-    end function calculate_water_content_ptr
+        if (debug_mode) then
+            if (.not. (associated(local_gcc) .and. associated(local_wrf) .and. associated(local_den))) then
+                stop "Error: Failed to get pointers in calculate_water_content_scalar."
+            end if
+        end if
+
+        val = local_wrf%calc(-local_gcc%calc(t=state%temperature, &
+                                             pw=state%pressure, &
+                                             rhow=local_den%material2, &
+                                             rhoi=local_den%material3))
+    end function calculate_water_content_scalar
+
+    function calculate_water_content_array(self, state, region_id) result(val)
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        type(type_gauss_point_state), intent(in) :: state(:)
+        integer(int32), intent(in) :: region_id
+        real(real64) :: val(size(state))
+
+        integer :: i
+        class(abst_gcc), pointer :: local_gcc
+        class(abst_wrf), pointer :: local_wrf
+        class(abst_den), pointer :: local_den
+
+        call self%materials%get_gcc(region_id, local_gcc)
+        call self%materials%get_wrf(region_id, local_wrf)
+        call self%materials%get_den(region_id, local_den)
+
+        if (debug_mode) then
+            if (.not. (associated(local_gcc) .and. associated(local_wrf) .and. associated(local_den))) then
+                stop "Error: Failed to get pointers in calculate_water_content_array."
+            end if
+        end if
+
+        do i = 1, size(state)
+            val(i) = local_wrf%calc(-local_gcc%calc(T=state(i)%temperature, &
+                                                    Pw=state(i)%pressure, &
+                                                    rhoW=local_den%material2, &
+                                                    rhoI=local_den%material3))
+        end do
+    end function calculate_water_content_array
 
 end module properties_properties_manager
