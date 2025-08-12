@@ -41,8 +41,9 @@ module main_thermal
         class(abst_solver), allocatable :: solver
         integer(int32) :: order
 
-        procedure(abst_assemble_local), pointer, nopass :: assemble_mass => null()
-        procedure(abst_assemble_local), pointer, nopass :: assemble_diffusive => null()
+        procedure(abst_assemble_global), pointer, nopass :: assemble_global => null()
+        ! procedure(abst_assemble_local), pointer, nopass :: assemble_mass => null()
+        ! procedure(abst_assemble_local), pointer, nopass :: assemble_diffusive => null()
     contains
         procedure(abst_update), pass(self), deferred :: update
         procedure(abst_shift), pass(self), deferred :: shift

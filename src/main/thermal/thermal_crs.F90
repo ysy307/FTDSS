@@ -41,17 +41,14 @@ contains
         call structure%Qice%initialize(num_nodes, structure%order)
         call structure%Si%initialize(num_nodes, structure%order)
 
-        if (associated(structure%assemble_mass)) nullify (structure%assemble_mass)
-        if (associated(structure%assemble_diffusive)) nullify (structure%assemble_diffusive)
+        if (associated(structure%assemble_global)) nullify (structure%assemble_global)
 
         select case (input%basic%solver_settings%nonlinear_solver%method)
         case ("none")
             if (input%basic%solver_settings%parallel_settings%threads%is_parallel) then
-                structure%assemble_mass => Assemble_Mass_Heat_1_Parallel
-                structure%assemble_diffusive => Assemble_Diffusion_Heat_1_Parallel
+                structure%assemble_global => assemble_thermal_matrices_1_parallel
             else
-                structure%assemble_mass => Assemble_Mass_Heat_1
-                structure%assemble_diffusive => Assemble_Diffusion_Heat_1
+                structure%assemble_global => assemble_thermal_matrices_1
             end if
         end select
 
@@ -196,8 +193,9 @@ contains
         ! --------------------------------------------------------------------------
         ! 剛性行列と質量行列を組み立てる
         ! --------------------------------------------------------------------------
-        call self%assemble_mass(self%CT_l, domain, self%T%pre, porosity, property)
-        call self%assemble_diffusive(self%KT_l, domain, self%T%pre, porosity, property)
+        call self%assemble_global(self%CT_l, self%KT_l, domain, self%T%pre, porosity, property)
+        ! call self%assemble_mass(self%CT_l, domain, self%T%pre, porosity, property)
+        ! call self%assemble_diffusive(self%KT_l, domain, self%T%pre, porosity, property)
 
         ! --------------------------------------------------------------------------
         ! 決定されたBDFスキームに基づいて左辺行列(LHS)と右辺ベクトル(RHS)を構築する
