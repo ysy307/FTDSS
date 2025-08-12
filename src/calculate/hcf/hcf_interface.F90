@@ -1,13 +1,13 @@
 module Calculate_HCF
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: Core_Allocate, only:Allocate_Array
+    use :: module_core, only:allocate_array, type_gauss_point_state
 #ifdef _OPENMP
     use omp_lib
 #endif
     implicit none
     private
 
-    public :: Abstract_HCF
+    public :: abst_hcf
     public :: Type_HCF
 
     public :: Type_HCF_Base_BC
@@ -44,44 +44,43 @@ module Calculate_HCF
     public :: Type_HCF_Viscosity
     public :: Type_HCF_Impedance_Viscosity
 
-    type, abstract :: Abstract_HCF
-        real(real64) :: Ks !! saturated hydraulic conductivity
-        integer(int32) :: nsize
-        real(real64), allocatable :: Kflh(:)
+    type :: holder_hcs
+        class(abst_hcf), allocatable :: p
     contains
-        !! get/set
-    end type Abstract_HCF
+        ! procedure, pass(self) :: initialize => initialize_holder_hcs
+    end type holder_hcs
 
-    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Base
-        real(real64) :: thetaS !! saturated water content
-        real(real64) :: thetaR !! residual water content
+    type, abstract :: abst_hcf
+        real(real64) :: k_s
+    end type abst_hcf
+
+    type, abstract, extends(abst_hcf) :: abst_hcf_base
+        real(real64) :: theta_r
+        real(real64) :: theta_s
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: l
     contains
-        procedure(Abstract_Calculate_kr_HCF_Base), pass(self), deferred :: Calculate_kr
-        procedure(Abstract_Calculate_Kflh_Base), pass(self), deferred :: Calculate_Kflh
-        procedure(Abstract_Update_Kflh_Base), pass(self), deferred :: Update_Kflh
-    end type Abstract_HCF_Base
+        procedure(abst_calc_kr), pass(self), deferred :: calc_kr
+        procedure(abst_calc_kflh_base), pass(self), deferred :: calc_kflh
+    end type abst_hcf_base
 
-    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Impedance
+    type, abstract, extends(abst_hcf) :: abst_hcf_impedance
         real(real64) :: Omega !! Impedance factor
     contains
-        procedure(Abstract_Calculate_Impedance), nopass, deferred :: Calculate_Impedance
-        procedure(Abstract_Calculate_Kflh_Impedance), pass(self), deferred :: Calculate_Kflh
-        procedure(Abstract_Update_Kflh_Impedance), pass(self), deferred :: Update_Kflh
-    end type Abstract_HCF_Impedance
+        procedure(abst_calc_impedance), nopass, deferred :: calc_impedance
+        procedure(abst_calc_kflh_impedance), pass(self), deferred :: calc_kflh
+    end type abst_hcf_impedance
 
-    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Viscosity
+    type, abstract, extends(abst_hcf) :: abst_hcf_Viscosity
         real(real64) :: kzero
-        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
+        procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
-        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
-        procedure(Abstract_Calculate_Kflh_Viscosity), pass(self), deferred :: Calculate_Kflh
-        procedure(Abstract_Update_Kflh_Viscosity), pass(self), deferred :: Update_Kflh
-    end type Abstract_HCF_Viscosity
+        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_calc_viscosity
+        procedure(abst_calc_kflh_viscosity), pass(self), deferred :: calc_kflh
+    end type abst_hcf_Viscosity
 
-    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Base_Impedance
+    type, abstract, extends(abst_hcf) :: abst_hcf_base_Impedance
         real(real64) :: thetaS !! saturated water content
         real(real64) :: thetaR !! residual water content
         real(real64) :: alpha1
@@ -89,44 +88,26 @@ module Calculate_HCF
         real(real64) :: l
         real(real64) :: Omega
     contains
-        procedure(Abstract_Calculate_kr_HCF_Base_Impedance), pass(self), deferred :: Calculate_kr
-        procedure(Abstract_Calculate_Impedance), nopass, deferred :: Calculate_Impedance
-        procedure(Abstract_Calculate_Kflh_Base_Impedance), pass(self), deferred :: Calculate_Kflh
-        procedure(Abstract_Update_Kflh_Base_Impedance), pass(self), deferred :: Update_Kflh
-    end type Abstract_HCF_Base_Impedance
+        procedure(abst_calc_kr_Impedance), pass(self), deferred :: calc_kr
+        procedure(abst_calc_kr_impedance), nopass, deferred :: calc_impedance
+        procedure(abst_calc_kflh_Impedance), pass(self), deferred :: calc_kflh
+    end type abst_hcf_base_Impedance
 
-    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Base_Viscosity
+    type, abstract, extends(abst_hcf) :: abst_hcf_base_Viscosity
         real(real64) :: thetaS !! saturated water content
         real(real64) :: thetaR !! residual water content
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: l
         real(real64) :: kzero
-        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
+        procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
-        procedure(Abstract_Calculate_kr_HCF_Base_Viscosity), pass(self), deferred :: Calculate_kr
-        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
-        procedure(Abstract_Calculate_Kflh_Base_Viscosity), pass(self), deferred :: Calculate_Kflh
-        procedure(Abstract_Update_Kflh_Base_Viscosity), pass(self), deferred :: Update_Kflh
-    end type Abstract_HCF_Base_Viscosity
+        procedure(abst_calc_kr_Viscosity), pass(self), deferred :: calc_kr
+        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_calc_viscosity
+        procedure(abst_calc_kflh_Viscosity), pass(self), deferred :: calc_kflh
+    end type abst_hcf_base_Viscosity
 
-    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Impedance_Viscosity
-        real(real64) :: thetaS !! saturated water content
-        real(real64) :: thetaR !! residual water content
-        real(real64) :: alpha1
-        real(real64) :: n1
-        real(real64) :: l
-        real(real64) :: Omega
-        real(real64) :: kzero
-        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
-    contains
-        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
-        procedure(Abstract_Calculate_Impedance), nopass, deferred :: Calculate_Impedance
-        procedure(Abstract_Calculate_Kflh_Impedance_Viscosity), pass(self), deferred :: Calculate_Kflh
-        procedure(Abstract_Update_Kflh_Impedance_Viscosity), pass(self), deferred :: Update_Kflh
-    end type Abstract_HCF_Impedance_Viscosity
-
-    type, abstract, extends(Abstract_HCF) :: Abstract_HCF_Base_Impedance_Viscosity
+    type, abstract, extends(abst_hcf) :: abst_hcf_impedance_Viscosity
         real(real64) :: thetaS !! saturated water content
         real(real64) :: thetaR !! residual water content
         real(real64) :: alpha1
@@ -134,156 +115,155 @@ module Calculate_HCF
         real(real64) :: l
         real(real64) :: Omega
         real(real64) :: kzero
-        procedure(Abstract_Calculate_Viscosity), nopass, pointer :: Calculate_Viscosity => null()
+        procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
-        procedure(Abstract_Calculate_kr_HCF_Base_Impedance_Viscosity), pass(self), deferred :: Calculate_kr
-        procedure(Abstract_Calculate_Impedance), nopass, deferred :: Calculate_Impedance
-        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_Calculate_Viscosity
-        procedure(Abstract_Calculate_Kflh_Base_Impedance_Viscosity), pass(self), deferred :: Calculate_Kflh
-        procedure(Abstract_Update_Kflh_Base_Impedance_Viscosity), pass(self), deferred :: Update_Kflh
-    end type Abstract_HCF_Base_Impedance_Viscosity
+        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_calc_viscosity
+        procedure(abst_calc_kr_impedance), nopass, deferred :: calc_impedance
+        procedure(abst_calc_kflh_impedance_Viscosity), pass(self), deferred :: calc_kflh
+    end type abst_hcf_impedance_Viscosity
 
-    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_BC
+    type, abstract, extends(abst_hcf) :: abst_hcf_base_Impedance_Viscosity
+        real(real64) :: thetaS !! saturated water content
+        real(real64) :: thetaR !! residual water content
+        real(real64) :: alpha1
+        real(real64) :: n1
+        real(real64) :: l
+        real(real64) :: Omega
+        real(real64) :: kzero
+        procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_BC
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_BC
-        procedure :: Update_Kflh => Update_Kflh_Base_BC
+        procedure(abst_calc_kr_Impedance_Viscosity), pass(self), deferred :: calc_kr
+        procedure(abst_calc_kr_impedance), nopass, deferred :: calc_impedance
+        procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_calc_viscosity
+        procedure(abst_calc_kflh_Impedance_Viscosity), pass(self), deferred :: calc_kflh
+        procedure(Abstract_Update_kflh_Base_Impedance_Viscosity), pass(self), deferred :: Update_kflh
+    end type abst_hcf_base_Impedance_Viscosity
+
+    type, extends(abst_hcf_base) :: Type_HCF_Base_BC
+    contains
+        procedure :: calc_kr => calc_kr_Base_BC
+        procedure :: calc_kflh => calc_kflh_Base_BC
     end type Type_HCF_Base_BC
 
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_BC
+    type, extends(abst_hcf_base_Impedance) :: Type_HCF_Base_Impedance_BC
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_BC
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_BC
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_BC
+        procedure :: calc_kr => calc_kr_Base_Impedance_BC
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_BC
     end type Type_HCF_Base_Impedance_BC
 
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_BC
+    type, extends(abst_hcf_base_Viscosity) :: Type_HCF_Base_Viscosity_BC
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_BC
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_BC
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_BC
+        procedure :: calc_kr => calc_kr_Base_Viscosity_BC
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Viscosity_BC
     end type Type_HCF_Base_Viscosity_BC
 
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_BC
+    type, extends(abst_hcf_base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_BC
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_BC
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_BC
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_BC
+        procedure :: calc_kr => calc_kr_Base_Impedance_Viscosity_BC
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_Viscosity_BC
     end type Type_HCF_Base_Impedance_Viscosity_BC
 
-    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_VG
+    type, extends(abst_hcf_base) :: Type_HCF_Base_VG
         real(real64) :: m1
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_VG
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_VG
-        procedure :: Update_Kflh => Update_Kflh_Base_VG
+        procedure :: calc_kr => calc_kr_Base_VG
+        procedure :: calc_kflh => calc_kflh_Base_VG
     end type Type_HCF_Base_VG
 
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_VG
+    type, extends(abst_hcf_base_Impedance) :: Type_HCF_Base_Impedance_VG
         real(real64) :: m1
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_VG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_VG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_VG
+        procedure :: calc_kr => calc_kr_Base_Impedance_VG
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_VG
     end type Type_HCF_Base_Impedance_VG
 
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_VG
+    type, extends(abst_hcf_base_Viscosity) :: Type_HCF_Base_Viscosity_VG
         real(real64) :: m1
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_VG
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_VG
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_VG
+        procedure :: calc_kr => calc_kr_Base_Viscosity_VG
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Viscosity_VG
     end type Type_HCF_Base_Viscosity_VG
 
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_VG
+    type, extends(abst_hcf_base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_VG
         real(real64) :: m1
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_VG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_VG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_VG
+        procedure :: calc_kr => calc_kr_Base_Impedance_Viscosity_VG
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_Viscosity_VG
     end type Type_HCF_Base_Impedance_Viscosity_VG
 
-    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_KO
+    type, extends(abst_hcf_base) :: Type_HCF_Base_KO
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_KO
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_KO
-        procedure :: Update_Kflh => Update_Kflh_Base_KO
+        procedure :: calc_kr => calc_kr_Base_KO
+        procedure :: calc_kflh => calc_kflh_Base_KO
     end type Type_HCF_Base_KO
 
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_KO
+    type, extends(abst_hcf_base_Impedance) :: Type_HCF_Base_Impedance_KO
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_KO
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_KO
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_KO
+        procedure :: calc_kr => calc_kr_Base_Impedance_KO
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_KO
     end type Type_HCF_Base_Impedance_KO
 
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_KO
+    type, extends(abst_hcf_base_Viscosity) :: Type_HCF_Base_Viscosity_KO
     contains
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_KO
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_KO
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_KO
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kr => calc_kr_Base_Viscosity_KO
+        procedure :: calc_kflh => calc_kflh_Base_Viscosity_KO
     end type Type_HCF_Base_Viscosity_KO
 
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_KO
+    type, extends(abst_hcf_base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_KO
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_KO
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_KO
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_KO
+        procedure :: calc_kr => calc_kr_Base_Impedance_Viscosity_KO
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_Viscosity_KO
     end type Type_HCF_Base_Impedance_Viscosity_KO
 
-    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_MVG
+    type, extends(abst_hcf_base) :: Type_HCF_Base_MVG
         real(real64) :: hcrit
         real(real64) :: m1
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_MVG
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_MVG
-        procedure :: Update_Kflh => Update_Kflh_Base_MVG
+        procedure :: calc_kr => calc_kr_Base_MVG
+        procedure :: calc_kflh => calc_kflh_Base_MVG
     end type Type_HCF_Base_MVG
 
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_MVG
+    type, extends(abst_hcf_base_Impedance) :: Type_HCF_Base_Impedance_MVG
         real(real64) :: m1
         real(real64) :: hcrit
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_MVG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_MVG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_MVG
+        procedure :: calc_kr => calc_kr_Base_Impedance_MVG
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_MVG
     end type Type_HCF_Base_Impedance_MVG
 
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_MVG
+    type, extends(abst_hcf_base_Viscosity) :: Type_HCF_Base_Viscosity_MVG
         real(real64) :: m1
         real(real64) :: hcrit
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_MVG
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_MVG
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_MVG
+        procedure :: calc_kr => calc_kr_Base_Viscosity_MVG
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Viscosity_MVG
     end type Type_HCF_Base_Viscosity_MVG
 
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_MVG
+    type, extends(abst_hcf_base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_MVG
         real(real64) :: m1
         real(real64) :: hcrit
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_MVG
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_MVG
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_MVG
+        procedure :: calc_kr => calc_kr_Base_Impedance_Viscosity_MVG
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_Viscosity_MVG
     end type Type_HCF_Base_Impedance_Viscosity_MVG
 
-    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_Durner
+    type, extends(abst_hcf_base) :: Type_HCF_Base_Durner
         real(real64) :: m1
         real(real64) :: alpha2
         real(real64) :: n2
@@ -291,12 +271,11 @@ module Calculate_HCF
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Durner
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Durner
-        procedure :: Update_Kflh => Update_Kflh_Base_Durner
+        procedure :: calc_kr => calc_kr_Base_Durner
+        procedure :: calc_kflh => calc_kflh_Base_Durner
     end type Type_HCF_Base_Durner
 
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_Durner
+    type, extends(abst_hcf_base_Impedance) :: Type_HCF_Base_Impedance_Durner
         real(real64) :: m1
         real(real64) :: alpha2
         real(real64) :: n2
@@ -304,13 +283,12 @@ module Calculate_HCF
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Durner
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Durner
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Durner
+        procedure :: calc_kr => calc_kr_Base_Impedance_Durner
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_Durner
     end type Type_HCF_Base_Impedance_Durner
 
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_Durner
+    type, extends(abst_hcf_base_Viscosity) :: Type_HCF_Base_Viscosity_Durner
         real(real64) :: m1
         real(real64) :: alpha2
         real(real64) :: n2
@@ -318,13 +296,12 @@ module Calculate_HCF
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_Durner
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_Durner
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_Durner
+        procedure :: calc_kr => calc_kr_Base_Viscosity_Durner
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Viscosity_Durner
     end type Type_HCF_Base_Viscosity_Durner
 
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_Durner
+    type, extends(abst_hcf_base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_Durner
         real(real64) :: m1
         real(real64) :: alpha2
         real(real64) :: n2
@@ -332,291 +309,273 @@ module Calculate_HCF
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_Durner
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_Durner
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_Durner
+        procedure :: calc_kr => calc_kr_Base_Impedance_Viscosity_Durner
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_Viscosity_Durner
     end type Type_HCF_Base_Impedance_Viscosity_Durner
 
-    type, extends(Abstract_HCF_Base) :: Type_HCF_Base_DVGCH
+    type, extends(abst_hcf_base) :: Type_HCF_Base_DVGCH
         real(real64) :: m1
         real(real64) :: n2
         real(real64) :: m2
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_DVGCH
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_DVGCH
-        procedure :: Update_Kflh => Update_Kflh_Base_DVGCH
+        procedure :: calc_kr => calc_kr_Base_DVGCH
+        procedure :: calc_kflh => calc_kflh_Base_DVGCH
     end type Type_HCF_Base_DVGCH
 
-    type, extends(Abstract_HCF_Base_Impedance) :: Type_HCF_Base_Impedance_DVGCH
+    type, extends(abst_hcf_base_Impedance) :: Type_HCF_Base_Impedance_DVGCH
         real(real64) :: m1
         real(real64) :: n2
         real(real64) :: m2
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_DVGCH
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_DVGCH
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_DVGCH
+        procedure :: calc_kr => calc_kr_Base_Impedance_DVGCH
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_DVGCH
     end type Type_HCF_Base_Impedance_DVGCH
 
-    type, extends(Abstract_HCF_Base_Viscosity) :: Type_HCF_Base_Viscosity_DVGCH
+    type, extends(abst_hcf_base_Viscosity) :: Type_HCF_Base_Viscosity_DVGCH
         real(real64) :: m1
         real(real64) :: n2
         real(real64) :: m2
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Viscosity_DVGCH
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Viscosity_DVGCH
-        procedure :: Update_Kflh => Update_Kflh_Base_Viscosity_DVGCH
+        procedure :: calc_kr => calc_kr_Base_Viscosity_DVGCH
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Viscosity_DVGCH
     end type Type_HCF_Base_Viscosity_DVGCH
 
-    type, extends(Abstract_HCF_Base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_DVGCH
+    type, extends(abst_hcf_base_Impedance_Viscosity) :: Type_HCF_Base_Impedance_Viscosity_DVGCH
         real(real64) :: m1
         real(real64) :: n2
         real(real64) :: m2
         real(real64) :: w1
         real(real64) :: w2
     contains
-        procedure :: Calculate_kr => Calculate_kr_Base_Impedance_Viscosity_DVGCH
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Base_Impedance_Viscosity_DVGCH
-        procedure :: Update_Kflh => Update_Kflh_Base_Impedance_Viscosity_DVGCH
+        procedure :: calc_kr => calc_kr_Base_Impedance_Viscosity_DVGCH
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Base_Impedance_Viscosity_DVGCH
     end type Type_HCF_Base_Impedance_Viscosity_DVGCH
 
-    type, extends(Abstract_HCF_Impedance) :: Type_HCF_Impedance
+    type, extends(abst_hcf_impedance) :: Type_HCF_Impedance
     contains
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Impedance
-        procedure :: Update_Kflh => Update_Kflh_Impedance
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure :: calc_kflh => calc_kflh_Impedance
     end type Type_HCF_Impedance
 
-    type, extends(Abstract_HCF_Viscosity) :: Type_HCF_Viscosity
+    type, extends(abst_hcf_Viscosity) :: Type_HCF_Viscosity
     contains
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure :: Calculate_Kflh => Calculate_Kflh_Viscosity
-        procedure :: Update_Kflh => Update_Kflh_Viscosity
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure :: calc_kflh => calc_kflh_Viscosity
     end type Type_HCF_Viscosity
 
-    type, extends(Abstract_HCF_Impedance_Viscosity) :: Type_HCF_Impedance_Viscosity
+    type, extends(abst_hcf_impedance_Viscosity) :: Type_HCF_Impedance_Viscosity
     contains
-        procedure, nopass :: Calculate_Impedance => Calculate_Impedance_Base
-        procedure, nopass :: Set_Calculate_Viscosity => Set_Calculate_Viscosity_Base
-        procedure, pass :: Calculate_Kflh => Calculate_Kflh_Impedance_Viscosity
-        procedure, pass :: Update_Kflh => Update_Kflh_Impedance_Viscosity
+        procedure, nopass :: calc_impedance => calc_impedance_Base
+        procedure, nopass :: Set_calc_viscosity => Set_calc_viscosity_Base
+        procedure, pass :: calc_kflh => calc_kflh_Impedance_Viscosity
+        procedure, pass :: Update_kflh => Update_kflh_Impedance_Viscosity
     end type Type_HCF_Impedance_Viscosity
 
     abstract interface
-        function Abstract_Calculate_Kflh_Base(self, h) result(Kflh)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base
+        function abst_calc_kr(self, h) result(kflh)
+            import :: abst_hcf_base, real64
             implicit none
-            class(Abstract_HCF_Base), intent(in) :: self
+            class(abst_hcf_base), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Abstract_Calculate_Kflh_Base
+        end function abst_calc_kr
 
-        function Abstract_Calculate_Kflh_Impedance(self, thetaI) result(Kflh)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Impedance
+        function abst_calc_kflh_base(self, h) result(kflh)
+            import :: abst_hcf_base, real64
             implicit none
-            class(Abstract_HCF_Impedance), intent(in) :: self
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
-
-        end function Abstract_Calculate_Kflh_Impedance
-
-        function Abstract_Calculate_Kflh_Viscosity(self, Temperature) result(Kflh)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Viscosity
-            implicit none
-            class(Abstract_HCF_Viscosity), intent(in) :: self
-            real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
-
-        end function Abstract_Calculate_Kflh_Viscosity
-
-        function Abstract_Calculate_Kflh_Base_Impedance(self, h, thetaI) result(Kflh)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Impedance
-            implicit none
-            class(Abstract_HCF_Base_Impedance), intent(in) :: self
+            class(abst_hcf_base), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Abstract_Calculate_Kflh_Base_Impedance
+        end function abst_calc_kflh_base
 
-        function Abstract_Calculate_Kflh_Base_Viscosity(self, h, Temperature) result(Kflh)
+        function abst_calc_kflh_impedance(self, q_ice) result(kflh)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Viscosity
+            import :: abst_hcf_impedance
             implicit none
-            class(Abstract_HCF_Base_Viscosity), intent(in) :: self
+            class(abst_hcf_impedance), intent(in) :: self
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
+
+        end function abst_calc_kflh_impedance
+
+        function abst_calc_kflh_viscosity(self, Temperature) result(kflh)
+            use, intrinsic :: iso_fortran_env, only: real64
+            import :: abst_hcf_Viscosity
+            implicit none
+            class(abst_hcf_Viscosity), intent(in) :: self
+            real(real64), intent(in) :: Temperature
+            real(real64) :: kflh
+
+        end function abst_calc_kflh_viscosity
+
+        function abst_calc_kflh_Impedance(self, h, q_ice) result(kflh)
+            use, intrinsic :: iso_fortran_env, only: real64
+            import :: abst_hcf_base_Impedance
+            implicit none
+            class(abst_hcf_base_Impedance), intent(in) :: self
+            real(real64), intent(in) :: h
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
+
+        end function abst_calc_kflh_Impedance
+
+        function abst_calc_kflh_Viscosity(self, h, Temperature) result(kflh)
+            use, intrinsic :: iso_fortran_env, only: real64
+            import :: abst_hcf_base_Viscosity
+            implicit none
+            class(abst_hcf_base_Viscosity), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Abstract_Calculate_Kflh_Base_Viscosity
+        end function abst_calc_kflh_Viscosity
 
-        function Abstract_Calculate_Kflh_Impedance_Viscosity(self, thetaI, Temperature) result(Kflh)
+        function abst_calc_kflh_impedance_Viscosity(self, q_ice, Temperature) result(kflh)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Impedance_Viscosity
+            import :: abst_hcf_impedance_Viscosity
             implicit none
-            class(Abstract_HCF_Impedance_Viscosity), intent(in) :: self
-            real(real64), intent(in) :: thetaI
+            class(abst_hcf_impedance_Viscosity), intent(in) :: self
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Abstract_Calculate_Kflh_Impedance_Viscosity
+        end function abst_calc_kflh_impedance_Viscosity
 
-        function Abstract_Calculate_Kflh_Base_Impedance_Viscosity(self, h, thetaI, Temperature) result(Kflh)
+        function abst_calc_kflh_Impedance_Viscosity(self, h, q_ice, Temperature) result(kflh)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Impedance_Viscosity
+            import :: abst_hcf_base_Impedance_Viscosity
             implicit none
-            class(Abstract_HCF_Base_Impedance_Viscosity), intent(in) :: self
+            class(abst_hcf_base_Impedance_Viscosity), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Abstract_Calculate_Kflh_Base_Impedance_Viscosity
+        end function abst_calc_kflh_Impedance_Viscosity
 
-        subroutine Abstract_Update_Kflh_Base(self, arr_h)
+        subroutine Abstract_Update_kflh_Base(self, arr_h)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base
+            import :: abst_hcf_base
             implicit none
-            class(Abstract_HCF_Base), intent(inout) :: self
+            class(abst_hcf_base), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
 
-        end subroutine Abstract_Update_Kflh_Base
+        end subroutine Abstract_Update_kflh_Base
 
-        subroutine Abstract_Update_Kflh_Impedance(self, arr_thetaI)
+        subroutine Abstract_Update_kflh_Viscosity(self, arr_Temperature)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Impedance
+            import :: abst_hcf_Viscosity
             implicit none
-            class(Abstract_HCF_Impedance), intent(inout) :: self
-            real(real64), intent(in) :: arr_thetaI(:)
-
-        end subroutine Abstract_Update_Kflh_Impedance
-
-        subroutine Abstract_Update_Kflh_Viscosity(self, arr_Temperature)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Viscosity
-            implicit none
-            class(Abstract_HCF_Viscosity), intent(inout) :: self
+            class(abst_hcf_Viscosity), intent(inout) :: self
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Abstract_Update_Kflh_Viscosity
+        end subroutine Abstract_Update_kflh_Viscosity
 
-        subroutine Abstract_Update_Kflh_Base_Impedance(self, arr_h, arr_thetaI)
+        subroutine Abstract_Update_kflh_Base_Impedance(self, arr_h, arr_q_ice)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Impedance
+            import :: abst_hcf_base_Impedance
             implicit none
-            class(Abstract_HCF_Base_Impedance), intent(inout) :: self
+            class(abst_hcf_base_Impedance), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Abstract_Update_Kflh_Base_Impedance
+        end subroutine Abstract_Update_kflh_Base_Impedance
 
-        subroutine Abstract_Update_Kflh_Base_Viscosity(self, arr_h, arr_Temperature)
+        subroutine Abstract_Update_kflh_Base_Viscosity(self, arr_h, arr_Temperature)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Viscosity
+            import :: abst_hcf_base_Viscosity
             implicit none
-            class(Abstract_HCF_Base_Viscosity), intent(inout) :: self
+            class(abst_hcf_base_Viscosity), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Abstract_Update_Kflh_Base_Viscosity
+        end subroutine Abstract_Update_kflh_Base_Viscosity
 
-        subroutine Abstract_Update_Kflh_Impedance_Viscosity(self, arr_thetaI, arr_Temperature)
+        subroutine Abstract_Update_kflh_Base_Impedance_Viscosity(self, arr_h, arr_q_ice, arr_Temperature)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Impedance_Viscosity
+            import :: abst_hcf_base_Impedance_Viscosity
             implicit none
-            class(Abstract_HCF_Impedance_Viscosity), intent(inout) :: self
-            real(real64), intent(in) :: arr_thetaI(:)
-            real(real64), intent(in) :: arr_Temperature(:)
-
-        end subroutine Abstract_Update_Kflh_Impedance_Viscosity
-
-        subroutine Abstract_Update_Kflh_Base_Impedance_Viscosity(self, arr_h, arr_thetaI, arr_Temperature)
-            use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Impedance_Viscosity
-            implicit none
-            class(Abstract_HCF_Base_Impedance_Viscosity), intent(inout) :: self
+            class(abst_hcf_base_Impedance_Viscosity), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Abstract_Update_Kflh_Base_Impedance_Viscosity
+        end subroutine Abstract_Update_kflh_Base_Impedance_Viscosity
 
-        function Abstract_Calculate_kr_HCF_Base(self, h) result(kr)
+        function abst_calc_kr(self, h) result(kr)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base
+            import :: abst_hcf_base
             implicit none
-            class(Abstract_HCF_Base), intent(in) :: self
+            class(abst_hcf_base), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
-        end function Abstract_Calculate_kr_HCF_Base
+        end function abst_calc_kr
 
-        function Abstract_Calculate_kr_HCF_Base_Impedance(self, h) result(kr)
+        function abst_calc_kr_Impedance(self, h) result(kr)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Impedance
+            import :: abst_hcf_base_Impedance
             implicit none
-            class(Abstract_HCF_Base_Impedance), intent(in) :: self
+            class(abst_hcf_base_Impedance), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
-        end function Abstract_Calculate_kr_HCF_Base_Impedance
+        end function abst_calc_kr_Impedance
 
-        function Abstract_Calculate_kr_HCF_Base_Viscosity(self, h) result(kr)
+        function abst_calc_kr_Viscosity(self, h) result(kr)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Viscosity
+            import :: abst_hcf_base_Viscosity
             implicit none
-            class(Abstract_HCF_Base_Viscosity), intent(in) :: self
+            class(abst_hcf_base_Viscosity), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
-        end function Abstract_Calculate_kr_HCF_Base_Viscosity
+        end function abst_calc_kr_Viscosity
 
-        function Abstract_Calculate_kr_HCF_Base_Impedance_Viscosity(self, h) result(kr)
+        function abst_calc_kr_Impedance_Viscosity(self, h) result(kr)
             use, intrinsic :: iso_fortran_env, only: real64
-            import :: Abstract_HCF_Base_Impedance_Viscosity
+            import :: abst_hcf_base_Impedance_Viscosity
             implicit none
-            class(Abstract_HCF_Base_Impedance_Viscosity), intent(in) :: self
+            class(abst_hcf_base_Impedance_Viscosity), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
-        end function Abstract_Calculate_kr_HCF_Base_Impedance_Viscosity
+        end function abst_calc_kr_Impedance_Viscosity
 
-        function Abstract_Calculate_Impedance(Omega, thetaI) result(Impedance)
+        function abst_calc_kr_impedance(Omega, q_ice) result(Impedance)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
             real(real64), intent(in) :: Omega
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64) :: Impedance
 
-        end function Abstract_Calculate_Impedance
+        end function abst_calc_kr_impedance
 
-        subroutine Abstract_Set_Calculate_HCF_Viscosity(Calculate_Viscosity_Type, Calculate_Viscosity)
+        subroutine Abstract_Set_Calculate_HCF_Viscosity(calc_viscosity_Type, calc_viscosity)
             use, intrinsic :: iso_fortran_env, only: int32
-            import :: Abstract_Calculate_Viscosity
+            import :: abst_calc_viscosity
             implicit none
-            integer(int32), intent(in) :: Calculate_Viscosity_Type
-            procedure(Abstract_Calculate_Viscosity), pointer, intent(inout) :: Calculate_Viscosity
+            integer(int32), intent(in) :: calc_viscosity_Type
+            procedure(abst_calc_viscosity), pointer, intent(inout) :: calc_viscosity
 
         end subroutine Abstract_Set_Calculate_HCF_Viscosity
 
-        function Abstract_Calculate_Viscosity(Temperature) result(Viscosity)
+        function abst_calc_viscosity(Temperature) result(Viscosity)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
             real(real64), intent(in) :: Temperature
             real(real64) :: Viscosity
-        end function Abstract_Calculate_Viscosity
+        end function abst_calc_viscosity
     end interface
 
     interface
@@ -627,13 +586,13 @@ module Calculate_HCF
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_BC
 
         module function Construct_Type_HCF_Base_BC_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_BC_minimal
 
@@ -645,13 +604,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_BC
 
         module function Construct_Type_HCF_Base_Impedance_BC_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_BC_minimal
 
@@ -663,13 +622,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_BC
 
         module function Construct_Type_HCF_Base_Viscosity_BC_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_BC_minimal
 
@@ -682,17 +641,17 @@ module Calculate_HCF
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_BC
 
         module function Construct_Type_HCF_Base_Impedance_Viscosity_BC_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_BC_minimal
 
-        module function Calculate_kr_BC_Base(alpha1, n1, l, h) result(kr)
+        module function calc_kr_BC_Base(alpha1, n1, l, h) result(kr)
             implicit none
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
@@ -700,107 +659,107 @@ module Calculate_HCF
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_BC_Base
+        end function calc_kr_BC_Base
 
-        module function Calculate_kr_Base_BC(self, h) result(kr)
+        module function calc_kr_Base_BC(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_BC), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_BC
+        end function calc_kr_Base_BC
 
-        module function Calculate_kr_Base_Impedance_BC(self, h) result(kr)
+        module function calc_kr_Base_Impedance_BC(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_BC), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_BC
+        end function calc_kr_Base_Impedance_BC
 
-        module function Calculate_kr_Base_Viscosity_BC(self, h) result(kr)
+        module function calc_kr_Base_Viscosity_BC(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Viscosity_BC), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Viscosity_BC
+        end function calc_kr_Base_Viscosity_BC
 
-        module function Calculate_kr_Base_Impedance_Viscosity_BC(self, h) result(kr)
+        module function calc_kr_Base_Impedance_Viscosity_BC(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_BC), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_Viscosity_BC
+        end function calc_kr_Base_Impedance_Viscosity_BC
 
-        module function Calculate_Kflh_Base_BC(self, h) result(Kflh)
+        module function calc_kflh_Base_BC(self, h) result(kflh)
             implicit none
             class(Type_HCF_Base_BC), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_BC
+        end function calc_kflh_Base_BC
 
-        module function Calculate_Kflh_Base_Impedance_BC(self, h, thetaI) result(Kflh)
+        module function calc_kflh_Base_Impedance_BC(self, h, q_ice) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_BC), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_BC
+        end function calc_kflh_Base_Impedance_BC
 
-        module function Calculate_Kflh_Base_Viscosity_BC(self, h, Temperature) result(Kflh)
+        module function calc_kflh_Base_Viscosity_BC(self, h, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Viscosity_BC), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Viscosity_BC
+        end function calc_kflh_Base_Viscosity_BC
 
-        module function Calculate_Kflh_Base_Impedance_Viscosity_BC(self, h, thetaI, Temperature) result(Kflh)
+        module function calc_kflh_Base_Impedance_Viscosity_BC(self, h, q_ice, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_BC), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_Viscosity_BC
+        end function calc_kflh_Base_Impedance_Viscosity_BC
 
-        module subroutine Update_Kflh_Base_BC(self, arr_h)
+        module subroutine Update_kflh_Base_BC(self, arr_h)
             implicit none
             class(Type_HCF_Base_BC), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
 
-        end subroutine Update_Kflh_Base_BC
+        end subroutine Update_kflh_Base_BC
 
-        module subroutine Update_Kflh_Base_Impedance_BC(self, arr_h, arr_thetaI)
+        module subroutine Update_kflh_Base_Impedance_BC(self, arr_h, arr_q_ice)
             implicit none
             class(Type_HCF_Base_Impedance_BC), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Update_Kflh_Base_Impedance_BC
+        end subroutine Update_kflh_Base_Impedance_BC
 
-        module subroutine Update_Kflh_Base_Viscosity_BC(self, arr_h, arr_Temperature)
+        module subroutine Update_kflh_Base_Viscosity_BC(self, arr_h, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Viscosity_BC), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Viscosity_BC
+        end subroutine Update_kflh_Base_Viscosity_BC
 
-        module subroutine Update_Kflh_Base_Impedance_Viscosity_BC(self, arr_h, arr_thetaI, arr_Temperature)
+        module subroutine Update_kflh_Base_Impedance_Viscosity_BC(self, arr_h, arr_q_ice, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_BC), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Impedance_Viscosity_BC
+        end subroutine Update_kflh_Base_Impedance_Viscosity_BC
 
         module function Construct_Type_HCF_Base_VG(Ks, alpha1, n1, l, nsize) result(structure_HCF)
             implicit none
@@ -809,13 +768,13 @@ module Calculate_HCF
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_VG
 
         module function Construct_Type_HCF_Base_VG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_VG_minimal
 
@@ -827,13 +786,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_VG
 
         module function Construct_Type_HCF_Base_Impedance_VG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_VG_minimal
 
@@ -845,13 +804,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_VG
 
         module function Construct_Type_HCF_Base_Viscosity_VG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_VG_minimal
 
@@ -864,17 +823,17 @@ module Calculate_HCF
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_VG
 
         module function Construct_Type_HCF_Base_Impedance_Viscosity_VG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_VG_minimal
 
-        module function Calculate_kr_VG_Base(alpha1, n1, m1, l, h) result(kr)
+        module function calc_kr_VG_Base(alpha1, n1, m1, l, h) result(kr)
             implicit none
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
@@ -883,107 +842,107 @@ module Calculate_HCF
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_VG_Base
+        end function calc_kr_VG_Base
 
-        module function Calculate_kr_Base_VG(self, h) result(kr)
+        module function calc_kr_Base_VG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_VG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_VG
+        end function calc_kr_Base_VG
 
-        module function Calculate_kr_Base_Impedance_VG(self, h) result(kr)
+        module function calc_kr_Base_Impedance_VG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_VG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_VG
+        end function calc_kr_Base_Impedance_VG
 
-        module function Calculate_kr_Base_Viscosity_VG(self, h) result(kr)
+        module function calc_kr_Base_Viscosity_VG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Viscosity_VG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Viscosity_VG
+        end function calc_kr_Base_Viscosity_VG
 
-        module function Calculate_kr_Base_Impedance_Viscosity_VG(self, h) result(kr)
+        module function calc_kr_Base_Impedance_Viscosity_VG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_VG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_Viscosity_VG
+        end function calc_kr_Base_Impedance_Viscosity_VG
 
-        module function Calculate_Kflh_Base_VG(self, h) result(Kflh)
+        module function calc_kflh_Base_VG(self, h) result(kflh)
             implicit none
             class(Type_HCF_Base_VG), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_VG
+        end function calc_kflh_Base_VG
 
-        module function Calculate_Kflh_Base_Impedance_VG(self, h, thetaI) result(Kflh)
+        module function calc_kflh_Base_Impedance_VG(self, h, q_ice) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_VG), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_VG
+        end function calc_kflh_Base_Impedance_VG
 
-        module function Calculate_Kflh_Base_Viscosity_VG(self, h, Temperature) result(Kflh)
+        module function calc_kflh_Base_Viscosity_VG(self, h, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Viscosity_VG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Viscosity_VG
+        end function calc_kflh_Base_Viscosity_VG
 
-        module function Calculate_Kflh_Base_Impedance_Viscosity_VG(self, h, thetaI, Temperature) result(Kflh)
+        module function calc_kflh_Base_Impedance_Viscosity_VG(self, h, q_ice, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_VG), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_Viscosity_VG
+        end function calc_kflh_Base_Impedance_Viscosity_VG
 
-        module subroutine Update_Kflh_Base_VG(self, arr_h)
+        module subroutine Update_kflh_Base_VG(self, arr_h)
             implicit none
             class(Type_HCF_Base_VG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
 
-        end subroutine Update_Kflh_Base_VG
+        end subroutine Update_kflh_Base_VG
 
-        module subroutine Update_Kflh_Base_Impedance_VG(self, arr_h, arr_thetaI)
+        module subroutine Update_kflh_Base_Impedance_VG(self, arr_h, arr_q_ice)
             implicit none
             class(Type_HCF_Base_Impedance_VG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Update_Kflh_Base_Impedance_VG
+        end subroutine Update_kflh_Base_Impedance_VG
 
-        module subroutine Update_Kflh_Base_Viscosity_VG(self, arr_h, arr_Temperature)
+        module subroutine Update_kflh_Base_Viscosity_VG(self, arr_h, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Viscosity_VG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Viscosity_VG
+        end subroutine Update_kflh_Base_Viscosity_VG
 
-        module subroutine Update_Kflh_Base_Impedance_Viscosity_VG(self, arr_h, arr_thetaI, arr_Temperature)
+        module subroutine Update_kflh_Base_Impedance_Viscosity_VG(self, arr_h, arr_q_ice, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_VG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Impedance_Viscosity_VG
+        end subroutine Update_kflh_Base_Impedance_Viscosity_VG
 
         module function Construct_Type_HCF_Base_KO(Ks, alpha1, n1, l, nsize) result(structure_HCF)
             implicit none
@@ -992,13 +951,13 @@ module Calculate_HCF
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_KO
 
         module function Construct_Type_HCF_Base_KO_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_KO_minimal
 
@@ -1010,13 +969,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_KO
 
         module function Construct_Type_HCF_Base_Impedance_KO_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_KO_minimal
 
@@ -1028,13 +987,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_KO
 
         module function Construct_Type_HCF_Base_Viscosity_KO_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_KO_minimal
 
@@ -1047,17 +1006,17 @@ module Calculate_HCF
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_KO
 
         module function Construct_Type_HCF_Base_Impedance_Viscosity_KO_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_KO_minimal
 
-        module function Calculate_kr_KO_Base(alpha1, n1, l, h) result(kr)
+        module function calc_kr_KO_Base(alpha1, n1, l, h) result(kr)
             implicit none
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
@@ -1065,107 +1024,107 @@ module Calculate_HCF
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_KO_Base
+        end function calc_kr_KO_Base
 
-        module function Calculate_kr_Base_KO(self, h) result(kr)
+        module function calc_kr_Base_KO(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_KO), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_KO
+        end function calc_kr_Base_KO
 
-        module function Calculate_kr_Base_Impedance_KO(self, h) result(kr)
+        module function calc_kr_Base_Impedance_KO(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_KO), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_KO
+        end function calc_kr_Base_Impedance_KO
 
-        module function Calculate_kr_Base_Viscosity_KO(self, h) result(kr)
+        module function calc_kr_Base_Viscosity_KO(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Viscosity_KO), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Viscosity_KO
+        end function calc_kr_Base_Viscosity_KO
 
-        module function Calculate_kr_Base_Impedance_Viscosity_KO(self, h) result(kr)
+        module function calc_kr_Base_Impedance_Viscosity_KO(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_KO), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_Viscosity_KO
+        end function calc_kr_Base_Impedance_Viscosity_KO
 
-        module function Calculate_Kflh_Base_KO(self, h) result(Kflh)
+        module function calc_kflh_Base_KO(self, h) result(kflh)
             implicit none
             class(Type_HCF_Base_KO), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_KO
+        end function calc_kflh_Base_KO
 
-        module function Calculate_Kflh_Base_Impedance_KO(self, h, thetaI) result(Kflh)
+        module function calc_kflh_Base_Impedance_KO(self, h, q_ice) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_KO), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_KO
+        end function calc_kflh_Base_Impedance_KO
 
-        module function Calculate_Kflh_Base_Viscosity_KO(self, h, Temperature) result(Kflh)
+        module function calc_kflh_Base_Viscosity_KO(self, h, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Viscosity_KO), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Viscosity_KO
+        end function calc_kflh_Base_Viscosity_KO
 
-        module function Calculate_Kflh_Base_Impedance_Viscosity_KO(self, h, thetaI, Temperature) result(Kflh)
+        module function calc_kflh_Base_Impedance_Viscosity_KO(self, h, q_ice, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_KO), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_Viscosity_KO
+        end function calc_kflh_Base_Impedance_Viscosity_KO
 
-        module subroutine Update_Kflh_Base_KO(self, arr_h)
+        module subroutine Update_kflh_Base_KO(self, arr_h)
             implicit none
             class(Type_HCF_Base_KO), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
 
-        end subroutine Update_Kflh_Base_KO
+        end subroutine Update_kflh_Base_KO
 
-        module subroutine Update_Kflh_Base_Impedance_KO(self, arr_h, arr_thetaI)
+        module subroutine Update_kflh_Base_Impedance_KO(self, arr_h, arr_q_ice)
             implicit none
             class(Type_HCF_Base_Impedance_KO), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Update_Kflh_Base_Impedance_KO
+        end subroutine Update_kflh_Base_Impedance_KO
 
-        module subroutine Update_Kflh_Base_Viscosity_KO(self, arr_h, arr_Temperature)
+        module subroutine Update_kflh_Base_Viscosity_KO(self, arr_h, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Viscosity_KO), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Viscosity_KO
+        end subroutine Update_kflh_Base_Viscosity_KO
 
-        module subroutine Update_Kflh_Base_Impedance_Viscosity_KO(self, arr_h, arr_thetaI, arr_Temperature)
+        module subroutine Update_kflh_Base_Impedance_Viscosity_KO(self, arr_h, arr_q_ice, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_KO), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Impedance_Viscosity_KO
+        end subroutine Update_kflh_Base_Impedance_Viscosity_KO
 
         module function Construct_Type_HCF_Base_MVG(Ks, thetaS, thetaR, alpha1, n1, l, hcrit, nsize) result(structure_HCF)
             implicit none
@@ -1177,13 +1136,13 @@ module Calculate_HCF
             real(real64), intent(in) :: hcrit
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_MVG
 
         module function Construct_Type_HCF_Base_MVG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_MVG_minimal
 
@@ -1198,13 +1157,13 @@ module Calculate_HCF
             real(real64), intent(in) :: hcrit
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_MVG
 
         module function Construct_Type_HCF_Base_Impedance_MVG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_MVG_minimal
 
@@ -1219,13 +1178,13 @@ module Calculate_HCF
             real(real64), intent(in) :: hcrit
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_MVG
 
         module function Construct_Type_HCF_Base_Viscosity_MVG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_MVG_minimal
 
@@ -1241,17 +1200,17 @@ module Calculate_HCF
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_MVG
 
         module function Construct_Type_HCF_Base_Impedance_Viscosity_MVG_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_MVG_minimal
 
-        module function Calculate_kr_MVG_Base(thetaS, thetaR, alpha1, n1, m1, l, hcrit, h) result(kr)
+        module function calc_kr_MVG_Base(thetaS, thetaR, alpha1, n1, m1, l, hcrit, h) result(kr)
             implicit none
             real(real64), intent(in) :: thetaS
             real(real64), intent(in) :: thetaR
@@ -1263,107 +1222,107 @@ module Calculate_HCF
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_MVG_Base
+        end function calc_kr_MVG_Base
 
-        module function Calculate_kr_Base_MVG(self, h) result(kr)
+        module function calc_kr_Base_MVG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_MVG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_MVG
+        end function calc_kr_Base_MVG
 
-        module function Calculate_kr_Base_Impedance_MVG(self, h) result(kr)
+        module function calc_kr_Base_Impedance_MVG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_MVG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_MVG
+        end function calc_kr_Base_Impedance_MVG
 
-        module function Calculate_kr_Base_Viscosity_MVG(self, h) result(kr)
+        module function calc_kr_Base_Viscosity_MVG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Viscosity_MVG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Viscosity_MVG
+        end function calc_kr_Base_Viscosity_MVG
 
-        module function Calculate_kr_Base_Impedance_Viscosity_MVG(self, h) result(kr)
+        module function calc_kr_Base_Impedance_Viscosity_MVG(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_MVG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_Viscosity_MVG
+        end function calc_kr_Base_Impedance_Viscosity_MVG
 
-        module function Calculate_Kflh_Base_MVG(self, h) result(Kflh)
+        module function calc_kflh_Base_MVG(self, h) result(kflh)
             implicit none
             class(Type_HCF_Base_MVG), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_MVG
+        end function calc_kflh_Base_MVG
 
-        module function Calculate_Kflh_Base_Impedance_MVG(self, h, thetaI) result(Kflh)
+        module function calc_kflh_Base_Impedance_MVG(self, h, q_ice) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_MVG), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_MVG
+        end function calc_kflh_Base_Impedance_MVG
 
-        module function Calculate_Kflh_Base_Viscosity_MVG(self, h, Temperature) result(Kflh)
+        module function calc_kflh_Base_Viscosity_MVG(self, h, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Viscosity_MVG), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Viscosity_MVG
+        end function calc_kflh_Base_Viscosity_MVG
 
-        module function Calculate_Kflh_Base_Impedance_Viscosity_MVG(self, h, thetaI, Temperature) result(Kflh)
+        module function calc_kflh_Base_Impedance_Viscosity_MVG(self, h, q_ice, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_MVG), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_Viscosity_MVG
+        end function calc_kflh_Base_Impedance_Viscosity_MVG
 
-        module subroutine Update_Kflh_Base_MVG(self, arr_h)
+        module subroutine Update_kflh_Base_MVG(self, arr_h)
             implicit none
             class(Type_HCF_Base_MVG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
 
-        end subroutine Update_Kflh_Base_MVG
+        end subroutine Update_kflh_Base_MVG
 
-        module subroutine Update_Kflh_Base_Impedance_MVG(self, arr_h, arr_thetaI)
+        module subroutine Update_kflh_Base_Impedance_MVG(self, arr_h, arr_q_ice)
             implicit none
             class(Type_HCF_Base_Impedance_MVG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Update_Kflh_Base_Impedance_MVG
+        end subroutine Update_kflh_Base_Impedance_MVG
 
-        module subroutine Update_Kflh_Base_Viscosity_MVG(self, arr_h, arr_Temperature)
+        module subroutine Update_kflh_Base_Viscosity_MVG(self, arr_h, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Viscosity_MVG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Viscosity_MVG
+        end subroutine Update_kflh_Base_Viscosity_MVG
 
-        module subroutine Update_Kflh_Base_Impedance_Viscosity_MVG(self, arr_h, arr_thetaI, arr_Temperature)
+        module subroutine Update_kflh_Base_Impedance_Viscosity_MVG(self, arr_h, arr_q_ice, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_MVG), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Impedance_Viscosity_MVG
+        end subroutine Update_kflh_Base_Impedance_Viscosity_MVG
 
         module function Construct_Type_HCF_Base_Durner(Ks, alpha1, n1, w1, alpha2, n2, l, nsize) result(structure_HCF)
             implicit none
@@ -1375,13 +1334,13 @@ module Calculate_HCF
             real(real64), intent(in) :: n2
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Durner
 
         module function Construct_Type_HCF_Base_Durner_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Durner_minimal
 
@@ -1396,13 +1355,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Durner
 
         module function Construct_Type_HCF_Base_Impedance_Durner_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Durner_minimal
 
@@ -1417,13 +1376,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_Durner
 
         module function Construct_Type_HCF_Base_Viscosity_Durner_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_Durner_minimal
 
@@ -1439,17 +1398,17 @@ module Calculate_HCF
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_Durner
 
         module function Construct_Type_HCF_Base_Impedance_Viscosity_Durner_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_Durner_minimal
 
-        module function Calculate_kr_Durner_Base(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h) result(kr)
+        module function calc_kr_Durner_Base(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h) result(kr)
             implicit none
             real(real64), intent(in) :: alpha1, alpha2
             real(real64), intent(in) :: n1, n2
@@ -1459,107 +1418,107 @@ module Calculate_HCF
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Durner_Base
+        end function calc_kr_Durner_Base
 
-        module function Calculate_kr_Base_Durner(self, h) result(kr)
+        module function calc_kr_Base_Durner(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Durner), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Durner
+        end function calc_kr_Base_Durner
 
-        module function Calculate_kr_Base_Impedance_Durner(self, h) result(kr)
+        module function calc_kr_Base_Impedance_Durner(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_Durner), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_Durner
+        end function calc_kr_Base_Impedance_Durner
 
-        module function Calculate_kr_Base_Viscosity_Durner(self, h) result(kr)
+        module function calc_kr_Base_Viscosity_Durner(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Viscosity_Durner), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Viscosity_Durner
+        end function calc_kr_Base_Viscosity_Durner
 
-        module function Calculate_kr_Base_Impedance_Viscosity_Durner(self, h) result(kr)
+        module function calc_kr_Base_Impedance_Viscosity_Durner(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_Durner), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_Viscosity_Durner
+        end function calc_kr_Base_Impedance_Viscosity_Durner
 
-        module function Calculate_Kflh_Base_Durner(self, h) result(Kflh)
+        module function calc_kflh_Base_Durner(self, h) result(kflh)
             implicit none
             class(Type_HCF_Base_Durner), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Durner
+        end function calc_kflh_Base_Durner
 
-        module function Calculate_Kflh_Base_Impedance_Durner(self, h, thetaI) result(Kflh)
+        module function calc_kflh_Base_Impedance_Durner(self, h, q_ice) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_Durner), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_Durner
+        end function calc_kflh_Base_Impedance_Durner
 
-        module function Calculate_Kflh_Base_Viscosity_Durner(self, h, Temperature) result(Kflh)
+        module function calc_kflh_Base_Viscosity_Durner(self, h, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Viscosity_Durner), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Viscosity_Durner
+        end function calc_kflh_Base_Viscosity_Durner
 
-        module function Calculate_Kflh_Base_Impedance_Viscosity_Durner(self, h, thetaI, Temperature) result(Kflh)
+        module function calc_kflh_Base_Impedance_Viscosity_Durner(self, h, q_ice, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_Durner), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_Viscosity_Durner
+        end function calc_kflh_Base_Impedance_Viscosity_Durner
 
-        module subroutine Update_Kflh_Base_Durner(self, arr_h)
+        module subroutine Update_kflh_Base_Durner(self, arr_h)
             implicit none
             class(Type_HCF_Base_Durner), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
 
-        end subroutine Update_Kflh_Base_Durner
+        end subroutine Update_kflh_Base_Durner
 
-        module subroutine Update_Kflh_Base_Impedance_Durner(self, arr_h, arr_thetaI)
+        module subroutine Update_kflh_Base_Impedance_Durner(self, arr_h, arr_q_ice)
             implicit none
             class(Type_HCF_Base_Impedance_Durner), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Update_Kflh_Base_Impedance_Durner
+        end subroutine Update_kflh_Base_Impedance_Durner
 
-        module subroutine Update_Kflh_Base_Viscosity_Durner(self, arr_h, arr_Temperature)
+        module subroutine Update_kflh_Base_Viscosity_Durner(self, arr_h, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Viscosity_Durner), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Viscosity_Durner
+        end subroutine Update_kflh_Base_Viscosity_Durner
 
-        module subroutine Update_Kflh_Base_Impedance_Viscosity_Durner(self, arr_h, arr_thetaI, arr_Temperature)
+        module subroutine Update_kflh_Base_Impedance_Viscosity_Durner(self, arr_h, arr_q_ice, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_Durner), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Impedance_Viscosity_Durner
+        end subroutine Update_kflh_Base_Impedance_Viscosity_Durner
 
         module function Construct_Type_HCF_Base_DVGCH(Ks, alpha1, n1, w1, n2, l, nsize) result(structure_HCF)
             implicit none
@@ -1570,13 +1529,13 @@ module Calculate_HCF
             real(real64), intent(in) :: w1
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_DVGCH
 
         module function Construct_Type_HCF_Base_DVGCH_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_DVGCH_minimal
 
@@ -1590,13 +1549,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_DVGCH
 
         module function Construct_Type_HCF_Base_Impedance_DVGCH_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_DVGCH_minimal
 
@@ -1610,13 +1569,13 @@ module Calculate_HCF
             real(real64), intent(in) :: l
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_DVGCH
 
         module function Construct_Type_HCF_Base_Viscosity_DVGCH_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_DVGCH_minimal
 
@@ -1631,17 +1590,17 @@ module Calculate_HCF
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_DVGCH
 
         module function Construct_Type_HCF_Base_Impedance_Viscosity_DVGCH_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Base_Impedance_Viscosity_DVGCH_minimal
 
-        module function Calculate_kr_DVGCH_Base(alpha1, n1, m1, w1, n2, m2, w2, l, h) result(kr)
+        module function calc_kr_DVGCH_Base(alpha1, n1, m1, w1, n2, m2, w2, l, h) result(kr)
             implicit none
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1, n2
@@ -1651,167 +1610,167 @@ module Calculate_HCF
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_DVGCH_Base
+        end function calc_kr_DVGCH_Base
 
-        module function Calculate_kr_Base_DVGCH(self, h) result(kr)
+        module function calc_kr_Base_DVGCH(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_DVGCH
+        end function calc_kr_Base_DVGCH
 
-        module function Calculate_kr_Base_Impedance_DVGCH(self, h) result(kr)
+        module function calc_kr_Base_Impedance_DVGCH(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_DVGCH
+        end function calc_kr_Base_Impedance_DVGCH
 
-        module function Calculate_kr_Base_Viscosity_DVGCH(self, h) result(kr)
+        module function calc_kr_Base_Viscosity_DVGCH(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Viscosity_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Viscosity_DVGCH
+        end function calc_kr_Base_Viscosity_DVGCH
 
-        module function Calculate_kr_Base_Impedance_Viscosity_DVGCH(self, h) result(kr)
+        module function calc_kr_Base_Impedance_Viscosity_DVGCH(self, h) result(kr)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64) :: kr
 
-        end function Calculate_kr_Base_Impedance_Viscosity_DVGCH
+        end function calc_kr_Base_Impedance_Viscosity_DVGCH
 
-        module function Calculate_Kflh_Base_DVGCH(self, h) result(Kflh)
+        module function calc_kflh_Base_DVGCH(self, h) result(kflh)
             implicit none
             class(Type_HCF_Base_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_DVGCH
+        end function calc_kflh_Base_DVGCH
 
-        module function Calculate_Kflh_Base_Impedance_DVGCH(self, h, thetaI) result(Kflh)
+        module function calc_kflh_Base_Impedance_DVGCH(self, h, q_ice) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_DVGCH
+        end function calc_kflh_Base_Impedance_DVGCH
 
-        module function Calculate_Kflh_Base_Viscosity_DVGCH(self, h, Temperature) result(Kflh)
+        module function calc_kflh_Base_Viscosity_DVGCH(self, h, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Viscosity_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Viscosity_DVGCH
+        end function calc_kflh_Base_Viscosity_DVGCH
 
-        module function Calculate_Kflh_Base_Impedance_Viscosity_DVGCH(self, h, thetaI, Temperature) result(Kflh)
+        module function calc_kflh_Base_Impedance_Viscosity_DVGCH(self, h, q_ice, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_DVGCH), intent(in) :: self
             real(real64), intent(in) :: h
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Base_Impedance_Viscosity_DVGCH
+        end function calc_kflh_Base_Impedance_Viscosity_DVGCH
 
-        module subroutine Update_Kflh_Base_DVGCH(self, arr_h)
+        module subroutine Update_kflh_Base_DVGCH(self, arr_h)
             implicit none
             class(Type_HCF_Base_DVGCH), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
 
-        end subroutine Update_Kflh_Base_DVGCH
+        end subroutine Update_kflh_Base_DVGCH
 
-        module subroutine Update_Kflh_Base_Impedance_DVGCH(self, arr_h, arr_thetaI)
+        module subroutine Update_kflh_Base_Impedance_DVGCH(self, arr_h, arr_q_ice)
             implicit none
             class(Type_HCF_Base_Impedance_DVGCH), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Update_Kflh_Base_Impedance_DVGCH
+        end subroutine Update_kflh_Base_Impedance_DVGCH
 
-        module subroutine Update_Kflh_Base_Viscosity_DVGCH(self, arr_h, arr_Temperature)
+        module subroutine Update_kflh_Base_Viscosity_DVGCH(self, arr_h, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Viscosity_DVGCH), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Viscosity_DVGCH
+        end subroutine Update_kflh_Base_Viscosity_DVGCH
 
-        module subroutine Update_Kflh_Base_Impedance_Viscosity_DVGCH(self, arr_h, arr_thetaI, arr_Temperature)
+        module subroutine Update_kflh_Base_Impedance_Viscosity_DVGCH(self, arr_h, arr_q_ice, arr_Temperature)
             implicit none
             class(Type_HCF_Base_Impedance_Viscosity_DVGCH), intent(inout) :: self
             real(real64), intent(in) :: arr_h(:)
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Base_Impedance_Viscosity_DVGCH
+        end subroutine Update_kflh_Base_Impedance_Viscosity_DVGCH
 
         module function Construct_Type_HCF_Impedance(Ks, Omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Impedance
 
         module function Construct_Type_HCF_Impedance_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Impedance_minimal
 
-        module function Calculate_Impedance_Base(Omega, thetaI) result(Impedance)
+        module function calc_impedance_Base(Omega, q_ice) result(Impedance)
             implicit none
             real(real64), intent(in) :: Omega
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64) :: Impedance
 
-        end function Calculate_Impedance_Base
+        end function calc_impedance_Base
 
-        module function Calculate_Kflh_Impedance(self, thetaI) result(Kflh)
+        module function calc_kflh_Impedance(self, q_ice) result(kflh)
             implicit none
             class(Type_HCF_Impedance), intent(in) :: self
-            real(real64), intent(in) :: thetaI
-            real(real64) :: Kflh
+            real(real64), intent(in) :: q_ice
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Impedance
+        end function calc_kflh_Impedance
 
-        module subroutine Update_Kflh_Impedance(self, arr_thetaI)
+        module subroutine Update_kflh_Impedance(self, arr_q_ice)
             implicit none
             class(Type_HCF_Impedance), intent(inout) :: self
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
 
-        end subroutine Update_Kflh_Impedance
+        end subroutine Update_kflh_Impedance
 
         module function Construct_Type_HCF_Viscosity(Ks, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Viscosity
 
         module function Construct_Type_HCF_Viscosity_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Viscosity_minimal
 
-        module subroutine Set_Calculate_Viscosity_Base(Calculate_Viscosity_Type, Calculate_Viscosity)
+        module subroutine Set_calc_viscosity_Base(calc_viscosity_Type, calc_viscosity)
             implicit none
-            integer(int32), intent(in) :: Calculate_Viscosity_Type
-            procedure(Abstract_Calculate_Viscosity), pointer, intent(inout) :: Calculate_Viscosity
+            integer(int32), intent(in) :: calc_viscosity_Type
+            procedure(abst_calc_viscosity), pointer, intent(inout) :: calc_viscosity
 
-        end subroutine Set_Calculate_Viscosity_Base
+        end subroutine Set_calc_viscosity_Base
 
         module function Calculate_HCF_mu_Exponential(Temperature) result(Viscosity)
             implicit none
@@ -1827,20 +1786,20 @@ module Calculate_HCF
 
         end function Calculate_HCF_mu_Exponential_Supercooled
 
-        module function Calculate_Kflh_Viscosity(self, Temperature) result(Kflh)
+        module function calc_kflh_Viscosity(self, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Viscosity), intent(in) :: self
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Viscosity
+        end function calc_kflh_Viscosity
 
-        module subroutine Update_Kflh_Viscosity(self, arr_Temperature)
+        module subroutine Update_kflh_Viscosity(self, arr_Temperature)
             implicit none
             class(Type_HCF_Viscosity), intent(inout) :: self
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Viscosity
+        end subroutine Update_kflh_Viscosity
 
         module function Construct_Type_HCF_Impedance_Viscosity(Ks, Omega, useViscosity, nsize) result(structure_HCF)
             implicit none
@@ -1848,32 +1807,32 @@ module Calculate_HCF
             real(real64), intent(in) :: Omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Impedance_Viscosity
 
         module function Construct_Type_HCF_Impedance_Viscosity_minimal() result(structure_HCF)
             implicit none
-            class(Abstract_HCF), allocatable :: structure_HCF
+            class(abst_hcf), allocatable :: structure_HCF
 
         end function Construct_Type_HCF_Impedance_Viscosity_minimal
 
-        module function Calculate_Kflh_Impedance_Viscosity(self, thetaI, Temperature) result(Kflh)
+        module function calc_kflh_Impedance_Viscosity(self, q_ice, Temperature) result(kflh)
             implicit none
             class(Type_HCF_Impedance_Viscosity), intent(in) :: self
-            real(real64), intent(in) :: thetaI
+            real(real64), intent(in) :: q_ice
             real(real64), intent(in) :: Temperature
-            real(real64) :: Kflh
+            real(real64) :: kflh
 
-        end function Calculate_Kflh_Impedance_Viscosity
+        end function calc_kflh_Impedance_Viscosity
 
-        module subroutine Update_Kflh_Impedance_Viscosity(self, arr_thetaI, arr_Temperature)
+        module subroutine Update_kflh_Impedance_Viscosity(self, arr_q_ice, arr_Temperature)
             implicit none
             class(Type_HCF_Impedance_Viscosity), intent(inout) :: self
-            real(real64), intent(in) :: arr_thetaI(:)
+            real(real64), intent(in) :: arr_q_ice(:)
             real(real64), intent(in) :: arr_Temperature(:)
 
-        end subroutine Update_Kflh_Impedance_Viscosity
+        end subroutine Update_kflh_Impedance_Viscosity
     end interface
 
     interface Type_HCF
@@ -2033,7 +1992,7 @@ contains
         real(real64), intent(in), optional :: Omega
         integer(int32), intent(in), optional :: useViscosity
         integer(int32), intent(in) :: nsize
-        class(Abstract_HCF), allocatable :: structure_HCF
+        class(abst_hcf), allocatable :: structure_HCF
 
         select case (useHCFType)
         case (11)
@@ -2414,7 +2373,7 @@ contains
     function Construct_Type_HCF_minimal(useHCFType) result(structure_HCF)
         implicit none
         integer(int32), intent(in) :: useHCFType
-        class(Abstract_HCF), allocatable :: structure_HCF
+        class(abst_hcf), allocatable :: structure_HCF
 
         select case (useHCFType)
         case (11)

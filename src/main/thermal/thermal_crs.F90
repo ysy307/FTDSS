@@ -1,4 +1,4 @@
-submodule(Main_Thermal) Main_Thermal_3Phase
+submodule(Main_Thermal) main_thermal_3phase
     implicit none
 contains
     module function construct_type_thermal_crs(input, coordinate, domain) result(structure)
@@ -24,11 +24,6 @@ contains
         structure%KT_old = structure%KT_star
         structure%CT_l = structure%KT_star
         structure%order = input%basic%solver_settings%bdf_order
-
-        ! allocate (structure%CT_old(structure%order))
-        ! do i = 1, structure%order
-        !     structure%CT_old(i) = structure%KT_star
-        ! end do
 
         call allocate_array(structure%FT, num_nodes)
         call allocate_array(structure%FT_old, num_nodes)
@@ -184,22 +179,22 @@ contains
         self%KT_l%val(:) = 0.0d0
         self%CT_l%val(:) = 0.0d0
 
-        ! --------------------------------------------------------------------------
+        !---------------------------------------------------------------------------------------------------------------------------
         ! 履歴に基づいて、このステップで使用する実際のBDF次数を決定する
-        ! --------------------------------------------------------------------------
+        !---------------------------------------------------------------------------------------------------------------------------
         actual_order = min(self%order, iteration%get_step())
         call allocate_array(coefficients, bounds=[0, actual_order])
 
-        ! --------------------------------------------------------------------------
+        !---------------------------------------------------------------------------------------------------------------------------
         ! 剛性行列と質量行列を組み立てる
-        ! --------------------------------------------------------------------------
+        !---------------------------------------------------------------------------------------------------------------------------
         call self%assemble_global(self%CT_l, self%KT_l, domain, self%T%pre, porosity, property)
         ! call self%assemble_mass(self%CT_l, domain, self%T%pre, porosity, property)
         ! call self%assemble_diffusive(self%KT_l, domain, self%T%pre, porosity, property)
 
-        ! --------------------------------------------------------------------------
+        !---------------------------------------------------------------------------------------------------------------------------
         ! 決定されたBDFスキームに基づいて左辺行列(LHS)と右辺ベクトル(RHS)を構築する
-        ! --------------------------------------------------------------------------
+        !---------------------------------------------------------------------------------------------------------------------------
         select case (actual_order)
         case (1) ! BDF1 (Backward Euler)
             dt_n = time%dt
@@ -279,4 +274,4 @@ contains
         call self%solver%check(stat, time%get_time())
     end subroutine solve_type_thermal_crs
 
-end submodule Main_Thermal_3Phase
+end submodule main_thermal_3phase

@@ -1,7 +1,7 @@
 module thermal_thermal_assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:type_gauss_point_state
+    use :: module_core, only:type_state
     use :: module_domain, only:type_domain, abst_element
     use :: module_properties, only:type_properties_manager
     use :: module_matrix, only:type_crs
@@ -41,7 +41,7 @@ contains
         ! --- ローカル変数 ---
         integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG
         real(real64) :: val, xi, eta, weight, detJ
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
 
         ! 並列版のコードに合わせて、事前補間用の配列をローカルに用意
         integer(int32), parameter :: max_gauss = 10
@@ -105,7 +105,7 @@ contains
         real(real64) :: val, xi, eta, weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
         real(real64) :: lambda_gp
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
 
         ! 並列版のコードに合わせて、事前補間用の配列をローカルに用意
         integer(int32), parameter :: max_gauss = 10
@@ -187,7 +187,7 @@ contains
 
         ! 熱伝導率と熱容量を事前に補間する配列
         integer(int32), parameter :: max_gauss = 10
-        type(type_gauss_point_state) :: state(max_gauss)
+        type(type_state) :: state(max_gauss)
         real(real64) :: Ca(max_gauss), lambda(max_gauss)
 
         num_nodes = element%get_num_nodes()

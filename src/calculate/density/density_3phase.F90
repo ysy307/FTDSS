@@ -24,7 +24,7 @@ contains
     module function calc_den_gauss_point_3phase(self, state) result(density)
         implicit none
         class(type_den_3phase), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        type(type_state), intent(in) :: state
         real(real64) :: density
 
         real(real64) :: phi1, phi2, phi3

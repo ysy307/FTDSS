@@ -1,6 +1,6 @@
 module calculate_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_gauss_point_state
+    use :: module_core, only:type_state
     use :: module_input, only:type_input
     implicit none
     private
@@ -40,10 +40,10 @@ module calculate_density
     ! ----------------------------------------------------------------
     abstract interface
         function abst_calc_den_gauss_point(self, state) result(density)
-            import :: abst_den, type_gauss_point_state, real64
+            import :: abst_den, type_state, real64
             implicit none
             class(abst_den), intent(in) :: self
-            type(type_gauss_point_state), intent(in) :: state
+            type(type_state), intent(in) :: state
             real(real64) :: density
         end function abst_calc_den_gauss_point
     end interface
@@ -66,10 +66,10 @@ module calculate_density
         end function construct_den_3phase
 
         module function calc_den_gauss_point_3phase(self, state) result(density)
-            import :: type_den_3phase, type_gauss_point_state
+            import :: type_den_3phase, type_state
             implicit none
             class(type_den_3phase), intent(in) :: self
-            type(type_gauss_point_state), intent(in) :: state
+            type(type_state), intent(in) :: state
             real(real64) :: density
         end function calc_den_gauss_point_3phase
     end interface

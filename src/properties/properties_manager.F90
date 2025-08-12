@@ -1,6 +1,6 @@
 module properties_properties_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_gauss_point_state
+    use :: module_core, only:type_state
     use :: module_input, only:type_input
     use :: module_calculate, only:abst_gcc, abst_wrf, abst_den, abst_vhc, abst_thc
     use :: properties_material_manager, only:type_material_manager
@@ -65,7 +65,7 @@ contains
     function calculate_thc_scalar(self, state, region_id) result(val)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        type(type_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
 
@@ -83,7 +83,7 @@ contains
     function calculate_thc_array(self, state, region_id) result(val)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state(:)
+        type(type_state), intent(in) :: state(:)
         integer(int32), intent(in) :: region_id
         real(real64) :: val(size(state))
 
@@ -107,7 +107,7 @@ contains
     function calculate_heat_capacity_scalar(self, state, region_id) result(val)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        type(type_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
 
@@ -140,7 +140,7 @@ contains
     function calculate_heat_capacity_array(self, state, region_id) result(val)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state(:)
+        type(type_state), intent(in) :: state(:)
         integer(int32), intent(in) :: region_id
         real(real64) :: val(size(state))
 
@@ -179,7 +179,7 @@ contains
     function calculate_water_content_scalar(self, state, region_id) result(val)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        type(type_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64) :: val
 
@@ -206,7 +206,7 @@ contains
     function calculate_water_content_array(self, state, region_id) result(val)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state(:)
+        type(type_state), intent(in) :: state(:)
         integer(int32), intent(in) :: region_id
         real(real64) :: val(size(state))
 
@@ -236,7 +236,7 @@ contains
     subroutine calc_thermal_properties_scalar(self, state, region_id, thc, vhc)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        type(type_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
         real(real64), intent(out) :: thc, vhc
 
@@ -274,7 +274,7 @@ contains
     subroutine calc_thermal_properties_array(self, state, region_id, thc, vhc)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state(:)
+        type(type_state), intent(in) :: state(:)
         integer(int32), intent(in) :: region_id
         real(real64), intent(out) :: thc(size(state)), vhc(size(state))
 

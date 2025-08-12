@@ -24,7 +24,7 @@ contains
     module function calc_sph_gauss_point_3phase(self, state) result(SPH)
         implicit none
         class(type_sph_3phase), intent(in) :: self
-        type(type_gauss_point_state), intent(in) :: state
+        type(type_state), intent(in) :: state
         real(real64) :: SPH
 
         real(real64) :: phi1, phi2, phi3

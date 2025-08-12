@@ -11,8 +11,6 @@ module solver_solve
 #endif
 
     public :: abst_solver
-    ! public :: abst_solver
-    ! public :: abst_solver
     public :: type_solver_sparse_crs_bicgstab
     public :: type_solver_sparse_crs_lu
     public :: type_solver_dense_lu
@@ -21,9 +19,6 @@ module solver_solve
     contains
         procedure(abst_solve), pass(self), deferred :: solve
         procedure(abst_check), pass(self), deferred :: check
-        ! generic :: solve => solve_sparse_crs
-        ! generic :: check => check_sparse_crs
-        ! final :: destruct_type_abst_solver
     end type abst_solver
 
     abstract interface

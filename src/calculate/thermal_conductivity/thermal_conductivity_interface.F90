@@ -1,6 +1,6 @@
 module calculate_thermal_conductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_gauss_point_state
+    use :: module_core, only:type_state
     use :: module_input, only:type_input
     implicit none
     private
@@ -35,10 +35,10 @@ module calculate_thermal_conductivity
 
     abstract interface
         function abst_calc_thc_gauss_point(self, state) result(lambda)
-            import :: abst_thc, type_gauss_point_state, real64
+            import :: abst_thc, type_state, real64
             implicit none
             class(abst_thc), intent(in) :: self
-            type(type_gauss_point_state), intent(in) :: state
+            type(type_state), intent(in) :: state
             real(real64) :: lambda
 
         end function abst_calc_thc_gauss_point
@@ -66,7 +66,7 @@ module calculate_thermal_conductivity
         module function calc_thc_gauss_point_3phase(self, state) result(lambda)
             implicit none
             class(type_thc_3phase), intent(in) :: self
-            type(type_gauss_point_state), intent(in) :: state
+            type(type_state), intent(in) :: state
             real(real64) :: lambda
 
         end function calc_thc_gauss_point_3phase

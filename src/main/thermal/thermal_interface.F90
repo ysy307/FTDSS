@@ -2,7 +2,7 @@ module main_thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
     use :: stdlib_strings
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d
     use :: module_domain, only:type_domain
     use :: module_properties, only:type_properties_manager
     use :: module_input, only:type_input
