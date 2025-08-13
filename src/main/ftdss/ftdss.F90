@@ -18,6 +18,7 @@ module Main_FTDSS
         type(type_domain) :: domain
 
         type(type_variable) :: phi
+        type(type_variable) :: T
         class(abst_thermal), allocatable :: thermal
 
         type(type_properties_manager) :: property
@@ -95,6 +96,7 @@ contains
         call self%output%initialize(input, self%domain, self%coordinate)
 
         call self%phi%initialize(nsize, input%basic%solver_settings%bdf_order)
+        call self%T%initialize(nsize, input%basic%solver_settings%bdf_order)
         call self%ic%apply('porosity', self%domain, self%phi)
 
         call self%output%output_coloring(self%domain)
@@ -102,5 +104,17 @@ contains
         call self%time%Profile_Stop("IO")
         call global_logger%log_information(message="FTDSS module initialized successfully.")
     end subroutine initialize_type_ftdss
+
+    subroutine shift_type_ftdss(self)
+        implicit none
+        class(type_ftdss), intent(inout) :: self
+
+        call self%phi%shift()
+        if (allocated(self%thermal)) then
+            call self%T%shift()
+            call self%thermal%shift()
+        end if
+
+    end subroutine shift_type_ftdss
 
 end module Main_FTDSS

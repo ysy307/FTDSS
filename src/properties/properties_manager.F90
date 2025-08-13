@@ -238,7 +238,8 @@ contains
         class(type_properties_manager), intent(in) :: self
         type(type_state), intent(in) :: state
         integer(int32), intent(in) :: region_id
-        real(real64), intent(out) :: thc, vhc
+        real(real64), intent(inout) :: thc
+        real(real64), intent(inout) :: vhc
 
         class(abst_thc), pointer :: local_thc
         class(abst_gcc), pointer :: local_gcc
@@ -276,7 +277,8 @@ contains
         class(type_properties_manager), intent(in) :: self
         type(type_state), intent(in) :: state(:)
         integer(int32), intent(in) :: region_id
-        real(real64), intent(out) :: thc(size(state)), vhc(size(state))
+        real(real64), intent(inout) :: thc(size(state))
+        real(real64), intent(inout) :: vhc(size(state))
 
         integer(int32) :: i
         class(abst_thc), pointer :: local_thc

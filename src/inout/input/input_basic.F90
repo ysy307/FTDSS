@@ -78,7 +78,7 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: coloring_types(4) = ["none", "welch_powell", "lfo", "dsatur"]
     character(*), parameter :: nonlinear_solver = "nonlinear_solver"
     character(*), parameter :: method = "method"
-    character(*), parameter :: valid_nonlinear_solver_methods(3) = ["none", "newton", "modified_newton"]
+    character(*), parameter :: valid_nonlinear_solver_methods(4) = ["none", "newton", "modified_newton", "picard"]
     character(*), parameter :: update_frequency = "update_frequency"
     character(*), parameter :: max_iterations = "max_iterations"
     character(*), parameter :: convergence = "convergence"
@@ -830,14 +830,14 @@ contains
         end select
 
         select case (self%basic%solver_settings%nonlinear_solver%method)
-        case (valid_nonlinear_solver_methods(2), valid_nonlinear_solver_methods(3))
+        case (valid_nonlinear_solver_methods(2), valid_nonlinear_solver_methods(3), valid_nonlinear_solver_methods(4))
             key = join([solver_settings, nonlinear_solver, max_iterations])
             call json%get(key, self%basic%solver_settings%nonlinear_solver%max_iterations, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
                 call global_logger%log_warning(message="Using default maximum iterations of 1000 for nonlinear solver.")
                 self%basic%solver_settings%nonlinear_solver%max_iterations = 1000
-            else if (self%basic%solver_settings%nonlinear_solver%max_iterations <= 0) then
+            else if (self%basic%solver_settings%nonlinear_solver%max_iterations < 0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if

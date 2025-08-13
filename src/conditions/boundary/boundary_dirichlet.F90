@@ -82,14 +82,14 @@ contains
                 end do
             else
                 select case (mode)
-                case (1)
+                case (mode_value)
                     call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
                     ! print *, value_dirichlet
-                case (0)
+                case (mode_nr)
                     !! Newton-Raphson step
                     value_dirichlet = 0.0d0
-                case (-1)
+                case (mode_ic)
                     !! initial condition
                     value_dirichlet = self%values(1)
                 end select
@@ -115,14 +115,14 @@ contains
                 end do
             else
                 select case (mode)
-                case (1)
+                case (mode_value)
                     call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
                     ! print *, value_dirichlet
-                case (0)
+                case (mode_nr)
                 !! Newton-Raphson step
                     value_dirichlet = 0.0d0
-                case (-1)
+                case (mode_ic)
                 !! initial condition
                     value_dirichlet = self%values(1)
                 end select

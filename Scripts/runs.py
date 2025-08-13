@@ -60,7 +60,8 @@ def main():
     WORKING_DIR_PATH = "/workspaces/FTDSS/Inout/1Domain-Square2nd"
     # 最終的な結果を格納するベースディレクトリのパス
     RESULTS_BASE_DIR_PATH = "/workspaces/FTDSS/Results/SQ2"
-    THREAD_LIST = [1, 2, 4, 8, 16, 32]
+    THREAD_LIST = [16, 32]
+    # THREAD_LIST = [1, 2, 4, 8, 16, 32]
     GEOMETRY_COUNT = 1
     # GEOMETRY_COUNT = 4
     # ======================================================================

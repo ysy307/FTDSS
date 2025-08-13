@@ -409,7 +409,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: original_temperature(:)
@@ -460,7 +460,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: original_temperature(:)
@@ -509,7 +509,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_temperature(:)
         real(real64), allocatable :: original_porosity(:)
@@ -562,7 +562,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_temperature(:)
         real(real64), allocatable :: original_porosity(:)
@@ -611,7 +611,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: original_temperature(:)
@@ -664,7 +664,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_temperature(:)
         real(real64), allocatable :: original_porosity(:)
@@ -712,7 +712,7 @@ contains
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_pressure(:)
         integer(int32) :: istat

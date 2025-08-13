@@ -4,7 +4,7 @@ module input_output
 !$  use :: omp_lib
     use :: stdlib_strings, only:to_string
     use :: vtk_fortran, only:vtk_file
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state, & !&
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, & !&
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                              get_cpu_architecture, get_os, get_openmp_version, get_memory_usage, & !&
                              filter, type_dp_vector_3d
@@ -106,6 +106,7 @@ module input_output
         character(:), allocatable :: format_output
         character(:), allocatable :: file_extension
         character(:), allocatable :: variable_names(:)
+        logical :: do_output
         ! DATA
         type(type_output_vtk) :: vtk
         procedure(abst_output_overall_fields), pointer, pass(self) :: write_fields => null()
@@ -279,6 +280,8 @@ contains
         real(real64), intent(in), optional :: si(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_dp_3d), intent(in), optional :: water_flux
+
+        if (.not. self%overall%do_output) return
 
         if (self%is_thermal .and. self%is_hydraulic) then
             call self%overall%write_fields(file_counts=file_counts, &

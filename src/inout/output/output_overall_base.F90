@@ -14,11 +14,14 @@ contains
         real(real64) :: output_step_second
         integer(int32) :: max_file_counts_digit
 
+        self%do_output = .false.
         select case (input%output_settings%field_output%file_format)
         case ("vtk")
             call self%initialize_vtk(input, coordinate, domain)
+            self%do_output = .true.
         case ("vtu")
             call self%initialize_vtu(input, coordinate, domain)
+            self%do_output = .true.
         end select
 
         if (allocated(self%variable_names)) deallocate (self%variable_names)

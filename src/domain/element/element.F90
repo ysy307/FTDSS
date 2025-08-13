@@ -533,7 +533,7 @@ module domain_element
     end interface
 
 contains
-    function get_id(self) result(id)
+    pure function get_id(self) result(id)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32) :: id
@@ -541,7 +541,7 @@ contains
         id = self%id
     end function get_id
 
-    function get_type(self) result(type)
+    pure function get_type(self) result(type)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32) :: type
@@ -549,7 +549,7 @@ contains
         type = self%type
     end function get_type
 
-    function get_num_nodes(self) result(num_nodes)
+    pure function get_num_nodes(self) result(num_nodes)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32) :: num_nodes
@@ -557,7 +557,7 @@ contains
         num_nodes = self%num_nodes
     end function get_num_nodes
 
-    function get_group(self) result(group)
+    pure function get_group(self) result(group)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32) :: group
@@ -565,7 +565,7 @@ contains
         group = self%group
     end function get_group
 
-    function get_order(self) result(order)
+    pure function get_order(self) result(order)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32) :: order
@@ -573,7 +573,7 @@ contains
         order = self%order
     end function get_order
 
-    function get_dimension(self) result(dimension)
+    pure function get_dimension(self) result(dimension)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32) :: dimension
@@ -581,7 +581,7 @@ contains
         dimension = self%dimension
     end function get_dimension
 
-    function get_num_gauss(self) result(num_gauss)
+    pure function get_num_gauss(self) result(num_gauss)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32) :: num_gauss

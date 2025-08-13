@@ -1,6 +1,6 @@
 module Calculate_HCF
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:allocate_array, type_gauss_point_state
+    use :: module_core, only:allocate_array, type_state
 #ifdef _OPENMP
     use omp_lib
 #endif
@@ -52,6 +52,8 @@ module Calculate_HCF
 
     type, abstract :: abst_hcf
         real(real64) :: k_s
+    contains
+        procedure(abst_calc_kflh), pass(self), deferred :: calc_kflh
     end type abst_hcf
 
     type, abstract, extends(abst_hcf) :: abst_hcf_base
@@ -62,22 +64,19 @@ module Calculate_HCF
         real(real64) :: l
     contains
         procedure(abst_calc_kr), pass(self), deferred :: calc_kr
-        procedure(abst_calc_kflh_base), pass(self), deferred :: calc_kflh
     end type abst_hcf_base
 
     type, abstract, extends(abst_hcf) :: abst_hcf_impedance
-        real(real64) :: Omega !! Impedance factor
+        real(real64) :: omega !! Impedance factor
     contains
         procedure(abst_calc_impedance), nopass, deferred :: calc_impedance
-        procedure(abst_calc_kflh_impedance), pass(self), deferred :: calc_kflh
     end type abst_hcf_impedance
 
     type, abstract, extends(abst_hcf) :: abst_hcf_Viscosity
-        real(real64) :: kzero
+        real(real64) :: k_zero
         procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
         procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_calc_viscosity
-        procedure(abst_calc_kflh_viscosity), pass(self), deferred :: calc_kflh
     end type abst_hcf_Viscosity
 
     type, abstract, extends(abst_hcf) :: abst_hcf_base_Impedance
@@ -86,11 +85,10 @@ module Calculate_HCF
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: l
-        real(real64) :: Omega
+        real(real64) :: omega
     contains
         procedure(abst_calc_kr_Impedance), pass(self), deferred :: calc_kr
         procedure(abst_calc_kr_impedance), nopass, deferred :: calc_impedance
-        procedure(abst_calc_kflh_Impedance), pass(self), deferred :: calc_kflh
     end type abst_hcf_base_Impedance
 
     type, abstract, extends(abst_hcf) :: abst_hcf_base_Viscosity
@@ -99,7 +97,7 @@ module Calculate_HCF
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: l
-        real(real64) :: kzero
+        real(real64) :: k_zero
         procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
         procedure(abst_calc_kr_Viscosity), pass(self), deferred :: calc_kr
@@ -113,8 +111,8 @@ module Calculate_HCF
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: l
-        real(real64) :: Omega
-        real(real64) :: kzero
+        real(real64) :: omega
+        real(real64) :: k_zero
         procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
         procedure(Abstract_Set_Calculate_HCF_Viscosity), nopass, deferred :: Set_calc_viscosity
@@ -128,8 +126,8 @@ module Calculate_HCF
         real(real64) :: alpha1
         real(real64) :: n1
         real(real64) :: l
-        real(real64) :: Omega
-        real(real64) :: kzero
+        real(real64) :: omega
+        real(real64) :: k_zero
         procedure(abst_calc_viscosity), nopass, pointer :: calc_viscosity => null()
     contains
         procedure(abst_calc_kr_Impedance_Viscosity), pass(self), deferred :: calc_kr
@@ -384,6 +382,17 @@ module Calculate_HCF
     end type Type_HCF_Impedance_Viscosity
 
     abstract interface
+        function abst_calc_kflh(self, state) result(kflh)
+            import :: abst_hcf_base, type_state, real64
+            implicit none
+            class(abst_hcf_base), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64) :: kflh
+
+        end function abst_calc_kflh
+    end interface
+
+    abstract interface
         function abst_calc_kr(self, h) result(kflh)
             import :: abst_hcf_base, real64
             implicit none
@@ -392,15 +401,6 @@ module Calculate_HCF
             real(real64) :: kflh
 
         end function abst_calc_kr
-
-        function abst_calc_kflh_base(self, h) result(kflh)
-            import :: abst_hcf_base, real64
-            implicit none
-            class(abst_hcf_base), intent(in) :: self
-            real(real64), intent(in) :: h
-            real(real64) :: kflh
-
-        end function abst_calc_kflh_base
 
         function abst_calc_kflh_impedance(self, q_ice) result(kflh)
             use, intrinsic :: iso_fortran_env, only: real64
@@ -552,10 +552,10 @@ module Calculate_HCF
             real(real64) :: kr
         end function abst_calc_kr_Impedance_Viscosity
 
-        function abst_calc_kr_impedance(Omega, q_ice) result(Impedance)
+        function abst_calc_kr_impedance(omega, q_ice) result(Impedance)
             use, intrinsic :: iso_fortran_env, only: real64
             implicit none
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             real(real64), intent(in) :: q_ice
             real(real64) :: Impedance
 
@@ -596,13 +596,13 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_BC_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_BC(Ks, alpha1, n1, l, Omega, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_BC(Ks, alpha1, n1, l, omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
 
@@ -632,13 +632,13 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_BC_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_Viscosity_BC(Ks, alpha1, n1, l, Omega, useViscosity, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_Viscosity_BC(Ks, alpha1, n1, l, omega, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
@@ -778,13 +778,13 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_VG_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_VG(Ks, alpha1, n1, l, Omega, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_VG(Ks, alpha1, n1, l, omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
 
@@ -814,13 +814,13 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_VG_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_Viscosity_VG(Ks, alpha1, n1, l, Omega, useViscosity, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_Viscosity_VG(Ks, alpha1, n1, l, omega, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
@@ -961,13 +961,13 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_KO_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_KO(Ks, alpha1, n1, l, Omega, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_KO(Ks, alpha1, n1, l, omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
 
@@ -997,13 +997,13 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_KO_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_Viscosity_KO(Ks, alpha1, n1, l, Omega, useViscosity, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_Viscosity_KO(Ks, alpha1, n1, l, omega, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
@@ -1146,7 +1146,7 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_MVG_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_MVG(Ks, thetaS, thetaR, alpha1, n1, l, hcrit, Omega, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_MVG(Ks, thetaS, thetaR, alpha1, n1, l, hcrit, omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: thetaS
@@ -1155,7 +1155,7 @@ module Calculate_HCF
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
             real(real64), intent(in) :: hcrit
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
 
@@ -1188,7 +1188,7 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_MVG_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_Viscosity_MVG(Ks, thetaS, thetaR, alpha1, n1, l, hcrit, Omega, useViscosity, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_Viscosity_MVG(Ks, thetaS, thetaR, alpha1, n1, l, hcrit, omega, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: thetaS
@@ -1197,7 +1197,7 @@ module Calculate_HCF
             real(real64), intent(in) :: n1
             real(real64), intent(in) :: l
             real(real64), intent(in) :: hcrit
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
@@ -1344,7 +1344,7 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_Durner_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_Durner(Ks, alpha1, n1, w1, alpha2, n2, l, Omega, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_Durner(Ks, alpha1, n1, w1, alpha2, n2, l, omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
@@ -1353,7 +1353,7 @@ module Calculate_HCF
             real(real64), intent(in) :: alpha2
             real(real64), intent(in) :: n2
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
 
@@ -1386,7 +1386,7 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_Durner_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_Viscosity_Durner(Ks, alpha1, n1, w1, alpha2, n2, l, Omega, useViscosity, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_Viscosity_Durner(Ks, alpha1, n1, w1, alpha2, n2, l, omega, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
@@ -1395,7 +1395,7 @@ module Calculate_HCF
             real(real64), intent(in) :: alpha2
             real(real64), intent(in) :: n2
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
@@ -1539,7 +1539,7 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_DVGCH_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_DVGCH(Ks, alpha1, n1, w1, n2, l, Omega, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_DVGCH(Ks, alpha1, n1, w1, n2, l, omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
@@ -1547,7 +1547,7 @@ module Calculate_HCF
             real(real64), intent(in) :: n2
             real(real64), intent(in) :: w1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
 
@@ -1579,7 +1579,7 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Base_Viscosity_DVGCH_minimal
 
-        module function Construct_Type_HCF_Base_Impedance_Viscosity_DVGCH(Ks, alpha1, n1, w1, n2, l, Omega, useViscosity, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Base_Impedance_Viscosity_DVGCH(Ks, alpha1, n1, w1, n2, l, omega, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
             real(real64), intent(in) :: alpha1
@@ -1587,7 +1587,7 @@ module Calculate_HCF
             real(real64), intent(in) :: n2
             real(real64), intent(in) :: w1
             real(real64), intent(in) :: l
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
@@ -1712,10 +1712,10 @@ module Calculate_HCF
 
         end subroutine Update_kflh_Base_Impedance_Viscosity_DVGCH
 
-        module function Construct_Type_HCF_Impedance(Ks, Omega, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Impedance(Ks, omega, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
 
@@ -1727,9 +1727,9 @@ module Calculate_HCF
 
         end function Construct_Type_HCF_Impedance_minimal
 
-        module function calc_impedance_Base(Omega, q_ice) result(Impedance)
+        module function calc_impedance_Base(omega, q_ice) result(Impedance)
             implicit none
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             real(real64), intent(in) :: q_ice
             real(real64) :: Impedance
 
@@ -1801,10 +1801,10 @@ module Calculate_HCF
 
         end subroutine Update_kflh_Viscosity
 
-        module function Construct_Type_HCF_Impedance_Viscosity(Ks, Omega, useViscosity, nsize) result(structure_HCF)
+        module function Construct_Type_HCF_Impedance_Viscosity(Ks, omega, useViscosity, nsize) result(structure_HCF)
             implicit none
             real(real64), intent(in) :: Ks
-            real(real64), intent(in) :: Omega
+            real(real64), intent(in) :: omega
             integer(int32), intent(in) :: useViscosity
             integer(int32), intent(in) :: nsize
             class(abst_hcf), allocatable :: structure_HCF
@@ -1976,7 +1976,7 @@ module Calculate_HCF
     end interface
 contains
 
-    function Construct_Type_HCF(useHCFType, Ks, thetaS, thetaR, alpha1, n1, w1, alpha2, n2, l, hcrit, Omega, useViscosity, nsize) result(structure_HCF)
+    function Construct_Type_HCF(useHCFType, Ks, thetaS, thetaR, alpha1, n1, w1, alpha2, n2, l, hcrit, omega, useViscosity, nsize) result(structure_HCF)
         implicit none
         integer(int32), intent(in) :: useHCFType
         real(real64), intent(in) :: Ks
@@ -1989,7 +1989,7 @@ contains
         real(real64), intent(in), optional :: n2
         real(real64), intent(in), optional :: l
         real(real64), intent(in), optional :: hcrit
-        real(real64), intent(in), optional :: Omega
+        real(real64), intent(in), optional :: omega
         integer(int32), intent(in), optional :: useViscosity
         integer(int32), intent(in) :: nsize
         class(abst_hcf), allocatable :: structure_HCF
@@ -2072,9 +2072,9 @@ contains
                                                 l=l, &
                                                 nsize=nsize)
         case (21)
-            if (.not. present(Omega)) stop "Missing Omega for HCF type 21"
+            if (.not. present(omega)) stop "Missing omega for HCF type 21"
             structure_HCF = Type_HCF_Impedance(Ks=Ks, &
-                                               Omega=Omega, &
+                                               omega=omega, &
                                                nsize=nsize)
         case (31)
             if (.not. present(useViscosity)) stop "Missing useViscosity for HCF type 31"
@@ -2082,48 +2082,48 @@ contains
                                                useViscosity=useViscosity, &
                                                nsize=nsize)
         case (41)
-            if (.not. present(Omega) .or. &
+            if (.not. present(omega) .or. &
                 .not. present(useViscosity) &
                 ) stop "Missing parameters for HCF type 41"
             structure_HCF = Type_HCF_Impedance_Viscosity(Ks=Ks, &
-                                                         Omega=Omega, &
+                                                         omega=omega, &
                                                          useViscosity=useViscosity, &
                                                          nsize=nsize)
         case (51)
             if (.not. present(alpha1) .or. &
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) &
+                .not. present(omega) &
                 ) stop "Missing parameters for HCF type 51"
             structure_HCF = Type_HCF_Base_Impedance_BC(Ks=Ks, &
                                                        alpha1=alpha1, &
                                                        n1=n1, &
                                                        l=l, &
-                                                       Omega=Omega, &
+                                                       omega=omega, &
                                                        nsize=nsize)
         case (52)
             if (.not. present(alpha1) .or. &
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) &
+                .not. present(omega) &
                 ) stop "Missing parameters for HCF type 52"
             structure_HCF = Type_HCF_Base_Impedance_VG(Ks=Ks, &
                                                        alpha1=alpha1, &
                                                        n1=n1, &
                                                        l=l, &
-                                                       Omega=Omega, &
+                                                       omega=omega, &
                                                        nsize=nsize)
         case (53)
             if (.not. present(alpha1) .or. &
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) &
+                .not. present(omega) &
                 ) stop "Missing parameters for HCF type 53"
             structure_HCF = Type_HCF_Base_Impedance_KO(Ks=Ks, &
                                                        alpha1=alpha1, &
                                                        n1=n1, &
                                                        l=l, &
-                                                       Omega=Omega, &
+                                                       omega=omega, &
                                                        nsize=nsize)
         case (54)
             if (.not. present(thetaS) .or. &
@@ -2132,7 +2132,7 @@ contains
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
                 .not. present(hcrit) .or. &
-                .not. present(Omega) &
+                .not. present(omega) &
                 ) stop "Missing parameters for HCF type 54"
             structure_HCF = Type_HCF_Base_Impedance_MVG(Ks=Ks, &
                                                         thetaS=thetaS, &
@@ -2141,7 +2141,7 @@ contains
                                                         n1=n1, &
                                                         l=l, &
                                                         hcrit=hcrit, &
-                                                        Omega=Omega, &
+                                                        omega=omega, &
                                                         nsize=nsize)
         case (55)
             if (.not. present(alpha1) .or. &
@@ -2150,7 +2150,7 @@ contains
                 .not. present(alpha2) .or. &
                 .not. present(n2) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) &
+                .not. present(omega) &
                 ) stop "Missing parameters for HCF type 55"
             structure_HCF = Type_HCF_Base_Impedance_Durner(Ks=Ks, &
                                                            alpha1=alpha1, &
@@ -2159,7 +2159,7 @@ contains
                                                            alpha2=alpha2, &
                                                            n2=n2, &
                                                            l=l, &
-                                                           Omega=Omega, &
+                                                           omega=omega, &
                                                            nsize=nsize)
         case (56)
             if (.not. present(alpha1) .or. &
@@ -2167,7 +2167,7 @@ contains
                 .not. present(w1) .or. &
                 .not. present(n2) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) &
+                .not. present(omega) &
                 ) stop "Missing parameters for HCF type 56"
             structure_HCF = Type_HCF_Base_Impedance_DVGCH(Ks=Ks, &
                                                           alpha1=alpha1, &
@@ -2175,7 +2175,7 @@ contains
                                                           w1=w1, &
                                                           n2=n2, &
                                                           l=l, &
-                                                          Omega=Omega, &
+                                                          omega=omega, &
                                                           nsize=nsize)
         case (61)
             if (.not. present(alpha1) .or. &
@@ -2269,42 +2269,42 @@ contains
             if (.not. present(alpha1) .or. &
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) .or. &
+                .not. present(omega) .or. &
                 .not. present(useViscosity) &
                 ) stop "Missing parameters for HCF type 71"
             structure_HCF = Type_HCF_Base_Impedance_Viscosity_BC(Ks=Ks, &
                                                                  alpha1=alpha1, &
                                                                  n1=n1, &
                                                                  l=l, &
-                                                                 Omega=Omega, &
+                                                                 omega=omega, &
                                                                  useViscosity=useViscosity, &
                                                                  nsize=nsize)
         case (72)
             if (.not. present(alpha1) .or. &
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) .or. &
+                .not. present(omega) .or. &
                 .not. present(useViscosity) &
                 ) stop "Missing parameters for HCF type 72"
             structure_HCF = Type_HCF_Base_Impedance_Viscosity_VG(Ks=Ks, &
                                                                  alpha1=alpha1, &
                                                                  n1=n1, &
                                                                  l=l, &
-                                                                 Omega=Omega, &
+                                                                 omega=omega, &
                                                                  useViscosity=useViscosity, &
                                                                  nsize=nsize)
         case (73)
             if (.not. present(alpha1) .or. &
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) .or. &
+                .not. present(omega) .or. &
                 .not. present(useViscosity) &
                 ) stop "Missing parameters for HCF type 73"
             structure_HCF = Type_HCF_Base_Impedance_Viscosity_KO(Ks=Ks, &
                                                                  alpha1=alpha1, &
                                                                  n1=n1, &
                                                                  l=l, &
-                                                                 Omega=Omega, &
+                                                                 omega=omega, &
                                                                  useViscosity=useViscosity, &
                                                                  nsize=nsize)
         case (74)
@@ -2314,7 +2314,7 @@ contains
                 .not. present(n1) .or. &
                 .not. present(l) .or. &
                 .not. present(hcrit) .or. &
-                .not. present(Omega) .or. &
+                .not. present(omega) .or. &
                 .not. present(useViscosity) &
                 ) stop "Missing parameters for HCF type 74"
             structure_HCF = Type_HCF_Base_Impedance_Viscosity_MVG(Ks=Ks, &
@@ -2324,7 +2324,7 @@ contains
                                                                   n1=n1, &
                                                                   l=l, &
                                                                   hcrit=hcrit, &
-                                                                  Omega=Omega, &
+                                                                  omega=omega, &
                                                                   useViscosity=useViscosity, &
                                                                   nsize=nsize)
         case (75)
@@ -2334,7 +2334,7 @@ contains
                 .not. present(alpha2) .or. &
                 .not. present(n2) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) .or. &
+                .not. present(omega) .or. &
                 .not. present(useViscosity) &
                 ) stop "Missing parameters for HCF type 75"
             structure_HCF = Type_HCF_Base_Impedance_Viscosity_Durner(Ks=Ks, &
@@ -2344,7 +2344,7 @@ contains
                                                                      alpha2=alpha2, &
                                                                      n2=n2, &
                                                                      l=l, &
-                                                                     Omega=Omega, &
+                                                                     omega=omega, &
                                                                      useViscosity=useViscosity, &
                                                                      nsize=nsize)
 
@@ -2354,7 +2354,7 @@ contains
                 .not. present(w1) .or. &
                 .not. present(n2) .or. &
                 .not. present(l) .or. &
-                .not. present(Omega) .or. &
+                .not. present(omega) .or. &
                 .not. present(useViscosity) &
                 ) stop "Missing parameters for HCF type 76"
             structure_HCF = Type_HCF_Base_Impedance_Viscosity_DVGCH(Ks=Ks, &
@@ -2363,7 +2363,7 @@ contains
                                                                     w1=w1, &
                                                                     n2=n2, &
                                                                     l=l, &
-                                                                    Omega=Omega, &
+                                                                    omega=omega, &
                                                                     useViscosity=useViscosity, &
                                                                     nsize=nsize)
         end select

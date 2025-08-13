@@ -13,6 +13,14 @@ module conditions_boundary
     public :: type_bc_thermal_dirichlet
     public :: type_bc_thermal_adiabatic
 
+    public :: mode_value
+    public :: mode_nr
+    public :: mode_ic
+
+    integer(int32), parameter :: mode_value = 1
+    integer(int32), parameter :: mode_nr = 0
+    integer(int32), parameter :: mode_ic = -1
+
     type, abstract :: abst_bc_thermal
         integer(int32) :: material_id
         character(:), allocatable :: boundary_name
