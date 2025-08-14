@@ -23,15 +23,15 @@ module main_thermal
         type(type_variable) :: Si
 
         type(type_crs) :: KT_star
-        type(type_crs) :: KT_l
-        type(type_crs) :: KT_old
-        type(type_crs) :: CT_l
+        ! type(type_crs) :: KT_l
+        ! type(type_crs) :: KT_old
+        ! type(type_crs) :: CT_l
         ! type(type_crs), allocatable :: CT_old(:)
 
         real(real64), allocatable :: FT(:)
-        real(real64), allocatable :: FT_old(:)
+        ! real(real64), allocatable :: FT_old(:)
         real(real64), allocatable :: PHIT(:)
-        real(real64), allocatable :: PHIT_old(:)
+        ! real(real64), allocatable :: PHIT_old(:)
 
         !! Nonlinear solver
         character(:), allocatable :: algorithm

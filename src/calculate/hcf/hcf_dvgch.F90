@@ -1,4 +1,4 @@
-submodule(Calculate_HCF) Calculate_HCF_DVGCH_Implementation
+submodule(calculate_hcf) calculate_hcf_dvgch
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -364,4 +364,4 @@ contains
         end do
 
     end subroutine Update_Kflh_Base_Impedance_Viscosity_DVGCH
-end submodule Calculate_HCF_DVGCH_Implementation
+end submodule calculate_hcf_dvgch

@@ -1,5 +1,6 @@
 add_library(Calc_HCF OBJECT
-    hcf.F90
+    hcf_interface.F90
+    hcf_base.F90
     hcf_bc.F90
     hcf_vg.F90
     hcf_ko.F90

@@ -1,112 +1,71 @@
-submodule(Calculate_HCF) Calculate_HCF_Viscosity_Implementation
+submodule(calculate_hcf) calculate_hcf_viscosity
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
     ! Constructe the type
     !----------------------------------------------------------------------------------------------------
-    module function Construct_Type_HCF_Viscosity(Ks, useViscosity, nsize) result(structure_HCF)
+    module function construct_type_hcf_viscosity(water_viscosity_model) result(structure)
         implicit none
-        real(real64), intent(in) :: Ks
-        integer(int32), intent(in) :: useViscosity
-        integer(int32), intent(in) :: nsize
-        class(Abstract_HCF), allocatable :: structure_HCF
+        integer(int32), intent(in) :: water_viscosity_model
+        class(abst_hcf_viscosity), allocatable :: structure
 
-        if (allocated(structure_HCF)) deallocate (structure_HCF)
-        allocate (Type_HCF_Viscosity :: structure_HCF)
+        if (allocated(structure)) deallocate (structure)
 
-        select type (this => structure_HCF)
-        type is (Type_HCF_Viscosity)
-            this%Ks = Ks
-            this%nsize = nsize
-
-            call this%Set_Calculate_Viscosity(useViscosity, this%Calculate_Viscosity)
-            this%Kzero = this%Ks * this%Calculate_Viscosity(15.d0)
-
-            call Allocate_Array(this%Kflh, nsize)
-            this%Kflh(:) = 0.0d0
-        end select
-
-    end function Construct_Type_HCF_Viscosity
-
-    module function Construct_Type_HCF_Viscosity_minimal() result(structure_HCF)
-        implicit none
-        class(Abstract_HCF), allocatable :: structure_HCF
-
-        if (allocated(structure_HCF)) deallocate (structure_HCF)
-        allocate (Type_HCF_Viscosity :: structure_HCF)
-
-    end function Construct_Type_HCF_Viscosity_minimal
-
-    !----------------------------------------------------------------------------------------------------
-    ! Associate the function to calculate the water viscosity
-    !----------------------------------------------------------------------------------------------------
-    module subroutine Set_Calculate_Viscosity_Base(Calculate_Viscosity_Type, Calculate_Viscosity)
-        implicit none
-        integer(int32), intent(in) :: Calculate_Viscosity_Type
-        procedure(Abstract_Calculate_Viscosity), pointer, intent(inout) :: Calculate_Viscosity
-
-        select case (Calculate_Viscosity_Type)
+        select case (water_viscosity_model)
         case (1)
-            Calculate_Viscosity => Calculate_HCF_mu_Exponential
+            allocate (type_hcf_viscosity_exp :: structure)
         case (2)
-            Calculate_Viscosity => Calculate_HCF_mu_Exponential_Supercooled
-        case default
-            Calculate_Viscosity => null()
+            allocate (type_hcf_viscosity_supercool :: structure)
         end select
 
-    end subroutine Set_Calculate_Viscosity_Base
+        select type (this => structure)
+        type is (type_hcf_viscosity_exp)
+            this%mu_zero = this%calc_viscosity(15.0d0)
+        type is (type_hcf_viscosity_supercool)
+            this%mu_zero = this%calc_viscosity(15.0d0)
+        end select
+
+    end function construct_type_hcf_viscosity
 
     !----------------------------------------------------------------------------------------------------
     ! Calculate water viscosity depending on the temperature
     !----------------------------------------------------------------------------------------------------
-    module function Calculate_HCF_mu_Exponential(Temperature) result(Viscosity)
-        !$omp declare simd uniform(Temperature)
+    module function calc_viscosity_exp(self, temperature) result(kr)
         implicit none
-        real(real64), intent(in) :: Temperature
-        real(real64) :: Viscosity
+        class(type_hcf_viscosity_exp), intent(in) :: self
+        real(real64), intent(in) :: temperature
+        real(real64) :: kr
 
-        Viscosity = 2.1d-6 * exp(1808.5d0 / (Temperature + 273.15d0))
+        kr = self%mu_zero / calc_mu_exponential(temperature)
 
-    end function Calculate_HCF_mu_Exponential
+    end function calc_viscosity_exp
 
-    module function Calculate_HCF_mu_Exponential_Supercooled(Temperature) result(Viscosity)
-        !$omp declare simd uniform(Temperature)
+    module function calc_viscosity_supercool(self, temperature) result(kr)
         implicit none
-        real(real64), intent(in) :: Temperature
-        real(real64) :: Viscosity
+        class(type_hcf_viscosity_supercool), intent(in) :: self
+        real(real64), intent(in) :: temperature
+        real(real64) :: kr
 
-        Viscosity = 1.3788d-4 * ((273.15d0 + Temperature) / 225.66d0 - 1.0d0)**(-1.6438d0)
+        kr = self%mu_zero / calc_mu_exponential_supercooled(temperature)
 
-    end function Calculate_HCF_mu_Exponential_Supercooled
+    end function calc_viscosity_supercool
 
-    !----------------------------------------------------------------------------------------------------
-    ! Calculate Kflh using the water viscosity
-    !----------------------------------------------------------------------------------------------------
-    module function Calculate_Kflh_Viscosity(self, Temperature) result(Kflh)
+    function calc_mu_exponential(temperature) result(viscosity)
         implicit none
-        class(Type_HCF_Viscosity), intent(in) :: self
-        real(real64), intent(in) :: Temperature
-        real(real64) :: Kflh
+        real(real64), intent(in) :: temperature
+        real(real64) :: viscosity
 
-        Kflh = self%kzero / self%Calculate_Viscosity(Temperature)
+        viscosity = 2.1d-6 * exp(1808.5d0 / (temperature + 273.15d0))
 
-    end function Calculate_Kflh_Viscosity
+    end function calc_mu_exponential
 
-    !----------------------------------------------------------------------------------------------------
-    ! Update Kflh using the water viscosity
-    !----------------------------------------------------------------------------------------------------
-    module subroutine Update_Kflh_Viscosity(self, arr_Temperature)
+    function calc_mu_exponential_supercooled(temperature) result(viscosity)
         implicit none
-        class(Type_HCF_Viscosity), intent(inout) :: self
-        real(real64), intent(in) :: arr_Temperature(:)
+        real(real64), intent(in) :: temperature
+        real(real64) :: viscosity
 
-        integer(int32) :: iN
+        viscosity = 1.3788d-4 * ((273.15d0 + temperature) / 225.66d0 - 1.0d0)**(-1.6438d0)
 
-        !$omp parallel do schedule(guided) private(iN)
-        do iN = 1, self%nsize
-            self%Kflh(iN) = self%Calculate_Kflh(arr_Temperature(iN))
-        end do
+    end function calc_mu_exponential_supercooled
 
-    end subroutine Update_Kflh_Viscosity
-
-end submodule Calculate_HCF_Viscosity_Implementation
+end submodule calculate_hcf_viscosity
