@@ -14,7 +14,7 @@ contains
 
         integer(int32) :: i
 
-        if (size(vector_reordered) /= self%num_nodes .or. size(vector_original) /= self%num_nodes) error stop "Size mismatch"
+        if (size(vector_reordered) /= size(vector_original)) error stop "Size mismatch"
         if (self%algorithm_name == "none") then
             vector_original(:) = vector_reordered(:)
             return
@@ -35,7 +35,7 @@ contains
 
         integer(int32) :: i
 
-        if (size(vector_reordered) /= self%num_nodes .or. size(vector_original) /= self%num_nodes) error stop "Size mismatch"
+        if (size(vector_reordered) /= size(vector_original)) error stop "Size mismatch"
         if (self%algorithm_name == "none") then
             vector_original(:) = vector_reordered(:)
             return

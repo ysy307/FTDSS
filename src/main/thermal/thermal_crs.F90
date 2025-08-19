@@ -32,6 +32,7 @@ contains
 
         ! call structure%T%initialize(num_nodes, structure%order)
 
+        print *, "Thermal CRS: num_nodes = ", num_nodes
         call structure%Qw%initialize(num_nodes, structure%order)
         call structure%Qice%initialize(num_nodes, structure%order)
         call structure%Si%initialize(num_nodes, structure%order)
@@ -83,7 +84,8 @@ contains
         n_nodes = domain%get_num_nodes()
 
         ! --- メイン計算ループ (OpenMPによる並列化) ---
-        !$omp parallel do private(j, state, neighbor_list, element_id, group_id, temp_qw, element_area, num_elem_nodes, weight) &
+        !$omp parallel do private(j, state, neighbor_list, element_id, group_id, temp_qw, element_area, num_elem_nodes, weight, &
+        !$omp total_weighted_qw, total_weight) &
         !$omp default(shared) schedule(static)
         do i = 1, n_nodes
             ! この節点の状態を設定
@@ -188,6 +190,8 @@ contains
         case default
             mode_bc = mode_nr
         end select
+        print *, mode_bc
+        stop
         call time%profile_stop("Setup")
 
         NR_LOOP_THERMAL: do while (iteration%should_continue())

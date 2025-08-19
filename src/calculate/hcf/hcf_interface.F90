@@ -281,6 +281,17 @@ module calculate_hcf
 
         end function calc_kr_base_durner
 
+        module function construct_type_hcf_base_dvgch(alpha1, n1, w1, n2, l) result(structure)
+            implicit none
+            real(real64), intent(in) :: alpha1
+            real(real64), intent(in) :: n1
+            real(real64), intent(in) :: w1
+            real(real64), intent(in) :: n2
+            real(real64), intent(in) :: l
+            class(abst_hcf_base), allocatable :: structure
+
+        end function construct_type_hcf_base_dvgch
+
         module function calc_kr_base_dvgch(self, h) result(kr)
             implicit none
             class(type_hcf_base_dvgch), intent(in) :: self

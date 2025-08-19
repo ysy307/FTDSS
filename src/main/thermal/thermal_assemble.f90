@@ -209,7 +209,7 @@ contains
         end do
 
         ! 状態配列を渡して、熱容量と熱伝導率の配列を一括計算
-        call propeties%calc_thermal(state(1:num_gauss), i_material, thc=lambda(1:num_gauss), vhc=Ca(1:num_gauss))
+        call propeties%calc_thermal(state, i_material, thc=lambda, vhc=Ca)
 
         ! 要素行列の計算とアセンブル
         do il = 1, num_nodes
@@ -262,6 +262,8 @@ contains
 
     subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, propeties, time, actual_order)
         implicit none
+
+        ! --- 引数 ---
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
         class(abst_element), intent(in), pointer :: element
@@ -271,13 +273,15 @@ contains
         type(type_time), intent(in) :: time
         integer(int32), intent(in) :: actual_order
 
-        ! --- ローカル変数 (変数名・宣言方法をあなたのコードに合わせる) ---
+        ! --- ローカル変数 ---
         integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, iO
         real(real64) :: xi, eta, weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
         real(real64) :: val
+        real(real64) :: dt_n
+        real(real64) :: coefficients(0:actual_order)
 
-        ! --- スタック上のワークスペース ---
+        ! --- スタック上のワークスペース (自動配列) ---
         real(real64) :: CT_e(element%get_num_nodes(), element%get_num_nodes())
         real(real64) :: KT_e(element%get_num_nodes(), element%get_num_nodes())
         real(real64) :: J_e(element%get_num_nodes(), element%get_num_nodes())
@@ -285,18 +289,16 @@ contains
         real(real64) :: T_old_e(element%get_num_nodes(), actual_order)
         real(real64) :: T_hist_e(element%get_num_nodes())
 
-        ! --- ガウスポイントでの物理量 ---
+        ! --- ガウスポイントでの物理量 (自動配列) ---
         type(type_state) :: state(element%get_num_gauss())
         real(real64) :: Ca(element%get_num_gauss()), lambda(element%get_num_gauss())
 
-        ! --- 時間関連 ---
-        real(real64) :: dt_n
-        real(real64) :: coefficients(0:actual_order)
-
-        ! --- 初期化 ---
+        ! ==========================================================================
+        ! STEP 0: 初期化とサイズの取得
+        ! ==========================================================================
         num_nodes = element%get_num_nodes()
-        i_material = element%get_group()
         num_gauss = element%get_num_gauss()
+        i_material = element%get_group()
 
         CT_e(:, :) = 0.0d0
         KT_e(:, :) = 0.0d0
@@ -304,17 +306,16 @@ contains
         ! ==========================================================================
         ! STEP 1: 全ガウスポイントの物理量を一括計算
         ! ==========================================================================
-        !$omp simd
         do iG = 1, num_gauss
             xi = element%gauss(1, iG)
             eta = element%gauss(2, iG)
-            state(iG)%temperature = element%interpolate(xi, eta, temperature%pre(:))
-            state(iG)%porosity = element%interpolate(xi, eta, porosity%pre(:))
+            state(iG)%temperature = element%interpolate(xi, eta, temperature%pre)
+            state(iG)%porosity = element%interpolate(xi, eta, porosity%pre)
         end do
-        call propeties%calc_thermal(state(1:num_gauss), i_material, lambda(1:num_gauss), Ca(1:num_gauss))
+        call propeties%calc_thermal(state, i_material, lambda, Ca)
 
         ! ==========================================================================
-        ! STEP 2: 1回の積分ループで、CT_e と KT_e を計算
+        ! STEP 2: 要素行列 CT_e と KT_e を計算
         ! ==========================================================================
         do iG = 1, num_gauss
             xi = element%gauss(1, iG)
@@ -322,24 +323,16 @@ contains
             weight = element%weight(iG)
             detJ = element%jacobian_det(xi, eta)
             do il = 1, num_nodes
-                dNdx_i = (element%jacobian(2, 2, xi, eta) * &
-                          element%dpsi_dxi(il, xi, eta) - &
-                          element%jacobian(2, 1, xi, eta) * &
-                          element%dpsi_deta(il, xi, eta)) / detJ
-                dNdy_i = (-element%jacobian(1, 2, xi, eta) * &
-                          element%dpsi_dxi(il, xi, eta) + &
-                          element%jacobian(1, 1, xi, eta) * &
-                          element%dpsi_deta(il, xi, eta)) / detJ
-                !$omp simd
+                dNdx_i = (element%jacobian(2, 2, xi, eta) * element%dpsi_dxi(il, xi, eta) - &
+                          element%jacobian(2, 1, xi, eta) * element%dpsi_deta(il, xi, eta)) / detJ
+                dNdy_i = (-element%jacobian(1, 2, xi, eta) * element%dpsi_dxi(il, xi, eta) + &
+                          element%jacobian(1, 1, xi, eta) * element%dpsi_deta(il, xi, eta)) / detJ
                 do jl = 1, num_nodes
-                    dNdx_j = (element%jacobian(2, 2, xi, eta) * &
-                              element%dpsi_dxi(jl, xi, eta) - &
-                              element%jacobian(2, 1, xi, eta) * &
-                              element%dpsi_deta(jl, xi, eta)) / detJ
-                    dNdy_j = (-element%jacobian(1, 2, xi, eta) * &
-                              element%dpsi_dxi(jl, xi, eta) + &
-                              element%jacobian(1, 1, xi, eta) * &
-                              element%dpsi_deta(jl, xi, eta)) / detJ
+                    dNdx_j = (element%jacobian(2, 2, xi, eta) * element%dpsi_dxi(jl, xi, eta) - &
+                              element%jacobian(2, 1, xi, eta) * element%dpsi_deta(jl, xi, eta)) / detJ
+                    dNdy_j = (-element%jacobian(1, 2, xi, eta) * element%dpsi_dxi(jl, xi, eta) + &
+                              element%jacobian(1, 1, xi, eta) * element%dpsi_deta(jl, xi, eta)) / detJ
+
                     CT_e(il, jl) = CT_e(il, jl) + element%psi(il, xi, eta) * element%psi(jl, xi, eta) * Ca(iG) * weight * detJ
                     KT_e(il, jl) = KT_e(il, jl) + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda(iG) * weight * detJ
                 end do
@@ -350,29 +343,28 @@ contains
         call time%get_time_coefficients(actual_order, coefficients)
 
         ! ==========================================================================
-        ! STEP 3: 計算済みのCT_e, KT_eを使い、最終的な LHS(J_e) と RHS(R_e) を構築
+        ! STEP 3: 最終的な LHS(J_e) と RHS(R_e) を構築
         ! ==========================================================================
-        ! --- 3a. LHS行列 J_e (=A_e) の構築 ---
-        J_e(:, :) = dt_n * KT_e(:, :) + coefficients(0) * CT_e(:, :)
-
-        ! --- 3b. RHSベクトル R_e (=b_e) の構築 (PHIT相当部分, SIMD最適化) ---
-        R_e(:) = 0.0d0
-        !$omp simd collapse(2)
-        do il = 1, num_nodes
-            do iO = 1, actual_order
-                T_old_e(il, iO) = temperature%old(element%get_connectivity(il), iO)
+        ! --- 3a. LHS行列 J_e の構築 (物理的に正しい式) ---
+        J_e(:, :) = 0.0d0
+        do jl = 1, num_nodes
+            do il = 1, num_nodes
+                J_e(il, jl) = coefficients(0) * CT_e(il, jl) + dt_n * KT_e(il, jl)
             end do
         end do
 
-        T_hist_e(:) = 0.0d0
-        !$omp simd
+        ! --- 3b. RHSベクトル R_e の構築 (物理的に正しい式) ---
         do il = 1, num_nodes
+            T_old_e(il, 1:actual_order) = temperature%old(element%get_connectivity(il), 1:actual_order)
+        end do
+
+        do il = 1, num_nodes
+            T_hist_e(il) = 0.0d0
             do iO = 1, actual_order
                 T_hist_e(il) = T_hist_e(il) + coefficients(iO) * T_old_e(il, iO)
             end do
         end do
 
-        !$omp simd
         do il = 1, num_nodes
             val = 0.0d0
             do jl = 1, num_nodes
@@ -382,9 +374,8 @@ contains
         end do
 
         ! ==========================================================================
-        ! STEP 4: 全体行列・ベクトルへの直接アセンブル
+        ! STEP 4: 全体行列・ベクトルへのアセンブル (数学的に正しい標準手順)
         ! ==========================================================================
-        !$omp simd
         do il = 1, num_nodes
             R(element%get_connectivity(il)) = R(element%get_connectivity(il)) + R_e(il)
             do jl = 1, num_nodes
@@ -526,7 +517,7 @@ contains
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element
 
-        !$omp parallel private(c, ie_idx, element, workspace) shared(domain, CT, KT, temperature, porosity, propeties)
+        !$omp parallel private(c, ie_idx, element)
         do c = 1, domain%colors%num_colors
             !$omp do
             do ie_idx = 1, domain%colors%colored(c)%num_elements
