@@ -32,7 +32,6 @@ contains
 
         ! call structure%T%initialize(num_nodes, structure%order)
 
-        print *, "Thermal CRS: num_nodes = ", num_nodes
         call structure%Qw%initialize(num_nodes, structure%order)
         call structure%Qice%initialize(num_nodes, structure%order)
         call structure%Si%initialize(num_nodes, structure%order)
@@ -133,7 +132,7 @@ contains
         self%Qw%dif(:) = self%Qw%pre(:) - self%Qw%old(:, 1)
         self%Qice%pre(:) = porosity(:) - self%Qw%pre(:)
         self%Qice%dif(:) = self%Qice%pre(:) - self%Qice%old(:, 1)
-        self%Si%pre(:) = (porosity(:) - self%Qice%pre(:)) / porosity(:)
+        self%Si%pre(:) = self%Qice%pre(:) / porosity(:)
 
     end subroutine update_type_thermal_crs
 
@@ -190,15 +189,12 @@ contains
         case default
             mode_bc = mode_nr
         end select
-        print *, mode_bc
-        stop
+
         call time%profile_stop("Setup")
 
         NR_LOOP_THERMAL: do while (iteration%should_continue())
             call time%profile_start("Setup")
             call iteration%increment_step()
-            self%KT_star%val(:) = 0.0d0
-            self%PHIT(:) = 0.0d0
             call time%profile_stop("Setup")
 
             call time%profile_start("Assemble")

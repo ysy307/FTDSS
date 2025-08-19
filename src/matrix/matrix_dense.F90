@@ -21,12 +21,12 @@ contains
         implicit none
         class(type_dense), intent(inout) :: self
         type(type_domain), intent(inout) :: domain
-
-        ! Initialize the dense matrix with zeros
         integer(int32) :: num_nodes
+
         num_nodes = domain%get_num_nodes()
         call allocate_array(self%val, num_nodes, num_nodes)
         self%val(:, :) = 0.0d0
+
     end subroutine initialize_type_dense
 
     subroutine find_dense(self, row, col, index)

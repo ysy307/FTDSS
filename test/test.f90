@@ -19,7 +19,7 @@ program test
                             b=FTDSS%T%new, &
                             Domain=FTDSS%domain, &
                             mode=-1)
-    call FTDSS%thermal%shift()
+    call FTDSS%shift()
     call FTDSS%thermal%update(FTDSS%domain, FTDSS%property, FTDSS%T%pre, FTDSS%phi%pre)
 
     count = 0
@@ -78,7 +78,7 @@ program test
         end if
         call FTDSS%time%profile_stop("IO")
 
-        call FTDSS%thermal%shift()
+        call FTDSS%shift()
 
         if (was_interrupted()) stop
 

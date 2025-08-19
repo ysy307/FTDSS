@@ -246,7 +246,7 @@ contains
         class(abst_wrf), pointer :: local_wrf
         class(abst_den), pointer :: local_den
         class(abst_vhc), pointer :: local_vhc
-        real(real64) :: local_dqi_dt
+        real(real64) :: local_dQi_dT
 
         call self%materials%get_thc(region_id, local_thc)
         call self%materials%get_gcc(region_id, local_gcc)
@@ -260,22 +260,26 @@ contains
         thc = local_thc%calc(state)
 
         ! 凍結水の微分項を一度だけ計算
-        local_dqi_dt = local_wrf%deriv(-local_gcc%calc(t=state%temperature, &
+        local_dQi_dT = local_wrf%deriv(-local_gcc%calc(t=state%temperature, &
                                                        pw=state%pressure, &
                                                        rhow=local_den%material2, &
-                                                       rhoi=local_den%material3))
+                                                       rhoi=local_den%material3)) &
+                       * local_gcc%deriv(t=state%temperature, &
+                                         pw=state%pressure, &
+                                         rhow=local_den%material2, &
+                                         rhoi=local_den%material3)
 
         ! 体積熱容量 (VHC) の計算
         vhc = local_vhc%calc(state=state, &
                              den=local_den, &
                              latentheat=local_gcc%lf, &
-                             dqi_dt=local_dqi_dt)
+                             dqi_dt=local_dQi_dT)
     end subroutine calc_thermal_properties_scalar
 
     subroutine calc_thermal_properties_array(self, state, region_id, thc, vhc)
         implicit none
         class(type_properties_manager), intent(in) :: self
-        type(type_state), intent(in) :: state(:)
+        type(type_state), intent(inout) :: state(:)
         integer(int32), intent(in) :: region_id
         real(real64), intent(inout) :: thc(size(state))
         real(real64), intent(inout) :: vhc(size(state))
@@ -286,7 +290,7 @@ contains
         class(abst_wrf), pointer :: local_wrf
         class(abst_den), pointer :: local_den
         class(abst_vhc), pointer :: local_vhc
-        real(real64) :: local_dqi_dt
+        real(real64) :: local_dQi_dT
 
         call self%materials%get_thc(region_id, local_thc)
         call self%materials%get_gcc(region_id, local_gcc)
@@ -297,20 +301,28 @@ contains
         ! デバッグモードでのポインタ関連付けチェックは省略
 
         do i = 1, size(state)
-            ! 熱伝導率 (THC) の計算
+            state(i)%water_content = local_wrf%calc(-local_gcc%calc(T=state(i)%temperature, &
+                                                                    Pw=state(i)%pressure, &
+                                                                    rhoW=local_den%material2, &
+                                                                    rhoI=local_den%material3))
+            ! Calculate thermal conductivity (THC)
             thc(i) = local_thc%calc(state(i))
 
             ! 凍結水の微分項を一度だけ計算
-            local_dqi_dt = local_wrf%deriv(-local_gcc%calc(t=state(i)%temperature, &
+            local_dQi_dT = local_wrf%deriv(-local_gcc%calc(t=state(i)%temperature, &
                                                            pw=state(i)%pressure, &
                                                            rhow=local_den%material2, &
-                                                           rhoi=local_den%material3))
+                                                           rhoi=local_den%material3)) &
+                           * local_gcc%deriv(t=state(i)%temperature, &
+                                             pw=state(i)%pressure, &
+                                             rhow=local_den%material2, &
+                                             rhoi=local_den%material3)
 
             ! 体積熱容量 (VHC) の計算
             vhc(i) = local_vhc%calc(state=state(i), &
                                     den=local_den, &
                                     latentheat=local_gcc%lf, &
-                                    dqi_dt=local_dqi_dt)
+                                    dqi_dt=local_dQi_dT)
         end do
     end subroutine calc_thermal_properties_array
 

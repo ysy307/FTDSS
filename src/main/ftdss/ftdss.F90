@@ -31,6 +31,7 @@ module Main_FTDSS
 
     contains
         procedure, pass(self) :: initialize => initialize_type_ftdss
+        procedure, pass(self) :: shift => shift_type_ftdss
     end type type_ftdss
 
 contains
