@@ -65,6 +65,10 @@ contains
                             self%eta(iObs) = tmp_eta
                             exit
                         end if
+                        if (iElem == num_elements) then
+                            print *, "Error: Observation point ", iObs, " is not inside any element."
+                            stop
+                        end if
                     end do
                 end do
             case (2)
@@ -89,6 +93,10 @@ contains
                             exit
                         end if
                     end do
+                    if (iElem == num_elements) then
+                        print *, "Error: Observation point ", iObs, " is not inside any element."
+                        stop
+                    end if
                 end do
             end select
         end select
