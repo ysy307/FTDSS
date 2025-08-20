@@ -106,73 +106,75 @@ contains
             call Allocate_Array(self%dt_old, input%basic%solver_settings%bdf_order)
             self%dt_old(:) = 0.0d0
 
-            select case (trim(input%output_settings%field_output%output_interval_unit))
-            case ("second")
-                select case (trim(input%conditions%time_control%simulation_period%unit))
+            if (allocated(input%output_settings%field_output%output_interval_unit)) then
+                select case (trim(input%output_settings%field_output%output_interval_unit))
                 case ("second")
-                    self%time_conversion = 1.0d0
+                    select case (trim(input%conditions%time_control%simulation_period%unit))
+                    case ("second")
+                        self%time_conversion = 1.0d0
+                    case ("minute")
+                        self%time_conversion = 1.0d0 / 60.0d0
+                    case ("hour")
+                        self%time_conversion = 1.0d0 / 3600.0d0
+                    case ("day")
+                        self%time_conversion = 1.0d0 / 86400.0d0
+                    case ("year")
+                        self%time_conversion = 1.0d0 / 31557600.0d0
+                    end select
                 case ("minute")
-                    self%time_conversion = 1.0d0 / 60.0d0
+                    select case (trim(input%conditions%time_control%simulation_period%unit))
+                    case ("second")
+                        self%time_conversion = 60.0d0
+                    case ("minute")
+                        self%time_conversion = 1.0d0
+                    case ("hour")
+                        self%time_conversion = 1.0d0 / 60.0d0
+                    case ("day")
+                        self%time_conversion = 1.0d0 / 1440.0d0
+                    case ("year")
+                        self%time_conversion = 1.0d0 / 525600.0d0
+                    end select
                 case ("hour")
-                    self%time_conversion = 1.0d0 / 3600.0d0
+                    select case (trim(input%conditions%time_control%simulation_period%unit))
+                    case ("second")
+                        self%time_conversion = 3600.0d0
+                    case ("minute")
+                        self%time_conversion = 60.0d0
+                    case ("hour")
+                        self%time_conversion = 1.0d0
+                    case ("day")
+                        self%time_conversion = 1.0d0 / 24.0d0
+                    case ("year")
+                        self%time_conversion = 1.0d0 / 8760.0d0
+                    end select
                 case ("day")
-                    self%time_conversion = 1.0d0 / 86400.0d0
+                    select case (trim(input%conditions%time_control%simulation_period%unit))
+                    case ("second")
+                        self%time_conversion = 86400.0d0
+                    case ("minute")
+                        self%time_conversion = 1440.0d0
+                    case ("hour")
+                        self%time_conversion = 24.0d0
+                    case ("day")
+                        self%time_conversion = 1.0d0
+                    case ("year")
+                        self%time_conversion = 1.0d0 / 365.0d0
+                    end select
                 case ("year")
-                    self%time_conversion = 1.0d0 / 31557600.0d0
+                    select case (trim(input%conditions%time_control%simulation_period%unit))
+                    case ("second")
+                        self%time_conversion = 31557600.0d0
+                    case ("minute")
+                        self%time_conversion = 525600.0d0
+                    case ("hour")
+                        self%time_conversion = 8760.0d0
+                    case ("day")
+                        self%time_conversion = 365.0d0
+                    case ("year")
+                        self%time_conversion = 1.0d0
+                    end select
                 end select
-            case ("minute")
-                select case (trim(input%conditions%time_control%simulation_period%unit))
-                case ("second")
-                    self%time_conversion = 60.0d0
-                case ("minute")
-                    self%time_conversion = 1.0d0
-                case ("hour")
-                    self%time_conversion = 1.0d0 / 60.0d0
-                case ("day")
-                    self%time_conversion = 1.0d0 / 1440.0d0
-                case ("year")
-                    self%time_conversion = 1.0d0 / 525600.0d0
-                end select
-            case ("hour")
-                select case (trim(input%conditions%time_control%simulation_period%unit))
-                case ("second")
-                    self%time_conversion = 3600.0d0
-                case ("minute")
-                    self%time_conversion = 60.0d0
-                case ("hour")
-                    self%time_conversion = 1.0d0
-                case ("day")
-                    self%time_conversion = 1.0d0 / 24.0d0
-                case ("year")
-                    self%time_conversion = 1.0d0 / 8760.0d0
-                end select
-            case ("day")
-                select case (trim(input%conditions%time_control%simulation_period%unit))
-                case ("second")
-                    self%time_conversion = 86400.0d0
-                case ("minute")
-                    self%time_conversion = 1440.0d0
-                case ("hour")
-                    self%time_conversion = 24.0d0
-                case ("day")
-                    self%time_conversion = 1.0d0
-                case ("year")
-                    self%time_conversion = 1.0d0 / 365.0d0
-                end select
-            case ("year")
-                select case (trim(input%conditions%time_control%simulation_period%unit))
-                case ("second")
-                    self%time_conversion = 31557600.0d0
-                case ("minute")
-                    self%time_conversion = 525600.0d0
-                case ("hour")
-                    self%time_conversion = 8760.0d0
-                case ("day")
-                    self%time_conversion = 365.0d0
-                case ("year")
-                    self%time_conversion = 1.0d0
-                end select
-            end select
+            end if
         end if
 
         if (present(profiler_sections)) then

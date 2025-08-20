@@ -48,23 +48,23 @@ contains
                                         - input%conditions%time_control%simulation_period%start) * 31536000.0d0
         end select
 
-        select case (input%output_settings%field_output%output_interval_unit)
-        case ("second")
-            output_step_second = input%output_settings%field_output%output_interval_step
-        case ("minute")
-            output_step_second = input%output_settings%field_output%output_interval_step * 60.0d0
-        case ("hour")
-            output_step_second = input%output_settings%field_output%output_interval_step * 3600.0d0
-        case ("day")
-            output_step_second = input%output_settings%field_output%output_interval_step * 86400.0d0
-        case ("year")
-            output_step_second = input%output_settings%field_output%output_interval_step * 31536000.0d0
-        end select
-
-        max_file_counts_digit = int(log10(simulation_period_second / output_step_second), kind=int32) + 1_int32
-        if (max_file_counts_digit < 1) max_file_counts_digit = 1
-
-        self%format_output = "(a,a,i"//to_string(max_file_counts_digit)//"."//to_string(max_file_counts_digit)//",a)"
+        if (allocated(input%output_settings%field_output%output_interval_unit)) then
+            select case (input%output_settings%field_output%output_interval_unit)
+            case ("second")
+                output_step_second = input%output_settings%field_output%output_interval_step
+            case ("minute")
+                output_step_second = input%output_settings%field_output%output_interval_step * 60.0d0
+            case ("hour")
+                output_step_second = input%output_settings%field_output%output_interval_step * 3600.0d0
+            case ("day")
+                output_step_second = input%output_settings%field_output%output_interval_step * 86400.0d0
+            case ("year")
+                output_step_second = input%output_settings%field_output%output_interval_step * 31536000.0d0
+            end select
+            max_file_counts_digit = int(log10(simulation_period_second / output_step_second), kind=int32) + 1_int32
+            if (max_file_counts_digit < 1) max_file_counts_digit = 1
+            self%format_output = "(a,a,i"//to_string(max_file_counts_digit)//"."//to_string(max_file_counts_digit)//",a)"
+        end if
 
     end subroutine initialize_input_type_output_overall
 

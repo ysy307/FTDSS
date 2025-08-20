@@ -171,7 +171,7 @@ contains
         ! Arguments
         class(type_thermal_crs), intent(inout) :: self
         type(type_domain), intent(inout) :: domain
-        type(type_properties_manager), intent(inout) :: property
+        type(type_properties_manager), intent(in) :: property
         type(type_variable), intent(inout) :: temperature
         type(type_variable), intent(inout) :: porosity
         type(type_time), intent(inout) :: time

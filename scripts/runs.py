@@ -55,29 +55,29 @@ def main():
     # ======================================================================
     # 「作業ディレクトリ」のパスのリスト。
     WORKING_DIR_PATHS = [
-        "/workspaces/FTDSS/Inout/1Domain-Square1st",
-        "/workspaces/FTDSS/Inout/2Domain-Square2nd",
-        "/workspaces/FTDSS/Inout/2Domain-Triangle1st",
-        "/workspaces/FTDSS/Inout/2Domain-Triangle2nd"
+        "/workspaces/FTDSS/project/1Domain-Square1st",
+        "/workspaces/FTDSS/project/1Domain-Square2nd",
+        "/workspaces/FTDSS/project/1Domain-Triangle1st",
+        "/workspaces/FTDSS/project/1Domain-Triangle2nd"
     ]
 
     # 最終的な結果を格納するベースディレクトリのパスのリスト。
     # 上のWORKING_DIR_PATHSと1対1で対応します。
     RESULTS_BASE_DIR_PATHS = [
         "/workspaces/FTDSS/Results/SQ1", # 1Domain-Square1st の結果
-        "/workspaces/FTDSS/Results/SQ2", # 2Domain-Square2nd の結果
-        "/workspaces/FTDSS/Results/TR1", # 2Domain-Triangle1st の結果
-        "/workspaces/FTDSS/Results/TR2"  # 2Domain-Triangle2nd の結果
+        "/workspaces/FTDSS/Results/SQ2", # 1Domain-Square2nd の結果
+        "/workspaces/FTDSS/Results/TR1", # 1Domain-Triangle1st の結果
+        "/workspaces/FTDSS/Results/TR2"  # 1Domain-Triangle2nd の結果
     ]
     
     # 各ディレクトリで試行するジオメトリの総数 (Geometry_1 から Geometry_N まで)
     GEOMETRY_COUNT = 4
     
     # 各シミュレーションで使用するスレッド数のリスト
-    THREAD_LIST = [16]
+    THREAD_LIST = [1,2,4,8,16,32]
     
     # 各シミュレーションを何回繰り返すか
-    REPEAT_COUNT = 1
+    REPEAT_COUNT = 3
     # ======================================================================
 
     results_summary = []

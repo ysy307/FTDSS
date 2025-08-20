@@ -17,7 +17,7 @@ module thermal_thermal_assemble
     public :: thermal_assemble_system_linear_1, thermal_assemble_system_linear_1_parallel
 
     abstract interface
-        subroutine abst_assemble_global(J, R, domain, temperature, porosity, propeties, time, actual_order)
+        subroutine abst_assemble_global(J, R, domain, temperature, porosity, properties, time, actual_order)
             import :: type_crs, type_domain, type_properties_manager, type_variable, type_time, int32, real64
             implicit none
             type(type_crs), intent(inout) :: J
@@ -25,14 +25,14 @@ module thermal_thermal_assemble
             type(type_domain), intent(inout), target :: domain
             type(type_variable), intent(in) :: temperature
             type(type_variable), intent(in) :: porosity
-            type(type_properties_manager), intent(inout) :: propeties
+            type(type_properties_manager), intent(in) :: properties
             type(type_time), intent(in) :: time
             integer(int32), intent(in) :: actual_order
         end subroutine abst_assemble_global
     end interface
 contains
 
-    subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, propeties, time, actual_order)
+    subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, time, actual_order)
         implicit none
 
         ! --- 引数 ---
@@ -41,7 +41,7 @@ contains
         class(abst_element), intent(in), pointer :: element
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: porosity
-        type(type_properties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(in) :: properties
         type(type_time), intent(in) :: time
         integer(int32), intent(in) :: actual_order
 
@@ -58,7 +58,6 @@ contains
         real(real64) :: KT_e(element%get_num_nodes(), element%get_num_nodes())
         real(real64) :: J_e(element%get_num_nodes(), element%get_num_nodes())
         real(real64) :: R_e(element%get_num_nodes())
-        real(real64) :: T_old_e(element%get_num_nodes(), actual_order)
         real(real64) :: T_hist_e(element%get_num_nodes())
 
         ! --- ガウスポイントでの物理量 (自動配列) ---
@@ -84,15 +83,7 @@ contains
             state(iG)%temperature = element%interpolate(xi, eta, temperature%pre)
             state(iG)%porosity = element%interpolate(xi, eta, porosity%pre)
         end do
-        call propeties%calc_thermal(state, i_material, lambda, Ca)
-        ! write (*, '(5es15.6)') state(1)%temperature, state(1)%porosity, state(1)%water_content, lambda(1), Ca(1)
-        ! write (*, '(5es15.6)') state(2)%temperature, state(2)%porosity, state(2)%water_content, lambda(2), Ca(2)
-        ! write (*, '(5es15.6)') state(3)%temperature, state(3)%porosity, state(3)%water_content, lambda(3), Ca(3)
-        ! write (*, '(5es15.6)') state(4)%temperature, state(4)%porosity, state(4)%water_content, lambda(4), Ca(4)
-        ! write (*, '(5es15.6)') state(5)%temperature, state(5)%porosity, state(5)%water_content, lambda(5), Ca(5)
-        ! write (*, '(5es15.6)') state(6)%temperature, state(6)%porosity, state(6)%water_content, lambda(6), Ca(6)
-        ! write (*, '(5es15.6)') state(7)%temperature, state(7)%porosity, state(7)%water_content, lambda(7), Ca(7)
-        ! write (*, '(5es15.6)') state(8)%temperature, state(8)%porosity, state(8)%water_content, lambda(8), Ca(8)
+        call properties%calc_thermal(state, i_material, lambda, Ca)
 
         ! ==========================================================================
         ! STEP 2: 要素行列 CT_e と KT_e を計算
@@ -133,11 +124,6 @@ contains
             end do
         end do
 
-        ! --- 3b. RHSベクトル R_e の構築 (物理的に正しい式) ---
-        do il = 1, num_nodes
-            T_old_e(il, 1:actual_order) = temperature%old(element%get_connectivity(il), 1:actual_order)
-        end do
-
         T_hist_e(:) = 0.0d0
         do il = 1, num_nodes
             do iO = 1, actual_order
@@ -166,14 +152,14 @@ contains
 
     end subroutine process_element_thermal_linear_1
 
-    subroutine thermal_assemble_system_linear_1(J, R, domain, temperature, porosity, propeties, time, actual_order)
+    subroutine thermal_assemble_system_linear_1(J, R, domain, temperature, porosity, properties, time, actual_order)
         implicit none
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
         type(type_domain), intent(inout), target :: domain
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: porosity
-        type(type_properties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(in) :: properties
         type(type_time), intent(in) :: time
         integer(int32), intent(in) :: actual_order
 
@@ -186,34 +172,54 @@ contains
 
         do iE = 1, num_elements
             element => domain%Elements(iE)%e
-            call process_element_thermal_linear_1(J, R, element, temperature, porosity, propeties, time, actual_order)
+            call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, time, actual_order)
         end do
     end subroutine thermal_assemble_system_linear_1
 
-    subroutine thermal_assemble_system_linear_1_parallel(J, R, domain, temperature, porosity, propeties, time, actual_order)
+    subroutine thermal_assemble_system_linear_1_parallel(J, R, domain, temperature, porosity, properties, time, actual_order)
         implicit none
+        ! --- 引数 ---
+        ! properties の intent(in) は、このサブルーチンがマスターオブジェクトを変更しないことを示す良い設計です。
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
         type(type_domain), intent(inout), target :: domain
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: porosity
-        type(type_properties_manager), intent(inout) :: propeties
+        type(type_properties_manager), intent(in) :: properties
         type(type_time), intent(in) :: time
         integer(int32), intent(in) :: actual_order
 
+        ! --- ローカル変数 ---
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element
+        type(type_properties_manager) :: local_properties
 
-        !$omp parallel private(c, ie_idx, element)
+        ! 1. 並列リージョンを開始する。スレッドチームが作られる。
+        !    local_properties は private なので、各スレッドが自分専用の変数を持つ。
+        !$omp parallel private(c, ie_idx, element, local_properties)
+
+        ! 2. --- ディープコピー ---
+        !    並列リージョンの内側で、各スレッドがこの代入文を一度だけ実行する。
+        !    これにより、各スレッドが完全に独立した安全なコピーを持つことになる。
+        local_properties = properties
+
+        ! 3. 色のループを開始する
         do c = 1, domain%colors%num_colors
+            ! 4. 同じ色の要素ループを、スレッド間で分担して実行する
             !$omp do
             do ie_idx = 1, domain%colors%colored(c)%num_elements
                 element => domain%Elements(domain%colors%colored(c)%Elements(ie_idx))%e
-                call process_element_thermal_linear_1(J, R, element, temperature, porosity, propeties, time, actual_order)
+
+                ! 5. ワーカー関数には、スレッド専用の local_properties を渡す
+                call process_element_thermal_linear_1(J, R, element, temperature, porosity, &
+                                                      local_properties, time, actual_order)
             end do
             !$omp end do
+            ! ここには暗黙のバリアがあり、全スレッドがこの色の処理を終えるまで次の色に進まない
         end do
+
+        ! 6. 全ての処理が終わり、並列リージョンを終了する
         !$omp end parallel
-    end subroutine thermal_assemble_system_linear_1_parallel
+    end subroutine
 
 end module thermal_thermal_assemble

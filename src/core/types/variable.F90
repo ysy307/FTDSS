@@ -82,7 +82,7 @@ contains
         real(real64), intent(in), optional :: dt2, dt3
 
         integer(int32) :: i
-        real(real64) :: w0, w1, w2
+        real(real64) :: w0, w1
         real(real64) :: t0, t1, t2, t3
         real(real64) :: l0, l1, l2
 
