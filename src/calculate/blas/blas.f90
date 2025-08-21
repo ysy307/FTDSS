@@ -15,6 +15,7 @@ module calculate_blas
     public :: norm_2
     public :: norm_infinity
     public :: inner_product
+    public :: multiply_matrix_vector
 
 contains
 
@@ -74,4 +75,28 @@ contains
         !$omp end parallel do
 #endif
     end function inner_product
+
+    subroutine multiply_matrix_vector(alpha, A, x, beta, y)
+        implicit none
+        real(real64), intent(in) :: alpha
+        real(real64), intent(in) :: A(:, :)
+        real(real64), intent(in) :: x(:)
+        real(real64), intent(in) :: beta
+        real(real64), intent(inout) :: y(:)
+
+        integer(int32) :: i
+
+#ifdef _MKL
+        call dgemv('N', size(A, 1), size(A, 2), alpha, A, size(A, 1), x, 1, beta, y, 1)
+#else
+
+        !$omp parallel do private(i)
+        do i = 1, size(A, 1)
+            y(i) = alpha * dot_product(A(i, :), x) + beta * y(i)
+        end do
+        !$omp end parallel do
+#endif
+
+    end subroutine multiply_matrix_vector
+
 end module calculate_blas

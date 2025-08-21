@@ -56,7 +56,7 @@ contains
 
         self%algorithm = input%basic%solver_settings%nonlinear_solver%method
         select case (trim(self%algorithm))
-        case ("newton", "modified_newton")
+        case ("newton", "modified_newton", "picard")
             self%config%max_iterations = input%basic%solver_settings%nonlinear_solver%max_iterations
             self%config%update_frequency = input%basic%solver_settings%nonlinear_solver%update_frequency
             self%config%convergence = input%basic%solver_settings%nonlinear_solver%convergence
@@ -203,7 +203,7 @@ contains
         end if
     end function continue_loop
 
-    function get_iter(self) result(iter)
+    pure function get_iter(self) result(iter)
         implicit none
         class(type_iteration), intent(in) :: self
         integer(int32) :: iter
@@ -211,7 +211,7 @@ contains
         iter = self%iter
     end function get_iter
 
-    function get_step(self) result(step)
+    pure function get_step(self) result(step)
         implicit none
         class(type_iteration), intent(in) :: self
         integer(int32) :: step
@@ -219,7 +219,7 @@ contains
         step = self%step
     end function get_step
 
-    function get_status(self) result(is_converged)
+    pure function get_status(self) result(is_converged)
         implicit none
         class(type_iteration), intent(in) :: self
         logical :: is_converged
@@ -227,7 +227,7 @@ contains
         is_converged = self%is_converged
     end function get_status
 
-    function get_algorithm_name(self) result(algorithm_name)
+    pure function get_algorithm_name(self) result(algorithm_name)
         implicit none
         class(type_iteration), intent(in) :: self
         character(:), allocatable :: algorithm_name

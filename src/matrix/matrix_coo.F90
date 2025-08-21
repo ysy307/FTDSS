@@ -7,6 +7,8 @@ module matrix_coo
     private
 
     public :: type_coo
+    public :: type_coo_gemv
+    public :: type_coo_add
 
     type, extends(abst_matrix) :: type_coo
         integer(int32) :: nnz = 0 ! number of non-zero elements
@@ -16,8 +18,7 @@ module matrix_coo
     contains
         procedure, public, pass(self) :: initialize => initialize_type_coo
         procedure, public, pass(self) :: find => find_coo
-        procedure, public, pass(self) :: copy => copy_coo
-        procedure, public, pass(self) :: destory => destory_coo
+        procedure, public, pass(self) :: destroy => destroy_coo
     end type
 
 contains
@@ -155,25 +156,7 @@ contains
         end do
     end subroutine find_coo
 
-    function copy_coo(self) result(B)
-        implicit none
-        class(type_coo), intent(in) :: self
-        class(abst_matrix), allocatable :: B
-
-        allocate (type_coo :: B)
-        select type (matrix => B)
-        type is (type_coo)
-            matrix%nnz = self%nnz
-            call allocate_array(matrix%row, self%nnz)
-            call allocate_array(matrix%col, self%nnz)
-            call allocate_array(matrix%val, self%nnz)
-            matrix%row(:) = self%row(:)
-            matrix%col(:) = self%col(:)
-            matrix%val(:) = self%val(:)
-        end select
-    end function copy_coo
-
-    subroutine destory_coo(self)
+    subroutine destroy_coo(self)
         implicit none
         class(type_coo), intent(inout) :: self
 
@@ -183,6 +166,59 @@ contains
         call deallocate_array(self%val)
 
         self%nnz = 0
-    end subroutine destory_coo
+    end subroutine destroy_coo
+
+    subroutine type_coo_gemv(alpha, A, x, beta, y)
+        ! y := alpha*A*x + beta*y
+        use omp_lib
+        implicit none
+        real(real64), intent(in) :: alpha
+        type(type_coo), intent(in) :: A
+        real(real64), intent(in) :: x(:)
+        real(real64), intent(in) :: beta
+        real(real64), intent(inout) :: y(:)
+
+        integer(int32) :: i
+
+        ! y := beta*y
+        !$omp parallel do default(shared) private(i)
+        do i = 1, size(y)
+            y(i) = beta * y(i)
+        end do
+        !$omp end parallel do
+
+        ! y += alpha*A*x
+        !$omp parallel do default(shared) private(i)
+        do i = 1, A%nnz
+            !$omp atomic
+            y(A%row(i)) = y(A%row(i)) + alpha * A%val(i) * x(A%col(i))
+        end do
+        !$omp end parallel do
+
+    end subroutine type_coo_gemv
+
+    subroutine type_coo_add(alpha, A, B, C)
+        ! C := alpha*A + B
+        implicit none
+        real(real64), intent(in) :: alpha
+        type(type_coo), intent(in) :: A
+        type(type_coo), intent(in) :: B
+        type(type_coo), intent(inout) :: C
+
+        integer(int32) :: i
+        real(real64), allocatable :: tmp(:)
+
+        call allocatable_array(tmp, A%nnz)
+
+        do i = 1, A%nnz
+            tmp(i) = alpha * A%val(i) + B%val(i)
+        end do
+
+        do i = 1, A%nnz
+            C%val(i) = tmp(i)
+        end do
+
+        call deallocate_array(tmp)
+    end subroutine type_coo_add
 
 end module matrix_coo

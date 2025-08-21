@@ -1,7 +1,7 @@
 module domain_element
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
-    use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
+    use :: module_core, only:type_dp_3d, type_dp_vector_3d, assignment(=), type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
     use :: module_input, only:type_geometry_settings
     implicit none
     private
@@ -50,7 +50,7 @@ module domain_element
         !----------------------------------------------------------------------------------
         integer(int32) :: num_gauss !! Number of Gauss Quadrature points
         real(real64), allocatable :: weight(:) !! Gauss weight
-        real(real64), allocatable :: gauss(:, :) !! Gauss Quadrature points Coordinate
+        type(type_dp_vector_3d), allocatable :: gauss(:) !! Gauss Quadrature points Coordinate
         !----------------------------------------------------------------------------------
         ! Interpolation functions
         !----------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ module domain_element
 
         end function abst_get_connectivity
 
-        function abst_get_area(self) result(area)
+        pure function abst_get_area(self) result(area)
             import :: abst_element, real64
             implicit none
             class(abst_element), intent(in) :: self
@@ -151,64 +151,64 @@ module domain_element
 
         end function abst_get_area
 
-        function abst_psi(self, i, xi, eta) result(psi)
-            import :: abst_element, int32, real64
+        pure function abst_psi(self, i, r) result(psi)
+            import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: psi
         end function abst_psi
 
-        function abst_dpsi_dxi(self, i, xi, eta) result(dpsi)
-            import :: abst_element, int32, real64
+        pure function abst_dpsi_dxi(self, i, r) result(dpsi)
+            import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
         end function abst_dpsi_dxi
 
-        function abst_dpsi_deta(self, i, xi, eta) result(dpsi)
-            import :: abst_element, int32, real64
+        pure function abst_dpsi_deta(self, i, r) result(dpsi)
+            import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
         end function abst_dpsi_deta
 
-        function abst_jacobian(self, i, j, xi, eta) result(Jval)
-            import :: abst_element, int32, real64
+        pure function abst_jacobian(self, i, j, r) result(Jval)
+            import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
             integer(int32), intent(in) :: i, j
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: Jval
         end function abst_jacobian
 
-        function abst_jacobian_det(self, xi, eta) result(J_Det)
-            import :: abst_element, int32, real64
+        pure function abst_jacobian_det(self, r) result(J_Det)
+            import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: J_Det
         end function abst_jacobian_det
 
-        subroutine abst_is_inside(self, px, py, pxi, peta, is_in)
-            import abst_element, real64
+        subroutine abst_is_inside(self, cartesian, normalized, is_in)
+            import abst_element, type_dp_vector_3d
             implicit none
             class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: px, py
-            real(real64), intent(inout) :: pxi, peta
+            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_dp_vector_3d), intent(inout) :: normalized
             logical, intent(inout) :: is_in
         end subroutine abst_is_inside
 
-        function abst_interpolate(self, xi, eta, value) result(interpolated_value)
-            import :: abst_element, real64
+        pure function abst_interpolate(self, r, value) result(interpolated_value)
+            import :: abst_element, type_dp_vector_3d, real64
             implicit none
             class(abst_element), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
         end function abst_interpolate
@@ -229,62 +229,62 @@ module domain_element
 
         end function construct_triangle_first
 
-        module function get_area_triangle_first(self) result(area)
+        pure module function get_area_triangle_first(self) result(area)
             implicit none
             class(type_triangle_first), intent(in) :: self
             real(real64) :: area
 
         end function get_area_triangle_first
 
-        module function psi_triangle_first(self, i, xi, eta) result(N)
+        pure module function psi_triangle_first(self, i, r) result(N)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: N
 
         end function psi_triangle_first
 
-        module function dpsi_dxi_triangle_first(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_dxi_triangle_first(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_dxi_triangle_first
 
-        module function dpsi_deta_triangle_first(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_deta_triangle_first(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_deta_triangle_first
 
-        module function jacobian_triangle_first(self, i, j, xi, eta) result(Jval)
+        pure module function jacobian_triangle_first(self, i, j, r) result(Jval)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i, j
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: Jval
 
         end function jacobian_triangle_first
 
-        module function jacobian_det_triangle_first(self, xi, eta) result(J_Det)
+        pure module function jacobian_det_triangle_first(self, r) result(J_Det)
             implicit none
             class(type_triangle_first), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: J_Det
 
         end function jacobian_det_triangle_first
 
-        module subroutine is_in_triangle_first(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_triangle_first(self, cartesian, normalized, is_in)
             implicit none
             class(type_triangle_first), intent(in) :: self
-            real(real64), intent(in) :: px, py
-            real(real64), intent(inout) :: pxi, peta
+            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_dp_vector_3d), intent(inout) :: normalized
             logical, intent(inout) :: is_in
 
         end subroutine is_in_triangle_first
@@ -304,62 +304,62 @@ module domain_element
 
         end function construct_square_first
 
-        module function get_area_square_first(self) result(area)
+        pure module function get_area_square_first(self) result(area)
             implicit none
             class(type_square_first), intent(in) :: self
             real(real64) :: area
 
         end function get_area_square_first
 
-        module function psi_square_first(self, i, xi, eta) result(psi)
+        pure module function psi_square_first(self, i, r) result(psi)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: psi
 
         end function psi_square_first
 
-        module function dpsi_dxi_square_first(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_dxi_square_first(self, i, r) result(dpsi)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_dxi_square_first
 
-        module function dpsi_deta_square_first(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_deta_square_first(self, i, r) result(dpsi)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_deta_square_first
 
-        module function jacobian_square_first(self, i, j, xi, eta) result(Jval)
+        pure module function jacobian_square_first(self, i, j, r) result(Jval)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i, j
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: Jval
 
         end function jacobian_square_first
 
-        module function jacobian_det_square_first(self, xi, eta) result(J_Det)
+        pure module function jacobian_det_square_first(self, r) result(J_Det)
             implicit none
             class(type_square_first), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: J_Det
 
         end function jacobian_det_square_first
 
-        module subroutine is_in_square_first(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_square_first(self, cartesian, normalized, is_in)
             implicit none
             class(type_square_first), intent(in) :: self
-            real(real64), intent(in) :: px, py
-            real(real64), intent(inout) :: pxi, peta
+            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_dp_vector_3d), intent(inout) :: normalized
             logical, intent(inout) :: is_in
 
         end subroutine is_in_square_first
@@ -379,62 +379,62 @@ module domain_element
 
         end function construct_triangle_second
 
-        module function get_area_triangle_second(self) result(area)
+        pure module function get_area_triangle_second(self) result(area)
             implicit none
             class(type_triangle_second), intent(in) :: self
             real(real64) :: area
 
         end function get_area_triangle_second
 
-        module function psi_triangle_second(self, i, xi, eta) result(N)
+        pure module function psi_triangle_second(self, i, r) result(N)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: N
 
         end function psi_triangle_second
 
-        module function dpsi_dxi_triangle_second(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_dxi_triangle_second(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_dxi_triangle_second
 
-        module function dpsi_deta_triangle_second(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_deta_triangle_second(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_deta_triangle_second
 
-        module function jacobian_triangle_second(self, i, j, xi, eta) result(Jval)
+        pure module function jacobian_triangle_second(self, i, j, r) result(Jval)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i, j
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: Jval
 
         end function jacobian_triangle_second
 
-        module function jacobian_det_triangle_second(self, xi, eta) result(J_Det)
+        pure module function jacobian_det_triangle_second(self, r) result(J_Det)
             implicit none
             class(type_triangle_second), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: J_Det
 
         end function jacobian_det_triangle_second
 
-        module subroutine is_in_triangle_second(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_triangle_second(self, cartesian, normalized, is_in)
             implicit none
             class(type_triangle_second), intent(in) :: self
-            real(real64), intent(in) :: px, py
-            real(real64), intent(inout) :: pxi, peta
+            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_dp_vector_3d), intent(inout) :: normalized
             logical, intent(inout) :: is_in
 
         end subroutine is_in_triangle_second
@@ -455,62 +455,62 @@ module domain_element
 
         end function construct_square_second
 
-        module function get_area_square_second(self) result(area)
+        pure module function get_area_square_second(self) result(area)
             implicit none
             class(type_square_second), intent(in) :: self
             real(real64) :: area
 
         end function get_area_square_second
 
-        module function psi_square_second(self, i, xi, eta) result(psi)
+        pure module function psi_square_second(self, i, r) result(psi)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: psi
 
         end function psi_square_second
 
-        module function dpsi_dxi_square_second(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_dxi_square_second(self, i, r) result(dpsi)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_dxi_square_second
 
-        module function dpsi_deta_square_second(self, i, xi, eta) result(dpsi)
+        pure module function dpsi_deta_square_second(self, i, r) result(dpsi)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
 
         end function dpsi_deta_square_second
 
-        module function jacobian_square_second(self, i, j, xi, eta) result(Jval)
+        pure module function jacobian_square_second(self, i, j, r) result(Jval)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i, j
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: Jval
 
         end function jacobian_square_second
 
-        module function jacobian_det_square_second(self, xi, eta) result(J_Det)
+        pure module function jacobian_det_square_second(self, r) result(J_Det)
             implicit none
             class(type_square_second), intent(in) :: self
-            real(real64), intent(in) :: xi, eta
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: J_Det
 
         end function jacobian_det_square_second
 
-        module subroutine is_in_square_second(self, px, py, pxi, peta, is_in)
+        module subroutine is_in_square_second(self, cartesian, normalized, is_in)
             implicit none
             class(type_square_second), intent(in) :: self
-            real(real64), intent(in) :: px, py
-            real(real64), intent(inout) :: pxi, peta
+            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_dp_vector_3d), intent(inout) :: normalized
             logical, intent(inout) :: is_in
 
         end subroutine is_in_square_second
@@ -589,56 +589,48 @@ contains
         num_gauss = self%num_gauss
     end function get_num_gauss
 
-    function interpolate(self, xi, eta, value) result(interpolated_value)
+    pure function interpolate(self, r, value) result(interpolated_value)
         implicit none
         class(abst_element), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
         integer(int32) :: i
 
         interpolated_value = 0.0d0
         do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity(i))
+            interpolated_value = interpolated_value + self%psi(i, r) * value(self%connectivity(i))
         end do
     end function interpolate
 
-    function interpolate_reordered(self, xi, eta, value) result(interpolated_value)
+    pure function interpolate_reordered(self, r, value) result(interpolated_value)
         implicit none
         class(abst_element), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
         integer(int32) :: i
 
         interpolated_value = 0.0d0
         do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, xi, eta) * value(self%connectivity_reordered(i))
+            interpolated_value = interpolated_value + self%psi(i, r) * value(self%connectivity_reordered(i))
         end do
     end function interpolate_reordered
 
-    function get_connectivity(self, index) result(connectivity)
+    pure function get_connectivity(self, index) result(connectivity)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32), intent(in) :: index
         integer(int32) :: connectivity
-
-        if (index < 1 .or. index > self%num_nodes) then
-            error stop 'Index out of bounds in get_connectivity'
-        end if
 
         connectivity = self%connectivity(index)
     end function get_connectivity
 
-    function get_connectivity_reordered(self, index) result(connectivity)
+    pure function get_connectivity_reordered(self, index) result(connectivity)
         implicit none
         class(abst_element), intent(in) :: self
         integer(int32), intent(in) :: index
         integer(int32) :: connectivity
-
-        if (index < 1 .or. index > self%num_nodes) then
-            error stop 'Index out of bounds in get_connectivity_reordered'
-        end if
 
         connectivity = self%connectivity_reordered(index)
     end function get_connectivity_reordered

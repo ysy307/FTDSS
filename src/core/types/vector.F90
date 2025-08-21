@@ -27,6 +27,10 @@ module core_types_vector
         real(real64) :: x
         real(real64) :: y
         real(real64) :: z
+    contains
+        procedure, private, pass(self) :: set_type_dp_vector_3d
+        procedure, private, pass(self) :: set_type_dp_vector_3d_array
+        generic, public :: set => set_type_dp_vector_3d, set_type_dp_vector_3d_array
     end type type_dp_vector_3d
 
     type :: type_int_vector_2d
@@ -62,6 +66,26 @@ contains
         a%y = b%y
         a%z = b%z
     end subroutine type_dp_vector_3d_assignment
+
+    subroutine set_type_dp_vector_3d(self, x_val, y_val, z_val)
+        implicit none
+        class(type_dp_vector_3d), intent(inout) :: self
+        real(real64), intent(in) :: x_val, y_val, z_val
+
+        self%x = x_val
+        self%y = y_val
+        self%z = z_val
+    end subroutine set_type_dp_vector_3d
+
+    subroutine set_type_dp_vector_3d_array(self, value)
+        implicit none
+        class(type_dp_vector_3d), intent(inout) :: self
+        real(real64), intent(in) :: value(3)
+
+        self%x = value(1)
+        self%y = value(2)
+        self%z = value(3)
+    end subroutine set_type_dp_vector_3d_array
 
     ! Assignment for 2D integer vector
     subroutine type_int_vector_2d_assignment(a, b)

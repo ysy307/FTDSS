@@ -11,8 +11,8 @@ module matrix_base
     contains
         procedure(abst_initialize), pass(self), deferred :: initialize
         procedure(abst_find), pass(self), deferred :: find
-        procedure(abst_copy), pass(self), deferred :: copy
-        procedure(abst_destory), pass(self), deferred :: destory
+        ! procedure(abst_copy), pass(self), deferred :: copy
+        procedure(abst_destroy), pass(self), deferred :: destroy
     end type abst_matrix
 
     abstract interface
@@ -32,18 +32,18 @@ module matrix_base
             integer(int32), intent(inout) :: index
         end subroutine abst_find
 
-        function abst_copy(self) result(new_matrix)
-            import :: abst_matrix
-            implicit none
-            class(abst_matrix), intent(in) :: self
-            class(abst_matrix), allocatable :: new_matrix
-        end function abst_copy
+        ! function abst_copy(self) result(new_matrix)
+        !     import :: abst_matrix
+        !     implicit none
+        !     class(abst_matrix), intent(in) :: self
+        !     class(abst_matrix), allocatable :: new_matrix
+        ! end function abst_copy
 
-        subroutine abst_destory(self)
+        subroutine abst_destroy(self)
             import :: abst_matrix
             implicit none
             class(abst_matrix), intent(inout) :: self
-        end subroutine abst_destory
+        end subroutine abst_destroy
     end interface
 
 end module matrix_base

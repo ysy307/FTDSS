@@ -8,6 +8,7 @@ matrix_base.F90
 target_link_libraries(Matrix PRIVATE
     Core
     Domain
+    Calc
 )
 enable_build_flags(Matrix)
 enable_thirdparty (Matrix)

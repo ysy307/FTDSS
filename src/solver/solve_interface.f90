@@ -1,9 +1,9 @@
 module solver_solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:allocate_array, deallocate_array, error_message
+    use :: module_core, only:allocate_array, deallocate_array, error_message, was_interrupted
     use :: module_calculate, only:norm => norm_2, dot => inner_product
-    use :: module_matrix, only:type_crs, operator(*), operator(+), type_dense, abst_matrix
+    use :: module_matrix, only:type_crs, type_dense, abst_matrix, gemv, add
     implicit none
     private
 #ifdef _MKL
@@ -42,7 +42,7 @@ module solver_solve
     end interface
 
     type, extends(abst_solver) :: type_solver_sparse_crs_bicgstab
-        integer(int32) :: n
+        integer(int32) :: size
         real(real64), allocatable :: m(:)
         real(real64), allocatable :: p(:)
         real(real64), allocatable :: phat(:)
@@ -70,9 +70,9 @@ module solver_solve
     end type type_solver_sparse_crs_bicgstab
 
     interface
-        module function construct_type_solver_sparse_crs_bicgstab(N, tolerance, max_iterations, preconditioner) result(structure)
+        module function construct_type_solver_sparse_crs_bicgstab(size, tolerance, max_iterations, preconditioner) result(structure)
             implicit none
-            integer(int32), intent(in) :: N
+            integer(int32), intent(in) :: size
             real(real64), intent(in) :: tolerance
             integer(int32), intent(in) :: max_iterations
             integer(int32), intent(in) :: preconditioner

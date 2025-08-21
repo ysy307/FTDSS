@@ -20,9 +20,9 @@ contains
 
     end subroutine initialize_holder_vhcs
 
-    module function calc_vhc_3(VHC_soil, phi_soil, &
-                               VHC_water, phi_water, &
-                               VHC_ice, phi_ice) result(VHC)
+    pure module function calc_vhc_3(VHC_soil, phi_soil, &
+                                    VHC_water, phi_water, &
+                                    VHC_ice, phi_ice) result(VHC)
         implicit none
         real(real64), intent(in) :: VHC_soil
         real(real64), intent(in) :: phi_soil
@@ -36,8 +36,8 @@ contains
 
     end function calc_vhc_3
 
-    module function calc_vhc_3a(VHC_soil, phi_soil, VHC_water, phi_water, &
-                                VHC_ice, phi_ice, Lf, DEN_ice, dQi_dT) result(VHC)
+    pure module function calc_vhc_3a(VHC_soil, phi_soil, VHC_water, phi_water, &
+                                     VHC_ice, phi_ice, Lf, DEN_ice, dQi_dT) result(VHC)
         implicit none
         real(real64), intent(in) :: VHC_soil
         real(real64), intent(in) :: phi_soil

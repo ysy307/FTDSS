@@ -68,23 +68,24 @@ contains
         case ("full")
             element%num_gauss = 1_int32
             call allocate_array(element%weight, element%num_gauss)
-            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+            if (allocated(element%gauss)) deallocate (element%gauss)
+            allocate (element%gauss(element%num_gauss))
             element%weight(:) = [0.5d0]
-            element%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
+            call element%gauss(1)%set([1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0])
         case ("reduced")
             call global_logger%log_warning(message="Reduced-type integration is not implemented for first order triangles.")
             element%num_gauss = 1_int32
             call allocate_array(element%weight, element%num_gauss)
-            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+            if (allocated(element%gauss)) deallocate (element%gauss)
             element%weight(:) = [0.5d0]
-            element%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
+            call element%gauss(1)%set([1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0])
         case ("free")
             call global_logger%log_warning(message="Free-type integration is not implemented for first order triangles.")
             element%num_gauss = 1_int32
             call allocate_array(element%weight, element%num_gauss)
-            call allocate_array(element%gauss, element%dimension, element%num_gauss)
+            allocate (element%gauss(element%num_gauss))
             element%weight(:) = [0.5d0]
-            element%gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
+            call element%gauss(1)%set([1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0])
         end select
 
         ! Initialize the interpolation function pointer
@@ -96,21 +97,18 @@ contains
 
     end function construct_triangle_first
 
-    module function get_area_triangle_first(self) result(area)
+    pure module function get_area_triangle_first(self) result(area)
         implicit none
         class(type_triangle_first), intent(in) :: self
         real(real64) :: area
 
-        integer(int32) :: i, n_gauss_full
-        real(real64) :: weight(1) = [0.5d0]
-        real(real64) :: gauss(2, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
+        type(type_dp_vector_3d) :: r
+        r%x = 1.0d0 / 3.0d0
+        r%y = 1.0d0 / 3.0d0
+        r%z = 0.0d0
 
         area = 0.0d0
-        n_gauss_full = 1_int32
-
-        do i = 1, n_gauss_full
-            area = area + weight(i) * self%jacobian_det(gauss(1, i), gauss(2, i))
-        end do
+        area = area + 0.5d0 * self%jacobian_det(r)
     end function get_area_triangle_first
 
     !----------------------------------------------------------------------!
@@ -144,19 +142,20 @@ contains
     !   - Returns 0.0d0 for indices outside the range [1, 3].
     !
     !----------------------------------------------------------------------!
-    module function psi_triangle_first(self, i, xi, eta) result(psi)
+    pure module function psi_triangle_first(self, i, r) result(psi)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: psi
+
         select case (i)
         case (1)
-            psi = xi
+            psi = r%x
         case (2)
-            psi = eta
+            psi = r%y
         case (3)
-            psi = 1.0d0 - xi - eta
+            psi = 1.0d0 - r%x - r%y
         case default
             psi = 0.0d0
         end select
@@ -194,12 +193,13 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 3].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_dxi_triangle_first(self, i, xi, eta) result(dpsi)
+    pure module function dpsi_dxi_triangle_first(self, i, r) result(dpsi)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
+
         select case (i)
         case (1)
             dpsi = 1.0d0
@@ -243,12 +243,13 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 3].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_deta_triangle_first(self, i, xi, eta) result(dpsi)
+    pure module function dpsi_deta_triangle_first(self, i, r) result(dpsi)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
+
         select case (i)
         case (1)
             dpsi = 0.0d0
@@ -308,11 +309,11 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    module function jacobian_triangle_first(self, i, j, xi, eta) result(Jval)
+    pure module function jacobian_triangle_first(self, i, j, r) result(Jval)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i, j
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
 
         real(real64) :: Jval
         integer(int32) :: ii, jlocal
@@ -325,12 +326,12 @@ contains
             case (1)
                 !! dx_dxi
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%x(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, r) * self%x(ii)%val
                 end do
             case (2)
                 !! dx_deta
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%x(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, r) * self%x(ii)%val
                 end do
             end select
 
@@ -340,12 +341,12 @@ contains
             case (1)
                 !! dy_dxi
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%y(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, r) * self%y(ii)%val
                 end do
             case (2)
                 !! dy_deta
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%y(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, r) * self%y(ii)%val
                 end do
             end select
         end select
@@ -386,10 +387,10 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    module function jacobian_det_triangle_first(self, xi, eta) result(J_Det)
+    pure module function jacobian_det_triangle_first(self, r) result(J_Det)
         implicit none
         class(type_triangle_first), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: J_Det
 
         real(real64) :: dx_xi, dx_eta
@@ -397,10 +398,10 @@ contains
 
         integer(int32) :: i
 
-        dx_xi = self%jacobian(1, 1, xi, eta)
-        dx_eta = self%jacobian(1, 2, xi, eta)
-        dy_xi = self%jacobian(2, 1, xi, eta)
-        dy_eta = self%jacobian(2, 2, xi, eta)
+        dx_xi = self%jacobian(1, 1, r)
+        dx_eta = self%jacobian(1, 2, r)
+        dy_xi = self%jacobian(2, 1, r)
+        dy_eta = self%jacobian(2, 2, r)
 
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
     end function jacobian_det_triangle_first
@@ -440,13 +441,13 @@ contains
     !     outside the valid range, the function returns .false.
     !
     !----------------------------------------------------------------------!
-    module subroutine is_in_triangle_first(self, px, py, pxi, peta, is_in)
+    module subroutine is_in_triangle_first(self, cartesian, normalized, is_in)
         class(type_triangle_first), intent(in) :: self
-        real(real64), intent(in) :: px, py
-        real(real64), intent(inout) :: pxi, peta
+        type(type_dp_vector_3d), intent(in) :: cartesian
+        type(type_dp_vector_3d), intent(inout) :: normalized
         logical, intent(inout) :: is_in
 
-        real(real64) :: xi, eta
+        type(type_dp_vector_3d) :: r
         real(real64) :: x0, y0
         real(real64) :: dx_xi, dx_eta, dy_xi, dy_eta
         real(real64) :: detJ
@@ -457,8 +458,7 @@ contains
         logical :: converged
 
         ! 初期化
-        xi = 0.0d0
-        eta = 0.0d0
+        call r%set([0.0d0, 0.0d0, 0.0d0])
         tol = 1.0d-15
         max_iter = 100
         converged = .false.
@@ -469,38 +469,35 @@ contains
             y0 = 0.0d0
 
             do i = 1, self%num_nodes
-                x0 = x0 + self%psi(i, xi, eta) * self%x(i)%val
-                y0 = y0 + self%psi(i, xi, eta) * self%y(i)%val
+                x0 = x0 + self%psi(i, r) * self%x(i)%val
+                y0 = y0 + self%psi(i, r) * self%y(i)%val
             end do
 
-            dx = px - x0
-            dy = py - y0
+            dx = cartesian%x - x0
+            dy = cartesian%y - y0
 
             if (sqrt(dx * dx + dy * dy) < tol) then
                 converged = .true.
                 exit
             end if
 
-            dx_xi = self%jacobian(1, 1, xi, eta)
-            dx_eta = self%jacobian(1, 2, xi, eta)
-            dy_xi = self%jacobian(2, 1, xi, eta)
-            dy_eta = self%jacobian(2, 2, xi, eta)
+            dx_xi = self%jacobian(1, 1, r)
+            dx_eta = self%jacobian(1, 2, r)
+            dy_xi = self%jacobian(2, 1, r)
+            dy_eta = self%jacobian(2, 2, r)
 
-            detJ = self%jacobian_det(xi, eta)
+            detJ = self%jacobian_det(r)
             if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
 
             ! Newton-Raphson 更新
-            xi = xi + (dy_eta * dx - dx_eta * dy) / detJ
-            eta = eta + (-dy_xi * dx + dx_xi * dy) / detJ
+            r%x = r%x + (dy_eta * dx - dx_eta * dy) / detJ
+            r%y = r%y + (-dy_xi * dx + dx_xi * dy) / detJ
         end do
 
         ! 最終判定：収束かつ自然座標が範囲内
-        is_in = converged .and. (xi >= 0.0d0) .and. (eta >= 0.0d0) .and. (xi + eta <= 1.0d0)
+        is_in = converged .and. (r%x >= 0.0d0) .and. (r%y >= 0.0d0) .and. (r%x + r%y <= 1.0d0)
+        if (is_in) normalized = r
 
-        if (is_in) then
-            pxi = xi
-            peta = eta
-        end if
     end subroutine is_in_triangle_first
 
 end submodule domain_element_triangle_first

@@ -37,7 +37,7 @@ contains
                 select case (input%basic%solver_settings%linear_solver%thermal%iterative_solver%solver_type)
                 case (4)
                     solver = type_solver_sparse_crs_bicgstab( &
-                             N=num_node, &
+                             size=num_node, &
                              tolerance=input%basic%solver_settings%linear_solver%thermal%iterative_solver%tolerance, &
                              max_iterations=input%basic%solver_settings%linear_solver%thermal%iterative_solver%max_iterations, &
                              preconditioner=input%basic%solver_settings%linear_solver%thermal%iterative_solver%preconditioner_type)
@@ -58,7 +58,7 @@ contains
                 select case (input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%solver_type)
                 case (4)
                     solver = type_solver_sparse_crs_bicgstab( &
-                             N=num_node, &
+                             size=num_node, &
                              tolerance=input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%tolerance, &
                              max_iterations=input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%max_iterations, &
                              preconditioner=input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%preconditioner_type)

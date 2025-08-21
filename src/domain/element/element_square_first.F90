@@ -69,30 +69,30 @@ contains
         case ("full")
             element%num_gauss = 4_int32
             call allocate_array(element%weight, element%num_gauss)
-            call allocate_array(element%gauss, element%dimension, element%num_gauss)
-
+            if (allocated(element%gauss)) deallocate (element%gauss)
+            allocate (element%gauss(element%num_gauss))
             element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
-            element%gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
-            element%gauss(:, 2) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
-            element%gauss(:, 3) = [sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)]
-            element%gauss(:, 4) = [sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]
+            call element%gauss(1)%set([-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0])
+            call element%gauss(2)%set([-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0), 0.0d0])
+            call element%gauss(3)%set([sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0), 0.0d0])
+            call element%gauss(4)%set([sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0])
         case ("reduced")
             element%num_gauss = 1_int32
             call allocate_array(element%weight, element%num_gauss)
-            call allocate_array(element%gauss, element%dimension, element%num_gauss)
-
+            if (allocated(element%gauss)) deallocate (element%gauss)
+            allocate (element%gauss(element%num_gauss))
             element%weight(:) = [4.0d0]
-            element%gauss(:, 1) = [0.0d0, 0.0d0]
+            call element%gauss(1)%set([0.0d0, 0.0d0, 0.0d0])
         case ("free")
             element%num_gauss = 4
             call allocate_array(element%weight, element%num_gauss)
-            call allocate_array(element%gauss, element%dimension, element%num_gauss)
-
+            if (allocated(element%gauss)) deallocate (element%gauss)
+            allocate (element%gauss(element%num_gauss))
             element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
-            element%gauss(:, 1) = [-integration%integration_points, -integration%integration_points]
-            element%gauss(:, 2) = [-integration%integration_points, integration%integration_points]
-            element%gauss(:, 3) = [integration%integration_points, integration%integration_points]
-            element%gauss(:, 4) = [integration%integration_points, -integration%integration_points]
+            call element%gauss(1)%set([-integration%integration_points, -integration%integration_points, 0.0d0])
+            call element%gauss(2)%set([-integration%integration_points, integration%integration_points, 0.0d0])
+            call element%gauss(3)%set([integration%integration_points, integration%integration_points, 0.0d0])
+            call element%gauss(4)%set([integration%integration_points, -integration%integration_points, 0.0d0])
         end select
 
         if (associated(element%interpolate)) nullify (element%interpolate)
@@ -106,23 +106,38 @@ contains
     !----------------------------------------------------------------------!
     ! get_area_square_first:
     !----------------------------------------------------------------------!
-    module function get_area_square_first(self) result(area)
+    pure module function get_area_square_first(self) result(area)
         implicit none
         class(type_square_first), intent(in) :: self
         real(real64) :: area
 
-        integer(int32), parameter :: n_gauss_full = 4_int32
-        integer(int32) :: i
-        real(real64) :: weight(n_gauss_full) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
-        real(real64) :: gauss(n_gauss_full, 2) = [[-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)], &
-                                                  [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)], &
-                                                  [sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0)], &
-                                                  [sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0)]]
+        type(type_dp_vector_3d) :: r
+        real(real64), parameter :: g = sqrt(1.0d0 / 3.0d0)
 
+        ! 初期化
         area = 0.0d0
-        do i = 1, n_gauss_full
-            area = area + weight(i) * self%jacobian_det(gauss(i, 1), gauss(i, 2))
-        end do
+        r%z = 0.0d0
+
+        ! ガウスポイント 1
+        r%x = -g
+        r%y = -g
+        area = area + self%jacobian_det(r)
+
+        ! ガウスポイント 2
+        r%x = -g
+        r%y = g
+        area = area + self%jacobian_det(r)
+
+        ! ガウスポイント 3
+        r%x = g
+        r%y = g
+        area = area + self%jacobian_det(r)
+
+        ! ガウスポイント 4
+        r%x = g
+        r%y = -g
+        area = area + self%jacobian_det(r)
+
     end function get_area_square_first
 
     !----------------------------------------------------------------------!
@@ -157,22 +172,22 @@ contains
     !   - Returns 0.0d0 for indices outside the range [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function psi_square_first(self, i, xi, eta) result(psi)
+    pure module function psi_square_first(self, i, r) result(psi)
         implicit none
         class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: psi
 
         select case (i)
         case (1)
-            psi = 0.25d0 * (1.0d0 - xi) * (1.0d0 - eta)
+            psi = 0.25d0 * (1.0d0 - r%x) * (1.0d0 - r%y)
         case (2)
-            psi = 0.25d0 * (1.0d0 + xi) * (1.0d0 - eta)
+            psi = 0.25d0 * (1.0d0 + r%x) * (1.0d0 - r%y)
         case (3)
-            psi = 0.25d0 * (1.0d0 + xi) * (1.0d0 + eta)
+            psi = 0.25d0 * (1.0d0 + r%x) * (1.0d0 + r%y)
         case (4)
-            psi = 0.25d0 * (1.0d0 - xi) * (1.0d0 + eta)
+            psi = 0.25d0 * (1.0d0 - r%x) * (1.0d0 + r%y)
         case default
             psi = 0.0d0
         end select
@@ -210,22 +225,22 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_dxi_square_first(self, i, xi, eta) result(dpsi)
+    pure module function dpsi_dxi_square_first(self, i, r) result(dpsi)
         implicit none
         class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
 
         select case (i)
         case (1)
-            dpsi = -0.25d0 * (1.0d0 - eta)
+            dpsi = -0.25d0 * (1.0d0 - r%y)
         case (2)
-            dpsi = 0.25d0 * (1.0d0 - eta)
+            dpsi = 0.25d0 * (1.0d0 - r%y)
         case (3)
-            dpsi = 0.25d0 * (1.0d0 + eta)
+            dpsi = 0.25d0 * (1.0d0 + r%y)
         case (4)
-            dpsi = -0.25d0 * (1.0d0 + eta)
+            dpsi = -0.25d0 * (1.0d0 + r%y)
         case default
             dpsi = 0.0d0
         end select
@@ -260,22 +275,22 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 4].
     !
     !----------------------------------------------------------------------!
-    module function dpsi_deta_square_first(self, i, xi, eta) result(dpsi)
+    pure module function dpsi_deta_square_first(self, i, r) result(dpsi)
         implicit none
         class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
 
         select case (i)
         case (1)
-            dpsi = -0.25d0 * (1.0d0 - xi)
+            dpsi = -0.25d0 * (1.0d0 - r%x)
         case (2)
-            dpsi = -0.25d0 * (1.0d0 + xi)
+            dpsi = -0.25d0 * (1.0d0 + r%x)
         case (3)
-            dpsi = 0.25d0 * (1.0d0 + xi)
+            dpsi = 0.25d0 * (1.0d0 + r%x)
         case (4)
-            dpsi = 0.25d0 * (1.0d0 - xi)
+            dpsi = 0.25d0 * (1.0d0 - r%x)
         case default
             dpsi = 0.0d0
         end select
@@ -328,11 +343,11 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    module function jacobian_square_first(self, i, j, xi, eta) result(Jval)
+    pure module function jacobian_square_first(self, i, j, r) result(Jval)
         implicit none
         class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i, j
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: Jval
 
         integer(int32) :: ii, jlocal
@@ -345,12 +360,12 @@ contains
             case (1)
                 !! dx_dxi
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%X(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, r) * self%X(ii)%val
                 end do
             case (2)
                 !! dx_deta
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%X(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, r) * self%X(ii)%val
                 end do
             end select
 
@@ -360,12 +375,12 @@ contains
             case (1)
                 !! dy_dxi
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, xi, eta) * self%Y(ii)%val
+                    Jval = Jval + self%dpsi_dxi(ii, r) * self%Y(ii)%val
                 end do
             case (2)
                 !! dy_deta
                 do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, xi, eta) * self%Y(ii)%val
+                    Jval = Jval + self%dpsi_deta(ii, r) * self%Y(ii)%val
                 end do
             end select
         end select
@@ -406,10 +421,10 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    module function jacobian_det_square_first(self, xi, eta) result(J_Det)
+    pure module function jacobian_det_square_first(self, r) result(J_Det)
         implicit none
         class(type_square_first), intent(in) :: self
-        real(real64), intent(in) :: xi, eta
+        type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: J_Det
 
         real(real64) :: dx_xi, dx_eta
@@ -422,10 +437,10 @@ contains
         dy_xi = 0.0d0
         dy_eta = 0.0d0
 
-        dx_xi = self%jacobian(1, 1, xi, eta)
-        dx_eta = self%jacobian(1, 2, xi, eta)
-        dy_xi = self%jacobian(2, 1, xi, eta)
-        dy_eta = self%jacobian(2, 2, xi, eta)
+        dx_xi = self%jacobian(1, 1, r)
+        dx_eta = self%jacobian(1, 2, r)
+        dy_xi = self%jacobian(2, 1, r)
+        dy_eta = self%jacobian(2, 2, r)
 
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
 
@@ -468,13 +483,13 @@ contains
     !     outside the valid range, the subroutine returns .false.
     !
     !--------------------------------------------------------------------------------------
-    module subroutine is_in_square_first(self, px, py, pxi, peta, is_in)
+    module subroutine is_in_square_first(self, cartesian, normalized, is_in)
         class(type_square_first), intent(in) :: self
-        real(real64), intent(in) :: px, py
-        real(real64), intent(inout) :: pxi, peta
+        type(type_dp_vector_3d), intent(in) :: cartesian
+        type(type_dp_vector_3d), intent(inout) :: normalized
         logical, intent(inout) :: is_in
 
-        real(real64) :: xi, eta
+        type(type_dp_vector_3d) :: r
         real(real64) :: x0, y0
         real(real64) :: dx_xi, dx_eta, dy_xi, dy_eta
         real(real64) :: detJ
@@ -485,8 +500,7 @@ contains
         logical :: converged
 
         ! 初期化
-        xi = 0.0d0
-        eta = 0.0d0
+        call r%set([0.0d0, 0.0d0, 0.0d0])
         tol = 1.0d-15
         max_iter = 100
         converged = .false.
@@ -497,37 +511,35 @@ contains
             y0 = 0.0d0
 
             do i = 1, self%num_nodes
-                x0 = x0 + self%psi(i, xi, eta) * self%X(i)%val
-                y0 = y0 + self%psi(i, xi, eta) * self%Y(i)%val
+                x0 = x0 + self%psi(i, r) * self%X(i)%val
+                y0 = y0 + self%psi(i, r) * self%Y(i)%val
             end do
 
-            dx = px - x0
-            dy = py - y0
+            dx = cartesian%x - x0
+            dy = cartesian%y - y0
 
             if (sqrt(dx * dx + dy * dy) < tol) then
                 converged = .true.
                 exit
             end if
 
-            dx_xi = self%jacobian(1, 1, xi, eta)
-            dx_eta = self%jacobian(1, 2, xi, eta)
-            dy_xi = self%jacobian(2, 1, xi, eta)
-            dy_eta = self%jacobian(2, 2, xi, eta)
+            dx_xi = self%jacobian(1, 1, r)
+            dx_eta = self%jacobian(1, 2, r)
+            dy_xi = self%jacobian(2, 1, r)
+            dy_eta = self%jacobian(2, 2, r)
 
-            detJ = self%jacobian_Det(xi, eta)
+            detJ = self%jacobian_Det(r)
             if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
 
             ! Newton-Raphson 更新
-            xi = xi + (dy_eta * dx - dx_eta * dy) / detJ
-            eta = eta + (-dy_xi * dx + dx_xi * dy) / detJ
+            r%x = r%x + (dy_eta * dx - dx_eta * dy) / detJ
+            r%y = r%y + (-dy_xi * dx + dx_xi * dy) / detJ
         end do
 
         ! 最終判定：収束かつ自然座標が範囲内
-        is_in = converged .and. (abs(xi) <= 1.0d0) .and. (abs(eta) <= 1.0d0)
-        if (is_in) then
-            pxi = xi
-            peta = eta
-        end if
+        is_in = converged .and. (abs(r%x) <= 1.0d0) .and. (abs(r%y) <= 1.0d0)
+        if (is_in) normalized = r
+
     end subroutine is_in_square_first
 
 end submodule domain_element_square_first
