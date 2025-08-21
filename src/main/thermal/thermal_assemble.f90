@@ -178,8 +178,6 @@ contains
 
     subroutine thermal_assemble_system_linear_1_parallel(J, R, domain, temperature, porosity, properties, time, actual_order)
         implicit none
-        ! --- 引数 ---
-        ! properties の intent(in) は、このサブルーチンがマスターオブジェクトを変更しないことを示す良い設計です。
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
         type(type_domain), intent(inout), target :: domain
@@ -189,37 +187,22 @@ contains
         type(type_time), intent(in) :: time
         integer(int32), intent(in) :: actual_order
 
-        ! --- ローカル変数 ---
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element
-        type(type_properties_manager) :: local_properties
 
-        ! 1. 並列リージョンを開始する。スレッドチームが作られる。
-        !    local_properties は private なので、各スレッドが自分専用の変数を持つ。
-        !$omp parallel private(c, ie_idx, element, local_properties)
+        J%val(:) = 0.0d0
+        R(:) = 0.0d0
 
-        ! 2. --- ディープコピー ---
-        !    並列リージョンの内側で、各スレッドがこの代入文を一度だけ実行する。
-        !    これにより、各スレッドが完全に独立した安全なコピーを持つことになる。
-        local_properties = properties
-
-        ! 3. 色のループを開始する
+        !$omp parallel private(c, ie_idx, element)
         do c = 1, domain%colors%num_colors
-            ! 4. 同じ色の要素ループを、スレッド間で分担して実行する
             !$omp do
             do ie_idx = 1, domain%colors%colored(c)%num_elements
                 element => domain%Elements(domain%colors%colored(c)%Elements(ie_idx))%e
-
-                ! 5. ワーカー関数には、スレッド専用の local_properties を渡す
-                call process_element_thermal_linear_1(J, R, element, temperature, porosity, &
-                                                      local_properties, time, actual_order)
+                call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, time, actual_order)
             end do
             !$omp end do
-            ! ここには暗黙のバリアがあり、全スレッドがこの色の処理を終えるまで次の色に進まない
         end do
-
-        ! 6. 全ての処理が終わり、並列リージョンを終了する
         !$omp end parallel
-    end subroutine
+    end subroutine thermal_assemble_system_linear_1_parallel
 
 end module thermal_thermal_assemble

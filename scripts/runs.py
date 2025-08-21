@@ -74,10 +74,11 @@ def main():
     GEOMETRY_COUNT = 4
     
     # 各シミュレーションで使用するスレッド数のリスト
-    THREAD_LIST = [1,2,4,8,16,32]
+    THREAD_LIST = [16]
+    # THREAD_LIST = [1,2,4,8,16,32]
     
     # 各シミュレーションを何回繰り返すか
-    REPEAT_COUNT = 3
+    REPEAT_COUNT = 1
     # ======================================================================
 
     results_summary = []
