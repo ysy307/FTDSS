@@ -19,18 +19,10 @@ contains
         num_nodes = domain%get_num_nodes()
 
         call structure%KT_star%initialize(domain)
-
-        ! structure%KT_l = structure%KT_star
-        ! structure%KT_old = structure%KT_star
-        ! structure%CT_l = structure%KT_star
         structure%order = input%basic%solver_settings%bdf_order
 
         call allocate_array(structure%FT, num_nodes)
-        ! call allocate_array(structure%FT_old, num_nodes)
         call allocate_array(structure%PHIT, num_nodes)
-        ! call allocate_array(structure%PHIT_old, num_nodes)
-
-        ! call structure%T%initialize(num_nodes, structure%order)
 
         call structure%Qw%initialize(num_nodes, structure%order)
         call structure%Qice%initialize(num_nodes, structure%order)

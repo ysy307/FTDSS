@@ -1,7 +1,7 @@
 module thermal_thermal_assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:type_state, type_variable, allocate_array, deallocate_array
+    use :: module_core, only:type_state, type_dp_vector_3d, assignment(=), type_variable, allocate_array, deallocate_array
     use :: module_domain, only:type_domain, abst_element
     use :: module_properties, only:type_properties_manager
     use :: module_matrix, only:type_crs
@@ -34,7 +34,6 @@ contains
 
     subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, time, actual_order)
         implicit none
-
         ! --- 引数 ---
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
@@ -47,7 +46,7 @@ contains
 
         ! --- ローカル変数 ---
         integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, iO
-        real(real64) :: xi, eta, weight, detJ
+        real(real64) :: weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
         real(real64) :: val
         real(real64) :: dt_n
@@ -78,10 +77,8 @@ contains
         ! STEP 1: 全ガウスポイントの物理量を一括計算
         ! ==========================================================================
         do iG = 1, num_gauss
-            xi = element%gauss(1, iG)
-            eta = element%gauss(2, iG)
-            state(iG)%temperature = element%interpolate(xi, eta, temperature%pre)
-            state(iG)%porosity = element%interpolate(xi, eta, porosity%pre)
+            state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre)
+            state(iG)%porosity = element%interpolate(element%gauss(iG), porosity%pre)
         end do
         call properties%calc_thermal(state, i_material, lambda, Ca)
 
@@ -89,22 +86,21 @@ contains
         ! STEP 2: 要素行列 CT_e と KT_e を計算
         ! ==========================================================================
         do iG = 1, num_gauss
-            xi = element%gauss(1, iG)
-            eta = element%gauss(2, iG)
             weight = element%weight(iG)
-            detJ = element%jacobian_det(xi, eta)
+            detJ = element%jacobian_det(element%gauss(iG))
             do il = 1, num_nodes
-                dNdx_i = (element%jacobian(2, 2, xi, eta) * element%dpsi_dxi(il, xi, eta) - &
-                          element%jacobian(2, 1, xi, eta) * element%dpsi_deta(il, xi, eta)) / detJ
-                dNdy_i = (-element%jacobian(1, 2, xi, eta) * element%dpsi_dxi(il, xi, eta) + &
-                          element%jacobian(1, 1, xi, eta) * element%dpsi_deta(il, xi, eta)) / detJ
+                dNdx_i = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) - &
+                          element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
+                dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) + &
+                          element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
                 do jl = 1, num_nodes
-                    dNdx_j = (element%jacobian(2, 2, xi, eta) * element%dpsi_dxi(jl, xi, eta) - &
-                              element%jacobian(2, 1, xi, eta) * element%dpsi_deta(jl, xi, eta)) / detJ
-                    dNdy_j = (-element%jacobian(1, 2, xi, eta) * element%dpsi_dxi(jl, xi, eta) + &
-                              element%jacobian(1, 1, xi, eta) * element%dpsi_deta(jl, xi, eta)) / detJ
+                    dNdx_j = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) - &
+                              element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
+                    dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) + &
+                              element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
 
-                    CT_e(il, jl) = CT_e(il, jl) + element%psi(il, xi, eta) * element%psi(jl, xi, eta) * Ca(iG) * weight * detJ
+                    CT_e(il, jl) = CT_e(il, jl) + element%psi(il, element%gauss(iG)) * & !&
+                                                  element%psi(jl, element%gauss(iG)) * Ca(iG) * weight * detJ
                     KT_e(il, jl) = KT_e(il, jl) + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda(iG) * weight * detJ
                 end do
             end do
@@ -166,7 +162,7 @@ contains
 
     !     ! --- ローカル変数 ---
     !     integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, iO
-    !     real(real64) :: xi, eta, weight, detJ
+    !     real(real64) :: element%gauss(iG), weight, detJ
     !     real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
     !     real(real64) :: val
     !     real(real64) :: dt_n
@@ -199,8 +195,8 @@ contains
     !     do iG = 1, num_gauss
     !         xi = element%gauss(1, iG)
     !         eta = element%gauss(2, iG)
-    !         state(iG)%temperature = element%interpolate(xi, eta, temperature%pre)
-    !         state(iG)%porosity = element%interpolate(xi, eta, porosity%pre)
+    !         state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre)
+    !         state(iG)%porosity = element%interpolate(element%gauss(iG), porosity%pre)
     !     end do
     !     call properties%calc_thermal(state, i_material, lambda, Ca)
 
@@ -211,19 +207,19 @@ contains
     !         xi = element%gauss(1, iG)
     !         eta = element%gauss(2, iG)
     !         weight = element%weight(iG)
-    !         detJ = element%jacobian_det(xi, eta)
+    !         detJ = element%jacobian_det(element%gauss(iG))
     !         do il = 1, num_nodes
-    !             dNdx_i = (element%jacobian(2, 2, xi, eta) * element%dpsi_dxi(il, xi, eta) - &
-    !                       element%jacobian(2, 1, xi, eta) * element%dpsi_deta(il, xi, eta)) / detJ
-    !             dNdy_i = (-element%jacobian(1, 2, xi, eta) * element%dpsi_dxi(il, xi, eta) + &
-    !                       element%jacobian(1, 1, xi, eta) * element%dpsi_deta(il, xi, eta)) / detJ
+    !             dNdx_i = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) - &
+    !                       element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
+    !             dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) + &
+    !                       element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
     !             do jl = 1, num_nodes
-    !                 dNdx_j = (element%jacobian(2, 2, xi, eta) * element%dpsi_dxi(jl, xi, eta) - &
-    !                           element%jacobian(2, 1, xi, eta) * element%dpsi_deta(jl, xi, eta)) / detJ
-    !                 dNdy_j = (-element%jacobian(1, 2, xi, eta) * element%dpsi_dxi(jl, xi, eta) + &
-    !                           element%jacobian(1, 1, xi, eta) * element%dpsi_deta(jl, xi, eta)) / detJ
+    !                 dNdx_j = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) - &
+    !                           element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
+    !                 dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) + &
+    !                           element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
 
-    !                 CT_e(il, jl) = CT_e(il, jl) + element%psi(il, xi, eta) * element%psi(jl, xi, eta) * Ca(iG) * weight * detJ
+    !                 CT_e(il, jl) = CT_e(il, jl) + element%psi(il, element%gauss(iG)) * element%psi(jl, element%gauss(iG)) * Ca(iG) * weight * detJ
     !                 KT_e(il, jl) = KT_e(il, jl) + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda(iG) * weight * detJ
     !             end do
     !         end do

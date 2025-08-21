@@ -195,15 +195,6 @@ module domain_element
             real(real64) :: J_Det
         end function abst_jacobian_det
 
-        subroutine abst_is_inside(self, cartesian, normalized, is_in)
-            import abst_element, type_dp_vector_3d
-            implicit none
-            class(abst_element), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: cartesian
-            type(type_dp_vector_3d), intent(inout) :: normalized
-            logical, intent(inout) :: is_in
-        end subroutine abst_is_inside
-
         pure function abst_interpolate(self, r, value) result(interpolated_value)
             import :: abst_element, type_dp_vector_3d, real64
             implicit none
@@ -212,6 +203,15 @@ module domain_element
             real(real64), intent(in) :: value(:)
             real(real64) :: interpolated_value
         end function abst_interpolate
+
+        subroutine abst_is_inside(self, cartesian, normalized, is_in)
+            import abst_element, type_dp_vector_3d
+            implicit none
+            class(abst_element), intent(in) :: self
+            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_dp_vector_3d), intent(inout) :: normalized
+            logical, intent(inout) :: is_in
+        end subroutine abst_is_inside
 
     end interface
 

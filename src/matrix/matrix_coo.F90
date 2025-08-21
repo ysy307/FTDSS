@@ -208,7 +208,7 @@ contains
         integer(int32) :: i
         real(real64), allocatable :: tmp(:)
 
-        call allocatable_array(tmp, A%nnz)
+        call allocate_array(tmp, A%nnz)
 
         do i = 1, A%nnz
             tmp(i) = alpha * A%val(i) + B%val(i)

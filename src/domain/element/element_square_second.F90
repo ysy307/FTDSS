@@ -171,21 +171,6 @@ contains
 
     end function get_area_square_second
 
-    pure module function get_area_triangle_first(self) result(area)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        real(real64) :: area
-        type(type_dp_vector_3d) :: r
-
-        ! 重心点
-        r%x = 1.0d0 / 3.0d0
-        r%y = 1.0d0 / 3.0d0
-        r%z = 0.0d0
-
-        area = 0.5d0 * self%jacobian_det(r)
-
-    end function get_area_triangle_first
-
     !----------------------------------------------------------------------!
     ! psi_square_second:
     !----------------------------------------------------------------------!

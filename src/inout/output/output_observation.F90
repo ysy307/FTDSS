@@ -13,6 +13,7 @@ contains
         integer(int32) :: iObs, iElem, num_elements
         integer(int32) :: local_id, local_type, ierr
         real(real64) :: tmp_xi, tmp_eta
+        type(type_dp_vector_3d) :: cartesian, normalized
 
         integer(int32) :: num_target_variables
 
@@ -39,8 +40,7 @@ contains
                 self%coordinate%z(iObs) = input%output_settings%history_output%coordinates(iObs)%z
             end do
             allocate (self%elements(self%num_observations))
-            allocate (self%xi(self%num_observations))
-            allocate (self%eta(self%num_observations))
+            allocate (self%coordinate_normalized(self%num_observations))
 
             select case (input%basic%simulation_settings%calculate_type)
 
@@ -48,10 +48,9 @@ contains
                 do iObs = 1, self%num_observations
                     num_elements = domain%get_num_elements()
                     do iElem = 1, num_elements
-                        call domain%Elements(iElem)%e%is_inside(self%coordinate%x(iObs), &
-                                                                self%coordinate%y(iObs), &
-                                                                tmp_xi, &
-                                                                tmp_eta, &
+                        call cartesian%set([self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0])
+                        call domain%Elements(iElem)%e%is_inside(cartesian, &
+                                                                normalized, &
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
@@ -61,8 +60,7 @@ contains
                                                 input%geometry%vtk%cells(local_id), &
                                                 input%basic%geometry_settings, &
                                                 ierr)
-                            self%xi(iObs) = tmp_xi
-                            self%eta(iObs) = tmp_eta
+                            self%coordinate_normalized = normalized
                             exit
                         end if
                         if (iElem == num_elements) then
@@ -75,10 +73,9 @@ contains
                 do iObs = 1, self%num_observations
                     num_elements = domain%get_num_elements()
                     do iElem = 1, num_elements
-                        call domain%Elements(iElem)%e%is_inside(self%coordinate%x(iObs), &
-                                                                self%coordinate%z(iObs), &
-                                                                tmp_xi, &
-                                                                tmp_eta, &
+                        call cartesian%set([self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0])
+                        call domain%Elements(iElem)%e%is_inside(cartesian, &
+                                                                normalized, &
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
@@ -88,8 +85,7 @@ contains
                                                 input%geometry%vtk%cells(local_id), &
                                                 input%basic%geometry_settings, &
                                                 ierr)
-                            self%xi(iObs) = tmp_xi
-                            self%eta(iObs) = tmp_eta
+                            self%coordinate_normalized = normalized
                             exit
                         end if
                     end do
@@ -366,8 +362,7 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            obs_values(iObs) = self%elements(iObs)%e%interpolate( &
-                               self%xi(iObs), self%eta(iObs), original_temperature(:))
+            obs_values(iObs) = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
         end do
 
         deallocate (original_temperature)
@@ -442,10 +437,8 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            state%temperature = self%elements(iObs)%e%interpolate( &
-                                self%xi(iObs), self%eta(iObs), original_temperature(:))
-            state%porosity = self%elements(iObs)%e%interpolate( &
-                             self%xi(iObs), self%eta(iObs), original_porosity(:))
+            state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
+            state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
             group_id = self%elements(iObs)%e%get_group()
             state%water_content = properties%get_qw(state, group_id)
             if (state%water_content > state%porosity) state%water_content = state%porosity
@@ -542,10 +535,8 @@ contains
             end if
 
             do iObs = 1, self%num_observations
-                state%temperature = self%elements(iObs)%e%interpolate( &
-                                    self%xi(iObs), self%eta(iObs), original_temperature(:))
-                state%porosity = self%elements(iObs)%e%interpolate( &
-                                 self%xi(iObs), self%eta(iObs), original_porosity(:))
+                state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
+                state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
                 state%water_content = properties%get_qw(state, group_id)
                 if (state%water_content > state%porosity) state%water_content = state%porosity
@@ -645,10 +636,8 @@ contains
             end if
 
             do iObs = 1, self%num_observations
-                state%temperature = self%elements(iObs)%e%interpolate( &
-                                    self%xi(iObs), self%eta(iObs), original_temperature(:))
-                state%porosity = self%elements(iObs)%e%interpolate( &
-                                 self%xi(iObs), self%eta(iObs), original_porosity(:))
+                state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
+                state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
                 state%water_content = properties%get_qw(state, group_id)
                 if (state%water_content > state%porosity) state%water_content = state%porosity
@@ -737,8 +726,7 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            obs_values(iObs) = self%elements(iObs)%e%interpolate( &
-                               self%xi(iObs), self%eta(iObs), original_pressure(:))
+            obs_values(iObs) = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_pressure(:))
         end do
 
         deallocate (original_pressure)

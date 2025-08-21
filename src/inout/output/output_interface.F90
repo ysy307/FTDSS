@@ -7,7 +7,7 @@ module input_output
     use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, & !&
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                              get_cpu_architecture, get_os, get_openmp_version, get_memory_usage, & !&
-                             filter, type_dp_vector_3d
+                             filter, type_dp_vector_3d, assignment(=)
 
     use :: module_input
     use :: inout_project_settings, only:get_project_path
@@ -33,8 +33,7 @@ module input_output
         type(type_dp_3d) :: coordinate
         !!
         type(holder_elements), allocatable :: elements(:)
-        real(real64), allocatable :: xi(:)
-        real(real64), allocatable :: eta(:)
+        type(type_dp_vector_3d), allocatable :: coordinate_normalized(:)
         !!
         integer(int32), allocatable :: node_ids(:)
         procedure(abst_write_line), pointer, pass(self) :: write_line => null()
