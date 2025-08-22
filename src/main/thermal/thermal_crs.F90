@@ -101,7 +101,7 @@ contains
 
                 ! b) この要素の物性でQwを計算
                 group_id = domain%elements(element_id)%e%get_group()
-                temp_qw = property%get_qw(state, group_id)
+                temp_qw = property%get_qw(group_id, state)
 
                 ! 物理的な範囲に収める
                 if (temp_qw > state%porosity) temp_qw = state%porosity

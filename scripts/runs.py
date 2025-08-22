@@ -64,9 +64,9 @@ def main():
         "/workspaces/FTDSS/Results/TR2"
     ]
     
-    start = 1
-    WORKING_DIR_PATHS = WORKING_DIR_PATHS[start:start+1]
-    RESULTS_BASE_DIR_PATHS = RESULTS_BASE_DIR_PATHS[start:start+1]
+    start = 2
+    WORKING_DIR_PATHS = WORKING_DIR_PATHS[start:start+2]
+    RESULTS_BASE_DIR_PATHS = RESULTS_BASE_DIR_PATHS[start:start+2]
 
     GEOMETRY_COUNT = 4
     

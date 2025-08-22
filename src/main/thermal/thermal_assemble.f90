@@ -80,7 +80,7 @@ contains
             state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre)
             state(iG)%porosity = element%interpolate(element%gauss(iG), porosity%pre)
         end do
-        call properties%calc_thermal(state, i_material, lambda, Ca)
+        call properties%calc_thermal(i_material, state, lambda, Ca)
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 2: 要素行列 CT_e と KT_e を計算
@@ -202,7 +202,7 @@ contains
             state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre)
             state(iG)%porosity = element%interpolate(element%gauss(iG), porosity%pre)
         end do
-        call properties%calc_thermal(state, i_material, lambda, Ca)
+        call properties%calc_thermal(i_material, state, lambda, Ca)
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 2: Compute the element matrices CT_e and KT_e
