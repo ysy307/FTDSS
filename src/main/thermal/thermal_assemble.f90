@@ -141,8 +141,9 @@ contains
         do il = 1, num_nodes
             R(element%get_connectivity(il)) = R(element%get_connectivity(il)) + R_e(il)
             do jl = 1, num_nodes
-                call J%find(element%get_connectivity(il), element%get_connectivity(jl), index)
-                J%val(index) = J%val(index) + J_e(il, jl)
+                call J%add(element%get_connectivity(il), element%get_connectivity(jl), J_e(il, jl))
+                ! call J%find(element%get_connectivity(il), element%get_connectivity(jl), index)
+                ! J%val(index) = J%val(index) + J_e(il, jl)
             end do
         end do
 
@@ -282,7 +283,7 @@ contains
         integer(int32) :: iE, num_elements
 
         num_elements = domain%get_num_elements()
-        J%val(:) = 0.0d0
+        call J%set_all(0.0d0)
         R(:) = 0.0d0
 
         do iE = 1, num_elements
@@ -305,7 +306,7 @@ contains
         integer(int32) :: c, ie_idx
         class(abst_element), pointer :: element
 
-        J%val(:) = 0.0d0
+        call J%set_all(0.0d0)
         R(:) = 0.0d0
 
         !$omp parallel private(c, ie_idx, element)

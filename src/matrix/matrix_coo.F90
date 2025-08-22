@@ -14,11 +14,14 @@ module matrix_coo
         integer(int32) :: nnz = 0 ! number of non-zero elements
         integer(int32), allocatable :: row(:)
         integer(int32), allocatable :: col(:)
-        real(real64), allocatable :: val(:) ! non-zero values
+        real(real64),   allocatable :: val(:) !& non-zero values
     contains
-        procedure, public, pass(self) :: initialize => initialize_type_coo
-        procedure, public, pass(self) :: find => find_coo
-        procedure, public, pass(self) :: destroy => destroy_coo
+        procedure, public, pass(self) :: initialize => initialize_type_coo !&
+        procedure, public, pass(self) :: find       => find_coo !&
+        procedure, public, pass(self) :: set        => set_coo !&
+        procedure, public, pass(self) :: set_all    => set_all_coo !&
+        procedure, public, pass(self) :: add        => add_coo !&
+        procedure, public, pass(self) :: destroy    => destroy_coo !&
     end type
 
 contains
@@ -133,11 +136,12 @@ contains
 
     end subroutine initialize_type_coo
 
-    subroutine find_coo(self, row, col, index)
+    pure function find_coo(self, row, col) result(index)
         implicit none
         class(type_coo), intent(in) :: self
-        integer(int32), intent(in) :: row, col
-        integer(int32), intent(inout) :: index
+        integer(int32), intent(in) :: row
+        integer(int32), intent(in) :: col
+        integer(int32) :: index
 
         integer(int32) :: i
 
@@ -154,7 +158,46 @@ contains
                 return
             end if
         end do
-    end subroutine find_coo
+    end function find_coo
+
+    subroutine set_coo(self, row, col, value)
+        implicit none
+        class(type_coo), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
+
+        integer(int32) :: index
+
+        index = self%find(row, col)
+        self%val(index) = value
+
+    end subroutine set_coo
+
+    subroutine set_all_coo(self, value)
+        implicit none
+        class(type_coo), intent(inout) :: self
+        real(real64), intent(in) :: value
+
+        integer(int32) :: i
+
+        do i = 1, self%nnz
+            self%val(i) = value
+        end do
+
+    end subroutine set_all_coo
+
+    subroutine add_coo(self, row, col, value)
+        implicit none
+        class(type_coo), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
+
+        integer(int32) :: index
+
+        index = self%find(row, col)
+        self%val(index) = self%val(index) + value
+
+    end subroutine add_coo
 
     subroutine destroy_coo(self)
         implicit none
@@ -168,6 +211,9 @@ contains
         self%nnz = 0
     end subroutine destroy_coo
 
+    !------------------------
+    ! Matrix calculation
+    !------------------------
     subroutine type_coo_gemv(alpha, A, x, beta, y)
         ! y := alpha*A*x + beta*y
         use omp_lib
@@ -180,18 +226,10 @@ contains
 
         integer(int32) :: i
 
-        ! y := beta*y
-        !$omp parallel do default(shared) private(i)
-        do i = 1, size(y)
-            y(i) = beta * y(i)
-        end do
-        !$omp end parallel do
-
-        ! y += alpha*A*x
         !$omp parallel do default(shared) private(i)
         do i = 1, A%nnz
             !$omp atomic
-            y(A%row(i)) = y(A%row(i)) + alpha * A%val(i) * x(A%col(i))
+            y(A%row(i)) = alpha * A%val(i) * x(A%col(i)) + beta * y(A%row(i))
         end do
         !$omp end parallel do
 
@@ -199,6 +237,9 @@ contains
 
     subroutine type_coo_add(alpha, A, B, C)
         ! C := alpha*A + B
+        !
+        ! [ATTENTION] Assumes A, B, and C have the exact same sparsity pattern.
+        !
         implicit none
         real(real64), intent(in) :: alpha
         type(type_coo), intent(in) :: A
@@ -206,19 +247,12 @@ contains
         type(type_coo), intent(inout) :: C
 
         integer(int32) :: i
-        real(real64), allocatable :: tmp(:)
 
-        call allocate_array(tmp, A%nnz)
-
+        !$omp parallel do
         do i = 1, A%nnz
-            tmp(i) = alpha * A%val(i) + B%val(i)
+            C%val(i) = alpha * A%val(i) + B%val(i)
         end do
-
-        do i = 1, A%nnz
-            C%val(i) = tmp(i)
-        end do
-
-        call deallocate_array(tmp)
+        !$omp end parallel do
     end subroutine type_coo_add
 
 end module matrix_coo

@@ -21,9 +21,12 @@ module matrix_crs
         integer(int32), allocatable :: ind(:) ! column indices of non-zeros
         real(real64), allocatable :: val(:) ! non-zero values
     contains
-        procedure, public, pass(self) :: initialize => initialize_type_crs
-        procedure, public, pass(self) :: find => find_crs
-        procedure, public, pass(self) :: destroy => destroy_crs
+        procedure, public, pass(self) :: initialize => initialize_type_crs !&
+        procedure, public, pass(self) :: find       => find_crs !&
+        procedure, public, pass(self) :: set        => set_crs !&
+        procedure, public, pass(self) :: set_all    => set_all_crs !&
+        procedure, public, pass(self) :: add        => add_crs !&
+        procedure, public, pass(self) :: destroy    => destroy_crs !&
     end type type_crs
 
 contains
@@ -104,11 +107,12 @@ contains
 
     end subroutine initialize_type_crs
 
-    pure subroutine find_crs(self, row, col, index)
+    pure function find_crs(self, row, col) result(index)
         implicit none
         class(type_crs), intent(in) :: self
-        integer(int32), intent(in) :: row, col
-        integer(int32), intent(inout) :: index
+        integer(int32), intent(in) :: row
+        integer(int32), intent(in) :: col
+        integer(int32) :: index
 
         integer(int32) :: i
         integer(int32) :: search_start, search_end
@@ -130,7 +134,46 @@ contains
             end if
         end do
 
-    end subroutine find_crs
+    end function find_crs
+
+    subroutine set_crs(self, row, col, value)
+        implicit none
+        class(type_crs), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
+
+        integer(int32) :: index
+
+        index = self%find(row, col)
+        self%val(index) = value
+
+    end subroutine set_crs
+
+    subroutine set_all_crs(self, value)
+        implicit none
+        class(type_crs), intent(inout) :: self
+        real(real64), intent(in) :: value
+
+        integer(int32) :: i
+
+        do i = 1, self%nnz
+            self%val(i) = value
+        end do
+
+    end subroutine set_all_crs
+
+    subroutine add_crs(self, row, col, value)
+        implicit none
+        class(type_crs), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
+
+        integer(int32) :: index
+
+        index = self%find(row, col)
+        self%val(index) = self%val(index) + value
+
+    end subroutine add_crs
 
     subroutine destroy_crs(self)
         implicit none
@@ -145,10 +188,11 @@ contains
         self%num_ptr = 0
     end subroutine destroy_crs
 
-    !----
-    !
-    !----
+    !------------------------
+    ! Matrix calculation
+    !------------------------
     subroutine type_crs_gemv(alpha, A, x, beta, y)
+        ! y := alpha*A*x + beta*y
         implicit none
         real(real64), intent(in) :: alpha
         type(type_crs), intent(in) :: A
@@ -159,14 +203,6 @@ contains
         integer(int32) :: i, j, is, ie
         real(real64) :: sum
 
-        ! y := beta * y
-        !$omp parallel do private(i)
-        do i = 1, size(y)
-            y(i) = beta * y(i)
-        end do
-        !$omp end parallel do
-
-        ! y := y + alpha * A * x
         !$omp parallel do private(i, j, is, ie, sum)
         do i = 1, A%num_row
             sum = 0.0d0
@@ -175,7 +211,7 @@ contains
             do j = is, ie
                 sum = sum + A%val(j) * x(A%ind(j))
             end do
-            y(i) = y(i) + alpha * sum
+            y(i) = alpha * sum + beta * y(i)
         end do
         !$omp end parallel do
 
@@ -183,6 +219,9 @@ contains
 
     subroutine type_crs_add(alpha, A, B, C)
         ! C := alpha*A + B
+        !
+        ! [ATTENTION] Assumes A, B, and C have the exact same sparsity pattern.
+        !
         implicit none
         real(real64), intent(in) :: alpha
         type(type_crs), intent(in) :: A
@@ -190,19 +229,13 @@ contains
         type(type_crs), intent(inout) :: C
 
         integer(int32) :: i
-        real(real64), allocatable :: tmp(:)
 
-        call allocate_array(tmp, A%nnz)
-
+        !$omp parallel do
         do i = 1, A%nnz
-            tmp(i) = alpha * A%val(i) + B%val(i)
+            C%val(i) = alpha * A%val(i) + B%val(i)
         end do
+        !$omp end parallel do
 
-        do i = 1, A%nnz
-            C%val(i) = tmp(i)
-        end do
-
-        call deallocate_array(tmp)
     end subroutine type_crs_add
 
 end module matrix_crs

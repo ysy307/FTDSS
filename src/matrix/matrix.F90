@@ -1,8 +1,8 @@
 module module_matrix
-    use :: matrix_base, only:abst_matrix
-    use :: matrix_coo, only:type_coo, type_coo_gemv, type_coo_add
-    use :: matrix_crs, only:type_crs, type_crs_gemv, type_crs_add
-    use :: matrix_dense, only:type_dense, type_dense_gemv, type_dense_add
+    use :: matrix_base,  only:abst_matrix !&
+    use :: matrix_coo,   only:type_coo, type_coo_gemv, type_coo_add !&
+    use :: matrix_crs,   only:type_crs, type_crs_gemv, type_crs_add !&
+    use :: matrix_dense, only:type_dense, type_dense_gemv, type_dense_add !&
     implicit none
     private
 

@@ -3,9 +3,8 @@ module domain_manager
     use :: stdlib_logger
     use :: module_core, only:type_dp_3d, allocate_array, deallocate_array
     use :: module_input, only:type_input
-    use :: domain_element
+    use :: module_element
     use :: domain_side, only:holder_sides
-    use :: domain_element_factory, only:create_element
     use :: domain_side_factory, only:create_side
     use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element, type_map_node_to_element
     use :: domain_multicoloring, only:type_coloring, type_colored_info
@@ -204,6 +203,7 @@ contains
         if (self%computaion_dimension >= 3) then
             !! TBI: Handle 3D reordering if necessary
         end if
+
         if (self%computaion_dimension >= 2) then
             do iElem = 1, self%num_elements
                 call allocate_array(self%elements(iElem)%e%connectivity_reordered, self%elements(iElem)%e%get_num_nodes())
@@ -214,12 +214,18 @@ contains
                 end if
                 self%elements(iElem)%e%interpolate => interpolate_reordered
 
+                if (associated(self%elements(iElem)%e%deriv_interpolate)) then
+                    nullify (self%elements(iElem)%e%deriv_interpolate)
+                end if
+                self%elements(iElem)%e%deriv_interpolate => deriv_interpolate_reordered
+
                 if (associated(self%elements(iElem)%e%get_connectivity)) then
                     nullify (self%elements(iElem)%e%get_connectivity)
                 end if
                 self%elements(iElem)%e%get_connectivity => get_connectivity_reordered
             end do
         end if
+
         if (self%computaion_dimension >= 1) then
             do iSide = 1, self%num_sides
                 call allocate_array(self%sides(iSide)%s%connectivity_reordered, self%sides(iSide)%s%get_num_nodes())

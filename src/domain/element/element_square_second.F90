@@ -88,6 +88,7 @@ contains
             element%num_gauss = 4_int32
             call allocate_array(element%weight, element%num_gauss)
             if (allocated(element%gauss)) deallocate (element%gauss)
+            allocate (element%gauss(element%num_gauss))
 
             element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
             call element%gauss(1)%set([-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0])
@@ -97,6 +98,7 @@ contains
         case ("free")
             element%num_gauss = 4_int32
             call allocate_array(element%weight, element%num_gauss)
+            if (allocated(element%gauss)) deallocate (element%gauss)
             allocate (element%gauss(element%num_gauss))
 
             element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
@@ -108,6 +110,9 @@ contains
 
         if (associated(element%interpolate)) nullify (element%interpolate)
         element%interpolate => interpolate
+
+        if (associated(element%deriv_interpolate)) nullify (element%deriv_interpolate)
+        element%deriv_interpolate => deriv_interpolate
 
         if (associated(element%get_connectivity)) nullify (element%get_connectivity)
         element%get_connectivity => get_connectivity
