@@ -18,15 +18,16 @@ module matrix_dense
         integer(int32) :: num_col
         real(real64), allocatable :: val(:, :)
     contains
-        procedure, public, pass(self) :: initialize => initialize_type_dense !&
-        procedure, public, pass(self) :: find       => find_dense !&
-        procedure, public, pass(self) :: set        => set_dense !&
-        procedure, public, pass(self) :: set_all    => set_all_dense !&
-        procedure, public, pass(self) :: add        => add_dense !&
-        procedure, public, pass(self) :: destroy    => destroy_dense !&
+        procedure, public, pass(self) :: initialize       => initialize_type_dense_from_domain !&
+        procedure, public, pass(self) :: initialize_local => initialize_type_dense_from_node !&
+        procedure, public, pass(self) :: find             => find_dense !&
+        procedure, public, pass(self) :: set              => set_dense !&
+        procedure, public, pass(self) :: set_all          => set_all_dense !&
+        procedure, public, pass(self) :: add              => add_dense !&
+        procedure, public, pass(self) :: destroy          => destroy_dense !&
     end type
 contains
-    subroutine initialize_type_dense(self, domain)
+    subroutine initialize_type_dense_from_domain(self, domain)
         implicit none
         class(type_dense), intent(inout) :: self
         type(type_domain), intent(inout) :: domain
@@ -39,7 +40,20 @@ contains
         self%num_row = num_nodes
         self%num_col = num_nodes
 
-    end subroutine initialize_type_dense
+    end subroutine initialize_type_dense_from_domain
+
+    subroutine initialize_type_dense_from_node(self, num_nodes)
+        implicit none
+        class(type_dense), intent(inout) :: self
+        integer(int32), intent(in) :: num_nodes
+
+        call allocate_array(self%val, num_nodes, num_nodes)
+        self%num_row = num_nodes
+        self%num_col = num_nodes
+
+        self%val(:, :) = 0.0d0
+
+    end subroutine initialize_type_dense_from_node
 
     pure function find_dense(self, row, col) result(index)
         implicit none
@@ -98,9 +112,9 @@ contains
         call deallocate_array(self%val)
     end subroutine destroy_dense
 
-    !------------------------
+    !-------------------------------------------------------------------------------------------------------------------------------
     ! Matrix calculation
-    !------------------------
+    !-------------------------------------------------------------------------------------------------------------------------------
     subroutine type_dense_gemv(alpha, A, x, beta, y)
         ! y := alpha*A*x + beta*y
         implicit none

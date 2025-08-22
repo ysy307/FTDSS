@@ -2,8 +2,8 @@ module properties_material_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_input, only:type_input
     use :: module_calculate, only: &
-        holder_gccs, holder_wrfs, holder_dens, holder_sphs, holder_vhcs, holder_thcs, &
-        abst_gcc, abst_wrf, abst_den, abst_sph, abst_vhc, abst_thc
+        holder_gccs, holder_wrfs, holder_dens, holder_sphs, holder_vhcs, holder_thcs, holder_hcfs, &
+        abst_gcc, abst_wrf, abst_den, abst_sph, abst_vhc, abst_thc, abst_hcf
     implicit none
     public
 
@@ -23,6 +23,7 @@ module properties_material_manager
         type(holder_vhcs), allocatable :: vhc(:)
         type(holder_gccs), allocatable :: gcc(:)
         type(holder_wrfs), allocatable :: wrf(:)
+        type(holder_hcfs), allocatable :: hcf(:)
 
         integer(int32), allocatable :: region_id_map(:)
     contains
@@ -34,6 +35,7 @@ module properties_material_manager
         procedure, public, pass(self) :: get_vhc => get_vhc_ptr
         procedure, public, pass(self) :: get_gcc => get_gcc_ptr
         procedure, public, pass(self) :: get_wrf => get_wrf_ptr
+        procedure, public, pass(self) :: get_hcf => get_hcf_ptr
 
     end type type_material_manager
 
@@ -70,6 +72,7 @@ contains
         allocate (self%vhc(num_unique_regions))
         allocate (self%gcc(num_unique_regions))
         allocate (self%wrf(num_unique_regions))
+        allocate (self%hcf(num_unique_regions))
 
         ! region_idの最大値でマップ配列を確保し、0(無効値)で初期化
         allocate (self%region_id_map(max_region_id), source=0)
@@ -82,6 +85,7 @@ contains
             call self%vhc(model_idx)%initialize(input, current_material_id)
             call self%gcc(model_idx)%initialize(input, current_material_id)
             call self%wrf(model_idx)%initialize(input, current_material_id)
+            call self%hcf(model_idx)%initialize(input, current_material_id)
 
             ! 正しいマッピング: region_idをインデックスとして、配列のインデックスを格納
             self%region_id_map(current_material_id) = model_idx
@@ -263,5 +267,34 @@ contains
 
         wrf_ptr => self%wrf(model_index)%p
     end subroutine get_wrf_ptr
+
+    ! HCF getter
+    subroutine get_hcf_ptr(self, region_id, hcf_ptr)
+        implicit none
+        class(type_material_manager), intent(in), target :: self
+        integer(int32), intent(in) :: region_id
+        class(abst_hcf), intent(inout), pointer :: hcf_ptr
+
+        integer(int32) :: model_index
+
+        if (debug_mode) then
+            if (region_id < 1 .or. region_id > size(self%region_id_map)) then
+                print *, "Error: Invalid region_id in get_hcf_ptr:", region_id
+                nullify (hcf_ptr)
+                stop 1
+            end if
+        end if
+
+        model_index = self%region_id_map(region_id)
+        if (debug_mode) then
+            if (model_index == 0) then
+                print *, "Error: region_id not mapped in get_hcf_ptr:", region_id
+                nullify (hcf_ptr)
+                stop 1
+            end if
+        end if
+
+        hcf_ptr => self%hcf(model_index)%p
+    end subroutine get_hcf_ptr
 
 end module properties_material_manager

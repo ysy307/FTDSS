@@ -19,7 +19,7 @@ contains
 
     end function type_GCC_Seg_Pa_Construct
 
-    module function Calc_GCC_Seg_Pa(self, T, Pw, rhoW, rhoI) result(suction)
+    module pure function Calc_GCC_Seg_Pa(self, T, Pw, rhoW, rhoI) result(suction)
         implicit none
         class(type_gcc_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
@@ -36,7 +36,7 @@ contains
 
     end function Calc_GCC_Seg_Pa
 
-    module function Calc_GCC_Seg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(suction_derivative)
+    module pure function Calc_GCC_Seg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(suction_derivative)
         implicit none
         class(type_gcc_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T
@@ -53,7 +53,7 @@ contains
 
     end function Calc_GCC_Seg_Pa_Derivative
 
-    module function Calc_GCC_Seg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(suction_derivative)
+    module pure function Calc_GCC_Seg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(suction_derivative)
         implicit none
         class(type_gcc_segregation_pa), intent(in) :: self
         real(real64), intent(in) :: T

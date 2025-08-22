@@ -44,6 +44,7 @@ module control_time
         procedure, public, pass(self) :: get_time
         procedure, public, pass(self) :: shift => shift_time
         procedure, public, pass(self) :: get_time_coefficients
+        procedure, public, pass(self) :: get_dt
     end type type_time
 
 contains
@@ -687,5 +688,12 @@ contains
         end select
 
     end subroutine get_time_coefficients
+
+    pure function get_dt(self) result(dt)
+        class(type_time), intent(in) :: self
+        real(real64) :: dt
+
+        dt = self%dt
+    end function get_dt
 
 end module control_time

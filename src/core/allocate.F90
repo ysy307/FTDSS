@@ -63,7 +63,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -71,30 +71,34 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
-
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -108,7 +112,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -116,30 +120,34 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
-
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -153,7 +161,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -161,30 +169,35 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
 
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -198,7 +211,7 @@ contains
         integer(int64), intent(in), optional :: length
         integer(int64), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -206,30 +219,35 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int64)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
 
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -243,7 +261,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -251,30 +269,35 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
 
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -288,7 +311,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -296,30 +319,35 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
 
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -333,7 +361,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -341,30 +369,35 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
 
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -378,7 +411,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -386,21 +419,24 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
@@ -423,7 +459,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -431,30 +467,35 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
 
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -468,7 +509,7 @@ contains
         integer(int32), intent(in), optional :: length
         integer(int32), intent(in), optional :: bounds(:)
         integer(int32) :: stat
-        logical(logical32) :: length_present, bounds_present
+        logical :: length_present, bounds_present
         integer(int64) :: requested_size
         integer(int32) :: first, last
 
@@ -476,30 +517,35 @@ contains
         bounds_present = present(bounds)
 
         ! --- Argument validation ---
+#ifdef USE_DEBUG
         if (length_present .and. bounds_present) call error_message(956)
         if (.not. length_present .and. .not. bounds_present) call error_message(957)
         if (bounds_present) then
             if (size(bounds) /= 2) call error_message(958)
         end if
+#endif
 
         ! --- Main logic ---
         if (allocated(array)) call error_message(951)
 
         if (length_present) then
             ! Allocate by length
+#ifdef USE_DEBUG
             if (length <= 0) call error_message(952)
             if (int(length, kind=int64) > huge(0_int32)) call error_message(953)
+#endif
             allocate (array(length), stat=stat)
-
         else if (bounds_present) then
             ! Allocate by bounds
             first = bounds(1)
             last = bounds(2)
 
+#ifdef USE_DEBUG
             if (first > last) call error_message(954)
 
             requested_size = int(last, kind=int64) - int(first, kind=int64) + 1_int64
             if (requested_size > huge(0_int64) / 4) call error_message(953)
+#endif
             allocate (array(first:last), stat=stat)
         end if
 
@@ -514,14 +560,17 @@ contains
         integer(int32) :: stat
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (nrow <= 0 .or. ncol <= 0) call error_message(952)
-        ! if (nrow * ncol > huge(ncol)) call error_message(953)
+#endif
 
         allocate (array(nrow, ncol), stat=stat)
 
         if (stat /= 0) call error_message(955)
 
     end subroutine allocate_rank2_int8
+
     subroutine allocate_rank2_int16(array, num_row, num_col)
         implicit none
         integer(int16), intent(inout), allocatable :: array(:, :)
@@ -530,10 +579,13 @@ contains
         integer(int64) :: total_size
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
         total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
         if (total_size > huge(0_int64) / 4) call error_message(953)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 
@@ -549,10 +601,13 @@ contains
         integer(int64) :: total_size
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
         total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
         if (total_size > huge(0_int64) / 4) call error_message(953)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 
@@ -568,10 +623,13 @@ contains
         integer(int64) :: total_size
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
         total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
         if (total_size > huge(0_int64) / 8) call error_message(953)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 
@@ -587,10 +645,13 @@ contains
         integer(int64) :: total_size
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
         total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
         if (total_size > huge(0_int64) / 4) call error_message(953)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 
@@ -606,10 +667,13 @@ contains
         integer(int64) :: total_size
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
         total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
         if (total_size > huge(0_int64) / 8) call error_message(953)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 
@@ -625,10 +689,13 @@ contains
         integer(int64) :: total_size
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
 
         total_size = int(num_row, kind=int64) * int(num_col, kind=int64)
         if (total_size > huge(0_int64) / 16) call error_message(953)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 
@@ -658,7 +725,10 @@ contains
         integer(int32) :: stat
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 
@@ -673,7 +743,10 @@ contains
         integer(int32) :: stat
 
         if (allocated(array)) call error_message(951)
+
+#ifdef USE_DEBUG
         if (num_row <= 0 .or. num_col <= 0) call error_message(952)
+#endif
 
         allocate (array(num_row, num_col), stat=stat)
 

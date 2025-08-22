@@ -19,7 +19,7 @@ contains
 
     end function type_GCC_Seg_m_Construct
 
-    module function Calc_GCC_Seg_m(self, T, Pw, rhoW, rhoI) result(suction)
+    module pure function Calc_GCC_Seg_m(self, T, Pw, rhoW, rhoI) result(suction)
         implicit none
         class(type_gcc_segregation_m), intent(in) :: self
         real(real64), intent(in) :: T
@@ -36,7 +36,7 @@ contains
 
     end function Calc_GCC_Seg_m
 
-    module function Calc_GCC_Seg_m_Derivative(self, T, Pw, rhoW, rhoI) result(suction_derivative)
+    module pure function Calc_GCC_Seg_m_Derivative(self, T, Pw, rhoW, rhoI) result(suction_derivative)
         implicit none
         class(type_gcc_segregation_m), intent(in) :: self
         real(real64), intent(in) :: T
@@ -53,7 +53,7 @@ contains
 
     end function Calc_GCC_Seg_m_Derivative
 
-    module function Calc_GCC_Seg_m_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(suction_derivative)
+    module pure function Calc_GCC_Seg_m_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(suction_derivative)
         implicit none
         class(type_gcc_segregation_m), intent(in) :: self
         real(real64), intent(in) :: T

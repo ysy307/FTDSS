@@ -11,6 +11,10 @@ module core_types_gauss
         real(real64) :: water_content
         real(real64) :: ice_content
         real(real64) :: porosity
+        real(real64) :: dQi_dT
+        real(real64) :: density_water
+        real(real64) :: density_ice
+        real(real64) :: vhc_water
     end type type_state
 
 end module core_types_gauss

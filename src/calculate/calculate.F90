@@ -8,6 +8,10 @@ module module_calculate
     use :: calculate_thermal_conductivity, only:holder_thcs, abst_thc, type_thc_3phase
     use :: calculate_specific_heat, only:holder_sphs, abst_sph, type_sph_3phase
     use :: calculate_volumetric_heat_capacity, only:holder_vhcs, abst_vhc, type_vhc_3phase, type_vhc_3phase_apparent
+
+    use :: calculate_hcf, only:holder_hcfs, abst_hcf, type_hcf_base, type_hcf_impedance, type_hcf_viscosity, &
+        type_hcf_base_impedance, type_hcf_base_viscosity, type_hcf_impedance_viscosity, &
+        type_hcf_base_impedance_viscosity
     implicit none
     private
 
@@ -70,5 +74,18 @@ module module_calculate
     public :: abst_vhc
     public :: type_vhc_3phase
     public :: type_vhc_3phase_apparent
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    !  hydraulic conductivity  calculation module
+    !-------------------------------------------------------------------------------------------------------------------------------
+    public :: abst_hcf
+    public :: holder_hcfs
+    public :: type_hcf_base
+    public :: type_hcf_impedance
+    public :: type_hcf_viscosity
+    public :: type_hcf_base_impedance
+    public :: type_hcf_base_viscosity
+    public :: type_hcf_impedance_viscosity
+    public :: type_hcf_base_impedance_viscosity
 
 end module module_calculate

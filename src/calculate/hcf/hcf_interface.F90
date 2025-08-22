@@ -1,19 +1,25 @@
 module calculate_hcf
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:allocate_array, type_state
-#ifdef _OPENMP
-    use omp_lib
-#endif
+    use :: module_core, only:type_state
+    use :: module_input, only:type_input, type_materials_hcf
     implicit none
     private
 
     public :: abst_hcf
+    public :: holder_hcfs
+    public :: type_hcf_base
+    public :: type_hcf_impedance
+    public :: type_hcf_viscosity
+    public :: type_hcf_base_impedance
+    public :: type_hcf_base_viscosity
+    public :: type_hcf_impedance_viscosity
+    public :: type_hcf_base_impedance_viscosity
 
-    type :: holder_hcs
+    type :: holder_hcfs
         class(abst_hcf), allocatable :: p
     contains
-        ! procedure, pass(self) :: initialize => initialize_holder_hcs
-    end type holder_hcs
+        procedure, pass(self) :: initialize => initialize_holder_hcfs
+    end type holder_hcfs
 
     type, abstract :: abst_hcf
         private
@@ -69,6 +75,15 @@ module calculate_hcf
             real(real64) :: kflh
 
         end function abst_calc_kflh
+    end interface
+
+    interface
+        module subroutine initialize_holder_hcfs(self, input, i_material)
+            implicit none
+            class(holder_hcfs), intent(inout) :: self
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
+        end subroutine initialize_holder_hcfs
     end interface
 
     interface
@@ -397,462 +412,169 @@ module calculate_hcf
 
 contains
 
-    ! function Construct_Type_HCF(useHCFType, Ks, thetaS, thetaR, alpha1, n1, w1, alpha2, n2, l, hcrit, omega, useViscosity, nsize) result(structure_HCF)
-    !     implicit none
-    !     integer(int32), intent(in) :: useHCFType
-    !     real(real64), intent(in) :: Ks
-    !     real(real64), intent(in), optional :: thetaS
-    !     real(real64), intent(in), optional :: thetaR
-    !     real(real64), intent(in), optional :: alpha1
-    !     real(real64), intent(in), optional :: n1
-    !     real(real64), intent(in), optional :: w1
-    !     real(real64), intent(in), optional :: alpha2
-    !     real(real64), intent(in), optional :: n2
-    !     real(real64), intent(in), optional :: l
-    !     real(real64), intent(in), optional :: hcrit
-    !     real(real64), intent(in), optional :: omega
-    !     integer(int32), intent(in), optional :: useViscosity
-    !     integer(int32), intent(in) :: nsize
-    !     class(abst_hcf), allocatable :: structure_HCF
+    function construct_hcf_base(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf_base), allocatable :: property
 
-    !     select case (useHCFType)
-    !     case (11)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) &
-    !             ) stop "Missing parameters for HCF type 11"
-    !         structure_HCF = Type_HCF_Base_BC(Ks=Ks, &
-    !                                          alpha1=alpha1, &
-    !                                          n1=n1, &
-    !                                          l=l, &
-    !                                          nsize=nsize)
-    !     case (12)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) &
-    !             ) stop "Missing parameters for HCF type 12"
-    !         structure_HCF = Type_HCF_Base_VG(Ks=Ks, &
-    !                                          alpha1=alpha1, &
-    !                                          n1=n1, &
-    !                                          l=l, &
-    !                                          nsize=nsize)
-    !     case (13)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) &
-    !             ) stop "Missing parameters for HCF type 13"
-    !         structure_HCF = Type_HCF_Base_KO(Ks=Ks, &
-    !                                          alpha1=alpha1, &
-    !                                          n1=n1, &
-    !                                          l=l, &
-    !                                          nsize=nsize)
-    !     case (14)
-    !         if (.not. present(thetaS) .or. &
-    !             .not. present(thetaR) .or. &
-    !             .not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(hcrit) &
-    !             ) stop "Missing parameters for HCF type 14"
-    !         structure_HCF = Type_HCF_Base_MVG(Ks=Ks, &
-    !                                           thetaS=thetaS, &
-    !                                           thetaR=thetaR, &
-    !                                           alpha1=alpha1, &
-    !                                           n1=n1, &
-    !                                           l=l, &
-    !                                           hcrit=hcrit, &
-    !                                           nsize=nsize)
-    !     case (15)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(alpha2) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) &
-    !             ) stop "Missing parameters for HCF type 15"
-    !         structure_HCF = Type_HCF_Base_Durner(Ks=Ks, &
-    !                                              alpha1=alpha1, &
-    !                                              n1=n1, &
-    !                                              w1=w1, &
-    !                                              alpha2=alpha2, &
-    !                                              n2=n2, &
-    !                                              l=l, &
-    !                                              nsize=nsize)
-    !     case (16)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) &
-    !             ) stop "Missing parameters for HCF type 16"
-    !         structure_HCF = Type_HCF_Base_DVGCH(Ks=Ks, &
-    !                                             alpha1=alpha1, &
-    !                                             n1=n1, &
-    !                                             w1=w1, &
-    !                                             n2=n2, &
-    !                                             l=l, &
-    !                                             nsize=nsize)
-    !     case (21)
-    !         if (.not. present(omega)) stop "Missing omega for HCF type 21"
-    !         structure_HCF = Type_HCF_Impedance_exp(Ks=Ks, &
-    !                                            omega=omega, &
-    !                                            nsize=nsize)
-    !     case (31)
-    !         if (.not. present(useViscosity)) stop "Missing useViscosity for HCF type 31"
-    !         structure_HCF = Type_HCF_Viscosity(Ks=Ks, &
-    !                                            useViscosity=useViscosity, &
-    !                                            nsize=nsize)
-    !     case (41)
-    !         if (.not. present(omega) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 41"
-    !         structure_HCF = Type_HCF_Impedance_exp_Viscosity(Ks=Ks, &
-    !                                                      omega=omega, &
-    !                                                      useViscosity=useViscosity, &
-    !                                                      nsize=nsize)
-    !     case (51)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) &
-    !             ) stop "Missing parameters for HCF type 51"
-    !         structure_HCF = Type_HCF_Base_Impedance_BC(Ks=Ks, &
-    !                                                    alpha1=alpha1, &
-    !                                                    n1=n1, &
-    !                                                    l=l, &
-    !                                                    omega=omega, &
-    !                                                    nsize=nsize)
-    !     case (52)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) &
-    !             ) stop "Missing parameters for HCF type 52"
-    !         structure_HCF = Type_HCF_Base_Impedance_VG(Ks=Ks, &
-    !                                                    alpha1=alpha1, &
-    !                                                    n1=n1, &
-    !                                                    l=l, &
-    !                                                    omega=omega, &
-    !                                                    nsize=nsize)
-    !     case (53)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) &
-    !             ) stop "Missing parameters for HCF type 53"
-    !         structure_HCF = Type_HCF_Base_Impedance_KO(Ks=Ks, &
-    !                                                    alpha1=alpha1, &
-    !                                                    n1=n1, &
-    !                                                    l=l, &
-    !                                                    omega=omega, &
-    !                                                    nsize=nsize)
-    !     case (54)
-    !         if (.not. present(thetaS) .or. &
-    !             .not. present(thetaR) .or. &
-    !             .not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(hcrit) .or. &
-    !             .not. present(omega) &
-    !             ) stop "Missing parameters for HCF type 54"
-    !         structure_HCF = Type_HCF_Base_Impedance_MVG(Ks=Ks, &
-    !                                                     thetaS=thetaS, &
-    !                                                     thetaR=thetaR, &
-    !                                                     alpha1=alpha1, &
-    !                                                     n1=n1, &
-    !                                                     l=l, &
-    !                                                     hcrit=hcrit, &
-    !                                                     omega=omega, &
-    !                                                     nsize=nsize)
-    !     case (55)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(alpha2) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) &
-    !             ) stop "Missing parameters for HCF type 55"
-    !         structure_HCF = Type_HCF_Base_Impedance_Durner(Ks=Ks, &
-    !                                                        alpha1=alpha1, &
-    !                                                        n1=n1, &
-    !                                                        w1=w1, &
-    !                                                        alpha2=alpha2, &
-    !                                                        n2=n2, &
-    !                                                        l=l, &
-    !                                                        omega=omega, &
-    !                                                        nsize=nsize)
-    !     case (56)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) &
-    !             ) stop "Missing parameters for HCF type 56"
-    !         structure_HCF = Type_HCF_Base_Impedance_DVGCH(Ks=Ks, &
-    !                                                       alpha1=alpha1, &
-    !                                                       n1=n1, &
-    !                                                       w1=w1, &
-    !                                                       n2=n2, &
-    !                                                       l=l, &
-    !                                                       omega=omega, &
-    !                                                       nsize=nsize)
-    !     case (61)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 61"
-    !         structure_HCF = Type_HCF_Base_Viscosity_BC(Ks=Ks, &
-    !                                                    alpha1=alpha1, &
-    !                                                    n1=n1, &
-    !                                                    l=l, &
-    !                                                    useViscosity=useViscosity, &
-    !                                                    nsize=nsize)
-    !     case (62)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 62"
-    !         structure_HCF = Type_HCF_Base_Viscosity_VG(Ks=Ks, &
-    !                                                    alpha1=alpha1, &
-    !                                                    n1=n1, &
-    !                                                    l=l, &
-    !                                                    useViscosity=useViscosity, &
-    !                                                    nsize=nsize)
-    !     case (63)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 63"
-    !         structure_HCF = Type_HCF_Base_Viscosity_KO(Ks=Ks, &
-    !                                                    alpha1=alpha1, &
-    !                                                    n1=n1, &
-    !                                                    l=l, &
-    !                                                    useViscosity=useViscosity, &
-    !                                                    nsize=nsize)
-    !     case (64)
-    !         if (.not. present(thetaS) .or. &
-    !             .not. present(thetaR) .or. &
-    !             .not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(hcrit) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 64"
-    !         structure_HCF = Type_HCF_Base_Viscosity_MVG(Ks=Ks, &
-    !                                                     thetaS=thetaS, &
-    !                                                     thetaR=thetaR, &
-    !                                                     alpha1=alpha1, &
-    !                                                     n1=n1, &
-    !                                                     l=l, &
-    !                                                     hcrit=hcrit, &
-    !                                                     useViscosity=useViscosity, &
-    !                                                     nsize=nsize)
-    !     case (65)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(alpha2) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 65"
-    !         structure_HCF = Type_HCF_Base_Viscosity_Durner(Ks=Ks, &
-    !                                                        alpha1=alpha1, &
-    !                                                        n1=n1, &
-    !                                                        w1=w1, &
-    !                                                        alpha2=alpha2, &
-    !                                                        n2=n2, &
-    !                                                        l=l, &
-    !                                                        useViscosity=useViscosity, &
-    !                                                        nsize=nsize)
-    !     case (66)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 66"
-    !         structure_HCF = Type_HCF_Base_Viscosity_DVGCH(Ks=Ks, &
-    !                                                       alpha1=alpha1, &
-    !                                                       n1=n1, &
-    !                                                       w1=w1, &
-    !                                                       n2=n2, &
-    !                                                       l=l, &
-    !                                                       useViscosity=useViscosity, &
-    !                                                       nsize=nsize)
-    !     case (71)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 71"
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_BC(Ks=Ks, &
-    !                                                              alpha1=alpha1, &
-    !                                                              n1=n1, &
-    !                                                              l=l, &
-    !                                                              omega=omega, &
-    !                                                              useViscosity=useViscosity, &
-    !                                                              nsize=nsize)
-    !     case (72)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 72"
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_VG(Ks=Ks, &
-    !                                                              alpha1=alpha1, &
-    !                                                              n1=n1, &
-    !                                                              l=l, &
-    !                                                              omega=omega, &
-    !                                                              useViscosity=useViscosity, &
-    !                                                              nsize=nsize)
-    !     case (73)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 73"
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_KO(Ks=Ks, &
-    !                                                              alpha1=alpha1, &
-    !                                                              n1=n1, &
-    !                                                              l=l, &
-    !                                                              omega=omega, &
-    !                                                              useViscosity=useViscosity, &
-    !                                                              nsize=nsize)
-    !     case (74)
-    !         if (.not. present(thetaS) .or. &
-    !             .not. present(thetaR) .or. &
-    !             .not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(hcrit) .or. &
-    !             .not. present(omega) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 74"
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_MVG(Ks=Ks, &
-    !                                                               thetaS=thetaS, &
-    !                                                               thetaR=thetaR, &
-    !                                                               alpha1=alpha1, &
-    !                                                               n1=n1, &
-    !                                                               l=l, &
-    !                                                               hcrit=hcrit, &
-    !                                                               omega=omega, &
-    !                                                               useViscosity=useViscosity, &
-    !                                                               nsize=nsize)
-    !     case (75)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(alpha2) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 75"
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_Durner(Ks=Ks, &
-    !                                                                  alpha1=alpha1, &
-    !                                                                  n1=n1, &
-    !                                                                  w1=w1, &
-    !                                                                  alpha2=alpha2, &
-    !                                                                  n2=n2, &
-    !                                                                  l=l, &
-    !                                                                  omega=omega, &
-    !                                                                  useViscosity=useViscosity, &
-    !                                                                  nsize=nsize)
+        select case (input%basic%materials(i_material)%hydraulic%hcf%model_number)
+        case (1)
+            property = construct_type_hcf_base_bc(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
+                                                  n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
+                                                  l=input%basic%materials(i_material)%hydraulic%hcf%l)
+        case (2)
+            property = construct_type_hcf_base_vg(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
+                                                  n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
+                                                  l=input%basic%materials(i_material)%hydraulic%hcf%l)
+        case (3)
+            property = construct_type_hcf_base_ko(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
+                                                  n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
+                                                  l=input%basic%materials(i_material)%hydraulic%hcf%l)
+        case (4)
+            property = construct_type_hcf_base_mvg(theta_s=input%basic%materials(i_material)%hydraulic%hcf%theta_s, &
+                                                   theta_r=input%basic%materials(i_material)%hydraulic%hcf%theta_r, &
+                                                   alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
+                                                   n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
+                                                   l=input%basic%materials(i_material)%hydraulic%hcf%l, &
+                                                   h_crit=input%basic%materials(i_material)%hydraulic%hcf%h_crit)
+        case (5)
+            property = construct_type_hcf_base_durner(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
+                                                      n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
+                                                      w1=input%basic%materials(i_material)%hydraulic%hcf%w1, &
+                                                      alpha2=input%basic%materials(i_material)%hydraulic%hcf%alpha2, &
+                                                      n2=input%basic%materials(i_material)%hydraulic%hcf%n2, &
+                                                      l=input%basic%materials(i_material)%hydraulic%hcf%l)
+        case (6)
+            property = construct_type_hcf_base_dvgch(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
+                                                     n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
+                                                     w1=input%basic%materials(i_material)%hydraulic%hcf%w1, &
+                                                     n2=input%basic%materials(i_material)%hydraulic%hcf%n2, &
+                                                     l=input%basic%materials(i_material)%hydraulic%hcf%l)
+        end select
 
-    !     case (76)
-    !         if (.not. present(alpha1) .or. &
-    !             .not. present(n1) .or. &
-    !             .not. present(w1) .or. &
-    !             .not. present(n2) .or. &
-    !             .not. present(l) .or. &
-    !             .not. present(omega) .or. &
-    !             .not. present(useViscosity) &
-    !             ) stop "Missing parameters for HCF type 76"
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_DVGCH(Ks=Ks, &
-    !                                                                 alpha1=alpha1, &
-    !                                                                 n1=n1, &
-    !                                                                 w1=w1, &
-    !                                                                 n2=n2, &
-    !                                                                 l=l, &
-    !                                                                 omega=omega, &
-    !                                                                 useViscosity=useViscosity, &
-    !                                                                 nsize=nsize)
-    !     end select
+    end function construct_hcf_base
 
-    ! end function Construct_Type_HCF
+    function construct_hcf_impedance(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf_impedance), allocatable :: property
 
-    ! function Construct_Type_HCF_minimal(useHCFType) result(structure_HCF)
-    !     implicit none
-    !     integer(int32), intent(in) :: useHCFType
-    !     class(abst_hcf), allocatable :: structure_HCF
+        property = construct_type_hcf_impedance(omega=input%basic%materials(i_material)%hydraulic%impedance_factor)
 
-    !     select case (useHCFType)
-    !     case (11)
-    !         structure_HCF = Type_HCF_Base_BC()
-    !     case (12)
-    !         structure_HCF = Type_HCF_Base_VG()
-    !     case (13)
-    !         structure_HCF = Type_HCF_Base_KO()
-    !     case (14)
-    !         structure_HCF = Type_HCF_Base_MVG()
-    !     case (15)
-    !         structure_HCF = Type_HCF_Base_Durner()
-    !     case (16)
-    !         structure_HCF = Type_HCF_Base_DVGCH()
-    !     case (21)
-    !         structure_HCF = Type_HCF_Impedance_exp()
-    !     case (31)
-    !         structure_HCF = Type_HCF_Viscosity()
-    !     case (41)
-    !         structure_HCF = Type_HCF_Impedance_exp_Viscosity()
-    !     case (51)
-    !         structure_HCF = Type_HCF_Base_Impedance_BC()
-    !     case (52)
-    !         structure_HCF = Type_HCF_Base_Impedance_VG()
-    !     case (53)
-    !         structure_HCF = Type_HCF_Base_Impedance_KO()
-    !     case (54)
-    !         structure_HCF = Type_HCF_Base_Impedance_MVG()
-    !     case (55)
-    !         structure_HCF = Type_HCF_Base_Impedance_Durner()
-    !     case (56)
-    !         structure_HCF = Type_HCF_Base_Impedance_DVGCH()
-    !     case (61)
-    !         structure_HCF = Type_HCF_Base_Viscosity_BC()
-    !     case (62)
-    !         structure_HCF = Type_HCF_Base_Viscosity_VG()
-    !     case (63)
-    !         structure_HCF = Type_HCF_Base_Viscosity_KO()
-    !     case (64)
-    !         structure_HCF = Type_HCF_Base_Viscosity_MVG()
-    !     case (65)
-    !         structure_HCF = Type_HCF_Base_Viscosity_Durner()
-    !     case (66)
-    !         structure_HCF = Type_HCF_Base_Viscosity_DVGCH()
-    !     case (71)
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_BC()
-    !     case (72)
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_VG()
-    !     case (73)
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_KO()
-    !     case (74)
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_MVG()
-    !     case (75)
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_Durner()
-    !     case (76)
-    !         structure_HCF = Type_HCF_Base_Impedance_Viscosity_DVGCH()
-    !     end select
+    end function construct_hcf_impedance
 
-    ! end function Construct_Type_HCF_minimal
+    function construct_hcf_viscosity(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf_viscosity), allocatable :: property
 
+        property = construct_type_hcf_viscosity(input%basic%materials(i_material)%hydraulic%water_viscosity_model)
+
+    end function construct_hcf_viscosity
+
+    function create_type_hcf_base(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf), allocatable :: property
+
+        if (allocated(property)) deallocate (property)
+        allocate (type_hcf_base :: property)
+
+        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, i_material)
+
+    end function create_type_hcf_base
+
+    function create_type_hcf_impedance(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf), allocatable :: property
+
+        if (allocated(property)) deallocate (property)
+        allocate (type_hcf_impedance :: property)
+
+        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
+        property%impedance = construct_hcf_impedance(input, i_material)
+
+    end function create_type_hcf_impedance
+
+    function create_type_hcf_viscosity(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf), allocatable :: property
+
+        if (allocated(property)) deallocate (property)
+        allocate (type_hcf_viscosity :: property)
+
+        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
+        property%viscosity = construct_hcf_viscosity(input, i_material)
+
+    end function create_type_hcf_viscosity
+
+    function create_type_hcf_base_impedance(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf), allocatable :: property
+
+        if (allocated(property)) deallocate (property)
+        allocate (type_hcf_base_impedance :: property)
+
+        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, i_material)
+        property%impedance = construct_hcf_impedance(input, i_material)
+
+    end function create_type_hcf_base_impedance
+
+    function create_type_hcf_base_viscosity(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf), allocatable :: property
+
+        if (allocated(property)) deallocate (property)
+        allocate (type_hcf_base_viscosity :: property)
+
+        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, i_material)
+        property%viscosity = construct_hcf_viscosity(input, i_material)
+
+    end function create_type_hcf_base_viscosity
+
+    function create_type_hcf_impedance_viscosity(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf), allocatable :: property
+
+        if (allocated(property)) deallocate (property)
+        allocate (type_hcf_impedance_viscosity :: property)
+
+        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
+        property%impedance = construct_hcf_impedance(input, i_material)
+        property%viscosity = construct_hcf_viscosity(input, i_material)
+
+    end function create_type_hcf_impedance_viscosity
+
+    function create_type_hcf_base_impedance_viscosity(input, i_material) result(property)
+        implicit none
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
+        class(abst_hcf), allocatable :: property
+
+        if (allocated(property)) deallocate (property)
+        allocate (type_hcf_base_impedance_viscosity :: property)
+
+        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, i_material)
+        property%impedance = construct_hcf_impedance(input, i_material)
+        property%viscosity = construct_hcf_viscosity(input, i_material)
+
+    end function create_type_hcf_base_impedance_viscosity
 end module calculate_hcf

@@ -19,7 +19,7 @@ contains
 
     end function construct_type_wrf_ko
 
-    module function calculate_wrf_ko(self, h) result(theta_w)
+    module pure function calculate_wrf_ko(self, h) result(theta_w)
         implicit none
         class(type_wrf_ko), intent(in) :: self
         real(real64), intent(in) :: h
@@ -33,7 +33,7 @@ contains
 
     end function calculate_wrf_ko
 
-    module function calculate_wrf_ko_derivative(self, h) result(dqw_dh)
+    module pure function calculate_wrf_ko_derivative(self, h) result(dqw_dh)
         implicit none
         class(type_wrf_ko), intent(in) :: self
         real(real64), intent(in) :: h
