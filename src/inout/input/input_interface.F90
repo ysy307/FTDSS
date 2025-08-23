@@ -87,6 +87,9 @@ module inout_input
         integer(int32) :: phase
         logical :: is_frozen
         logical :: is_dispersed
+        logical :: calculate_thermal
+        logical :: calculate_hydraulic
+        logical :: calculate_mechanical
         type(type_materials_thermal) :: thermal
         type(type_materials_hydraulic) :: hydraulic
     end type type_material_settings

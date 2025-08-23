@@ -3,7 +3,7 @@ module Main_FTDSS
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
-    use :: module_control, only:type_time, type_iteration, initialize_openmp
+    use :: module_control, only:type_controls
     use :: module_output, only:type_output
     use :: module_domain, only:type_domain
     use :: module_properties, only:type_properties_manager
@@ -11,6 +11,7 @@ module Main_FTDSS
     use :: module_initial, only:type_ic
 
     use :: module_thermal
+    use :: module_hydraulic
     implicit none
 
     type :: type_ftdss
@@ -21,14 +22,14 @@ module Main_FTDSS
         type(type_variable) :: T
         class(abst_thermal), allocatable :: thermal
         type(type_variable) :: P
+        class(abst_hydraulic), allocatable :: hydraulic
 
         type(type_properties_manager) :: property
         type(type_bc) :: bc
         type(type_ic) :: ic
 
-        type(type_time) :: time
-        type(type_iteration) :: iteration
-        type(Type_output) :: output
+        type(type_controls) :: controls
+        type(type_output) :: output
 
     contains
         procedure, pass(self) :: initialize => initialize_type_ftdss
@@ -42,22 +43,20 @@ contains
 
         type(type_input) :: input
         integer(int32) :: nsize
-        integer(int32) :: iN
         integer(int32) :: ierr
         character(len=10), allocatable :: profiler_labels(:)
 
-        ! ★ 計測したいセクション名を定義
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
-        call self%time%initialize(profiler_sections=profiler_labels)
-        call self%time%Record("Start")
-        call self%time%Profile_Start("Total")
-        call self%time%Profile_Start("IO")
+        call self%controls%time%initialize(profiler_sections=profiler_labels)
+        call self%controls%time%Record("Start")
+        call self%controls%time%Profile_Start("Total")
+        call self%controls%time%Profile_Start("IO")
 
         call setup_handler()
 
         call input%initialize()
-        call self%time%initialize(input=input)
-        call self%iteration%initialize(input)
+        call self%controls%time%initialize(input=input)
+        call self%controls%iteration%initialize(input)
         call initialize_openmp(input)
 
         if (input%output_settings%standard_output%print_progress) then
@@ -81,10 +80,6 @@ contains
         self%coordinate = input%geometry%vtk%POINTS
 
         call self%domain%initialize(input, self%coordinate, ierr)
-        if (ierr /= 0) then
-            print *, "Error initializing domain in Type_thermal_3Phase_2D_Construct"
-            return
-        end if
 
         call self%bc%initialize(input, self%domain)
         call self%ic%initialize(input)
@@ -99,11 +94,11 @@ contains
 
         call self%phi%initialize(nsize, input%basic%solver_settings%bdf_order)
         call self%T%initialize(nsize, input%basic%solver_settings%bdf_order)
-        call self%ic%apply('porosity', self%domain, self%phi)
+        call self%ic%apply("porosity", self%domain, self%phi)
 
         call self%output%output_coloring(self%domain)
 
-        call self%time%Profile_Stop("IO")
+        call self%controls%time%Profile_Stop("IO")
         call global_logger%log_information(message="FTDSS module initialized successfully.")
     end subroutine initialize_type_ftdss
 
@@ -112,7 +107,7 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         call self%phi%shift()
-        if (allocated(self%thermal)) then
+        if (self%controls%calculate_thermal) then
             call self%T%shift()
             call self%thermal%shift()
         end if

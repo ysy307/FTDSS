@@ -117,8 +117,6 @@ contains
             end if
 #endif
         case ("hydraulic")
-            call self%materials%get_gcc(region_id, ptrs%gcc)
-            call self%materials%get_wrf(region_id, ptrs%wrf)
             call self%materials%get_den(region_id, ptrs%den)
             call self%materials%get_hcf(region_id, ptrs%hcf)
 

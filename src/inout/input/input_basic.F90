@@ -351,6 +351,33 @@ contains
         call json%print_error_message(output_unit)
         if (.not. found) self%basic%materials(i)%is_dispersed = .false.
 
+        if (self%basic%analysis_controls%calculate_thermal) then
+            key = join([key_material, calculate_thermal])
+            call json%get(key, self%basic%materials(i)%calculate_thermal, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) self%basic%materials(i)%calculate_thermal = .false.
+        else
+            self%basic%materials(i)%calculate_thermal = .false.
+        end if
+
+        if (self%basic%analysis_controls%calculate_hydraulic) then
+            key = join([key_material, calculate_hydraulic])
+            call json%get(key, self%basic%materials(i)%calculate_hydraulic, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) self%basic%materials(i)%calculate_hydraulic = .false.
+        else
+            self%basic%materials(i)%calculate_hydraulic = .false.
+        end if
+
+        if (self%basic%analysis_controls%calculate_mechanical) then
+            key = join([key_material, calculate_mechanical])
+            call json%get(key, self%basic%materials(i)%calculate_mechanical, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) self%basic%materials(i)%calculate_mechanical = .false.
+        else
+            self%basic%materials(i)%calculate_mechanical = .false.
+        end if
+
     end subroutine read_parameters_materials_basic
 
     subroutine read_parameters_materials_thermal(self, json, i)
