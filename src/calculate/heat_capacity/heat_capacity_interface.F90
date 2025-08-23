@@ -26,88 +26,69 @@ module calculate_volumetric_heat_capacity
         real(real64) :: material3 !! ice
         real(real64) :: material4 !! gas
     contains
-        ! procedure(abst_calc_vhc_gauss_point_holder), pass(self), deferred :: calc_gauss_point_holder
         procedure(abst_calc_vhc_gauss_point), pass(self), deferred :: calc
     end type abst_vhc
 
     ! --- 3相モデルの具象クラス ---
     type, extends(abst_vhc) :: type_vhc_3phase
     contains
-        ! procedure :: calc_gauss_point_holder => calc_vhc_gauss_point_3phase_holder
         procedure :: calc => calc_vhc_gauss_point_3phase
 
     end type type_vhc_3phase
     type, extends(abst_vhc) :: type_vhc_3phase_apparent
     contains
-        ! procedure :: calc_gauss_point_holder => calc_vhc_gauss_point_3phase_apparent_holder
         procedure :: calc => calc_vhc_gauss_point_3phase_apparent
     end type type_vhc_3phase_apparent
 
     ! --- 手続きのインターフェース宣言 ---
     abstract interface
-        ! function abst_calc_vhc_gauss_point_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
-        !     import :: abst_vhc, type_state, holder_dens, real64
-        !     implicit none
-        !     class(abst_vhc), intent(in) :: self
-        !     type(type_state), intent(in) :: state
-        !     type(holder_dens), intent(in), optional :: DEN
-        !     real(real64), intent(in), optional :: LatentHeat
-        !     real(real64), intent(in), optional :: dQi_dT
-        !     real(real64) :: VHC
-        ! end function abst_calc_vhc_gauss_point_holder
-
-        function abst_calc_vhc_gauss_point(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+        pure elemental function abst_calc_vhc_gauss_point(self, state) result(VHC)
             import :: abst_vhc, type_state, abst_den, real64
             implicit none
             class(abst_vhc), intent(in) :: self
             type(type_state), intent(in) :: state
-            class(abst_den), pointer, intent(in), optional :: DEN
-            real(real64), intent(in), optional :: LatentHeat
-            real(real64), intent(in), optional :: dQi_dT
             real(real64) :: VHC
         end function abst_calc_vhc_gauss_point
 
     end interface
 
     interface
-        module subroutine initialize_holder_vhcs(self, input, i_material)
+        module subroutine initialize_holder_vhcs(self, input, material_id)
             implicit none
             class(holder_vhcs), intent(inout) :: self
             type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: i_material
+            integer(int32), intent(in) :: material_id
+
         end subroutine initialize_holder_vhcs
 
-        module function construct_type_vhc_3phase(input, i_material) result(property)
+        module function construct_type_vhc_3phase(input, material_id) result(property)
             implicit none
             class(abst_vhc), allocatable :: property
             type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: i_material
+            integer(int32), intent(in) :: material_id
+
         end function construct_type_vhc_3phase
 
-        module pure function calc_vhc_gauss_point_3phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+        module pure elemental function calc_vhc_gauss_point_3phase(self, state) result(VHC)
             implicit none
             class(type_vhc_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            class(abst_den), pointer, intent(in), optional :: DEN
-            real(real64), intent(in), optional :: LatentHeat
-            real(real64), intent(in), optional :: dQi_dT
             real(real64) :: VHC
+
         end function calc_vhc_gauss_point_3phase
 
-        module function construct_type_vhc_3phase_apparent(input, i_material) result(property)
+        module function construct_type_vhc_3phase_apparent(input, material_id) result(property)
             implicit none
             class(abst_vhc), allocatable :: property
             type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: i_material
+            integer(int32), intent(in) :: material_id
+
         end function construct_type_vhc_3phase_apparent
 
-        module pure function calc_vhc_gauss_point_3phase_apparent(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+        module pure elemental function calc_vhc_gauss_point_3phase_apparent(self, state) result(VHC)
             implicit none
             class(type_vhc_3phase_apparent), intent(in) :: self
             type(type_state), intent(in) :: state
-            class(abst_den), pointer, intent(in), optional :: DEN
-            real(real64), intent(in), optional :: LatentHeat
-            real(real64), intent(in), optional :: dQi_dT
             real(real64) :: VHC
 
         end function calc_vhc_gauss_point_3phase_apparent

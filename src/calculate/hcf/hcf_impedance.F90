@@ -19,7 +19,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Wrapper of the function to calculate the impedance factor
     !----------------------------------------------------------------------------------------------------
-    module function calc_impedance_exp(self, q_ice) result(kr)
+    module pure elemental function calc_impedance_exp(self, q_ice) result(kr)
         implicit none
         class(type_hcf_impedance_exp), intent(in) :: self
         real(real64), intent(in) :: q_ice
@@ -29,7 +29,7 @@ contains
 
     end function calc_impedance_exp
 
-    function calc_impedance_exponential(omega, q_ice) result(impedance)
+    pure elemental function calc_impedance_exponential(omega, q_ice) result(impedance)
         implicit none
         real(real64), intent(in) :: omega
         real(real64), intent(in) :: q_ice

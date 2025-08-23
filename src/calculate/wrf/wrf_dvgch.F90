@@ -19,7 +19,7 @@ contains
 
     end function construct_type_wrf_dvgch
 
-    module pure function calculate_wrf_dvgch(self, h) result(theta_w)
+    module pure elemental function calculate_wrf_dvgch(self, h) result(theta_w)
         implicit none
         class(type_wrf_dvgch), intent(in) :: self
         real(real64), intent(in) :: h
@@ -35,7 +35,7 @@ contains
 
     end function calculate_wrf_dvgch
 
-    module pure function calculate_wrf_dvgch_Derivative(self, h) result(dqw_dh)
+    module pure elemental function calculate_wrf_dvgch_Derivative(self, h) result(dqw_dh)
         implicit none
         class(type_wrf_dvgch), intent(in) :: self
         real(real64), intent(in) :: h

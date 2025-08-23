@@ -32,7 +32,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Calculate kr for Modified Durner model
     !----------------------------------------------------------------------------------------------------
-    function calc_kr_durner(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h) result(kr)
+    pure elemental function calc_kr_durner(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h) result(kr)
         implicit none
         real(real64), intent(in) :: alpha1, alpha2
         real(real64), intent(in) :: n1, n2
@@ -56,7 +56,7 @@ contains
 
     end function calc_kr_durner
 
-    module function calc_kr_base_durner(self, h) result(kr)
+    pure elemental module function calc_kr_base_durner(self, h) result(kr)
         implicit none
         class(type_hcf_base_durner), intent(in) :: self
         real(real64), intent(in) :: h

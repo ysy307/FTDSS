@@ -4,24 +4,24 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function construct_den_3phase(input, i_material) result(property)
+    module function construct_den_3phase(input, material_id) result(property)
         implicit none
         class(abst_den), allocatable :: property
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         type(type_input), intent(in) :: input
 
         if (allocated(property)) deallocate (property)
         allocate (Type_DEN_3Phase :: property)
 
-        property%material_id = i_material
+        property%material_id = material_id
 
-        property%material1 = input%basic%materials(i_material)%thermal%density(1)
-        property%material2 = input%basic%materials(i_material)%thermal%density(2)
-        property%material3 = input%basic%materials(i_material)%thermal%density(3)
+        property%material1 = input%basic%materials(material_id)%thermal%density(1)
+        property%material2 = input%basic%materials(material_id)%thermal%density(2)
+        property%material3 = input%basic%materials(material_id)%thermal%density(3)
 
     end function construct_den_3phase
 
-    module function calc_den_gauss_point_3phase(self, state) result(density)
+    module pure elemental function calc_den_gauss_point_3phase(self, state) result(density)
         implicit none
         class(type_den_3phase), intent(in) :: self
         type(type_state), intent(in) :: state

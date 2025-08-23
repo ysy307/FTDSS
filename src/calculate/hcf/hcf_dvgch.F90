@@ -30,7 +30,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Calculate kr for Modified van-Genuchten model
     !----------------------------------------------------------------------------------------------------
-    function calc_kr_dvgch(alpha1, n1, m1, w1, n2, m2, w2, l, h) result(kr)
+    pure elemental function calc_kr_dvgch(alpha1, n1, m1, w1, n2, m2, w2, l, h) result(kr)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1, n2
@@ -57,7 +57,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Wrapper of calculating kr for Modified van-Genuchten model bounding different derived types
     !----------------------------------------------------------------------------------------------------
-    module function calc_kr_base_dvgch(self, h) result(kr)
+    pure elemental module function calc_kr_base_dvgch(self, h) result(kr)
         implicit none
         class(Type_HCF_Base_DVGCH), intent(in) :: self
         real(real64), intent(in) :: h

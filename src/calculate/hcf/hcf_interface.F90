@@ -67,7 +67,7 @@ module calculate_hcf
     end type type_hcf_base_impedance_viscosity
 
     abstract interface
-        function abst_calc_kflh(self, state) result(kflh)
+        pure elemental function abst_calc_kflh(self, state) result(kflh)
             import :: abst_hcf, type_state, real64
             implicit none
             class(abst_hcf), intent(in) :: self
@@ -78,16 +78,16 @@ module calculate_hcf
     end interface
 
     interface
-        module subroutine initialize_holder_hcfs(self, input, i_material)
+        module subroutine initialize_holder_hcfs(self, input, material_id)
             implicit none
             class(holder_hcfs), intent(inout) :: self
             type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: i_material
+            integer(int32), intent(in) :: material_id
         end subroutine initialize_holder_hcfs
     end interface
 
     interface
-        module function calc_kflh_base(self, state) result(kflh)
+        module pure elemental function calc_kflh_base(self, state) result(kflh)
             implicit none
             class(type_hcf_base), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -95,7 +95,7 @@ module calculate_hcf
 
         end function calc_kflh_base
 
-        module function calc_kflh_impedance(self, state) result(kflh)
+        module pure elemental function calc_kflh_impedance(self, state) result(kflh)
             implicit none
             class(type_hcf_impedance), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -103,7 +103,7 @@ module calculate_hcf
 
         end function calc_kflh_impedance
 
-        module function calc_kflh_viscosity(self, state) result(kflh)
+        module pure elemental function calc_kflh_viscosity(self, state) result(kflh)
             implicit none
             class(type_hcf_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -111,7 +111,7 @@ module calculate_hcf
 
         end function calc_kflh_viscosity
 
-        module function calc_kflh_base_impedance(self, state) result(kflh)
+        module pure elemental function calc_kflh_base_impedance(self, state) result(kflh)
             implicit none
             class(type_hcf_base_impedance), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -119,7 +119,7 @@ module calculate_hcf
 
         end function calc_kflh_base_impedance
 
-        module function calc_kflh_base_viscosity(self, state) result(kflh)
+        module pure elemental function calc_kflh_base_viscosity(self, state) result(kflh)
             implicit none
             class(type_hcf_base_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -127,7 +127,7 @@ module calculate_hcf
 
         end function calc_kflh_base_viscosity
 
-        module function calc_kflh_impedance_viscosity(self, state) result(kflh)
+        module pure elemental function calc_kflh_impedance_viscosity(self, state) result(kflh)
             implicit none
             class(type_hcf_impedance_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -135,7 +135,7 @@ module calculate_hcf
 
         end function calc_kflh_impedance_viscosity
 
-        module function calc_kflh_base_impedance_viscosity(self, state) result(kflh)
+        module pure elemental function calc_kflh_base_impedance_viscosity(self, state) result(kflh)
             implicit none
             class(type_hcf_base_impedance_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -194,7 +194,7 @@ module calculate_hcf
     end type type_hcf_base_dvgch
 
     abstract interface
-        function abst_calc_base_kr(self, h) result(kr)
+        pure elemental function abst_calc_base_kr(self, h) result(kr)
             import :: abst_hcf_base, real64
             implicit none
             class(abst_hcf_base), intent(in) :: self
@@ -214,7 +214,7 @@ module calculate_hcf
 
         end function construct_type_hcf_base_bc
 
-        module function calc_kr_base_bc(self, h) result(kr)
+        module pure elemental function calc_kr_base_bc(self, h) result(kr)
             implicit none
             class(type_hcf_base_bc), intent(in) :: self
             real(real64), intent(in) :: h
@@ -231,7 +231,7 @@ module calculate_hcf
 
         end function construct_type_hcf_base_vg
 
-        module function calc_kr_base_vg(self, h) result(kr)
+        module pure elemental function calc_kr_base_vg(self, h) result(kr)
             implicit none
             class(type_hcf_base_vg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -248,7 +248,7 @@ module calculate_hcf
 
         end function construct_type_hcf_base_ko
 
-        module function calc_kr_base_ko(self, h) result(kr)
+        module pure elemental function calc_kr_base_ko(self, h) result(kr)
             implicit none
             class(type_hcf_base_ko), intent(in) :: self
             real(real64), intent(in) :: h
@@ -268,7 +268,7 @@ module calculate_hcf
 
         end function construct_type_hcf_base_mvg
 
-        module function calc_kr_base_mvg(self, h) result(kr)
+        module pure elemental function calc_kr_base_mvg(self, h) result(kr)
             implicit none
             class(type_hcf_base_mvg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -288,7 +288,7 @@ module calculate_hcf
 
         end function construct_type_hcf_base_durner
 
-        module function calc_kr_base_durner(self, h) result(kr)
+        module pure elemental function calc_kr_base_durner(self, h) result(kr)
             implicit none
             class(type_hcf_base_durner), intent(in) :: self
             real(real64), intent(in) :: h
@@ -307,7 +307,7 @@ module calculate_hcf
 
         end function construct_type_hcf_base_dvgch
 
-        module function calc_kr_base_dvgch(self, h) result(kr)
+        module pure elemental function calc_kr_base_dvgch(self, h) result(kr)
             implicit none
             class(type_hcf_base_dvgch), intent(in) :: self
             real(real64), intent(in) :: h
@@ -329,7 +329,7 @@ module calculate_hcf
     end type type_hcf_impedance_exp
 
     abstract interface
-        function abst_calc_impedance_kr(self, q_ice) result(kr)
+        pure elemental function abst_calc_impedance_kr(self, q_ice) result(kr)
             import :: abst_hcf_impedance, real64
             implicit none
             class(abst_hcf_impedance), intent(in) :: self
@@ -347,7 +347,7 @@ module calculate_hcf
 
         end function construct_type_hcf_impedance
 
-        module function calc_impedance_exp(self, q_ice) result(kr)
+        module pure elemental function calc_impedance_exp(self, q_ice) result(kr)
             implicit none
             class(type_hcf_impedance_exp), intent(in) :: self
             real(real64), intent(in) :: q_ice
@@ -374,7 +374,7 @@ module calculate_hcf
     end type type_hcf_viscosity_supercool
 
     abstract interface
-        function abst_calc_viscosity_kr(self, temperature) result(kr)
+        pure elemental function abst_calc_viscosity_kr(self, temperature) result(kr)
             import :: abst_hcf_viscosity, real64
             implicit none
             class(abst_hcf_viscosity), intent(in) :: self
@@ -392,7 +392,7 @@ module calculate_hcf
 
         end function construct_type_hcf_viscosity
 
-        module function calc_viscosity_exp(self, temperature) result(kr)
+        module pure elemental function calc_viscosity_exp(self, temperature) result(kr)
             implicit none
             class(type_hcf_viscosity_exp), intent(in) :: self
             real(real64), intent(in) :: temperature
@@ -400,7 +400,7 @@ module calculate_hcf
 
         end function calc_viscosity_exp
 
-        module function calc_viscosity_supercool(self, temperature) result(kr)
+        module pure elemental function calc_viscosity_supercool(self, temperature) result(kr)
             implicit none
             class(type_hcf_viscosity_supercool), intent(in) :: self
             real(real64), intent(in) :: temperature
@@ -412,169 +412,169 @@ module calculate_hcf
 
 contains
 
-    function construct_hcf_base(input, i_material) result(property)
+    function construct_hcf_base(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf_base), allocatable :: property
 
-        select case (input%basic%materials(i_material)%hydraulic%hcf%model_number)
+        select case (input%basic%materials(material_id)%hydraulic%hcf%model_number)
         case (1)
-            property = construct_type_hcf_base_bc(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
-                                                  n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
-                                                  l=input%basic%materials(i_material)%hydraulic%hcf%l)
+            property = construct_type_hcf_base_bc(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
+                                                  n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
+                                                  l=input%basic%materials(material_id)%hydraulic%hcf%l)
         case (2)
-            property = construct_type_hcf_base_vg(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
-                                                  n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
-                                                  l=input%basic%materials(i_material)%hydraulic%hcf%l)
+            property = construct_type_hcf_base_vg(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
+                                                  n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
+                                                  l=input%basic%materials(material_id)%hydraulic%hcf%l)
         case (3)
-            property = construct_type_hcf_base_ko(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
-                                                  n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
-                                                  l=input%basic%materials(i_material)%hydraulic%hcf%l)
+            property = construct_type_hcf_base_ko(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
+                                                  n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
+                                                  l=input%basic%materials(material_id)%hydraulic%hcf%l)
         case (4)
-            property = construct_type_hcf_base_mvg(theta_s=input%basic%materials(i_material)%hydraulic%hcf%theta_s, &
-                                                   theta_r=input%basic%materials(i_material)%hydraulic%hcf%theta_r, &
-                                                   alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
-                                                   n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
-                                                   l=input%basic%materials(i_material)%hydraulic%hcf%l, &
-                                                   h_crit=input%basic%materials(i_material)%hydraulic%hcf%h_crit)
+            property = construct_type_hcf_base_mvg(theta_s=input%basic%materials(material_id)%hydraulic%hcf%theta_s, &
+                                                   theta_r=input%basic%materials(material_id)%hydraulic%hcf%theta_r, &
+                                                   alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
+                                                   n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
+                                                   l=input%basic%materials(material_id)%hydraulic%hcf%l, &
+                                                   h_crit=input%basic%materials(material_id)%hydraulic%hcf%h_crit)
         case (5)
-            property = construct_type_hcf_base_durner(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
-                                                      n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
-                                                      w1=input%basic%materials(i_material)%hydraulic%hcf%w1, &
-                                                      alpha2=input%basic%materials(i_material)%hydraulic%hcf%alpha2, &
-                                                      n2=input%basic%materials(i_material)%hydraulic%hcf%n2, &
-                                                      l=input%basic%materials(i_material)%hydraulic%hcf%l)
+            property = construct_type_hcf_base_durner(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
+                                                      n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
+                                                      w1=input%basic%materials(material_id)%hydraulic%hcf%w1, &
+                                                      alpha2=input%basic%materials(material_id)%hydraulic%hcf%alpha2, &
+                                                      n2=input%basic%materials(material_id)%hydraulic%hcf%n2, &
+                                                      l=input%basic%materials(material_id)%hydraulic%hcf%l)
         case (6)
-            property = construct_type_hcf_base_dvgch(alpha1=input%basic%materials(i_material)%hydraulic%hcf%alpha1, &
-                                                     n1=input%basic%materials(i_material)%hydraulic%hcf%n1, &
-                                                     w1=input%basic%materials(i_material)%hydraulic%hcf%w1, &
-                                                     n2=input%basic%materials(i_material)%hydraulic%hcf%n2, &
-                                                     l=input%basic%materials(i_material)%hydraulic%hcf%l)
+            property = construct_type_hcf_base_dvgch(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
+                                                     n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
+                                                     w1=input%basic%materials(material_id)%hydraulic%hcf%w1, &
+                                                     n2=input%basic%materials(material_id)%hydraulic%hcf%n2, &
+                                                     l=input%basic%materials(material_id)%hydraulic%hcf%l)
         end select
 
     end function construct_hcf_base
 
-    function construct_hcf_impedance(input, i_material) result(property)
+    function construct_hcf_impedance(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf_impedance), allocatable :: property
 
-        property = construct_type_hcf_impedance(omega=input%basic%materials(i_material)%hydraulic%impedance_factor)
+        property = construct_type_hcf_impedance(omega=input%basic%materials(material_id)%hydraulic%impedance_factor)
 
     end function construct_hcf_impedance
 
-    function construct_hcf_viscosity(input, i_material) result(property)
+    function construct_hcf_viscosity(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf_viscosity), allocatable :: property
 
-        property = construct_type_hcf_viscosity(input%basic%materials(i_material)%hydraulic%water_viscosity_model)
+        property = construct_type_hcf_viscosity(input%basic%materials(material_id)%hydraulic%water_viscosity_model)
 
     end function construct_hcf_viscosity
 
-    function create_type_hcf_base(input, i_material) result(property)
+    function create_type_hcf_base(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_hcf_base :: property)
 
-        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
-        property%base = construct_hcf_base(input, i_material)
+        property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, material_id)
 
     end function create_type_hcf_base
 
-    function create_type_hcf_impedance(input, i_material) result(property)
+    function create_type_hcf_impedance(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_hcf_impedance :: property)
 
-        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
-        property%impedance = construct_hcf_impedance(input, i_material)
+        property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
+        property%impedance = construct_hcf_impedance(input, material_id)
 
     end function create_type_hcf_impedance
 
-    function create_type_hcf_viscosity(input, i_material) result(property)
+    function create_type_hcf_viscosity(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_hcf_viscosity :: property)
 
-        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
-        property%viscosity = construct_hcf_viscosity(input, i_material)
+        property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
+        property%viscosity = construct_hcf_viscosity(input, material_id)
 
     end function create_type_hcf_viscosity
 
-    function create_type_hcf_base_impedance(input, i_material) result(property)
+    function create_type_hcf_base_impedance(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_hcf_base_impedance :: property)
 
-        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
-        property%base = construct_hcf_base(input, i_material)
-        property%impedance = construct_hcf_impedance(input, i_material)
+        property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, material_id)
+        property%impedance = construct_hcf_impedance(input, material_id)
 
     end function create_type_hcf_base_impedance
 
-    function create_type_hcf_base_viscosity(input, i_material) result(property)
+    function create_type_hcf_base_viscosity(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_hcf_base_viscosity :: property)
 
-        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
-        property%base = construct_hcf_base(input, i_material)
-        property%viscosity = construct_hcf_viscosity(input, i_material)
+        property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, material_id)
+        property%viscosity = construct_hcf_viscosity(input, material_id)
 
     end function create_type_hcf_base_viscosity
 
-    function create_type_hcf_impedance_viscosity(input, i_material) result(property)
+    function create_type_hcf_impedance_viscosity(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_hcf_impedance_viscosity :: property)
 
-        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
-        property%impedance = construct_hcf_impedance(input, i_material)
-        property%viscosity = construct_hcf_viscosity(input, i_material)
+        property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
+        property%impedance = construct_hcf_impedance(input, material_id)
+        property%viscosity = construct_hcf_viscosity(input, material_id)
 
     end function create_type_hcf_impedance_viscosity
 
-    function create_type_hcf_base_impedance_viscosity(input, i_material) result(property)
+    function create_type_hcf_base_impedance_viscosity(input, material_id) result(property)
         implicit none
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
         class(abst_hcf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_hcf_base_impedance_viscosity :: property)
 
-        property%k_s = input%basic%materials(i_material)%hydraulic%hydraulic_conductivity
-        property%base = construct_hcf_base(input, i_material)
-        property%impedance = construct_hcf_impedance(input, i_material)
-        property%viscosity = construct_hcf_viscosity(input, i_material)
+        property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
+        property%base = construct_hcf_base(input, material_id)
+        property%impedance = construct_hcf_impedance(input, material_id)
+        property%viscosity = construct_hcf_viscosity(input, material_id)
 
     end function create_type_hcf_base_impedance_viscosity
 end module calculate_hcf

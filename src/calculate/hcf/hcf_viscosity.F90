@@ -30,7 +30,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Calculate water viscosity depending on the temperature
     !----------------------------------------------------------------------------------------------------
-    module function calc_viscosity_exp(self, temperature) result(kr)
+    module pure elemental function calc_viscosity_exp(self, temperature) result(kr)
         implicit none
         class(type_hcf_viscosity_exp), intent(in) :: self
         real(real64), intent(in) :: temperature
@@ -40,7 +40,7 @@ contains
 
     end function calc_viscosity_exp
 
-    module function calc_viscosity_supercool(self, temperature) result(kr)
+    module pure elemental function calc_viscosity_supercool(self, temperature) result(kr)
         implicit none
         class(type_hcf_viscosity_supercool), intent(in) :: self
         real(real64), intent(in) :: temperature
@@ -50,7 +50,7 @@ contains
 
     end function calc_viscosity_supercool
 
-    function calc_mu_exponential(temperature) result(viscosity)
+    pure elemental function calc_mu_exponential(temperature) result(viscosity)
         implicit none
         real(real64), intent(in) :: temperature
         real(real64) :: viscosity
@@ -59,7 +59,7 @@ contains
 
     end function calc_mu_exponential
 
-    function calc_mu_exponential_supercooled(temperature) result(viscosity)
+    pure elemental function calc_mu_exponential_supercooled(temperature) result(viscosity)
         implicit none
         real(real64), intent(in) :: temperature
         real(real64) :: viscosity

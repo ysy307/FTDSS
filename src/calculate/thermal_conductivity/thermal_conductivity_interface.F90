@@ -34,7 +34,7 @@ module calculate_thermal_conductivity
     end type type_thc_3phase
 
     abstract interface
-        function abst_calc_thc_gauss_point(self, state) result(lambda)
+        pure elemental function abst_calc_thc_gauss_point(self, state) result(lambda)
             import :: abst_thc, type_state, real64
             implicit none
             class(abst_thc), intent(in) :: self
@@ -45,25 +45,25 @@ module calculate_thermal_conductivity
     end interface
 
     interface
-        module subroutine initialize_holder_thcs(self, input, i_material)
+        module subroutine initialize_holder_thcs(self, input, material_id)
             implicit none
             class(holder_thcs), intent(inout) :: self
             type(type_Input), intent(in) :: Input
-            integer(int32), intent(in) :: i_material
+            integer(int32), intent(in) :: material_id
 
         end subroutine initialize_holder_thcs
     end interface
 
     interface
-        module function construct_thc_3(input, i_material) result(property)
+        module function construct_thc_3(input, material_id) result(property)
             implicit none
             class(abst_thc), allocatable :: property
             type(type_Input), intent(in) :: Input
-            integer(int32), intent(in) :: i_material
+            integer(int32), intent(in) :: material_id
 
         end function construct_thc_3
 
-        module function calc_thc_gauss_point_3phase(self, state) result(lambda)
+        module pure elemental function calc_thc_gauss_point_3phase(self, state) result(lambda)
             implicit none
             class(type_thc_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
@@ -74,9 +74,9 @@ module calculate_thermal_conductivity
     end interface
 
     interface
-        module function calc_thc_3(lambda_soil, phi_soil, &
-                                   lambda_water, phi_water, &
-                                   lambda_ice, phi_ice) result(lambda)
+        module pure elemental function calc_thc_3(lambda_soil, phi_soil, &
+                                                  lambda_water, phi_water, &
+                                                  lambda_ice, phi_ice) result(lambda)
             implicit none
             real(real64), intent(in) :: lambda_soil
             real(real64), intent(in) :: phi_soil

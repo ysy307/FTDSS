@@ -4,33 +4,30 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module function construct_type_vhc_3phase(input, i_material) result(property)
+    module function construct_type_vhc_3phase(input, material_id) result(property)
         implicit none
         class(abst_vhc), allocatable :: property
         type(type_input), intent(in) :: input
-        integer(int32), intent(in) :: i_material
+        integer(int32), intent(in) :: material_id
 
         if (allocated(property)) deallocate (property)
         allocate (type_vhc_3phase :: property)
 
-        property%material_id = i_material
+        property%material_id = material_id
 
-        property%material1 = input%basic%materials(i_material)%thermal%density(1) * &
-                             input%basic%materials(i_material)%thermal%specific_heat(1)
-        property%material2 = input%basic%materials(i_material)%thermal%density(2) * &
-                             input%basic%materials(i_material)%thermal%specific_heat(2)
-        property%material3 = input%basic%materials(i_material)%thermal%density(3) * &
-                             input%basic%materials(i_material)%thermal%specific_heat(3)
+        property%material1 = input%basic%materials(material_id)%thermal%density(1) * &
+                             input%basic%materials(material_id)%thermal%specific_heat(1)
+        property%material2 = input%basic%materials(material_id)%thermal%density(2) * &
+                             input%basic%materials(material_id)%thermal%specific_heat(2)
+        property%material3 = input%basic%materials(material_id)%thermal%density(3) * &
+                             input%basic%materials(material_id)%thermal%specific_heat(3)
 
     end function construct_type_vhc_3phase
 
-    module pure function calc_vhc_gauss_point_3phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+    module pure elemental function calc_vhc_gauss_point_3phase(self, state) result(VHC)
         implicit none
         class(type_vhc_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
-        class(abst_den), pointer, intent(in), optional :: DEN
-        real(real64), intent(in), optional :: LatentHeat
-        real(real64), intent(in), optional :: dQi_dT
         real(real64) :: VHC
 
         real(real64) :: phi1, phi2, phi3

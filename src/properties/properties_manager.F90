@@ -270,10 +270,7 @@ contains
 
         call self%calculate_water_content(ptrs, state)
         call self%calculate_dQw_dT(ptrs, state)
-        val = ptrs%vhc%calc(state=state, &
-                            den=ptrs%den, &
-                            latentheat=ptrs%gcc%lf, &
-                            dQw_dT=state%dQw_dT)
+        val = ptrs%vhc%calc(state)
     end function calculate_vhc_impl_scalar
 
     ! --- Wrapper (Array) ---
@@ -373,7 +370,7 @@ contains
         call self%calculate_dQw_dT(ptrs, state)
 
         thc = ptrs%thc%calc(state)
-        vhc = ptrs%vhc%calc(state=state, den=ptrs%den, latentheat=ptrs%gcc%lf, dQw_dT=state%dQw_dT)
+        vhc = ptrs%vhc%calc(state=state)
 
     end subroutine calc_thermal_properties_impl_scalar
 

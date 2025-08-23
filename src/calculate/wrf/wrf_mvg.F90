@@ -21,7 +21,7 @@ contains
 
     end function construct_type_wrf_mvg
 
-    module pure function calculate_wrf_mvg(self, h) result(theta_w)
+    module pure elemental function calculate_wrf_mvg(self, h) result(theta_w)
         implicit none
         class(type_wrf_mvg), intent(in) :: self
         real(real64), intent(in) :: h
@@ -35,7 +35,7 @@ contains
 
     end function calculate_wrf_mvg
 
-    module pure function calculate_wrf_mvg_derivative(self, h) result(dvw_dh)
+    module pure elemental function calculate_wrf_mvg_derivative(self, h) result(dvw_dh)
         implicit none
         class(type_wrf_mvg), intent(in) :: self
         real(real64), intent(in) :: h

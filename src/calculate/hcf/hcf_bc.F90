@@ -22,7 +22,7 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Calculate kr for Brooks and Corey model
     !----------------------------------------------------------------------------------------------------
-    function calc_kr_bc(alpha1, n1, l, h) result(kr)
+    pure elemental function calc_kr_bc(alpha1, n1, l, h) result(kr)
         implicit none
         real(real64), intent(in) :: alpha1
         real(real64), intent(in) :: n1
@@ -41,7 +41,7 @@ contains
 
     end function calc_kr_bc
 
-    module function calc_kr_base_bc(self, h) result(kr)
+    module pure elemental function calc_kr_base_bc(self, h) result(kr)
         implicit none
         class(type_hcf_base_bc), intent(in) :: self
         real(real64), intent(in) :: h
