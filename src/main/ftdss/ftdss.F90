@@ -20,6 +20,7 @@ module Main_FTDSS
         type(type_variable) :: phi
         type(type_variable) :: T
         class(abst_thermal), allocatable :: thermal
+        type(type_variable) :: P
 
         type(type_properties_manager) :: property
         type(type_bc) :: bc

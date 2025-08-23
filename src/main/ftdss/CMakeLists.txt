@@ -5,6 +5,7 @@ target_link_libraries(FTDSS PRIVATE
     Core
     Input
     Thermal
+    Hydraulic
     control
     Output
 )

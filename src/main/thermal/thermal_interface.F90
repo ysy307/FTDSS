@@ -33,7 +33,7 @@ module main_thermal
         class(abst_solver), allocatable :: solver
         integer(int32) :: order
 
-        procedure(abst_assemble_global), nopass, pointer :: assemble_global => null()
+        procedure(abst_assemble_global_thermal), nopass, pointer :: assemble_global => null()
     contains
         procedure(abst_update), pass(self), deferred :: update
         procedure(abst_shift), pass(self), deferred :: shift
@@ -50,14 +50,16 @@ module main_thermal
     end type type_thermal_crs
 
     abstract interface
-        subroutine abst_update(self, domain, property, temperature, porosity)
-            import :: abst_thermal, type_domain, type_properties_manager, real64
+        subroutine abst_update(self, domain, property, temperature, porosity, time, iteration)
+            import :: abst_thermal, type_domain, type_properties_manager, real64, type_time, type_iteration
             implicit none
             class(abst_thermal), intent(inout) :: self
             type(type_domain), intent(inout), target :: domain
             type(type_properties_manager), intent(inout) :: property
             real(real64), intent(in) :: temperature(:)
             real(real64), intent(in) :: porosity(:)
+            type(type_time), intent(in) :: time
+            type(type_iteration), intent(in) :: iteration
 
         end subroutine abst_update
 
@@ -103,13 +105,15 @@ module main_thermal
 
         end function construct_type_thermal_crs
 
-        module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity)
+        module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, time, iteration)
             implicit none
             class(type_thermal_crs), intent(inout) :: self
             type(type_domain), intent(inout), target :: domain
             type(type_properties_manager), intent(inout) :: property
             real(real64), intent(in) :: temperature(:)
             real(real64), intent(in) :: porosity(:)
+            type(type_time), intent(in) :: time
+            type(type_iteration), intent(in) :: iteration
 
         end subroutine update_type_thermal_crs
 

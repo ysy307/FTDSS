@@ -1,4 +1,4 @@
-submodule(Main_Thermal) main_thermal_3phase
+submodule(main_thermal) main_thermal_crs
     implicit none
 contains
     module function construct_type_thermal_crs(input, coordinate, domain) result(structure)
@@ -54,31 +54,42 @@ contains
 
     end function construct_type_thermal_crs
 
-    module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity)
+    module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, time, iteration)
         implicit none
         class(type_thermal_crs), intent(inout) :: self
         type(type_domain), intent(inout), target :: domain
         type(type_properties_manager), intent(inout) :: property
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
+        type(type_time), intent(in) :: time
+        type(type_iteration), intent(in) :: iteration
 
         ! --- 変数宣言 ---
-        integer(int32) :: i, j, n_nodes
+        integer(int32) :: i, j, num_nodes
         integer(int32) :: element_id, group_id, num_elem_nodes
         integer(int32), pointer :: neighbor_list(:) => null()
 
         real(real64) :: total_weighted_qw, total_weight, weight, temp_qw, element_area
-        real(real64), allocatable :: temp_Qws(:)
         type(type_state) :: state
 
+        ! --- BDF計算用の変数を追加 ---
+        integer(int32) :: actual_order, iO
+        real(real64) :: Qw_hist_i, Qice_hist_i
+        real(real64), dimension(:), allocatable :: coefficients
+
         ! --- 初期化 ---
-        n_nodes = domain%get_num_nodes()
+        num_nodes = domain%get_num_nodes()
+
+        ! ★ BDFの次数と係数を取得
+        actual_order = min(self%order, iteration%get_iter())
+        allocate (coefficients(0:actual_order))
+        call time%get_time_coefficients(actual_order, coefficients)
 
         ! --- メイン計算ループ (OpenMPによる並列化) ---
         !$omp parallel do private(j, state, neighbor_list, element_id, group_id, temp_qw, element_area, num_elem_nodes, weight, &
         !$omp total_weighted_qw, total_weight) &
         !$omp default(shared) schedule(static)
-        do i = 1, n_nodes
+        do i = 1, num_nodes
             ! この節点の状態を設定
             state%temperature = temperature(i)
             state%porosity = porosity(i)
@@ -86,7 +97,7 @@ contains
             total_weighted_qw = 0.0d0
             total_weight = 0.0d0
 
-            ! ★ domainオブジェクトから隣接要素リストへのポインタを取得
+            ! domainオブジェクトから隣接要素リストへのポインタを取得
             neighbor_list => domain%map_node_to_element%get_list(i)
             if (.not. associated(neighbor_list)) cycle
 
@@ -121,10 +132,30 @@ contains
         end do
         !$omp end parallel do
 
-        self%Qw%dif(:) = self%Qw%pre(:) - self%Qw%old(:, 1)
+        !----------------------------------------------------------------------------------
+        ! ★ 修正箇所：BDF履歴項を使って高次精度の 'dif' を計算
+        !----------------------------------------------------------------------------------
         self%Qice%pre(:) = porosity(:) - self%Qw%pre(:)
-        self%Qice%dif(:) = self%Qice%pre(:) - self%Qice%old(:, 1)
+
+        do i = 1, num_nodes
+            ! --- Qw の dif を計算 ---
+            Qw_hist_i = 0.0d0
+            do iO = 1, actual_order
+                Qw_hist_i = Qw_hist_i + coefficients(iO) * self%Qw%old(i, iO)
+            end do
+            self%Qw%dif(i) = coefficients(0) * self%Qw%pre(i) + Qw_hist_i
+
+            ! --- Qice の dif を計算 ---
+            Qice_hist_i = 0.0d0
+            do iO = 1, actual_order
+                Qice_hist_i = Qice_hist_i + coefficients(iO) * self%Qice%old(i, iO)
+            end do
+            self%Qice%dif(i) = coefficients(0) * self%Qice%pre(i) + Qice_hist_i
+        end do
+
         self%Si%pre(:) = self%Qice%pre(:) / porosity(:)
+
+        deallocate (coefficients)
 
     end subroutine update_type_thermal_crs
 
@@ -217,4 +248,4 @@ contains
 
     end subroutine compute_type_thermal_crs
 
-end submodule main_thermal_3phase
+end submodule main_thermal_crs

@@ -10,14 +10,14 @@ module thermal_thermal_assemble
     implicit none
     private
 
-    public :: abst_assemble_global
+    public :: abst_assemble_global_thermal
 
     ! public :: assemble_mass_heat_1, assemble_diffusion_heat_1
     ! public :: assemble_mass_heat_1_parallel, assemble_diffusion_heat_1_parallel
     public :: thermal_assemble_system_linear_1, thermal_assemble_system_linear_1_parallel
 
     abstract interface
-        subroutine abst_assemble_global(J, R, domain, temperature, porosity, properties, time, actual_order)
+        subroutine abst_assemble_global_thermal(J, R, domain, temperature, porosity, properties, time, actual_order)
             import :: type_crs, type_domain, type_properties_manager, type_variable, type_time, int32, real64
             implicit none
             type(type_crs), intent(inout) :: J
@@ -28,7 +28,7 @@ module thermal_thermal_assemble
             type(type_properties_manager), intent(in) :: properties
             type(type_time), intent(in) :: time
             integer(int32), intent(in) :: actual_order
-        end subroutine abst_assemble_global
+        end subroutine abst_assemble_global_thermal
     end interface
 contains
 
@@ -77,8 +77,8 @@ contains
         ! STEP 1: 全ガウスポイントの物理量を一括計算
         !---------------------------------------------------------------------------------------------------------------------------
         do iG = 1, num_gauss
-            state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre)
-            state(iG)%porosity = element%interpolate(element%gauss(iG), porosity%pre)
+            state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre) !&
+            state(iG)%porosity    = element%interpolate(element%gauss(iG), porosity%pre) !&
         end do
         call properties%calc_thermal(i_material, state, lambda, Ca)
 
@@ -199,8 +199,8 @@ contains
         ! STEP 1: Compute the physical quantities at all Gauss points
         !---------------------------------------------------------------------------------------------------------------------------
         do iG = 1, num_gauss
-            state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre)
-            state(iG)%porosity = element%interpolate(element%gauss(iG), porosity%pre)
+            state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre) !&
+            state(iG)%porosity    = element%interpolate(element%gauss(iG), porosity%pre) !&
         end do
         call properties%calc_thermal(i_material, state, lambda, Ca)
 

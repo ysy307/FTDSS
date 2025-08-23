@@ -9,10 +9,6 @@ target_link_libraries(Thermal PRIVATE
     Core
     Input
     Domain
-    Calc_THC
-    Calc_VHC
-    Calc_DEN
-    Calc_SPH
     Properties
     Matrix
     Boundary
