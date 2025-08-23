@@ -440,7 +440,7 @@ contains
             state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
             state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(group_id, state)
+            state%water_content = properties%calc_qw(group_id, state)
             if (state%water_content > state%porosity) state%water_content = state%porosity
             if (state%water_content < 0.0d0) state%water_content = 0.0d0
             obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
@@ -489,7 +489,7 @@ contains
             state%temperature = original_temperature(self%node_ids(iObs))
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(group_id, state)
+            state%water_content = properties%calc_qw(group_id, state)
             if (state%water_content > state%porosity) state%water_content = state%porosity
             if (state%water_content < 0.0d0) state%water_content = 0.0d0
             obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
@@ -538,10 +538,10 @@ contains
                 state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
                 state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
-                state%water_content = properties%get_qw(group_id, state)
+                state%water_content = properties%calc_qw(group_id, state)
                 if (state%water_content > state%porosity) state%water_content = state%porosity
                 if (state%water_content < 0.0d0) state%water_content = 0.0d0
-                obs_values(iObs) = properties%get_thc(group_id, state)
+                obs_values(iObs) = properties%calc_thc(group_id, state)
             end do
 
             deallocate (original_temperature)
@@ -588,10 +588,10 @@ contains
             state%temperature = original_temperature(self%node_ids(iObs))
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(group_id, state)
+            state%water_content = properties%calc_qw(group_id, state)
             if (state%water_content > state%porosity) state%water_content = state%porosity
             if (state%water_content < 0.0d0) state%water_content = 0.0d0
-            obs_values(iObs) = properties%get_thc(group_id, state)
+            obs_values(iObs) = properties%calc_thc(group_id, state)
         end do
 
         deallocate (original_temperature)
@@ -639,10 +639,10 @@ contains
                 state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
                 state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
-                state%water_content = properties%get_qw(group_id, state)
+                state%water_content = properties%calc_qw(group_id, state)
                 if (state%water_content > state%porosity) state%water_content = state%porosity
                 if (state%water_content < 0.0d0) state%water_content = 0.0d0
-                obs_values(iObs) = properties%get_vhc(group_id, state)
+                obs_values(iObs) = properties%calc_vhc(group_id, state)
             end do
 
             deallocate (original_temperature)
@@ -688,10 +688,10 @@ contains
             state%temperature = original_temperature(self%node_ids(iObs))
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(group_id, state)
+            state%water_content = properties%calc_qw(group_id, state)
             if (state%water_content > state%porosity) state%water_content = state%porosity
             if (state%water_content < 0.0d0) state%water_content = 0.0d0
-            obs_values(iObs) = properties%get_vhc(group_id, state)
+            obs_values(iObs) = properties%calc_vhc(group_id, state)
         end do
 
         deallocate (original_temperature)

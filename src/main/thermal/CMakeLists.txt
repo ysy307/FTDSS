@@ -9,6 +9,7 @@ target_link_libraries(Thermal PRIVATE
     Core
     Input
     Domain
+    Calculate
     Properties
     Matrix
     Boundary

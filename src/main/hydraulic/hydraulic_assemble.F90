@@ -5,7 +5,7 @@ module hydraulic_hydraulic_assemble
     use :: module_domain, only:type_domain, abst_element
     use :: module_properties, only:type_properties_manager
     use :: module_matrix, only:type_crs, type_dense, gemv, add
-    use :: module_control, only:type_time
+    use :: module_control
 
     implicit none
     private
@@ -16,8 +16,8 @@ module hydraulic_hydraulic_assemble
 
     abstract interface
         subroutine abst_assemble_global_hydraulic(J, R, domain, pressure, temperature, ice, porosity, &
-                                                  properties, time, actual_order)
-            import :: type_crs, type_domain, type_properties_manager, type_variable, type_time, int32, real64
+                                                  properties, controls, actual_order)
+            import :: type_crs, type_domain, type_properties_manager, type_variable, type_controls, int32, real64
             implicit none
             type(type_crs), intent(inout) :: J
             real(real64), intent(inout) :: R(:)
@@ -27,14 +27,14 @@ module hydraulic_hydraulic_assemble
             type(type_variable), intent(in) :: ice
             type(type_variable), intent(in) :: porosity
             type(type_properties_manager), intent(in) :: properties
-            type(type_time), intent(in) :: time
+            type(type_controls), intent(in) :: controls
             integer(int32), intent(in) :: actual_order
         end subroutine abst_assemble_global_hydraulic
     end interface
 contains
 
     subroutine process_element_hydraulic_linear_1(J, R, element, pressure, temperature, ice, porosity, &
-                                                  properties, time, actual_order)
+                                                  properties, controls, actual_order)
         implicit none
         ! --- 引数 ---
         type(type_crs), intent(inout) :: J
@@ -45,7 +45,7 @@ contains
         type(type_variable), intent(in) :: ice
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         ! --- ローカル変数 ---
@@ -72,6 +72,7 @@ contains
         num_nodes = element%get_num_nodes()
         num_gauss = element%get_num_gauss()
         i_material = element%get_group()
+        if (.not. controls%is_target(calc_hydraulic, i_material)) return
 
         CH_e(:, :) = 0.0d0
         KH_e(:, :) = 0.0d0
@@ -87,7 +88,7 @@ contains
         end do
         call properties%calc_hydraulic(i_material, state, kflh)
 
-        dt = time%get_dt()
+        dt = controls%time%get_dt()
         dot_ice(:) = 0.0d0
         do il = 1, num_nodes
             dot_ice(il) = ice%dif(element%get_connectivity(il)) / dt
@@ -150,7 +151,7 @@ contains
     end subroutine process_element_hydraulic_linear_1
 
     subroutine process_element_hydraulic_linear_1_ns(J, R, element, pressure, temperature, ice, porosity, &
-                                                     properties, time, actual_order)
+                                                     properties, controls, actual_order)
         implicit none
         ! --- arguments ---
         type(type_crs), intent(inout) :: J
@@ -161,7 +162,7 @@ contains
         type(type_variable), intent(in) :: ice
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         ! --- Local variables ---
@@ -188,6 +189,7 @@ contains
         num_nodes = element%get_num_nodes()
         num_gauss = element%get_num_gauss()
         i_material = element%get_group()
+        if (.not. controls%is_target(calc_hydraulic, i_material)) return
 
         call CH_e%initialize_local(num_nodes)
         call KH_e%initialize_local(num_nodes)
@@ -208,7 +210,7 @@ contains
         end do
         call properties%calc_hydraulic(i_material, state, kflh)
 
-        dt = time%get_dt()
+        dt = controls%time%get_dt()
         dot_ice(:) = 0.0d0
         do il = 1, num_nodes
             dot_ice(il) = ice%dif(element%get_connectivity(il)) / dt
@@ -269,7 +271,7 @@ contains
     end subroutine process_element_hydraulic_linear_1_ns
 
     subroutine hydraulic_assemble_system_linear_1(J, R, domain, pressure, temperature, porosity, ice, &
-                                                  properties, time, actual_order)
+                                                  properties, controls, actual_order)
         implicit none
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
@@ -279,7 +281,7 @@ contains
         type(type_variable), intent(in) :: ice
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         class(abst_element), pointer :: element
@@ -292,12 +294,12 @@ contains
         do iE = 1, num_elements
             element => domain%Elements(iE)%e
             call process_element_hydraulic_linear_1(J, R, element, pressure, temperature, porosity, ice, &
-                                                    properties, time, actual_order)
+                                                    properties, controls, actual_order)
         end do
     end subroutine hydraulic_assemble_system_linear_1
 
     subroutine hydraulic_assemble_system_linear_1_parallel(J, R, domain, pressure, temperature, porosity, ice, &
-                                                           properties, time, actual_order)
+                                                           properties, controls, actual_order)
         implicit none
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
@@ -307,7 +309,7 @@ contains
         type(type_variable), intent(in) :: ice
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         integer(int32) :: c, ie_idx
@@ -322,7 +324,7 @@ contains
             do ie_idx = 1, domain%colors%colored(c)%num_elements
                 element => domain%Elements(domain%colors%colored(c)%Elements(ie_idx))%e
                 call process_element_hydraulic_linear_1(J, R, element, pressure, temperature, porosity, ice, &
-                                                        properties, time, actual_order)
+                                                        properties, controls, actual_order)
             end do
             !$omp end do
         end do

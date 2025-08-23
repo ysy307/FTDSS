@@ -9,7 +9,7 @@ module main_hydraulic
     use :: module_matrix, only:type_crs, gemv, add
     use :: module_boundary, only:type_bc, mode_value, mode_nr
     use :: module_solver
-    use :: module_control, only:type_time, type_iteration
+    use :: module_control, only:type_controls
     use :: hydraulic_hydraulic_assemble
     implicit none
     private
@@ -66,26 +66,26 @@ module main_hydraulic
 
         end subroutine abst_shift
 
-        subroutine abst_solve(self, pressure, time, iteration)
-            import :: abst_hydraulic, type_time, type_iteration, type_variable
+        subroutine abst_solve(self, pressure, controls)
+            import :: abst_hydraulic, type_controls, type_variable
             implicit none
             class(abst_hydraulic), intent(inout) :: self
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
+            type(type_controls), intent(inout) :: controls
             type(type_variable), intent(inout) :: pressure
 
         end subroutine abst_solve
 
-        subroutine abst_compute(self, domain, property, pressure, porosity, time, iteration, bc)
-            import :: abst_hydraulic, type_domain, type_properties_manager, type_variable, type_time, type_iteration, type_bc
+        subroutine abst_compute(self, domain, property, pressure, temperature, porosity, ice, controls, bc)
+            import :: abst_hydraulic, type_domain, type_properties_manager, type_variable, type_controls, type_bc
             implicit none
             class(abst_hydraulic), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
             type(type_properties_manager), intent(in) :: property
             type(type_variable), intent(inout) :: pressure
+            type(type_variable), intent(inout) :: temperature
             type(type_variable), intent(inout) :: porosity
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
+            type(type_variable), intent(inout) :: ice
+            type(type_controls), intent(inout) :: controls
             type(type_bc), intent(inout) :: bc
 
         end subroutine abst_compute
@@ -117,24 +117,24 @@ module main_hydraulic
 
         end subroutine shift_type_hydraulic_crs
 
-        module subroutine solve_type_hydraulic_crs(self, pressure, time, iteration)
+        module subroutine solve_type_hydraulic_crs(self, pressure, controls)
             implicit none
             class(type_hydraulic_crs), intent(inout) :: self
             type(type_variable), intent(inout) :: pressure
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
+            type(type_controls), intent(inout) :: controls
 
         end subroutine solve_type_hydraulic_crs
 
-        module subroutine compute_type_hydraulic_crs(self, domain, property, pressure, porosity, time, iteration, bc)
+        module subroutine compute_type_hydraulic_crs(self, domain, property, pressure, temperature, porosity, ice, controls, bc)
             implicit none
             class(type_hydraulic_crs), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
             type(type_properties_manager), intent(in) :: property
             type(type_variable), intent(inout) :: pressure
+            type(type_variable), intent(inout) :: temperature
             type(type_variable), intent(inout) :: porosity
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
+            type(type_variable), intent(inout) :: ice
+            type(type_controls), intent(inout) :: controls
             type(type_bc), intent(inout) :: bc
 
         end subroutine compute_type_hydraulic_crs

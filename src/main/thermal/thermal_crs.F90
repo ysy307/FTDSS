@@ -54,108 +54,101 @@ contains
 
     end function construct_type_thermal_crs
 
-    module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, time, iteration)
+    module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, controls)
         implicit none
         class(type_thermal_crs), intent(inout) :: self
         type(type_domain), intent(inout), target :: domain
         type(type_properties_manager), intent(inout) :: property
         real(real64), intent(in) :: temperature(:)
         real(real64), intent(in) :: porosity(:)
-        type(type_time), intent(in) :: time
-        type(type_iteration), intent(in) :: iteration
+        type(type_controls), intent(in) :: controls
 
         ! --- 変数宣言 ---
         integer(int32) :: i, j, num_nodes
-        integer(int32) :: element_id, group_id, num_elem_nodes
+        integer(int32) :: element_id, material_id, num_elem_nodes
         integer(int32), pointer :: neighbor_list(:) => null()
-
-        real(real64) :: total_weighted_qw, total_weight, weight, temp_qw, element_area
+        real(real64) :: total_weight, weight, temp_qw, element_area
         type(type_state) :: state
-
-        ! --- BDF計算用の変数を追加 ---
         integer(int32) :: actual_order, iO
-        real(real64) :: Qw_hist_i, Qice_hist_i
-        real(real64), dimension(:), allocatable :: coefficients
+        real(real64) :: Qw_hist_i
+        real(real64), allocatable :: coefficients(:)
+        real(real64), allocatable :: ratio_densities(:)
+        real(real64) :: total_weighted_qw, total_weighted_density_ratio, density_ratio
+        type(type_phase_property) :: density
 
         ! --- 初期化 ---
         num_nodes = domain%get_num_nodes()
+        call allocate_array(ratio_densities, num_nodes)
 
         ! ★ BDFの次数と係数を取得
-        actual_order = min(self%order, iteration%get_iter())
-        allocate (coefficients(0:actual_order))
-        call time%get_time_coefficients(actual_order, coefficients)
+        actual_order = min(self%order, controls%iteration%get_iter())
+        call allocate_array(coefficients, bounds=[0, actual_order])
+        call controls%time%get_time_coefficients(actual_order, coefficients)
 
         ! --- メイン計算ループ (OpenMPによる並列化) ---
-        !$omp parallel do private(j, state, neighbor_list, element_id, group_id, temp_qw, element_area, num_elem_nodes, weight, &
-        !$omp total_weighted_qw, total_weight) &
-        !$omp default(shared) schedule(static)
+        !$omp parallel do private(j, state, neighbor_list, element_id, material_id, temp_qw, element_area, &
+        !$omp                     num_elem_nodes, weight, total_weighted_qw, total_weight, &
+        !$omp                     total_weighted_density_ratio, density_ratio, density)
         do i = 1, num_nodes
-            ! この節点の状態を設定
             state%temperature = temperature(i)
             state%porosity = porosity(i)
-
             total_weighted_qw = 0.0d0
+            total_weighted_density_ratio = 0.0d0
             total_weight = 0.0d0
 
-            ! domainオブジェクトから隣接要素リストへのポインタを取得
             neighbor_list => domain%map_node_to_element%get_list(i)
             if (.not. associated(neighbor_list)) cycle
 
-            ! 隣接する全要素でループし、重み付き和を計算
             do j = 1, size(neighbor_list)
                 element_id = neighbor_list(j)
+                material_id = domain%elements(element_id)%e%get_group()
+                if (.not. controls%is_target(calc_thermal, material_id)) cycle
 
-                ! a) 重みを計算
                 element_area = domain%elements(element_id)%e%get_area()
                 num_elem_nodes = domain%elements(element_id)%e%get_num_nodes()
+                density = property%get_phase_dens(material_id)
                 weight = element_area / dble(num_elem_nodes)
 
-                ! b) この要素の物性でQwを計算
-                group_id = domain%elements(element_id)%e%get_group()
-                temp_qw = property%get_qw(group_id, state)
-
-                ! 物理的な範囲に収める
-                if (temp_qw > state%porosity) temp_qw = state%porosity
-                if (temp_qw < 0.0d0) temp_qw = 0.0d0
-
-                ! c) 重み付き和と重みの合計を更新
+                density_ratio = density%water / density%ice
+                temp_qw = property%calc_qw(material_id, state)
                 total_weighted_qw = total_weighted_qw + temp_qw * weight
+                total_weighted_density_ratio = total_weighted_density_ratio + density_ratio * weight
                 total_weight = total_weight + weight
             end do
 
-            ! 重み付き平均を計算し、一時配列に格納
             if (total_weight > 1.0d-12) then
                 self%Qw%pre(i) = total_weighted_qw / total_weight
+                ratio_densities(i) = total_weighted_density_ratio / total_weight
             else
                 self%Qw%pre(i) = 0.0d0
+                ratio_densities(i) = 0.0d0
             end if
         end do
         !$omp end parallel do
 
         !----------------------------------------------------------------------------------
-        ! ★ 修正箇所：BDF履歴項を使って高次精度の 'dif' を計算
+        ! ★ 質量保存則の適用とBDF履歴項を使った計算
         !----------------------------------------------------------------------------------
-        self%Qice%pre(:) = porosity(:) - self%Qw%pre(:)
+        self%Qice%pre(:) = ratio_densities(:) * (porosity(:) - self%Qw%pre(:))
+        where (self%Qice%pre(:) < 0.0d0) self%Qice%pre(:) = 0.0d0
 
         do i = 1, num_nodes
-            ! --- Qw の dif を計算 ---
             Qw_hist_i = 0.0d0
             do iO = 1, actual_order
                 Qw_hist_i = Qw_hist_i + coefficients(iO) * self%Qw%old(i, iO)
             end do
             self%Qw%dif(i) = coefficients(0) * self%Qw%pre(i) + Qw_hist_i
-
-            ! --- Qice の dif を計算 ---
-            Qice_hist_i = 0.0d0
-            do iO = 1, actual_order
-                Qice_hist_i = Qice_hist_i + coefficients(iO) * self%Qice%old(i, iO)
-            end do
-            self%Qice%dif(i) = coefficients(0) * self%Qice%pre(i) + Qice_hist_i
+            self%Qice%dif(i) = -ratio_densities(i) * self%Qw%dif(i)
         end do
 
-        self%Si%pre(:) = self%Qice%pre(:) / porosity(:)
+        where (porosity(:) > 1.0d-12)
+            self%Si%pre(:) = self%Qice%pre(:) / porosity(:)
+        elsewhere
+            self%Si%pre(:) = 0.0d0
+        end where
 
         deallocate (coefficients)
+        deallocate (ratio_densities)
 
     end subroutine update_type_thermal_crs
 
@@ -169,16 +162,15 @@ contains
 
     end subroutine shift_type_thermal_crs
 
-    module subroutine solve_type_thermal_crs(self, temperature, time, iteration)
+    module subroutine solve_type_thermal_crs(self, temperature, controls)
         implicit none
         class(type_thermal_crs), intent(inout) :: self
         type(type_variable), intent(inout) :: temperature
-        type(type_time), intent(inout) :: time
-        type(type_iteration), intent(inout) :: iteration
+        type(type_controls), intent(in) :: controls
 
         integer(int32) :: stat
 
-        select case (trim(iteration%get_algorithm_name()))
+        select case (trim(controls%iteration%get_algorithm_name()))
         case ("none")
             call self%solver%solve(self%KT_star, self%PHIT, temperature%new(:), stat)
             temperature%dif(:) = temperature%new(:) - temperature%pre(:)
@@ -186,10 +178,10 @@ contains
             call self%solver%solve(self%KT_star, self%PHIT, temperature%dif(:), stat)
             temperature%new(:) = temperature%pre(:) + temperature%dif(:)
         end select
-        call self%solver%check(stat, time%get_time())
+        call self%solver%check(stat, controls%time%get_time())
     end subroutine solve_type_thermal_crs
 
-    module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, time, iteration, bc)
+    module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, controls, bc)
         implicit none
         ! Arguments
         class(type_thermal_crs), intent(inout) :: self
@@ -197,15 +189,14 @@ contains
         type(type_properties_manager), intent(in) :: property
         type(type_variable), intent(inout) :: temperature
         type(type_variable), intent(inout) :: porosity
-        type(type_time), intent(inout) :: time
-        type(type_iteration), intent(inout) :: iteration
+        type(type_controls), intent(inout) :: controls
         type(type_bc), intent(inout) :: bc
 
         ! Local variables
         integer(int32) :: actual_order
         integer(int32) :: mode_bc
 
-        call time%profile_start("Setup")
+        call controls%time%profile_start("Setup")
         select case (self%algorithm)
         case ("none")
             mode_bc = mode_value
@@ -213,37 +204,37 @@ contains
             mode_bc = mode_nr
         end select
 
-        call time%profile_stop("Setup")
+        call controls%time%profile_stop("Setup")
 
-        NR_LOOP_THERMAL: do while (iteration%should_continue())
-            call time%profile_start("Setup")
-            call iteration%increment_step()
-            call time%profile_stop("Setup")
+        NR_LOOP_THERMAL: do while (controls%iteration%should_continue())
+            call controls%time%profile_start("Setup")
+            call controls%iteration%increment_step()
+            call controls%time%profile_stop("Setup")
 
-            call time%profile_start("Assemble")
-            actual_order = min(self%order, iteration%get_step())
-            call self%assemble_global(self%KT_star, self%PHIT, domain, temperature, porosity, property, time, actual_order)
-            call time%profile_stop("Assemble")
+            call controls%time%profile_start("Assemble")
+            actual_order = min(self%order, controls%iteration%get_step())
+            call self%assemble_global(self%KT_star, self%PHIT, domain, temperature, porosity, property, controls, actual_order)
+            call controls%time%profile_stop("Assemble")
 
-            call time%profile_start("Setup")
+            call controls%time%profile_start("Setup")
             call bc%apply_crs(boundary_target='thermal', &
-                              current_time=time%get_time(), &
+                              current_time=controls%time%get_time(), &
                               A=self%KT_star, &
                               b=self%PHIT, &
                               Domain=Domain, &
                               mode=mode_bc)
-            if (iteration%get_step() == 1) call iteration%set_initial_norms(res_vec=self%PHIT)
-            call time%profile_stop("Setup")
+            if (controls%iteration%get_step() == 1) call controls%iteration%set_initial_norms(res_vec=self%PHIT)
+            call controls%time%profile_stop("Setup")
 
-            call time%profile_start("Solve")
-            call self%solve(temperature, time, iteration)
-            call time%profile_stop("Solve")
+            call controls%time%profile_start("Solve")
+            call self%solve(temperature, controls)
+            call controls%time%profile_stop("Solve")
 
-            call time%profile_start("Setup")
-            if (iteration%get_step() == 1) call iteration%set_initial_norms(upd_vec=temperature%dif(:))
-            call iteration%check_convergence(self%PHIT, temperature%dif(:))
+            call controls%time%profile_start("Setup")
+            if (controls%iteration%get_step() == 1) call controls%iteration%set_initial_norms(upd_vec=temperature%dif(:))
+            call controls%iteration%check_convergence(self%PHIT, temperature%dif(:))
             temperature%pre(:) = temperature%new(:)
-            call time%profile_stop("Setup")
+            call controls%time%profile_stop("Setup")
         end do NR_LOOP_THERMAL
 
     end subroutine compute_type_thermal_crs

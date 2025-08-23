@@ -8,5 +8,6 @@ target_link_libraries(Properties PRIVATE
     Core
     Input
     Calc
+    control
 )
 enable_build_flags(Properties)

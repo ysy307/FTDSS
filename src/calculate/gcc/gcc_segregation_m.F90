@@ -2,11 +2,11 @@ submodule(calculate_gcc) gcc_segregation_m
     implicit none
 contains
 
-    module function type_GCC_Seg_m_Construct(Tf, Lf) result(property)
+    module function construct_type_gcc_seg_m(Tf, Lf) result(property)
         implicit none
         real(real64), intent(in) :: Tf
         real(real64), intent(in) :: Lf
-        class(Abst_GCC), allocatable :: property
+        class(abst_gcc), allocatable :: property
 
         if (allocated(property)) deallocate (property)
         allocate (type_gcc_segregation_m :: property)
@@ -17,57 +17,50 @@ contains
             this%Tf = Tf
         end select
 
-    end function type_GCC_Seg_m_Construct
+    end function construct_type_gcc_seg_m
 
-    module pure function Calc_GCC_Seg_m(self, T, Pw, rhoW, rhoI) result(suction)
+    module pure elemental function calc_gcc_seg_m(self, state) result(suction)
         implicit none
         class(type_gcc_segregation_m), intent(in) :: self
-        real(real64), intent(in) :: T
-        real(real64), intent(in), optional :: Pw
-        real(real64), intent(in), optional :: rhoW
-        real(real64), intent(in), optional :: rhoI
+        type(type_state), intent(in) :: state
         real(real64) :: suction
 
-        if (T <= self%Tf) then
-            suction = ((rhoI / rhoW - 1.0d0) * Pw - self%Lf * rhoI * log((T + self%TtoK) / (self%Tf + self%TtoK))) / (rhoW * self%g)
+        if (state%temperature <= self%Tf) then
+            suction = ((state%density_ice / state%density_water - 1.0d0) * state%pressure - &
+                       self%Lf * state%density_ice * log((state%temperature + self%TtoK) / (self%Tf + self%TtoK))) / &
+                      (state%density_water * self%g)
         else
             suction = 0.0d0
         end if
 
-    end function Calc_GCC_Seg_m
+    end function calc_gcc_seg_m
 
-    module pure function Calc_GCC_Seg_m_Derivative(self, T, Pw, rhoW, rhoI) result(suction_derivative)
+    module pure elemental function deriv_gcc_seg_m(self, state) result(suction_derivative)
         implicit none
         class(type_gcc_segregation_m), intent(in) :: self
-        real(real64), intent(in) :: T
-        real(real64), intent(in), optional :: Pw
-        real(real64), intent(in), optional :: rhoW
-        real(real64), intent(in), optional :: rhoI
+        type(type_state), intent(in) :: state
         real(real64) :: suction_derivative
 
-        if (T <= self%Tf) then
-            suction_derivative = -self%Lf * rhoI / ((T + self%TtoK) * rhoW * self%g)
+        if (state%temperature <= self%Tf) then
+            suction_derivative = -self%Lf * state%density_ice / ((state%temperature + self%TtoK) * state%density_water * self%g)
         else
             suction_derivative = 0.0d0
         end if
 
-    end function Calc_GCC_Seg_m_Derivative
+    end function deriv_gcc_seg_m
 
-    module pure function Calc_GCC_Seg_m_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(suction_derivative)
+    module pure elemental function deriv_2nd_gcc_seg_m(self, state) result(suction_derivative)
         implicit none
         class(type_gcc_segregation_m), intent(in) :: self
-        real(real64), intent(in) :: T
-        real(real64), intent(in), optional :: Pw
-        real(real64), intent(in), optional :: rhoW
-        real(real64), intent(in), optional :: rhoI
+        type(type_state), intent(in) :: state
         real(real64) :: suction_derivative
 
-        if (T <= self%Tf) then
-            suction_derivative = self%Lf * rhoI / ((T + self%TtoK)**2.0d0 * rhoW * self%g)
+        if (state%temperature <= self%Tf) then
+            suction_derivative = self%Lf * state%density_ice / ((state%temperature + self%TtoK)**2.0d0 * state%density_water * self%g)
         else
             suction_derivative = 0.0d0
         end if
 
-    end function Calc_GCC_Seg_m_Derivative_2nd
+    end function deriv_2nd_gcc_seg_m
 
 end submodule gcc_segregation_m

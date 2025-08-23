@@ -20,9 +20,9 @@ contains
 
     end subroutine initialize_holder_vhcs
 
-    pure module function calc_vhc_3(VHC_soil, phi_soil, &
-                                    VHC_water, phi_water, &
-                                    VHC_ice, phi_ice) result(VHC)
+    module pure elemental function calc_vhc_3(VHC_soil, phi_soil, &
+                                              VHC_water, phi_water, &
+                                              VHC_ice, phi_ice) result(VHC)
         implicit none
         real(real64), intent(in) :: VHC_soil
         real(real64), intent(in) :: phi_soil
@@ -36,8 +36,8 @@ contains
 
     end function calc_vhc_3
 
-    pure module function calc_vhc_3a(VHC_soil, phi_soil, VHC_water, phi_water, &
-                                     VHC_ice, phi_ice, Lf, DEN_ice, dQi_dT) result(VHC)
+    module pure elemental function calc_vhc_3a(VHC_soil, phi_soil, VHC_water, phi_water, &
+                                               VHC_ice, phi_ice, Lf, density_water, dQw_dT) result(VHC)
         implicit none
         real(real64), intent(in) :: VHC_soil
         real(real64), intent(in) :: phi_soil
@@ -46,11 +46,11 @@ contains
         real(real64), intent(in) :: VHC_ice
         real(real64), intent(in) :: phi_ice
         real(real64), intent(in) :: Lf
-        real(real64), intent(in) :: DEN_ice
-        real(real64), intent(in) :: dQi_dT
+        real(real64), intent(in) :: density_water
+        real(real64), intent(in) :: dQw_dT
         real(real64) :: VHC
 
-        VHC = VHC_soil * phi_soil + VHC_water * phi_water + VHC_ice * phi_ice - Lf * DEN_ice * dQi_dT
+        VHC = VHC_soil * phi_soil + VHC_water * phi_water + VHC_ice * phi_ice + Lf * density_water * dQw_dT
 
     end function calc_vhc_3a
 

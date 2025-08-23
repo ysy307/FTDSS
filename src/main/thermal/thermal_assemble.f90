@@ -5,20 +5,17 @@ module thermal_thermal_assemble
     use :: module_domain, only:type_domain, abst_element
     use :: module_properties, only:type_properties_manager
     use :: module_matrix, only:type_crs, type_dense, gemv, add
-    use :: module_control, only:type_time
+    use :: module_control
 
     implicit none
     private
 
     public :: abst_assemble_global_thermal
-
-    ! public :: assemble_mass_heat_1, assemble_diffusion_heat_1
-    ! public :: assemble_mass_heat_1_parallel, assemble_diffusion_heat_1_parallel
     public :: thermal_assemble_system_linear_1, thermal_assemble_system_linear_1_parallel
 
     abstract interface
-        subroutine abst_assemble_global_thermal(J, R, domain, temperature, porosity, properties, time, actual_order)
-            import :: type_crs, type_domain, type_properties_manager, type_variable, type_time, int32, real64
+        subroutine abst_assemble_global_thermal(J, R, domain, temperature, porosity, properties, controls, actual_order)
+            import :: type_crs, type_domain, type_properties_manager, type_variable, type_controls, int32, real64
             implicit none
             type(type_crs), intent(inout) :: J
             real(real64), intent(inout) :: R(:)
@@ -26,13 +23,13 @@ module thermal_thermal_assemble
             type(type_variable), intent(in) :: temperature
             type(type_variable), intent(in) :: porosity
             type(type_properties_manager), intent(in) :: properties
-            type(type_time), intent(in) :: time
+            type(type_controls), intent(in) :: controls
             integer(int32), intent(in) :: actual_order
         end subroutine abst_assemble_global_thermal
     end interface
 contains
 
-    subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, time, actual_order)
+    subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, controls, actual_order)
         implicit none
         ! --- 引数 ---
         type(type_crs), intent(inout) :: J
@@ -41,7 +38,7 @@ contains
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         ! --- ローカル変数 ---
@@ -69,6 +66,7 @@ contains
         num_nodes = element%get_num_nodes()
         num_gauss = element%get_num_gauss()
         i_material = element%get_group()
+        if (.not. controls%is_target(calc_thermal, i_material)) return
 
         CT_e(:, :) = 0.0d0
         KT_e(:, :) = 0.0d0
@@ -106,8 +104,8 @@ contains
             end do
         end do
 
-        dt_n = time%get_dt()
-        call time%get_time_coefficients(actual_order, coefficients)
+        dt_n = controls%time%get_dt()
+        call controls%time%get_time_coefficients(actual_order, coefficients)
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 3: 最終的な LHS(J_e) と RHS(R_e) を構築
@@ -147,7 +145,7 @@ contains
 
     end subroutine process_element_thermal_linear_1
 
-    subroutine process_element_thermal_linear_1_ns(J, R, element, temperature, porosity, properties, time, actual_order)
+    subroutine process_element_thermal_linear_1_ns(J, R, element, temperature, porosity, properties, controls, actual_order)
         implicit none
         ! --- arguments ---
         type(type_crs), intent(inout) :: J
@@ -156,7 +154,7 @@ contains
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         ! --- Local variables ---
@@ -184,6 +182,7 @@ contains
         num_nodes = element%get_num_nodes()
         num_gauss = element%get_num_gauss()
         i_material = element%get_group()
+        if (.not. controls%is_target(calc_thermal, i_material)) return
 
         call allocate_array(coefficients, bounds=[0:actual_order])
         call CT_e%initialize_local(num_nodes)
@@ -229,8 +228,8 @@ contains
             end do
         end do
 
-        dt_n = time%get_dt()
-        call time%get_time_coefficients(actual_order, coefficients)
+        dt_n = controls%time%get_dt()
+        call controls%time%get_time_coefficients(actual_order, coefficients)
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 3: Build the final local matrix (J_e) and vector (R_e)
@@ -270,7 +269,7 @@ contains
 
     end subroutine process_element_thermal_linear_1_ns
 
-    subroutine thermal_assemble_system_linear_1(J, R, domain, temperature, porosity, properties, time, actual_order)
+    subroutine thermal_assemble_system_linear_1(J, R, domain, temperature, porosity, properties, controls, actual_order)
         implicit none
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
@@ -278,7 +277,7 @@ contains
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         class(abst_element), pointer :: element
@@ -290,11 +289,11 @@ contains
 
         do iE = 1, num_elements
             element => domain%Elements(iE)%e
-            call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, time, actual_order)
+            call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, controls, actual_order)
         end do
     end subroutine thermal_assemble_system_linear_1
 
-    subroutine thermal_assemble_system_linear_1_parallel(J, R, domain, temperature, porosity, properties, time, actual_order)
+    subroutine thermal_assemble_system_linear_1_parallel(J, R, domain, temperature, porosity, properties, controls, actual_order)
         implicit none
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
@@ -302,7 +301,7 @@ contains
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: porosity
         type(type_properties_manager), intent(in) :: properties
-        type(type_time), intent(in) :: time
+        type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
         integer(int32) :: c, ie_idx
@@ -316,7 +315,7 @@ contains
             !$omp do
             do ie_idx = 1, domain%colors%colored(c)%num_elements
                 element => domain%Elements(domain%colors%colored(c)%Elements(ie_idx))%e
-                call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, time, actual_order)
+                call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, controls, actual_order)
             end do
             !$omp end do
         end do

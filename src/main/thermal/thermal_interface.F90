@@ -4,12 +4,13 @@ module main_thermal
     use :: stdlib_strings
     use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state
     use :: module_domain, only:type_domain
-    use :: module_properties, only:type_properties_manager
+    use :: module_calculate, only:abst_den
+    use :: module_properties, only:type_properties_manager, type_phase_property
     use :: module_input, only:type_input
     use :: module_matrix, only:type_crs, gemv, add
     use :: module_boundary, only:type_bc, mode_value, mode_nr
     use :: module_solver
-    use :: module_control, only:type_time, type_iteration
+    use :: module_control
     use :: thermal_thermal_assemble
     implicit none
     private
@@ -50,16 +51,15 @@ module main_thermal
     end type type_thermal_crs
 
     abstract interface
-        subroutine abst_update(self, domain, property, temperature, porosity, time, iteration)
-            import :: abst_thermal, type_domain, type_properties_manager, real64, type_time, type_iteration
+        subroutine abst_update(self, domain, property, temperature, porosity, controls)
+            import :: abst_thermal, type_domain, type_properties_manager, real64, type_controls
             implicit none
             class(abst_thermal), intent(inout) :: self
             type(type_domain), intent(inout), target :: domain
             type(type_properties_manager), intent(inout) :: property
             real(real64), intent(in) :: temperature(:)
             real(real64), intent(in) :: porosity(:)
-            type(type_time), intent(in) :: time
-            type(type_iteration), intent(in) :: iteration
+            type(type_controls), intent(in) :: controls
 
         end subroutine abst_update
 
@@ -70,26 +70,24 @@ module main_thermal
 
         end subroutine abst_shift
 
-        subroutine abst_solve(self, temperature, time, iteration)
-            import :: abst_thermal, type_time, type_iteration, type_variable
+        subroutine abst_solve(self, temperature, controls)
+            import :: abst_thermal, type_controls, type_variable
             implicit none
             class(abst_thermal), intent(inout) :: self
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
             type(type_variable), intent(inout) :: temperature
+            type(type_controls), intent(in) :: controls
 
         end subroutine abst_solve
 
-        subroutine abst_compute(self, domain, property, temperature, porosity, time, iteration, bc)
-            import :: abst_thermal, type_domain, type_properties_manager, type_variable, type_time, type_iteration, type_bc
+        subroutine abst_compute(self, domain, property, temperature, porosity, controls, bc)
+            import :: abst_thermal, type_domain, type_properties_manager, type_variable, type_controls, type_bc
             implicit none
             class(abst_thermal), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
             type(type_properties_manager), intent(in) :: property
             type(type_variable), intent(inout) :: temperature
             type(type_variable), intent(inout) :: porosity
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
+            type(type_controls), intent(inout) :: controls
             type(type_bc), intent(inout) :: bc
 
         end subroutine abst_compute
@@ -105,15 +103,14 @@ module main_thermal
 
         end function construct_type_thermal_crs
 
-        module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, time, iteration)
+        module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, controls)
             implicit none
             class(type_thermal_crs), intent(inout) :: self
             type(type_domain), intent(inout), target :: domain
             type(type_properties_manager), intent(inout) :: property
             real(real64), intent(in) :: temperature(:)
             real(real64), intent(in) :: porosity(:)
-            type(type_time), intent(in) :: time
-            type(type_iteration), intent(in) :: iteration
+            type(type_controls), intent(in) :: controls
 
         end subroutine update_type_thermal_crs
 
@@ -123,24 +120,22 @@ module main_thermal
 
         end subroutine shift_type_thermal_crs
 
-        module subroutine solve_type_thermal_crs(self, temperature, time, iteration)
+        module subroutine solve_type_thermal_crs(self, temperature, controls)
             implicit none
             class(type_thermal_crs), intent(inout) :: self
             type(type_variable), intent(inout) :: temperature
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
+            type(type_controls), intent(in) :: controls
 
         end subroutine solve_type_thermal_crs
 
-        module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, time, iteration, bc)
+        module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, controls, bc)
             implicit none
             class(type_thermal_crs), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
             type(type_properties_manager), intent(in) :: property
             type(type_variable), intent(inout) :: temperature
             type(type_variable), intent(inout) :: porosity
-            type(type_time), intent(inout) :: time
-            type(type_iteration), intent(inout) :: iteration
+            type(type_controls), intent(inout) :: controls
             type(type_bc), intent(inout) :: bc
 
         end subroutine compute_type_thermal_crs

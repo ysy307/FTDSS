@@ -95,11 +95,11 @@ contains
     end subroutine initialize_type_material_manager
 
     ! THC getter
-    subroutine get_thc_ptr(self, region_id, thc_ptr)
+    function get_thc_ptr(self, region_id) result(thc_ptr)
         implicit none
         class(type_material_manager), intent(in), target :: self
         integer(int32), intent(in) :: region_id
-        class(abst_thc), intent(inout), pointer :: thc_ptr
+        class(abst_thc), pointer :: thc_ptr
 
         integer(int32) :: model_index
 
@@ -122,14 +122,14 @@ contains
 #endif
 
         thc_ptr => self%thc(model_index)%p
-    end subroutine get_thc_ptr
+    end function get_thc_ptr
 
     ! DEN getter
-    subroutine get_den_ptr(self, region_id, den_ptr)
+    function get_den_ptr(self, region_id) result(den_ptr)
         implicit none
         class(type_material_manager), intent(in), target :: self
         integer(int32), intent(in) :: region_id
-        class(abst_den), intent(inout), pointer :: den_ptr
+        class(abst_den), pointer :: den_ptr
 
         integer(int32) :: model_index
 
@@ -152,14 +152,14 @@ contains
 #endif
 
         den_ptr => self%den(model_index)%p
-    end subroutine get_den_ptr
+    end function get_den_ptr
 
     ! SPH getter
-    subroutine get_sph_ptr(self, region_id, sph_ptr)
+    function get_sph_ptr(self, region_id) result(sph_ptr)
         implicit none
         class(type_material_manager), intent(in), target :: self
         integer(int32), intent(in) :: region_id
-        class(abst_sph), intent(inout), pointer :: sph_ptr
+        class(abst_sph), pointer :: sph_ptr
 
         integer(int32) :: model_index
 
@@ -182,14 +182,14 @@ contains
 #endif
 
         sph_ptr => self%sph(model_index)%p
-    end subroutine get_sph_ptr
+    end function get_sph_ptr
 
     ! VHC getter
-    subroutine get_vhc_ptr(self, region_id, vhc_ptr)
+    function get_vhc_ptr(self, region_id) result(vhc_ptr)
         implicit none
         class(type_material_manager), intent(in), target :: self
         integer(int32), intent(in) :: region_id
-        class(abst_vhc), intent(inout), pointer :: vhc_ptr
+        class(abst_vhc), pointer :: vhc_ptr
 
         integer(int32) :: model_index
 
@@ -212,14 +212,14 @@ contains
 #endif
 
         vhc_ptr => self%vhc(model_index)%p
-    end subroutine get_vhc_ptr
+    end function get_vhc_ptr
 
     ! GCC getter
-    subroutine get_gcc_ptr(self, region_id, gcc_ptr)
+    function get_gcc_ptr(self, region_id) result(gcc_ptr)
         implicit none
         class(type_material_manager), intent(in), target :: self
         integer(int32), intent(in) :: region_id
-        class(abst_gcc), intent(inout), pointer :: gcc_ptr
+        class(abst_gcc), pointer :: gcc_ptr
 
         integer(int32) :: model_index
 
@@ -242,14 +242,14 @@ contains
 #endif
 
         gcc_ptr => self%gcc(model_index)%p
-    end subroutine get_gcc_ptr
+    end function get_gcc_ptr
 
     ! WRF getter
-    subroutine get_wrf_ptr(self, region_id, wrf_ptr)
+    function get_wrf_ptr(self, region_id) result(wrf_ptr)
         implicit none
         class(type_material_manager), intent(in), target :: self
         integer(int32), intent(in) :: region_id
-        class(abst_wrf), intent(inout), pointer :: wrf_ptr
+        class(abst_wrf), pointer :: wrf_ptr
 
         integer(int32) :: model_index
 
@@ -272,14 +272,14 @@ contains
 #endif
 
         wrf_ptr => self%wrf(model_index)%p
-    end subroutine get_wrf_ptr
+    end function get_wrf_ptr
 
     ! HCF getter
-    subroutine get_hcf_ptr(self, region_id, hcf_ptr)
+    function get_hcf_ptr(self, region_id) result(hcf_ptr)
         implicit none
         class(type_material_manager), intent(in), target :: self
         integer(int32), intent(in) :: region_id
-        class(abst_hcf), intent(inout), pointer :: hcf_ptr
+        class(abst_hcf), pointer :: hcf_ptr
 
         integer(int32) :: model_index
 
@@ -302,6 +302,6 @@ contains
 #endif
 
         hcf_ptr => self%hcf(model_index)%p
-    end subroutine get_hcf_ptr
+    end function get_hcf_ptr
 
 end module properties_material_manager

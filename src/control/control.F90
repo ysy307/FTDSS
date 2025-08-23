@@ -12,6 +12,11 @@ module module_control
     public :: type_iteration
     public :: type_controls
 
+    public :: calc_thermal, calc_hydraulic, calc_mechanical
+    integer(int32), parameter :: calc_thermal = 1
+    integer(int32), parameter :: calc_hydraulic = 2
+    integer(int32), parameter :: calc_mechanical = 3
+
     type :: type_controls
         logical :: calculate_thermal
         logical :: calculate_hydraulic
@@ -26,6 +31,7 @@ module module_control
         type(type_time) :: time
     contains
         procedure :: initialize => initialize_type_controls
+        procedure :: is_target => should_calculate_target
     end type type_controls
 
 contains
@@ -105,5 +111,56 @@ contains
         call deallocate_array(unique_material_ids)
 
     end subroutine initialize_type_controls
+
+    ! -----------------------------------------------------------------
+    ! <<< ここからが追加した関数 >>>
+    ! 指定された物理現象と材料IDが計算対象かどうかを判定する
+    ! -----------------------------------------------------------------
+    pure function should_calculate_target(self, target_id, i_material) result(is_active)
+        implicit none
+        class(type_controls), intent(in) :: self
+        integer, intent(in) :: target_id
+        integer(int32), intent(in) :: i_material
+        logical :: is_active
+
+        is_active = .false.
+
+        ! 高速な整数比較
+        select case (target_id)
+        case (calc_thermal)
+#ifdef USE_DEBUG
+            if (allocated(self%thermal)) then
+                if (i_material <= ubound(self%thermal, 1)) then
+#endif
+                    is_active = self%thermal(i_material)
+#ifdef USE_DEBUG
+                end if
+            end if
+#endif
+
+        case (calc_hydraulic)
+#ifdef USE_DEBUG
+            if (allocated(self%hydraulic)) then
+                if (i_material <= ubound(self%hydraulic, 1)) then
+#endif
+                    is_active = self%hydraulic(i_material)
+#ifdef USE_DEBUG
+                end if
+            end if
+#endif
+
+        case (calc_mechanical)
+#ifdef USE_DEBUG
+            if (allocated(self%mechanical)) then
+                if (i_material <= ubound(self%mechanical, 1)) then
+#endif
+                    is_active = self%mechanical(i_material)
+#ifdef USE_DEBUG
+                end if
+            end if
+#endif
+        end select
+    end function should_calculate_target
+
 end module module_control
 

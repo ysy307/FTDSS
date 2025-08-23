@@ -24,26 +24,7 @@ contains
 
     end function construct_type_vhc_3phase
 
-    ! module function calc_vhc_gauss_point_3phase_holder(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
-    !     implicit none
-    !     class(type_vhc_3phase), intent(in) :: self
-    !     type(type_state), intent(in) :: state
-    !     type(holder_dens), intent(in), optional :: DEN
-    !     real(real64), intent(in), optional :: LatentHeat
-    !     real(real64), intent(in), optional :: dQi_dT
-    !     real(real64) :: VHC
-
-    !     real(real64) :: phi1, phi2, phi3
-
-    !     phi1 = 1.0d0 - state%porosity
-    !     if (phi2 > state%porosity) phi2 = state%porosity
-    !     if (phi2 < 0.0d0) phi2 = 0.0d0
-    !     phi3 = 1.0d0 - phi1 - phi2
-
-    !     VHC = calc_vhc_3(self%material1, phi1, self%material2, phi2, self%material3, phi3)
-    ! end function calc_vhc_gauss_point_3phase_holder
-
-    module function calc_vhc_gauss_point_3phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
+    module pure function calc_vhc_gauss_point_3phase(self, state, DEN, LatentHeat, dQi_dT) result(VHC)
         implicit none
         class(type_vhc_3phase), intent(in) :: self
         type(type_state), intent(in) :: state
