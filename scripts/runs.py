@@ -64,14 +64,14 @@ def main():
         "/workspaces/FTDSS/Results/TR2"
     ]
     
-    # start = 2
-    # WORKING_DIR_PATHS = WORKING_DIR_PATHS[start:start+2]
-    # RESULTS_BASE_DIR_PATHS = RESULTS_BASE_DIR_PATHS[start:start+2]
+    start = 1
+    WORKING_DIR_PATHS = WORKING_DIR_PATHS[start:start+1]
+    RESULTS_BASE_DIR_PATHS = RESULTS_BASE_DIR_PATHS[start:start+1]
 
     GEOMETRY_COUNT = 4
     
     # 各シミュレーションで使用するスレッド数のリスト
-    THREAD_LIST = [16]
+    THREAD_LIST = [28]
     # THREAD_LIST = [1,2,4,8,12,16,32]
     
     # 各シミュレーションを何回繰り返すか

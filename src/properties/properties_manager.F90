@@ -14,7 +14,7 @@ module properties_properties_manager
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Helper Derived Type to Hold Pointers for a Specific Region
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Note: ポインタをまとめて保持するためのプライベートな派生型
+    ! Note: This type holds pointers to various material property classes
     type :: type_material_pointers
         class(abst_thc), pointer :: thc => null()
         class(abst_vhc), pointer :: vhc => null()

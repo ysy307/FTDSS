@@ -1,0 +1,96 @@
+submodule(domain_side) domain_side_first
+    implicit none
+contains
+
+    module function construct_side_first(id, global_coordinate, cell_info, integration) result(side)
+        implicit none
+        integer(int32), intent(in) :: id
+        type(type_dp_3d), pointer, intent(in) :: global_coordinate
+        type(type_vtk_cell), intent(in) :: cell_info
+        type(type_geometry_settings), intent(in) :: integration
+        class(abst_side), allocatable :: side
+
+        integer(int32) :: i
+        integer(int32) :: num_nodes, num_gauss
+        real(real64), allocatable :: weight(:)
+        real(real64), allocatable :: gauss(:, :)
+
+        allocate (type_side_first :: side)
+
+        num_nodes = cell_info%num_nodes_in_cell
+
+        select case (integration%integration_type)
+        case ("full")
+            num_gauss = 1_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
+
+            weight(:) = [0.0d0]
+            gauss(:, 1) = [2.0d0, 0.0d0, 0.0d0]
+        case ("reduced")
+            call global_logger%log_warning(message="Reduced-type integration is not implemented for first order sides.")
+            num_gauss = 1_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
+
+            weight(:) = [0.0d0]
+            gauss(:, 1) = [2.0d0, 0.0d0, 0.0d0]
+        case ("free")
+            call global_logger%log_warning(message="Free-type integration is not implemented for first order sides.")
+            num_gauss = 1_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
+
+            weight(:) = [0.0d0]
+            gauss(:, 1) = [2.0d0, 0.0d0, 0.0d0]
+        end select
+
+        call side%initialize(id=id, &
+                             type=cell_info%cell_type, &
+                             group=cell_info%cell_entity_id, &
+                             dimension=cell_info%get_dimension(), &
+                             order=cell_info%get_order(), &
+                             num_nodes=num_nodes, &
+                             connectivity=cell_info%connectivity(1:num_nodes), &
+                             num_gauss=num_gauss, &
+                             weight=weight, &
+                             gauss=gauss, &
+                             global_coordinate=global_coordinate)
+
+    end function construct_side_first
+
+    module pure elemental function psi_side_first(self, i, r) result(psi)
+        implicit none
+        class(type_side_first), intent(in) :: self
+        integer(int32), intent(in) :: i
+        type(type_dp_vector_3d), intent(in) :: r
+        real(real64) :: psi
+
+        select case (i)
+        case (1)
+            psi = 0.5d0 * (1.0d0 - r%x)
+        case (2)
+            psi = 0.5d0 * (1.0d0 + r%x)
+        case default
+            psi = 0.0d0
+        end select
+    end function psi_side_first
+
+    module pure elemental function dpsi_dxi_side_first(self, i, r) result(dpsi)
+        implicit none
+        class(type_side_first), intent(in) :: self
+        type(type_dp_vector_3d), intent(in) :: r
+        integer(int32), intent(in) :: i
+        real(real64) :: dpsi
+
+        select case (i)
+        case (1)
+            dpsi = -0.5d0
+        case (2)
+            dpsi = 0.5d0
+        case default
+            dpsi = 0.0d0
+        end select
+    end function dpsi_dxi_side_first
+
+end submodule domain_side_First

@@ -1,35 +1,35 @@
-submodule(domain_element) domain_element_triangle_first
+submodule(domain_element) domain_element_triangle_second
     implicit none
 contains
     !----------------------------------------------------------------------!
-    ! triangle_first_Construct:
+    ! construct_triangle_second:
     !----------------------------------------------------------------------!
-    ! This function constructs a triangle_first element object based on the
+    ! This function constructs a type_triangle_second element object based on the
     ! given element index, global nodal coordinates, connectivity, and
     ! spatial dimension type.
     !
     ! Arguments:
-    !   id             : Element index (int32).
+    !   iElem             : Element index (int32).
     !                       Identifies the target element.
     !
-    !   global_coordinate : type_dp_3d type pointer containing the global coordinates
+    !   Global_Coordinate : type_dp_3d type pointer containing the global coordinates
     !                       of all nodes in the mesh.
     !
-    !   Connectivity      : Integer array (size 3) specifying the indices of
+    !   connectivity      : Integer array (size 6) specifying the indices of
     !                       nodes that form the triangular element.
     !
     ! Return Value:
     !   element         : Allocated polymorphic object of type
-    !                       triangle_first (extends Abstract_ElementType).
+    !                       type_triangle_second (extends Abstract_ElementType).
     !
     ! Function Details:
-    !   - Allocates a new triangle_first element object.
+    !   - Allocates a new type_triangle_second element object.
     !   - Stores element ID and connectivity information.
     !   - Links to the corresponding global coordinates for each node.
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function construct_triangle_first(id, global_coordinate, cell_info, integration) result(element)
+    module function construct_triangle_second(id, global_coordinate, cell_info, integration) result(element)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
@@ -38,220 +38,232 @@ contains
         class(abst_element), allocatable :: element
 
         integer(int32) :: i
+        integer(int32) :: num_nodes, num_gauss
+        real(real64), allocatable :: weight(:)
+        real(real64), allocatable :: gauss(:, :)
 
-        if (allocated(element)) deallocate (element)
-        allocate (type_triangle_first :: element)
+        allocate (type_triangle_second :: element)
 
-        element%id = id
-        element%type = cell_info%cell_type
-        element%group = cell_info%cell_entity_id
-        element%dimension = cell_info%get_dimension()
-        element%order = cell_info%get_order()
-
-        element%num_nodes = cell_info%num_nodes_in_cell
-        allocate (element%connectivity(element%num_nodes))
-        element%connectivity(:) = cell_info%connectivity(1:element%num_nodes)
-
-        allocate (element%x(element%num_nodes))
-        allocate (element%y(element%num_nodes))
-        allocate (element%z(element%num_nodes))
-        do i = 1, element%num_nodes
-            nullify (element%x(i)%val)
-            nullify (element%y(i)%val)
-            nullify (element%z(i)%val)
-            element%x(i)%val => global_coordinate%x(element%connectivity(i))
-            element%y(i)%val => global_coordinate%y(element%connectivity(i))
-            element%z(i)%val => global_coordinate%z(element%connectivity(i))
-        end do
+        num_nodes = cell_info%num_nodes_in_cell
 
         select case (integration%integration_type)
         case ("full")
-            element%num_gauss = 1_int32
-            call allocate_array(element%weight, element%num_gauss)
-            if (allocated(element%gauss)) deallocate (element%gauss)
-            allocate (element%gauss(element%num_gauss))
+            num_gauss = 3_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
 
-            element%weight(:) = [0.5d0]
-            call element%gauss(1)%set([1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0])
+            weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+            gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 0.0d0]
+            gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0, 0.0d0]
+            gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0, 0.0d0]
         case ("reduced")
             call global_logger%log_warning(message="Reduced-type integration is not implemented for first order triangles.")
-            element%num_gauss = 1_int32
-            call allocate_array(element%weight, element%num_gauss)
-            if (allocated(element%gauss)) deallocate (element%gauss)
+            num_gauss = 1_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
 
-            element%weight(:) = [0.5d0]
-            call element%gauss(1)%set([1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0])
+            weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+            gauss(:, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0]
         case ("free")
             call global_logger%log_warning(message="Free-type integration is not implemented for first order triangles.")
-            element%num_gauss = 1_int32
-            call allocate_array(element%weight, element%num_gauss)
-            allocate (element%gauss(element%num_gauss))
+            num_gauss = 3_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
 
-            element%weight(:) = [0.5d0]
-            call element%gauss(1)%set([1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0])
+            weight(:) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 1.0d0 / 6.0d0]
+            gauss(:, 1) = [1.0d0 / 6.0d0, 1.0d0 / 6.0d0, 0.0d0]
+            gauss(:, 2) = [2.0d0 / 3.0d0, 1.0d0 / 6.0d0, 0.0d0]
+            gauss(:, 3) = [1.0d0 / 6.0d0, 2.0d0 / 3.0d0, 0.0d0]
         end select
 
-        ! Initialize the interpolation function pointer
-        if (associated(element%interpolate)) nullify (element%interpolate)
-        element%interpolate => interpolate
+        call element%initialize(id=id, &
+                                type=cell_info%cell_type, &
+                                group=cell_info%cell_entity_id, &
+                                dimension=cell_info%get_dimension(), &
+                                order=cell_info%get_order(), &
+                                num_nodes=num_nodes, &
+                                connectivity=cell_info%connectivity(1:num_nodes), &
+                                num_gauss=num_gauss, &
+                                weight=weight, &
+                                gauss=gauss, &
+                                global_coordinate=global_coordinate)
 
-        if (associated(element%deriv_interpolate)) nullify (element%deriv_interpolate)
-        element%deriv_interpolate => deriv_interpolate
+    end function construct_triangle_second
 
-        if (associated(element%get_connectivity)) nullify (element%get_connectivity)
-        element%get_connectivity => get_connectivity
-
-    end function construct_triangle_first
-
-    pure module function get_area_triangle_first(self) result(area)
+    pure module function get_area_triangle_second(self) result(area)
         implicit none
-        class(type_triangle_first), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         real(real64) :: area
-
+        real(real64) :: det1, det2, det3
         type(type_dp_vector_3d) :: r
-        r%x = 1.0d0 / 3.0d0
-        r%y = 1.0d0 / 3.0d0
-        r%z = 0.0d0
 
-        area = 0.0d0
-        area = area + 0.5d0 * self%jacobian_det(r)
-    end function get_area_triangle_first
+        ! --- ガウスポイントでのヤコビアンを計算 ---
+        r%x = 1.0d0 / 6.0d0
+        r%y = 1.0d0 / 6.0d0
+        r%z = 0.0d0
+        det1 = self%jacobian_det(r)
+        r%x = 2.0d0 / 3.0d0
+        r%y = 1.0d0 / 6.0d0
+        det2 = self%jacobian_det(r)
+        r%x = 1.0d0 / 6.0d0
+        r%y = 2.0d0 / 3.0d0
+        det3 = self%jacobian_det(r)
+
+        ! --- 面積の加重平均 ---
+        area = (det1 + det2 + det3) / 6.0d0
+
+    end function get_area_triangle_second
 
     !----------------------------------------------------------------------!
-    ! psi_triangle_first:
+    ! psi_triangle_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the shape function ψ_i(ξ, η) for a linear
     ! triangular element at the given natural coordinates (ξ, η).
     !
     ! Arguments:
-    !   self : triangle_first type object.
+    !   self : type_triangle_second type object.
     !          Represents the triangular element for which the shape
     !          function is evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 3).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
     !          Each index corresponds to a vertex of the triangle.
     !
     !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system.
+    !          system (barycentric or reference triangle).
     !
-    !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system.
+    !   eta  : Real(real64), the η coordinate in the natural coordinate system.
     !
     ! Return Value:
     !   psi  : Real(real64), value of the i-th shape function ψ_i at (ξ, η).
     !
     ! Function Details:
-    !   - For a linear triangular element, the shape functions are:
-    !       ψ₁(ξ, η) = ξ
+    !   - For a bilenar triangular element, the shape functions are:
+    !       ψ₁(ξ, η) = ξ * (2 * ξ -1)
     !       ψ₂(ξ, η) = η
     !       ψ₃(ξ, η) = 1 - ξ - η
-    !   - Returns 0.0d0 for indices outside the range [1, 3].
+    !       ψ₄(ξ, η) = 4 * ξ * η
+    !       ψ₅(ξ, η) = 4 * (1 - ξ - η) * η
+    !       ψ₆(ξ, η) = 4 * ξ * (1 - ξ - η)
+    !   - Returns 0.0d0 for indices outside the range [1, 6].
     !
     !----------------------------------------------------------------------!
-    pure module function psi_triangle_first(self, i, r) result(psi)
+    pure elemental module function psi_triangle_second(self, i, r) result(psi)
         implicit none
-        class(type_triangle_first), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i
         type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: psi
-
         select case (i)
         case (1)
-            psi = r%x
+            psi = r%x * (2.0d0 * r%x - 1.0d0)
         case (2)
-            psi = r%y
+            psi = r%y * (2.0d0 * r%y - 1.0d0)
         case (3)
-            psi = 1.0d0 - r%x - r%y
+            psi = (1.0d0 - r%x - r%y) * (1.0d0 - 2.0d0 * r%x - 2.0d0 * r%y)
+        case (4)
+            psi = 4.0d0 * r%x * r%y
+        case (5)
+            psi = 4.0d0 * (1.0d0 - r%x - r%y) * r%y
+        case (6)
+            psi = 4.0d0 * r%x * (1.0d0 - r%x - r%y)
         case default
             psi = 0.0d0
         end select
-    end function psi_triangle_first
+    end function psi_triangle_second
 
     !----------------------------------------------------------------------!
-    ! dpsi_dxi_triangle_first:
+    ! dpsi_dxi_triangle_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
     ! shape function for a linear triangular element with respect to ξ
     ! at a given η coordinate.
     !
     ! Arguments:
-    !   self : triangle_first type object.
+    !   self : type_triangle_second type object.
     !          Represents the triangular element for which the derivative
     !          is being evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 3).
-    !
-    !
-    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
     !
     !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !          system.
     !
     ! Return Value:
     !   dpsi : Real(real64), value of ∂ψ_i/∂ξ evaluated at (ξ, η).
     !
     ! Function Details:
     !   - For a linear triangle element:
-    !       ∂ψ₁/∂ξ =  1.0
-    !       ∂ψ₂/∂ξ =  0.0
-    !       ∂ψ₃/∂ξ = -1.0
-    !   - Returns 0.0d0 for indices outside [1, 3].
+    !       ∂ψ₁/∂ξ =  4 * ξ - 1
+    !       ∂ψ₂/∂ξ =  0
+    !       ∂ψ₃/∂ξ =  4 * ξ + 4 * η - 3
+    !       ∂ψ₄/∂ξ =  4 * η
+    !       ∂ψ₅/∂ξ = -4 * η
+    !       ∂ψ₆/∂ξ =  4 - 8 * ξ - 4 * η
+    !   - Returns 0.0 for indices outside [1, 6].
     !
     !----------------------------------------------------------------------!
-    pure module function dpsi_dxi_triangle_first(self, i, r) result(dpsi)
+    pure elemental module function dpsi_dxi_triangle_second(self, i, r) result(dpsi)
         implicit none
-        class(type_triangle_first), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i
         type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
 
         select case (i)
         case (1)
-            dpsi = 1.0d0
+            dpsi = 4.0d0 * r%x - 1.0d0
         case (2)
             dpsi = 0.0d0
         case (3)
-            dpsi = -1.0d0
+            dpsi = -3.0d0 + 4.0d0 * r%x + 4.0d0 * r%y
+        case (4)
+            dpsi = 4.0d0 * r%y
+        case (5)
+            dpsi = -4.0d0 * r%y
+        case (6)
+            dpsi = 4.0d0 - 8.0d0 * r%x - 4.0d0 * r%y
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_dxi_triangle_first
+    end function dpsi_dxi_triangle_second
 
     !----------------------------------------------------------------------!
-    ! dpsi_deta_triangle_first:
+    ! dpsi_deta_triangle_second:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
     ! shape function for a linear triangular element with respect to η
     ! at a given ξ coordinate.
     !
     ! Arguments:
-    !   self : triangle_first type object.
+    !   self : type_triangle_second type object.
     !          Represents the triangular element for which the derivative
     !          is being evaluated.
     !
-    !   i    : Integer (int32), index of the shape function (i = 1, 2, 3).
+    !   i    : Integer (int32), index of the shape function (i = 1 ~ 6).
     !
     !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !          system.
     !
     !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
+    !          system.
     !
     ! Return Value:
     !   dpsi : Real(real64), value of ∂ψ_i/∂η evaluated at (ξ, η).
     !
     ! Function Details:
     !   - For a linear triangle element:
-    !       ∂ψ₁/∂η =  0.0
-    !       ∂ψ₂/∂η =  1.0
-    !       ∂ψ₃/∂η = -1.0
-    !   - Returns 0.0d0 for indices outside [1, 3].
+    !       ∂ψ₁/∂η = 0
+    !       ∂ψ₂/∂η = 4 * η - 1
+    !       ∂ψ₃/∂η = 4 * η + 4 * ξ - 3
+    !       ∂ψ₄/∂η = 4 * ξ
+    !       ∂ψ₅/∂η = 4 * (1 - ξ - η)
+    !       ∂ψ₆/∂η = -4 * ξ
+    !   - Returns 0.0d0 for indices outside [1, 6].
     !
     !----------------------------------------------------------------------!
-    pure module function dpsi_deta_triangle_first(self, i, r) result(dpsi)
+    pure elemental module function dpsi_deta_triangle_second(self, i, r) result(dpsi)
         implicit none
-        class(type_triangle_first), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i
         type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
@@ -260,31 +272,37 @@ contains
         case (1)
             dpsi = 0.0d0
         case (2)
-            dpsi = 1.0d0
+            dpsi = 4.0d0 * r%y - 1.0d0
         case (3)
-            dpsi = -1.0d0
+            dpsi = -3.0d0 + 4.0d0 * r%y + 4.0d0 * r%x
+        case (4)
+            dpsi = 4.0d0 * r%x
+        case (5)
+            dpsi = 4.0d0 - 4.0d0 * r%x - 8.0d0 * r%y
+        case (6)
+            dpsi = -4.0d0 * r%x
         case default
             dpsi = 0.0d0
         end select
-    end function dpsi_deta_triangle_first
+    end function dpsi_deta_triangle_second
 
     !----------------------------------------------------------------------!
-    ! jacobian_triangle_first:
+    ! jacobian_triangle_second:
     !----------------------------------------------------------------------!
-    ! This function computes the (i,j) component of the Jacobian matrix J
+    ! This function computes the (i,j) component of the jacobian matrix J
     ! for a linear triangular finite element at a given natural coordinate
-    ! (ξ, η). The Jacobian maps natural coordinates (ξ, η) to physical
+    ! (ξ, η). The jacobian maps natural coordinates (ξ, η) to physical
     ! coordinates (x, y).
     !
     ! Arguments:
-    !   self : triangle_first type object.
-    !          Represents the element whose Jacobian is being evaluated.
+    !   self : type_triangle_second type object.
+    !          Represents the element whose jacobian is being evaluated.
     !
-    !   i    : Integer (int32), the row index of the Jacobian component.
+    !   i    : Integer (int32), the row index of the jacobian component.
     !          i = 1 → corresponds to x-component (dx/dξ or dx/dη),
     !          i = 2 → corresponds to y-component (dy/dξ or dy/dη).
     !
-    !   j    : Integer (int32), the column index of the Jacobian component.
+    !   j    : Integer (int32), the column index of the jacobian component.
     !          j = 1 → partial derivative w.r.t ξ,
     !          j = 2 → partial derivative w.r.t η.
     !
@@ -293,10 +311,10 @@ contains
     !   eta  : Real(real64), η coordinate in natural coordinate system.
     !
     ! Return Value:
-    !   Jval : Real(real64), the (i,j) component of the Jacobian matrix.
+    !   Jval : Real(real64), the (i,j) component of the jacobian matrix.
     !
     ! Function Details:
-    !   - The Jacobian matrix J is a 2×2 matrix defined as:
+    !   - The jacobian matrix J is a 2×2 matrix defined as:
     !         [ ∂x/∂ξ  ∂x/∂η ]
     !         [ ∂y/∂ξ  ∂y/∂η ]
     !
@@ -315,14 +333,15 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    pure module function jacobian_triangle_first(self, i, j, r) result(Jval)
+    pure elemental module function jacobian_triangle_second(self, i, j, r) result(Jval)
         implicit none
-        class(type_triangle_first), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         integer(int32), intent(in) :: i, j
         type(type_dp_vector_3d), intent(in) :: r
 
         real(real64) :: Jval
-        integer(int32) :: ii, jlocal
+        integer(int32) :: ii
+        type(type_dp_vector_3d) :: coordinate
 
         Jval = 0
         !! dx
@@ -331,13 +350,15 @@ contains
             select case (j)
             case (1)
                 !! dx_dxi
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, r) * self%x(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%x
                 end do
             case (2)
                 !! dx_deta
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, r) * self%x(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%x
                 end do
             end select
 
@@ -346,39 +367,41 @@ contains
             select case (j)
             case (1)
                 !! dy_dxi
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, r) * self%y(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%y
                 end do
             case (2)
                 !! dy_deta
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, r) * self%y(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%y
                 end do
             end select
         end select
 
-    end function jacobian_triangle_first
+    end function jacobian_triangle_second
 
     !----------------------------------------------------------------------!
-    ! jacobian_det_triangle_first:
+    ! jacobian_det_triangle_second:
     !----------------------------------------------------------------------!
-    ! This function computes the determinant of the Jacobian matrix J
+    ! This function computes the determinant of the jacobian matrix J
     ! for a linear triangular element at a specified point (ξ, η) in
     ! the natural coordinate system.
     !
     ! Arguments:
-    !   self : triangle_first type object.
-    !          Represents the finite element whose Jacobian is evaluated.
+    !   self : type_triangle_second type object.
+    !          Represents the finite element whose jacobian is evaluated.
     !
     !   xi   : Real(real64), ξ coordinate in the natural coordinate system.
     !
     !   eta  : Real(real64), η coordinate in the natural coordinate system.
     !
     ! Return Value:
-    !   J_Det : Real(real64), the determinant of the Jacobian matrix J.
+    !   J_Det : Real(real64), the determinant of the jacobian matrix J.
     !
     ! Function Details:
-    !   - The Jacobian matrix J is a 2×2 matrix defined as:
+    !   - The jacobian matrix J is a 2×2 matrix defined as:
     !         [ ∂x/∂ξ  ∂x/∂η ]
     !         [ ∂y/∂ξ  ∂y/∂η ]
     !
@@ -393,9 +416,9 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    pure module function jacobian_det_triangle_first(self, r) result(J_Det)
+    pure elemental module function jacobian_det_triangle_second(self, r) result(J_Det)
         implicit none
-        class(type_triangle_first), intent(in) :: self
+        class(type_triangle_second), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: J_Det
 
@@ -410,10 +433,10 @@ contains
         dy_eta = self%jacobian(2, 2, r)
 
         J_Det = dx_xi * dy_eta - dx_eta * dy_xi
-    end function jacobian_det_triangle_first
+    end function jacobian_det_triangle_second
 
     !----------------------------------------------------------------------!
-    ! is_in_triangle_first:
+    ! is_in_triangle_second:
     !----------------------------------------------------------------------!
     ! This function checks if the given physical coordinates (px, py) lie
     ! within the boundaries of a square element.
@@ -422,7 +445,7 @@ contains
     ! checks if the point lies within the square element.
     !
     ! Arguments:
-    !   self  : triangle_first type object.
+    !   self  : type_triangle_second type object.
     !
     !   px    : x-coordinate (real64 type) in the physical coordinate system.
     !           This coordinate is checked to see if it lies inside the square element.
@@ -447,13 +470,14 @@ contains
     !     outside the valid range, the function returns .false.
     !
     !----------------------------------------------------------------------!
-    module subroutine is_in_triangle_first(self, cartesian, normalized, is_in)
-        class(type_triangle_first), intent(in) :: self
+    module subroutine is_in_triangle_second(self, cartesian, normalized, is_in)
+        class(type_triangle_second), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: cartesian
         type(type_dp_vector_3d), intent(inout) :: normalized
         logical, intent(inout) :: is_in
 
         type(type_dp_vector_3d) :: r
+        type(type_dp_vector_3d) :: coordinate
         real(real64) :: x0, y0
         real(real64) :: dx_xi, dx_eta, dy_xi, dy_eta
         real(real64) :: detJ
@@ -474,9 +498,10 @@ contains
             x0 = 0.0d0
             y0 = 0.0d0
 
-            do i = 1, self%num_nodes
-                x0 = x0 + self%psi(i, r) * self%x(i)%val
-                y0 = y0 + self%psi(i, r) * self%y(i)%val
+            do i = 1, self%get_num_nodes()
+                coordinate = self%get_coordinate(i)
+                x0 = x0 + self%psi(i, r) * coordinate%x
+                y0 = y0 + self%psi(i, r) * coordinate%y
             end do
 
             dx = cartesian%x - x0
@@ -492,7 +517,7 @@ contains
             dy_xi = self%jacobian(2, 1, r)
             dy_eta = self%jacobian(2, 2, r)
 
-            detJ = self%jacobian_det(r)
+            detJ = self%jacobian_Det(r)
             if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
 
             ! Newton-Raphson 更新
@@ -504,6 +529,6 @@ contains
         is_in = converged .and. (r%x >= 0.0d0) .and. (r%y >= 0.0d0) .and. (r%x + r%y <= 1.0d0)
         if (is_in) normalized = r
 
-    end subroutine is_in_triangle_first
+    end subroutine is_in_triangle_second
 
-end submodule domain_element_triangle_first
+end submodule domain_element_triangle_second

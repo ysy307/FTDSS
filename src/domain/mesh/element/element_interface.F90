@@ -4,6 +4,7 @@ module domain_element
     use :: module_core, only:type_dp_3d, type_dp_vector_3d, assignment(=), operator(+), & !&
                              type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
     use :: module_input, only:type_geometry_settings
+    use :: domain_mesh, only:abst_mesh
     implicit none
     private
 
@@ -14,10 +15,6 @@ module domain_element
     public :: type_square_second
     public :: holder_elements
 
-    public :: interpolate_reordered
-    public :: deriv_interpolate_reordered
-    public :: get_connectivity_reordered
-
     !--------------------------------------------------------------------------------------
     ! Holder for polymorphic element objects
     !--------------------------------------------------------------------------------------
@@ -26,45 +23,12 @@ module domain_element
     end type holder_elements
 
     !--------------------------------------------------------------------------------------
-    !   Abstract base type for 2D elements
+    !   Abstract base type for 2D elementss
     !--------------------------------------------------------------------------------------
-    type, abstract :: abst_element
-        integer(int32), private :: id !! Element ID
-        integer(int32), private :: type !! Element type (5: triangle 1st, 9: square 1st)
-        integer(int32), private :: num_nodes !! Number of nodes in the element
-        integer(int32), private :: group !! Element group number
-        integer(int32), private :: dimension
-        integer(int32), private :: order
-        integer(int32), allocatable :: connectivity(:) !! connectivity information
-        integer(int32), allocatable :: connectivity_reordered(:) !! reordered connectivity information
-        type(type_dp_pointer), allocatable :: x(:) !! X coordinate
-        type(type_dp_pointer), allocatable :: y(:) !! Y coordinate
-        type(type_dp_pointer), allocatable :: z(:) !! Z coordinate
-        !----------------------------------------------------------------------------------
-        ! Gauss Quadrature points and weights
-        !  - Gauss Quadrature points are defined in the local coordinate system
-        !  - The number of Gauss points is determined by the element type
-        !  - The weights are used for numerical integration over the element
-        !  - The Gauss points are used to evaluate the shape functions and their derivatives
-        !----------------------------------------------------------------------------------
-        integer(int32) :: num_gauss !! Number of Gauss Quadrature points
-        real(real64), allocatable :: weight(:) !! Gauss weight
-        type(type_dp_vector_3d), allocatable :: gauss(:) !! Gauss Quadrature points Coordinate
-        !----------------------------------------------------------------------------------
-        ! Interpolation functions
-        !----------------------------------------------------------------------------------
-        procedure(abst_interpolate),       pass(self), pointer :: interpolate       => null() !&
-        procedure(abst_deriv_interpolate), pass(self), pointer :: deriv_interpolate => null() !&
-        procedure(abst_get_connectivity),  pass(self), pointer :: get_connectivity  => null() !&
+    type, abstract, extends(abst_mesh) :: abst_element
     contains
-        procedure, pass(self) :: get_id !&
-        procedure, pass(self) :: get_type !&
-        procedure, pass(self) :: get_num_nodes !&
-        procedure, pass(self) :: get_group !&
-        procedure, pass(self) :: get_order !&
-        procedure, pass(self) :: get_dimension !&
-        procedure, pass(self) :: get_num_gauss !&
-        !----------------------------------------------------------------------------------
+        procedure,                     pass(self)           :: lerp => interpolate_element !&
+        procedure,                     pass(self)           :: dlerp => deriv_interpolate_element !&
         procedure(abst_get_area),      pass(self), deferred :: get_area !&
         procedure(abst_psi),           pass(self), deferred :: psi !&
         procedure(abst_dpsi_dxi),      pass(self), deferred :: dpsi_dxi !&
@@ -134,15 +98,6 @@ module domain_element
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
-        function abst_get_connectivity(self, index) result(connectivity)
-            import :: abst_element, int32
-            implicit none
-            class(abst_element), intent(in) :: self
-            integer(int32), intent(in) :: index
-            integer(int32) :: connectivity
-
-        end function abst_get_connectivity
-
         pure function abst_get_area(self) result(area)
             import :: abst_element, real64
             implicit none
@@ -151,7 +106,7 @@ module domain_element
 
         end function abst_get_area
 
-        pure function abst_psi(self, i, r) result(psi)
+        pure elemental function abst_psi(self, i, r) result(psi)
             import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
@@ -160,7 +115,7 @@ module domain_element
             real(real64) :: psi
         end function abst_psi
 
-        pure function abst_dpsi_dxi(self, i, r) result(dpsi)
+        pure elemental function abst_dpsi_dxi(self, i, r) result(dpsi)
             import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
@@ -169,7 +124,7 @@ module domain_element
             real(real64) :: dpsi
         end function abst_dpsi_dxi
 
-        pure function abst_dpsi_deta(self, i, r) result(dpsi)
+        pure elemental function abst_dpsi_deta(self, i, r) result(dpsi)
             import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
@@ -178,7 +133,7 @@ module domain_element
             real(real64) :: dpsi
         end function abst_dpsi_deta
 
-        pure function abst_jacobian(self, i, j, r) result(Jval)
+        pure elemental function abst_jacobian(self, i, j, r) result(Jval)
             import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
@@ -187,31 +142,13 @@ module domain_element
             real(real64) :: Jval
         end function abst_jacobian
 
-        pure function abst_jacobian_det(self, r) result(J_Det)
+        pure elemental function abst_jacobian_det(self, r) result(J_Det)
             import :: abst_element, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_element), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: J_Det
         end function abst_jacobian_det
-
-        pure function abst_interpolate(self, r, value) result(interpolated_value)
-            import :: abst_element, type_dp_vector_3d, real64
-            implicit none
-            class(abst_element), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
-        end function abst_interpolate
-
-        pure function abst_deriv_interpolate(self, r, value) result(interpolated_value)
-            import :: abst_element, type_dp_vector_3d, real64
-            implicit none
-            class(abst_element), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64), intent(in) :: value(:)
-            type(type_dp_vector_3d) :: interpolated_value
-        end function abst_deriv_interpolate
 
         subroutine abst_is_inside(self, cartesian, normalized, is_in)
             import abst_element, type_dp_vector_3d
@@ -245,7 +182,7 @@ module domain_element
 
         end function get_area_triangle_first
 
-        pure module function psi_triangle_first(self, i, r) result(N)
+        pure elemental module function psi_triangle_first(self, i, r) result(N)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -254,7 +191,7 @@ module domain_element
 
         end function psi_triangle_first
 
-        pure module function dpsi_dxi_triangle_first(self, i, r) result(dpsi)
+        pure elemental module function dpsi_dxi_triangle_first(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -263,7 +200,7 @@ module domain_element
 
         end function dpsi_dxi_triangle_first
 
-        pure module function dpsi_deta_triangle_first(self, i, r) result(dpsi)
+        pure elemental module function dpsi_deta_triangle_first(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -272,7 +209,7 @@ module domain_element
 
         end function dpsi_deta_triangle_first
 
-        pure module function jacobian_triangle_first(self, i, j, r) result(Jval)
+        pure elemental module function jacobian_triangle_first(self, i, j, r) result(Jval)
             implicit none
             class(type_triangle_first), intent(in) :: self
             integer(int32), intent(in) :: i, j
@@ -281,7 +218,7 @@ module domain_element
 
         end function jacobian_triangle_first
 
-        pure module function jacobian_det_triangle_first(self, r) result(J_Det)
+        pure elemental module function jacobian_det_triangle_first(self, r) result(J_Det)
             implicit none
             class(type_triangle_first), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
@@ -320,7 +257,7 @@ module domain_element
 
         end function get_area_square_first
 
-        pure module function psi_square_first(self, i, r) result(psi)
+        pure elemental module function psi_square_first(self, i, r) result(psi)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -329,7 +266,7 @@ module domain_element
 
         end function psi_square_first
 
-        pure module function dpsi_dxi_square_first(self, i, r) result(dpsi)
+        pure elemental module function dpsi_dxi_square_first(self, i, r) result(dpsi)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -338,7 +275,7 @@ module domain_element
 
         end function dpsi_dxi_square_first
 
-        pure module function dpsi_deta_square_first(self, i, r) result(dpsi)
+        pure elemental module function dpsi_deta_square_first(self, i, r) result(dpsi)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -347,7 +284,7 @@ module domain_element
 
         end function dpsi_deta_square_first
 
-        pure module function jacobian_square_first(self, i, j, r) result(Jval)
+        pure elemental module function jacobian_square_first(self, i, j, r) result(Jval)
             implicit none
             class(type_square_first), intent(in) :: self
             integer(int32), intent(in) :: i, j
@@ -356,7 +293,7 @@ module domain_element
 
         end function jacobian_square_first
 
-        pure module function jacobian_det_square_first(self, r) result(J_Det)
+        pure elemental module function jacobian_det_square_first(self, r) result(J_Det)
             implicit none
             class(type_square_first), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
@@ -395,7 +332,7 @@ module domain_element
 
         end function get_area_triangle_second
 
-        pure module function psi_triangle_second(self, i, r) result(N)
+        pure elemental module function psi_triangle_second(self, i, r) result(N)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -404,7 +341,7 @@ module domain_element
 
         end function psi_triangle_second
 
-        pure module function dpsi_dxi_triangle_second(self, i, r) result(dpsi)
+        pure elemental module function dpsi_dxi_triangle_second(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -413,7 +350,7 @@ module domain_element
 
         end function dpsi_dxi_triangle_second
 
-        pure module function dpsi_deta_triangle_second(self, i, r) result(dpsi)
+        pure elemental module function dpsi_deta_triangle_second(self, i, r) result(dpsi)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -422,7 +359,7 @@ module domain_element
 
         end function dpsi_deta_triangle_second
 
-        pure module function jacobian_triangle_second(self, i, j, r) result(Jval)
+        pure elemental module function jacobian_triangle_second(self, i, j, r) result(Jval)
             implicit none
             class(type_triangle_second), intent(in) :: self
             integer(int32), intent(in) :: i, j
@@ -431,7 +368,7 @@ module domain_element
 
         end function jacobian_triangle_second
 
-        pure module function jacobian_det_triangle_second(self, r) result(J_Det)
+        pure elemental module function jacobian_det_triangle_second(self, r) result(J_Det)
             implicit none
             class(type_triangle_second), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
@@ -471,7 +408,7 @@ module domain_element
 
         end function get_area_square_second
 
-        pure module function psi_square_second(self, i, r) result(psi)
+        pure elemental module function psi_square_second(self, i, r) result(psi)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -480,7 +417,7 @@ module domain_element
 
         end function psi_square_second
 
-        pure module function dpsi_dxi_square_second(self, i, r) result(dpsi)
+        pure elemental module function dpsi_dxi_square_second(self, i, r) result(dpsi)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -489,7 +426,7 @@ module domain_element
 
         end function dpsi_dxi_square_second
 
-        pure module function dpsi_deta_square_second(self, i, r) result(dpsi)
+        pure elemental module function dpsi_deta_square_second(self, i, r) result(dpsi)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i
@@ -498,7 +435,7 @@ module domain_element
 
         end function dpsi_deta_square_second
 
-        pure module function jacobian_square_second(self, i, j, r) result(Jval)
+        pure elemental module function jacobian_square_second(self, i, j, r) result(Jval)
             implicit none
             class(type_square_second), intent(in) :: self
             integer(int32), intent(in) :: i, j
@@ -507,7 +444,7 @@ module domain_element
 
         end function jacobian_square_second
 
-        pure module function jacobian_det_square_second(self, r) result(J_Det)
+        pure elemental module function jacobian_det_square_second(self, r) result(J_Det)
             implicit none
             class(type_square_second), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
@@ -542,142 +479,45 @@ module domain_element
     end interface
 
 contains
-    pure function get_id(self) result(id)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32) :: id
-
-        id = self%id
-    end function get_id
-
-    pure function get_type(self) result(type)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32) :: type
-
-        type = self%type
-    end function get_type
-
-    pure function get_num_nodes(self) result(num_nodes)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32) :: num_nodes
-
-        num_nodes = self%num_nodes
-    end function get_num_nodes
-
-    pure function get_group(self) result(group)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32) :: group
-
-        group = self%group
-    end function get_group
-
-    pure function get_order(self) result(order)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32) :: order
-
-        order = self%order
-    end function get_order
-
-    pure function get_dimension(self) result(dimension)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32) :: dimension
-
-        dimension = self%dimension
-    end function get_dimension
-
-    pure function get_num_gauss(self) result(num_gauss)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32) :: num_gauss
-
-        num_gauss = self%num_gauss
-    end function get_num_gauss
-
-    pure function interpolate(self, r, value) result(interpolated_value)
+    function interpolate_element(self, r, value) result(interpolated_value)
         implicit none
         class(abst_element), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
         real(real64), intent(in) :: value(:)
         real(real64) :: interpolated_value
+
+        integer(int32), dimension(:), pointer :: connectivity
         integer(int32) :: i
 
         interpolated_value = 0.0d0
-        do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, r) * value(self%connectivity(i))
+
+        connectivity => self%get_connectivity()
+
+        do i = 1, self%get_num_nodes()
+            interpolated_value = interpolated_value + self%psi(i, r) * value(connectivity(i))
         end do
-    end function interpolate
+    end function interpolate_element
 
-    pure function interpolate_reordered(self, r, value) result(interpolated_value)
-        implicit none
-        class(abst_element), intent(in) :: self
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64), intent(in) :: value(:)
-        real(real64) :: interpolated_value
-        integer(int32) :: i
-
-        interpolated_value = 0.0d0
-        do i = 1, self%num_nodes
-            interpolated_value = interpolated_value + self%psi(i, r) * value(self%connectivity_reordered(i))
-        end do
-    end function interpolate_reordered
-
-    pure function deriv_interpolate(self, r, value) result(interpolated_value)
+    function deriv_interpolate_element(self, r, value) result(interpolated_value)
         implicit none
         class(abst_element), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
         real(real64), intent(in) :: value(:)
         type(type_dp_vector_3d) :: interpolated_value
+
+        integer(int32), dimension(:), pointer :: connectivity
         integer(int32) :: i
 
         interpolated_value%x = 0.0d0
         interpolated_value%y = 0.0d0
         interpolated_value%z = 0.0d0
 
-        do i = 1, self%num_nodes
-            interpolated_value%x = interpolated_value%x + self%dpsi_dxi(i, r) * value(self%connectivity(i))
-            interpolated_value%y = interpolated_value%y + self%dpsi_deta(i, r) * value(self%connectivity(i))
+        connectivity => self%get_connectivity()
+
+        do i = 1, self%get_num_nodes()
+            interpolated_value%x = interpolated_value%x + self%dpsi_dxi(i, r) * value(connectivity(i))
+            interpolated_value%y = interpolated_value%y + self%dpsi_deta(i, r) * value(connectivity(i))
         end do
-    end function deriv_interpolate
-
-    pure function deriv_interpolate_reordered(self, r, value) result(interpolated_value)
-        implicit none
-        class(abst_element), intent(in) :: self
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64), intent(in) :: value(:)
-        type(type_dp_vector_3d) :: interpolated_value
-        integer(int32) :: i
-
-        interpolated_value%x = 0.0d0
-        interpolated_value%y = 0.0d0
-        interpolated_value%z = 0.0d0
-
-        do i = 1, self%num_nodes
-            interpolated_value%x = interpolated_value%x + self%dpsi_dxi(i, r) * value(self%connectivity_reordered(i))
-            interpolated_value%y = interpolated_value%y + self%dpsi_deta(i, r) * value(self%connectivity_reordered(i))
-        end do
-    end function deriv_interpolate_reordered
-
-    pure function get_connectivity(self, index) result(connectivity)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32), intent(in) :: index
-        integer(int32) :: connectivity
-
-        connectivity = self%connectivity(index)
-    end function get_connectivity
-
-    pure function get_connectivity_reordered(self, index) result(connectivity)
-        implicit none
-        class(abst_element), intent(in) :: self
-        integer(int32), intent(in) :: index
-        integer(int32) :: connectivity
-
-        connectivity = self%connectivity_reordered(index)
-    end function get_connectivity_reordered
+    end function deriv_interpolate_element
 
 end module domain_element

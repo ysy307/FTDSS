@@ -49,7 +49,7 @@ contains
         integer(int32), intent(in) :: actual_order
 
         ! --- ローカル変数 ---
-        integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, iO
+        integer(int32) :: index, num_nodes, num_gauss, material_id, il, jl, iG, iO
         real(real64) :: weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
         real(real64) :: val, zeta
@@ -69,10 +69,10 @@ contains
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 0: 初期化とサイズの取得
         !---------------------------------------------------------------------------------------------------------------------------
-        num_nodes = element%get_num_nodes()
-        num_gauss = element%get_num_gauss()
-        i_material = element%get_group()
-        if (.not. controls%is_target(calc_hydraulic, i_material)) return
+        num_nodes   = element%get_num_nodes() !&
+        num_gauss   = element%get_num_gauss() !&
+        material_id = element%get_group() !&
+        if (.not. controls%is_target(calc_hydraulic, material_id)) return
 
         CH_e(:, :) = 0.0d0
         KH_e(:, :) = 0.0d0
@@ -84,9 +84,8 @@ contains
             state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre) !&
             state(iG)%pressure    = element%interpolate(element%gauss(iG), pressure%pre) !&
             state(iG)%porosity    = element%interpolate(element%gauss(iG), porosity%pre) !&
-            state(iG)%ice         = element%interpolate(element%gauss(iG), ice%pre) !&
         end do
-        call properties%calc_hydraulic(i_material, state, kflh)
+        call properties%calc_hydraulic(material_id, state, kflh)
 
         dt = controls%time%get_dt()
         dot_ice(:) = 0.0d0
@@ -102,15 +101,15 @@ contains
             detJ = element%jacobian_det(element%gauss(iG))
             zeta = state(iG)%density_ice / state(iG)%density_water - 1.0d0
             do il = 1, num_nodes
-                dNdx_i = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) - &
-                          element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
-                dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) + &
-                          element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
+                dNdx_i = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) - & !&
+                           element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
+                dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) + & !&
+                           element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
                 do jl = 1, num_nodes
-                    dNdx_j = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) - &
-                              element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
-                    dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) + &
-                              element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
+                    dNdx_j = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) - & !&
+                               element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
+                    dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) + & !&
+                               element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
 
                     CH_e(il, jl) = CH_e(il, jl) + element%psi(il, element%gauss(iG)) * & !&
                                                   element%psi(jl, element%gauss(iG)) * zeta * weight * detJ
@@ -166,7 +165,7 @@ contains
         integer(int32), intent(in) :: actual_order
 
         ! --- Local variables ---
-        integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, iO
+        integer(int32) :: index, num_nodes, num_gauss, material_id, il, jl, iG, iO
         real(real64) :: weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
         real(real64) :: val, zeta
@@ -186,10 +185,10 @@ contains
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 0: Initialize and obtain sizes
         !---------------------------------------------------------------------------------------------------------------------------
-        num_nodes = element%get_num_nodes()
-        num_gauss = element%get_num_gauss()
-        i_material = element%get_group()
-        if (.not. controls%is_target(calc_hydraulic, i_material)) return
+        num_nodes   = element%get_num_nodes() !&
+        num_gauss   = element%get_num_gauss() !&
+        material_id = element%get_group() !&
+        if (.not. controls%is_target(calc_hydraulic, material_id)) return
 
         call CH_e%initialize_local(num_nodes)
         call KH_e%initialize_local(num_nodes)
@@ -206,12 +205,10 @@ contains
             state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre) !&
             state(iG)%pressure    = element%interpolate(element%gauss(iG), pressure%pre) !&
             state(iG)%porosity    = element%interpolate(element%gauss(iG), porosity%pre) !&
-            state(iG)%ice         = element%interpolate(element%gauss(iG), ice%pre) !&
         end do
-        call properties%calc_hydraulic(i_material, state, kflh)
+        call properties%calc_hydraulic(material_id, state, kflh)
 
         dt = controls%time%get_dt()
-        dot_ice(:) = 0.0d0
         do il = 1, num_nodes
             dot_ice(il) = ice%dif(element%get_connectivity(il)) / dt
         end do
@@ -220,19 +217,19 @@ contains
         ! STEP 2: Compute the element matrices CH_e and KH_e
         !---------------------------------------------------------------------------------------------------------------------------
         do iG = 1, num_gauss
-            weight = element%weight(iG)
-            detJ = element%jacobian_det(element%gauss(iG))
-            zeta = state(iG)%density_ice / state(iG)%density_water - 1.0d0
+            weight = element%weight(iG) !&
+            detJ   = element%jacobian_det(element%gauss(iG)) !&
+            zeta   = state(iG)%density_ice / state(iG)%density_water - 1.0d0 !&
             do il = 1, num_nodes
-                dNdx_i = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) - &
-                          element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
-                dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(il, element%gauss(iG)) + &
-                          element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ
+                dNdx_i = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) - & !&
+                           element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
+                dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) + & !&
+                           element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
                 do jl = 1, num_nodes
-                    dNdx_j = (element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) - &
-                              element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
-                    dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi(jl, element%gauss(iG)) + &
-                              element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ
+                    dNdx_j = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) - & !&
+                               element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
+                    dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) + & !&
+                               element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
 
                     val = element%psi(il, element%gauss(iG)) * element%psi(jl, element%gauss(iG)) * zeta * weight * detJ
                     call CH_e%add(il, jl, val)
@@ -292,7 +289,7 @@ contains
         R(:) = 0.0d0
 
         do iE = 1, num_elements
-            element => domain%Elements(iE)%e
+            element => domain%elements(iE)%e
             call process_element_hydraulic_linear_1(J, R, element, pressure, temperature, porosity, ice, &
                                                     properties, controls, actual_order)
         end do
@@ -322,7 +319,7 @@ contains
         do c = 1, domain%colors%num_colors
             !$omp do
             do ie_idx = 1, domain%colors%colored(c)%num_elements
-                element => domain%Elements(domain%colors%colored(c)%Elements(ie_idx))%e
+                element => domain%elements(domain%colors%colored(c)%elements(ie_idx))%e
                 call process_element_hydraulic_linear_1(J, R, element, pressure, temperature, porosity, ice, &
                                                         properties, controls, actual_order)
             end do

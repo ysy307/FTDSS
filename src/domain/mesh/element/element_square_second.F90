@@ -39,83 +39,66 @@ contains
         class(abst_element), allocatable :: element
 
         integer(int32) :: i
+        integer(int32) :: num_nodes, num_gauss
+        real(real64), allocatable :: weight(:)
+        real(real64), allocatable :: gauss(:, :)
 
-        if (allocated(element)) deallocate (element)
         allocate (type_square_second :: element)
 
-        element%id = id
-        element%type = cell_info%cell_type
-        element%group = cell_info%cell_entity_id
-        element%dimension = cell_info%get_dimension()
-        element%order = cell_info%get_order()
-
-        element%num_nodes = cell_info%num_nodes_in_cell
-        allocate (element%connectivity(element%num_nodes))
-        element%connectivity(:) = cell_info%connectivity(1:element%num_nodes)
-
-        allocate (element%x(element%num_nodes))
-        allocate (element%y(element%num_nodes))
-        allocate (element%z(element%num_nodes))
-        do i = 1, element%num_nodes
-            nullify (element%x(i)%val)
-            nullify (element%y(i)%val)
-            nullify (element%z(i)%val)
-            element%x(i)%val => global_coordinate%x(element%connectivity(i))
-            element%y(i)%val => global_coordinate%y(element%connectivity(i))
-            element%z(i)%val => global_coordinate%z(element%connectivity(i))
-        end do
+        num_nodes = cell_info%num_nodes_in_cell
 
         select case (integration%integration_type)
         case ("full")
-            element%num_gauss = 9_int32
-            call allocate_array(element%weight, element%num_gauss)
-            if (allocated(element%gauss)) deallocate (element%gauss)
-            allocate (element%gauss(element%num_gauss))
+            num_gauss = 9_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
 
-            element%weight(:) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
-                                 64.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
-                                 25.0d0 / 81.0d0]
-            call element%gauss(1)%set([-sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0), 0.0d0])
-            call element%gauss(2)%set([0.0d0, -sqrt(3.0d0 / 5.0d0), 0.0d0])
-            call element%gauss(3)%set([sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0), 0.0d0])
-            call element%gauss(4)%set([-sqrt(3.0d0 / 5.0d0), 0.0d0, 0.0d0])
-            call element%gauss(5)%set([0.0d0, 0.0d0, 0.0d0])
-            call element%gauss(6)%set([sqrt(3.0d0 / 5.0d0), 0.0d0, 0.0d0])
-            call element%gauss(7)%set([-sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0), 0.0d0])
-            call element%gauss(8)%set([0.0d0, sqrt(3.0d0 / 5.0d0), 0.0d0])
-            call element%gauss(9)%set([sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0), 0.0d0])
+            weight(:) = [25.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                         64.0d0 / 81.0d0, 40.0d0 / 81.0d0, 25.0d0 / 81.0d0, 40.0d0 / 81.0d0, &
+                         25.0d0 / 81.0d0]
+
+            gauss(:, 1) = [-sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0), 0.0d0]
+            gauss(:, 2) = [0.0d0, -sqrt(3.0d0 / 5.0d0), 0.0d0]
+            gauss(:, 3) = [sqrt(3.0d0 / 5.0d0), -sqrt(3.0d0 / 5.0d0), 0.0d0]
+            gauss(:, 4) = [-sqrt(3.0d0 / 5.0d0), 0.0d0, 0.0d0]
+            gauss(:, 5) = [0.0d0, 0.0d0, 0.0d0]
+            gauss(:, 6) = [sqrt(3.0d0 / 5.0d0), 0.0d0, 0.0d0]
+            gauss(:, 7) = [-sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0), 0.0d0]
+            gauss(:, 8) = [0.0d0, sqrt(3.0d0 / 5.0d0), 0.0d0]
+            gauss(:, 9) = [sqrt(3.0d0 / 5.0d0), sqrt(3.0d0 / 5.0d0), 0.0d0]
         case ("reduced")
-            element%num_gauss = 4_int32
-            call allocate_array(element%weight, element%num_gauss)
-            if (allocated(element%gauss)) deallocate (element%gauss)
-            allocate (element%gauss(element%num_gauss))
+            num_gauss = 4_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
 
-            element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
-            call element%gauss(1)%set([-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0])
-            call element%gauss(2)%set([-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0), 0.0d0])
-            call element%gauss(3)%set([sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0), 0.0d0])
-            call element%gauss(4)%set([sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0])
+            weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
+            gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0]
+            gauss(:, 2) = [-sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0), 0.0d0]
+            gauss(:, 3) = [sqrt(1.0d0 / 3.0d0), sqrt(1.0d0 / 3.0d0), 0.0d0]
+            gauss(:, 4) = [sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0]
         case ("free")
-            element%num_gauss = 4_int32
-            call allocate_array(element%weight, element%num_gauss)
-            if (allocated(element%gauss)) deallocate (element%gauss)
-            allocate (element%gauss(element%num_gauss))
+            num_gauss = 4_int32
+            call allocate_array(weight, num_gauss)
+            call allocate_array(gauss, num_gauss, 3_int32)
 
-            element%weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
-            call element%gauss(1)%set([-integration%integration_points, -integration%integration_points, 0.0d0])
-            call element%gauss(2)%set([-integration%integration_points, integration%integration_points, 0.0d0])
-            call element%gauss(3)%set([integration%integration_points, integration%integration_points, 0.0d0])
-            call element%gauss(4)%set([integration%integration_points, -integration%integration_points, 0.0d0])
+            weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
+            gauss(:, 1) = [-integration%integration_points, -integration%integration_points, 0.0d0]
+            gauss(:, 2) = [-integration%integration_points, integration%integration_points, 0.0d0]
+            gauss(:, 3) = [integration%integration_points, integration%integration_points, 0.0d0]
+            gauss(:, 4) = [integration%integration_points, -integration%integration_points, 0.0d0]
         end select
 
-        if (associated(element%interpolate)) nullify (element%interpolate)
-        element%interpolate => interpolate
-
-        if (associated(element%deriv_interpolate)) nullify (element%deriv_interpolate)
-        element%deriv_interpolate => deriv_interpolate
-
-        if (associated(element%get_connectivity)) nullify (element%get_connectivity)
-        element%get_connectivity => get_connectivity
+        call element%initialize(id=id, &
+                                type=cell_info%cell_type, &
+                                group=cell_info%cell_entity_id, &
+                                dimension=cell_info%get_dimension(), &
+                                order=cell_info%get_order(), &
+                                num_nodes=num_nodes, &
+                                connectivity=cell_info%connectivity(1:num_nodes), &
+                                num_gauss=num_gauss, &
+                                weight=weight, &
+                                gauss=gauss, &
+                                global_coordinate=global_coordinate)
 
     end function construct_square_second
 
@@ -212,7 +195,7 @@ contains
     !   - Returns 0.0d0 for indices outside the range [1, 8].
     !
     !----------------------------------------------------------------------!
-    pure module function psi_square_second(self, i, r) result(psi)
+    pure elemental module function psi_square_second(self, i, r) result(psi)
         implicit none
         class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -277,7 +260,7 @@ contains
     !   - Returns 0.0 for indices outside [1, 8].
     !
     !----------------------------------------------------------------------!
-    pure module function dpsi_dxi_square_second(self, i, r) result(dpsi)
+    pure elemental module function dpsi_dxi_square_second(self, i, r) result(dpsi)
         implicit none
         class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -342,7 +325,7 @@ contains
     !   - Returns 0.0 for indices outside [1, 8].
     !
     !----------------------------------------------------------------------!
-    pure module function dpsi_deta_square_second(self, i, r) result(dpsi)
+    pure elemental module function dpsi_deta_square_second(self, i, r) result(dpsi)
         implicit none
         class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i
@@ -418,14 +401,15 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    pure module function jacobian_square_second(self, i, j, r) result(Jval)
+    pure elemental module function jacobian_square_second(self, i, j, r) result(Jval)
         implicit none
         class(type_square_second), intent(in) :: self
         integer(int32), intent(in) :: i, j
         type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: Jval
 
-        integer(int32) :: ii, jlocal
+        integer(int32) :: ii
+        type(type_dp_vector_3d) :: coordinate
 
         Jval = 0
         !! dx
@@ -434,13 +418,15 @@ contains
             select case (j)
             case (1)
                 !! dx_dxi
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, r) * self%x(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%x
                 end do
             case (2)
                 !! dx_deta
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, r) * self%x(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%x
                 end do
             end select
 
@@ -449,13 +435,15 @@ contains
             select case (j)
             case (1)
                 !! dy_dxi
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_dxi(ii, r) * self%y(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%y
                 end do
             case (2)
                 !! dy_deta
-                do ii = 1, self%num_nodes
-                    Jval = Jval + self%dpsi_deta(ii, r) * self%y(ii)%val
+                do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
+                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%y
                 end do
             end select
         end select
@@ -496,7 +484,7 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    pure module function jacobian_det_square_second(self, r) result(J_Det)
+    pure elemental module function jacobian_det_square_second(self, r) result(J_Det)
         implicit none
         class(type_square_second), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
@@ -565,6 +553,7 @@ contains
         logical, intent(inout) :: is_in
 
         type(type_dp_vector_3d) :: r
+        type(type_dp_vector_3d) :: coordinate
         real(real64) :: x0, y0
         real(real64) :: dx_xi, dx_eta, dy_xi, dy_eta
         real(real64) :: detJ
@@ -586,9 +575,10 @@ contains
             x0 = 0.0d0
             y0 = 0.0d0
 
-            do i = 1, self%num_nodes
-                x0 = x0 + self%psi(i, r) * self%x(i)%val
-                y0 = y0 + self%psi(i, r) * self%y(i)%val
+            do i = 1, self%get_num_nodes()
+                coordinate = self%get_coordinate(i)
+                x0 = x0 + self%psi(i, r) * coordinate%x
+                y0 = y0 + self%psi(i, r) * coordinate%y
             end do
 
             dx = cartesian%x - x0

@@ -2,26 +2,26 @@
 # C++/C VTKラッパーライブラリの作成
 #    VTKへの依存をこのライブラリに閉じ込めます。
 # --------------------------------------------------------------------
-add_library(vtk_c_wrapper STATIC
+add_library(VTK_C_WRAPPER STATIC
     vtk/reader_vtk.cpp
     vtk/reader_vtu.cpp
     vtk/c_wrapper.cpp
 )
 # VTKのインクルードディレクトリとライブラリをリンク
-enable_build_flags(vtk_c_wrapper)
+enable_build_flags(VTK_C_WRAPPER)
 
 # <--- [新規追加] C++ラッパーが公式VTKライブラリに依存することを明記します
-target_link_libraries(vtk_c_wrapper PUBLIC
+target_link_libraries(VTK_C_WRAPPER PUBLIC
     VTK::IOXML
     VTK::CommonCore
     VTK::CommonDataModel
     VTK::IOLegacy
 )
-set_target_properties(vtk_c_wrapper PROPERTIES CXX_STANDARD 17)
+set_target_properties(VTK_C_WRAPPER PROPERTIES CXX_STANDARD 17)
 # --------------------------------------------------------------------
 # Fortran/C Core OBJECTライブラリ
 # --------------------------------------------------------------------
-add_library(Core OBJECT
+add_library(CORE OBJECT
     c_utils/signal_flag.c
     c_utils/system_info.c
     c_utils/memory_stats.c
@@ -52,6 +52,6 @@ add_library(Core OBJECT
     unique.F90
     core.F90
 )
-target_link_libraries(Core PRIVATE vtk_c_wrapper)
-enable_build_flags(Core)
-enable_thirdparty (Core)
+target_link_libraries(CORE PRIVATE VTK_C_WRAPPER)
+enable_build_flags(CORE)
+enable_thirdparty (CORE)

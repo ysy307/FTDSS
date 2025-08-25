@@ -19,7 +19,9 @@
         "--cap-add=SYS_ADMIN",
         "--cap-add=SYS_PTRACE",
         "-v",
-        "/sys/kernel/debug:/sys/kernel/debug"
+        "/sys/kernel/debug:/sys/kernel/debug",
+        "--cpus=32",
+        "--memory=96g"
     ],
     // コンテナ内で作業するユーザーを 'devuser' に指定
     "remoteUser": "devuser",

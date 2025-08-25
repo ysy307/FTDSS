@@ -10,8 +10,9 @@ module domain_side
     !--------------------------------------------------------------------------------------
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
-    use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array
+    use :: module_core, only:type_dp_3d, type_dp_pointer, type_vtk_cell, allocate_array, type_dp_vector_3d, assignment(=)
     use :: module_input, only:type_geometry_settings
+    use :: domain_mesh, only:abst_mesh
     implicit none
     private
 
@@ -30,38 +31,10 @@ module domain_side
     !--------------------------------------------------------------------------------------
     !   Abstract base type for 1D elements
     !--------------------------------------------------------------------------------------
-    type, abstract :: abst_side
-        integer(int32), private :: id
-        integer(int32), private :: type ! Edge type
-        integer(int32), private :: num_nodes ! Number of nodes in the Edge
-        integer(int32), private :: group ! Group ID
-        integer(int32), private :: dimension
-        integer(int32), private :: order
-        integer(int32), allocatable :: connectivity(:) !! connectivity information
-        integer(int32), allocatable :: connectivity_reordered(:) !! reordered connectivity information
-        type(type_dp_pointer), allocatable :: x(:) !! X coordinate
-        type(type_dp_pointer), allocatable :: y(:) !! Y coordinate
-        type(type_dp_pointer), allocatable :: z(:) !! Z coordinate
-
-        !----------------------------------------------------------------------------------
-        ! Gauss Quadrature points and weights
-        !  - Gauss Quadrature points are defined in the local coordinate system
-        !  - The number of Gauss points is determined by the element type
-        !  - The weights are used for numerical integration over the element
-        !  - The Gauss points are used to evaluate the shape functions and their derivatives
-        !----------------------------------------------------------------------------------
-        integer(int32) :: num_gauss !! Number of Gauss Quadrature points
-        real(real64), allocatable :: weight(:) !! Gauss weight
-        real(real64), allocatable :: gauss(:) !! Gauss Quadrature points Coordinate
+    type, abstract, extends(abst_mesh) :: abst_side
     contains
-        procedure(abst_get_id),        pass(self), deferred :: get_id !&
-        procedure(abst_get_type),      pass(self), deferred :: get_type !&
-        procedure(abst_get_num_nodes), pass(self), deferred :: get_num_nodes !&
-        procedure(abst_get_group),     pass(self), deferred :: get_group !&
-        procedure(abst_get_order),     pass(self), deferred :: get_order !&
-        procedure(abst_get_dimension), pass(self), deferred :: get_dimension !&
-        procedure(abst_get_num_gauss), pass(self), deferred :: get_num_gauss !&
-        !----------------------------------------------------------------------------------
+        procedure,                     pass(self)           :: lerp => interpolate_side !&
+        procedure,                     pass(self)           :: dlerp => deriv_interpolate_side !&
         procedure(abst_psi),           pass(self), deferred :: psi !&
         procedure(abst_dpsi_dxi),      pass(self), deferred :: dpsi_dxi !&
     end type abst_side
@@ -71,14 +44,6 @@ module domain_side
     !--------------------------------------------------------------------------------------
     type, extends(abst_side) :: type_side_first
     contains
-        procedure, pass(self) :: get_id        => get_id_side_first !&
-        procedure, pass(self) :: get_type      => get_type_side_first !&
-        procedure, pass(self) :: get_num_nodes => get_num_nodes_side_first !&
-        procedure, pass(self) :: get_group     => get_group_side_first !&
-        procedure, pass(self) :: get_order     => get_order_side_first !&
-        procedure, pass(self) :: get_dimension => get_dimension_side_first !&
-        procedure, pass(self) :: get_num_gauss => get_num_gauss_side_first !
-        !----------------------------------------------------------------------------------
         procedure, pass(self) :: psi           => psi_side_first !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_side_first !&
     end type type_side_first
@@ -88,14 +53,6 @@ module domain_side
     !--------------------------------------------------------------------------------------
     type, extends(abst_side) :: type_side_second
     contains
-        procedure, pass(self) :: get_id        => get_id_side_second !&
-        procedure, pass(self) :: get_type      => get_type_side_second !&
-        procedure, pass(self) :: get_num_nodes => get_num_nodes_side_second !&
-        procedure, pass(self) :: get_group     => get_group_side_second !&
-        procedure, pass(self) :: get_order     => get_order_side_second !&
-        procedure, pass(self) :: get_dimension => get_dimension_side_second !&
-        procedure, pass(self) :: get_num_gauss => get_num_gauss_side_second !
-        !----------------------------------------------------------------------------------
         procedure, pass(self) :: psi           => psi_side_second !&
         procedure, pass(self) :: dpsi_dxi      => dpsi_dxi_side_second !&
     end type type_side_second
@@ -153,20 +110,21 @@ module domain_side
             integer(int32) :: group
         end function abst_get_group
 
-        function abst_psi(self, i, xi) result(psi)
-            import :: abst_side, int32, real64
+        pure elemental function abst_psi(self, i, r) result(psi)
+            import :: abst_side, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_side), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: psi
         end function abst_psi
 
-        function abst_dpsi_dxi(self, i) result(dpsi)
-            import :: abst_side, int32, real64
+        pure elemental function abst_dpsi_dxi(self, i, r) result(dpsi)
+            import :: abst_side, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_side), intent(in) :: self
             integer(int32), intent(in) :: i
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
         end function abst_dpsi_dxi
     end interface
@@ -184,60 +142,19 @@ module domain_side
 
         end function construct_side_first
 
-        module function get_id_side_first(self) result(id)
-            implicit none
-            class(type_side_first), intent(in) :: self
-            integer(int32) :: id
-        end function get_id_side_first
-
-        module function get_type_side_first(self) result(type)
-            implicit none
-            class(type_side_first), intent(in) :: self
-            integer(int32) :: type
-        end function get_type_side_first
-
-        module function get_num_nodes_side_first(self) result(n)
-            implicit none
-            class(type_side_first), intent(in) :: self
-            integer(int32) :: n
-        end function get_num_nodes_side_first
-
-        module function get_group_side_first(self) result(group)
-            implicit none
-            class(type_side_first), intent(in) :: self
-            integer(int32) :: group
-        end function get_group_side_first
-
-        module function get_order_side_first(self) result(order)
-            implicit none
-            class(type_side_first), intent(in) :: self
-            integer(int32) :: order
-        end function get_order_side_first
-
-        module function get_dimension_side_first(self) result(dimension)
-            implicit none
-            class(type_side_first), intent(in) :: self
-            integer(int32) :: dimension
-        end function get_dimension_side_first
-
-        module function get_num_gauss_side_first(self) result(num_gauss)
-            implicit none
-            class(type_side_first), intent(in) :: self
-            integer(int32) :: num_gauss
-        end function get_num_gauss_side_first
-
-        module function psi_side_first(self, i, xi) result(psi)
+        module pure elemental function psi_side_first(self, i, r) result(psi)
             implicit none
             class(type_side_first), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: psi
         end function psi_side_first
 
-        module function dpsi_dxi_side_first(self, i) result(dpsi)
+        module pure elemental function dpsi_dxi_side_first(self, i, r) result(dpsi)
             implicit none
             class(type_side_first), intent(in) :: self
             integer(int32), intent(in) :: i
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
         end function dpsi_dxi_side_first
     end interface
@@ -256,60 +173,19 @@ module domain_side
 
         end function construct_side_second
 
-        module function get_id_side_second(self) result(id)
-            implicit none
-            class(type_side_second), intent(in) :: self
-            integer(int32) :: id
-        end function get_id_side_second
-
-        module function get_type_side_second(self) result(type)
-            implicit none
-            class(type_side_second), intent(in) :: self
-            integer(int32) :: type
-        end function get_type_side_second
-
-        module function get_num_nodes_side_second(self) result(n)
-            implicit none
-            class(type_side_second), intent(in) :: self
-            integer(int32) :: n
-        end function get_num_nodes_side_second
-
-        module function get_group_side_second(self) result(group)
-            implicit none
-            class(type_side_second), intent(in) :: self
-            integer(int32) :: group
-        end function get_group_side_second
-
-        module function get_order_side_second(self) result(order)
-            implicit none
-            class(type_side_second), intent(in) :: self
-            integer(int32) :: order
-        end function get_order_side_second
-
-        module function get_dimension_side_second(self) result(dimension)
-            implicit none
-            class(type_side_second), intent(in) :: self
-            integer(int32) :: dimension
-        end function get_dimension_side_second
-
-        module function get_num_gauss_side_second(self) result(num_gauss)
-            implicit none
-            class(type_side_second), intent(in) :: self
-            integer(int32) :: num_gauss
-        end function get_num_gauss_side_second
-
-        module function psi_side_second(self, i, xi) result(psi)
+        module pure elemental function psi_side_second(self, i, r) result(psi)
             implicit none
             class(type_side_second), intent(in) :: self
             integer(int32), intent(in) :: i
-            real(real64), intent(in) :: xi
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: psi
         end function psi_side_second
 
-        module function dpsi_dxi_side_second(self, i) result(dpsi)
+        module pure elemental function dpsi_dxi_side_second(self, i, r) result(dpsi)
             implicit none
             class(type_side_second), intent(in) :: self
             integer(int32), intent(in) :: i
+            type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: dpsi
         end function dpsi_dxi_side_second
     end interface
@@ -321,5 +197,46 @@ module domain_side
     interface type_side_second
         module procedure :: construct_side_second
     end interface
+
+contains
+    function interpolate_side(self, r, value) result(interpolated_value)
+        implicit none
+        class(abst_side), intent(in) :: self
+        type(type_dp_vector_3d), intent(in) :: r
+        real(real64), intent(in) :: value(:)
+        real(real64) :: interpolated_value
+
+        integer(int32), dimension(:), pointer :: connectivity
+        integer(int32) :: i
+
+        interpolated_value = 0.0d0
+
+        connectivity => self%get_connectivity()
+
+        do i = 1, self%get_num_nodes()
+            interpolated_value = interpolated_value + self%psi(i, r) * value(connectivity(i))
+        end do
+    end function interpolate_side
+
+    function deriv_interpolate_side(self, r, value) result(interpolated_value)
+        implicit none
+        class(abst_side), intent(in) :: self
+        type(type_dp_vector_3d), intent(in) :: r
+        real(real64), intent(in) :: value(:)
+        type(type_dp_vector_3d) :: interpolated_value
+
+        integer(int32), dimension(:), pointer :: connectivity
+        integer(int32) :: i
+
+        interpolated_value%x = 0.0d0
+        interpolated_value%y = 0.0d0
+        interpolated_value%z = 0.0d0
+
+        connectivity => self%get_connectivity()
+
+        do i = 1, self%get_num_nodes()
+            interpolated_value%x = interpolated_value%x + self%dpsi_dxi(i, r) * value(connectivity(i))
+        end do
+    end function deriv_interpolate_side
 
 end module domain_side

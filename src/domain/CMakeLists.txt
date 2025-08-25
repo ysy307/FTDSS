@@ -1,15 +1,4 @@
 add_library(Domain OBJECT
-    element/element_interface.F90
-    element/element_triangle_first.F90
-    element/element_triangle_second.F90
-    element/element_square_first.F90
-    element/element_square_second.F90
-    element/element_factory.F90
-    element/element.F90
-    side/side.F90
-    side/side_first.F90
-    side/side_second.F90
-    side/side_factory.F90
     adjacency/adjacency_element.F90
     adjacency/adjacency_node.F90
     adjacency/adjacency_node_element.F90

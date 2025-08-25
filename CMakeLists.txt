@@ -66,6 +66,7 @@ add_subdirectory(src/conditions/initial)
 add_subdirectory(src/solver)
 add_subdirectory(src/control)
 add_subdirectory(src/main/thermal)
+add_subdirectory(src/main/hydraulic)
 add_subdirectory(src/inout/output)
 add_subdirectory(src/main/FTDSS)
 

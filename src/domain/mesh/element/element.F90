@@ -1,6 +1,6 @@
 module module_element
-    use :: domain_element, only:abst_element, type_triangle_first, type_triangle_second, type_square_first, type_square_second, &
-        holder_elements, interpolate_reordered, deriv_interpolate_reordered, get_connectivity_reordered
+    use :: domain_element, only:abst_element, type_triangle_first, type_triangle_second, type_square_first, type_square_second, & !&
+                                holder_elements
     use :: domain_element_factory, only:create_element
     implicit none
     private
@@ -18,9 +18,6 @@ module module_element
     ! element operation procedures
     !-------------------------------------------------------------------------------------------------------------------------------
     public :: create_element
-    public :: interpolate_reordered
-    public :: deriv_interpolate_reordered
-    public :: get_connectivity_reordered
     !-------------------------------------------------------------------------------------------------------------------------------
 
 end module module_element
