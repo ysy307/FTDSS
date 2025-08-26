@@ -50,6 +50,7 @@ add_subdirectory(src/core)
 add_subdirectory(src/inout)
 add_subdirectory(src/inout/input)
 add_subdirectory(src/matrix)
+add_subdirectory(src/domain/mesh)
 add_subdirectory(src/domain)
 add_subdirectory(src/calculate/blas)
 add_subdirectory(src/calculate/wrf)
@@ -66,7 +67,7 @@ add_subdirectory(src/conditions/initial)
 add_subdirectory(src/solver)
 add_subdirectory(src/control)
 add_subdirectory(src/main/thermal)
-add_subdirectory(src/main/hydraulic)
+# add_subdirectory(src/main/hydraulic)
 add_subdirectory(src/inout/output)
 add_subdirectory(src/main/FTDSS)
 
@@ -74,26 +75,27 @@ add_subdirectory(src/main/FTDSS)
 # ★改善点1: 全ての共通ライブラリをグループ化するINTERFACEライブラリを定義
 # =========================================================================
 set(COMMON_LIBS
-    Core
-    Inout
-    Input
-    Matrix 
-    Domain 
-    Calc_WRF
-    # Calc_HCF
-    Calc_GCC
-    Calc_THC
-    Calc_DEN
-    Calc_SPH
-    Calc_VHC
-    Properties
-    Calc_BLAS
-    Boundary
-    Initial
-    Solver
-    control
-    Thermal
-    Output
+    CORE
+    INOUT
+    INPUT
+    MATRIX
+    MESH
+    DOMAIN
+    CALC_WRF
+    # CALC_HCF
+    CALC_GCC
+    CALC_THC
+    CALC_DEN
+    CALC_SPH
+    CALC_VHC
+    PROPERTIES
+    CALC_BLAS
+    BOUNDARY
+    INITIAL
+    SOLVER
+    CONTROL
+    THERMAL
+    OUTPUT
     FTDSS
 )
 

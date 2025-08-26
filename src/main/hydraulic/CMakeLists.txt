@@ -1,18 +1,19 @@
-add_library(Hydraulic OBJECT
+add_library(HYDRAULIC STATIC
     hydraulic_assemble.F90
     hydraulic_interface.F90
     hydraulic_crs.F90
     hydraulic.F90
 
 )
-target_link_libraries(Hydraulic PRIVATE
-    Core
-    Input
-    Domain
-    Properties
-    Matrix
-    Boundary
-    Initial
-    Solver
+target_include_directories(HYDRAULIC PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(HYDRAULIC PUBLIC
+    CORE
+    INPUT
+    DOMAIN
+    PROPERTIES
+    MATRIX
+    BOUNDARY
+    INITIAL
+    SOLVER
 )
-enable_build_flags(Hydraulic)
+enable_build_flags(HYDRAULIC)

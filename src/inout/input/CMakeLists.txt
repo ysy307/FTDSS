@@ -1,4 +1,4 @@
-add_library(INPUT OBJECT
+add_library(INPUT STATIC
     input_interface.F90
     input_basic.F90
     input_conditions.F90
@@ -6,7 +6,8 @@ add_library(INPUT OBJECT
     input_geometry.F90
     input.F90
 )
-target_link_libraries(INPUT PRIVATE
+target_include_directories(INPUT PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(INPUT PUBLIC
     CORE
     INOUT
 )

@@ -10,4 +10,5 @@ cmake -S . -B CMakeBuild \
     -DCMAKE_CXX_COMPILER=icpx \
     -G "Ninja"
 
-cmake --build CMakeBuild --parallel
+cmake --build CMakeBuild
+# cmake --build CMakeBuild --parallel

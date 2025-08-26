@@ -1,15 +1,16 @@
-add_library(Calc OBJECT
+add_library(CALC STATIC
     calculate.F90
 )
-target_link_libraries(Calc PRIVATE
-    Input
-    Calc_THC
-    Calc_DEN
-    Calc_SPH
-    Calc_VHC
-    Calc_GCC
-    Calc_WRF
-    Calc_BLAS
+target_include_directories(CALC PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(CALC PUBLIC
+    INPUT
+    CALC_THC
+    CALC_DEN
+    CALC_SPH
+    CALC_VHC
+    CALC_GCC
+    CALC_WRF
+    CALC_BLAS
 
 )
-enable_build_flags(Calc)
+enable_build_flags(CALC)

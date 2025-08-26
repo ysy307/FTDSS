@@ -1,4 +1,4 @@
-add_library(Domain OBJECT
+add_library(DOMAIN STATIC
     adjacency/adjacency_element.F90
     adjacency/adjacency_node.F90
     adjacency/adjacency_node_element.F90
@@ -14,9 +14,11 @@ add_library(Domain OBJECT
     domain_manager.F90
     domain.F90
 )
-target_link_libraries(Domain PRIVATE
-    Core
-    Input
+target_include_directories(DOMAIN PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(DOMAIN PUBLIC
+    CORE
+    INPUT
+    MESH
 )
-enable_build_flags(Domain)
-enable_thirdparty (Domain)
+enable_build_flags(DOMAIN)
+enable_thirdparty (DOMAIN)

@@ -1,4 +1,4 @@
-add_library(Calc_HCF OBJECT
+add_library(CALC_HCF STATIC
     hcf_interface.F90
     hcf_base.F90
     hcf_bc.F90
@@ -10,8 +10,9 @@ add_library(Calc_HCF OBJECT
     hcf_impedance.F90
     hcf_viscosity.F90
 )
-target_link_libraries(Calc_HCF PRIVATE
-    Core
-    Input
+target_include_directories(CALC_HCF PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(CALC_HCF PUBLIC
+    CORE
+    INPUT
 )
-enable_build_flags(Calc_HCF)
+enable_build_flags(CALC_HCF)

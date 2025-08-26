@@ -1,4 +1,4 @@
-add_library(Solver OBJECT
+add_library(SOLVER STATIC
     solve_interface.F90
     direct/solve_lu.F90
     iterative/solve_bicgstab.F90
@@ -6,10 +6,11 @@ add_library(Solver OBJECT
     solver_factory.F90
     solver.F90
 )
-target_link_libraries(Solver PRIVATE
-    Core
-    Input
-    Matrix
-    Calc_BLAS
+target_include_directories(SOLVER PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(SOLVER PRIVATE
+    CORE
+    INPUT
+    MATRIX
+    CALC_BLAS
 )
-enable_build_flags(Solver)
+enable_build_flags(SOLVER)

@@ -1,7 +1,7 @@
-module module_element
-    use :: domain_element, only:abst_element, type_triangle_first, type_triangle_second, type_square_first, type_square_second, & !&
+module module_mesh_element
+    use :: domain_mesh_element, only:abst_element, type_triangle_first, type_triangle_second, type_square_first, type_square_second, & !&
                                 holder_elements
-    use :: domain_element_factory, only:create_element
+    use :: domain_mesh_element_factory, only:create_element
     implicit none
     private
 
@@ -20,4 +20,4 @@ module module_element
     public :: create_element
     !-------------------------------------------------------------------------------------------------------------------------------
 
-end module module_element
+end module module_mesh_element

@@ -3,9 +3,7 @@ module domain_manager
     use :: stdlib_logger
     use :: module_core, only:type_dp_3d, allocate_array, deallocate_array
     use :: module_input, only:type_input
-    use :: module_element
-    use :: domain_side, only:holder_sides
-    use :: domain_side_factory, only:create_side
+    use :: module_mesh
     use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element, type_map_node_to_element
     use :: domain_multicoloring, only:type_coloring, type_colored_info
     use :: domain_reordering, only:type_reordering
@@ -92,24 +90,18 @@ contains
             cell_dimension = input%geometry%vtk%cells(iCell)%get_dimension()
             select case (cell_dimension)
             case (1)
-                call create_side(new_side=self%sides(iSide)%s, &
-                                 id=iCell, &
-                                 global_coordinate=Coordinate, &
-                                 cell_info=input%geometry%vtk%cells(iCell), &
-                                 integration=input%basic%geometry_settings, &
-                                 ierr=factory_ierr)
+                self%sides(iSide)%s = create_side(id=iCell, &
+                                                  global_coordinate=Coordinate, &
+                                                  input=input)
                 if (factory_ierr /= 0) then
                     ierr = -1
                     return
                 end if
                 iSide = iSide + 1
             case (2)
-                call create_element(new_element=self%elements(iElem)%e, &
-                                    id=iCell, &
-                                    global_coordinate=Coordinate, &
-                                    cell_info=input%geometry%vtk%cells(iCell), &
-                                    integration=input%basic%geometry_settings, &
-                                    ierr=factory_ierr)
+                self%elements(iElem)%e = create_element(id=iCell, &
+                                                        global_coordinate=Coordinate, &
+                                                        input=input)
                 if (factory_ierr /= 0) then
                     ierr = -1
                     return

@@ -2,7 +2,7 @@ module domain_reordering
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_sorting, only:sort, sort_index
     use :: module_core, only:allocate_array, deallocate_array, error_message
-    use :: domain_element, only:holder_elements
+    use :: module_mesh, only:holder_elements
     use :: domain_adjacency_adjacency_node, only:type_node_adjacency
 
     implicit none

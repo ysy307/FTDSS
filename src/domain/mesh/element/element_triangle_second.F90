@@ -1,4 +1,4 @@
-submodule(domain_element) domain_element_triangle_second
+submodule(domain_mesh_element) domain_mesh_element_triangle_second
     implicit none
 contains
     !----------------------------------------------------------------------!
@@ -29,12 +29,11 @@ contains
     !   - Initializes Gauss point and weight for integration.
     !
     !----------------------------------------------------------------------!
-    module function construct_triangle_second(id, global_coordinate, cell_info, integration) result(element)
+    module function construct_triangle_second(id, global_coordinate, input) result(element)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
-        type(type_vtk_cell), intent(in) :: cell_info
-        type(type_geometry_settings), intent(in) :: integration
+        type(type_input), intent(in) :: input
         class(abst_element), allocatable :: element
 
         integer(int32) :: i
@@ -44,9 +43,9 @@ contains
 
         allocate (type_triangle_second :: element)
 
-        num_nodes = cell_info%num_nodes_in_cell
+        num_nodes = input%geometry%vtk%cells(id)%num_nodes_in_cell
 
-        select case (integration%integration_type)
+        select case (input%basic%geometry_settings%integration_type)
         case ("full")
             num_gauss = 3_int32
             call allocate_array(weight, num_gauss)
@@ -77,12 +76,12 @@ contains
         end select
 
         call element%initialize(id=id, &
-                                type=cell_info%cell_type, &
-                                group=cell_info%cell_entity_id, &
-                                dimension=cell_info%get_dimension(), &
-                                order=cell_info%get_order(), &
+                                type=input%geometry%vtk%cells(id)%cell_type, &
+                                group=input%geometry%vtk%cells(id)%cell_entity_id, &
+                                dimension=input%geometry%vtk%cells(id)%get_dimension(), &
+                                order=input%geometry%vtk%cells(id)%get_order(), &
                                 num_nodes=num_nodes, &
-                                connectivity=cell_info%connectivity(1:num_nodes), &
+                                connectivity=input%geometry%vtk%cells(id)%connectivity(1:num_nodes), &
                                 num_gauss=num_gauss, &
                                 weight=weight, &
                                 gauss=gauss, &
@@ -531,4 +530,4 @@ contains
 
     end subroutine is_in_triangle_second
 
-end submodule domain_element_triangle_second
+end submodule domain_mesh_element_triangle_second

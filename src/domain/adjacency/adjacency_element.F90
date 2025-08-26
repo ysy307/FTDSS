@@ -1,7 +1,7 @@
 module domain_adjacency_adjacency_element
     use, intrinsic :: iso_fortran_env, only: int32
     use :: module_core, only:allocate_array, deallocate_array
-    use :: domain_element, only:abst_element, holder_elements
+    use :: module_mesh, only:abst_element, holder_elements
     implicit none
     private
 

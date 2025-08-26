@@ -1,13 +1,12 @@
-submodule(domain_side) domain_side_second
+submodule(domain_mesh_side) domain_mesh_side_second
     implicit none
 contains
 
-    module function construct_side_second(id, global_coordinate, cell_info, integration) result(side)
+    module function construct_side_second(id, global_coordinate, input) result(side)
         implicit none
         integer(int32), intent(in) :: id
         type(type_dp_3d), pointer, intent(in) :: global_coordinate
-        type(type_vtk_cell), intent(in) :: cell_info
-        type(type_geometry_settings), intent(in) :: integration
+        type(type_input), intent(in) :: input
         class(abst_side), allocatable :: side
 
         integer(int32) :: i
@@ -17,9 +16,9 @@ contains
 
         allocate (type_side_second :: side)
 
-        num_nodes = cell_info%num_nodes_in_cell
+        num_nodes = input%geometry%vtk%cells(id)%num_nodes_in_cell
 
-        select case (integration%integration_type)
+        select case (input%basic%geometry_settings%integration_type)
         case ("full")
             num_gauss = 2_int32
             call allocate_array(weight, num_gauss)
@@ -46,12 +45,12 @@ contains
         end select
 
         call side%initialize(id=id, &
-                             type=cell_info%cell_type, &
-                             group=cell_info%cell_entity_id, &
-                             dimension=cell_info%get_dimension(), &
-                             order=cell_info%get_order(), &
+                             type=input%geometry%vtk%cells(id)%cell_type, &
+                             group=input%geometry%vtk%cells(id)%cell_entity_id, &
+                             dimension=input%geometry%vtk%cells(id)%get_dimension(), &
+                             order=input%geometry%vtk%cells(id)%get_order(), &
                              num_nodes=num_nodes, &
-                             connectivity=cell_info%connectivity(1:num_nodes), &
+                             connectivity=input%geometry%vtk%cells(id)%connectivity(1:num_nodes), &
                              num_gauss=num_gauss, &
                              weight=weight, &
                              gauss=gauss, &
@@ -97,4 +96,4 @@ contains
         end select
     end function dpsi_dxi_side_second
 
-end submodule domain_side_Second
+end submodule domain_mesh_side_Second

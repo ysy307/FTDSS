@@ -1,6 +1,6 @@
 module domain_adjacency_adjacency_node_element
     use, intrinsic :: iso_fortran_env, only: int32
-    use :: domain_element, only:holder_elements, abst_element
+    use :: module_mesh, only:holder_elements, abst_element
     implicit none
     private
 
