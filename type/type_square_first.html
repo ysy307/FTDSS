@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 1.3% of total for derived types.</p>Including implementation: 16 statements,  0.5% of total for derived types.">19 statements</a>
+                 title="<p> 1.0% of total for derived types.</p>Including implementation: 152 statements,  2.9% of total for derived types.">12 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/element.F90"> Source File</a>
+              <a href="../src/element_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/element.f90.html'>element.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/domain_element.html'>domain_element</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/element_interface.f90.html'>element_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_mesh_element.html'>domain_mesh_element</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_square_first</li>
           </ol>
         </nav>
@@ -127,27 +127,7 @@
       <div id="sidebar">
       <h3>Contents</h3>
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#vars-0"
-         aria-expanded="false" aria-controls="vars-0">
-         <h4 class="card-header bg-primary text-white">Variables</h4>
-      </a>
-      <div id="vars-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_square_first.html#variable-connectivity">connectivity</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-connectivity_reordered">connectivity_reordered</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-gauss">gauss</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-get_connectivity">get_connectivity</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-interpolate">interpolate</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-num_gauss">num_gauss</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-weight">weight</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-x">x</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-y">y</a>
-            <a class="list-group-item" href="../type/type_square_first.html#variable-z">z</a>
-        </div>
-      </div>
-    </div>
-
+  
   
       <div class="card mb-4">
       <a data-bs-toggle="collapse" href="#cons-0"
@@ -181,19 +161,26 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-dpsi_deta~3">dpsi_deta</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-dpsi_dxi~3">dpsi_dxi</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_dimension~3">get_dimension</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_group~3">get_group</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_id~3">get_id</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_num_gauss~3">get_num_gauss</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-dlerp">dlerp</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-dpsi~6">dpsi</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_connectivity">get_connectivity</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_coordinate">get_coordinate</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_dimension~2">get_dimension</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_gauss">get_gauss</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_geometry~4">get_geometry</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_group">get_group</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_id">get_id</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_num_gauss">get_num_gauss</a>
             <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_num_nodes~3">get_num_nodes</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_order~3">get_order</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_type~3">get_type</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_order~2">get_order</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_type">get_type</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-get_weight">get_weight</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-initialize~32">initialize</a>
             <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-is_inside~3">is_inside</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-jacobian~3">jacobian</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-jacobian_det~3">jacobian_det</a>
-            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-psi~3">psi</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-jacobian~6">jacobian</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-jacobian_det~6">jacobian_det</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-lerp">lerp</a>
+            <a class="list-group-item" href="../type/type_square_first.html#boundprocedure-psi~6">psi</a>
         </div>
       </div>
     </div>
@@ -227,47 +214,78 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_square_first~~InheritsGraph Pages: 1 -->
-<svg id="typetype_square_firstInheritsGraph" width="395pt" height="32pt"
- viewBox="0.00 0.00 395.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_square_first~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg id="typetype_square_firstInheritsGraph" width="517pt" height="74pt"
+ viewBox="0.00 0.00 517.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_square_first~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
 <title>type~~type_square_first~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 391,-28 391,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 513,-70 513,4 -4,4"/>
 <!-- type~type_square_first -->
 <g id="type~~type_square_first~~InheritsGraph_node1" class="node">
 <title>type~type_square_first</title>
-<polygon fill="none" stroke="black" points="387,-24 284,-24 284,0 387,0 387,-24"/>
-<text text-anchor="middle" x="335.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_square_first</text>
+<polygon fill="none" stroke="black" points="509,-45 406,-45 406,-21 509,-21 509,-45"/>
+<text text-anchor="middle" x="457.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_square_first</text>
 </g>
 <!-- type~abst_element -->
 <g id="type~~type_square_first~~InheritsGraph_node2" class="node">
 <title>type~abst_element</title>
 <g id="a_type~~type_square_first~~InheritsGraph_node2"><a xlink:href="../type/abst_element.html" xlink:title="abst_element">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="247,-24 162,-24 162,0 247,0 247,-24"/>
-<text text-anchor="middle" x="204.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_element</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="369,-45 284,-45 284,-21 369,-21 369,-45"/>
+<text text-anchor="middle" x="326.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_element</text>
 </a>
 </g>
 </g>
 <!-- type~type_square_first&#45;&gt;type~abst_element -->
 <g id="type~~type_square_first~~InheritsGraph_edge1" class="edge">
 <title>type~type_square_first&#45;&gt;type~abst_element</title>
-<path fill="none" stroke="#ff0000" d="M283.89,-12C275.16,-12 266.08,-12 257.32,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="257.23,-8.5 247.23,-12 257.23,-15.5 257.23,-8.5"/>
+<path fill="none" stroke="#ff0000" d="M405.89,-33C397.16,-33 388.08,-33 379.32,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="379.23,-29.5 369.23,-33 379.23,-36.5 379.23,-29.5"/>
 </g>
-<!-- type~type_dp_pointer -->
+<!-- type~abst_mesh -->
 <g id="type~~type_square_first~~InheritsGraph_node3" class="node">
-<title>type~type_dp_pointer</title>
-<g id="a_type~~type_square_first~~InheritsGraph_node3"><a xlink:href="../type/type_dp_pointer.html" xlink:title="type_dp_pointer">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="98,-24 0,-24 0,0 98,0 98,-24"/>
-<text text-anchor="middle" x="49" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dp_pointer</text>
+<title>type~abst_mesh</title>
+<g id="a_type~~type_square_first~~InheritsGraph_node3"><a xlink:href="../type/abst_mesh.html" xlink:title="abst_mesh">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="247,-45 177,-45 177,-21 247,-21 247,-45"/>
+<text text-anchor="middle" x="212" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_mesh</text>
 </a>
 </g>
 </g>
-<!-- type~abst_element&#45;&gt;type~type_dp_pointer -->
+<!-- type~abst_element&#45;&gt;type~abst_mesh -->
 <g id="type~~type_square_first~~InheritsGraph_edge2" class="edge">
-<title>type~abst_element&#45;&gt;type~type_dp_pointer</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M161.96,-12C145.41,-12 126.06,-12 108.15,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="108.1,-8.5 98.1,-12 108.1,-15.5 108.1,-8.5"/>
-<text text-anchor="middle" x="130" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">x, y, z</text>
+<title>type~abst_element&#45;&gt;type~abst_mesh</title>
+<path fill="none" stroke="#ff0000" d="M283.93,-33C275.2,-33 265.97,-33 257.15,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="257.04,-29.5 247.04,-33 257.04,-36.5 257.04,-29.5"/>
+</g>
+<!-- type~type_dp_pointer -->
+<g id="type~~type_square_first~~InheritsGraph_node4" class="node">
+<title>type~type_dp_pointer</title>
+<g id="a_type~~type_square_first~~InheritsGraph_node4"><a xlink:href="../type/type_dp_pointer.html" xlink:title="type_dp_pointer">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="105,-66 7,-66 7,-42 105,-42 105,-66"/>
+<text text-anchor="middle" x="56" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dp_pointer</text>
+</a>
+</g>
+</g>
+<!-- type~abst_mesh&#45;&gt;type~type_dp_pointer -->
+<g id="type~~type_square_first~~InheritsGraph_edge3" class="edge">
+<title>type~abst_mesh&#45;&gt;type~type_dp_pointer</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M176.82,-37.66C158.7,-40.13 135.93,-43.24 115.13,-46.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="114.54,-42.62 105.1,-47.44 115.48,-49.56 114.54,-42.62"/>
+<text text-anchor="middle" x="144.5" y="-45.4" font-family="Helvetica,sans-Serif" font-size="9.50">x, y, z</text>
+</g>
+<!-- type~type_dp_vector_3d -->
+<g id="type~~type_square_first~~InheritsGraph_node5" class="node">
+<title>type~type_dp_vector_3d</title>
+<g id="a_type~~type_square_first~~InheritsGraph_node5"><a xlink:href="../type/type_dp_vector_3d.html" xlink:title="type_dp_vector_3d">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="112,-24 0,-24 0,0 112,0 112,-24"/>
+<text text-anchor="middle" x="56" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dp_vector_3d</text>
+</a>
+</g>
+</g>
+<!-- type~abst_mesh&#45;&gt;type~type_dp_vector_3d -->
+<g id="type~~type_square_first~~InheritsGraph_edge4" class="edge">
+<title>type~abst_mesh&#45;&gt;type~type_dp_vector_3d</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M176.82,-28.34C160.75,-26.15 141.02,-23.46 122.25,-20.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="122.63,-17.42 112.25,-19.53 121.69,-24.35 122.63,-17.42"/>
+<text text-anchor="middle" x="144.5" y="-27.4" font-family="Helvetica,sans-Serif" font-size="9.50">gauss</text>
 </g>
 </g>
 </svg>
@@ -324,193 +342,6 @@ large graphs.</div>
       </div>
     <br>
 
-    <section>
-    <h2>Components</h2>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-<th></th><th scope="col">Initial</th>        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-connectivity"></span>
-              integer(kind=int32),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>connectivity</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>connectivity information</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-connectivity_reordered"></span>
-              integer(kind=int32),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>connectivity_reordered</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>reordered connectivity information</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-gauss"></span>
-              real(kind=real64),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>gauss</strong>(:,:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>Gauss Quadrature points Coordinate</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-get_connectivity"></span>
-              procedure(<a href='../interface/abst_get_connectivity.html'>abst_get_connectivity</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              pass(self), pointer
-            </td>
-            <td>::</td>
-            <td><strong>get_connectivity</strong></td>
-<td>=&gt; </td>
-                <td>null()</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-interpolate"></span>
-              procedure(<a href='../interface/abst_interpolate.html'>abst_interpolate</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              pass(self), pointer
-            </td>
-            <td>::</td>
-            <td><strong>interpolate</strong></td>
-<td>=&gt; </td>
-                <td>null()</td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-num_gauss"></span>
-              integer(kind=int32),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>num_gauss</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>Number of Gauss Quadrature points</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-weight"></span>
-              real(kind=real64),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>weight</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>Gauss weight</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-x"></span>
-              type(<a href='type_dp_pointer.html'>type_dp_pointer</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>x</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>X coordinate</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-y"></span>
-              type(<a href='type_dp_pointer.html'>type_dp_pointer</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>y</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>Y coordinate</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-z"></span>
-              type(<a href='type_dp_pointer.html'>type_dp_pointer</a>),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>z</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>Z coordinate</p>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    </section>
-    <br>
     
       <section>
         <h2>Constructor</h2>
@@ -545,10 +376,99 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-dpsi_deta~3"></span>
+      <span class="anchor" id="boundprocedure-dlerp"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>dpsi_deta</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/dpsi_deta_square_first.html'>dpsi_deta_square_first</a>
+  <strong>dlerp</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/dlerp.html'>dlerp</a>(self, r, value) result(val)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-dpsi~6"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>dpsi</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/dpsi_square_first.html'>dpsi_square_first</a>
         
       </h3>
     </div>
@@ -556,8 +476,8 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function dpsi_deta_square_first(self, i, xi, eta) result(dpsi)  
-    <a href="../proc/dpsi_deta_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure elemental module function dpsi_square_first(self, i, j, r) result(dpsi)  
+    <a href="../proc/dpsi_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -606,14 +526,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              integer(kind=int32),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>xi</strong></td>
+            <td><strong>j</strong></td>
             <td>
                 
             </td>
@@ -621,14 +541,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>eta</strong></td>
+            <td><strong>r</strong></td>
             <td>
                 
             </td>
@@ -650,20 +570,19 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-dpsi_dxi~3"></span>
+      <span class="anchor" id="boundprocedure-get_connectivity"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>dpsi_dxi</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/dpsi_dxi_square_first.html'>dpsi_dxi_square_first</a>
+  <strong>get_connectivity</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module function dpsi_dxi_square_first(self, i, xi, eta) result(dpsi)  
-    <a href="../proc/dpsi_dxi_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private  function <a href='../proc/get_connectivity.html'>get_connectivity</a>(self) result(connectivity)  
 </h3>
+    
 
   
 
@@ -681,7 +600,66 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32), dimension(:), pointer</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_coordinate"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_coordinate</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/get_coordinate.html'>get_coordinate</a>(self, index) result(coordinate)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -690,7 +668,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
         <tr>
@@ -703,37 +681,185 @@ large graphs.</div>
               
             </td>
             <td>::</td>
-            <td><strong>i</strong></td>
+            <td><strong>index</strong></td>
             <td>
-                
+
             </td>
         </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_dimension~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_dimension</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/get_dimension.html'>get_dimension</a>(self) result(dimension)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>xi</strong></td>
+            <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_gauss"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_gauss</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/get_gauss.html'>get_gauss</a>(self) result(gauss)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>), dimension(:), pointer</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_geometry~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_geometry</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_area_square_first.html'>get_area_square_first</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private pure module function get_area_square_first(self) result(area)  
+    <a href="../proc/get_area_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_square_first.html'>type_square_first</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>eta</strong></td>
+            <td><strong>self</strong></td>
             <td>
                 
             </td>
@@ -755,19 +881,19 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_dimension~3"></span>
+      <span class="anchor" id="boundprocedure-get_group"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_dimension</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_dimension_square_first.html'>get_dimension_square_first</a>
+  <strong>get_group</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module function get_dimension_square_first(self) result(dimension)  
+    private pure function <a href='../proc/get_group.html'>get_group</a>(self) result(group)  
 </h3>
+    
 
   
 
@@ -785,7 +911,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -794,7 +920,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
     </tbody>
@@ -814,20 +940,19 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_group~3"></span>
+      <span class="anchor" id="boundprocedure-get_id"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_group</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_group_square_first.html'>get_group_square_first</a>
+  <strong>get_id</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module function get_group_square_first(self) result(group)  
-    <a href="../proc/get_group_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure function <a href='../proc/get_id.html'>get_id</a>(self) result(id)  
 </h3>
+    
 
   
 
@@ -845,7 +970,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -854,7 +979,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
     </tbody>
@@ -874,80 +999,20 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_id~3"></span>
+      <span class="anchor" id="boundprocedure-get_num_gauss"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_id</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_id_square_first.html'>get_id_square_first</a>
+  <strong>get_num_gauss</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module function get_id_square_first(self) result(id)  
-    <a href="../proc/get_id_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure function <a href='../proc/get_num_gauss.html'>get_num_gauss</a>(self) result(num_gauss)  
 </h3>
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>integer(kind=int32)</small>
-    </h4>
     
 
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_num_gauss~3"></span>
-      <h3>
-          procedure, public, pass(self) ::
-  <strong>get_num_gauss</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_num_gauss_square_first.html'>get_num_gauss_square_first</a>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                <h3>interface </h3>
-                    <h3>
-    private module function get_num_gauss_square_first(self) result(num_gauss)  
-</h3>
-
   
 
   <h4>Arguments</h4>
@@ -964,7 +1029,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -973,7 +1038,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
     </tbody>
@@ -996,17 +1061,16 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-get_num_nodes~3"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_num_nodes</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_num_nodes_square_first.html'>get_num_nodes_square_first</a>
+  <strong>get_num_nodes</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module function get_num_nodes_square_first(self) result(num_nodes)  
-    <a href="../proc/get_num_nodes_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure function <a href='../proc/get_num_nodes~3.html'>get_num_nodes</a>(self) result(num_nodes)  
 </h3>
+    
 
   
 
@@ -1024,7 +1088,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1033,7 +1097,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
     </tbody>
@@ -1053,19 +1117,19 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_order~3"></span>
+      <span class="anchor" id="boundprocedure-get_order~2"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_order</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_order_square_first.html'>get_order_square_first</a>
+  <strong>get_order</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module function get_order_square_first(self) result(order)  
+    private pure function <a href='../proc/get_order.html'>get_order</a>(self) result(order)  
 </h3>
+    
 
   
 
@@ -1083,7 +1147,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1092,7 +1156,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
     </tbody>
@@ -1112,20 +1176,19 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_type~3"></span>
+      <span class="anchor" id="boundprocedure-get_type"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>get_type</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/get_type_square_first.html'>get_type_square_first</a>
+  <strong>get_type</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
-                <h3>interface </h3>
                     <h3>
-    private module function get_type_square_first(self) result(type)  
-    <a href="../proc/get_type_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure function <a href='../proc/get_type.html'>get_type</a>(self) result(type)  
 </h3>
+    
 
   
 
@@ -1143,7 +1206,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_square_first.html'>type_square_first</a>),
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -1152,7 +1215,7 @@ large graphs.</div>
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+
             </td>
         </tr>
     </tbody>
@@ -1163,6 +1226,284 @@ large graphs.</div>
     <small>integer(kind=int32)</small>
     </h4>
     
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_weight"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_weight</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/get_weight.html'>get_weight</a>(self) result(weight)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              target
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64), dimension(:), pointer</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~32"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_abst_mesh.html'>initialize_abst_mesh</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/initialize_abst_mesh.html'>initialize_abst_mesh</a>(self, id, type, group, dimension, order, num_nodes, connectivity, num_gauss, weight, gauss, global_coordinate)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>id</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>type</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>group</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dimension</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>order</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>connectivity</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_gauss</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>weight</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>gauss</strong>(:,:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_dp_3d.html'>type_dp_3d</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>global_coordinate</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
 
           </li>
       </ul>
@@ -1183,7 +1524,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module subroutine is_in_square_first(self, px, py, pxi, peta, is_in)  
+    private module subroutine is_in_square_first(self, cartesian, normalized, is_in)  
     <a href="../proc/is_in_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -1218,14 +1559,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>px</strong></td>
+            <td><strong>cartesian</strong></td>
             <td>
                 
             </td>
@@ -1233,44 +1574,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>py</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>pxi</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>peta</strong></td>
+            <td><strong>normalized</strong></td>
             <td>
                 
             </td>
@@ -1302,7 +1613,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-jacobian~3"></span>
+      <span class="anchor" id="boundprocedure-jacobian~6"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>jacobian</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/jacobian_square_first.html'>jacobian_square_first</a>
@@ -1313,7 +1624,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function jacobian_square_first(self, i, j, xi, eta) result(Jval)  
+    private pure elemental module function jacobian_square_first(self, i, j, r) result(jacobian)  
     <a href="../proc/jacobian_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -1378,29 +1689,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>xi</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>eta</strong></td>
+            <td><strong>r</strong></td>
             <td>
                 
             </td>
@@ -1422,7 +1718,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-jacobian_det~3"></span>
+      <span class="anchor" id="boundprocedure-jacobian_det~6"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>jacobian_det</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/jacobian_det_square_first.html'>jacobian_det_square_first</a>
@@ -1433,7 +1729,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function jacobian_det_square_first(self, xi, eta) result(J_Det)  
+    private pure elemental module function jacobian_det_square_first(self, r) result(jacobian_det)  
     <a href="../proc/jacobian_det_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -1468,29 +1764,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>xi</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>eta</strong></td>
+            <td><strong>r</strong></td>
             <td>
                 
             </td>
@@ -1512,7 +1793,96 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-psi~3"></span>
+      <span class="anchor" id="boundprocedure-lerp"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>lerp</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/lerp.html'>lerp</a>(self, r, value) result(val)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_mesh.html'>abst_mesh</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-psi~6"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>psi</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/psi_square_first.html'>psi_square_first</a>
@@ -1523,7 +1893,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function psi_square_first(self, i, xi, eta) result(psi)  
+    private pure elemental module function psi_square_first(self, i, r) result(psi)  
     <a href="../proc/psi_square_first.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -1573,29 +1943,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_dp_vector_3d.html'>type_dp_vector_3d</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>xi</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>eta</strong></td>
+            <td><strong>r</strong></td>
             <td>
                 
             </td>
@@ -1620,20 +1975,12 @@ large graphs.</div>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_element</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_square_first</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_id</span><span class="w">        </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_id_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_type</span><span class="w">      </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_type_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_num_nodes</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_num_nodes_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_group</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_group_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_order</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_order_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_dimension</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_dimension_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_num_gauss</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_num_gauss_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="c">!----------------------------------------------------------------------------------</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">psi</span><span class="w">           </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">psi_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dpsi_dxi</span><span class="w">      </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">dpsi_dxi_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dpsi_deta</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">dpsi_deta_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">jacobian</span><span class="w">      </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">jacobian_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">jacobian_det</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">jacobian_det_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_inside</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_in_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_geometry</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_area_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">psi</span><span class="w">          </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">psi_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dpsi</span><span class="w">         </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">dpsi_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">jacobian</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">jacobian_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">jacobian_det</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">jacobian_det_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_inside</span><span class="w">    </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_in_square_first</span><span class="w"> </span><span class="c">!&amp;</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_square_first</span>
 </pre></div>
 
@@ -1657,7 +2004,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

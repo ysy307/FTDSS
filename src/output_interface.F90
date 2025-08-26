@@ -4,17 +4,16 @@ module input_output
 !$  use :: omp_lib
     use :: stdlib_strings, only:to_string
     use :: vtk_fortran, only:vtk_file
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_gauss_point_state, & !&
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, & !&
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                              get_cpu_architecture, get_os, get_openmp_version, get_memory_usage, & !&
-                             filter, type_dp_vector_3d
+                             filter, type_dp_vector_3d, assignment(=), type_crs
 
     use :: module_input
     use :: inout_project_settings, only:get_project_path
     use :: module_domain, only:holder_elements, create_element, type_domain, type_reordering, abst_element
     use :: module_control, only:type_time, type_iteration
-    use :: module_properties, only:type_proereties_manager
-    use :: module_matrix
+    use :: module_properties, only:type_properties_manager
 
     implicit none
     private
@@ -33,8 +32,7 @@ module input_output
         type(type_dp_3d) :: coordinate
         !!
         type(holder_elements), allocatable :: elements(:)
-        real(real64), allocatable :: xi(:)
-        real(real64), allocatable :: eta(:)
+        type(type_dp_vector_3d), allocatable :: coordinate_normalized(:)
         !!
         integer(int32), allocatable :: node_ids(:)
         procedure(abst_write_line), pointer, pass(self) :: write_line => null()
@@ -57,12 +55,12 @@ module input_output
 
         subroutine abst_get_values(self, obs_values, domain, properties, &
                                    nodal_temperature, nodal_porosity, nodal_pw)
-            import :: type_output_observation, type_domain, type_proereties_manager, real64, int32
+            import :: type_output_observation, type_domain, type_properties_manager, real64, int32
             implicit none
             class(type_output_observation), intent(inout) :: self
             real(real64), intent(out) :: obs_values(:)
             type(type_domain), intent(inout), optional :: domain
-            type(type_proereties_manager), intent(inout), optional :: properties
+            type(type_properties_manager), intent(inout), optional :: properties
             real(real64), intent(in), optional :: nodal_temperature(:)
             real(real64), intent(in), optional :: nodal_porosity(:)
             real(real64), intent(in), optional :: nodal_pw(:)
@@ -106,6 +104,7 @@ module input_output
         character(:), allocatable :: format_output
         character(:), allocatable :: file_extension
         character(:), allocatable :: variable_names(:)
+        logical :: do_output
         ! DATA
         type(type_output_vtk) :: vtk
         procedure(abst_output_overall_fields), pointer, pass(self) :: write_fields => null()
@@ -280,6 +279,8 @@ contains
         real(real64), intent(in), optional :: pressure(:)
         type(type_dp_3d), intent(in), optional :: water_flux
 
+        if (.not. self%overall%do_output) return
+
         if (self%is_thermal .and. self%is_hydraulic) then
             call self%overall%write_fields(file_counts=file_counts, &
                                            domain=domain, &
@@ -347,7 +348,7 @@ contains
         class(type_output) :: self
         real(real64), intent(in) :: time
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: propeties
+        type(type_properties_manager), intent(inout), optional :: propeties
         real(real64), intent(in), optional :: porosity(:)
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: pressure(:)

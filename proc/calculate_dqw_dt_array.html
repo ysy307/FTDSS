@@ -1,0 +1,644 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calculate_dQw_dT_array &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calculate_dQw_dT_array
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">6 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/properties_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/properties_manager.f90.html'>properties_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/properties_properties_manager.html'>properties_properties_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calculate_dQw_dT_array</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calculate_dqw_dt_array.html#src">calculate_dQw_dT_array</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private pure subroutine calculate_dQw_dT_array(ptrs, states)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_properties_manager.html'>type_properties_manager</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ptrs~5"></span>
+              type(<a href='../type/type_material_pointers.html'>type_material_pointers</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ptrs</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-states~2"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>states</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calculate_dqw_dt_array~~CallsGraph Pages: 1 -->
+<svg id="proccalculate_dqw_dt_arrayCallsGraph" width="641pt" height="70pt"
+ viewBox="0.00 0.00 641.00 69.96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph" class="graph" transform="scale(0.95 0.95) rotate(0) translate(4 70)">
+<title>proc~~calculate_dqw_dt_array~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 674,-70 674,4 -4,4"/>
+<!-- proc~calculate_dqw_dt_array -->
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph_node1" class="node">
+<title>proc~calculate_dqw_dt_array</title>
+<polygon fill="none" stroke="black" points="289,-45 0,-45 0,-21 289,-21 289,-45"/>
+<text text-anchor="middle" x="144.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_properties_manager%calculate_dQw_dT_array</text>
+</g>
+<!-- proc~calculate_dqw_dt -->
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph_node2" class="node">
+<title>proc~calculate_dqw_dt</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CallsGraph_node2"><a xlink:href="../proc/calculate_dqw_dt.html" xlink:title="type_properties_manager%calculate_dQw_dT">
+<polygon fill="#d9534f" stroke="#d9534f" points="580,-45 325,-45 325,-21 580,-21 580,-45"/>
+<text text-anchor="middle" x="452.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_dQw_dT</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_dqw_dt_array&#45;&gt;proc~calculate_dqw_dt -->
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph_edge1" class="edge">
+<title>proc~calculate_dqw_dt_array&#45;&gt;proc~calculate_dqw_dt</title>
+<path fill="none" stroke="#ff0000" d="M289.09,-33C297.69,-33 306.32,-33 314.88,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="314.9,-36.5 324.9,-33 314.9,-29.5 314.9,-36.5"/>
+</g>
+<!-- calc -->
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph_node3" class="node">
+<title>calc</title>
+<polygon fill="#777777" stroke="#777777" points="670,-66 616,-66 616,-42 670,-42 670,-66"/>
+<text text-anchor="middle" x="643" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc</text>
+</g>
+<!-- proc~calculate_dqw_dt&#45;&gt;calc -->
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph_edge2" class="edge">
+<title>proc~calculate_dqw_dt&#45;&gt;calc</title>
+<path fill="none" stroke="#ff0000" d="M561.24,-45C577.09,-46.77 592.42,-48.48 605.39,-49.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="605.36,-53.44 615.68,-51.07 606.13,-46.48 605.36,-53.44"/>
+</g>
+<!-- deriv -->
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph_node4" class="node">
+<title>deriv</title>
+<polygon fill="#777777" stroke="#777777" points="670,-24 616,-24 616,0 670,0 670,-24"/>
+<text text-anchor="middle" x="643" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deriv</text>
+</g>
+<!-- proc~calculate_dqw_dt&#45;&gt;deriv -->
+<g id="proc~~calculate_dqw_dt_array~~CallsGraph_edge3" class="edge">
+<title>proc~calculate_dqw_dt&#45;&gt;deriv</title>
+<path fill="none" stroke="#ff0000" d="M561.24,-21C577.09,-19.23 592.42,-17.52 605.39,-16.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="606.13,-19.52 615.68,-14.93 605.36,-12.56 606.13,-19.52"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalculate_dqw_dt_arrayCallsGraph = svgPanZoom('#proccalculate_dqw_dt_arrayCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calculate_dqw_dt_array~~CalledByGraph Pages: 1 -->
+<svg id="proccalculate_dqw_dt_arrayCalledByGraph" width="641pt" height="35pt"
+ viewBox="0.00 0.00 641.00 34.82" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph" class="graph" transform="scale(0.37 0.37) rotate(0) translate(4 91)">
+<title>proc~~calculate_dqw_dt_array~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-91 1745,-91 1745,4 -4,4"/>
+<!-- proc~calculate_dqw_dt_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node1" class="node">
+<title>proc~calculate_dqw_dt_array</title>
+<polygon fill="none" stroke="black" points="1741,-66 1452,-66 1452,-42 1741,-42 1741,-66"/>
+<text text-anchor="middle" x="1596.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_properties_manager%calculate_dQw_dT_array</text>
+</g>
+<!-- none~calc_dqw_dt -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node2" class="node">
+<title>none~calc_dqw_dt</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node2"><a xlink:href="../type/type_properties_manager.html#boundprocedure-calc_dqw_dt" xlink:title="type_properties_manager%calc_dQw_dT">
+<polygon fill="#a7506f" stroke="#a7506f" points="1416,-66 1188,-66 1188,-42 1416,-42 1416,-66"/>
+<text text-anchor="middle" x="1302" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_dQw_dT</text>
+</a>
+</g>
+</g>
+<!-- none~calc_dqw_dt&#45;&gt;proc~calculate_dqw_dt_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge1" class="edge">
+<title>none~calc_dqw_dt&#45;&gt;proc~calculate_dqw_dt_array</title>
+<path fill="none" stroke="#ff0000" d="M1416.09,-54C1424.52,-54 1433.11,-54 1441.74,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1441.87,-57.5 1451.87,-54 1441.87,-50.5 1441.87,-57.5"/>
+</g>
+<!-- proc~calc_thermal_properties_impl_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node3" class="node">
+<title>proc~calc_thermal_properties_impl_array</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node3"><a xlink:href="../proc/calc_thermal_properties_impl_array.html" xlink:title="type_properties_manager%calc_thermal_properties_impl_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="1152,-87 803,-87 803,-63 1152,-63 1152,-87"/>
+<text text-anchor="middle" x="977.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_thermal_properties_impl_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_properties_impl_array&#45;&gt;none~calc_dqw_dt -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge2" class="edge">
+<title>proc~calc_thermal_properties_impl_array&#45;&gt;none~calc_dqw_dt</title>
+<path fill="none" stroke="#ff0000" d="M1152.02,-63.7C1160.61,-63.14 1169.15,-62.59 1177.54,-62.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1177.95,-65.52 1187.7,-61.38 1177.49,-58.53 1177.95,-65.52"/>
+</g>
+<!-- proc~calculate_vhc_impl_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node4" class="node">
+<title>proc~calculate_vhc_impl_array</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node4"><a xlink:href="../proc/calculate_vhc_impl_array.html" xlink:title="type_properties_manager%calculate_vhc_impl_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1124.5,-45 830.5,-45 830.5,-21 1124.5,-21 1124.5,-45"/>
+<text text-anchor="middle" x="977.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_vhc_impl_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_vhc_impl_array&#45;&gt;none~calc_dqw_dt -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge3" class="edge">
+<title>proc~calculate_vhc_impl_array&#45;&gt;none~calc_dqw_dt</title>
+<path fill="none" stroke="#ff0000" d="M1124.65,-42.52C1142.35,-43.67 1160.28,-44.84 1177.6,-45.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1177.52,-49.47 1187.72,-46.62 1177.97,-42.48 1177.52,-49.47"/>
+</g>
+<!-- proc~calc_thermal_properties_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node5" class="node">
+<title>proc~calc_thermal_properties_array</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node5"><a xlink:href="../proc/calc_thermal_properties_array.html" xlink:title="type_properties_manager%calc_thermal_properties_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-87 446,-87 446,-63 767,-63 767,-87"/>
+<text text-anchor="middle" x="606.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_thermal_properties_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_properties_array&#45;&gt;proc~calc_thermal_properties_impl_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge4" class="edge">
+<title>proc~calc_thermal_properties_array&#45;&gt;proc~calc_thermal_properties_impl_array</title>
+<path fill="none" stroke="#ff0000" d="M767.2,-75C775.67,-75 784.21,-75 792.75,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="792.77,-78.5 802.77,-75 792.77,-71.5 792.77,-78.5"/>
+</g>
+<!-- proc~calculate_vhc_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node6" class="node">
+<title>proc~calculate_vhc_array</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node6"><a xlink:href="../proc/calculate_vhc_array.html" xlink:title="type_properties_manager%calculate_vhc_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="739,-45 474,-45 474,-21 739,-21 739,-45"/>
+<text text-anchor="middle" x="606.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_vhc_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_vhc_array&#45;&gt;proc~calculate_vhc_impl_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge5" class="edge">
+<title>proc~calculate_vhc_array&#45;&gt;proc~calculate_vhc_impl_array</title>
+<path fill="none" stroke="#00ffff" d="M739.15,-33C765.4,-33 793.2,-33 820.18,-33"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="820.48,-36.5 830.48,-33 820.48,-29.5 820.48,-36.5"/>
+</g>
+<!-- none~calc_vhc -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node7" class="node">
+<title>none~calc_vhc</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node7"><a xlink:href="../type/type_properties_manager.html#boundprocedure-calc_vhc" xlink:title="type_properties_manager%calc_vhc">
+<polygon fill="#a7506f" stroke="#a7506f" points="410,-45 205,-45 205,-21 410,-21 410,-45"/>
+<text text-anchor="middle" x="307.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_vhc</text>
+</a>
+</g>
+</g>
+<!-- none~calc_vhc&#45;&gt;proc~calculate_vhc_array -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge6" class="edge">
+<title>none~calc_vhc&#45;&gt;proc~calculate_vhc_array</title>
+<path fill="none" stroke="#00ffff" d="M410.3,-33C427.58,-33 445.81,-33 463.89,-33"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="463.92,-36.5 473.92,-33 463.92,-29.5 463.92,-36.5"/>
+</g>
+<!-- proc~get_observations_vhc -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node8" class="node">
+<title>proc~get_observations_vhc</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node8"><a xlink:href="../proc/get_observations_vhc.html" xlink:title="get_observations_vhc">
+<polygon fill="#d9534f" stroke="#d9534f" points="148,-66 21,-66 21,-42 148,-42 148,-66"/>
+<text text-anchor="middle" x="84.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_observations_vhc</text>
+</a>
+</g>
+</g>
+<!-- proc~get_observations_vhc&#45;&gt;none~calc_vhc -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge7" class="edge">
+<title>proc~get_observations_vhc&#45;&gt;none~calc_vhc</title>
+<path fill="none" stroke="#ff0000" d="M148.24,-48.04C162.68,-46.67 178.48,-45.16 194.32,-43.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="195.1,-47.1 204.72,-42.67 194.44,-40.13 195.1,-47.1"/>
+</g>
+<!-- proc~interpolate_observations_vhc -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_node9" class="node">
+<title>proc~interpolate_observations_vhc</title>
+<g id="a_proc~~calculate_dqw_dt_array~~CalledByGraph_node9"><a xlink:href="../proc/interpolate_observations_vhc.html" xlink:title="interpolate_observations_vhc">
+<polygon fill="#d9534f" stroke="#d9534f" points="169,-24 0,-24 0,0 169,0 169,-24"/>
+<text text-anchor="middle" x="84.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpolate_observations_vhc</text>
+</a>
+</g>
+</g>
+<!-- proc~interpolate_observations_vhc&#45;&gt;none~calc_vhc -->
+<g id="proc~~calculate_dqw_dt_array~~CalledByGraph_edge8" class="edge">
+<title>proc~interpolate_observations_vhc&#45;&gt;none~calc_vhc</title>
+<path fill="none" stroke="#ff0000" d="M169.05,-19.94C177.48,-20.74 186.14,-21.56 194.81,-22.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="194.69,-25.89 204.97,-23.35 195.35,-18.92 194.69,-25.89"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalculate_dqw_dt_arrayCalledByGraph = svgPanZoom('#proccalculate_dqw_dt_arrayCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure subroutine </span><span class="n">calculate_dQw_dT_array</span><span class="p">(</span><span class="n">ptrs</span><span class="p">,</span><span class="w"> </span><span class="n">states</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        type</span><span class="p">(</span><span class="n">type_material_pointers</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ptrs</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">states</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">calculate_dQw_dT</span><span class="p">(</span><span class="n">ptrs</span><span class="p">,</span><span class="w"> </span><span class="n">states</span><span class="p">(:))</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">calculate_dQw_dT_array</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

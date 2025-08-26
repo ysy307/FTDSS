@@ -1,0 +1,1121 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>create_coo_from_mesh &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>create_coo_from_mesh
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.4% of total for procedures.">58 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/adjacency_node.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/adjacency_node.f90.html'>adjacency_node.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_adjacency_adjacency_node.html'>domain_adjacency_adjacency_node</a></li>
+            <li class="breadcrumb-item active" aria-current="page">create_coo_from_mesh</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/create_coo_from_mesh.html#src">create_coo_from_mesh</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine create_coo_from_mesh(computation_dimension, sides, elements, row_indices, col_indices, counter)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-computation_dimension~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>computation_dimension</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-sides~4"></span>
+              class(<a href='../type/holder_sides.html'>holder_sides</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>sides</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-elements~8"></span>
+              class(<a href='../type/holder_elements.html'>holder_elements</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>elements</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_indices"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_indices</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col_indices"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_indices</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-counter"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>counter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~create_coo_from_mesh~~CallsGraph Pages: 1 -->
+<svg id="proccreate_coo_from_meshCallsGraph" width="641pt" height="713pt"
+ viewBox="0.00 0.00 641.00 713.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~create_coo_from_mesh~~CallsGraph" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 826)">
+<title>proc~~create_coo_from_mesh~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-826 742,-826 742,4 -4,4"/>
+<!-- proc~create_coo_from_mesh -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node1" class="node">
+<title>proc~create_coo_from_mesh</title>
+<polygon fill="none" stroke="black" points="136,-381 0,-381 0,-357 136,-357 136,-381"/>
+<text text-anchor="middle" x="68" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50">create_coo_from_mesh</text>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node2" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node2"><a xlink:href="../interface/allocate_array.html" xlink:title="allocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="299.5,-423 210.5,-423 210.5,-399 299.5,-399 299.5,-423"/>
+<text text-anchor="middle" x="255" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~create_coo_from_mesh&#45;&gt;interface~allocate_array -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge1" class="edge">
+<title>proc~create_coo_from_mesh&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M122.01,-381.04C146.6,-386.62 175.77,-393.24 200.42,-398.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="199.81,-402.29 210.34,-401.09 201.36,-395.46 199.81,-402.29"/>
+</g>
+<!-- proc~get_connectivity -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node3" class="node">
+<title>proc~get_connectivity</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node3"><a xlink:href="../proc/get_connectivity.html" xlink:title="abst_mesh%get_connectivity">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="338,-381 172,-381 172,-357 338,-357 338,-381"/>
+<text text-anchor="middle" x="255" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_mesh%get_connectivity</text>
+</a>
+</g>
+</g>
+<!-- proc~create_coo_from_mesh&#45;&gt;proc~get_connectivity -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge2" class="edge">
+<title>proc~create_coo_from_mesh&#45;&gt;proc~get_connectivity</title>
+<path fill="none" stroke="#ff0000" d="M136.05,-369C144.37,-369 153,-369 161.62,-369"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="161.72,-372.5 171.72,-369 161.72,-365.5 161.72,-372.5"/>
+</g>
+<!-- proc~get_num_nodes~3 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node4" class="node">
+<title>proc~get_num_nodes~3</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node4"><a xlink:href="../proc/get_num_nodes~3.html" xlink:title="abst_mesh%get_num_nodes">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="336.5,-339 173.5,-339 173.5,-315 336.5,-315 336.5,-339"/>
+<text text-anchor="middle" x="255" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_mesh%get_num_nodes</text>
+</a>
+</g>
+</g>
+<!-- proc~create_coo_from_mesh&#45;&gt;proc~get_num_nodes~3 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge3" class="edge">
+<title>proc~create_coo_from_mesh&#45;&gt;proc~get_num_nodes~3</title>
+<path fill="none" stroke="#ff0000" d="M122.01,-356.96C143.59,-352.07 168.7,-346.37 191.19,-341.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="192,-344.66 200.98,-339.04 190.45,-337.84 192,-344.66"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node5" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node5"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="allocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="505.5,-822 381.5,-822 381.5,-798 505.5,-798 505.5,-822"/>
+<text text-anchor="middle" x="443.5" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge4" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M255.96,-423.18C256.48,-475.22 265.56,-681.11 374,-789 375.1,-790.1 376.26,-791.14 377.47,-792.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="375.77,-795.2 386.03,-797.87 379.68,-789.39 375.77,-795.2"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node6" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node6"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="505.5,-780 381.5,-780 381.5,-756 505.5,-756 505.5,-780"/>
+<text text-anchor="middle" x="443.5" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge5" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M256.51,-423.14C259.19,-471.53 275.68,-652.56 374,-747 375.26,-748.21 376.6,-749.36 377.99,-750.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="376.19,-753.44 386.49,-755.92 379.98,-747.56 376.19,-753.44"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node7" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node7"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="allocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="505.5,-738 381.5,-738 381.5,-714 505.5,-714 505.5,-738"/>
+<text text-anchor="middle" x="443.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M257.19,-423.15C262.22,-467.72 285.73,-623.86 374,-705 375.32,-706.22 376.71,-707.36 378.16,-708.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="376.65,-711.62 386.99,-713.92 380.34,-705.67 376.65,-711.62"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node8" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node8"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="allocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="502,-696 385,-696 385,-672 502,-672 502,-696"/>
+<text text-anchor="middle" x="443.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M258.08,-423.08C265.65,-463.44 295.58,-594.89 374,-663 375.51,-664.32 377.11,-665.55 378.77,-666.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="377.14,-669.81 387.54,-671.86 380.69,-663.77 377.14,-669.81"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="allocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="513,-654 374,-654 374,-630 513,-630 513,-654"/>
+<text text-anchor="middle" x="443.5" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M259.29,-423.05C269.68,-458.88 305.29,-565.64 374,-621 375.77,-622.43 377.64,-623.76 379.58,-625"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="378.04,-628.14 388.49,-629.88 381.4,-622 378.04,-628.14"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="allocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="513,-612 374,-612 374,-588 513,-588 513,-612"/>
+<text text-anchor="middle" x="443.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M261.14,-423.24C274.77,-454.17 314.87,-536.07 374,-579 376.11,-580.53 378.34,-581.96 380.65,-583.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="379.38,-586.56 389.89,-587.88 382.5,-580.29 379.38,-586.56"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="allocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="513,-570 374,-570 374,-546 513,-546 513,-570"/>
+<text text-anchor="middle" x="443.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M263.93,-423.01C281.03,-447.98 323.91,-505.75 374,-537 376.8,-538.74 379.75,-540.35 382.79,-541.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="381.58,-545.12 392.14,-545.91 384.37,-538.71 381.58,-545.12"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="allocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="512,-528 375,-528 375,-504 512,-504 512,-528"/>
+<text text-anchor="middle" x="443.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M269.94,-423.22C291.09,-441.22 333.18,-474.87 374,-495 378,-496.97 382.22,-498.8 386.52,-500.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="385.43,-503.82 396.02,-503.97 387.84,-497.25 385.43,-503.82"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="allocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="508.5,-486 378.5,-486 378.5,-462 508.5,-462 508.5,-486"/>
+<text text-anchor="middle" x="443.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M288.67,-423.07C312.29,-431.68 345,-443.4 374,-453 379.97,-454.98 386.25,-456.99 392.48,-458.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="391.61,-462.34 402.2,-461.97 393.69,-455.66 391.61,-462.34"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="508.5,-444 378.5,-444 378.5,-420 508.5,-420 508.5,-444"/>
+<text text-anchor="middle" x="443.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.73,-415.92C320.08,-418.22 344.86,-421.01 368.03,-423.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="367.87,-427.12 378.19,-424.76 368.65,-420.16 367.87,-427.12"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="allocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="505.5,-402 381.5,-402 381.5,-378 505.5,-378 505.5,-402"/>
+<text text-anchor="middle" x="443.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.73,-406.08C321.02,-403.68 347.16,-400.74 371.23,-398.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="371.85,-401.48 381.4,-396.88 371.07,-394.52 371.85,-401.48"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="allocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="505.5,-360 381.5,-360 381.5,-336 505.5,-336 505.5,-360"/>
+<text text-anchor="middle" x="443.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.71,-402.19C312.3,-399.02 325.9,-394.97 338,-390 355.14,-382.97 357.03,-376.43 374,-369 378.47,-367.04 383.17,-365.2 387.93,-363.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="389.42,-366.66 397.74,-360.09 387.14,-360.04 389.42,-366.66"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="allocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="505.5,-318 381.5,-318 381.5,-294 505.5,-294 505.5,-318"/>
+<text text-anchor="middle" x="443.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.75,-406.47C313.04,-403.43 327.01,-398.37 338,-390 363.65,-370.45 348.81,-347.14 374,-327 375.78,-325.58 377.65,-324.26 379.59,-323.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="381.41,-326.02 388.51,-318.16 378.06,-319.87 381.41,-326.02"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="allocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="502,-276 385,-276 385,-252 502,-252 502,-276"/>
+<text text-anchor="middle" x="443.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.91,-407.86C313.51,-404.92 327.64,-399.57 338,-390 374.24,-356.53 338.55,-319.31 374,-285 375.26,-283.78 376.59,-282.63 377.97,-281.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="379.97,-284.43 386.46,-276.05 376.17,-278.55 379.97,-284.43"/>
+</g>
+<!-- proc~allocate_rank2_logical1 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank2_logical1</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank2_logical1.html" xlink:title="allocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="513,-234 374,-234 374,-210 513,-210 513,-234"/>
+<text text-anchor="middle" x="443.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.57,-408.57C313.48,-405.71 327.87,-400.24 338,-390 385.31,-342.19 327.82,-291.91 374,-243 375.04,-241.9 376.14,-240.85 377.28,-239.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="379.32,-242.71 385.46,-234.08 375.28,-236.99 379.32,-242.71"/>
+</g>
+<!-- proc~allocate_rank2_logical4 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank2_logical4</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank2_logical4.html" xlink:title="allocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="513,-192 374,-192 374,-168 513,-168 513,-192"/>
+<text text-anchor="middle" x="443.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.88,-408.87C313.81,-406.03 328.14,-400.5 338,-390 396.55,-327.68 316.93,-264.68 374,-201 374.89,-200.01 375.82,-199.07 376.79,-198.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="379.02,-200.87 384.94,-192.09 374.83,-195.26 379.02,-200.87"/>
+</g>
+<!-- proc~allocate_rank2_logical8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank2_logical8</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank2_logical8.html" xlink:title="allocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="513,-150 374,-150 374,-126 513,-126 513,-150"/>
+<text text-anchor="middle" x="443.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.66,-409.14C313.74,-406.35 328.22,-400.77 338,-390 407.86,-313.08 305.96,-237.53 374,-159 374.75,-158.13 375.54,-157.3 376.36,-156.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="378.75,-159.07 384.5,-150.17 374.45,-153.55 378.75,-159.07"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="allocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="512,-108 375,-108 375,-84 512,-84 512,-108"/>
+<text text-anchor="middle" x="443.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.8,-409.27C313.9,-406.49 328.35,-400.88 338,-390 419.21,-298.44 294.95,-210.43 374,-117 374.74,-116.12 375.52,-115.28 376.33,-114.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="378.73,-117.04 384.41,-108.1 374.39,-111.55 378.73,-117.04"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="allocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="508.5,-66 378.5,-66 378.5,-42 508.5,-42 508.5,-66"/>
+<text text-anchor="middle" x="443.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.91,-409.37C314.01,-406.59 328.44,-400.97 338,-390 430.59,-283.78 283.92,-183.36 374,-75 374.74,-74.12 375.51,-73.27 376.31,-72.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="378.71,-75.02 384.34,-66.04 374.34,-69.55 378.71,-75.02"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="allocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="508.5,-24 378.5,-24 378.5,0 508.5,0 508.5,-24"/>
+<text text-anchor="middle" x="443.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge23" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M299.56,-409.52C313.81,-406.78 328.42,-401.14 338,-390 441.98,-269.09 272.87,-156.3 374,-33 374.62,-32.24 375.27,-31.51 375.94,-30.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="378.47,-33.26 383.97,-24.2 374.03,-27.85 378.47,-33.26"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node25" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~create_coo_from_mesh~~CallsGraph_node25"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="641,-423 549,-423 549,-399 641,-399 641,-423"/>
+<text text-anchor="middle" x="595" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge24" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M501.97,-797.83C506.05,-795.4 509.81,-792.48 513,-789 561.66,-735.95 585.65,-506.37 592.14,-433.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="595.66,-433.32 593.04,-423.05 588.69,-432.71 595.66,-433.32"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge25" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff4c00" d="M501.55,-755.93C505.77,-753.48 509.68,-750.53 513,-747 556.62,-700.63 583.58,-500.3 591.53,-433.08"/>
+<polygon fill="#ff4c00" stroke="#ff4c00" points="595.01,-433.48 592.68,-423.14 588.05,-432.67 595.01,-433.48"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge26" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff9900" d="M501.1,-714C505.48,-711.53 509.53,-708.57 513,-705 588.09,-627.72 594.98,-487.5 594.65,-433.26"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="598.15,-432.98 594.49,-423.04 591.15,-433.09 598.15,-432.98"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge27" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffe500" d="M500.94,-671.84C505.35,-669.41 509.46,-666.49 513,-663 578.1,-598.77 590.94,-482.13 593.42,-433.36"/>
+<polygon fill="#ffe500" stroke="#ffe500" points="596.92,-433.4 593.84,-423.26 589.93,-433.11 596.92,-433.4"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge28" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cbff00" d="M500.06,-629.98C504.77,-627.52 509.18,-624.56 513,-621 568.24,-569.53 586.24,-476.11 591.74,-433.4"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="595.25,-433.57 592.94,-423.23 588.29,-432.75 595.25,-433.57"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge29" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7fff00" d="M499.08,-587.98C504.1,-585.53 508.85,-582.57 513,-579 558.64,-539.81 580.7,-469.02 589.36,-433.14"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="592.82,-433.73 591.63,-423.2 585.99,-432.17 592.82,-433.73"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge30" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#33ff00" d="M497.6,-545.92C503.08,-543.47 508.34,-540.53 513,-537 549.37,-509.44 573.93,-460.47 585.79,-432.39"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="589.06,-433.64 589.58,-423.06 582.57,-431.01 589.06,-433.64"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge31" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff19" d="M494.45,-503.97C500.92,-501.48 507.28,-498.51 513,-495 540.25,-478.27 564.69,-450.24 579.42,-431.21"/>
+<polygon fill="#00ff19" stroke="#00ff19" points="582.26,-433.26 585.49,-423.16 576.67,-429.04 582.26,-433.26"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge32" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff66" d="M488.04,-461.95C496.42,-459.27 505.06,-456.25 513,-453 530.49,-445.85 549.26,-436.25 564.32,-428.03"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="566.13,-431.04 573.18,-423.13 562.74,-424.91 566.13,-431.04"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge33" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffb2" d="M508.77,-422.97C518.75,-421.57 528.99,-420.13 538.76,-418.76"/>
+<polygon fill="#00ffb2" stroke="#00ffb2" points="539.31,-422.22 548.73,-417.36 538.34,-415.28 539.31,-422.22"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge34" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffff" d="M505.74,-398.6C516.62,-400.13 527.89,-401.71 538.59,-403.22"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="538.26,-406.7 548.65,-404.63 539.23,-399.77 538.26,-406.7"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge35" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00b2ff" d="M488.04,-360.05C496.42,-362.73 505.06,-365.75 513,-369 530.49,-376.15 549.26,-385.75 564.32,-393.97"/>
+<polygon fill="#00b2ff" stroke="#00b2ff" points="562.74,-397.09 573.18,-398.87 566.13,-390.96 562.74,-397.09"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge36" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0066ff" d="M494.45,-318.03C500.92,-320.52 507.28,-323.49 513,-327 540.25,-343.73 564.69,-371.76 579.42,-390.79"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="576.67,-392.96 585.49,-398.84 582.26,-388.74 576.67,-392.96"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge37" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0019ff" d="M497.6,-276.08C503.08,-278.53 508.34,-281.47 513,-285 549.37,-312.56 573.93,-361.53 585.79,-389.61"/>
+<polygon fill="#0019ff" stroke="#0019ff" points="582.57,-390.99 589.58,-398.94 589.06,-388.36 582.57,-390.99"/>
+</g>
+<!-- proc~allocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge38" class="edge">
+<title>proc~allocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3200ff" d="M499.08,-234.02C504.1,-236.47 508.85,-239.43 513,-243 558.64,-282.19 580.7,-352.98 589.36,-388.86"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="585.99,-389.83 591.63,-398.8 592.82,-388.27 585.99,-389.83"/>
+</g>
+<!-- proc~allocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge39" class="edge">
+<title>proc~allocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#7f00ff" d="M500.06,-192.02C504.77,-194.48 509.18,-197.44 513,-201 568.24,-252.47 586.24,-345.89 591.74,-388.6"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="588.29,-389.25 592.94,-398.77 595.25,-388.43 588.29,-389.25"/>
+</g>
+<!-- proc~allocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge40" class="edge">
+<title>proc~allocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cc00ff" d="M500.94,-150.16C505.35,-152.59 509.46,-155.51 513,-159 578.1,-223.23 590.94,-339.87 593.42,-388.64"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="589.93,-388.89 593.84,-398.74 596.92,-388.6 589.93,-388.89"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge41" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00e5" d="M501.1,-108C505.48,-110.47 509.53,-113.43 513,-117 588.09,-194.28 594.98,-334.5 594.65,-388.74"/>
+<polygon fill="#ff00e5" stroke="#ff00e5" points="591.15,-388.91 594.49,-398.96 598.15,-389.02 591.15,-388.91"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge42" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0098" d="M501.55,-66.07C505.77,-68.52 509.68,-71.47 513,-75 556.62,-121.37 583.58,-321.7 591.53,-388.92"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="588.05,-389.33 592.68,-398.86 595.01,-388.52 588.05,-389.33"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge43" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff004c" d="M501.97,-24.17C506.05,-26.6 509.81,-29.52 513,-33 561.66,-86.05 585.65,-315.63 592.14,-388.63"/>
+<polygon fill="#ff004c" stroke="#ff004c" points="588.69,-389.29 593.04,-398.95 595.66,-388.68 588.69,-389.29"/>
+</g>
+<!-- log_error -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_node26" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="738,-423 677,-423 677,-399 738,-399 738,-423"/>
+<text text-anchor="middle" x="707.5" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~create_coo_from_mesh~~CallsGraph_edge44" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#ff0000" d="M641.26,-411C649.73,-411 658.52,-411 666.8,-411"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="666.95,-414.5 676.95,-411 666.95,-407.5 666.95,-414.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccreate_coo_from_meshCallsGraph = svgPanZoom('#proccreate_coo_from_meshCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~create_coo_from_mesh~~CalledByGraph Pages: 1 -->
+<svg id="proccreate_coo_from_meshCalledByGraph" width="641pt" height="29pt"
+ viewBox="0.00 0.00 641.00 28.81" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~create_coo_from_mesh~~CalledByGraph" class="graph" transform="scale(0.9 0.9) rotate(0) translate(4 28)">
+<title>proc~~create_coo_from_mesh~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 708,-28 708,4 -4,4"/>
+<!-- proc~create_coo_from_mesh -->
+<g id="proc~~create_coo_from_mesh~~CalledByGraph_node1" class="node">
+<title>proc~create_coo_from_mesh</title>
+<polygon fill="none" stroke="black" points="704,-24 568,-24 568,0 704,0 704,-24"/>
+<text text-anchor="middle" x="636" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">create_coo_from_mesh</text>
+</g>
+<!-- proc~initialize_hybrid_from_mesh -->
+<g id="proc~~create_coo_from_mesh~~CalledByGraph_node2" class="node">
+<title>proc~initialize_hybrid_from_mesh</title>
+<g id="a_proc~~create_coo_from_mesh~~CalledByGraph_node2"><a xlink:href="../proc/initialize_hybrid_from_mesh.html" xlink:title="type_node_adjacency%initialize_hybrid_from_mesh">
+<polygon fill="#d9534f" stroke="#d9534f" points="532,-24 246,-24 246,0 532,0 532,-24"/>
+<text text-anchor="middle" x="389" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_node_adjacency%initialize_hybrid_from_mesh</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_hybrid_from_mesh&#45;&gt;proc~create_coo_from_mesh -->
+<g id="proc~~create_coo_from_mesh~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_hybrid_from_mesh&#45;&gt;proc~create_coo_from_mesh</title>
+<path fill="none" stroke="#ff0000" d="M532.16,-12C540.85,-12 549.39,-12 557.62,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="557.87,-15.5 567.87,-12 557.87,-8.5 557.87,-15.5"/>
+</g>
+<!-- proc~initialize_type_domain -->
+<g id="proc~~create_coo_from_mesh~~CalledByGraph_node3" class="node">
+<title>proc~initialize_type_domain</title>
+<g id="a_proc~~create_coo_from_mesh~~CalledByGraph_node3"><a xlink:href="../proc/initialize_type_domain.html" xlink:title="type_domain%initialize_type_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="210,-24 0,-24 0,0 210,0 210,-24"/>
+<text text-anchor="middle" x="105" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%initialize_type_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_domain&#45;&gt;proc~initialize_hybrid_from_mesh -->
+<g id="proc~~create_coo_from_mesh~~CalledByGraph_edge2" class="edge">
+<title>proc~initialize_type_domain&#45;&gt;proc~initialize_hybrid_from_mesh</title>
+<path fill="none" stroke="#ff0000" d="M210.21,-12C218.55,-12 227.08,-12 235.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="235.76,-15.5 245.76,-12 235.76,-8.5 235.76,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccreate_coo_from_meshCalledByGraph = svgPanZoom('#proccreate_coo_from_meshCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">create_coo_from_mesh</span><span class="p">(</span><span class="n">computation_dimension</span><span class="p">,</span><span class="w"> </span><span class="n">sides</span><span class="p">,</span><span class="w"> </span><span class="n">elements</span><span class="p">,</span><span class="w"> </span><span class="n">row_indices</span><span class="p">,</span><span class="w"> </span><span class="n">col_indices</span><span class="p">,</span><span class="w"> </span><span class="n">counter</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">computation_dimension</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">holder_sides</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">sides</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">holder_elements</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">elements</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">row_indices</span><span class="p">(:),</span><span class="w"> </span><span class="n">col_indices</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">counter</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_elements</span><span class="p">,</span><span class="w"> </span><span class="n">num_sides</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">offsets_e</span><span class="p">(:),</span><span class="w"> </span><span class="n">offsets_s</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="n">nodes_per_mesh</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p_conn</span><span class="p">(:)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
+
+<span class="w">        </span><span class="n">num_elements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+<span class="w">        </span><span class="n">num_sides</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">sides</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! 並列書き込みのためのオフセット計算</span>
+<span class="w">        </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">offsets_e</span><span class="p">,</span><span class="w"> </span><span class="n">num_elements</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">offsets_s</span><span class="p">,</span><span class="w"> </span><span class="n">num_sides</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">offsets_e</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">computation_dimension</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_elements</span>
+<span class="w">                </span><span class="n">offsets_e</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">offsets_e</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">e</span><span class="p">%</span><span class="n">get_num_nodes</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">        else</span>
+<span class="k">            </span><span class="n">offsets_e</span><span class="p">(</span><span class="mi">2</span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">offsets_s</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">computation_dimension</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_sides</span>
+<span class="w">                </span><span class="n">offsets_s</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">offsets_s</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sides</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">s</span><span class="p">%</span><span class="n">get_num_nodes</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">        else</span>
+<span class="k">            </span><span class="n">offsets_s</span><span class="p">(</span><span class="mi">2</span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="w">        </span><span class="c">!$omp parallel do private(i, j, k, base, nodes_per_mesh, p_conn)</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_elements</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">computation_dimension</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">cycle</span>
+<span class="k">            </span><span class="n">nodes_per_mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">e</span><span class="p">%</span><span class="n">get_num_nodes</span><span class="p">()</span>
+<span class="w">            </span><span class="n">p_conn</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">e</span><span class="p">%</span><span class="n">get_connectivity</span><span class="p">()</span>
+<span class="w">            </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">offsets_e</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nodes_per_mesh</span>
+<span class="w">                </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nodes_per_mesh</span>
+<span class="w">                    </span><span class="n">row_indices</span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">nodes_per_mesh</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p_conn</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">col_indices</span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">nodes_per_mesh</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p_conn</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end do</span>
+<span class="k">            end do</span>
+<span class="k">        end do</span>
+<span class="w">        </span><span class="c">!$omp end parallel do</span>
+
+<span class="w">        </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">offsets_e</span><span class="p">(</span><span class="n">num_elements</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="c">!$omp parallel do private(i, j, k, nodes_per_mesh, p_conn)</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_sides</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">computation_dimension</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">cycle</span>
+<span class="k">            </span><span class="n">nodes_per_mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sides</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">s</span><span class="p">%</span><span class="n">get_num_nodes</span><span class="p">()</span>
+<span class="w">            </span><span class="n">p_conn</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">sides</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">s</span><span class="p">%</span><span class="n">get_connectivity</span><span class="p">()</span>
+<span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nodes_per_mesh</span>
+<span class="w">                </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nodes_per_mesh</span>
+<span class="w">                    </span><span class="n">row_indices</span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">offsets_s</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">nodes_per_mesh</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p_conn</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">col_indices</span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">offsets_s</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">nodes_per_mesh</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p_conn</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="w">                </span><span class="k">end do</span>
+<span class="k">            end do</span>
+<span class="k">        end do</span>
+<span class="w">        </span><span class="c">!$omp end parallel do</span>
+
+<span class="w">        </span><span class="n">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">offsets_e</span><span class="p">(</span><span class="n">num_elements</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">offsets_s</span><span class="p">(</span><span class="n">num_sides</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">offsets_e</span><span class="p">,</span><span class="w"> </span><span class="n">offsets_s</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">create_coo_from_mesh</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

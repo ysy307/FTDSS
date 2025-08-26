@@ -10,7 +10,6 @@ module inout_project_settings
     public :: get_project_path
 
 contains
-
     subroutine inout_project_path_initialize()
         implicit none
         character(64), parameter :: dName = "ProjectPath.dir"

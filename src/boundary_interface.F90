@@ -4,7 +4,6 @@ module conditions_boundary
     use :: stdlib_logger
     use :: module_core
     use :: module_domain, only:type_domain, holder_sides
-    use :: module_matrix, only:type_crs
     use :: module_input
     implicit none
     private
@@ -12,6 +11,14 @@ module conditions_boundary
     public :: abst_bc_thermal
     public :: type_bc_thermal_dirichlet
     public :: type_bc_thermal_adiabatic
+
+    public :: mode_value
+    public :: mode_nr
+    public :: mode_ic
+
+    integer(int32), parameter :: mode_value = 1
+    integer(int32), parameter :: mode_nr = 0
+    integer(int32), parameter :: mode_ic = -1
 
     type, abstract :: abst_bc_thermal
         integer(int32) :: material_id
@@ -47,7 +54,7 @@ module conditions_boundary
             implicit none
             class(abst_bc_thermal), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in) :: id
             integer(int32), intent(in) :: i_material
             real(real64), intent(in) :: time_conv
@@ -60,7 +67,7 @@ module conditions_boundary
             real(real64), intent(in) :: current_time
             real(real64), intent(inout), optional :: A(:, :)
             real(real64), intent(inout) :: b(:)
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in), optional :: mode
         end subroutine abst_apply_bc_dence
 
@@ -71,7 +78,7 @@ module conditions_boundary
             real(real64), intent(in) :: current_time
             type(type_crs), intent(inout), optional :: A
             real(real64), intent(inout) :: b(:)
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in), optional :: mode
         end subroutine abst_apply_bc_sparse_crs
     end interface
@@ -81,7 +88,7 @@ module conditions_boundary
             implicit none
             class(type_bc_thermal_dirichlet), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in) :: id
             integer(int32), intent(in) :: i_material
             real(real64), intent(in) :: time_conv
@@ -94,7 +101,7 @@ module conditions_boundary
             real(real64), intent(in) :: current_time
             real(real64), intent(inout), optional :: A(:, :)
             real(real64), intent(inout) :: b(:)
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_dense_thermal_dirichlet
@@ -105,7 +112,7 @@ module conditions_boundary
             real(real64), intent(in) :: current_time
             type(type_crs), intent(inout), optional :: A
             real(real64), intent(inout) :: b(:)
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_crs_thermal_dirichlet
@@ -116,7 +123,7 @@ module conditions_boundary
             implicit none
             class(type_bc_thermal_adiabatic), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in) :: id
             integer(int32), intent(in) :: i_material
             real(real64), intent(in) :: time_conv
@@ -129,7 +136,7 @@ module conditions_boundary
             real(real64), intent(in) :: current_time
             real(real64), intent(inout), optional :: A(:, :)
             real(real64), intent(inout) :: b(:)
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_dense_thermal_adiabatic
@@ -140,191 +147,16 @@ module conditions_boundary
             real(real64), intent(in) :: current_time
             type(type_crs), intent(inout), optional :: A
             real(real64), intent(inout) :: b(:)
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in), optional :: mode
 
         end subroutine apply_crs_thermal_adiabatic
     end interface
 
-!     public :: Condition_BC_Local
-!     public :: Abstract_Condition_BC
-!     public :: Type_BC_Thermal
-
-!     type :: Type_Edge
-!         integer(int32) :: EdgeType
-!         integer(int32) :: EdgeGroup
-!         integer(int32), allocatable :: Conn(:)
-!         real(real64), allocatable :: Distance(:)
-!         type(Vector3D), allocatable :: UnitNormal(:)
-!     end type Type_Edge
-
-!     type :: Condition_BC_Local
-!         character(:), allocatable :: type
-!         logical(4) :: isUniform
-!         real(real64), allocatable :: value(:)
-!     end type Condition_BC_Local
-
-!     type, abstract :: Abstract_Condition_BC
-!         !! Boundary conditions information
-!         integer(int32) :: numBCGroup
-!         real(real64), allocatable :: Time(:)
-!         integer(int32), allocatable :: BCGroup(:)
-!         type(Condition_BC_Local), allocatable :: BCInfo(:)
-
-!     contains
-!         procedure(Abstract_BC_Thermal_CRS_Dirichlet),    pass(self), deferred :: Fix_BC_Dirichlet !&
-!         procedure(Abstract_BC_Thermal_CRS_Dirichlet_NR), pass(self), deferred :: Fix_BC_Dirichlet_NR !&
-!         procedure(Abstract_BC_Thermal_CRS_Fix_All),      pass(self), deferred :: Fix_BC_All !&
-!         procedure(Abstract_BC_Thermal_CRS_Fix_RHS),      pass(self), deferred :: Fix_BC_RHS !&
-!         generic, public :: Fix_BC => Fix_BC_All, & !&
-!                                      Fix_BC_RHS !&
-!     end type Abstract_Condition_BC
-
-!     type :: Type_BC_Thermal
-!         !! Boundary conditions information
-!         integer(int32) :: numBCGroup
-!         real(real64), allocatable :: Time(:)
-!         integer(int32), allocatable :: BCGroup(:)
-!         type(Condition_BC_Local), allocatable :: BC_Info(:)
-!         ! type(Condition_BC_Local), allocatable :: BCInfo(:)
-!         !! Boundary conditions information of the Edges
-!         integer(int32) :: numEdges
-!         type(Type_Edge), allocatable :: EdgeInfo(:)
-
-!     contains
-!         procedure, private, pass(self) :: Fix_BoundaryConditions_CRS
-!         procedure, private, pass(self) :: Fix_BoundaryConditions_Full
-!         generic, public :: Fix_BoundaryConditions => Fix_BoundaryConditions_CRS, & !&
-!                                                      Fix_BoundaryConditions_Full
-!         procedure, private, pass(self) :: Fix_Bounday_Values_CRS
-!         procedure, private, pass(self) :: Fix_Bounday_Values_Full
-!         procedure, private, pass(self) :: Fix_Bounday_Values_RHS
-!         generic, public :: Fix_Bounday_Values => Fix_Bounday_Values_CRS, & !&
-!                                                  Fix_Bounday_Values_Full, & !&
-!                                                  Fix_Bounday_Values_RHS
-!     end type
-
-!     type, extends(Abstract_Condition_BC) :: Type_BC_Thermal_CRS
-!     contains
-!         procedure :: Fix_BC_Dirichlet    => Type_BC_Thermal_CRS_Dirichlet !&
-!         procedure :: Fix_BC_Dirichlet_NR => Type_BC_Thermal_CRS_Dirichlet_NR !&
-!         procedure :: Fix_BC_All          => Type_BC_Thermal_CRS_Fix_BC_All !&
-!         procedure :: Fix_BC_RHS          => Type_BC_Thermal_CRS_Fix_BC_RHS !&
-!     end type
-!     ! public :: Fix_BoundaryConditions
-
-!     abstract interface
-!         subroutine Abstract_BC_Thermal_CRS_Fix_All(self, A, b, Sides, time)
-!             import :: Abstract_Condition_BC, type_crs, SideHolder, real64
-!             implicit none
-!             class(Abstract_Condition_BC), intent(in) :: self
-!             type(type_crs), intent(inout) :: A
-!             real(real64), intent(inout) :: b(:)
-!             type(SideHolder), intent(in) :: Sides(:)
-!             real(real64), intent(in), optional :: time
-
-!         end subroutine Abstract_BC_Thermal_CRS_Fix_All
-
-!         subroutine Abstract_BC_Thermal_CRS_Fix_RHS(self, b, Sides, time)
-!             import :: Abstract_Condition_BC, type_crs, SideHolder, real64
-!             implicit none
-!             class(Abstract_Condition_BC), intent(in) :: self
-!             real(real64), intent(inout) :: b(:)
-!             type(SideHolder), intent(in) :: Sides(:)
-!             real(real64), intent(in), optional :: time
-
-!         end subroutine Abstract_BC_Thermal_CRS_Fix_RHS
-
-!         subroutine Abstract_BC_Thermal_CRS_Dirichlet(self, A, b, Info, Edge, Dval)
-!             import :: Abstract_Condition_BC, Condition_BC_Local, type_crs, real64, int32
-!             implicit none
-!             class(Abstract_Condition_BC), intent(in) :: self
-!             type(type_crs), intent(inout), optional :: A
-!             real(real64), intent(inout) :: b(:)
-!             type(Condition_BC_Local), intent(in) :: Info
-!             integer(int32), intent(in) :: Edge(2)
-!             real(real64), intent(in) :: Dval
-
-!         end subroutine Abstract_BC_Thermal_CRS_Dirichlet
-
-!         subroutine Abstract_BC_Thermal_CRS_Dirichlet_NR(self, A, b, Info, Edge)
-!             import :: Abstract_Condition_BC, Condition_BC_Local, type_crs, real64, int32
-!             implicit none
-!             class(Abstract_Condition_BC), intent(in) :: self
-!             type(type_crs), intent(inout), optional :: A
-!             real(real64), intent(inout) :: b(:)
-!             type(Condition_BC_Local), intent(in) :: Info
-!             integer(int32), intent(in) :: Edge(2)
-
-!         end subroutine Abstract_BC_Thermal_CRS_Dirichlet_NR
-!     end interface
-
-!     interface
-!         module function Type_BC_Thermal_CRS_Construct(Input) result(Structure)
-!             implicit none
-!             type(Type_Input), intent(in) :: Input
-!             class(Abstract_Condition_BC), allocatable :: Structure
-
-!         end function Type_BC_Thermal_CRS_Construct
-
-!         module subroutine Type_BC_Thermal_CRS_Fix_BC_All(self, A, b, Sides, time)
-!             implicit none
-!             class(Type_BC_Thermal_CRS), intent(in) :: self
-!             type(type_crs), intent(inout) :: A
-!             real(real64), intent(inout) :: b(:)
-!             type(SideHolder), intent(in) :: Sides(:)
-!             real(real64), intent(in), optional :: time
-
-!         end subroutine Type_BC_Thermal_CRS_Fix_BC_All
-
-!         module subroutine Type_BC_Thermal_CRS_Fix_BC_RHS(self, b, Sides, time)
-!             implicit none
-!             class(Type_BC_Thermal_CRS), intent(in) :: self
-!             real(real64), intent(inout) :: b(:)
-!             type(SideHolder), intent(in) :: Sides(:)
-!             real(real64), intent(in), optional :: time
-
-!         end subroutine Type_BC_Thermal_CRS_Fix_BC_RHS
-
-!         module subroutine Type_BC_Thermal_CRS_Dirichlet(self, A, b, Info, Edge, Dval)
-!             implicit none
-!             class(Type_BC_Thermal_CRS), intent(in) :: self
-!             type(type_crs), intent(inout), optional :: A
-!             real(real64), intent(inout) :: b(:)
-!             type(Condition_BC_Local), intent(in) :: Info
-!             integer(int32), intent(in) :: Edge(2)
-!             real(real64), intent(in) :: Dval
-
-!         end subroutine Type_BC_Thermal_CRS_Dirichlet
-
-!         module subroutine Type_BC_Thermal_CRS_Dirichlet_NR(self, A, b, Info, Edge)
-!             implicit none
-!             class(Type_BC_Thermal_CRS), intent(in) :: self
-!             type(type_crs), intent(inout), optional :: A
-!             real(real64), intent(inout) :: b(:)
-!             type(Condition_BC_Local), intent(in) :: Info
-!             integer(int32), intent(in) :: Edge(2)
-
-!         end subroutine Type_BC_Thermal_CRS_Dirichlet_NR
-!     end interface
-
-!     interface
-!         module subroutine Fix_BC_CRS_Dirichlet(A, b, Info, Edge, Dval)
-!             implicit none
-!             type(type_crs), intent(inout), optional :: A
-!             real(real64), intent(inout) :: b(:)
-!             type(Condition_BC_Local), intent(in) :: Info
-!             integer(int32), intent(in) :: Edge(2)
-!             real(real64), intent(in) :: Dval
-
-!         end subroutine Fix_BC_CRS_Dirichlet
-
-!     end interface
-
     interface
         module subroutine calculate_time_coefficient(time, arr_time, time_coefficient, idx)
             implicit none
-            real(real64), intent(in) :: Time
+            real(real64), intent(in) :: time
             real(real64), intent(in) :: arr_time(:)
             real(real64), intent(inout) :: time_coefficient
             integer(int32), intent(inout) :: idx
@@ -333,7 +165,7 @@ module conditions_boundary
 
         module subroutine find_target_edges_by_group(domain, i_material, target_edges)
             implicit none
-            type(type_domain), intent(in) :: domain
+            type(type_domain), intent(inout) :: domain
             integer(int32), intent(in) :: i_material
             integer(int32), allocatable, intent(inout) :: target_edges(:, :)
 

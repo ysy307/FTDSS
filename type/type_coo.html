@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.8% of total for derived types.</p>Including implementation: 135 statements,  4.2% of total for derived types.">11 statements</a>
+                 title="<p> 1.1% of total for derived types.</p>Including implementation: 96 statements,  1.8% of total for derived types.">14 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/matrix_coo.f90.html'>matrix_coo.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/matrix_coo.html'>matrix_coo</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_matrix_coo.html'>core_types_matrix_coo</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_coo</li>
           </ol>
         </nav>
@@ -134,9 +134,9 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_coo.html#variable-col~4">col</a>
+            <a class="list-group-item" href="../type/type_coo.html#variable-col~13">col</a>
             <a class="list-group-item" href="../type/type_coo.html#variable-nnz~3">nnz</a>
-            <a class="list-group-item" href="../type/type_coo.html#variable-row~4">row</a>
+            <a class="list-group-item" href="../type/type_coo.html#variable-row~13">row</a>
             <a class="list-group-item" href="../type/type_coo.html#variable-val~11">val</a>
         </div>
       </div>
@@ -164,10 +164,13 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-copy~4">copy</a>
-            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-destory~4">destory</a>
+            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-add~4">add</a>
+            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-destroy~9">destroy</a>
             <a class="list-group-item" href="../type/type_coo.html#boundprocedure-find~4">find</a>
-            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-initialize~31">initialize</a>
+            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-initialize~30">initialize</a>
+            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-set~9">set</a>
+            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-set_all~4">set_all</a>
+            <a class="list-group-item" href="../type/type_coo.html#boundprocedure-zero~4">zero</a>
         </div>
       </div>
     </div>
@@ -290,7 +293,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-col~4"></span>
+              <span class="anchor" id="variable-col~13"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -324,7 +327,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-row~4"></span>
+              <span class="anchor" id="variable-row~13"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -369,17 +372,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-copy~4"></span>
+      <span class="anchor" id="boundprocedure-add~4"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>copy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/copy_coo.html'>copy_coo</a>
+  <strong>add</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/add_coo.html'>add_coo</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  function <a href='../proc/copy_coo.html'>copy_coo</a>(self) result(B)  
+    private  subroutine <a href='../proc/add_coo.html'>add_coo</a>(self, row, col, value)  
 </h3>
     
 
@@ -401,7 +404,7 @@ large graphs.</div>
               <span class="anchor" ></span>
               class(<a href='type_coo.html'>type_coo</a>),
             </td>
-<td>intent(in)</td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
@@ -411,14 +414,54 @@ large graphs.</div>
 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
     </tbody>
   </table>
 
-    <h4>
-    Return Value
-    <small>class(<a href='abst_matrix.html'>abst_matrix</a>), allocatable</small>
-    </h4>
-    
 
           </li>
       </ul>
@@ -428,17 +471,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destory~4"></span>
+      <span class="anchor" id="boundprocedure-destroy~9"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>destory</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destory_coo.html'>destory_coo</a>
+  <strong>destroy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destroy_coo.html'>destroy_coo</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/destory_coo.html'>destory_coo</a>(self)  
+    private  subroutine <a href='../proc/destroy_coo.html'>destroy_coo</a>(self)  
 </h3>
     
 
@@ -492,7 +535,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/find_coo.html'>find_coo</a>(self, row, col, index)  
+    private pure function <a href='../proc/find_coo.html'>find_coo</a>(self, row, col) result(index)  
 </h3>
     
 
@@ -554,24 +597,14 @@ large graphs.</div>
 
             </td>
         </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>index</strong></td>
-            <td>
-
-            </td>
-        </tr>
     </tbody>
   </table>
 
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
 
           </li>
       </ul>
@@ -581,7 +614,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~31"></span>
+      <span class="anchor" id="boundprocedure-initialize~30"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_coo.html'>initialize_type_coo</a>
@@ -591,7 +624,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/initialize_type_coo.html'>initialize_type_coo</a>(self, domain)  
+    private  subroutine <a href='../proc/initialize_type_coo.html'>initialize_type_coo</a>(self, num_nodes, row, col)  
 </h3>
     
 
@@ -626,14 +659,266 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_domain.html'>type_domain</a>),
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set~9"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/set_coo.html'>set_coo</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_coo.html'>set_coo</a>(self, row, col, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coo.html'>type_coo</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>domain</strong></td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_all~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_all</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/set_all_coo.html'>set_all_coo</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_all_coo.html'>set_all_coo</a>(self, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coo.html'>type_coo</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-zero~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>zero</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/zero_coo.html'>zero_coo</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/zero_coo.html'>zero_coo</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_coo.html'>type_coo</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
             <td>
 
             </td>
@@ -668,7 +953,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 9 statements,  0.3% of total for derived types.">9 statements</a>
+                 title="<p> 1.0% of total for derived types.</p>Including implementation: 12 statements,  0.2% of total for derived types.">12 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,11 +134,14 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-calculate_hydraulic~3">calculate_hydraulic</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-calculate_mechanical~3">calculate_mechanical</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-calculate_thermal~3">calculate_thermal</a>
             <a class="list-group-item" href="../type/type_material_settings.html#variable-hydraulic~3">hydraulic</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-id~38">id</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-id~16">id</a>
             <a class="list-group-item" href="../type/type_material_settings.html#variable-is_dispersed~2">is_dispersed</a>
             <a class="list-group-item" href="../type/type_material_settings.html#variable-is_frozen~2">is_frozen</a>
-            <a class="list-group-item" href="../type/type_material_settings.html#variable-name~5">name</a>
+            <a class="list-group-item" href="../type/type_material_settings.html#variable-name~4">name</a>
             <a class="list-group-item" href="../type/type_material_settings.html#variable-phase~2">phase</a>
             <a class="list-group-item" href="../type/type_material_settings.html#variable-thermal~3">thermal</a>
         </div>
@@ -483,6 +486,57 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
+              <span class="anchor" id="variable-calculate_hydraulic~3"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>calculate_hydraulic</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-calculate_mechanical~3"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>calculate_mechanical</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-calculate_thermal~3"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>calculate_thermal</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
               <span class="anchor" id="variable-hydraulic~3"></span>
               type(<a href='type_materials_hydraulic.html'>type_materials_hydraulic</a>),
             </td>
@@ -500,7 +554,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-id~38"></span>
+              <span class="anchor" id="variable-id~16"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -551,7 +605,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-name~5"></span>
+              <span class="anchor" id="variable-name~4"></span>
               character(len=:),
             </td>
               <td>public,</td>
@@ -617,6 +671,9 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phase</span>
 <span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_frozen</span>
 <span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_dispersed</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calculate_thermal</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calculate_hydraulic</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calculate_mechanical</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_thermal</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">thermal</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_materials_hydraulic</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hydraulic</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_material_settings</span>
@@ -642,7 +699,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

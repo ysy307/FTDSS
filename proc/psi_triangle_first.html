@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">17 statements</a>
+                 title=" 0.1% of total for procedures.">17 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/element_triangle_first.f90.html'>element_triangle_first.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/domain_element_triangle_first.html'>domain_element_triangle_first</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_mesh_element_triangle_first.html'>domain_mesh_element_triangle_first</a></li>
             <li class="breadcrumb-item active" aria-current="page">psi_triangle_first</li>
           </ol>
         </nav>
@@ -159,7 +159,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>module function psi_triangle_first(self, i, xi, eta) result(psi)  
+    <h2>pure elemental module function psi_triangle_first(self, i, r) result(psi)  
     <a href="../interface/psi_triangle_first.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
 </h2>
     
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~188"></span>
+              <span class="anchor" id="variable-self~402"></span>
               class(<a href='../type/type_triangle_first.html'>type_triangle_first</a>),
             </td>
 <td>intent(in)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-i~43"></span>
+              <span class="anchor" id="variable-i~133"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -209,30 +209,15 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-xi~40"></span>
-              real(kind=real64),
+              <span class="anchor" id="variable-r~50"></span>
+              type(<a href='../type/type_dp_vector_3d.html'>type_dp_vector_3d</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>xi</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-eta~37"></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>eta</strong></td>
+            <td><strong>r</strong></td>
             <td>
                 
             </td>
@@ -242,7 +227,7 @@
 
       <h3>Return Value
         <small>
-          <span class="anchor" id="variable-psi~15"></span>
+          <span class="anchor" id="variable-psi~18"></span>
           real(kind=real64)
         </small>
       </h3>
@@ -416,19 +401,20 @@ large graphs.</div>
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">psi_triangle_first</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">xi</span><span class="p">,</span><span class="w"> </span><span class="n">eta</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure elemental module function </span><span class="n">psi_triangle_first</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
 <span class="k">        class</span><span class="p">(</span><span class="n">type_triangle_first</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xi</span><span class="p">,</span><span class="w"> </span><span class="n">eta</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_dp_vector_3d</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">psi</span>
+
 <span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="w">            </span><span class="n">psi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xi</span>
+<span class="w">            </span><span class="n">psi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">%</span><span class="n">x</span>
 <span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="w">            </span><span class="n">psi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eta</span>
+<span class="w">            </span><span class="n">psi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">%</span><span class="n">y</span>
 <span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="w">            </span><span class="n">psi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">eta</span>
+<span class="w">            </span><span class="n">psi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">r</span><span class="p">%</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">r</span><span class="p">%</span><span class="n">y</span>
 <span class="w">        </span><span class="k">case </span><span class="n">default</span>
 <span class="w">            </span><span class="n">psi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
 <span class="w">        </span><span class="k">end select</span>
@@ -456,7 +442,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,0 +1,1037 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calculate_water_content &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calculate_water_content
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">8 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/properties_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/properties_manager.f90.html'>properties_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/properties_properties_manager.html'>properties_properties_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calculate_water_content</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calculate_water_content.html#src">calculate_water_content</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private pure elemental subroutine calculate_water_content(ptrs, state)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_properties_manager.html'>type_properties_manager</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ptrs~2"></span>
+              type(<a href='../type/type_material_pointers.html'>type_material_pointers</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ptrs</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~3"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calculate_water_content~~CallsGraph Pages: 1 -->
+<svg id="proccalculate_water_contentCallsGraph" width="387pt" height="32pt"
+ viewBox="0.00 0.00 387.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calculate_water_content~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~calculate_water_content~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 383,-28 383,4 -4,4"/>
+<!-- proc~calculate_water_content -->
+<g id="proc~~calculate_water_content~~CallsGraph_node1" class="node">
+<title>proc~calculate_water_content</title>
+<polygon fill="none" stroke="black" points="289,-24 0,-24 0,0 289,0 289,-24"/>
+<text text-anchor="middle" x="144.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_properties_manager%calculate_water_content</text>
+</g>
+<!-- calc -->
+<g id="proc~~calculate_water_content~~CallsGraph_node2" class="node">
+<title>calc</title>
+<polygon fill="#777777" stroke="#777777" points="379,-24 325,-24 325,0 379,0 379,-24"/>
+<text text-anchor="middle" x="352" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc</text>
+</g>
+<!-- proc~calculate_water_content&#45;&gt;calc -->
+<g id="proc~~calculate_water_content~~CallsGraph_edge1" class="edge">
+<title>proc~calculate_water_content&#45;&gt;calc</title>
+<path fill="none" stroke="#ff0000" d="M289.06,-12C298.28,-12 306.98,-12 314.77,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="314.82,-15.5 324.82,-12 314.82,-8.5 314.82,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calculate_water_content~~CalledByGraph Pages: 1 -->
+<svg id="proccalculate_water_contentCalledByGraph" width="641pt" height="96pt"
+ viewBox="0.00 0.00 641.00 95.55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calculate_water_content~~CalledByGraph" class="graph" transform="scale(0.25 0.25) rotate(0) translate(4 380.16)">
+<title>proc~~calculate_water_content~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-380.16 2573,-380.16 2573,4 -4,4"/>
+<!-- proc~calculate_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node1" class="node">
+<title>proc~calculate_water_content</title>
+<polygon fill="none" stroke="black" points="2569,-167.16 2280,-167.16 2280,-143.16 2569,-143.16 2569,-167.16"/>
+<text text-anchor="middle" x="2424.5" y="-152.76" font-family="Helvetica,sans-Serif" font-size="10.50">type_properties_manager%calculate_water_content</text>
+</g>
+<!-- none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node2" class="node">
+<title>none~calc_water_content</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node2"><a xlink:href="../type/type_properties_manager.html#boundprocedure-calc_water_content" xlink:title="type_properties_manager%calc_water_content">
+<polygon fill="#a7506f" stroke="#a7506f" points="1823.5,-207.16 1561.5,-207.16 1561.5,-183.16 1823.5,-183.16 1823.5,-207.16"/>
+<text text-anchor="middle" x="1692.5" y="-192.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_water_content</text>
+</a>
+</g>
+</g>
+<!-- none~calc_water_content&#45;&gt;proc~calculate_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge1" class="edge">
+<title>none~calc_water_content&#45;&gt;proc~calculate_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1793.6,-183.13C1824.76,-179.76 1859.27,-176.41 1891,-174.16 2018.38,-165.12 2163.23,-160.31 2269.66,-157.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2269.92,-161.28 2279.84,-157.55 2269.76,-154.28 2269.92,-161.28"/>
+</g>
+<!-- proc~calculate_water_content_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node6" class="node">
+<title>proc~calculate_water_content_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node6"><a xlink:href="../proc/calculate_water_content_array.html" xlink:title="type_properties_manager%calculate_water_content_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="2228.5,-207.16 1906.5,-207.16 1906.5,-183.16 2228.5,-183.16 2228.5,-207.16"/>
+<text text-anchor="middle" x="2067.5" y="-192.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_water_content_array</text>
+</a>
+</g>
+</g>
+<!-- none~calc_water_content&#45;&gt;proc~calculate_water_content_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge20" class="edge">
+<title>none~calc_water_content&#45;&gt;proc~calculate_water_content_array</title>
+<path fill="none" stroke="#cc00ff" d="M1823.7,-195.16C1847.15,-195.16 1871.92,-195.16 1896.32,-195.16"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1896.38,-198.66 1906.38,-195.16 1896.38,-191.66 1896.38,-198.66"/>
+</g>
+<!-- proc~calc_thermal_properties_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node3" class="node">
+<title>proc~calc_thermal_properties_impl_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node3"><a xlink:href="../proc/calc_thermal_properties_impl_scalar.html" xlink:title="type_properties_manager%calc_thermal_properties_impl_scalar">
+<polygon fill="#d9534f" stroke="#d9534f" points="2244,-88.16 1891,-88.16 1891,-64.16 2244,-64.16 2244,-88.16"/>
+<text text-anchor="middle" x="2067.5" y="-73.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_thermal_properties_impl_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_properties_impl_scalar&#45;&gt;proc~calculate_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge2" class="edge">
+<title>proc~calc_thermal_properties_impl_scalar&#45;&gt;proc~calculate_water_content</title>
+<path fill="none" stroke="#ff0000" d="M2161.82,-88.22C2188.49,-92.29 2217.51,-97.31 2244,-103.16 2289.9,-113.29 2341.34,-128.61 2377.34,-140"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2376.48,-143.4 2387.07,-143.1 2378.61,-136.73 2376.48,-143.4"/>
+</g>
+<!-- proc~calculate_thc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node4" class="node">
+<title>proc~calculate_thc_impl_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node4"><a xlink:href="../proc/calculate_thc_impl_scalar.html" xlink:title="type_properties_manager%calculate_thc_impl_scalar">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1840,-292.16 1545,-292.16 1545,-268.16 1840,-268.16 1840,-292.16"/>
+<text text-anchor="middle" x="1692.5" y="-277.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_thc_impl_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_thc_impl_scalar&#45;&gt;proc~calculate_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge3" class="edge">
+<title>proc~calculate_thc_impl_scalar&#45;&gt;proc~calculate_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1840.09,-271.59C1951.82,-263.03 2108.96,-246.59 2244,-216.16 2293.6,-204.98 2348.7,-185.08 2384.6,-171.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2386.18,-174.19 2394.2,-167.27 2383.61,-167.68 2386.18,-174.19"/>
+</g>
+<!-- proc~calculate_vhc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node5" class="node">
+<title>proc~calculate_vhc_impl_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node5"><a xlink:href="../proc/calculate_vhc_impl_scalar.html" xlink:title="type_properties_manager%calculate_vhc_impl_scalar">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1841.5,-128.16 1543.5,-128.16 1543.5,-104.16 1841.5,-104.16 1841.5,-128.16"/>
+<text text-anchor="middle" x="1692.5" y="-113.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_vhc_impl_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_vhc_impl_scalar&#45;&gt;proc~calculate_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge4" class="edge">
+<title>proc~calculate_vhc_impl_scalar&#45;&gt;proc~calculate_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1841.64,-121.58C1952.5,-125.96 2107.81,-132.75 2244,-141.16 2252.41,-141.68 2261.04,-142.24 2269.74,-142.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2269.78,-146.35 2280,-143.55 2270.26,-139.36 2269.78,-146.35"/>
+</g>
+<!-- proc~calculate_water_content_array&#45;&gt;proc~calculate_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge5" class="edge">
+<title>proc~calculate_water_content_array&#45;&gt;proc~calculate_water_content</title>
+<path fill="none" stroke="#ff0000" d="M2175.01,-183.15C2216.51,-178.48 2264.21,-173.1 2306.66,-168.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2307.21,-171.78 2316.76,-167.18 2306.43,-164.83 2307.21,-171.78"/>
+</g>
+<!-- proc~calc_thermal_properties_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node7" class="node">
+<title>proc~calc_thermal_properties_impl_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node7"><a xlink:href="../proc/calc_thermal_properties_impl_array.html" xlink:title="type_properties_manager%calc_thermal_properties_impl_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="1494,-128.16 1145,-128.16 1145,-104.16 1494,-104.16 1494,-128.16"/>
+<text text-anchor="middle" x="1319.5" y="-113.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_thermal_properties_impl_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_properties_impl_array&#45;&gt;none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge6" class="edge">
+<title>proc~calc_thermal_properties_impl_array&#45;&gt;none~calc_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1414.04,-128.19C1440.04,-132.07 1468.21,-136.78 1494,-142.16 1544.94,-152.77 1602.3,-168.61 1642.02,-180.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1641.14,-183.59 1651.72,-183.06 1643.12,-176.88 1641.14,-183.59"/>
+</g>
+<!-- proc~calc_thermal_properties_impl_array&#45;&gt;proc~calculate_thc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge14" class="edge">
+<title>proc~calc_thermal_properties_impl_array&#45;&gt;proc~calculate_thc_impl_scalar</title>
+<path fill="none" stroke="#00ff66" d="M1379.82,-128.16C1415.07,-137.21 1459.48,-152.09 1494,-175.16 1514.16,-188.63 1510.18,-202.19 1530,-216.16 1561.73,-238.51 1602.37,-254.56 1634.94,-265"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1634.18,-268.43 1644.77,-268.06 1636.26,-261.75 1634.18,-268.43"/>
+</g>
+<!-- proc~calc_thermal_properties_impl_array&#45;&gt;proc~calculate_vhc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge17" class="edge">
+<title>proc~calc_thermal_properties_impl_array&#45;&gt;proc~calculate_vhc_impl_scalar</title>
+<path fill="none" stroke="#0066ff" d="M1494.05,-116.16C1507.07,-116.16 1520.17,-116.16 1533.09,-116.16"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1533.41,-119.66 1543.41,-116.16 1533.41,-112.66 1533.41,-119.66"/>
+</g>
+<!-- proc~calc_thermal_properties_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node8" class="node">
+<title>proc~calc_thermal_properties_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node8"><a xlink:href="../proc/calc_thermal_properties_scalar.html" xlink:title="type_properties_manager%calc_thermal_properties_scalar">
+<polygon fill="#d9534f" stroke="#d9534f" points="1855,-86.16 1530,-86.16 1530,-62.16 1855,-62.16 1855,-86.16"/>
+<text text-anchor="middle" x="1692.5" y="-71.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_thermal_properties_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_properties_scalar&#45;&gt;proc~calc_thermal_properties_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge13" class="edge">
+<title>proc~calc_thermal_properties_scalar&#45;&gt;proc~calc_thermal_properties_impl_scalar</title>
+<path fill="none" stroke="#cbff00" d="M1855.2,-75.02C1863.69,-75.07 1872.24,-75.11 1880.8,-75.16"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1880.81,-78.66 1890.83,-75.21 1880.85,-71.66 1880.81,-78.66"/>
+</g>
+<!-- proc~calculate_hcf_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node9" class="node">
+<title>proc~calculate_hcf_impl_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node9"><a xlink:href="../proc/calculate_hcf_impl_array.html" xlink:title="type_properties_manager%calculate_hcf_impl_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1094.5,-170.16 802.5,-170.16 802.5,-146.16 1094.5,-146.16 1094.5,-170.16"/>
+<text text-anchor="middle" x="948.5" y="-155.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_hcf_impl_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_hcf_impl_array&#45;&gt;none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge7" class="edge">
+<title>proc~calculate_hcf_impl_array&#45;&gt;none~calc_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1094.66,-159.94C1204.43,-161.95 1358.81,-166.21 1494,-175.16 1520.68,-176.92 1549.33,-179.45 1576.31,-182.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1576.25,-185.64 1586.55,-183.16 1576.95,-178.67 1576.25,-185.64"/>
+</g>
+<!-- proc~calculate_hcf_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node10" class="node">
+<title>proc~calculate_hcf_impl_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node10"><a xlink:href="../proc/calculate_hcf_impl_scalar.html" xlink:title="type_properties_manager%calculate_hcf_impl_scalar">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1467,-208.16 1172,-208.16 1172,-184.16 1467,-184.16 1467,-208.16"/>
+<text text-anchor="middle" x="1319.5" y="-193.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_hcf_impl_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_hcf_impl_array&#45;&gt;proc~calculate_hcf_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge23" class="edge">
+<title>proc~calculate_hcf_impl_array&#45;&gt;proc~calculate_hcf_impl_scalar</title>
+<path fill="none" stroke="#33ff00" d="M1066.25,-170.18C1106.24,-174.3 1151.16,-178.92 1191.89,-183.12"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1191.57,-186.6 1201.87,-184.15 1192.28,-179.64 1191.57,-186.6"/>
+</g>
+<!-- proc~calculate_hcf_impl_scalar&#45;&gt;none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge8" class="edge">
+<title>proc~calculate_hcf_impl_scalar&#45;&gt;none~calc_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1467.13,-195.76C1494.82,-195.69 1523.72,-195.61 1551.21,-195.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1551.28,-199.03 1561.27,-195.51 1551.26,-192.03 1551.28,-199.03"/>
+</g>
+<!-- proc~calculate_qw_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node11" class="node">
+<title>proc~calculate_qw_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node11"><a xlink:href="../proc/calculate_qw_array.html" xlink:title="type_properties_manager%calculate_qw_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1450.5,-250.16 1188.5,-250.16 1188.5,-226.16 1450.5,-226.16 1450.5,-250.16"/>
+<text text-anchor="middle" x="1319.5" y="-235.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_qw_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_qw_array&#45;&gt;none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge9" class="edge">
+<title>proc~calculate_qw_array&#45;&gt;none~calc_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1424.34,-226.12C1472.07,-220.59 1528.81,-214.01 1577.7,-208.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1578.16,-211.82 1587.69,-207.19 1577.35,-204.86 1578.16,-211.82"/>
+</g>
+<!-- proc~calculate_qw_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node12" class="node">
+<title>proc~calculate_qw_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node12"><a xlink:href="../proc/calculate_qw_scalar.html" xlink:title="type_properties_manager%calculate_qw_scalar">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1452,-292.16 1187,-292.16 1187,-268.16 1452,-268.16 1452,-292.16"/>
+<text text-anchor="middle" x="1319.5" y="-277.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_qw_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_qw_scalar&#45;&gt;none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge10" class="edge">
+<title>proc~calculate_qw_scalar&#45;&gt;none~calc_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1444.21,-268.15C1461.03,-265.66 1478,-262.68 1494,-259.16 1549.49,-246.93 1611.53,-225.49 1651.01,-210.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1652.41,-214.04 1660.55,-207.25 1649.95,-207.48 1652.41,-214.04"/>
+</g>
+<!-- proc~calculate_thc_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node13" class="node">
+<title>proc~calculate_thc_impl_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node13"><a xlink:href="../proc/calculate_thc_impl_array.html" xlink:title="type_properties_manager%calculate_thc_impl_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1465.5,-334.16 1173.5,-334.16 1173.5,-310.16 1465.5,-310.16 1465.5,-334.16"/>
+<text text-anchor="middle" x="1319.5" y="-319.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_thc_impl_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_thc_impl_array&#45;&gt;none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge11" class="edge">
+<title>proc~calculate_thc_impl_array&#45;&gt;none~calc_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1465.55,-313.01C1475.45,-309.85 1485.04,-305.95 1494,-301.16 1515.68,-289.56 1509.99,-273.44 1530,-259.16 1561.48,-236.69 1601.95,-220.68 1634.5,-210.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1635.81,-213.54 1644.33,-207.24 1633.74,-206.85 1635.81,-213.54"/>
+</g>
+<!-- proc~calculate_thc_impl_array&#45;&gt;proc~calculate_thc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge15" class="edge">
+<title>proc~calculate_thc_impl_array&#45;&gt;proc~calculate_thc_impl_scalar</title>
+<path fill="none" stroke="#00ff66" d="M1426.81,-310.12C1473.29,-304.86 1527.93,-298.67 1575.46,-293.29"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1575.95,-296.76 1585.49,-292.16 1575.16,-289.8 1575.95,-296.76"/>
+</g>
+<!-- proc~calculate_thc_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node14" class="node">
+<title>proc~calculate_thc_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node14"><a xlink:href="../proc/calculate_thc_scalar.html" xlink:title="type_properties_manager%calculate_thc_scalar">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1453,-376.16 1186,-376.16 1186,-352.16 1453,-352.16 1453,-376.16"/>
+<text text-anchor="middle" x="1319.5" y="-361.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_thc_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_thc_scalar&#45;&gt;proc~calculate_thc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge16" class="edge">
+<title>proc~calculate_thc_scalar&#45;&gt;proc~calculate_thc_impl_scalar</title>
+<path fill="none" stroke="#00ff66" d="M1443.73,-352.15C1460.7,-349.65 1477.84,-346.68 1494,-343.16 1549.27,-331.11 1611.12,-310.11 1650.64,-295.69"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1652.01,-298.91 1660.19,-292.17 1649.59,-292.34 1652.01,-298.91"/>
+</g>
+<!-- proc~calculate_vhc_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node15" class="node">
+<title>proc~calculate_vhc_impl_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node15"><a xlink:href="../proc/calculate_vhc_impl_array.html" xlink:title="type_properties_manager%calculate_vhc_impl_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1466.5,-86.16 1172.5,-86.16 1172.5,-62.16 1466.5,-62.16 1466.5,-86.16"/>
+<text text-anchor="middle" x="1319.5" y="-71.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_vhc_impl_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_vhc_impl_array&#45;&gt;none~calc_water_content -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge12" class="edge">
+<title>proc~calculate_vhc_impl_array&#45;&gt;none~calc_water_content</title>
+<path fill="none" stroke="#ff0000" d="M1466.88,-83.73C1476.31,-86.81 1485.44,-90.58 1494,-95.16 1515.68,-106.76 1509.76,-123.2 1530,-137.16 1559.11,-157.22 1595.93,-171.14 1627.06,-180.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1626.37,-183.75 1636.95,-183.12 1628.29,-177.02 1626.37,-183.75"/>
+</g>
+<!-- proc~calculate_vhc_impl_array&#45;&gt;proc~calculate_vhc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge18" class="edge">
+<title>proc~calculate_vhc_impl_array&#45;&gt;proc~calculate_vhc_impl_scalar</title>
+<path fill="none" stroke="#0066ff" d="M1426.81,-86.19C1473.29,-91.45 1527.93,-97.64 1575.46,-103.02"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1575.16,-106.51 1585.49,-104.16 1575.95,-99.55 1575.16,-106.51"/>
+</g>
+<!-- proc~calculate_vhc_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node16" class="node">
+<title>proc~calculate_vhc_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node16"><a xlink:href="../proc/calculate_vhc_scalar.html" xlink:title="type_properties_manager%calculate_vhc_scalar">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1083,-44.16 814,-44.16 814,-20.16 1083,-20.16 1083,-44.16"/>
+<text text-anchor="middle" x="948.5" y="-29.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_vhc_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_vhc_scalar&#45;&gt;proc~calculate_vhc_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge19" class="edge">
+<title>proc~calculate_vhc_scalar&#45;&gt;proc~calculate_vhc_impl_scalar</title>
+<path fill="none" stroke="#0066ff" d="M1006.74,-20.1C1110.04,-1.32 1331.97,25.19 1494,-53.16 1516.13,-63.86 1508.37,-83.46 1530,-95.16 1533.37,-96.98 1536.83,-98.67 1540.37,-100.23"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1539.33,-103.58 1549.91,-104.08 1541.95,-97.09 1539.33,-103.58"/>
+</g>
+<!-- none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node17" class="node">
+<title>none~calc_qw</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node17"><a xlink:href="../type/type_properties_manager.html#boundprocedure-calc_qw" xlink:title="type_properties_manager%calc_qw">
+<polygon fill="#a7506f" stroke="#a7506f" points="721,-252.16 520,-252.16 520,-228.16 721,-228.16 721,-252.16"/>
+<text text-anchor="middle" x="620.5" y="-237.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_qw</text>
+</a>
+</g>
+</g>
+<!-- none~calc_qw&#45;&gt;proc~calculate_qw_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge25" class="edge">
+<title>none~calc_qw&#45;&gt;proc~calculate_qw_array</title>
+<path fill="none" stroke="#00ff66" d="M721.36,-239.87C841.17,-239.53 1042.79,-238.95 1178.2,-238.56"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="1178.24,-242.06 1188.23,-238.53 1178.22,-235.06 1178.24,-242.06"/>
+</g>
+<!-- none~calc_qw&#45;&gt;proc~calculate_qw_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge26" class="edge">
+<title>none~calc_qw&#45;&gt;proc~calculate_qw_scalar</title>
+<path fill="none" stroke="#00ffff" d="M721.4,-248.4C743.33,-250.08 766.44,-251.77 788,-253.16 919.61,-261.64 1069.73,-269.07 1176.61,-273.98"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1176.67,-277.49 1186.82,-274.45 1176.99,-270.49 1176.67,-277.49"/>
+</g>
+<!-- none~calc_thc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node18" class="node">
+<title>none~calc_thc</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node18"><a xlink:href="../type/type_properties_manager.html#boundprocedure-calc_thc" xlink:title="type_properties_manager%calc_thc">
+<polygon fill="#a7506f" stroke="#a7506f" points="721.5,-337.16 519.5,-337.16 519.5,-313.16 721.5,-313.16 721.5,-337.16"/>
+<text text-anchor="middle" x="620.5" y="-322.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_thc</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thc&#45;&gt;proc~calculate_thc_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge28" class="edge">
+<title>none~calc_thc&#45;&gt;proc~calculate_thc_scalar</title>
+<path fill="none" stroke="#3200ff" d="M715.6,-337.16C739.2,-339.82 764.5,-342.38 788,-344.16 919.1,-354.09 1068.81,-359.17 1175.69,-361.71"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1175.82,-365.21 1185.9,-361.95 1175.98,-358.22 1175.82,-365.21"/>
+</g>
+<!-- proc~calculate_thc_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node23" class="node">
+<title>proc~calculate_thc_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node23"><a xlink:href="../proc/calculate_thc_array.html" xlink:title="type_properties_manager%calculate_thc_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1080,-335.16 817,-335.16 817,-311.16 1080,-311.16 1080,-335.16"/>
+<text text-anchor="middle" x="948.5" y="-320.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_thc_array</text>
+</a>
+</g>
+</g>
+<!-- none~calc_thc&#45;&gt;proc~calculate_thc_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge42" class="edge">
+<title>none~calc_thc&#45;&gt;proc~calculate_thc_array</title>
+<path fill="none" stroke="#7f00ff" d="M721.53,-324.54C748.48,-324.38 778.15,-324.2 806.88,-324.02"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="807.02,-327.52 816.99,-323.96 806.97,-320.52 807.02,-327.52"/>
+</g>
+<!-- none~calc_vhc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node19" class="node">
+<title>none~calc_vhc</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node19"><a xlink:href="../type/type_properties_manager.html#boundprocedure-calc_vhc" xlink:title="type_properties_manager%calc_vhc">
+<polygon fill="#a7506f" stroke="#a7506f" points="723,-86.16 518,-86.16 518,-62.16 723,-62.16 723,-86.16"/>
+<text text-anchor="middle" x="620.5" y="-71.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_vhc</text>
+</a>
+</g>
+</g>
+<!-- none~calc_vhc&#45;&gt;proc~calculate_vhc_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge30" class="edge">
+<title>none~calc_vhc&#45;&gt;proc~calculate_vhc_scalar</title>
+<path fill="none" stroke="#ff0098" d="M714.92,-62.12C755.33,-56.91 802.77,-50.8 844.22,-45.46"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="844.88,-48.91 854.35,-44.16 843.98,-41.96 844.88,-48.91"/>
+</g>
+<!-- proc~calculate_vhc_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node24" class="node">
+<title>proc~calculate_vhc_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node24"><a xlink:href="../proc/calculate_vhc_array.html" xlink:title="type_properties_manager%calculate_vhc_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1081,-86.16 816,-86.16 816,-62.16 1081,-62.16 1081,-86.16"/>
+<text text-anchor="middle" x="948.5" y="-71.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_vhc_array</text>
+</a>
+</g>
+</g>
+<!-- none~calc_vhc&#45;&gt;proc~calculate_vhc_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge43" class="edge">
+<title>none~calc_vhc&#45;&gt;proc~calculate_vhc_array</title>
+<path fill="none" stroke="#ff00bf" d="M723.31,-74.16C749.43,-74.16 778.01,-74.16 805.75,-74.16"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="805.92,-77.66 815.92,-74.16 805.92,-70.66 805.92,-77.66"/>
+</g>
+<!-- proc~calc_thermal_properties_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node20" class="node">
+<title>proc~calc_thermal_properties_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node20"><a xlink:href="../proc/calc_thermal_properties_array.html" xlink:title="type_properties_manager%calc_thermal_properties_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="1109,-128.16 788,-128.16 788,-104.16 1109,-104.16 1109,-128.16"/>
+<text text-anchor="middle" x="948.5" y="-113.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calc_thermal_properties_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_thermal_properties_array&#45;&gt;proc~calc_thermal_properties_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge21" class="edge">
+<title>proc~calc_thermal_properties_array&#45;&gt;proc~calc_thermal_properties_impl_array</title>
+<path fill="none" stroke="#ff0000" d="M1109.2,-116.16C1117.67,-116.16 1126.21,-116.16 1134.75,-116.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1134.77,-119.66 1144.77,-116.16 1134.77,-112.66 1134.77,-119.66"/>
+</g>
+<!-- proc~calculate_hcf_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node21" class="node">
+<title>proc~calculate_hcf_array</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node21"><a xlink:href="../proc/calculate_hcf_array.html" xlink:title="type_properties_manager%calculate_hcf_array">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="752,-170.16 489,-170.16 489,-146.16 752,-146.16 752,-170.16"/>
+<text text-anchor="middle" x="620.5" y="-155.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_hcf_array</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_hcf_array&#45;&gt;proc~calculate_hcf_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge22" class="edge">
+<title>proc~calculate_hcf_array&#45;&gt;proc~calculate_hcf_impl_array</title>
+<path fill="none" stroke="#cbff00" d="M752.22,-158.16C765.35,-158.16 778.76,-158.16 792.12,-158.16"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="792.31,-161.66 802.31,-158.16 792.31,-154.66 792.31,-161.66"/>
+</g>
+<!-- proc~calculate_hcf_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node22" class="node">
+<title>proc~calculate_hcf_scalar</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node22"><a xlink:href="../proc/calculate_hcf_scalar.html" xlink:title="type_properties_manager%calculate_hcf_scalar">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1082,-212.16 815,-212.16 815,-188.16 1082,-188.16 1082,-212.16"/>
+<text text-anchor="middle" x="948.5" y="-197.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager%calculate_hcf_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_hcf_scalar&#45;&gt;proc~calculate_hcf_impl_scalar -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge24" class="edge">
+<title>proc~calculate_hcf_scalar&#45;&gt;proc~calculate_hcf_impl_scalar</title>
+<path fill="none" stroke="#33ff00" d="M1082.2,-198.72C1108.03,-198.44 1135.34,-198.14 1161.86,-197.85"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1162.02,-201.35 1171.98,-197.74 1161.94,-194.35 1162.02,-201.35"/>
+</g>
+<!-- proc~calculate_thc_array&#45;&gt;proc~calculate_thc_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge27" class="edge">
+<title>proc~calculate_thc_array&#45;&gt;proc~calculate_thc_impl_array</title>
+<path fill="none" stroke="#0066ff" d="M1080.11,-322.8C1106.98,-322.73 1135.52,-322.65 1163.16,-322.58"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1163.31,-326.08 1173.3,-322.55 1163.29,-319.08 1163.31,-326.08"/>
+</g>
+<!-- proc~calculate_vhc_array&#45;&gt;proc~calculate_vhc_impl_array -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge29" class="edge">
+<title>proc~calculate_vhc_array&#45;&gt;proc~calculate_vhc_impl_array</title>
+<path fill="none" stroke="#cc00ff" d="M1081.15,-74.16C1107.4,-74.16 1135.2,-74.16 1162.18,-74.16"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1162.48,-77.66 1172.48,-74.16 1162.48,-70.66 1162.48,-77.66"/>
+</g>
+<!-- proc~get_observations_si -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node25" class="node">
+<title>proc~get_observations_si</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node25"><a xlink:href="../proc/get_observations_si.html" xlink:title="get_observations_si">
+<polygon fill="#d9534f" stroke="#d9534f" points="427,-212.16 310,-212.16 310,-188.16 427,-188.16 427,-212.16"/>
+<text text-anchor="middle" x="368.5" y="-197.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_observations_si</text>
+</a>
+</g>
+</g>
+<!-- proc~get_observations_si&#45;&gt;none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge31" class="edge">
+<title>proc~get_observations_si&#45;&gt;none~calc_qw</title>
+<path fill="none" stroke="#ff0000" d="M427.17,-209.38C458.8,-214.44 498.63,-220.82 533.82,-226.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="533.67,-229.97 544.1,-228.09 534.78,-223.06 533.67,-229.97"/>
+</g>
+<!-- proc~get_observations_thc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node26" class="node">
+<title>proc~get_observations_thc</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node26"><a xlink:href="../proc/get_observations_thc.html" xlink:title="get_observations_thc">
+<polygon fill="#d9534f" stroke="#d9534f" points="431,-296.16 306,-296.16 306,-272.16 431,-272.16 431,-296.16"/>
+<text text-anchor="middle" x="368.5" y="-281.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_observations_thc</text>
+</a>
+</g>
+</g>
+<!-- proc~get_observations_thc&#45;&gt;none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge32" class="edge">
+<title>proc~get_observations_thc&#45;&gt;none~calc_qw</title>
+<path fill="none" stroke="#ff0000" d="M431.3,-273.28C464.33,-267.47 505.35,-260.25 540.66,-254.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="541.69,-257.4 550.94,-252.22 540.48,-250.51 541.69,-257.4"/>
+</g>
+<!-- proc~get_observations_thc&#45;&gt;none~calc_thc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge38" class="edge">
+<title>proc~get_observations_thc&#45;&gt;none~calc_thc</title>
+<path fill="none" stroke="#ffbf00" d="M431.3,-294.29C462.88,-299.47 501.77,-305.85 535.99,-311.46"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="535.54,-314.93 545.97,-313.1 536.67,-308.03 535.54,-314.93"/>
+</g>
+<!-- proc~get_observations_vhc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node27" class="node">
+<title>proc~get_observations_vhc</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node27"><a xlink:href="../proc/get_observations_vhc.html" xlink:title="get_observations_vhc">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-86.16 305,-86.16 305,-62.16 432,-62.16 432,-86.16"/>
+<text text-anchor="middle" x="368.5" y="-71.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_observations_vhc</text>
+</a>
+</g>
+</g>
+<!-- proc~get_observations_vhc&#45;&gt;none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge33" class="edge">
+<title>proc~get_observations_vhc&#45;&gt;none~calc_qw</title>
+<path fill="none" stroke="#ff0000" d="M432.37,-83.13C439.86,-86.1 446.97,-90.02 453,-95.16 483.9,-121.51 460.75,-149.97 489,-179.16 509.59,-200.43 539.04,-215.07 564.76,-224.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="563.81,-228.04 574.41,-228.1 566.16,-221.45 563.81,-228.04"/>
+</g>
+<!-- proc~get_observations_vhc&#45;&gt;none~calc_vhc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge40" class="edge">
+<title>proc~get_observations_vhc&#45;&gt;none~calc_vhc</title>
+<path fill="none" stroke="#7fff00" d="M432.26,-74.16C455.12,-74.16 481.7,-74.16 507.54,-74.16"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="507.77,-77.66 517.77,-74.16 507.77,-70.66 507.77,-77.66"/>
+</g>
+<!-- proc~interpolate_observations_si -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node28" class="node">
+<title>proc~interpolate_observations_si</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node28"><a xlink:href="../proc/interpolate_observations_si.html" xlink:title="interpolate_observations_si">
+<polygon fill="#d9534f" stroke="#d9534f" points="447.5,-170.16 289.5,-170.16 289.5,-146.16 447.5,-146.16 447.5,-170.16"/>
+<text text-anchor="middle" x="368.5" y="-155.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpolate_observations_si</text>
+</a>
+</g>
+</g>
+<!-- proc~interpolate_observations_si&#45;&gt;none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge34" class="edge">
+<title>proc~interpolate_observations_si&#45;&gt;none~calc_qw</title>
+<path fill="none" stroke="#ff0000" d="M420.96,-170.2C431.61,-172.94 442.71,-175.99 453,-179.16 497.05,-192.72 546.53,-211.29 580.01,-224.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="578.85,-227.67 589.44,-228.06 581.41,-221.15 578.85,-227.67"/>
+</g>
+<!-- proc~interpolate_observations_thc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node29" class="node">
+<title>proc~interpolate_observations_thc</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node29"><a xlink:href="../proc/interpolate_observations_thc.html" xlink:title="interpolate_observations_thc">
+<polygon fill="#d9534f" stroke="#d9534f" points="451.5,-338.16 285.5,-338.16 285.5,-314.16 451.5,-314.16 451.5,-338.16"/>
+<text text-anchor="middle" x="368.5" y="-323.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpolate_observations_thc</text>
+</a>
+</g>
+</g>
+<!-- proc~interpolate_observations_thc&#45;&gt;none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge35" class="edge">
+<title>proc~interpolate_observations_thc&#45;&gt;none~calc_qw</title>
+<path fill="none" stroke="#ff0000" d="M421.9,-314.05C432.27,-311.35 443.03,-308.34 453,-305.16 498.33,-290.67 549.1,-270.21 582.53,-256.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="584.06,-259.29 591.9,-252.17 581.33,-252.85 584.06,-259.29"/>
+</g>
+<!-- proc~interpolate_observations_thc&#45;&gt;none~calc_thc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge39" class="edge">
+<title>proc~interpolate_observations_thc&#45;&gt;none~calc_thc</title>
+<path fill="none" stroke="#ffbf00" d="M451.71,-325.83C470.13,-325.75 489.96,-325.67 509.31,-325.6"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="509.39,-329.1 519.37,-325.56 509.36,-322.1 509.39,-329.1"/>
+</g>
+<!-- proc~interpolate_observations_vhc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node30" class="node">
+<title>proc~interpolate_observations_vhc</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node30"><a xlink:href="../proc/interpolate_observations_vhc.html" xlink:title="interpolate_observations_vhc">
+<polygon fill="#d9534f" stroke="#d9534f" points="453,-128.16 284,-128.16 284,-104.16 453,-104.16 453,-128.16"/>
+<text text-anchor="middle" x="368.5" y="-113.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpolate_observations_vhc</text>
+</a>
+</g>
+</g>
+<!-- proc~interpolate_observations_vhc&#45;&gt;none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge36" class="edge">
+<title>proc~interpolate_observations_vhc&#45;&gt;none~calc_qw</title>
+<path fill="none" stroke="#ff0000" d="M434.51,-128.22C440.99,-130.67 447.28,-133.62 453,-137.16 473.9,-150.1 469.42,-164.28 489,-179.16 514.72,-198.69 547.7,-214.04 574.07,-224.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="572.87,-227.75 583.46,-228.07 575.38,-221.21 572.87,-227.75"/>
+</g>
+<!-- proc~interpolate_observations_vhc&#45;&gt;none~calc_vhc -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge41" class="edge">
+<title>proc~interpolate_observations_vhc&#45;&gt;none~calc_vhc</title>
+<path fill="none" stroke="#7fff00" d="M441.14,-104.12C471.35,-99.05 506.67,-93.11 537.87,-87.87"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="538.57,-91.3 547.85,-86.19 537.41,-84.4 538.57,-91.3"/>
+</g>
+<!-- proc~update_type_thermal_crs -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node31" class="node">
+<title>proc~update_type_thermal_crs</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node31"><a xlink:href="../proc/update_type_thermal_crs.html" xlink:title="update_type_thermal_crs">
+<polygon fill="#d9534f" stroke="#d9534f" points="442,-254.16 295,-254.16 295,-230.16 442,-230.16 442,-254.16"/>
+<text text-anchor="middle" x="368.5" y="-239.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_type_thermal_crs</text>
+</a>
+</g>
+</g>
+<!-- proc~update_type_thermal_crs&#45;&gt;none~calc_qw -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge37" class="edge">
+<title>proc~update_type_thermal_crs&#45;&gt;none~calc_qw</title>
+<path fill="none" stroke="#ff0000" d="M442.15,-241.58C463.24,-241.41 486.77,-241.22 509.61,-241.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="509.73,-244.53 519.7,-240.95 509.67,-237.53 509.73,-244.53"/>
+</g>
+<!-- interface~update_type_thermal_crs -->
+<g id="proc~~calculate_water_content~~CalledByGraph_node32" class="node">
+<title>interface~update_type_thermal_crs</title>
+<g id="a_proc~~calculate_water_content~~CalledByGraph_node32"><a xlink:href="../interface/update_type_thermal_crs.html" xlink:title="type_thermal_crs%update_type_thermal_crs">
+<polygon fill="#a7506f" stroke="#a7506f" points="248,-254.16 0,-254.16 0,-230.16 248,-230.16 248,-254.16"/>
+<text text-anchor="middle" x="124" y="-239.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal_crs%update_type_thermal_crs</text>
+</a>
+</g>
+</g>
+<!-- interface~update_type_thermal_crs&#45;&gt;proc~update_type_thermal_crs -->
+<g id="proc~~calculate_water_content~~CalledByGraph_edge44" class="edge">
+<title>interface~update_type_thermal_crs&#45;&gt;proc~update_type_thermal_crs</title>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M248.03,-242.16C260.45,-242.16 272.85,-242.16 284.7,-242.16"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="284.96,-245.66 294.96,-242.16 284.96,-238.66 284.96,-245.66"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalculate_water_contentCalledByGraph = svgPanZoom('#proccalculate_water_contentCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure elemental subroutine </span><span class="n">calculate_water_content</span><span class="p">(</span><span class="n">ptrs</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        type</span><span class="p">(</span><span class="n">type_material_pointers</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ptrs</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+
+<span class="w">        </span><span class="n">state</span><span class="p">%</span><span class="n">density_water</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptrs</span><span class="p">%</span><span class="n">den</span><span class="p">%</span><span class="n">material2</span>
+<span class="w">        </span><span class="n">state</span><span class="p">%</span><span class="n">density_ice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptrs</span><span class="p">%</span><span class="n">den</span><span class="p">%</span><span class="n">material3</span>
+<span class="w">        </span><span class="n">state</span><span class="p">%</span><span class="n">water_content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptrs</span><span class="p">%</span><span class="n">wrf</span><span class="p">%</span><span class="n">calc</span><span class="p">(</span><span class="o">-</span><span class="n">ptrs</span><span class="p">%</span><span class="n">gcc</span><span class="p">%</span><span class="n">calc</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">calculate_water_content</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 6 statements,  0.2% of total for derived types.">9 statements</a>
+                 title="<p> 0.7% of total for derived types.</p>Including implementation: 6 statements,  0.1% of total for derived types.">9 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,8 +134,8 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#variable-lf~6">Lf</a>
-            <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#variable-tf~4">Tf</a>
+            <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#variable-lf~3">Lf</a>
+            <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#variable-tf~3">Tf</a>
         </div>
       </div>
     </div>
@@ -173,7 +173,7 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#boundprocedure-calc~3">calc</a>
+            <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#boundprocedure-calc~7">calc</a>
             <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#boundprocedure-deriv~3">deriv</a>
             <a class="list-group-item" href="../type/type_gcc_non_segregation_pa.html#boundprocedure-deriv2~3">deriv2</a>
         </div>
@@ -304,7 +304,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-lf~6"></span>
+              <span class="anchor" id="variable-lf~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -321,7 +321,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-tf~4"></span>
+              <span class="anchor" id="variable-tf~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -353,7 +353,7 @@ large graphs.</div>
     <ul class="list-group">
           <li class="list-group-item">
                 <h3>
-    private  interface <a href='../interface/type_gcc_nonseg_pa_construct.html'>type_GCC_NonSeg_Pa_Construct</a>()  
+    private  interface <a href='../interface/construct_type_gcc_nonseg_pa.html'>construct_type_gcc_nonseg_pa</a>()  
 
     </h3>
     
@@ -375,10 +375,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc~3"></span>
+      <span class="anchor" id="boundprocedure-calc~7"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>calc</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_gcc_nonseg_pa.html'>calc_GCC_NonSeg_Pa</a>
+  <strong>calc</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_gcc_nonseg_pa.html'>calc_gcc_nonseg_pa</a>
         
       </h3>
     </div>
@@ -386,7 +386,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function calc_GCC_NonSeg_Pa(self, T, Pw, rhoW, rhoI) result(Suction)  
+    private pure elemental module function calc_gcc_nonseg_pa(self, state) result(suction)  
     <a href="../proc/calc_gcc_nonseg_pa.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -421,59 +421,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_state.html'>type_state</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>T</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pw</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>rhoW</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>rhoI</strong></td>
+            <td><strong>state</strong></td>
             <td>
                 
             </td>
@@ -498,7 +453,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-deriv~3"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>deriv</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_gcc_nonseg_pa_derivative.html'>calc_GCC_NonSeg_Pa_derivative</a>
+  <strong>deriv</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/deriv_gcc_nonseg_pa.html'>deriv_gcc_nonseg_pa</a>
         
       </h3>
     </div>
@@ -506,8 +461,8 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function calc_GCC_NonSeg_Pa_derivative(self, T, Pw, rhoW, rhoI) result(Suction_derivative)  
-    <a href="../proc/calc_gcc_nonseg_pa_derivative.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure elemental module function deriv_gcc_nonseg_pa(self, state) result(suction_derivative)  
+    <a href="../proc/deriv_gcc_nonseg_pa.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -541,59 +496,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_state.html'>type_state</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>T</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pw</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>rhoW</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>rhoI</strong></td>
+            <td><strong>state</strong></td>
             <td>
                 
             </td>
@@ -618,7 +528,7 @@ large graphs.</div>
       <span class="anchor" id="boundprocedure-deriv2~3"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>deriv2</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_gcc_nonseg_pa_derivative_2nd.html'>calc_GCC_NonSeg_Pa_derivative_2nd</a>
+  <strong>deriv2</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/deriv_2nd_gcc_nonseg_pa.html'>deriv_2nd_gcc_nonseg_pa</a>
         
       </h3>
     </div>
@@ -626,8 +536,8 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function calc_GCC_NonSeg_Pa_derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_derivative)  
-    <a href="../proc/calc_gcc_nonseg_pa_derivative_2nd.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure elemental module function deriv_2nd_gcc_nonseg_pa(self, state) result(suction_derivative)  
+    <a href="../proc/deriv_2nd_gcc_nonseg_pa.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -661,59 +571,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_state.html'>type_state</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>T</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Pw</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>rhoW</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>rhoI</strong></td>
+            <td><strong>state</strong></td>
             <td>
                 
             </td>
@@ -738,9 +603,9 @@ large graphs.</div>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_gcc</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_gcc_non_segregation_pa</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_GCC_NonSeg_Pa</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">deriv</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_GCC_NonSeg_Pa_derivative</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">deriv2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_GCC_NonSeg_Pa_derivative_2nd</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_gcc_nonseg_pa</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">deriv</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">deriv_gcc_nonseg_pa</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">deriv2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">deriv_2nd_gcc_nonseg_pa</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_gcc_non_segregation_pa</span>
 </pre></div>
 
@@ -764,7 +629,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

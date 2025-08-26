@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">11 statements</a>
+                 title=" 0.1% of total for procedures.">11 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -159,7 +159,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>module function calc_sph_3(SpecificHeat_soil, phi_soil, SpecificHeat_water, phi_water, SpecificHeat_ice, phi_ice) result(SpecificHeat)  
+    <h2>pure elemental module function calc_sph_3(specific_heat_soil, phi_soil, specific_heat_water, phi_water, specific_heat_ice, phi_ice) result(specific_heat)  
     <a href="../interface/calc_sph_3.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
 </h2>
     
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-specificheat_soil~2"></span>
+              <span class="anchor" id="variable-specific_heat_soil"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -187,14 +187,14 @@
               
             </td>
             <td>::</td>
-            <td><strong>SpecificHeat_soil</strong></td>
+            <td><strong>specific_heat_soil</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-phi_soil~9"></span>
+              <span class="anchor" id="variable-phi_soil"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-specificheat_water~2"></span>
+              <span class="anchor" id="variable-specific_heat_water"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -217,14 +217,14 @@
               
             </td>
             <td>::</td>
-            <td><strong>SpecificHeat_water</strong></td>
+            <td><strong>specific_heat_water</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-phi_water~9"></span>
+              <span class="anchor" id="variable-phi_water"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -239,7 +239,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-specificheat_ice~2"></span>
+              <span class="anchor" id="variable-specific_heat_ice"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -247,14 +247,14 @@
               
             </td>
             <td>::</td>
-            <td><strong>SpecificHeat_ice</strong></td>
+            <td><strong>specific_heat_ice</strong></td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-phi_ice~9"></span>
+              <span class="anchor" id="variable-phi_ice"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -272,7 +272,7 @@
 
       <h3>Return Value
         <small>
-          <span class="anchor" id="variable-specificheat~4"></span>
+          <span class="anchor" id="variable-specific_heat"></span>
           real(kind=real64)
         </small>
       </h3>
@@ -446,21 +446,21 @@ large graphs.</div>
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">calc_sph_3</span><span class="p">(</span><span class="n">SpecificHeat_soil</span><span class="p">,</span><span class="w"> </span><span class="n">phi_soil</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                               </span><span class="n">SpecificHeat_water</span><span class="p">,</span><span class="w"> </span><span class="n">phi_water</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                               </span><span class="n">SpecificHeat_ice</span><span class="p">,</span><span class="w"> </span><span class="n">phi_ice</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">SpecificHeat</span><span class="p">)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module pure elemental function </span><span class="n">calc_sph_3</span><span class="p">(</span><span class="n">specific_heat_soil</span><span class="p">,</span><span class="w"> </span><span class="n">phi_soil</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                              </span><span class="n">specific_heat_water</span><span class="p">,</span><span class="w"> </span><span class="n">phi_water</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                              </span><span class="n">specific_heat_ice</span><span class="p">,</span><span class="w"> </span><span class="n">phi_ice</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">specific_heat</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
-<span class="k">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">SpecificHeat_soil</span>
+<span class="k">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">specific_heat_soil</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi_soil</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">SpecificHeat_water</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">specific_heat_water</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi_water</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">SpecificHeat_ice</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">specific_heat_ice</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi_ice</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">SpecificHeat</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">specific_heat</span>
 
-<span class="w">        </span><span class="n">SpecificHeat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpecificHeat_soil</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">phi_soil</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                       </span><span class="o">+</span><span class="w"> </span><span class="n">SpecificHeat_water</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">phi_water</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                       </span><span class="o">+</span><span class="w"> </span><span class="n">SpecificHeat_ice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">phi_ice</span>
+<span class="w">        </span><span class="n">specific_heat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">specific_heat_soil</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">phi_soil</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="n">specific_heat_water</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">phi_water</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="n">specific_heat_ice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">phi_ice</span>
 
 <span class="w">    </span><span class="k">end function </span><span class="n">calc_sph_3</span>
 </pre></div>
@@ -486,7 +486,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

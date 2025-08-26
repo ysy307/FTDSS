@@ -1,241 +1,361 @@
+!================================================================!
+! domain_adjacency_adjacency_node (ハイブリッド形式 / 自己ループ対応)
+!
+! CSR行列構築のため、自己ループ(対角成分)を含む隣接関係を
+! COO形式とCSR形式の両方で保持するモジュール。
+!================================================================!
 module domain_adjacency_adjacency_node
     use, intrinsic :: iso_fortran_env, only: int32, int64
     use :: stdlib_sorting, only:sort
-    use :: module_core, only:allocate_array, deallocate_array
+    use :: module_core, only:allocate_array, deallocate_array, unique
+    use :: module_mesh, only:holder_sides, holder_elements
 
     implicit none
     private
-
     public :: type_node_adjacency
 
+    !> @type type_node_adjacency
+    !! @brief ノードの隣接関係をCOO形式とCSR形式の両方で保持する型。
     type :: type_node_adjacency
         integer(int32) :: num_nodes = 0
+        integer(int32) :: nnz = 0
+
+        ! COO (Coordinate list) 形式のデータ (ソート済み)
+        integer(int32), allocatable :: row(:)
+        integer(int32), allocatable :: col(:)
+
+        ! CSR (Compressed Sparse Row) 形式のデータ
         integer(int32), allocatable :: ptr(:)
         integer(int32), allocatable :: ind(:)
     contains
-        procedure, pass(self), public :: initialize => initialize_node_adjacency
-        procedure, pass(self), public :: is_adjacent => check_node_adjacent
-        procedure, pass(self), public :: get_degree => get_node_degree
+        procedure, pass(self), public :: initialize => initialize_hybrid_from_mesh
         procedure, pass(self), public :: get_num_nodes => get_num_nodes
-        ! 追加: 指定ノードの隣接ノードリストを取得
-        procedure, pass(self), public :: get_neighbors => get_node_neighbors
-        procedure, pass(self), public :: destroy => destroy_node_adjacency
+        procedure, pass(self), public :: get_degree => get_degree_csr
+        procedure, pass(self), public :: get_neighbors => get_neighbors_csr
+        procedure, pass(self), public :: get_nnz => get_nnz
+        procedure, pass(self), public :: get_coo => get_coo
+        procedure, pass(self), public :: get_csr => get_csr
+        procedure, pass(self), public :: destroy => destroy_hybrid
     end type type_node_adjacency
 
 contains
 
     !================================================================!
-    !【コントローラー】初期化処理のメインフロー
+    ! メインの初期化処理 (COOとCSRを両方構築)
     !================================================================!
-    subroutine initialize_node_adjacency(self, num_nodes_in, num_elems, &
-                                         elements_conn_data, elements_ptr)
+    subroutine initialize_hybrid_from_mesh(self, num_nodes, computation_dimension, sides, elements)
+        implicit none
         class(type_node_adjacency), intent(inout) :: self
-        integer(int32), intent(in) :: num_nodes_in, num_elems
-        integer(int32), intent(in) :: elements_conn_data(:)
-        integer(int32), intent(in) :: elements_ptr(:)
+        integer(int32), intent(in) :: num_nodes
+        integer(int32), intent(in) :: computation_dimension
+        class(holder_sides), intent(in) :: sides(:)
+        class(holder_elements), intent(in) :: elements(:)
 
-        integer(int32), allocatable :: edge_i(:), edge_j(:)
-        integer(int32) :: edge_count, istat
+        integer(int32) :: estimated_nnz, actual_nnz
+        integer(int32), allocatable :: temp_row_indices(:), temp_col_indices(:)
 
-        self%num_nodes = num_nodes_in
+        self%num_nodes = num_nodes
+        if (self%num_nodes <= 0) return
 
-        ! ステップ1: 要素情報から全てのエッジ(ノードペア)を抽出
-        call generate_all_edges(num_elems, elements_ptr, elements_conn_data, &
-                                edge_i, edge_j, edge_count, istat)
-        if (istat /= 0) then
-            print *, "Error in generate_all_edges"
-            return
+        ! 1. 一時COO配列の最大サイズを見積もる
+        estimated_nnz = estimate_max_coo_size(computation_dimension, sides, elements)
+        if (estimated_nnz <= 0) return
+
+        call allocate_array(temp_row_indices, estimated_nnz)
+        call allocate_array(temp_col_indices, estimated_nnz)
+
+        ! 2. メッシュから重複を含むCOOリストを生成
+        call create_coo_from_mesh(computation_dimension, sides, elements, temp_row_indices, temp_col_indices, actual_nnz)
+
+        ! 3.【COO構築】一時COOリストからユニークなCOOリストを作成
+        call create_unique_coo(self, temp_row_indices(1:actual_nnz), temp_col_indices(1:actual_nnz))
+
+        ! 4.【CSR構築】作成したユニークCOOリストからCSR形式を構築
+        call build_csr_from_coo(self)
+
+        call deallocate_array(temp_row_indices)
+        call deallocate_array(temp_col_indices)
+    end subroutine initialize_hybrid_from_mesh
+
+    !================================================================!
+    ! COO配列の最大サイズを見積もる
+    !================================================================!
+    function estimate_max_coo_size(computation_dimension, sides, elements) result(max_size)
+        implicit none
+        integer(int32), intent(in) :: computation_dimension
+        class(holder_sides), intent(in) :: sides(:)
+        class(holder_elements), intent(in) :: elements(:)
+        integer(int32) :: max_size
+        integer(int32) :: i
+
+        max_size = 0
+
+        if (computation_dimension >= 2) then
+            !$omp parallel do reduction(+:max_size) private(i)
+            do i = 1, size(elements)
+                max_size = max_size + elements(i)%e%get_num_nodes()**2
+            end do
+            !$omp end parallel do
         end if
 
-        ! ステップ2: エッジリストからCSR形式の隣接グラフを構築
-        call build_csr_from_edges(self, edge_i, edge_j, edge_count)
-
-        call deallocate_array(edge_i)
-        call deallocate_array(edge_j)
-    end subroutine initialize_node_adjacency
+        if (computation_dimension >= 1) then
+            !$omp parallel do reduction(+:max_size) private(i)
+            do i = 1, size(sides)
+                max_size = max_size + sides(i)%s%get_num_nodes()**2
+            end do
+            !$omp end parallel do
+        end if
+    end function estimate_max_coo_size
 
     !================================================================!
-    !【ステップ1】要素情報から全てのエッジ(ノードペア)を抽出
+    ! メッシュ情報からCOOリストを生成 (並列化対応)
     !================================================================!
-    subroutine generate_all_edges(num_elems, elem_ptr, elem_data, &
-                                  edge_i, edge_j, edge_count, istat)
-        integer(int32), intent(in) :: num_elems, elem_ptr(:), elem_data(:)
-        integer(int32), allocatable, intent(out) :: edge_i(:), edge_j(:)
-        integer(int32), intent(out) :: edge_count, istat
+    subroutine create_coo_from_mesh(computation_dimension, sides, elements, row_indices, col_indices, counter)
+        implicit none
+        integer(int32), intent(in) :: computation_dimension
+        class(holder_sides), intent(in) :: sides(:)
+        class(holder_elements), intent(in) :: elements(:)
+        integer(int32), intent(out) :: row_indices(:), col_indices(:)
+        integer(int32), intent(out) :: counter
 
-        integer(int32) :: i, j, k, n1, n2, start_idx, end_idx, est_edges
+        integer(int32) :: num_elements, num_sides
+        integer(int32), allocatable :: offsets_e(:), offsets_s(:)
+        integer(int32) :: i, j, k, base, nodes_per_mesh
+        integer(int32), pointer :: p_conn(:) => null()
 
-        istat = 0
-        est_edges = size(elem_data) * 4 ! 推定サイズ
-        call allocate_array(edge_i, est_edges)
-        call allocate_array(edge_j, est_edges)
-        edge_count = 0
+        num_elements = size(elements)
+        num_sides = size(sides)
 
-        do i = 1, num_elems
-            start_idx = elem_ptr(i)
-            end_idx = elem_ptr(i + 1) - 1
-            do j = start_idx, end_idx
-                do k = j + 1, end_idx
-                    edge_count = edge_count + 1
-                    if (edge_count > est_edges) then
-                        istat = -1; return ! メモリ見積もりエラー
-                    end if
-                    n1 = elem_data(j)
-                    n2 = elem_data(k)
-                    if (n1 < n2) then
-                        edge_i(edge_count) = n1
-                        edge_j(edge_count) = n2
-                    else
-                        edge_i(edge_count) = n2
-                        edge_j(edge_count) = n1
-                    end if
+        ! 並列書き込みのためのオフセット計算
+        call allocate_array(offsets_e, num_elements + 1)
+        call allocate_array(offsets_s, num_sides + 1)
+        offsets_e(1) = 0
+        if (computation_dimension >= 2) then
+            do i = 1, num_elements
+                offsets_e(i + 1) = offsets_e(i) + elements(i)%e%get_num_nodes()**2
+            end do
+        else
+            offsets_e(2:) = 0
+        end if
+
+        offsets_s(1) = 0
+        if (computation_dimension >= 1) then
+            do i = 1, num_sides
+                offsets_s(i + 1) = offsets_s(i) + sides(i)%s%get_num_nodes()**2
+            end do
+        else
+            offsets_s(2:) = 0
+        end if
+
+        !$omp parallel do private(i, j, k, base, nodes_per_mesh, p_conn)
+        do i = 1, num_elements
+            if (computation_dimension < 2) cycle
+            nodes_per_mesh = elements(i)%e%get_num_nodes()
+            p_conn => elements(i)%e%get_connectivity()
+            base = offsets_e(i)
+            do j = 1, nodes_per_mesh
+                do k = 1, nodes_per_mesh
+                    row_indices(base + (j - 1) * nodes_per_mesh + k) = p_conn(j)
+                    col_indices(base + (j - 1) * nodes_per_mesh + k) = p_conn(k)
                 end do
             end do
         end do
-    end subroutine generate_all_edges
+        !$omp end parallel do
+
+        base = offsets_e(num_elements + 1)
+        !$omp parallel do private(i, j, k, nodes_per_mesh, p_conn)
+        do i = 1, num_sides
+            if (computation_dimension < 1) cycle
+            nodes_per_mesh = sides(i)%s%get_num_nodes()
+            p_conn => sides(i)%s%get_connectivity()
+            do j = 1, nodes_per_mesh
+                do k = 1, nodes_per_mesh
+                    row_indices(base + offsets_s(i) + (j - 1) * nodes_per_mesh + k) = p_conn(j)
+                    col_indices(base + offsets_s(i) + (j - 1) * nodes_per_mesh + k) = p_conn(k)
+                end do
+            end do
+        end do
+        !$omp end parallel do
+
+        counter = offsets_e(num_elements + 1) + offsets_s(num_sides + 1)
+        deallocate (offsets_e, offsets_s)
+    end subroutine create_coo_from_mesh
 
     !================================================================!
-    !【ステップ2】エッジリストからCSR形式の隣接グラフを構築
+    !【COO構築】一時COOリストからユニークなCOOリストを生成 (自己ループ対応)
     !================================================================!
-    subroutine build_csr_from_edges(self, edge_i_in, edge_j_in, edge_count_in)
+    subroutine create_unique_coo(self, temp_row, temp_col)
+        implicit none
         class(type_node_adjacency), intent(inout) :: self
-        integer(int32), intent(in) :: edge_i_in(:), edge_j_in(:), edge_count_in
+        integer(int32), intent(in) :: temp_row(:), temp_col(:)
 
-        integer(int64), allocatable :: sort_keys(:)
-        integer(int32), allocatable :: temp_deg(:), temp_pos(:)
-        integer(int32) :: unique_count, i, n1, n2, total_adj
+        integer(int64), allocatable :: packed_edges(:), unique_packed_edges(:)
+        integer(int32) :: i, n1, n2, edge_count
 
-        if (edge_count_in == 0) then
-            call allocate_array(self%ptr, self%num_nodes + 1_int32)
-            call allocate_array(self%ind, 0_int32)
-            self%ptr = 1
+        if (size(temp_row) == 0) return
+
+        ! (i,j) と (j,i) の両方を持つ対称COOリストを作成するため、2倍のサイズを確保
+        allocate (packed_edges(size(temp_row) * 2))
+        edge_count = 0
+        do i = 1, size(temp_row)
+            n1 = temp_row(i)
+            n2 = temp_col(i)
+
+            if (n1 == n2) then
+                edge_count = edge_count + 1
+                packed_edges(edge_count) = ishft(int(n1, int64), 32) + int(n2, int64)
+            else
+                edge_count = edge_count + 1
+                packed_edges(edge_count) = ishft(int(n1, int64), 32) + int(n2, int64)
+                edge_count = edge_count + 1
+                packed_edges(edge_count) = ishft(int(n2, int64), 32) + int(n1, int64)
+            end if
+        end do
+
+        ! ソートしてユニークなエッジのみを抽出し、ソート済みCOOを生成
+        call unique(packed_edges(1:edge_count), unique_packed_edges)
+        deallocate (packed_edges)
+
+        self%nnz = size(unique_packed_edges)
+        call allocate_array(self%row, self%nnz)
+        call allocate_array(self%col, self%nnz)
+
+        ! 結果を自身のCOOメンバに格納
+        do i = 1, self%nnz
+            self%row(i) = int(ishft(unique_packed_edges(i), -32), kind=int32)
+            self%col(i) = int(iand(unique_packed_edges(i), int(z'FFFFFFFF', int64)), kind=int32)
+        end do
+        deallocate (unique_packed_edges)
+    end subroutine create_unique_coo
+
+    !================================================================!
+    !【CSR構築】自身のCOOメンバからCSR形式を構築 (修正版)
+    !================================================================!
+    subroutine build_csr_from_coo(self)
+        implicit none
+        class(type_node_adjacency), intent(inout) :: self
+        integer(int32) :: i
+
+        if (self%nnz == 0) then
+            if (self%num_nodes > 0) then
+                call allocate_array(self%ptr, self%num_nodes + 1)
+                self%ptr = 1
+            end if
+            call allocate_array(self%ind, 0)
             return
         end if
 
-        call allocate_array(sort_keys, int(edge_count_in, kind=int64))
-        do i = 1, edge_count_in
-            sort_keys(i) = int(edge_i_in(i), int64) * (self%num_nodes + 1) &
-                           + int(edge_j_in(i), int64)
-        end do
-        call sort(sort_keys)
+        ! COOデータはcreate_unique_cooによって行でソート済み
+        call allocate_array(self%ptr, self%num_nodes + 1)
+        call allocate_array(self%ind, self%nnz)
+        self%ind = self%col ! col配列をindにコピー
+        self%ptr = 0
 
-        unique_count = 1
-        do i = 2, edge_count_in
-            if (sort_keys(i) > sort_keys(i - 1)) then
-                unique_count = unique_count + 1
-                sort_keys(unique_count) = sort_keys(i)
-            end if
+        ! 1. 各行の非ゼロ要素数を数える (次数を計算)
+        do i = 1, self%nnz
+            self%ptr(self%row(i) + 1) = self%ptr(self%row(i) + 1) + 1
         end do
 
-        call allocate_array(temp_deg, self%num_nodes)
-        temp_deg = 0
-
-        do i = 1, unique_count
-            n1 = int(sort_keys(i) / (self%num_nodes + 1))
-            n2 = int(mod(sort_keys(i), int(self%num_nodes + 1, int64)))
-            temp_deg(n1) = temp_deg(n1) + 1
-            temp_deg(n2) = temp_deg(n2) + 1
-        end do
-
-        call allocate_array(self%ptr, self%num_nodes + 1_int32)
-        self%ptr(1) = 1
+        ! 2. 次数の累積和からptr配列を構築
         do i = 1, self%num_nodes
-            self%ptr(i + 1) = self%ptr(i) + temp_deg(i)
+            self%ptr(i + 1) = self%ptr(i) + self%ptr(i + 1)
         end do
 
-        total_adj = self%ptr(self%num_nodes + 1) - 1
-        call allocate_array(self%ind, total_adj)
-        call allocate_array(temp_pos, self%num_nodes)
-        temp_pos = self%ptr(1:self%num_nodes)
+        ! Fortranは1-based indexなので、全体に1を加算
+        self%ptr = self%ptr + 1
 
-        do i = 1, unique_count
-            n1 = int(sort_keys(i) / (self%num_nodes + 1))
-            n2 = int(mod(sort_keys(i), int(self%num_nodes + 1, int64)))
-            self%ind(temp_pos(n1)) = n2
-            temp_pos(n1) = temp_pos(n1) + 1
-            self%ind(temp_pos(n2)) = n1
-            temp_pos(n2) = temp_pos(n2) + 1
-        end do
-
-        call deallocate_array(sort_keys)
-        call deallocate_array(temp_deg)
-        call deallocate_array(temp_pos)
-    end subroutine build_csr_from_edges
-
-    !================================================================!
-    ! 照会・取得・解放用サブルーチン
-    !================================================================!
-    function check_node_adjacent(self, i, j) result(is_adj)
-        class(type_node_adjacency), intent(in) :: self
-        integer(int32), intent(in) :: i, j; logical :: is_adj
-        integer(int32) :: k, startp, endp
-
-        is_adj = .false.
-        if (i < 1 .or. i > self%num_nodes .or. j < 1 .or. j > self%num_nodes) return
-
-        startp = self%ptr(i)
-        endp = self%ptr(i + 1) - 1
-
-        do k = startp, endp
-            if (self%ind(k) == j) then
-                is_adj = .true.
-                return
+        ! 3. 各行の列インデックスをソートする
+        do i = 1, self%num_nodes
+            if (self%ptr(i + 1) > self%ptr(i)) then
+                call sort(self%ind(self%ptr(i):self%ptr(i + 1) - 1))
             end if
         end do
-    end function
+    end subroutine build_csr_from_coo
 
-    function get_node_degree(self, i) result(deg)
+    !================================================================!
+    ! 照会・解放用サブルーチン
+    !================================================================!
+    pure function get_num_nodes(self) result(n_nodes)
+        implicit none
         class(type_node_adjacency), intent(in) :: self
-        integer(int32), intent(in) :: i; integer(int32) :: deg
-        if (i < 1 .or. i > self%num_nodes) then
-            deg = 0
-        else
-            deg = self%ptr(i + 1) - self%ptr(i)
+        integer(int32) :: n_nodes
+        n_nodes = self%num_nodes
+    end function get_num_nodes
+
+    pure function get_degree_csr(self, node_id) result(degree)
+        implicit none
+        class(type_node_adjacency), intent(in) :: self
+        integer(int32), intent(in) :: node_id
+        integer(int32) :: degree
+        if (node_id < 1 .or. node_id > self%num_nodes) then
+            degree = 0; return
         end if
-    end function
+        degree = self%ptr(node_id + 1) - self%ptr(node_id)
+    end function get_degree_csr
 
-    function get_num_nodes(self) result(n)
-        class(type_node_adjacency), intent(in) :: self
-        integer(int32) :: n
-        n = self%num_nodes
-    end function
-
-    subroutine destroy_node_adjacency(self)
-        class(type_node_adjacency), intent(inout) :: self
-        if (allocated(self%ptr)) call deallocate_array(self%ptr)
-        if (allocated(self%ind)) call deallocate_array(self%ind)
-        self%num_nodes = 0
-    end subroutine
-
-    !================================================================!
-    !【追加】指定されたノードの隣接ノードリストを取得する
-    !================================================================!
-    subroutine get_node_neighbors(self, node_id, neighbors)
+    subroutine get_neighbors_csr(self, node_id, neighbors)
+        implicit none
         class(type_node_adjacency), intent(in) :: self
         integer(int32), intent(in) :: node_id
         integer(int32), allocatable, intent(out) :: neighbors(:)
-
-        integer(int32) :: degree, start_p, end_p
+        integer(int32) :: start_p, end_p, degree
 
         if (node_id < 1 .or. node_id > self%num_nodes) then
-            ! 不正なノードIDの場合は、0サイズの配列を返す
-            if (allocated(neighbors)) deallocate (neighbors)
-            allocate (neighbors(0))
-            return
+            allocate (neighbors(0)); return
         end if
-
-        ! 1. 隣接ノードの数（次数）を計算
         start_p = self%ptr(node_id)
         end_p = self%ptr(node_id + 1) - 1
         degree = end_p - start_p + 1
-
-        ! 2. 戻り値の配列を確保]
-        if (allocated(neighbors)) deallocate (neighbors)
+        if (degree <= 0) then
+            allocate (neighbors(0)); return
+        end if
         allocate (neighbors(degree))
-
-        ! 3. self%indから隣接ノードのリストをコピー
         neighbors = self%ind(start_p:end_p)
+    end subroutine get_neighbors_csr
 
-    end subroutine get_node_neighbors
+    pure function get_nnz(self) result(nnz)
+        implicit none
+        class(type_node_adjacency), intent(in) :: self
+        integer(int32) :: nnz
+        nnz = self%nnz
+    end function get_nnz
+
+    subroutine get_coo(self, row_out, col_out)
+        implicit none
+        class(type_node_adjacency), intent(in) :: self
+        integer(int32), intent(inout), allocatable :: row_out(:)
+        integer(int32), intent(inout), allocatable :: col_out(:)
+
+        if (self%nnz <= 0) return
+        call allocate_array(row_out, self%nnz)
+        call allocate_array(col_out, self%nnz)
+        row_out(:) = self%row(:)
+        col_out(:) = self%col(:)
+    end subroutine get_coo
+
+    subroutine get_csr(self, ptr_out, ind_out)
+        implicit none
+        class(type_node_adjacency), intent(in) :: self
+        integer(int32), intent(inout), allocatable :: ptr_out(:)
+        integer(int32), intent(inout), allocatable :: ind_out(:)
+
+        if (self%nnz <= 0) return
+        call allocate_array(ptr_out, self%num_nodes + 1_int32)
+        call allocate_array(ind_out, self%nnz)
+        ptr_out(:) = self%ptr(:)
+        ind_out(:) = self%ind(:)
+    end subroutine get_csr
+
+    subroutine destroy_hybrid(self)
+        implicit none
+        class(type_node_adjacency), intent(inout) :: self
+
+        call deallocate_array(self%row)
+        call deallocate_array(self%col)
+        call deallocate_array(self%ptr)
+        call deallocate_array(self%ind)
+        self%num_nodes = 0
+        self%nnz = 0
+    end subroutine destroy_hybrid
 
 end module domain_adjacency_adjacency_node

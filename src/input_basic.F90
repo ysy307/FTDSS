@@ -78,7 +78,7 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: coloring_types(4) = ["none", "welch_powell", "lfo", "dsatur"]
     character(*), parameter :: nonlinear_solver = "nonlinear_solver"
     character(*), parameter :: method = "method"
-    character(*), parameter :: valid_nonlinear_solver_methods(3) = ["none", "newton", "modified_newton"]
+    character(*), parameter :: valid_nonlinear_solver_methods(4) = ["none", "newton", "modified_newton", "picard"]
     character(*), parameter :: update_frequency = "update_frequency"
     character(*), parameter :: max_iterations = "max_iterations"
     character(*), parameter :: convergence = "convergence"
@@ -105,8 +105,6 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: num_threads = "num_threads"
     character(*), parameter :: schedule = "schedule"
     character(*), parameter :: valid_schedule_types(6) = ["affinity", "auto", "dynamic", "guided", "runtime", "static"]
-    character(*), parameter :: dynamic_adjustment = "dynamic_adjustment"
-    character(*), parameter :: nested_parallelism = "nested_parallelism"
     character(*), parameter :: max_active_levels = "max_active_levels"
     !!------------------------------------------------------------------------------------------------------------------------------
 
@@ -352,6 +350,33 @@ contains
         call json%get(key, self%basic%materials(i)%is_dispersed, found)
         call json%print_error_message(output_unit)
         if (.not. found) self%basic%materials(i)%is_dispersed = .false.
+
+        if (self%basic%analysis_controls%calculate_thermal) then
+            key = join([key_material, calculate_thermal])
+            call json%get(key, self%basic%materials(i)%calculate_thermal, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) self%basic%materials(i)%calculate_thermal = .false.
+        else
+            self%basic%materials(i)%calculate_thermal = .false.
+        end if
+
+        if (self%basic%analysis_controls%calculate_hydraulic) then
+            key = join([key_material, calculate_hydraulic])
+            call json%get(key, self%basic%materials(i)%calculate_hydraulic, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) self%basic%materials(i)%calculate_hydraulic = .false.
+        else
+            self%basic%materials(i)%calculate_hydraulic = .false.
+        end if
+
+        if (self%basic%analysis_controls%calculate_mechanical) then
+            key = join([key_material, calculate_mechanical])
+            call json%get(key, self%basic%materials(i)%calculate_mechanical, found)
+            call json%print_error_message(output_unit)
+            if (.not. found) self%basic%materials(i)%calculate_mechanical = .false.
+        else
+            self%basic%materials(i)%calculate_mechanical = .false.
+        end if
 
     end subroutine read_parameters_materials_basic
 
@@ -832,14 +857,14 @@ contains
         end select
 
         select case (self%basic%solver_settings%nonlinear_solver%method)
-        case (valid_nonlinear_solver_methods(2), valid_nonlinear_solver_methods(3))
+        case (valid_nonlinear_solver_methods(2), valid_nonlinear_solver_methods(3), valid_nonlinear_solver_methods(4))
             key = join([solver_settings, nonlinear_solver, max_iterations])
             call json%get(key, self%basic%solver_settings%nonlinear_solver%max_iterations, found)
             call json%print_error_message(output_unit)
             if (.not. found) then
                 call global_logger%log_warning(message="Using default maximum iterations of 1000 for nonlinear solver.")
                 self%basic%solver_settings%nonlinear_solver%max_iterations = 1000
-            else if (self%basic%solver_settings%nonlinear_solver%max_iterations <= 0) then
+            else if (self%basic%solver_settings%nonlinear_solver%max_iterations < 0) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
             end if
@@ -1103,22 +1128,6 @@ contains
             else if (.not. any(valid_schedule_types(:) == self%basic%solver_settings%parallel_settings%threads%schedule)) then
                 call json%destroy()
                 call error_message(905, c_opt=key)
-            end if
-
-            key = join([solver_settings, parallel_settings, threads, dynamic_adjustment])
-            call json%get(key, self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment, found)
-            call json%print_error_message(output_unit)
-            if (.not. found) then
-                call global_logger%log_warning(message="Default dynamic adjustment is set to 'false'.")
-                self%basic%solver_settings%parallel_settings%threads%dynamic_adjustment = .false.
-            end if
-
-            key = join([solver_settings, parallel_settings, threads, nested_parallelism])
-            call json%get(key, self%basic%solver_settings%parallel_settings%threads%nested_parallelism, found)
-            call json%print_error_message(output_unit)
-            if (.not. found) then
-                call global_logger%log_warning(message="Default nested parallelism is set to 'false'.")
-                self%basic%solver_settings%parallel_settings%threads%nested_parallelism = .false.
             end if
 
             key = join([solver_settings, parallel_settings, threads, max_active_levels])

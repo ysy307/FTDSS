@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 39 statements,  1.2% of total for derived types.">8 statements</a>
+                 title="<p> 1.1% of total for derived types.</p>Including implementation: 82 statements,  1.6% of total for derived types.">14 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -105,7 +105,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
                 <li class="breadcrumb-item"><a href='../sourcefile/matrix_dense.f90.html'>matrix_dense.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/matrix_dense.html'>matrix_dense</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_matrix_dense.html'>core_types_matrix_dense</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_dense</li>
           </ol>
         </nav>
@@ -134,7 +134,9 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_dense.html#variable-val~2">val</a>
+            <a class="list-group-item" href="../type/type_dense.html#variable-num_col~10">num_col</a>
+            <a class="list-group-item" href="../type/type_dense.html#variable-num_row~11">num_row</a>
+            <a class="list-group-item" href="../type/type_dense.html#variable-val~10">val</a>
         </div>
       </div>
     </div>
@@ -161,10 +163,14 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-copy">copy</a>
-            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-destory">destory</a>
-            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-find">find</a>
-            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-initialize~3">initialize</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-add~2">add</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-destroy~7">destroy</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-find~2">find</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-initialize~22">initialize</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-initialize_local">initialize_local</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-set~6">set</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-set_all~2">set_all</a>
+            <a class="list-group-item" href="../type/type_dense.html#boundprocedure-zero~2">zero</a>
         </div>
       </div>
     </div>
@@ -287,7 +293,41 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-val~2"></span>
+              <span class="anchor" id="variable-num_col~10"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_col</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_row~11"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_row</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-val~10"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -315,17 +355,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-copy"></span>
+      <span class="anchor" id="boundprocedure-add~2"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>copy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/copy_dense.html'>copy_dense</a>
+  <strong>add</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/add_dense.html'>add_dense</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  function <a href='../proc/copy_dense.html'>copy_dense</a>(self) result(B)  
+    private  subroutine <a href='../proc/add_dense.html'>add_dense</a>(self, row, col, value)  
 </h3>
     
 
@@ -347,7 +387,7 @@ large graphs.</div>
               <span class="anchor" ></span>
               class(<a href='type_dense.html'>type_dense</a>),
             </td>
-<td>intent(in)</td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
@@ -357,14 +397,54 @@ large graphs.</div>
 
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
     </tbody>
   </table>
 
-    <h4>
-    Return Value
-    <small>class(<a href='abst_matrix.html'>abst_matrix</a>), allocatable</small>
-    </h4>
-    
 
           </li>
       </ul>
@@ -374,17 +454,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destory"></span>
+      <span class="anchor" id="boundprocedure-destroy~7"></span>
       <h3>
           procedure, public, pass(self) ::
-  <strong>destory</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destory_dense.html'>destory_dense</a>
+  <strong>destroy</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/destroy_dense.html'>destroy_dense</a>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/destory_dense.html'>destory_dense</a>(self)  
+    private  subroutine <a href='../proc/destroy_dense.html'>destroy_dense</a>(self)  
 </h3>
     
 
@@ -428,7 +508,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-find"></span>
+      <span class="anchor" id="boundprocedure-find~2"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>find</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/find_dense.html'>find_dense</a>
@@ -438,7 +518,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/find_dense.html'>find_dense</a>(self, row, col, index)  
+    private pure function <a href='../proc/find_dense.html'>find_dense</a>(self, row, col) result(index)  
 </h3>
     
 
@@ -500,24 +580,14 @@ large graphs.</div>
 
             </td>
         </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              integer(kind=int32),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>index</strong></td>
-            <td>
-
-            </td>
-        </tr>
     </tbody>
   </table>
 
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
 
           </li>
       </ul>
@@ -527,7 +597,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~3"></span>
+      <span class="anchor" id="boundprocedure-initialize~22"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_dense.html'>initialize_type_dense</a>
@@ -537,7 +607,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/initialize_type_dense.html'>initialize_type_dense</a>(self, domain)  
+    private  subroutine <a href='../proc/initialize_type_dense.html'>initialize_type_dense</a>(self, num_nodes, row, col)  
 </h3>
     
 
@@ -572,14 +642,335 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_domain.html'>type_domain</a>),
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize_local"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize_local</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/initialize_type_dense_from_node.html'>initialize_type_dense_from_node</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/initialize_type_dense_from_node.html'>initialize_type_dense_from_node</a>(self, num_nodes)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_dense.html'>type_dense</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>domain</strong></td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set~6"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/set_dense.html'>set_dense</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_dense.html'>set_dense</a>(self, row, col, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_dense.html'>type_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_all~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_all</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/set_all_dense.html'>set_all_dense</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_all_dense.html'>set_all_dense</a>(self, value)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_dense.html'>type_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-zero~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>zero</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/proc/zero_dense.html'>zero_dense</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/zero_dense.html'>zero_dense</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_dense.html'>type_dense</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
             <td>
 
             </td>
@@ -614,7 +1005,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,0 +1,931 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_type_thermal_crs &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_type_thermal_crs
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.3% of total for procedures.">41 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/thermal_crs.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/thermal_crs.f90.html'>thermal_crs.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/main_thermal_crs.html'>main_thermal_crs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_type_thermal_crs</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/compute_type_thermal_crs.html#src">compute_type_thermal_crs</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, controls, bc)  
+    <a href="../interface/compute_type_thermal_crs.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~482"></span>
+              class(<a href='../type/type_thermal_crs.html'>type_thermal_crs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-domain~71"></span>
+              type(<a href='../type/type_domain.html'>type_domain</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>domain</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-property~46"></span>
+              type(<a href='../type/type_properties_manager.html'>type_properties_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>property</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-temperature~29"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-porosity~24"></span>
+              type(<a href='../type/type_variable.html'>type_variable</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>porosity</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-controls~20"></span>
+              type(<a href='../type/type_controls.html'>type_controls</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>controls</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc~8"></span>
+              type(<a href='../type/type_bc.html'>type_bc</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_type_thermal_crs~~CallsGraph Pages: 1 -->
+<svg id="proccompute_type_thermal_crsCallsGraph" width="641pt" height="327pt"
+ viewBox="0.00 0.00 641.00 327.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_type_thermal_crs~~CallsGraph" class="graph" transform="scale(0.75 0.75) rotate(0) translate(4 431.91)">
+<title>proc~~compute_type_thermal_crs~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-431.91 850,-431.91 850,4 -4,4"/>
+<!-- proc~compute_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node1" class="node">
+<title>proc~compute_type_thermal_crs</title>
+<polygon fill="none" stroke="black" points="157,-213 0,-213 0,-189 157,-189 157,-213"/>
+<text text-anchor="middle" x="78.5" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_type_thermal_crs</text>
+</g>
+<!-- interface~solve_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node2" class="node">
+<title>interface~solve_type_thermal_crs</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node2"><a xlink:href="../interface/solve_type_thermal_crs.html" xlink:title="type_thermal_crs%solve_type_thermal_crs">
+<polygon fill="#a7506f" stroke="#a7506f" points="431,-360 193,-360 193,-336 431,-336 431,-360"/>
+<text text-anchor="middle" x="312" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal_crs%solve_type_thermal_crs</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;interface~solve_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge1" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;interface~solve_type_thermal_crs</title>
+<path fill="none" stroke="#ff0000" d="M86.49,-213.11C102.01,-238.8 142.03,-298.7 193,-327 196.48,-328.93 200.1,-330.69 203.82,-332.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="202.66,-335.6 213.25,-335.97 205.2,-329.08 202.66,-335.6"/>
+</g>
+<!-- proc~apply_type_bc_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node3" class="node">
+<title>proc~apply_type_bc_crs</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node3"><a xlink:href="../proc/apply_type_bc_crs.html" xlink:title="type_bc%apply_type_bc_crs">
+<polygon fill="#d9534f" stroke="#d9534f" points="392,-318 232,-318 232,-294 392,-294 392,-318"/>
+<text text-anchor="middle" x="312" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_bc%apply_type_bc_crs</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~apply_type_bc_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge2" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~apply_type_bc_crs</title>
+<path fill="none" stroke="#ff0000" d="M91.87,-213.27C111.5,-231.96 151.8,-267.26 193,-285 202.1,-288.92 211.9,-292.11 221.82,-294.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="221.22,-298.16 231.76,-297.1 222.87,-291.35 221.22,-298.16"/>
+</g>
+<!-- proc~check_convergence -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node4" class="node">
+<title>proc~check_convergence</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node4"><a xlink:href="../proc/check_convergence.html" xlink:title="type_iteration%check_convergence">
+<polygon fill="#d9534f" stroke="#d9534f" points="413,-276 211,-276 211,-252 413,-252 413,-276"/>
+<text text-anchor="middle" x="312" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%check_convergence</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~check_convergence -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge3" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~check_convergence</title>
+<path fill="none" stroke="#ff0000" d="M107.96,-213.14C130.64,-222.43 163.4,-234.96 193,-243 202.41,-245.56 212.33,-247.88 222.26,-249.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="221.68,-253.43 232.18,-251.99 223.07,-246.57 221.68,-253.43"/>
+</g>
+<!-- proc~continue_loop -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node5" class="node">
+<title>proc~continue_loop</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node5"><a xlink:href="../proc/continue_loop.html" xlink:title="type_iteration%continue_loop">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="397.5,-192 226.5,-192 226.5,-168 397.5,-168 397.5,-192"/>
+<text text-anchor="middle" x="312" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%continue_loop</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~continue_loop -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge4" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~continue_loop</title>
+<path fill="none" stroke="#ff0000" d="M157.23,-193.95C176.13,-192.23 196.56,-190.38 216.16,-188.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="216.68,-192.07 226.32,-187.68 216.04,-185.1 216.68,-192.07"/>
+</g>
+<!-- proc~get_step -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node6" class="node">
+<title>proc~get_step</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node6"><a xlink:href="../proc/get_step.html" xlink:title="type_iteration%get_step">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="382.5,-150 241.5,-150 241.5,-126 382.5,-126 382.5,-150"/>
+<text text-anchor="middle" x="312" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%get_step</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~get_step -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge5" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~get_step</title>
+<path fill="none" stroke="#ff0000" d="M107.96,-188.86C130.64,-179.57 163.4,-167.04 193,-159 205.32,-155.65 218.51,-152.7 231.45,-150.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="232.11,-153.59 241.28,-148.28 230.8,-146.72 232.11,-153.59"/>
+</g>
+<!-- proc~get_time -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node7" class="node">
+<title>proc~get_time</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node7"><a xlink:href="../proc/get_time.html" xlink:title="type_time%get_time">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="803.5,-402 682.5,-402 682.5,-378 803.5,-378 803.5,-402"/>
+<text text-anchor="middle" x="743" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%get_time</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~get_time -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge6" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~get_time</title>
+<path fill="none" stroke="#ff0000" d="M83.38,-213.22C94.41,-245.6 129.32,-333.59 193,-369 351.29,-457.01 576.79,-426.02 682.72,-404.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="683.53,-407.54 692.59,-402.05 682.08,-400.69 683.53,-407.54"/>
+</g>
+<!-- proc~increment_step -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node8" class="node">
+<title>proc~increment_step</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node8"><a xlink:href="../proc/increment_step.html" xlink:title="type_iteration%increment_step">
+<polygon fill="#d9534f" stroke="#d9534f" points="401,-108 223,-108 223,-84 401,-84 401,-108"/>
+<text text-anchor="middle" x="312" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%increment_step</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~increment_step -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge7" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~increment_step</title>
+<path fill="none" stroke="#ff0000" d="M91.87,-188.73C111.5,-170.04 151.8,-134.74 193,-117 199.36,-114.26 206.05,-111.88 212.89,-109.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="214.3,-113.05 223,-107 212.42,-106.31 214.3,-113.05"/>
+</g>
+<!-- proc~profile_start_timer -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node9" class="node">
+<title>proc~profile_start_timer</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node9"><a xlink:href="../proc/profile_start_timer.html" xlink:title="type_time%profile_start_timer">
+<polygon fill="#d9534f" stroke="#d9534f" points="398,-66 226,-66 226,-42 398,-42 398,-66"/>
+<text text-anchor="middle" x="312" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%profile_start_timer</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~profile_start_timer -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge8" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~profile_start_timer</title>
+<path fill="none" stroke="#ff0000" d="M86.49,-188.89C102.01,-163.2 142.03,-103.3 193,-75 200.26,-70.97 208.12,-67.69 216.22,-65.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="217.23,-68.36 225.81,-62.15 215.23,-61.66 217.23,-68.36"/>
+</g>
+<!-- proc~profile_stop_timer -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node10" class="node">
+<title>proc~profile_stop_timer</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node10"><a xlink:href="../proc/profile_stop_timer.html" xlink:title="type_time%profile_stop_timer">
+<polygon fill="#d9534f" stroke="#d9534f" points="397,-24 227,-24 227,0 397,0 397,-24"/>
+<text text-anchor="middle" x="312" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%profile_stop_timer</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~profile_stop_timer -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge9" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~profile_stop_timer</title>
+<path fill="none" stroke="#ff0000" d="M83.84,-188.8C95.76,-157.22 132.2,-72.52 193,-33 200.42,-28.18 208.62,-24.38 217.15,-21.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="218.39,-24.68 226.89,-18.37 216.3,-18 218.39,-24.68"/>
+</g>
+<!-- proc~set_initial_norms -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node11" class="node">
+<title>proc~set_initial_norms</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node11"><a xlink:href="../proc/set_initial_norms.html" xlink:title="type_iteration%set_initial_norms">
+<polygon fill="#d9534f" stroke="#d9534f" points="404.5,-234 219.5,-234 219.5,-210 404.5,-210 404.5,-234"/>
+<text text-anchor="middle" x="312" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%set_initial_norms</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_type_thermal_crs&#45;&gt;proc~set_initial_norms -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge10" class="edge">
+<title>proc~compute_type_thermal_crs&#45;&gt;proc~set_initial_norms</title>
+<path fill="none" stroke="#ff0000" d="M157.23,-208.05C173.92,-209.57 191.8,-211.19 209.24,-212.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="209.18,-216.28 219.45,-213.7 209.81,-209.31 209.18,-216.28"/>
+</g>
+<!-- proc~solve_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node17" class="node">
+<title>proc~solve_type_thermal_crs</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node17"><a xlink:href="../proc/solve_type_thermal_crs.html" xlink:title="solve_type_thermal_crs">
+<polygon fill="#d9534f" stroke="#d9534f" points="604,-360 467,-360 467,-336 604,-336 604,-360"/>
+<text text-anchor="middle" x="535.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_thermal_crs</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_thermal_crs&#45;&gt;proc~solve_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge11" class="edge">
+<title>interface~solve_type_thermal_crs&#45;&gt;proc~solve_type_thermal_crs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M431.21,-348C439.76,-348 448.25,-348 456.48,-348"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="456.75,-351.5 466.75,-348 456.75,-344.5 456.75,-351.5"/>
+</g>
+<!-- apply_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node12" class="node">
+<title>apply_crs</title>
+<polygon fill="#777777" stroke="#777777" points="567,-318 504,-318 504,-294 567,-294 567,-318"/>
+<text text-anchor="middle" x="535.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">apply_crs</text>
+</g>
+<!-- proc~apply_type_bc_crs&#45;&gt;apply_crs -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge12" class="edge">
+<title>proc~apply_type_bc_crs&#45;&gt;apply_crs</title>
+<path fill="none" stroke="#ff9900" d="M392.03,-306C426.29,-306 464.98,-306 493.38,-306"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="493.73,-309.5 503.73,-306 493.73,-302.5 493.73,-309.5"/>
+</g>
+<!-- proc~norm_2 -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node15" class="node">
+<title>proc~norm_2</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node15"><a xlink:href="../proc/norm_2.html" xlink:title="norm_2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="562.5,-276 508.5,-276 508.5,-252 562.5,-252 562.5,-276"/>
+<text text-anchor="middle" x="535.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence&#45;&gt;proc~norm_2 -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge13" class="edge">
+<title>proc~check_convergence&#45;&gt;proc~norm_2</title>
+<path fill="none" stroke="#cbff00" d="M413.06,-264C443.48,-264 474.99,-264 498.29,-264"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="498.38,-267.5 508.38,-264 498.38,-260.5 498.38,-267.5"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node13" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node13"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="581.5,-24 489.5,-24 489.5,0 581.5,0 581.5,-24"/>
+<text text-anchor="middle" x="535.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~profile_start_timer&#45;&gt;proc~error_message -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge14" class="edge">
+<title>proc~profile_start_timer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#3200ff" d="M382.31,-41.95C398.31,-39.09 415.26,-36 431,-33 446.74,-30 463.78,-26.61 479.42,-23.43"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="480.36,-26.81 489.46,-21.38 478.96,-19.95 480.36,-26.81"/>
+</g>
+<!-- proc~get_current_time -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node14" class="node">
+<title>proc~get_current_time</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node14"><a xlink:href="../proc/get_current_time.html" xlink:title="get_current_time">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="587,-66 484,-66 484,-42 587,-42 587,-66"/>
+<text text-anchor="middle" x="535.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_current_time</text>
+</a>
+</g>
+</g>
+<!-- proc~profile_start_timer&#45;&gt;proc~get_current_time -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge15" class="edge">
+<title>proc~profile_start_timer&#45;&gt;proc~get_current_time</title>
+<path fill="none" stroke="#3200ff" d="M398,-54C423.19,-54 450.26,-54 473.6,-54"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="473.69,-57.5 483.69,-54 473.69,-50.5 473.69,-57.5"/>
+</g>
+<!-- proc~profile_stop_timer&#45;&gt;proc~error_message -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge16" class="edge">
+<title>proc~profile_stop_timer&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#cc00ff" d="M397.06,-12C424.47,-12 454.2,-12 478.98,-12"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="479.28,-15.5 489.28,-12 479.28,-8.5 479.28,-15.5"/>
+</g>
+<!-- proc~profile_stop_timer&#45;&gt;proc~get_current_time -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge17" class="edge">
+<title>proc~profile_stop_timer&#45;&gt;proc~get_current_time</title>
+<path fill="none" stroke="#cc00ff" d="M382.31,-24.05C398.31,-26.91 415.26,-30 431,-33 444.84,-35.64 459.7,-38.58 473.72,-41.41"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="473.25,-44.89 483.75,-43.45 474.64,-38.03 473.25,-44.89"/>
+</g>
+<!-- proc~set_initial_norms&#45;&gt;proc~norm_2 -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge18" class="edge">
+<title>proc~set_initial_norms&#45;&gt;proc~norm_2</title>
+<path fill="none" stroke="#ff0098" d="M382.31,-234.05C398.31,-236.91 415.26,-240 431,-243 453.39,-247.26 478.45,-252.34 498.3,-256.43"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="497.66,-259.87 508.16,-258.47 499.08,-253.02 497.66,-259.87"/>
+</g>
+<!-- proc~norm_inf -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node16" class="node">
+<title>proc~norm_inf</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node16"><a xlink:href="../proc/norm_inf.html" xlink:title="norm_inf">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="565.5,-234 505.5,-234 505.5,-210 565.5,-210 565.5,-234"/>
+<text text-anchor="middle" x="535.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf</text>
+</a>
+</g>
+</g>
+<!-- proc~set_initial_norms&#45;&gt;proc~norm_inf -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge19" class="edge">
+<title>proc~set_initial_norms&#45;&gt;proc~norm_inf</title>
+<path fill="none" stroke="#ff0098" d="M404.69,-222C436.25,-222 469.93,-222 495.07,-222"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="495.3,-225.5 505.3,-222 495.3,-218.5 495.3,-225.5"/>
+</g>
+<!-- log_error -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node19" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="773.5,-24 712.5,-24 712.5,0 773.5,0 773.5,-24"/>
+<text text-anchor="middle" x="743" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge20" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#ffff00" d="M581.6,-12C617.57,-12 667.49,-12 702.04,-12"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="702.24,-15.5 712.24,-12 702.24,-8.5 702.24,-15.5"/>
+</g>
+<!-- proc~solve_type_thermal_crs&#45;&gt;proc~get_time -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge23" class="edge">
+<title>proc~solve_type_thermal_crs&#45;&gt;proc~get_time</title>
+<path fill="none" stroke="#ff00ff" d="M595.39,-360.04C619.68,-365 648,-370.79 673.23,-375.95"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="672.61,-379.39 683.1,-377.96 674.01,-372.53 672.61,-379.39"/>
+</g>
+<!-- check -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node18" class="node">
+<title>check</title>
+<polygon fill="#777777" stroke="#777777" points="770,-360 716,-360 716,-336 770,-336 770,-360"/>
+<text text-anchor="middle" x="743" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check</text>
+</g>
+<!-- proc~solve_type_thermal_crs&#45;&gt;check -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge21" class="edge">
+<title>proc~solve_type_thermal_crs&#45;&gt;check</title>
+<path fill="none" stroke="#ff00ff" d="M604.07,-348C637.99,-348 677.73,-348 705.82,-348"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="705.97,-351.5 715.97,-348 705.97,-344.5 705.97,-351.5"/>
+</g>
+<!-- proc~get_algorithm_name~2 -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node20" class="node">
+<title>proc~get_algorithm_name~2</title>
+<g id="a_proc~~compute_type_thermal_crs~~CallsGraph_node20"><a xlink:href="../proc/get_algorithm_name~2.html" xlink:title="type_iteration%get_algorithm_name">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="846,-318 640,-318 640,-294 846,-294 846,-318"/>
+<text text-anchor="middle" x="743" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%get_algorithm_name</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_thermal_crs&#45;&gt;proc~get_algorithm_name~2 -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge22" class="edge">
+<title>proc~solve_type_thermal_crs&#45;&gt;proc~get_algorithm_name~2</title>
+<path fill="none" stroke="#ff00ff" d="M595.39,-335.96C619.68,-331 648,-325.21 673.23,-320.05"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="674.01,-323.47 683.1,-318.04 672.61,-316.61 674.01,-323.47"/>
+</g>
+<!-- solve -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_node21" class="node">
+<title>solve</title>
+<polygon fill="#777777" stroke="#777777" points="770,-276 716,-276 716,-252 770,-252 770,-276"/>
+<text text-anchor="middle" x="743" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve</text>
+</g>
+<!-- proc~solve_type_thermal_crs&#45;&gt;solve -->
+<g id="proc~~compute_type_thermal_crs~~CallsGraph_edge24" class="edge">
+<title>proc~solve_type_thermal_crs&#45;&gt;solve</title>
+<path fill="none" stroke="#ff00ff" d="M586.62,-335.93C592.72,-333.46 598.67,-330.51 604,-327 624.54,-313.49 618.82,-297.48 640,-285 659.76,-273.35 684.99,-268.09 705.41,-265.75"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="705.98,-269.21 715.6,-264.77 705.31,-262.24 705.98,-269.21"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_type_thermal_crsCallsGraph = svgPanZoom('#proccompute_type_thermal_crsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_type_thermal_crs~~CalledByGraph Pages: 1 -->
+<svg id="proccompute_type_thermal_crsCalledByGraph" width="459pt" height="32pt"
+ viewBox="0.00 0.00 459.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_type_thermal_crs~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~compute_type_thermal_crs~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 455,-28 455,4 -4,4"/>
+<!-- proc~compute_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CalledByGraph_node1" class="node">
+<title>proc~compute_type_thermal_crs</title>
+<polygon fill="none" stroke="black" points="451,-24 294,-24 294,0 451,0 451,-24"/>
+<text text-anchor="middle" x="372.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_type_thermal_crs</text>
+</g>
+<!-- interface~compute_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CalledByGraph_node2" class="node">
+<title>interface~compute_type_thermal_crs</title>
+<g id="a_proc~~compute_type_thermal_crs~~CalledByGraph_node2"><a xlink:href="../interface/compute_type_thermal_crs.html" xlink:title="type_thermal_crs%compute_type_thermal_crs">
+<polygon fill="#a7506f" stroke="#a7506f" points="258,-24 0,-24 0,0 258,0 258,-24"/>
+<text text-anchor="middle" x="129" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal_crs%compute_type_thermal_crs</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_type_thermal_crs&#45;&gt;proc~compute_type_thermal_crs -->
+<g id="proc~~compute_type_thermal_crs~~CalledByGraph_edge1" class="edge">
+<title>interface~compute_type_thermal_crs&#45;&gt;proc~compute_type_thermal_crs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M258.17,-12C266.84,-12 275.46,-12 283.85,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="283.95,-15.5 293.95,-12 283.95,-8.5 283.95,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">compute_type_thermal_crs</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">property</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">porosity</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">,</span><span class="w"> </span><span class="n">bc</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="w">        </span><span class="c">! Arguments</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_thermal_crs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_properties_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">property</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">porosity</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_controls</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">controls</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_bc</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc</span>
+
+<span class="w">        </span><span class="c">! Local variables</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">actual_order</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mode_bc</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_start</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="n">mode_bc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mode_value</span>
+<span class="w">        </span><span class="k">case </span><span class="n">default</span>
+<span class="w">            </span><span class="n">mode_bc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mode_nr</span>
+<span class="w">        </span><span class="k">end select</span>
+
+<span class="k">        call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_stop</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">NR_LOOP_THERMAL</span><span class="p">:</span><span class="w"> </span><span class="k">do while</span><span class="w"> </span><span class="p">(</span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">should_continue</span><span class="p">())</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_start</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">increment_step</span><span class="p">()</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_stop</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_start</span><span class="p">(</span><span class="s2">&quot;Assemble&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="n">actual_order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">order</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">get_step</span><span class="p">())</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">assemble_global</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">KT_star</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">PHIT</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">porosity</span><span class="p">,</span><span class="w"> </span><span class="n">property</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">,</span><span class="w"> </span><span class="n">actual_order</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_stop</span><span class="p">(</span><span class="s2">&quot;Assemble&quot;</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_start</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">bc</span><span class="p">%</span><span class="n">apply_crs</span><span class="p">(</span><span class="n">boundary_target</span><span class="o">=</span><span class="s1">&#39;thermal&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                              </span><span class="n">current_time</span><span class="o">=</span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">get_time</span><span class="p">(),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                              </span><span class="n">A</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">KT_star</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                              </span><span class="n">b</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">PHIT</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                              </span><span class="n">Domain</span><span class="o">=</span><span class="n">Domain</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                              </span><span class="n">mode</span><span class="o">=</span><span class="n">mode_bc</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">get_step</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">set_initial_norms</span><span class="p">(</span><span class="n">res_vec</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">PHIT</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_stop</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_start</span><span class="p">(</span><span class="s2">&quot;Solve&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">solve</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_stop</span><span class="p">(</span><span class="s2">&quot;Solve&quot;</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_start</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">get_step</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">set_initial_norms</span><span class="p">(</span><span class="n">upd_vec</span><span class="o">=</span><span class="n">temperature</span><span class="p">%</span><span class="n">dif</span><span class="p">(:))</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="n">iteration</span><span class="p">%</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">PHIT</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">%</span><span class="n">dif</span><span class="p">(:))</span>
+<span class="w">            </span><span class="n">temperature</span><span class="p">%</span><span class="n">pre</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temperature</span><span class="p">%</span><span class="n">new</span><span class="p">(:)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">controls</span><span class="p">%</span><span class="nb">time</span><span class="p">%</span><span class="n">profile_stop</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end do </span><span class="n">NR_LOOP_THERMAL</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">compute_type_thermal_crs</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

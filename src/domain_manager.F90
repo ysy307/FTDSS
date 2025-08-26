@@ -3,11 +3,8 @@ module domain_manager
     use :: stdlib_logger
     use :: module_core, only:type_dp_3d, allocate_array, deallocate_array
     use :: module_input, only:type_input
-    use :: domain_element
-    use :: domain_side, only:holder_sides
-    use :: domain_element_factory, only:create_element
-    use :: domain_side_factory, only:create_side
-    use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element
+    use :: module_mesh
+    use :: domain_adjacency, only:type_node_adjacency, type_crs_adjacency_element, type_map_node_to_element
     use :: domain_multicoloring, only:type_coloring, type_colored_info
     use :: domain_reordering, only:type_reordering
     implicit none
@@ -21,13 +18,16 @@ module domain_manager
         integer(int32), private :: num_volumes
         integer(int32), private :: num_nodes
         integer(int32), private :: num_materials
-        type(holder_elements), allocatable :: elements(:)
-        type(holder_sides), allocatable :: sides(:)
+        type(holder_elements), allocatable :: elements(:) !&
+        type(holder_sides),    allocatable :: sides(:) !&
 
         type(type_coloring) :: colors
         type(type_reordering) :: reordering
+        type(type_node_adjacency) :: node_adjacency
+        type(type_crs_adjacency_element) :: element_adjacency
+        type(type_map_node_to_element) :: map_node_to_element
 
-        integer(int32), private :: computaion_dimension
+        integer(int32), private :: computation_dimension
         ! ...
     contains
         procedure, pass(self) :: initialize => initialize_type_domain
@@ -41,25 +41,19 @@ module domain_manager
     end type type_domain
 
 contains
-    subroutine initialize_type_domain(self, input, Coordinate, ierr)
+    subroutine initialize_type_domain(self, input, Coordinate)
         implicit none
         class(type_domain), intent(inout) :: self
         type(type_input), intent(in) :: input
         type(type_dp_3d), intent(inout), pointer :: Coordinate
-        integer(int32), intent(inout) :: ierr
-
-        type(type_crs_adjacency_element) :: element_adjacency
-        type(type_node_adjacency) :: node_adjacency
 
         integer(int32) :: count_sides, count_elements, count_volumes
         integer(int32) :: iCell, iElem, iSide
-        integer(int32) :: factory_ierr
         integer(int32) :: cell_dimension
 
         ! -----------------------------------------------------------------------------------
         ! 初期化処理
         ! -----------------------------------------------------------------------------------
-        ierr = 0
         count_sides = 0
         count_elements = 0
         count_volumes = 0
@@ -92,28 +86,14 @@ contains
             cell_dimension = input%geometry%vtk%cells(iCell)%get_dimension()
             select case (cell_dimension)
             case (1)
-                call create_side(new_side=self%sides(iSide)%s, &
-                                 id=iCell, &
-                                 global_coordinate=Coordinate, &
-                                 cell_info=input%geometry%vtk%cells(iCell), &
-                                 integration=input%basic%geometry_settings, &
-                                 ierr=factory_ierr)
-                if (factory_ierr /= 0) then
-                    ierr = -1
-                    return
-                end if
+                self%sides(iSide)%s = create_side(id=iCell, &
+                                                  global_coordinate=Coordinate, &
+                                                  input=input)
                 iSide = iSide + 1
             case (2)
-                call create_element(new_element=self%elements(iElem)%e, &
-                                    id=iCell, &
-                                    global_coordinate=Coordinate, &
-                                    cell_info=input%geometry%vtk%cells(iCell), &
-                                    integration=input%basic%geometry_settings, &
-                                    ierr=factory_ierr)
-                if (factory_ierr /= 0) then
-                    ierr = -1
-                    return
-                end if
+                self%elements(iElem)%e = create_element(id=iCell, &
+                                                        global_coordinate=Coordinate, &
+                                                        input=input)
                 iElem = iElem + 1
             case (3)
                 !!TBI
@@ -121,18 +101,19 @@ contains
 
         end do
 
-        self%computaion_dimension = input%basic%simulation_settings%calculate_dimension
+        self%computation_dimension = input%basic%simulation_settings%calculate_dimension
 
         !===============================================================
         ! 3. 隣接行列の構築
         !===============================================================
-        call element_adjacency%initialize(self%elements)
-        print *, "Step 3a: Element adjacency matrix created."
+        call self%node_adjacency%initialize(self%num_nodes, self%computation_dimension, self%sides, self%elements)
+        call self%element_adjacency%initialize(self%elements)
+        call self%map_node_to_element%initialize(self%num_nodes, self%elements, "fast")
 
         !===============================================================
         ! 4. RCM並べ替えの実行
         !===============================================================
-        call self%reordering%initialize(input%basic%solver_settings%reordering, self%elements)
+        call self%reordering%initialize(input%basic%solver_settings%reordering, self%node_adjacency)
         if (input%basic%solver_settings%reordering /= "none") then
             call self%apply_reordering()
             call global_logger%log_information(message="RCM reordering completed.")
@@ -141,13 +122,10 @@ contains
         !===============================================================
         ! 5. グラフ彩色の実行
         !===============================================================
-        call self%colors%initialize(input%basic%solver_settings%coloring, element_adjacency)
+        call self%colors%initialize(input%basic%solver_settings%coloring, self%element_adjacency)
         call global_logger%log_information(message="Graph coloring completed using " &
                                            //trim(self%colors%algorithm_name)//" algorithm.")
 
-        !===============================================================
-        ! 6. 後片付け
-        !===============================================================
         call global_logger%log_information(message="Initialization process completed successfully.")
 
     end subroutine initialize_type_domain
@@ -188,12 +166,12 @@ contains
 
     end function get_num_materials
 
-    function get_computation_dimension(self) result(computaion_dimension)
+    function get_computation_dimension(self) result(computation_dimension)
         implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: computaion_dimension
+        integer(int32) :: computation_dimension
 
-        computaion_dimension = self%computaion_dimension
+        computation_dimension = self%computation_dimension
 
     end function get_computation_dimension
 
@@ -201,32 +179,54 @@ contains
         implicit none
         class(type_domain), intent(inout) :: self
 
-        integer(int32) :: iElem, iSide
+        integer(int32) :: iElem, iSide, i
+        integer(int32), dimension(:), pointer :: ptr_connectivity => null()
+        integer(int32), allocatable :: connectivity(:)
+        integer(int32), allocatable :: connectivity_reordered(:)
+        integer(int32) :: node_per_mesh
 
-        if (self%computaion_dimension >= 3) then
+        if (self%computation_dimension >= 3) then
             !! TBI: Handle 3D reordering if necessary
         end if
-        if (self%computaion_dimension >= 2) then
-            do iElem = 1, self%num_elements
-                call allocate_array(self%elements(iElem)%e%connectivity_reordered, self%elements(iElem)%e%get_num_nodes())
-                call self%reordering%to_reordered(self%elements(iElem)%e%connectivity, &
-                                                  self%elements(iElem)%e%connectivity_reordered)
-                if (associated(self%elements(iElem)%e%interpolate)) then
-                    nullify (self%elements(iElem)%e%interpolate)
-                end if
-                self%elements(iElem)%e%interpolate => interpolate_reordered
 
-                if (associated(self%elements(iElem)%e%get_connectivity)) then
-                    nullify (self%elements(iElem)%e%get_connectivity)
-                end if
-                self%elements(iElem)%e%get_connectivity => get_connectivity_reordered
+        if (self%computation_dimension >= 2) then
+            do iElem = 1, self%get_num_elements()
+                ptr_connectivity => self%elements(iElem)%e%get_connectivity()
+                node_per_mesh = self%elements(iElem)%e%get_num_nodes()
+                call allocate_array(connectivity, node_per_mesh)
+                call allocate_array(connectivity_reordered, node_per_mesh)
+
+                do i = 1, node_per_mesh
+                    connectivity(i) = ptr_connectivity(i)
+                end do
+                call self%reordering%to_reordered(connectivity, connectivity_reordered)
+                do i = 1, node_per_mesh
+                    ptr_connectivity(i) = connectivity_reordered(i)
+                end do
+
+                call deallocate_array(connectivity)
+                call deallocate_array(connectivity_reordered)
             end do
         end if
-        if (self%computaion_dimension >= 1) then
-            do iSide = 1, self%num_sides
-                call allocate_array(self%sides(iSide)%s%connectivity_reordered, self%sides(iSide)%s%get_num_nodes())
-                call self%reordering%to_reordered(self%sides(iSide)%s%connectivity, &
-                                                  self%sides(iSide)%s%connectivity_reordered)
+
+        if (self%computation_dimension >= 1) then
+            do iSide = 1, self%get_num_sides()
+                ptr_connectivity => self%sides(iSide)%s%get_connectivity()
+                node_per_mesh = self%sides(iSide)%s%get_num_nodes()
+                call allocate_array(connectivity, node_per_mesh)
+                call allocate_array(connectivity_reordered, node_per_mesh)
+
+                do i = 1, node_per_mesh
+                    connectivity(i) = ptr_connectivity(i)
+                end do
+                call self%reordering%to_reordered(connectivity, connectivity_reordered)
+                do i = 1, node_per_mesh
+                    ptr_connectivity(i) = connectivity_reordered(i)
+                end do
+
+                call deallocate_array(connectivity)
+                call deallocate_array(connectivity_reordered)
+
             end do
         end if
 

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">17 statements</a>
+                 title=" 0.2% of total for procedures.">23 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -180,7 +180,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~289"></span>
+              <span class="anchor" id="variable-self~438"></span>
               class(<a href='../type/type_coloring.html'>type_coloring</a>),
             </td>
 <td>intent(inout)</td>
@@ -195,7 +195,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-algorithm_name~2"></span>
+              <span class="anchor" id="variable-algorithm_name~5"></span>
               character(len=*),
             </td>
 <td>intent(in)</td>
@@ -1540,15 +1540,22 @@ large graphs.</div>
 
 <span class="w">        </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">)))</span>
 <span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;welsh-powell&quot;</span><span class="p">)</span>
-<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Welsh-Powell&quot;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">)</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len_trim</span><span class="p">(</span><span class="s2">&quot;Welsh-Powell&quot;</span><span class="p">))</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;welsh-powell&quot;</span>
 <span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">coloring_welsh_powell</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span>
-<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;dsatur&quot;</span><span class="p">)</span><span class="w"> </span><span class="c">! DSATURのケースを追加</span>
-<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;DSATUR&quot;</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;dsatur&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">)</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len_trim</span><span class="p">(</span><span class="s2">&quot;dsatur&quot;</span><span class="p">))</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;dsatur&quot;</span>
 <span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">coloring_dsatur</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span>
 <span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;lfo&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">)</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len_trim</span><span class="p">(</span><span class="s2">&quot;Largest First Order&quot;</span><span class="p">))</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="p">)</span>
 <span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">algorithm_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Largest First Order&quot;</span>
-<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">coloring_lfo</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span><span class="w"> </span><span class="c">! LFOアルゴリズムの実行</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">coloring_lfo</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span>
 <span class="w">        </span><span class="k">end select</span>
+
 <span class="k">    end subroutine </span><span class="n">initialize_type_coloring</span>
 </pre></div>
 
@@ -1573,7 +1580,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

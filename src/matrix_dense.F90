@@ -1,59 +1,121 @@
-module matrix_dense
+module core_types_matrix_dense
     use, intrinsic :: iso_fortran_env
-    use :: module_core, only:allocate_array, deallocate_array, unique
-    use :: module_domain, only:type_domain
-    use :: matrix_base, only:abst_matrix
+    use :: core_allocate, only:allocate_array
+    use :: core_deallocate, only:deallocate_array
+    use :: core_types_matrix, only:abst_matrix
     implicit none
     private
 
     public :: type_dense
 
+    ! public :: type_dense_gemv
+    ! public :: type_dense_add
+
     type, extends(abst_matrix) :: type_dense
+        integer(int32) :: num_row
+        integer(int32) :: num_col
         real(real64), allocatable :: val(:, :)
     contains
-        procedure, public, pass(self) :: initialize => initialize_type_dense
-        procedure, public, pass(self) :: find => find_dense
-        procedure, public, pass(self) :: copy => copy_dense
-        procedure, public, pass(self) :: destory => destory_dense
+        procedure, public, pass(self) :: initialize       => initialize_type_dense !&
+        procedure, public, pass(self) :: initialize_local => initialize_type_dense_from_node !&
+        procedure, public, pass(self) :: find             => find_dense !&
+        procedure, public, pass(self) :: set              => set_dense !&
+        procedure, public, pass(self) :: set_all          => set_all_dense !&
+        procedure, public, pass(self) :: zero             => zero_dense !&
+        procedure, public, pass(self) :: add              => add_dense !&
+        procedure, public, pass(self) :: destroy          => destroy_dense !&
     end type
 contains
-    subroutine initialize_type_dense(self, domain)
+    subroutine initialize_type_dense(self, num_nodes, row, col)
         implicit none
         class(type_dense), intent(inout) :: self
-        type(type_domain), intent(inout) :: domain
+        integer(int32), intent(in) :: num_nodes
+        integer(int32), intent(in), optional :: row(:)
+        integer(int32), intent(in), optional :: col(:)
 
-        ! Initialize the dense matrix with zeros
-        integer(int32) :: num_nodes
-        num_nodes = domain%get_num_nodes()
-        call allocate_array(self%val, num_nodes, num_nodes)
+        self%num_row = num_nodes
+        self%num_col = num_nodes
+
+        call allocate_array(self%val, self%num_row, self%num_col)
         self%val(:, :) = 0.0d0
+
     end subroutine initialize_type_dense
 
-    subroutine find_dense(self, row, col, index)
+    subroutine initialize_type_dense_from_node(self, num_nodes)
+        implicit none
+        class(type_dense), intent(inout) :: self
+        integer(int32), intent(in) :: num_nodes
+
+        call allocate_array(self%val, num_nodes, num_nodes)
+        self%num_row = num_nodes
+        self%num_col = num_nodes
+
+        self%val(:, :) = 0.0d0
+
+    end subroutine initialize_type_dense_from_node
+
+    pure function find_dense(self, row, col) result(index)
         implicit none
         class(type_dense), intent(in) :: self
-        integer(int32), intent(in) :: row, col
-        integer(int32), intent(inout) :: index
+        integer(int32), intent(in) :: row
+        integer(int32), intent(in) :: col
+        integer(int32) :: index
+
+        if (row < 1 .or. row > self%num_row .or. col < 1 .or. col > self%num_col) then
+            index = 0
+        else
+            index = row + (col - 1) * self%num_row
+        end if
 
         return
-    end subroutine find_dense
+    end function find_dense
 
-    function copy_dense(self) result(B)
+    subroutine set_dense(self, row, col, value)
         implicit none
-        class(type_dense), intent(in) :: self
-        class(abst_matrix), allocatable :: B
+        class(type_dense), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
 
-        select type (matrix => B)
-        type is (type_dense)
-            call allocate_array(matrix%val, size(self%val, 1), size(self%val, 2))
-            matrix%val(:, :) = self%val(:, :)
-        end select
-    end function copy_dense
+        self%val(row, col) = value
 
-    subroutine destory_dense(self)
+    end subroutine set_dense
+
+    subroutine set_all_dense(self, value)
+        implicit none
+        class(type_dense), intent(inout) :: self
+        real(real64), intent(in) :: value
+
+        integer(int32) :: i, j
+
+        do j = 1, self%num_col
+            do i = 1, self%num_row
+                self%val(i, j) = value
+            end do
+        end do
+    end subroutine set_all_dense
+
+    subroutine zero_dense(self)
         implicit none
         class(type_dense), intent(inout) :: self
 
-        if (allocated(self%val)) deallocate (self%val)
-    end subroutine destory_dense
-end module matrix_dense
+        call self%set_all(0.0d0)
+    end subroutine zero_dense
+
+    subroutine add_dense(self, row, col, value)
+        implicit none
+        class(type_dense), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
+
+        self%val(row, col) = self%val(row, col) + value
+
+    end subroutine add_dense
+
+    subroutine destroy_dense(self)
+        implicit none
+        class(type_dense), intent(inout) :: self
+
+        call deallocate_array(self%val)
+    end subroutine destroy_dense
+
+end module core_types_matrix_dense

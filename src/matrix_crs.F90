@@ -1,17 +1,14 @@
-module matrix_crs
+module core_types_matrix_crs
     use, intrinsic :: iso_fortran_env
-    use :: stdlib_sorting, only:sort
-    use :: module_core, only:allocate_array, deallocate_array
-    use :: module_domain, only:type_domain
-    use :: matrix_base, only:abst_matrix
-    use :: matrix_coo, only:type_coo
+    use :: core_allocate, only:allocate_array
+    use :: core_deallocate, only:deallocate_array
+    use :: core_types_matrix, only:abst_matrix
     implicit none
     private
 
     public :: type_crs
-    public :: operator(*)
-    public :: operator(+)
-    ! public :: Transpose_CRS
+    ! public :: type_crs_gemv
+    ! public :: type_crs_add
 
     type, extends(abst_matrix) :: type_crs
         integer(int32) :: nnz ! number of non-zero elements
@@ -21,168 +18,55 @@ module matrix_crs
         integer(int32), allocatable :: ind(:) ! column indices of non-zeros
         real(real64), allocatable :: val(:) ! non-zero values
     contains
-        procedure, public, pass(self) :: initialize => initialize_type_crs
-        procedure, public, pass(self) :: find => find_crs
-        procedure, public, pass(self) :: copy => copy_crs
-        procedure, public, pass(self) :: destory => destory_crs
+        procedure, public, pass(self) :: initialize => initialize_type_crs !&
+        procedure, public, pass(self) :: find       => find_crs !&
+        procedure, public, pass(self) :: set        => set_crs !&
+        procedure, public, pass(self) :: set_all    => set_all_crs !&
+        procedure, public, pass(self) :: zero       => zero_crs !&
+        procedure, public, pass(self) :: add        => add_crs !&
+        procedure, public, pass(self) :: destroy    => destroy_crs !&
     end type type_crs
-
-    interface operator(*)
-        module procedure type_crs_matrix_vector_product
-        module procedure Multiplication_Scalar_matrix_crs
-        module procedure Multiplication_Matrix_Scalar_CRS
-    end interface
-    interface operator(+)
-        module procedure Matrix_Addition_CRS
-    end interface
 
 contains
 
-    subroutine initialize_type_crs(self, domain)
+    subroutine initialize_type_crs(self, num_nodes, row, col)
         implicit none
         class(type_crs), intent(inout) :: self
-        type(type_domain), intent(inout) :: domain
+        integer(int32), intent(in) :: num_nodes
+        integer(int32), intent(in), optional :: row(:)
+        integer(int32), intent(in), optional :: col(:)
 
-        ! --- ローカル変数 ---
-        type(type_coo) :: coo
-        integer(int32) :: i, r, pos
-        integer(int32), allocatable :: rcm_row(:), rcm_col(:)
-        integer(int32), allocatable :: write_pos(:)
+        integer(int32) :: i
 
-        ! =================================================================
-        ! Step 1: coo%initializeを呼び出し、COO行列を作成する
-        ! =================================================================
-        call coo%initialize(domain)
-
-        self%nnz = coo%nnz
-        self%num_row = domain%get_num_nodes()
-        self%num_ptr = self%num_row + 1
-
-        if (self%nnz == 0) then
-            call allocate_array(self%ptr, self%num_ptr)
-            self%ptr = 1
-            return
+        if (.not. present(row) .or. .not. present(col)) then
+            print *, "Error: row and col must be provided for CRS initialization."
+            stop
         end if
 
-        ! =================================================================
-        ! Step 2: COOの行・列インデックスをRCM番号に変換
-        ! =================================================================
-        call allocate_array(rcm_row, self%nnz)
-        call allocate_array(rcm_col, self%nnz)
+        self%nnz = size(col)
+        self%num_row = num_nodes
+        self%num_ptr = self%num_row + 1
 
-        call domain%reordering%to_reordered(coo%row, rcm_row)
-        call domain%reordering%to_reordered(coo%col, rcm_col)
-
-        ! =================================================================
-        ! Step 3: RCM適用後のデータから直接CRS行列を構築
-        ! =================================================================
         call allocate_array(self%ptr, self%num_ptr)
+        do i = 1, self%num_ptr
+            self%ptr(i) = row(i)
+        end do
+
         call allocate_array(self%ind, self%nnz)
         call allocate_array(self%val, self%nnz)
-        self%ptr = 0
-
-        ! -- Pass 1: 各行の非ゼロ要素数をカウント
         do i = 1, self%nnz
-            self%ptr(rcm_row(i) + 1) = self%ptr(rcm_row(i) + 1) + 1
+            self%ind(i) = col(i)
+            self%val(i) = 0.0d0
         end do
-
-        ! -- Pass 2: 累積和を計算して、各行の開始ポインタを決定
-        self%ptr(1) = 1
-        do i = 2, self%num_ptr
-            self%ptr(i) = self%ptr(i) + self%ptr(i - 1)
-        end do
-
-        ! -- Pass 3: indとvalを正しい位置に配置
-        call allocate_array(write_pos, self%num_row)
-        write_pos(:) = self%ptr(1:self%num_row)
-
-        do i = 1, self%nnz
-            r = rcm_row(i)
-            pos = write_pos(r)
-
-            self%ind(pos) = rcm_col(i)
-            self%val(pos) = 0.0d0
-
-            write_pos(r) = pos + 1
-        end do
-
-        call deallocate_array(write_pos)
-        call deallocate_array(rcm_row)
-        call deallocate_array(rcm_col)
-
-        call coo%destory()
 
     end subroutine initialize_type_crs
 
-    function type_crs_matrix_vector_product(A, x) result(y)
-        implicit none
-        type(type_crs), intent(in) :: A
-        real(real64), intent(in) :: x(A%num_row)
-        real(real64) :: y(A%num_row)
-        integer(int32) :: i, j, is, ie
-        real(real64) :: sum
-
-        y(:) = 0.0d0
-        do i = 1, A%num_row
-            sum = 0.0d0
-            is = A%ptr(i)
-            ie = A%ptr(i + 1) - 1
-            do j = is, ie
-                sum = sum + A%val(j) * x(A%ind(j))
-            end do
-            y(i) = sum
-        end do
-    end function type_crs_matrix_vector_product
-
-    function Matrix_Addition_CRS(A, B) result(C)
-        implicit none
-        type(type_crs), intent(in) :: A, B
-        type(type_crs) :: C
-        integer(int32) :: k
-
-        ! Assume same sparsity structure
-
-        C = A
-        C%val(:) = 0.0d0
-        do k = 1, A%nnz
-            C%val(k) = A%val(k) + B%val(k)
-        end do
-    end function Matrix_Addition_CRS
-
-    function Multiplication_Scalar_matrix_crs(A, b) result(C)
-        implicit none
-        type(type_crs), intent(in) :: A
-        real(real64), intent(in) :: b
-        type(type_crs) :: C
-        integer(int32) :: k
-
-        ! Assume same sparsity structure
-
-        C = A
-        do k = 1, A%nnz
-            C%val(k) = A%val(k) * b
-        end do
-    end function Multiplication_Scalar_matrix_crs
-
-    function Multiplication_Matrix_Scalar_CRS(a, B) result(C)
-        implicit none
-        real(real64), intent(in) :: a
-        type(type_crs), intent(in) :: B
-        type(type_crs) :: C
-        integer(int32) :: k
-
-        ! Assume same sparsity structure
-        C = B
-        do k = 1, B%nnz
-            C%val(k) = B%val(k) * a
-        end do
-    end function Multiplication_Matrix_Scalar_CRS
-
-    subroutine find_crs(self, row, col, index)
+    pure function find_crs(self, row, col) result(index)
         implicit none
         class(type_crs), intent(in) :: self
-        integer(int32), intent(in) :: row, col
-        integer(int32), intent(inout) :: index
+        integer(int32), intent(in) :: row
+        integer(int32), intent(in) :: col
+        integer(int32) :: index
 
         integer(int32) :: i
         integer(int32) :: search_start, search_end
@@ -204,29 +88,56 @@ contains
             end if
         end do
 
-    end subroutine find_crs
+    end function find_crs
 
-    function copy_crs(self) result(B)
+    subroutine set_crs(self, row, col, value)
         implicit none
-        class(type_crs), intent(in) :: self
-        class(abst_matrix), allocatable :: B
+        class(type_crs), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
 
-        allocate (type_crs :: B)
-        select type (matrix => B)
-        type is (type_crs)
-            matrix%num_row = self%num_row
-            matrix%num_ptr = self%num_ptr
-            matrix%nnz = self%nnz
-            call allocate_array(matrix%ptr, self%num_ptr)
-            call allocate_array(matrix%ind, self%nnz)
-            call allocate_array(matrix%val, self%nnz)
-            matrix%ptr(:) = self%ptr(:)
-            matrix%ind(:) = self%ind(:)
-            matrix%val(:) = self%val(:)
-        end select
-    end function copy_crs
+        integer(int32) :: index
 
-    subroutine destory_crs(self)
+        index = self%find(row, col)
+        self%val(index) = value
+
+    end subroutine set_crs
+
+    subroutine set_all_crs(self, value)
+        implicit none
+        class(type_crs), intent(inout) :: self
+        real(real64), intent(in) :: value
+
+        integer(int32) :: i
+
+        do i = 1, self%nnz
+            self%val(i) = value
+        end do
+
+    end subroutine set_all_crs
+
+    subroutine zero_crs(self)
+        implicit none
+        class(type_crs), intent(inout) :: self
+
+        call self%set_all(0.0d0)
+
+    end subroutine zero_crs
+
+    subroutine add_crs(self, row, col, value)
+        implicit none
+        class(type_crs), intent(inout) :: self
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
+
+        integer(int32) :: index
+
+        index = self%find(row, col)
+        self%val(index) = self%val(index) + value
+
+    end subroutine add_crs
+
+    subroutine destroy_crs(self)
         implicit none
         class(type_crs), intent(inout) :: self
 
@@ -237,6 +148,6 @@ contains
         self%nnz = 0
         self%num_row = 0
         self%num_ptr = 0
-    end subroutine destory_crs
+    end subroutine destroy_crs
 
-end module matrix_crs
+end module core_types_matrix_crs

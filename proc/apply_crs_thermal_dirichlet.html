@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">54 statements</a>
+                 title=" 0.4% of total for procedures.">54 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -183,7 +183,7 @@ initial condition</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~612"></span>
+              <span class="anchor" id="variable-self~233"></span>
               class(<a href='../type/type_bc_thermal_dirichlet.html'>type_bc_thermal_dirichlet</a>),
             </td>
 <td>intent(in)</td>
@@ -213,7 +213,7 @@ initial condition</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-a~21"></span>
+              <span class="anchor" id="variable-a~19"></span>
               type(<a href='../type/type_crs.html'>type_crs</a>),
             </td>
 <td>intent(inout),</td>
@@ -228,7 +228,7 @@ initial condition</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-b~25"></span>
+              <span class="anchor" id="variable-b~31"></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -243,10 +243,10 @@ initial condition</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-domain~59"></span>
+              <span class="anchor" id="variable-domain~28"></span>
               type(<a href='../type/type_domain.html'>type_domain</a>),
             </td>
-<td>intent(in)</td>
+<td>intent(inout)</td>
               <td></td>            <td>
               
             </td>
@@ -258,7 +258,7 @@ initial condition</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-mode~11"></span>
+              <span class="anchor" id="variable-mode~10"></span>
               integer(kind=int32),
             </td>
 <td>intent(in),</td>
@@ -370,7 +370,7 @@ initial condition</p>
 <g id="proc~~apply_crs_thermal_dirichlet~~CallsGraph_node7" class="node">
 <title>proc~find_crs</title>
 <g id="a_proc~~apply_crs_thermal_dirichlet~~CallsGraph_node7"><a xlink:href="../proc/find_crs.html" xlink:title="type_crs%find_crs">
-<polygon fill="#d9534f" stroke="#d9534f" points="513,-108 405,-108 405,-84 513,-84 513,-108"/>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="513,-108 405,-108 405,-84 513,-84 513,-108"/>
 <text text-anchor="middle" x="459" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_crs%find_crs</text>
 </a>
 </g>
@@ -604,7 +604,7 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_time</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_crs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">b</span><span class="p">(:)</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mode</span>
 
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">value_dirichlet</span><span class="p">,</span><span class="w"> </span><span class="n">timeCoe</span>
@@ -628,14 +628,14 @@ large graphs.</div>
 <span class="w">                </span><span class="k">end do</span>
 <span class="k">            else</span>
 <span class="k">                select case</span><span class="w"> </span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
-<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">mode_value</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">call </span><span class="n">calculate_time_coefficient</span><span class="p">(</span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">,</span><span class="w"> </span><span class="n">timeCoe</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">)</span>
 <span class="w">                    </span><span class="n">value_dirichlet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">timeCoe</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">timeCoe</span><span class="p">)</span>
 <span class="w">                    </span><span class="c">! print *, value_dirichlet</span>
-<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">mode_nr</span><span class="p">)</span>
 <span class="w">                    </span><span class="c">!! Newton-Raphson step</span>
 <span class="w">                    </span><span class="n">value_dirichlet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
-<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">mode_ic</span><span class="p">)</span>
 <span class="w">                    </span><span class="c">!! initial condition</span>
 <span class="w">                    </span><span class="n">value_dirichlet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="w">                </span><span class="k">end select</span>
@@ -661,14 +661,14 @@ large graphs.</div>
 <span class="w">                </span><span class="k">end do</span>
 <span class="k">            else</span>
 <span class="k">                select case</span><span class="w"> </span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
-<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">mode_value</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">call </span><span class="n">calculate_time_coefficient</span><span class="p">(</span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">time_points</span><span class="p">,</span><span class="w"> </span><span class="n">timeCoe</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">)</span>
 <span class="w">                    </span><span class="n">value_dirichlet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">timeCoe</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">timeCoe</span><span class="p">)</span>
 <span class="w">                    </span><span class="c">! print *, value_dirichlet</span>
-<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">mode_nr</span><span class="p">)</span>
 <span class="w">                </span><span class="c">!! Newton-Raphson step</span>
 <span class="w">                    </span><span class="n">value_dirichlet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
-<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">mode_ic</span><span class="p">)</span>
 <span class="w">                </span><span class="c">!! initial condition</span>
 <span class="w">                    </span><span class="n">value_dirichlet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="w">                </span><span class="k">end select</span>
@@ -706,7 +706,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

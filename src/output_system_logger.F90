@@ -5,7 +5,7 @@ contains
         implicit none
         class(type_output), intent(inout) :: self
         type(type_time), intent(in) :: time
-        type(Type_CRS), intent(in) :: Matrix
+        type(type_crs), intent(in) :: Matrix
         type(type_domain), intent(inout) :: domain
 
         character(:), allocatable :: username

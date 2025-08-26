@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">40 statements</a>
+                 title=" 0.4% of total for procedures.">64 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~170"></span>
+              <span class="anchor" id="variable-self~307"></span>
               class(<a href='../type/type_input.html'>type_input</a>)
             </td>
 <td></td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-json~6"></span>
+              <span class="anchor" id="variable-json~11"></span>
               type(json_file),
             </td>
 <td>intent(inout)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-i~39"></span>
+              <span class="anchor" id="variable-i~92"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -772,7 +772,34 @@ large graphs.</div>
 <span class="w">        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">print_error_message</span><span class="p">(</span><span class="n">output_unit</span><span class="p">)</span>
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">found</span><span class="p">)</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">is_dispersed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 
-<span class="w">    </span><span class="k">end subroutine </span><span class="n">read_parameters_materials_basic</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">analysis_controls</span><span class="p">%</span><span class="n">calculate_thermal</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">join</span><span class="p">([</span><span class="n">key_material</span><span class="p">,</span><span class="w"> </span><span class="n">calculate_thermal</span><span class="p">])</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">found</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">print_error_message</span><span class="p">(</span><span class="n">output_unit</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">found</span><span class="p">)</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_thermal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_thermal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">analysis_controls</span><span class="p">%</span><span class="n">calculate_hydraulic</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">join</span><span class="p">([</span><span class="n">key_material</span><span class="p">,</span><span class="w"> </span><span class="n">calculate_hydraulic</span><span class="p">])</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">found</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">print_error_message</span><span class="p">(</span><span class="n">output_unit</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">found</span><span class="p">)</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_hydraulic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_hydraulic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">analysis_controls</span><span class="p">%</span><span class="n">calculate_mechanical</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">join</span><span class="p">([</span><span class="n">key_material</span><span class="p">,</span><span class="w"> </span><span class="n">calculate_mechanical</span><span class="p">])</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_mechanical</span><span class="p">,</span><span class="w"> </span><span class="n">found</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">print_error_message</span><span class="p">(</span><span class="n">output_unit</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">found</span><span class="p">)</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_mechanical</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">calculate_mechanical</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">read_parameters_materials_basic</span>
 </pre></div>
 
     </section>
@@ -796,7 +823,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

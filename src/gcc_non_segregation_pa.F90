@@ -2,7 +2,7 @@ submodule(Calculate_GCC) gcc_non_segregation_pa
     implicit none
 contains
 
-    module function type_GCC_NonSeg_Pa_Construct(Tf, Lf) result(property)
+    module function construct_type_gcc_nonseg_pa(Tf, Lf) result(property)
         implicit none
         real(real64), intent(in) :: Tf
         real(real64), intent(in) :: Lf
@@ -17,57 +17,48 @@ contains
             this%Tf = Tf
         end select
 
-    end function type_GCC_NonSeg_Pa_Construct
+    end function construct_type_gcc_nonseg_pa
 
-    module function Calc_GCC_NonSeg_Pa(self, T, Pw, rhoW, rhoI) result(Suction)
+    module pure elemental function calc_gcc_nonseg_pa(self, state) result(suction)
         implicit none
         class(type_gcc_non_segregation_pa), intent(in) :: self
-        real(real64), intent(in) :: T
-        real(real64), intent(in), optional :: Pw
-        real(real64), intent(in), optional :: rhoW
-        real(real64), intent(in), optional :: rhoI
-        real(real64) :: Suction
+        type(type_state), intent(in) :: state
+        real(real64) :: suction
 
-        if (T <= self%Tf) then
-            Suction = -self%Lf * rhoW * log((T + self%TtoK) / (self%Tf + self%TtoK))
+        if (state%temperature <= self%Tf) then
+            suction = -self%Lf * state%density_water * log((state%temperature + self%TtoK) / (self%Tf + self%TtoK))
         else
-            Suction = 0.0d0
+            suction = 0.0d0
         end if
 
-    end function Calc_GCC_NonSeg_Pa
+    end function calc_gcc_nonseg_pa
 
-    module function Calc_GCC_NonSeg_Pa_Derivative(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
+    module pure elemental function deriv_gcc_nonseg_pa(self, state) result(suction_derivative)
         implicit none
         class(type_gcc_non_segregation_pa), intent(in) :: self
-        real(real64), intent(in) :: T
-        real(real64), intent(in), optional :: Pw
-        real(real64), intent(in), optional :: rhoW
-        real(real64), intent(in), optional :: rhoI
-        real(real64) :: Suction_Derivative
+        type(type_state), intent(in) :: state
+        real(real64) :: suction_derivative
 
-        if (T <= self%Tf) then
-            Suction_Derivative = -self%Lf * rhoW / (T + self%TtoK)
+        if (state%temperature <= self%Tf) then
+            suction_derivative = -self%Lf * state%density_water / (state%temperature + self%TtoK)
         else
-            Suction_Derivative = 0.0d0
+            suction_derivative = 0.0d0
         end if
 
-    end function Calc_GCC_NonSeg_Pa_Derivative
+    end function deriv_gcc_nonseg_pa
 
-    module function Calc_GCC_NonSeg_Pa_Derivative_2nd(self, T, Pw, rhoW, rhoI) result(Suction_Derivative)
+    module pure elemental function deriv_2nd_gcc_nonseg_pa(self, state) result(suction_derivative)
         implicit none
         class(type_gcc_non_segregation_pa), intent(in) :: self
-        real(real64), intent(in) :: T
-        real(real64), intent(in), optional :: Pw
-        real(real64), intent(in), optional :: rhoW
-        real(real64), intent(in), optional :: rhoI
-        real(real64) :: Suction_Derivative
+        type(type_state), intent(in) :: state
+        real(real64) :: suction_derivative
 
-        if (T <= self%Tf) then
-            Suction_Derivative = self%Lf * rhoW / (T + self%TtoK)**2.0d0
+        if (state%temperature <= self%Tf) then
+            suction_derivative = self%Lf * state%density_water / (state%temperature + self%TtoK)**2.0d0
         else
-            Suction_Derivative = 0.0d0
+            suction_derivative = 0.0d0
         end if
 
-    end function Calc_GCC_NonSeg_Pa_Derivative_2nd
+    end function deriv_2nd_gcc_nonseg_pa
 
 end submodule gcc_non_segregation_pa

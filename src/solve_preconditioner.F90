@@ -48,7 +48,7 @@ contains
             return
         case (1)
             !! Jacobi preconditioner
-            call create_preconditioner_jacobi(self%N, A, self%M(:))
+            call create_preconditioner_jacobi(self%size, A, self%M(:))
         case (2)
             !! ILU preconditioner
         end select
@@ -68,7 +68,7 @@ contains
             return
         case (1)
             !! Jacobi preconditioner
-            call apply_preconditioner_jacobi(self%N, self%M(:), b(:), x(:))
+            call apply_preconditioner_jacobi(self%size, self%M(:), b(:), x(:))
         case (2)
             !! ILU preconditioner
         end select

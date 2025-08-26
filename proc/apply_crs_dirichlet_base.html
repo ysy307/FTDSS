@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">37 statements</a>
+                 title=" 0.3% of total for procedures.">37 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -178,7 +178,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-a~22"></span>
+              <span class="anchor" id="variable-a~20"></span>
               type(<a href='../type/type_crs.html'>type_crs</a>),
             </td>
 <td>intent(inout),</td>
@@ -193,7 +193,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-b~26"></span>
+              <span class="anchor" id="variable-b~32"></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -208,7 +208,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-is_uniform~3"></span>
+              <span class="anchor" id="variable-is_uniform~2"></span>
               logical,
             </td>
 <td>intent(in)</td>
@@ -281,7 +281,7 @@
 <g id="proc~~apply_crs_dirichlet_base~~CallsGraph_node2" class="node">
 <title>proc~find_crs</title>
 <g id="a_proc~~apply_crs_dirichlet_base~~CallsGraph_node2"><a xlink:href="../proc/find_crs.html" xlink:title="type_crs%find_crs">
-<polygon fill="#d9534f" stroke="#d9534f" points="286,-24 178,-24 178,0 286,0 286,-24"/>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="286,-24 178,-24 178,0 286,0 286,-24"/>
 <text text-anchor="middle" x="232" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_crs%find_crs</text>
 </a>
 </g>
@@ -552,13 +552,13 @@ large graphs.</div>
 <span class="w">            </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Edge</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">A</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                call </span><span class="n">A</span><span class="p">%</span><span class="n">find</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">ind</span><span class="p">)</span>
+<span class="k">                </span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">find</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p1</span><span class="p">)</span>
 <span class="w">                </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
 <span class="w">                </span><span class="n">pe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">p1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">                </span><span class="n">A</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">ps</span><span class="p">:</span><span class="n">pe</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
 <span class="w">                </span><span class="n">A</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
 
-<span class="w">                </span><span class="k">call </span><span class="n">A</span><span class="p">%</span><span class="n">find</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">ind</span><span class="p">)</span>
+<span class="w">                </span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">find</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">)</span>
 <span class="w">                </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
 <span class="w">                </span><span class="n">pe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">p2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">                </span><span class="n">A</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">ps</span><span class="p">:</span><span class="n">pe</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
@@ -597,7 +597,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

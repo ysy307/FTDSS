@@ -15,18 +15,18 @@ module core_types_array
     public :: assignment(=)
 
     interface assignment(=)
-        module procedure :: type_dp_2d_assignment
-        module procedure :: type_dp_3d_assignment
-        module procedure :: type_int_2d_assignment
-        module procedure :: type_int_3d_assignment
+        module procedure :: assignment_type_dp_2d
+        module procedure :: assignment_type_dp_3d
+        module procedure :: assignment_type_int_2d
+        module procedure :: assignment_type_int_3d
     end interface
 
     type :: type_dp_2d
         real(real64), allocatable :: x(:)
         real(real64), allocatable :: y(:)
     contains
-        procedure, pass(self) :: initialize => type_dp_2d_initialize
-        procedure, pass(self) :: destroy => type_dp_2d_destroy
+        procedure, pass(self) :: initialize => initialize_type_dp_2d
+        procedure, pass(self) :: destroy => destroy_type_dp_2d
     end type type_dp_2d
 
     type :: type_dp_3d
@@ -34,23 +34,30 @@ module core_types_array
         real(real64), allocatable :: y(:)
         real(real64), allocatable :: z(:)
     contains
-        procedure, pass(self) :: initialize => type_dp_3d_initialize
+        procedure, pass(self) :: initialize => initialize_type_dp_3d
+        procedure, pass(self) :: destroy => destroy_type_dp_3d
     end type type_dp_3d
 
     type :: type_int_2d
         integer(int32), allocatable :: x(:)
         integer(int32), allocatable :: y(:)
+    contains
+        procedure, pass(self) :: initialize => initialize_type_int_2d
+        procedure, pass(self) :: destroy => destroy_type_int_2d
     end type type_int_2d
 
     type :: type_int_3d
         integer(int32), allocatable :: x(:)
         integer(int32), allocatable :: y(:)
         integer(int32), allocatable :: z(:)
+    contains
+        procedure, pass(self) :: initialize => initialize_type_int_3d
+        procedure, pass(self) :: destroy => destroy_type_int_3d
     end type type_int_3d
 
 contains
 
-    subroutine type_dp_2d_initialize(self, length, initialize_value)
+    subroutine initialize_type_dp_2d(self, length, initialize_value)
         implicit none
         class(type_dp_2d), intent(inout) :: self
         integer(int32), intent(in) :: length
@@ -67,9 +74,9 @@ contains
             self%y(:) = 0.0d0
         end if
 
-    end subroutine type_dp_2d_initialize
+    end subroutine initialize_type_dp_2d
 
-    subroutine type_dp_2d_assignment(a, b)
+    subroutine assignment_type_dp_2d(a, b)
         implicit none
         class(type_dp_2d), intent(inout) :: a
         class(type_dp_2d), intent(in) :: b
@@ -77,18 +84,18 @@ contains
         a%x(:) = b%x(:)
         a%y(:) = b%y(:)
 
-    end subroutine type_dp_2d_assignment
+    end subroutine assignment_type_dp_2d
 
-    subroutine type_dp_2d_destroy(self)
+    subroutine destroy_type_dp_2d(self)
         implicit none
         class(type_dp_2d), intent(inout) :: self
 
         call deallocate_array(self%x)
         call deallocate_array(self%y)
 
-    end subroutine type_dp_2d_destroy
+    end subroutine destroy_type_dp_2d
 
-    subroutine type_dp_3d_initialize(self, length, initialize_value)
+    subroutine initialize_type_dp_3d(self, length, initialize_value)
         implicit none
         class(type_dp_3d), intent(inout) :: self
         integer(int32), intent(in) :: length
@@ -108,9 +115,9 @@ contains
             self%z(:) = 0.0d0
         end if
 
-    end subroutine type_dp_3d_initialize
+    end subroutine initialize_type_dp_3d
 
-    subroutine type_dp_3d_assignment(a, b)
+    subroutine assignment_type_dp_3d(a, b)
         implicit none
         class(type_dp_3d), intent(inout) :: a
         class(type_dp_3d), intent(in) :: b
@@ -119,9 +126,9 @@ contains
         a%y(:) = b%y(:)
         a%z(:) = b%z(:)
 
-    end subroutine type_dp_3d_assignment
+    end subroutine assignment_type_dp_3d
 
-    subroutine type_dp_3d_destroy(self)
+    subroutine destroy_type_dp_3d(self)
         implicit none
         class(type_dp_3d), intent(inout) :: self
 
@@ -129,9 +136,9 @@ contains
         call deallocate_array(self%y)
         call deallocate_array(self%z)
 
-    end subroutine type_dp_3d_destroy
+    end subroutine destroy_type_dp_3d
 
-    subroutine type_int_2d_initialize(self, length, initialize_value)
+    subroutine initialize_type_int_2d(self, length, initialize_value)
         implicit none
         class(type_int_2d), intent(inout) :: self
         integer(int32), intent(in) :: length
@@ -148,9 +155,9 @@ contains
             self%y(:) = 0_int32
         end if
 
-    end subroutine type_int_2d_initialize
+    end subroutine initialize_type_int_2d
 
-    subroutine type_int_2d_assignment(a, b)
+    subroutine assignment_type_int_2d(a, b)
         implicit none
         class(type_int_2d), intent(inout) :: a
         class(type_int_2d), intent(in) :: b
@@ -158,18 +165,18 @@ contains
         a%x(:) = b%x(:)
         a%y(:) = b%y(:)
 
-    end subroutine type_int_2d_assignment
+    end subroutine assignment_type_int_2d
 
-    subroutine type_int_2d_destroy(self)
+    subroutine destroy_type_int_2d(self)
         implicit none
         class(type_int_2d), intent(inout) :: self
 
         call deallocate_array(self%x)
         call deallocate_array(self%y)
 
-    end subroutine type_int_2d_destroy
+    end subroutine destroy_type_int_2d
 
-    subroutine type_int_3d_initialize(self, length, initialize_value)
+    subroutine initialize_type_int_3d(self, length, initialize_value)
         implicit none
         class(type_int_3d), intent(inout) :: self
         integer(int32), intent(in) :: length
@@ -189,9 +196,9 @@ contains
             self%z(:) = 0_int32
         end if
 
-    end subroutine type_int_3d_initialize
+    end subroutine initialize_type_int_3d
 
-    subroutine type_int_3d_assignment(a, b)
+    subroutine assignment_type_int_3d(a, b)
         implicit none
         class(type_int_3d), intent(inout) :: a
         class(type_int_3d), intent(in) :: b
@@ -200,9 +207,9 @@ contains
         a%y(:) = b%y(:)
         a%z(:) = b%z(:)
 
-    end subroutine type_int_3d_assignment
+    end subroutine assignment_type_int_3d
 
-    subroutine type_int_3d_destroy(self)
+    subroutine destroy_type_int_3d(self)
         implicit none
         class(type_int_3d), intent(inout) :: self
 
@@ -210,6 +217,6 @@ contains
         call deallocate_array(self%y)
         call deallocate_array(self%z)
 
-    end subroutine type_int_3d_destroy
+    end subroutine destroy_type_int_3d
 
 end module core_types_array

@@ -1,0 +1,833 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_holder_hcfs &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_holder_hcfs
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">8 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hcf_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hcf_interface.f90.html'>hcf_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/calculate_hcf.html'>calculate_hcf</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_holder_hcfs</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~initialize_holder_hcfs~~CallsGraph Pages: 1 -->
+<svg id="interfaceinitialize_holder_hcfsCallsGraph" width="641pt" height="170pt"
+ viewBox="0.00 0.00 641.00 169.95" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~initialize_holder_hcfs~~CallsGraph" class="graph" transform="scale(0.46 0.46) rotate(0) translate(4 364)">
+<title>interface~~initialize_holder_hcfs~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-364 1384,-364 1384,4 -4,4"/>
+<!-- interface~initialize_holder_hcfs -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node1" class="node">
+<title>interface~initialize_holder_hcfs</title>
+<polygon fill="none" stroke="black" points="195,-150 0,-150 0,-126 195,-126 195,-150"/>
+<text text-anchor="middle" x="97.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">holder_hcfs%initialize_holder_hcfs</text>
+</g>
+<!-- proc~initialize_holder_hcfs -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node2" class="node">
+<title>proc~initialize_holder_hcfs</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node2"><a xlink:href="../proc/initialize_holder_hcfs.html" xlink:title="initialize_holder_hcfs">
+<polygon fill="#d9534f" stroke="#d9534f" points="355,-150 231,-150 231,-126 355,-126 355,-150"/>
+<text text-anchor="middle" x="293" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_holder_hcfs</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_holder_hcfs&#45;&gt;proc~initialize_holder_hcfs -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge1" class="edge">
+<title>interface~initialize_holder_hcfs&#45;&gt;proc~initialize_holder_hcfs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M195.25,-138C203.85,-138 212.45,-138 220.77,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="220.78,-141.5 230.78,-138 220.78,-134.5 220.78,-141.5"/>
+</g>
+<!-- proc~create_type_hcf_base -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node3" class="node">
+<title>proc~create_type_hcf_base</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node3"><a xlink:href="../proc/create_type_hcf_base.html" xlink:title="create_type_hcf_base">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="576,-276 449,-276 449,-252 576,-252 576,-276"/>
+<text text-anchor="middle" x="512.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_type_hcf_base</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M301.31,-150.13C315.52,-172.54 349.16,-220.21 391,-243 405.52,-250.91 422.35,-255.95 438.74,-259.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="438.42,-262.63 448.87,-260.89 439.61,-255.73 438.42,-262.63"/>
+</g>
+<!-- proc~create_type_hcf_base_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node4" class="node">
+<title>proc~create_type_hcf_base_impedance</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node4"><a xlink:href="../proc/create_type_hcf_base_impedance.html" xlink:title="create_type_hcf_base_impedance">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="609,-234 416,-234 416,-210 609,-210 609,-234"/>
+<text text-anchor="middle" x="512.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_type_hcf_base_impedance</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge3" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base_impedance</title>
+<path fill="none" stroke="#ff0000" d="M308.41,-150.07C326.5,-164.55 359.04,-188.45 391,-201 396.97,-203.34 403.2,-205.43 409.56,-207.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="409.06,-210.77 419.63,-210 410.89,-204.01 409.06,-210.77"/>
+</g>
+<!-- proc~create_type_hcf_base_impedance_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node5" class="node">
+<title>proc~create_type_hcf_base_impedance_viscosity</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node5"><a xlink:href="../proc/create_type_hcf_base_impedance_viscosity.html" xlink:title="create_type_hcf_base_impedance_viscosity">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="634,-192 391,-192 391,-168 634,-168 634,-192"/>
+<text text-anchor="middle" x="512.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_type_hcf_base_impedance_viscosity</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base_impedance_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge4" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base_impedance_viscosity</title>
+<path fill="none" stroke="#ff0000" d="M347.79,-150.05C361.83,-153.09 376.96,-156.26 391,-159 403.54,-161.45 416.84,-163.91 429.85,-166.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="429.27,-169.69 439.73,-167.99 430.49,-162.79 429.27,-169.69"/>
+</g>
+<!-- proc~create_type_hcf_base_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node6" class="node">
+<title>proc~create_type_hcf_base_viscosity</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node6"><a xlink:href="../proc/create_type_hcf_base_viscosity.html" xlink:title="create_type_hcf_base_viscosity">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="601.5,-150 423.5,-150 423.5,-126 601.5,-126 601.5,-150"/>
+<text text-anchor="middle" x="512.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_type_hcf_base_viscosity</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge5" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_base_viscosity</title>
+<path fill="none" stroke="#ff0000" d="M355.16,-138C373.14,-138 393.28,-138 412.96,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="413.2,-141.5 423.2,-138 413.2,-134.5 413.2,-141.5"/>
+</g>
+<!-- proc~create_type_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node7" class="node">
+<title>proc~create_type_hcf_impedance</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node7"><a xlink:href="../proc/create_type_hcf_impedance.html" xlink:title="create_type_hcf_impedance">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="593.5,-108 431.5,-108 431.5,-84 593.5,-84 593.5,-108"/>
+<text text-anchor="middle" x="512.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_type_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge6" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_impedance</title>
+<path fill="none" stroke="#ff0000" d="M347.79,-125.95C361.83,-122.91 376.96,-119.74 391,-117 403.54,-114.55 416.84,-112.09 429.85,-109.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="430.49,-113.21 439.73,-108.01 429.27,-106.31 430.49,-113.21"/>
+</g>
+<!-- proc~create_type_hcf_impedance_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node8" class="node">
+<title>proc~create_type_hcf_impedance_viscosity</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node8"><a xlink:href="../proc/create_type_hcf_impedance_viscosity.html" xlink:title="create_type_hcf_impedance_viscosity">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="618.5,-66 406.5,-66 406.5,-42 618.5,-42 618.5,-66"/>
+<text text-anchor="middle" x="512.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_type_hcf_impedance_viscosity</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_impedance_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge7" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_impedance_viscosity</title>
+<path fill="none" stroke="#ff0000" d="M308.41,-125.93C326.5,-111.45 359.04,-87.55 391,-75 396.97,-72.66 403.2,-70.57 409.56,-68.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="410.89,-71.99 419.63,-66 409.06,-65.23 410.89,-71.99"/>
+</g>
+<!-- proc~create_type_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node9" class="node">
+<title>proc~create_type_hcf_viscosity</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node9"><a xlink:href="../proc/create_type_hcf_viscosity.html" xlink:title="create_type_hcf_viscosity">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="586,-24 439,-24 439,0 586,0 586,-24"/>
+<text text-anchor="middle" x="512.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_type_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge8" class="edge">
+<title>proc~initialize_holder_hcfs&#45;&gt;proc~create_type_hcf_viscosity</title>
+<path fill="none" stroke="#ff0000" d="M301.31,-125.87C315.52,-103.46 349.16,-55.79 391,-33 402.59,-26.69 415.66,-22.2 428.8,-19.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="429.81,-22.39 438.84,-16.85 428.32,-15.55 429.81,-22.39"/>
+</g>
+<!-- proc~construct_hcf_base -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node10" class="node">
+<title>proc~construct_hcf_base</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node10"><a xlink:href="../proc/construct_hcf_base.html" xlink:title="construct_hcf_base">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="802,-234 687,-234 687,-210 802,-210 802,-234"/>
+<text text-anchor="middle" x="744.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_hcf_base</text>
+</a>
+</g>
+</g>
+<!-- proc~create_type_hcf_base&#45;&gt;proc~construct_hcf_base -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge9" class="edge">
+<title>proc~create_type_hcf_base&#45;&gt;proc~construct_hcf_base</title>
+<path fill="none" stroke="#ff0000" d="M576.08,-253.3C594.73,-250.06 615.2,-246.44 634,-243 647.87,-240.46 662.7,-237.67 676.84,-234.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="677.82,-238.35 686.98,-233.03 676.5,-231.47 677.82,-238.35"/>
+</g>
+<!-- proc~create_type_hcf_base_impedance&#45;&gt;proc~construct_hcf_base -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge10" class="edge">
+<title>proc~create_type_hcf_base_impedance&#45;&gt;proc~construct_hcf_base</title>
+<path fill="none" stroke="#ffda00" d="M609.04,-222C631.74,-222 655.48,-222 676.58,-222"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="676.72,-225.5 686.72,-222 676.72,-218.5 676.72,-225.5"/>
+</g>
+<!-- proc~construct_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node11" class="node">
+<title>proc~construct_hcf_impedance</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node11"><a xlink:href="../proc/construct_hcf_impedance.html" xlink:title="construct_hcf_impedance">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="819,-108 670,-108 670,-84 819,-84 819,-108"/>
+<text text-anchor="middle" x="744.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- proc~create_type_hcf_base_impedance&#45;&gt;proc~construct_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge11" class="edge">
+<title>proc~create_type_hcf_base_impedance&#45;&gt;proc~construct_hcf_impedance</title>
+<path fill="none" stroke="#ffda00" d="M609.28,-210.76C617.86,-208.14 626.23,-204.93 634,-201 674.19,-180.66 709.54,-140.65 728.59,-116.31"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="731.56,-118.2 734.85,-108.12 726,-113.94 731.56,-118.2"/>
+</g>
+<!-- proc~create_type_hcf_base_impedance_viscosity&#45;&gt;proc~construct_hcf_base -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge12" class="edge">
+<title>proc~create_type_hcf_base_impedance_viscosity&#45;&gt;proc~construct_hcf_base</title>
+<path fill="none" stroke="#48ff00" d="M583.63,-192.01C600.16,-194.9 617.71,-198.02 634,-201 647.87,-203.54 662.7,-206.33 676.84,-209.03"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="676.5,-212.53 686.98,-210.97 677.82,-205.65 676.5,-212.53"/>
+</g>
+<!-- proc~create_type_hcf_base_impedance_viscosity&#45;&gt;proc~construct_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge13" class="edge">
+<title>proc~create_type_hcf_base_impedance_viscosity&#45;&gt;proc~construct_hcf_impedance</title>
+<path fill="none" stroke="#48ff00" d="M603.25,-167.96C613.76,-165.5 624.22,-162.54 634,-159 664.86,-147.83 697.05,-128.2 718.48,-113.81"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="720.69,-116.54 726.96,-108 716.73,-110.76 720.69,-116.54"/>
+</g>
+<!-- proc~construct_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node12" class="node">
+<title>proc~construct_hcf_viscosity</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node12"><a xlink:href="../proc/construct_hcf_viscosity.html" xlink:title="construct_hcf_viscosity">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="811.5,-66 677.5,-66 677.5,-42 811.5,-42 811.5,-66"/>
+<text text-anchor="middle" x="744.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- proc~create_type_hcf_base_impedance_viscosity&#45;&gt;proc~construct_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge14" class="edge">
+<title>proc~create_type_hcf_base_impedance_viscosity&#45;&gt;proc~construct_hcf_viscosity</title>
+<path fill="none" stroke="#48ff00" d="M620.04,-167.9C624.98,-165.37 629.67,-162.43 634,-159 665.86,-133.8 639.52,-101.85 670,-75 671.49,-73.68 673.06,-72.45 674.7,-71.29"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="676.55,-74.27 683.33,-66.13 672.95,-68.26 676.55,-74.27"/>
+</g>
+<!-- proc~create_type_hcf_base_viscosity&#45;&gt;proc~construct_hcf_base -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge15" class="edge">
+<title>proc~create_type_hcf_base_viscosity&#45;&gt;proc~construct_hcf_base</title>
+<path fill="none" stroke="#00ff91" d="M601.65,-149.67C612.69,-152.2 623.72,-155.28 634,-159 664.86,-170.17 697.05,-189.8 718.48,-204.19"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="716.73,-207.24 726.96,-210 720.69,-201.46 716.73,-207.24"/>
+</g>
+<!-- proc~create_type_hcf_base_viscosity&#45;&gt;proc~construct_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge16" class="edge">
+<title>proc~create_type_hcf_base_viscosity&#45;&gt;proc~construct_hcf_viscosity</title>
+<path fill="none" stroke="#00ff91" d="M601.56,-130C612.91,-126.88 624.03,-122.67 634,-117 655.37,-104.84 649.3,-88.27 670,-75 672.74,-73.24 675.62,-71.63 678.61,-70.15"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="680.05,-73.34 687.78,-66.1 677.22,-66.94 680.05,-73.34"/>
+</g>
+<!-- proc~create_type_hcf_impedance&#45;&gt;proc~construct_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge17" class="edge">
+<title>proc~create_type_hcf_impedance&#45;&gt;proc~construct_hcf_impedance</title>
+<path fill="none" stroke="#0091ff" d="M593.62,-96C615,-96 638.15,-96 659.72,-96"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="659.83,-99.5 669.83,-96 659.83,-92.5 659.83,-99.5"/>
+</g>
+<!-- proc~create_type_hcf_impedance_viscosity&#45;&gt;proc~construct_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge18" class="edge">
+<title>proc~create_type_hcf_impedance_viscosity&#45;&gt;proc~construct_hcf_impedance</title>
+<path fill="none" stroke="#4800ff" d="M583.63,-66.01C600.16,-68.9 617.71,-72.02 634,-75 646.24,-77.24 659.25,-79.68 671.85,-82.08"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="671.38,-85.55 681.86,-83.99 672.69,-78.68 671.38,-85.55"/>
+</g>
+<!-- proc~create_type_hcf_impedance_viscosity&#45;&gt;proc~construct_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge19" class="edge">
+<title>proc~create_type_hcf_impedance_viscosity&#45;&gt;proc~construct_hcf_viscosity</title>
+<path fill="none" stroke="#4800ff" d="M618.74,-54C635.14,-54 651.8,-54 667.39,-54"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="667.46,-57.5 677.46,-54 667.46,-50.5 667.46,-57.5"/>
+</g>
+<!-- proc~create_type_hcf_viscosity&#45;&gt;proc~construct_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge20" class="edge">
+<title>proc~create_type_hcf_viscosity&#45;&gt;proc~construct_hcf_viscosity</title>
+<path fill="none" stroke="#ff00da" d="M583.63,-24.01C600.16,-26.9 617.71,-30.02 634,-33 646.24,-35.24 659.25,-37.68 671.85,-40.08"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="671.38,-43.55 681.86,-41.99 672.69,-36.68 671.38,-43.55"/>
+</g>
+<!-- interface~construct_type_hcf_base_bc -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node13" class="node">
+<title>interface~construct_type_hcf_base_bc</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node13"><a xlink:href="../interface/construct_type_hcf_base_bc.html" xlink:title="construct_type_hcf_base_bc">
+<polygon fill="#a7506f" stroke="#a7506f" points="1027.5,-360 866.5,-360 866.5,-336 1027.5,-336 1027.5,-360"/>
+<text text-anchor="middle" x="947" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_bc</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_bc -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge21" class="edge">
+<title>proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_bc</title>
+<path fill="none" stroke="#ff0000" d="M754.53,-234.24C771.57,-256.4 810.75,-303.08 855,-327 858.69,-329 862.56,-330.8 866.55,-332.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="865.41,-335.75 876,-335.95 867.85,-329.19 865.41,-335.75"/>
+</g>
+<!-- interface~construct_type_hcf_base_durner -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node14" class="node">
+<title>interface~construct_type_hcf_base_durner</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node14"><a xlink:href="../interface/construct_type_hcf_base_durner.html" xlink:title="construct_type_hcf_base_durner">
+<polygon fill="#a7506f" stroke="#a7506f" points="1039,-318 855,-318 855,-294 1039,-294 1039,-318"/>
+<text text-anchor="middle" x="947" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_durner</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_durner -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge22" class="edge">
+<title>proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_durner</title>
+<path fill="none" stroke="#ff0000" d="M762.89,-234.19C783.83,-248.33 820.5,-271.44 855,-285 860.74,-287.26 866.79,-289.31 872.93,-291.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="872.03,-294.55 882.6,-293.92 873.94,-287.81 872.03,-294.55"/>
+</g>
+<!-- interface~construct_type_hcf_base_dvgch -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node15" class="node">
+<title>interface~construct_type_hcf_base_dvgch</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node15"><a xlink:href="../interface/construct_type_hcf_base_dvgch.html" xlink:title="construct_type_hcf_base_dvgch">
+<polygon fill="#a7506f" stroke="#a7506f" points="1037.5,-276 856.5,-276 856.5,-252 1037.5,-252 1037.5,-276"/>
+<text text-anchor="middle" x="947" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_dvgch</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_dvgch -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge23" class="edge">
+<title>proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_dvgch</title>
+<path fill="none" stroke="#ff0000" d="M802.15,-233.87C825.87,-238.83 853.62,-244.65 878.39,-249.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="877.94,-253.32 888.44,-251.94 879.37,-246.47 877.94,-253.32"/>
+</g>
+<!-- interface~construct_type_hcf_base_ko -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node16" class="node">
+<title>interface~construct_type_hcf_base_ko</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node16"><a xlink:href="../interface/construct_type_hcf_base_ko.html" xlink:title="construct_type_hcf_base_ko">
+<polygon fill="#a7506f" stroke="#a7506f" points="1027.5,-234 866.5,-234 866.5,-210 1027.5,-210 1027.5,-234"/>
+<text text-anchor="middle" x="947" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_ko</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_ko -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge24" class="edge">
+<title>proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_ko</title>
+<path fill="none" stroke="#ff0000" d="M802.15,-222C818.96,-222 837.79,-222 856.16,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="856.3,-225.5 866.3,-222 856.3,-218.5 856.3,-225.5"/>
+</g>
+<!-- interface~construct_type_hcf_base_mvg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node17" class="node">
+<title>interface~construct_type_hcf_base_mvg</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node17"><a xlink:href="../interface/construct_type_hcf_base_mvg.html" xlink:title="construct_type_hcf_base_mvg">
+<polygon fill="#a7506f" stroke="#a7506f" points="1033,-192 861,-192 861,-168 1033,-168 1033,-192"/>
+<text text-anchor="middle" x="947" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_mvg</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_mvg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge25" class="edge">
+<title>proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_mvg</title>
+<path fill="none" stroke="#ff0000" d="M802.15,-210.13C825.87,-205.17 853.62,-199.35 878.39,-194.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="879.37,-197.53 888.44,-192.06 877.94,-190.68 879.37,-197.53"/>
+</g>
+<!-- interface~construct_type_hcf_base_vg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node18" class="node">
+<title>interface~construct_type_hcf_base_vg</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node18"><a xlink:href="../interface/construct_type_hcf_base_vg.html" xlink:title="construct_type_hcf_base_vg">
+<polygon fill="#a7506f" stroke="#a7506f" points="1027.5,-150 866.5,-150 866.5,-126 1027.5,-126 1027.5,-150"/>
+<text text-anchor="middle" x="947" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_vg</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_vg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge26" class="edge">
+<title>proc~construct_hcf_base&#45;&gt;interface~construct_type_hcf_base_vg</title>
+<path fill="none" stroke="#ff0000" d="M762.89,-209.81C783.83,-195.67 820.5,-172.56 855,-159 860.74,-156.74 866.79,-154.69 872.93,-152.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="873.94,-156.19 882.6,-150.08 872.03,-149.45 873.94,-156.19"/>
+</g>
+<!-- interface~construct_type_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node19" class="node">
+<title>interface~construct_type_hcf_impedance</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node19"><a xlink:href="../interface/construct_type_hcf_impedance.html" xlink:title="construct_type_hcf_impedance">
+<polygon fill="#a7506f" stroke="#a7506f" points="1036,-108 858,-108 858,-84 1036,-84 1036,-108"/>
+<text text-anchor="middle" x="947" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_impedance&#45;&gt;interface~construct_type_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge27" class="edge">
+<title>proc~construct_hcf_impedance&#45;&gt;interface~construct_type_hcf_impedance</title>
+<path fill="none" stroke="#00ff00" d="M819.02,-96C828.39,-96 838.1,-96 847.79,-96"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="847.85,-99.5 857.85,-96 847.85,-92.5 847.85,-99.5"/>
+</g>
+<!-- interface~construct_type_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node20" class="node">
+<title>interface~construct_type_hcf_viscosity</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node20"><a xlink:href="../interface/construct_type_hcf_viscosity.html" xlink:title="construct_type_hcf_viscosity">
+<polygon fill="#a7506f" stroke="#a7506f" points="1028.5,-66 865.5,-66 865.5,-42 1028.5,-42 1028.5,-66"/>
+<text text-anchor="middle" x="947" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_hcf_viscosity&#45;&gt;interface~construct_type_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge28" class="edge">
+<title>proc~construct_hcf_viscosity&#45;&gt;interface~construct_type_hcf_viscosity</title>
+<path fill="none" stroke="#0000ff" d="M811.71,-54C825.61,-54 840.5,-54 855.13,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="855.19,-57.5 865.19,-54 855.19,-50.5 855.19,-57.5"/>
+</g>
+<!-- proc~construct_type_hcf_base_bc -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node21" class="node">
+<title>proc~construct_type_hcf_base_bc</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node21"><a xlink:href="../proc/construct_type_hcf_base_bc.html" xlink:title="construct_type_hcf_base_bc">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1247.5,-360 1086.5,-360 1086.5,-336 1247.5,-336 1247.5,-360"/>
+<text text-anchor="middle" x="1167" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_bc</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_bc&#45;&gt;proc~construct_type_hcf_base_bc -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge29" class="edge">
+<title>interface~construct_type_hcf_base_bc&#45;&gt;proc~construct_type_hcf_base_bc</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1027.63,-348C1043.29,-348 1059.83,-348 1075.81,-348"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1076.22,-351.5 1086.22,-348 1076.22,-344.5 1076.22,-351.5"/>
+</g>
+<!-- proc~construct_type_hcf_base_durner -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node22" class="node">
+<title>proc~construct_type_hcf_base_durner</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node22"><a xlink:href="../proc/construct_type_hcf_base_durner.html" xlink:title="construct_type_hcf_base_durner">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1259,-318 1075,-318 1075,-294 1259,-294 1259,-318"/>
+<text text-anchor="middle" x="1167" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_durner</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_durner&#45;&gt;proc~construct_type_hcf_base_durner -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge30" class="edge">
+<title>interface~construct_type_hcf_base_durner&#45;&gt;proc~construct_type_hcf_base_durner</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M1039.19,-306C1047.57,-306 1056.09,-306 1064.55,-306"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1064.83,-309.5 1074.83,-306 1064.83,-302.5 1064.83,-309.5"/>
+</g>
+<!-- proc~construct_type_hcf_base_dvgch -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node23" class="node">
+<title>proc~construct_type_hcf_base_dvgch</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node23"><a xlink:href="../proc/construct_type_hcf_base_dvgch.html" xlink:title="construct_type_hcf_base_dvgch">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1257.5,-276 1076.5,-276 1076.5,-252 1257.5,-252 1257.5,-276"/>
+<text text-anchor="middle" x="1167" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_dvgch</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_dvgch&#45;&gt;proc~construct_type_hcf_base_dvgch -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge31" class="edge">
+<title>interface~construct_type_hcf_base_dvgch&#45;&gt;proc~construct_type_hcf_base_dvgch</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M1037.61,-264C1047.01,-264 1056.61,-264 1066.12,-264"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1066.38,-267.5 1076.38,-264 1066.38,-260.5 1066.38,-267.5"/>
+</g>
+<!-- proc~construct_type_hcf_base_ko -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node24" class="node">
+<title>proc~construct_type_hcf_base_ko</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node24"><a xlink:href="../proc/construct_type_hcf_base_ko.html" xlink:title="construct_type_hcf_base_ko">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1247.5,-234 1086.5,-234 1086.5,-210 1247.5,-210 1247.5,-234"/>
+<text text-anchor="middle" x="1167" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_ko</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_ko&#45;&gt;proc~construct_type_hcf_base_ko -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge32" class="edge">
+<title>interface~construct_type_hcf_base_ko&#45;&gt;proc~construct_type_hcf_base_ko</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M1027.63,-222C1043.29,-222 1059.83,-222 1075.81,-222"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1076.22,-225.5 1086.22,-222 1076.22,-218.5 1076.22,-225.5"/>
+</g>
+<!-- proc~construct_type_hcf_base_mvg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node25" class="node">
+<title>proc~construct_type_hcf_base_mvg</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node25"><a xlink:href="../proc/construct_type_hcf_base_mvg.html" xlink:title="construct_type_hcf_base_mvg">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1253,-192 1081,-192 1081,-168 1253,-168 1253,-192"/>
+<text text-anchor="middle" x="1167" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_mvg</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_mvg&#45;&gt;proc~construct_type_hcf_base_mvg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge33" class="edge">
+<title>interface~construct_type_hcf_base_mvg&#45;&gt;proc~construct_type_hcf_base_mvg</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1033.22,-180C1045.44,-180 1058.08,-180 1070.49,-180"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1070.84,-183.5 1080.84,-180 1070.84,-176.5 1070.84,-183.5"/>
+</g>
+<!-- proc~construct_type_hcf_base_vg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node26" class="node">
+<title>proc~construct_type_hcf_base_vg</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node26"><a xlink:href="../proc/construct_type_hcf_base_vg.html" xlink:title="construct_type_hcf_base_vg">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1247.5,-150 1086.5,-150 1086.5,-126 1247.5,-126 1247.5,-150"/>
+<text text-anchor="middle" x="1167" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_base_vg</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_base_vg&#45;&gt;proc~construct_type_hcf_base_vg -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge34" class="edge">
+<title>interface~construct_type_hcf_base_vg&#45;&gt;proc~construct_type_hcf_base_vg</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M1027.63,-138C1043.29,-138 1059.83,-138 1075.81,-138"/>
+<polygon fill="#003fff" stroke="#003fff" points="1076.22,-141.5 1086.22,-138 1076.22,-134.5 1076.22,-141.5"/>
+</g>
+<!-- proc~construct_type_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node27" class="node">
+<title>proc~construct_type_hcf_impedance</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node27"><a xlink:href="../proc/construct_type_hcf_impedance.html" xlink:title="construct_type_hcf_impedance">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1256,-108 1078,-108 1078,-84 1256,-84 1256,-108"/>
+<text text-anchor="middle" x="1167" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_impedance&#45;&gt;proc~construct_type_hcf_impedance -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge35" class="edge">
+<title>interface~construct_type_hcf_impedance&#45;&gt;proc~construct_type_hcf_impedance</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1036.04,-96C1046.52,-96 1057.26,-96 1067.87,-96"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1067.99,-99.5 1077.99,-96 1067.99,-92.5 1067.99,-99.5"/>
+</g>
+<!-- proc~construct_type_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node28" class="node">
+<title>proc~construct_type_hcf_viscosity</title>
+<g id="a_interface~~initialize_holder_hcfs~~CallsGraph_node28"><a xlink:href="../proc/construct_type_hcf_viscosity.html" xlink:title="construct_type_hcf_viscosity">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1248.5,-66 1085.5,-66 1085.5,-42 1248.5,-42 1248.5,-66"/>
+<text text-anchor="middle" x="1167" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_type_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_type_hcf_viscosity&#45;&gt;proc~construct_type_hcf_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge36" class="edge">
+<title>interface~construct_type_hcf_viscosity&#45;&gt;proc~construct_type_hcf_viscosity</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M1028.56,-54C1043.78,-54 1059.8,-54 1075.31,-54"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1075.41,-57.5 1085.41,-54 1075.41,-50.5 1075.41,-57.5"/>
+</g>
+<!-- calc_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_node29" class="node">
+<title>calc_viscosity</title>
+<polygon fill="#777777" stroke="#777777" points="1380,-66 1295,-66 1295,-42 1380,-42 1380,-66"/>
+<text text-anchor="middle" x="1337.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_viscosity</text>
+</g>
+<!-- proc~construct_type_hcf_viscosity&#45;&gt;calc_viscosity -->
+<g id="interface~~initialize_holder_hcfs~~CallsGraph_edge37" class="edge">
+<title>proc~construct_type_hcf_viscosity&#45;&gt;calc_viscosity</title>
+<path fill="none" stroke="#ff00bf" d="M1248.8,-54C1260.95,-54 1273.21,-54 1284.54,-54"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="1284.66,-57.5 1294.66,-54 1284.66,-50.5 1284.66,-57.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceinitialize_holder_hcfsCallsGraph = svgPanZoom('#interfaceinitialize_holder_hcfsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine initialize_holder_hcfs(self, input, material_id)  
+    <a href="../proc/initialize_holder_hcfs.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~408"></span>
+              class(<a href='../type/holder_hcfs.html'>holder_hcfs</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-input~55"></span>
+              type(<a href='../type/type_input.html'>type_input</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>input</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-material_id~37"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>material_id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

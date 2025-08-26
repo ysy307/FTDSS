@@ -1,0 +1,1452 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_abst_mesh &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_abst_mesh
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.3% of total for procedures.">46 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/mesh_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/mesh_interface.f90.html'>mesh_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_mesh.html'>domain_mesh</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_abst_mesh</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_abst_mesh.html#src">initialize_abst_mesh</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine initialize_abst_mesh(self, id, type, group, dimension, order, num_nodes, connectivity, num_gauss, weight, gauss, global_coordinate)  
+</h2>
+    
+
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/abst_mesh.html'>abst_mesh</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~376"></span>
+              class(<a href='../type/abst_mesh.html'>abst_mesh</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-id~21"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>id</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-type~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>type</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-group~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>group</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dimension~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dimension</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-order~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>order</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~23"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_nodes</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-connectivity~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>connectivity</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_gauss~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>num_gauss</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-weight~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>weight</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gauss~6"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>gauss</strong>(:,:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-global_coordinate~10"></span>
+              type(<a href='../type/type_dp_3d.html'>type_dp_3d</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>global_coordinate</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_abst_mesh~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_abst_meshCallsGraph" width="641pt" height="668pt"
+ viewBox="0.00 0.00 641.00 668.04" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_abst_mesh~~CallsGraph" class="graph" transform="scale(0.73 0.73) rotate(0) translate(4 910)">
+<title>proc~~initialize_abst_mesh~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-910 873,-910 873,4 -4,4"/>
+<!-- proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node1" class="node">
+<title>proc~initialize_abst_mesh</title>
+<polygon fill="none" stroke="black" points="186,-276 0,-276 0,-252 186,-252 186,-276"/>
+<text text-anchor="middle" x="93" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_mesh%initialize_abst_mesh</text>
+</g>
+<!-- interface~allocate_array -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node2" class="node">
+<title>interface~allocate_array</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node2"><a xlink:href="../interface/allocate_array.html" xlink:title="allocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="335.5,-486 246.5,-486 246.5,-462 335.5,-462 335.5,-486"/>
+<text text-anchor="middle" x="291" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_abst_mesh&#45;&gt;interface~allocate_array -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_abst_mesh&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M105.38,-276.2C137.93,-311.07 231.58,-411.4 271.55,-454.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="269.2,-456.85 278.58,-461.77 274.32,-452.07 269.2,-456.85"/>
+</g>
+<!-- none~set~3 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node3" class="node">
+<title>none~set~3</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node3"><a xlink:href="../type/type_dp_vector_3d.html#boundprocedure-set~3" xlink:title="type_dp_vector_3d%set">
+<polygon fill="#a7506f" stroke="#a7506f" points="360,-66 222,-66 222,-42 360,-42 360,-66"/>
+<text text-anchor="middle" x="291" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dp_vector_3d%set</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_abst_mesh&#45;&gt;none~set~3 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge2" class="edge">
+<title>proc~initialize_abst_mesh&#45;&gt;none~set~3</title>
+<path fill="none" stroke="#ff0000" d="M105.38,-251.8C137.93,-216.93 231.58,-116.6 271.55,-73.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="274.32,-75.93 278.58,-66.23 269.2,-71.15 274.32,-75.93"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node4" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node4"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="allocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="582,-906 458,-906 458,-882 582,-882 582,-906"/>
+<text text-anchor="middle" x="520" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge3" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M293.4,-486.09C300.66,-546.83 336.13,-818.07 396,-873 410.07,-885.91 429.04,-892.42 447.86,-895.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.6,-898.9 457.96,-896.69 448.48,-891.96 447.6,-898.9"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node5" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node5"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="582,-864 458,-864 458,-840 582,-840 582,-864"/>
+<text text-anchor="middle" x="520" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge4" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M293.82,-486.31C302.53,-543.52 341.8,-782.67 396,-831 410.19,-843.65 429.09,-850.09 447.82,-853.1"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.51,-856.59 457.87,-854.41 448.41,-849.65 447.51,-856.59"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node6" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node6"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="allocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="582,-822 458,-822 458,-798 582,-798 582,-822"/>
+<text text-anchor="middle" x="520" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge5" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M291.89,-486.03C292.18,-533.12 299.96,-706.36 396,-789 410.34,-801.34 429.2,-807.7 447.84,-810.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.46,-814.21 457.84,-812.06 448.38,-807.27 447.46,-814.21"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node7" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node7"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="allocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="578.5,-780 461.5,-780 461.5,-756 578.5,-756 578.5,-780"/>
+<text text-anchor="middle" x="520" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M292.59,-486.21C295.37,-529.55 310.97,-677.12 396,-747 411.39,-759.65 431.6,-765.92 451.18,-768.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="450.99,-772.27 461.33,-769.95 451.8,-765.31 450.99,-772.27"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node8" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node8"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="allocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="589.5,-738 450.5,-738 450.5,-714 589.5,-714 589.5,-738"/>
+<text text-anchor="middle" x="520" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M293.51,-486.24C299,-525.26 321.73,-647.54 396,-705 408.77,-714.88 424.53,-720.79 440.46,-724.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="439.9,-727.65 450.37,-726.01 441.16,-720.77 439.9,-727.65"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="allocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="589.5,-696 450.5,-696 450.5,-672 589.5,-672 589.5,-696"/>
+<text text-anchor="middle" x="520" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M294.78,-486.18C303.26,-520.36 332.22,-617.62 396,-663 408.89,-672.17 424.43,-677.82 440.06,-681.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="439.85,-684.73 450.32,-683.12 441.13,-677.84 439.85,-684.73"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="allocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="589.5,-654 450.5,-654 450.5,-630 589.5,-630 589.5,-654"/>
+<text text-anchor="middle" x="520" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M296.8,-486.37C308.71,-515.28 342.57,-587.34 396,-621 409.23,-629.33 424.78,-634.64 440.29,-637.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="439.98,-641.46 450.45,-639.86 441.27,-634.58 439.98,-641.46"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="allocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="588.5,-612 451.5,-612 451.5,-588 588.5,-588 588.5,-612"/>
+<text text-anchor="middle" x="520" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M300.06,-486.14C315.65,-508.57 352.3,-556.27 396,-579 409.87,-586.22 425.7,-591.03 441.28,-594.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="440.99,-597.73 451.46,-596.1 442.26,-590.85 440.99,-597.73"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="allocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="585,-570 455,-570 455,-546 585,-546 585,-570"/>
+<text text-anchor="middle" x="520" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M307.6,-486.05C327.14,-500.52 362.18,-524.39 396,-537 411.38,-542.73 428.43,-546.91 444.82,-549.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="444.46,-553.45 454.91,-551.71 445.66,-546.55 444.46,-553.45"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="585,-528 455,-528 455,-504 585,-504 585,-528"/>
+<text text-anchor="middle" x="520" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M335.71,-483.13C354.28,-486.93 376.17,-491.31 396,-495 411.78,-497.94 428.74,-500.94 444.86,-503.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="444.33,-507.17 454.78,-505.41 445.51,-500.27 444.33,-507.17"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="allocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="582,-486 458,-486 458,-462 582,-462 582,-486"/>
+<text text-anchor="middle" x="520" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M335.77,-474C367.45,-474 410.96,-474 447.63,-474"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.78,-477.5 457.78,-474 447.78,-470.5 447.78,-477.5"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="allocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="582,-444 458,-444 458,-420 582,-420 582,-444"/>
+<text text-anchor="middle" x="520" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M335.71,-464.87C354.28,-461.07 376.17,-456.69 396,-453 412.82,-449.87 430.98,-446.67 448.04,-443.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="448.67,-447.18 457.94,-442.05 447.49,-440.28 448.67,-447.18"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="allocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="582,-402 458,-402 458,-378 582,-378 582,-402"/>
+<text text-anchor="middle" x="520" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M307.6,-461.95C327.14,-447.48 362.18,-423.61 396,-411 412.29,-404.93 430.45,-400.6 447.71,-397.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="448.47,-400.94 457.75,-395.84 447.31,-394.03 448.47,-400.94"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="allocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="578.5,-360 461.5,-360 461.5,-336 578.5,-336 578.5,-360"/>
+<text text-anchor="middle" x="520" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M300.06,-461.86C315.65,-439.43 352.3,-391.73 396,-369 412.86,-360.23 432.61,-355 451.29,-351.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="451.85,-355.38 461.23,-350.46 450.83,-348.45 451.85,-355.38"/>
+</g>
+<!-- proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank2_logical1</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank2_logical1.html" xlink:title="allocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="589.5,-318 450.5,-318 450.5,-294 589.5,-294 589.5,-318"/>
+<text text-anchor="middle" x="520" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M296.8,-461.63C308.71,-432.72 342.57,-360.66 396,-327 409.23,-318.67 424.78,-313.36 440.29,-310.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="441.27,-313.42 450.45,-308.14 439.98,-306.54 441.27,-313.42"/>
+</g>
+<!-- proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank2_logical4</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank2_logical4.html" xlink:title="allocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="589.5,-276 450.5,-276 450.5,-252 589.5,-252 589.5,-276"/>
+<text text-anchor="middle" x="520" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M294.78,-461.82C303.26,-427.64 332.22,-330.38 396,-285 408.89,-275.83 424.43,-270.18 440.06,-266.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="441.13,-270.16 450.32,-264.88 439.85,-263.27 441.13,-270.16"/>
+</g>
+<!-- proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank2_logical8</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank2_logical8.html" xlink:title="allocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="589.5,-234 450.5,-234 450.5,-210 589.5,-210 589.5,-234"/>
+<text text-anchor="middle" x="520" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M293.51,-461.76C299,-422.74 321.73,-300.46 396,-243 408.77,-233.12 424.53,-227.21 440.46,-223.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="441.16,-227.23 450.37,-221.99 439.9,-220.35 441.16,-227.23"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="allocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="588.5,-192 451.5,-192 451.5,-168 588.5,-168 588.5,-192"/>
+<text text-anchor="middle" x="520" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M292.59,-461.79C295.37,-418.45 310.97,-270.88 396,-201 408.75,-190.52 424.81,-184.42 441.07,-181.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="441.95,-184.41 451.2,-179.23 440.74,-177.52 441.95,-184.41"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="allocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="585,-150 455,-150 455,-126 585,-126 585,-150"/>
+<text text-anchor="middle" x="520" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M291.89,-461.97C292.18,-414.88 299.96,-241.64 396,-159 409.52,-147.37 427.07,-141.04 444.65,-137.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="445.62,-141.21 454.98,-136.26 444.57,-134.29 445.62,-141.21"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="allocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="585,-108 455,-108 455,-84 585,-84 585,-108"/>
+<text text-anchor="middle" x="520" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M293.82,-461.69C302.53,-404.48 341.8,-165.33 396,-117 409.31,-105.13 426.79,-98.72 444.37,-95.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="445.33,-98.89 454.7,-93.94 444.29,-91.96 445.33,-98.89"/>
+</g>
+<!-- proc~set_dp_vector_3d -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node24" class="node">
+<title>proc~set_dp_vector_3d</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node24"><a xlink:href="../proc/set_dp_vector_3d.html" xlink:title="type_dp_vector_3d%set_dp_vector_3d">
+<polygon fill="#d9534f" stroke="#d9534f" points="627,-66 413,-66 413,-42 627,-42 627,-66"/>
+<text text-anchor="middle" x="520" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dp_vector_3d%set_dp_vector_3d</text>
+</a>
+</g>
+</g>
+<!-- none~set~3&#45;&gt;proc~set_dp_vector_3d -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge23" class="edge">
+<title>none~set~3&#45;&gt;proc~set_dp_vector_3d</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M360.11,-54C373.58,-54 388.08,-54 402.64,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="402.72,-57.5 412.72,-54 402.72,-50.5 402.72,-57.5"/>
+</g>
+<!-- proc~set_dp_vector_3d_array -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node25" class="node">
+<title>proc~set_dp_vector_3d_array</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node25"><a xlink:href="../proc/set_dp_vector_3d_array.html" xlink:title="type_dp_vector_3d%set_dp_vector_3d_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="644,-24 396,-24 396,0 644,0 644,-24"/>
+<text text-anchor="middle" x="520" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dp_vector_3d%set_dp_vector_3d_array</text>
+</a>
+</g>
+</g>
+<!-- none~set~3&#45;&gt;proc~set_dp_vector_3d_array -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge24" class="edge">
+<title>none~set~3&#45;&gt;proc~set_dp_vector_3d_array</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M349.97,-41.97C364.95,-38.95 381.06,-35.78 396,-33 408.98,-30.58 422.76,-28.12 436.21,-25.78"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="437.16,-29.17 446.42,-24.02 435.97,-22.27 437.16,-29.17"/>
+</g>
+<!-- proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node26" class="node">
+<title>proc~error_message</title>
+<g id="a_proc~~initialize_abst_mesh~~CallsGraph_node26"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="772,-507 680,-507 680,-483 772,-483 772,-507"/>
+<text text-anchor="middle" x="726" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge25" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M582.08,-897.1C604.16,-895.04 627.66,-888.67 644,-873 696.07,-823.07 717.81,-590.46 723.44,-517.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="726.93,-517.43 724.18,-507.19 719.95,-516.91 726.93,-517.43"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge26" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff4500" d="M582.19,-854.85C604.16,-852.74 627.54,-846.38 644,-831 690.51,-787.53 715.57,-585.29 722.78,-517.34"/>
+<polygon fill="#ff4500" stroke="#ff4500" points="726.27,-517.59 723.82,-507.29 719.31,-516.87 726.27,-517.59"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge27" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff8b00" d="M582.24,-812.54C604.09,-810.36 627.38,-804.04 644,-789 685.02,-751.88 713.05,-579.43 721.96,-517.34"/>
+<polygon fill="#ff8b00" stroke="#ff8b00" points="725.47,-517.48 723.4,-507.09 718.54,-516.51 725.47,-517.48"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge28" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffd000" d="M578.76,-770.46C601.44,-768.52 626.24,-762.4 644,-747 713.41,-686.8 723.81,-566.93 725.03,-517.31"/>
+<polygon fill="#ffd000" stroke="#ffd000" points="728.54,-517.1 725.18,-507.05 721.54,-517 728.54,-517.1"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge29" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#e7ff00" d="M589.73,-726.59C609.01,-723.68 628.83,-717.42 644,-705 702.84,-656.85 719.03,-560.59 723.41,-517.16"/>
+<polygon fill="#e7ff00" stroke="#e7ff00" points="726.91,-517.36 724.31,-507.09 719.93,-516.74 726.91,-517.36"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge30" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a2ff00" d="M589.75,-683.7C608.82,-680.74 628.51,-674.66 644,-663 692.29,-626.64 713.23,-553.97 721.02,-517.28"/>
+<polygon fill="#a2ff00" stroke="#a2ff00" points="724.52,-517.62 723.04,-507.13 717.66,-516.26 724.52,-517.62"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge31" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#5cff00" d="M589.53,-640.38C608.37,-637.35 628.01,-631.58 644,-621 682.25,-595.7 706.24,-545.47 717.46,-516.66"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="720.81,-517.69 721.02,-507.1 714.25,-515.25 720.81,-517.69"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge32" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#17ff00" d="M588.62,-596.25C607.35,-593.18 627.15,-587.91 644,-579 672.58,-563.89 697,-534.98 711.34,-515.35"/>
+<polygon fill="#17ff00" stroke="#17ff00" points="714.29,-517.25 717.2,-507.06 708.57,-513.21 714.29,-517.25"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge33" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff2e" d="M585.13,-550.89C604.37,-547.74 625.31,-543.27 644,-537 662.41,-530.82 681.75,-520.93 696.92,-512.3"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="698.91,-515.2 705.78,-507.14 695.38,-509.15 698.91,-515.2"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge34" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff73" d="M585.27,-509.38C612.38,-506.59 643.64,-503.38 669.71,-500.69"/>
+<polygon fill="#00ff73" stroke="#00ff73" points="670.2,-504.16 679.79,-499.65 669.49,-497.2 670.2,-504.16"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge35" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffb9" d="M582.21,-480.3C609.99,-483.16 642.61,-486.52 669.66,-489.3"/>
+<polygon fill="#00ffb9" stroke="#00ffb9" points="669.42,-492.8 679.73,-490.34 670.14,-485.83 669.42,-492.8"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge36" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffff" d="M582.29,-438.65C602.29,-441.83 624.39,-446.42 644,-453 662.41,-459.18 681.75,-469.07 696.92,-477.7"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="695.38,-480.85 705.78,-482.86 698.91,-474.8 695.38,-480.85"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge37" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00b9ff" d="M582.28,-392.78C602.81,-395.67 625.23,-401.08 644,-411 672.58,-426.11 697,-455.02 711.34,-474.65"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="708.57,-476.79 717.2,-482.94 714.29,-472.75 708.57,-476.79"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge38" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0073ff" d="M578.78,-348.17C600.7,-350.61 624.94,-356.39 644,-369 682.25,-394.3 706.24,-444.53 717.46,-473.34"/>
+<polygon fill="#0073ff" stroke="#0073ff" points="714.25,-474.75 721.02,-482.9 720.81,-472.31 714.25,-474.75"/>
+</g>
+<!-- proc~allocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge39" class="edge">
+<title>proc~allocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#002eff" d="M589.75,-306.3C608.82,-309.26 628.51,-315.34 644,-327 692.29,-363.36 713.23,-436.03 721.02,-472.72"/>
+<polygon fill="#002eff" stroke="#002eff" points="717.66,-473.74 723.04,-482.87 724.52,-472.38 717.66,-473.74"/>
+</g>
+<!-- proc~allocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge40" class="edge">
+<title>proc~allocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1700ff" d="M589.73,-263.41C609.01,-266.32 628.83,-272.58 644,-285 702.84,-333.15 719.03,-429.41 723.41,-472.84"/>
+<polygon fill="#1700ff" stroke="#1700ff" points="719.93,-473.26 724.31,-482.91 726.91,-472.64 719.93,-473.26"/>
+</g>
+<!-- proc~allocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge41" class="edge">
+<title>proc~allocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#5c00ff" d="M589.54,-220.78C609.04,-223.63 629.03,-230.01 644,-243 713.41,-303.2 723.81,-423.07 725.03,-472.69"/>
+<polygon fill="#5c00ff" stroke="#5c00ff" points="721.54,-473 725.18,-482.95 728.54,-472.9 721.54,-473"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge42" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#a200ff" d="M588.61,-178.21C608.53,-180.94 628.98,-187.41 644,-201 685.02,-238.12 713.05,-410.57 721.96,-472.66"/>
+<polygon fill="#a200ff" stroke="#a200ff" points="718.54,-473.49 723.4,-482.91 725.47,-472.52 718.54,-473.49"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge43" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#e700ff" d="M585.05,-135.45C606.17,-137.83 628.25,-144.28 644,-159 690.51,-202.47 715.57,-404.71 722.78,-472.66"/>
+<polygon fill="#e700ff" stroke="#e700ff" points="719.31,-473.13 723.82,-482.71 726.27,-472.41 719.31,-473.13"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge44" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00d0" d="M585.26,-93.22C606.4,-95.59 628.44,-102.08 644,-117 696.07,-166.93 717.81,-399.54 723.44,-472.83"/>
+<polygon fill="#ff00d0" stroke="#ff00d0" points="719.95,-473.09 724.18,-482.81 726.93,-472.57 719.95,-473.09"/>
+</g>
+<!-- log_error -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_node27" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="869,-507 808,-507 808,-483 869,-483 869,-507"/>
+<text text-anchor="middle" x="838.5" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="proc~~initialize_abst_mesh~~CallsGraph_edge45" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#ff0000" d="M772.26,-495C780.73,-495 789.52,-495 797.8,-495"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="797.95,-498.5 807.95,-495 797.95,-491.5 797.95,-498.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_abst_meshCallsGraph = svgPanZoom('#procinitialize_abst_meshCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_abst_mesh~~CalledByGraph Pages: 1 -->
+<svg id="procinitialize_abst_meshCalledByGraph" width="641pt" height="212pt"
+ viewBox="0.00 0.00 641.00 211.92" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_abst_mesh~~CalledByGraph" class="graph" transform="scale(0.88 0.88) rotate(0) translate(4 238)">
+<title>proc~~initialize_abst_mesh~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-238 728,-238 728,4 -4,4"/>
+<!-- proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node1" class="node">
+<title>proc~initialize_abst_mesh</title>
+<polygon fill="none" stroke="black" points="724,-129 538,-129 538,-105 724,-105 724,-129"/>
+<text text-anchor="middle" x="631" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_mesh%initialize_abst_mesh</text>
+</g>
+<!-- proc~construct_side_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node2" class="node">
+<title>proc~construct_side_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node2"><a xlink:href="../proc/construct_side_first.html" xlink:title="construct_side_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="483.5,-234 368.5,-234 368.5,-210 483.5,-210 483.5,-234"/>
+<text text-anchor="middle" x="426" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_side_first&#45;&gt;proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge1" class="edge">
+<title>proc~construct_side_first&#45;&gt;proc~initialize_abst_mesh</title>
+<path fill="none" stroke="#ff0000" d="M478.19,-209.95C486.3,-207.39 494.49,-204.42 502,-201 541.17,-183.18 582,-154.3 606.71,-135.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="608.97,-138.16 614.75,-129.28 604.7,-132.61 608.97,-138.16"/>
+</g>
+<!-- proc~construct_side_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node3" class="node">
+<title>proc~construct_side_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node3"><a xlink:href="../proc/construct_side_second.html" xlink:title="construct_side_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="492.5,-192 359.5,-192 359.5,-168 492.5,-168 492.5,-192"/>
+<text text-anchor="middle" x="426" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_side_second&#45;&gt;proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge2" class="edge">
+<title>proc~construct_side_second&#45;&gt;proc~initialize_abst_mesh</title>
+<path fill="none" stroke="#ff0000" d="M471.11,-168C481.28,-165.13 492.04,-162.03 502,-159 529.73,-150.57 560.61,-140.46 585.09,-132.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="586.45,-135.51 594.82,-129.01 584.22,-128.87 586.45,-135.51"/>
+</g>
+<!-- proc~construct_square_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node4" class="node">
+<title>proc~construct_square_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node4"><a xlink:href="../proc/construct_square_first.html" xlink:title="construct_square_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="490.5,-150 361.5,-150 361.5,-126 490.5,-126 490.5,-150"/>
+<text text-anchor="middle" x="426" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_square_first&#45;&gt;proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge3" class="edge">
+<title>proc~construct_square_first&#45;&gt;proc~initialize_abst_mesh</title>
+<path fill="none" stroke="#ff0000" d="M490.67,-131.41C502.51,-130.19 515.15,-128.88 527.8,-127.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="528.34,-131.03 537.93,-126.52 527.62,-124.07 528.34,-131.03"/>
+</g>
+<!-- proc~construct_square_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node5" class="node">
+<title>proc~construct_square_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node5"><a xlink:href="../proc/construct_square_second.html" xlink:title="construct_square_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="499.5,-108 352.5,-108 352.5,-84 499.5,-84 499.5,-108"/>
+<text text-anchor="middle" x="426" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_square_second&#45;&gt;proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge4" class="edge">
+<title>proc~construct_square_second&#45;&gt;proc~initialize_abst_mesh</title>
+<path fill="none" stroke="#ff0000" d="M499.71,-103.52C508.82,-104.46 518.26,-105.44 527.72,-106.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="527.66,-109.93 537.96,-107.48 528.38,-102.97 527.66,-109.93"/>
+</g>
+<!-- proc~construct_triangle_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node6" class="node">
+<title>proc~construct_triangle_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node6"><a xlink:href="../proc/construct_triangle_first.html" xlink:title="construct_triangle_first">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="493,-66 359,-66 359,-42 493,-42 493,-66"/>
+<text text-anchor="middle" x="426" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_first</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_triangle_first&#45;&gt;proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge5" class="edge">
+<title>proc~construct_triangle_first&#45;&gt;proc~initialize_abst_mesh</title>
+<path fill="none" stroke="#ff0000" d="M471.11,-66C481.28,-68.87 492.04,-71.97 502,-75 529.73,-83.43 560.61,-93.54 585.09,-101.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="584.22,-105.13 594.82,-104.99 586.45,-98.49 584.22,-105.13"/>
+</g>
+<!-- proc~construct_triangle_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node7" class="node">
+<title>proc~construct_triangle_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node7"><a xlink:href="../proc/construct_triangle_second.html" xlink:title="construct_triangle_second">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="502,-24 350,-24 350,0 502,0 502,-24"/>
+<text text-anchor="middle" x="426" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- proc~construct_triangle_second&#45;&gt;proc~initialize_abst_mesh -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge6" class="edge">
+<title>proc~construct_triangle_second&#45;&gt;proc~initialize_abst_mesh</title>
+<path fill="none" stroke="#ff0000" d="M478.19,-24.05C486.3,-26.61 494.49,-29.58 502,-33 541.17,-50.82 582,-79.7 606.71,-98.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="604.7,-101.39 614.75,-104.72 608.97,-95.84 604.7,-101.39"/>
+</g>
+<!-- interface~construct_side_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node8" class="node">
+<title>interface~construct_side_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node8"><a xlink:href="../interface/construct_side_first.html" xlink:title="construct_side_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="295.5,-234 180.5,-234 180.5,-210 295.5,-210 295.5,-234"/>
+<text text-anchor="middle" x="238" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_side_first&#45;&gt;proc~construct_side_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge7" class="edge">
+<title>interface~construct_side_first&#45;&gt;proc~construct_side_first</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M295.56,-222C315.31,-222 337.67,-222 358.17,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="358.38,-225.5 368.38,-222 358.38,-218.5 358.38,-225.5"/>
+</g>
+<!-- interface~construct_side_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node9" class="node">
+<title>interface~construct_side_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node9"><a xlink:href="../interface/construct_side_second.html" xlink:title="construct_side_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="304.5,-192 171.5,-192 171.5,-168 304.5,-168 304.5,-192"/>
+<text text-anchor="middle" x="238" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_side_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_side_second&#45;&gt;proc~construct_side_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge8" class="edge">
+<title>interface~construct_side_second&#45;&gt;proc~construct_side_second</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M304.58,-180C319.02,-180 334.44,-180 349.25,-180"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="349.39,-183.5 359.39,-180 349.39,-176.5 349.39,-183.5"/>
+</g>
+<!-- interface~construct_square_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node10" class="node">
+<title>interface~construct_square_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node10"><a xlink:href="../interface/construct_square_first.html" xlink:title="construct_square_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="302.5,-150 173.5,-150 173.5,-126 302.5,-126 302.5,-150"/>
+<text text-anchor="middle" x="238" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_square_first&#45;&gt;proc~construct_square_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge9" class="edge">
+<title>interface~construct_square_first&#45;&gt;proc~construct_square_first</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M302.75,-138C318.28,-138 335.02,-138 350.98,-138"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="351.33,-141.5 361.33,-138 351.33,-134.5 351.33,-141.5"/>
+</g>
+<!-- interface~construct_square_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node11" class="node">
+<title>interface~construct_square_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node11"><a xlink:href="../interface/construct_square_second.html" xlink:title="construct_square_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="311.5,-108 164.5,-108 164.5,-84 311.5,-84 311.5,-108"/>
+<text text-anchor="middle" x="238" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_square_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_square_second&#45;&gt;proc~construct_square_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge10" class="edge">
+<title>interface~construct_square_second&#45;&gt;proc~construct_square_second</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M311.71,-96C321.72,-96 332.06,-96 342.24,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="342.34,-99.5 352.34,-96 342.34,-92.5 342.34,-99.5"/>
+</g>
+<!-- interface~construct_triangle_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node12" class="node">
+<title>interface~construct_triangle_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node12"><a xlink:href="../interface/construct_triangle_first.html" xlink:title="construct_triangle_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="305,-66 171,-66 171,-42 305,-42 305,-66"/>
+<text text-anchor="middle" x="238" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_first</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_triangle_first&#45;&gt;proc~construct_triangle_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge11" class="edge">
+<title>interface~construct_triangle_first&#45;&gt;proc~construct_triangle_first</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M305.1,-54C319.13,-54 334.06,-54 348.44,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="348.8,-57.5 358.8,-54 348.8,-50.5 348.8,-57.5"/>
+</g>
+<!-- interface~construct_triangle_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node13" class="node">
+<title>interface~construct_triangle_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node13"><a xlink:href="../interface/construct_triangle_second.html" xlink:title="construct_triangle_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="314,-24 162,-24 162,0 314,0 314,-24"/>
+<text text-anchor="middle" x="238" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">construct_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- interface~construct_triangle_second&#45;&gt;proc~construct_triangle_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge12" class="edge">
+<title>interface~construct_triangle_second&#45;&gt;proc~construct_triangle_second</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M314.12,-12C322.6,-12 331.28,-12 339.87,-12"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="339.9,-15.5 349.9,-12 339.9,-8.5 339.9,-15.5"/>
+</g>
+<!-- interface~type_side_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node14" class="node">
+<title>interface~type_side_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node14"><a xlink:href="../interface/type_side_first.html" xlink:title="type_side_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="107,-234 19,-234 19,-210 107,-210 107,-234"/>
+<text text-anchor="middle" x="63" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_side_first</text>
+</a>
+</g>
+</g>
+<!-- interface~type_side_first&#45;&gt;interface~construct_side_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge13" class="edge">
+<title>interface~type_side_first&#45;&gt;interface~construct_side_first</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M107.21,-222C126.22,-222 148.98,-222 170.1,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="170.31,-225.5 180.31,-222 170.31,-218.5 170.31,-225.5"/>
+</g>
+<!-- interface~type_side_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node15" class="node">
+<title>interface~type_side_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node15"><a xlink:href="../interface/type_side_second.html" xlink:title="type_side_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="116,-192 10,-192 10,-168 116,-168 116,-192"/>
+<text text-anchor="middle" x="63" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_side_second</text>
+</a>
+</g>
+</g>
+<!-- interface~type_side_second&#45;&gt;interface~construct_side_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge14" class="edge">
+<title>interface~type_side_second&#45;&gt;interface~construct_side_second</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M116.38,-180C130.43,-180 145.93,-180 160.99,-180"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="161.32,-183.5 171.32,-180 161.32,-176.5 161.32,-183.5"/>
+</g>
+<!-- interface~type_square_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node16" class="node">
+<title>interface~type_square_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node16"><a xlink:href="../interface/type_square_first.html" xlink:title="type_square_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="114.5,-150 11.5,-150 11.5,-126 114.5,-126 114.5,-150"/>
+<text text-anchor="middle" x="63" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_square_first</text>
+</a>
+</g>
+</g>
+<!-- interface~type_square_first&#45;&gt;interface~construct_square_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge15" class="edge">
+<title>interface~type_square_first&#45;&gt;interface~construct_square_first</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M114.5,-138C129.7,-138 146.7,-138 163.09,-138"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="163.19,-141.5 173.19,-138 163.19,-134.5 163.19,-141.5"/>
+</g>
+<!-- interface~type_square_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node17" class="node">
+<title>interface~type_square_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node17"><a xlink:href="../interface/type_square_second.html" xlink:title="type_square_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="123.5,-108 2.5,-108 2.5,-84 123.5,-84 123.5,-108"/>
+<text text-anchor="middle" x="63" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_square_second</text>
+</a>
+</g>
+</g>
+<!-- interface~type_square_second&#45;&gt;interface~construct_square_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge16" class="edge">
+<title>interface~type_square_second&#45;&gt;interface~construct_square_second</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M123.54,-96C133.36,-96 143.7,-96 153.97,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="154.2,-99.5 164.2,-96 154.2,-92.5 154.2,-99.5"/>
+</g>
+<!-- interface~type_triangle_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node18" class="node">
+<title>interface~type_triangle_first</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node18"><a xlink:href="../interface/type_triangle_first.html" xlink:title="type_triangle_first">
+<polygon fill="#a7506f" stroke="#a7506f" points="117,-66 9,-66 9,-42 117,-42 117,-66"/>
+<text text-anchor="middle" x="63" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_triangle_first</text>
+</a>
+</g>
+</g>
+<!-- interface~type_triangle_first&#45;&gt;interface~construct_triangle_first -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge17" class="edge">
+<title>interface~type_triangle_first&#45;&gt;interface~construct_triangle_first</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M117.32,-54C131.03,-54 146.05,-54 160.69,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="160.73,-57.5 170.73,-54 160.73,-50.5 160.73,-57.5"/>
+</g>
+<!-- interface~type_triangle_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_node19" class="node">
+<title>interface~type_triangle_second</title>
+<g id="a_proc~~initialize_abst_mesh~~CalledByGraph_node19"><a xlink:href="../interface/type_triangle_second.html" xlink:title="type_triangle_second">
+<polygon fill="#a7506f" stroke="#a7506f" points="126,-24 0,-24 0,0 126,0 126,-24"/>
+<text text-anchor="middle" x="63" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_triangle_second</text>
+</a>
+</g>
+</g>
+<!-- interface~type_triangle_second&#45;&gt;interface~construct_triangle_second -->
+<g id="proc~~initialize_abst_mesh~~CalledByGraph_edge18" class="edge">
+<title>interface~type_triangle_second&#45;&gt;interface~construct_triangle_second</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M126.46,-12C134.74,-12 143.33,-12 151.91,-12"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="151.95,-15.5 161.95,-12 151.95,-8.5 151.95,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_abst_meshCalledByGraph = svgPanZoom('#procinitialize_abst_meshCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">initialize_abst_mesh</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">group</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">,</span><span class="w"> </span><span class="n">connectivity</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                    </span><span class="n">num_gauss</span><span class="p">,</span><span class="w"> </span><span class="n">weight</span><span class="p">,</span><span class="w"> </span><span class="n">gauss</span><span class="p">,</span><span class="w"> </span><span class="n">global_coordinate</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">abst_mesh</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">id</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">type</span>
+<span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">group</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">dimension</span>
+<span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">order</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">connectivity</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">num_gauss</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">weight</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gauss</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_dp_3d</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">global_coordinate</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="k">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">type</span>
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">group</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="k">dimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">dimension</span>
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">order</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_gauss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_gauss</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">        call </span><span class="n">allocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">weight</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_gauss</span><span class="p">)</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_gauss</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">weight</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">        allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">gauss</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_gauss</span><span class="p">))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_gauss</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">gauss</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">set</span><span class="p">(</span><span class="n">gauss</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">gauss</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">gauss</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">        allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">y</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span><span class="p">))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_nodes</span>
+<span class="w">            </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="p">)</span>
+<span class="w">            </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="p">)</span>
+<span class="w">            </span><span class="k">nullify</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">global_coordinate</span><span class="p">%</span><span class="n">x</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">global_coordinate</span><span class="p">%</span><span class="n">y</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">global_coordinate</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">connectivity</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">    end subroutine </span><span class="n">initialize_abst_mesh</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

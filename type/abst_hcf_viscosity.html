@@ -1,0 +1,645 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>abst_hcf_viscosity &ndash; FTDSS </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>abst_hcf_viscosity
+      <small>Derived Type</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 0.5% of total for derived types.</p>Including implementation: 6 statements,  0.1% of total for derived types.">6 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hcf_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hcf_interface.f90.html'>hcf_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/calculate_hcf.html'>calculate_hcf</a></li>
+            <li class="breadcrumb-item active" aria-current="page">abst_hcf_viscosity</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/abst_hcf_viscosity.html#variable-mu_zero">mu_zero</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/abst_hcf_viscosity.html#boundprocedure-calc_viscosity">calc_viscosity</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../type/abst_hcf_viscosity.html#src">abst_hcf_viscosity</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2 id="type-def-statement">
+        type, private, abstract :: abst_hcf_viscosity</h2>
+    
+<br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherited by</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~abst_hcf_viscosity~~InheritedByGraph Pages: 1 -->
+<svg id="typeabst_hcf_viscosityInheritedByGraph" width="641pt" height="200pt"
+ viewBox="0.00 0.00 641.00 200.07" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph" class="graph" transform="scale(0.54 0.54) rotate(0) translate(4 364)">
+<title>type~~abst_hcf_viscosity~~InheritedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-364 1175,-364 1175,4 -4,4"/>
+<!-- type~abst_hcf_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node1" class="node">
+<title>type~abst_hcf_viscosity</title>
+<polygon fill="none" stroke="black" points="107,-166 0,-166 0,-142 107,-142 107,-166"/>
+<text text-anchor="middle" x="53.5" y="-151.6" font-family="Helvetica,sans-Serif" font-size="10.50">abst_hcf_viscosity</text>
+</g>
+<!-- type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node2" class="node">
+<title>type~abst_hcf</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node2"><a xlink:href="../type/abst_hcf.html" xlink:title="abst_hcf">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="297,-192 240,-192 240,-168 297,-168 297,-192"/>
+<text text-anchor="middle" x="268.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~abst_hcf_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge1" class="edge">
+<title>type~abst_hcf&#45;&gt;type~abst_hcf_viscosity</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M239.65,-176.6C208.78,-172.83 157.98,-166.63 117.39,-161.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="117.66,-158.18 107.31,-160.45 116.81,-165.13 117.66,-158.18"/>
+<text text-anchor="middle" x="146.5" y="-169.4" font-family="Helvetica,sans-Serif" font-size="9.50">viscosity</text>
+</g>
+<!-- type~type_hcf_viscosity_exp -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node3" class="node">
+<title>type~type_hcf_viscosity_exp</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node3"><a xlink:href="../type/type_hcf_viscosity_exp.html" xlink:title="type_hcf_viscosity_exp">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="334.5,-150 202.5,-150 202.5,-126 334.5,-126 334.5,-150"/>
+<text text-anchor="middle" x="268.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_viscosity_exp</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_viscosity_exp&#45;&gt;type~abst_hcf_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge3" class="edge">
+<title>type~type_hcf_viscosity_exp&#45;&gt;type~abst_hcf_viscosity</title>
+<path fill="none" stroke="#ff0000" d="M202.39,-133.98C184.49,-133.96 165.16,-134.96 147.5,-138"/>
+</g>
+<!-- type~type_hcf_viscosity_supercool -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node4" class="node">
+<title>type~type_hcf_viscosity_supercool</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node4"><a xlink:href="../type/type_hcf_viscosity_supercool.html" xlink:title="type_hcf_viscosity_supercool">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="351,-108 186,-108 186,-84 351,-84 351,-108"/>
+<text text-anchor="middle" x="268.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_viscosity_supercool</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_viscosity_supercool&#45;&gt;type~abst_hcf_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge2" class="edge">
+<title>type~type_hcf_viscosity_supercool&#45;&gt;type~abst_hcf_viscosity</title>
+<path fill="none" stroke="#ff0000" d="M212.98,-108.05C203.85,-110.63 194.56,-113.62 186,-117 167.87,-124.15 166.71,-134.69 147.5,-138"/>
+<path fill="none" stroke="#ff0000" d="M145.5,-138C136.44,-139.56 126.89,-141.22 117.5,-142.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="116.67,-139.45 107.42,-144.63 117.87,-146.35 116.67,-139.45"/>
+</g>
+<!-- type~holder_hcfs -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node5" class="node">
+<title>type~holder_hcfs</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node5"><a xlink:href="../type/holder_hcfs.html" xlink:title="holder_hcfs">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="541,-360 467,-360 467,-336 541,-336 541,-360"/>
+<text text-anchor="middle" x="504" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_hcfs</text>
+</a>
+</g>
+</g>
+<!-- type~holder_hcfs&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge5" class="edge">
+<title>type~holder_hcfs&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M466.93,-346C446.74,-343.58 421.73,-338.32 402,-327 347.22,-295.55 302.78,-233.46 282.09,-200.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="284.92,-198.89 276.66,-192.25 278.98,-202.59 284.92,-198.89"/>
+<text text-anchor="middle" x="376.5" y="-314.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
+</g>
+<!-- type~type_hcf_base -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node6" class="node">
+<title>type~type_hcf_base</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node6"><a xlink:href="../type/type_hcf_base.html" xlink:title="type_hcf_base">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="548,-318 460,-318 460,-294 548,-294 548,-318"/>
+<text text-anchor="middle" x="504" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge6" class="edge">
+<title>type~type_hcf_base&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M459.78,-307.14C439.76,-305.38 417.12,-299.76 402,-285 367.71,-251.53 425.42,-180 377.5,-180"/>
+</g>
+<!-- type~type_hcf_base_impedance -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node7" class="node">
+<title>type~type_hcf_base_impedance</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node7"><a xlink:href="../type/type_hcf_base_impedance.html" xlink:title="type_hcf_base_impedance">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="581,-276 427,-276 427,-252 581,-252 581,-276"/>
+<text text-anchor="middle" x="504" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_impedance</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_impedance&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge9" class="edge">
+<title>type~type_hcf_base_impedance&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M426.86,-256.9C417.82,-253.63 409.24,-249.13 402,-243 379.07,-223.59 407.54,-180 377.5,-180"/>
+</g>
+<!-- type~type_hcf_base_impedance_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node8" class="node">
+<title>type~type_hcf_base_impedance_viscosity</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node8"><a xlink:href="../type/type_hcf_base_impedance_viscosity.html" xlink:title="type_hcf_base_impedance_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="606,-234 402,-234 402,-210 606,-210 606,-234"/>
+<text text-anchor="middle" x="504" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_impedance_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_impedance_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge7" class="edge">
+<title>type~type_hcf_base_impedance_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M425.01,-209.96C417.04,-207.51 409.23,-204.55 402,-201 389.13,-194.67 391.84,-180 377.5,-180"/>
+</g>
+<!-- type~type_hcf_base_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node9" class="node">
+<title>type~type_hcf_base_viscosity</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node9"><a xlink:href="../type/type_hcf_base_viscosity.html" xlink:title="type_hcf_base_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="573.5,-192 434.5,-192 434.5,-168 573.5,-168 573.5,-192"/>
+<text text-anchor="middle" x="504" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_base_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_base_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge10" class="edge">
+<title>type~type_hcf_base_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M434.28,-180C415.84,-180 395.91,-180 377.5,-180"/>
+</g>
+<!-- type~type_hcf_impedance -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node10" class="node">
+<title>type~type_hcf_impedance</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node10"><a xlink:href="../type/type_hcf_impedance.html" xlink:title="type_hcf_impedance">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="565.5,-150 442.5,-150 442.5,-126 565.5,-126 565.5,-150"/>
+<text text-anchor="middle" x="504" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_impedance&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge12" class="edge">
+<title>type~type_hcf_impedance&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M442.33,-145.46C428.63,-148.54 414.46,-152.88 402,-159 389.13,-165.33 391.84,-180 377.5,-180"/>
+</g>
+<!-- type~type_hcf_impedance_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node11" class="node">
+<title>type~type_hcf_impedance_viscosity</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node11"><a xlink:href="../type/type_hcf_impedance_viscosity.html" xlink:title="type_hcf_impedance_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="590.5,-108 417.5,-108 417.5,-84 590.5,-84 590.5,-108"/>
+<text text-anchor="middle" x="504" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_impedance_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_impedance_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge11" class="edge">
+<title>type~type_hcf_impedance_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M417.36,-107.11C411.84,-109.81 406.65,-113.07 402,-117 379.07,-136.41 407.54,-180 377.5,-180"/>
+</g>
+<!-- type~type_hcf_viscosity -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node12" class="node">
+<title>type~type_hcf_viscosity</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node12"><a xlink:href="../type/type_hcf_viscosity.html" xlink:title="type_hcf_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="558,-66 450,-66 450,-42 558,-42 558,-66"/>
+<text text-anchor="middle" x="504" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~type_hcf_viscosity&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge8" class="edge">
+<title>type~type_hcf_viscosity&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M449.95,-54.03C432.67,-56.67 414.69,-62.62 402,-75 367.71,-108.47 425.42,-180 377.5,-180"/>
+<path fill="none" stroke="#ff0000" d="M375.5,-180C352.93,-180 327.66,-180 307.46,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="307.4,-176.5 297.4,-180 307.4,-183.5 307.4,-176.5"/>
+</g>
+<!-- type~type_material_pointers -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node13" class="node">
+<title>type~type_material_pointers</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node13"><a xlink:href="../type/type_material_pointers.html" xlink:title="type_material_pointers">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="571.5,-24 436.5,-24 436.5,0 571.5,0 571.5,-24"/>
+<text text-anchor="middle" x="504" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_pointers</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_pointers&#45;&gt;type~abst_hcf -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge4" class="edge">
+<title>type~type_material_pointers&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M436.29,-16.28C423.88,-19.61 411.76,-24.85 402,-33 355.62,-71.72 396.45,-119.2 351,-159 339.03,-169.48 322.5,-174.84 307.46,-177.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="306.74,-174.12 297.35,-179.03 307.75,-181.04 306.74,-174.12"/>
+<text text-anchor="middle" x="376.5" y="-136.4" font-family="Helvetica,sans-Serif" font-size="9.50">hcf</text>
+</g>
+<!-- type~type_material_manager -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node14" class="node">
+<title>type~type_material_manager</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node14"><a xlink:href="../type/type_material_manager.html" xlink:title="type_material_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="797,-360 657,-360 657,-336 797,-336 797,-360"/>
+<text text-anchor="middle" x="727" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_material_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_material_manager&#45;&gt;type~holder_hcfs -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge13" class="edge">
+<title>type~type_material_manager&#45;&gt;type~holder_hcfs</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M656.98,-348C622.66,-348 582.08,-348 551.49,-348"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="551.12,-344.5 541.12,-348 551.12,-351.5 551.12,-344.5"/>
+<text text-anchor="middle" x="631.5" y="-350.4" font-family="Helvetica,sans-Serif" font-size="9.50">hcf</text>
+</g>
+<!-- type~type_properties_manager -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node15" class="node">
+<title>type~type_properties_manager</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node15"><a xlink:href="../type/type_properties_manager.html" xlink:title="type_properties_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1028,-360 879,-360 879,-336 1028,-336 1028,-360"/>
+<text text-anchor="middle" x="953.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_properties_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_properties_manager&#45;&gt;type~type_material_manager -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge14" class="edge">
+<title>type~type_properties_manager&#45;&gt;type~type_material_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M878.99,-348C856.04,-348 830.63,-348 807.31,-348"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="807.1,-344.5 797.1,-348 807.1,-351.5 807.1,-344.5"/>
+<text text-anchor="middle" x="838" y="-350.4" font-family="Helvetica,sans-Serif" font-size="9.50">materials</text>
+</g>
+<!-- type~type_ftdss -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_node16" class="node">
+<title>type~type_ftdss</title>
+<g id="a_type~~abst_hcf_viscosity~~InheritedByGraph_node16"><a xlink:href="../type/type_ftdss.html" xlink:title="type_ftdss">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1171,-360 1105,-360 1105,-336 1171,-336 1171,-360"/>
+<text text-anchor="middle" x="1138" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftdss</text>
+</a>
+</g>
+</g>
+<!-- type~type_ftdss&#45;&gt;type~type_properties_manager -->
+<g id="type~~abst_hcf_viscosity~~InheritedByGraph_edge15" class="edge">
+<title>type~type_ftdss&#45;&gt;type~type_properties_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1104.79,-348C1086.17,-348 1061.79,-348 1038.11,-348"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1038.02,-344.5 1028.02,-348 1038.02,-351.5 1038.02,-344.5"/>
+<text text-anchor="middle" x="1066.5" y="-350.4" font-family="Helvetica,sans-Serif" font-size="9.50">property</text>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pantypeabst_hcf_viscosityInheritedByGraph = svgPanZoom('#typeabst_hcf_viscosityInheritedByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <br>
+
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mu_zero"></span>
+              real(kind=real64),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>mu_zero</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+
+
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_viscosity"></span>
+      <h3>
+          procedure(<a href='../interface/abst_calc_viscosity_kr.html'>abst_calc_viscosity_kr</a>), public, deferred, pass(self) ::
+  <strong>calc_viscosity</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    pure elemental function abst_calc_viscosity_kr(self, temperature) result(kr)  
+<small>Prototype</small></h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_hcf_viscosity.html'>abst_hcf_viscosity</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>temperature</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
+
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_hcf_viscosity</span>
+<span class="w">        </span><span class="k">private</span>
+<span class="k">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mu_zero</span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">(</span><span class="n">abst_calc_viscosity_kr</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_viscosity</span>
+<span class="w">    </span><span class="k">end type </span><span class="n">abst_hcf_viscosity</span>
+</pre></div>
+
+    </section>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

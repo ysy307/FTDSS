@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.5% of total for derived types.</p>Including implementation: 4 statements,  0.1% of total for derived types.">7 statements</a>
+                 title="<p> 0.6% of total for derived types.</p>Including implementation: 4 statements,  0.1% of total for derived types.">7 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,11 +134,11 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material1~2">material1</a>
-            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material2~2">material2</a>
-            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material3~2">material3</a>
-            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material4~2">material4</a>
-            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material_id~2">material_id</a>
+            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material1~3">material1</a>
+            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material2~3">material2</a>
+            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material3~3">material3</a>
+            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material4~3">material4</a>
+            <a class="list-group-item" href="../type/type_sph_3phase.html#variable-material_id~29">material_id</a>
         </div>
       </div>
     </div>
@@ -176,7 +176,7 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_sph_3phase.html#boundprocedure-calc_gauss_point~2">calc_gauss_point</a>
+            <a class="list-group-item" href="../type/type_sph_3phase.html#boundprocedure-calc~11">calc</a>
         </div>
       </div>
     </div>
@@ -305,7 +305,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-material1~2"></span>
+              <span class="anchor" id="variable-material1~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -322,7 +322,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material2~2"></span>
+              <span class="anchor" id="variable-material2~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -339,7 +339,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material3~2"></span>
+              <span class="anchor" id="variable-material3~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -356,7 +356,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material4~2"></span>
+              <span class="anchor" id="variable-material4~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -373,7 +373,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~2"></span>
+              <span class="anchor" id="variable-material_id~29"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -427,10 +427,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_gauss_point~2"></span>
+      <span class="anchor" id="boundprocedure-calc~11"></span>
       <h3>
           procedure, public ::
-  <strong>calc_gauss_point</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_sph_gauss_point_3phase.html'>calc_sph_gauss_point_3phase</a>
+  <strong>calc</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_sph_gauss_point_3phase.html'>calc_sph_gauss_point_3phase</a>
         
       </h3>
     </div>
@@ -438,7 +438,7 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function calc_sph_gauss_point_3phase(self, state) result(SpecificHeat)  
+    private pure elemental module function calc_sph_gauss_point_3phase(self, state) result(specific_heat)  
     <a href="../proc/calc_sph_gauss_point_3phase.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
@@ -473,7 +473,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              type(<a href='type_gauss_point_state.html'>type_gauss_point_state</a>),
+              type(<a href='type_state.html'>type_state</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -505,7 +505,7 @@ large graphs.</div>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_sph</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_sph_3phase</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_gauss_point</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_sph_gauss_point_3phase</span>
+<span class="k">        procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_sph_gauss_point_3phase</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_sph_3phase</span>
 </pre></div>
 
@@ -529,7 +529,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

@@ -1,0 +1,1316 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>create_inverse_permutation &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>create_inverse_permutation
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">19 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/reordering.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/reordering.f90.html'>reordering.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/domain_reordering.html'>domain_reordering</a></li>
+            <li class="breadcrumb-item active" aria-current="page">create_inverse_permutation</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~create_inverse_permutation~~CallsGraph Pages: 1 -->
+<svg id="interfacecreate_inverse_permutationCallsGraph" width="641pt" height="1003pt"
+ viewBox="0.00 0.00 641.00 1002.59" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~create_inverse_permutation~~CallsGraph" class="graph" transform="scale(0.63 0.63) rotate(0) translate(4 1582)">
+<title>interface~~create_inverse_permutation~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1582 1010,-1582 1010,4 -4,4"/>
+<!-- interface~create_inverse_permutation -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node1" class="node">
+<title>interface~create_inverse_permutation</title>
+<polygon fill="none" stroke="black" points="256,-780 0,-780 0,-756 256,-756 256,-780"/>
+<text text-anchor="middle" x="128" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_reordering%create_inverse_permutation</text>
+</g>
+<!-- proc~create_inverse_permutation -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node2" class="node">
+<title>proc~create_inverse_permutation</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node2"><a xlink:href="../proc/create_inverse_permutation.html" xlink:title="create_inverse_permutation">
+<polygon fill="#d9534f" stroke="#d9534f" points="454,-780 292,-780 292,-756 454,-756 454,-780"/>
+<text text-anchor="middle" x="373" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_inverse_permutation</text>
+</a>
+</g>
+</g>
+<!-- interface~create_inverse_permutation&#45;&gt;proc~create_inverse_permutation -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge1" class="edge">
+<title>interface~create_inverse_permutation&#45;&gt;proc~create_inverse_permutation</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M256.19,-768C264.85,-768 273.46,-768 281.86,-768"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="281.99,-771.5 291.99,-768 281.99,-764.5 281.99,-771.5"/>
+</g>
+<!-- interface~allocate_array -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node3" class="node">
+<title>interface~allocate_array</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node3"><a xlink:href="../interface/allocate_array.html" xlink:title="allocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="586,-1158 497,-1158 497,-1134 586,-1134 586,-1158"/>
+<text text-anchor="middle" x="541.5" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~create_inverse_permutation&#45;&gt;interface~allocate_array -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge2" class="edge">
+<title>proc~create_inverse_permutation&#45;&gt;interface~allocate_array</title>
+<path fill="none" stroke="#ff0000" d="M379.35,-780.15C403.22,-834.35 500.19,-1054.48 531.03,-1124.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="527.85,-1125.97 535.09,-1133.71 534.26,-1123.14 527.85,-1125.97"/>
+</g>
+<!-- interface~deallocate_array -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node4" class="node">
+<title>interface~deallocate_array</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node4"><a xlink:href="../interface/deallocate_array.html" xlink:title="deallocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="593,-402 490,-402 490,-378 593,-378 593,-402"/>
+<text text-anchor="middle" x="541.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~create_inverse_permutation&#45;&gt;interface~deallocate_array -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge3" class="edge">
+<title>proc~create_inverse_permutation&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M379.35,-755.85C403.22,-701.65 500.19,-481.52 531.03,-411.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="534.26,-412.86 535.09,-402.29 527.85,-410.03 534.26,-412.86"/>
+</g>
+<!-- proc~allocate_rank1_int16 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node5" class="node">
+<title>proc~allocate_rank1_int16</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node5"><a xlink:href="../proc/allocate_rank1_int16.html" xlink:title="allocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-1578 643,-1578 643,-1554 767,-1554 767,-1578"/>
+<text text-anchor="middle" x="705" y="-1563.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int16 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge4" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M543.49,-1158.35C548.6,-1219.19 573.95,-1486.58 629,-1545 630.62,-1546.72 632.37,-1548.3 634.22,-1549.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="632.62,-1552.89 642.92,-1555.37 636.41,-1547.01 632.62,-1552.89"/>
+</g>
+<!-- proc~allocate_rank1_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node6" class="node">
+<title>proc~allocate_rank1_int32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node6"><a xlink:href="../proc/allocate_rank1_int32.html" xlink:title="allocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-1536 643,-1536 643,-1512 767,-1512 767,-1536"/>
+<text text-anchor="middle" x="705" y="-1521.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge5" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M543.81,-1158.17C550.11,-1214.72 579.17,-1451.38 629,-1503 630.6,-1504.66 632.32,-1506.19 634.14,-1507.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="632.36,-1510.62 642.66,-1513.08 636.14,-1504.73 632.36,-1510.62"/>
+</g>
+<!-- proc~allocate_rank1_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node7" class="node">
+<title>proc~allocate_rank1_int64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node7"><a xlink:href="../proc/allocate_rank1_int64.html" xlink:title="allocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-1494 643,-1494 643,-1470 767,-1470 767,-1494"/>
+<text text-anchor="middle" x="705" y="-1479.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge6" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M541.92,-1158C540.37,-1204.26 541.2,-1372.76 629,-1461 630.63,-1462.64 632.37,-1464.15 634.21,-1465.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="632.46,-1468.58 642.79,-1470.95 636.2,-1462.66 632.46,-1468.58"/>
+</g>
+<!-- proc~allocate_rank1_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node8" class="node">
+<title>proc~allocate_rank1_int8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node8"><a xlink:href="../proc/allocate_rank1_int8.html" xlink:title="allocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="763.5,-1452 646.5,-1452 646.5,-1428 763.5,-1428 763.5,-1452"/>
+<text text-anchor="middle" x="705" y="-1437.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge7" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M542.52,-1158.15C543.25,-1200.66 551.61,-1344.19 629,-1419 631.56,-1421.47 634.38,-1423.66 637.39,-1425.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.82,-1428.72 646.28,-1430.39 639.14,-1422.56 635.82,-1428.72"/>
+</g>
+<!-- proc~allocate_rank1_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node9" class="node">
+<title>proc~allocate_rank1_logical1</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node9"><a xlink:href="../proc/allocate_rank1_logical1.html" xlink:title="allocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-1410 635.5,-1410 635.5,-1386 774.5,-1386 774.5,-1410"/>
+<text text-anchor="middle" x="705" y="-1395.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge8" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M543.31,-1158.14C546.55,-1196.36 561.81,-1315.31 629,-1377 630.3,-1378.19 631.66,-1379.32 633.08,-1380.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="631.37,-1383.45 641.7,-1385.81 635.1,-1377.52 631.37,-1383.45"/>
+</g>
+<!-- proc~allocate_rank1_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node10" class="node">
+<title>proc~allocate_rank1_logical4</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node10"><a xlink:href="../proc/allocate_rank1_logical4.html" xlink:title="allocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-1368 635.5,-1368 635.5,-1344 774.5,-1344 774.5,-1368"/>
+<text text-anchor="middle" x="705" y="-1353.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge9" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M544.47,-1158.3C550.5,-1191.94 571.95,-1286.23 629,-1335 630.54,-1336.32 632.16,-1337.55 633.84,-1338.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="632.3,-1341.87 642.7,-1343.88 635.83,-1335.82 632.3,-1341.87"/>
+</g>
+<!-- proc~allocate_rank1_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node11" class="node">
+<title>proc~allocate_rank1_logical8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node11"><a xlink:href="../proc/allocate_rank1_logical8.html" xlink:title="allocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-1326 635.5,-1326 635.5,-1302 774.5,-1302 774.5,-1326"/>
+<text text-anchor="middle" x="705" y="-1311.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge10" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M546.23,-1158.41C555.41,-1186.78 581.83,-1256.7 629,-1293 630.87,-1294.44 632.84,-1295.78 634.88,-1297.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="633.73,-1300.38 644.21,-1301.94 636.99,-1294.19 633.73,-1300.38"/>
+</g>
+<!-- proc~allocate_rank1_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node12" class="node">
+<title>proc~allocate_rank1_real128</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node12"><a xlink:href="../proc/allocate_rank1_real128.html" xlink:title="allocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="773.5,-1284 636.5,-1284 636.5,-1260 773.5,-1260 773.5,-1284"/>
+<text text-anchor="middle" x="705" y="-1269.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge11" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M549.09,-1158.11C561.65,-1180.05 591.2,-1226.38 629,-1251 631.72,-1252.77 634.59,-1254.39 637.55,-1255.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="636.13,-1259.08 646.69,-1259.95 638.98,-1252.69 636.13,-1259.08"/>
+</g>
+<!-- proc~allocate_rank1_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node13" class="node">
+<title>proc~allocate_rank1_real32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node13"><a xlink:href="../proc/allocate_rank1_real32.html" xlink:title="allocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="770,-1242 640,-1242 640,-1218 770,-1218 770,-1242"/>
+<text text-anchor="middle" x="705" y="-1227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge12" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M555.89,-1158.14C572.1,-1172.24 600.75,-1195.31 629,-1209 633.08,-1210.98 637.38,-1212.8 641.77,-1214.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="640.88,-1217.86 651.47,-1217.88 643.2,-1211.26 640.88,-1217.86"/>
+</g>
+<!-- proc~allocate_rank1_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node14" class="node">
+<title>proc~allocate_rank1_real64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node14"><a xlink:href="../proc/allocate_rank1_real64.html" xlink:title="allocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="770,-1200 640,-1200 640,-1176 770,-1176 770,-1200"/>
+<text text-anchor="middle" x="705" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank1_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge13" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank1_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M586.2,-1157.37C605.23,-1162.31 627.76,-1168.17 647.99,-1173.44"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="647.16,-1176.83 657.72,-1175.96 648.92,-1170.06 647.16,-1176.83"/>
+</g>
+<!-- proc~allocate_rank2_int16 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node15" class="node">
+<title>proc~allocate_rank2_int16</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node15"><a xlink:href="../proc/allocate_rank2_int16.html" xlink:title="allocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-1158 643,-1158 643,-1134 767,-1134 767,-1158"/>
+<text text-anchor="middle" x="705" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int16 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge14" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int16</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M586.2,-1146C600.53,-1146 616.85,-1146 632.68,-1146"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="632.98,-1149.5 642.98,-1146 632.98,-1142.5 632.98,-1149.5"/>
+</g>
+<!-- proc~allocate_rank2_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node16" class="node">
+<title>proc~allocate_rank2_int32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node16"><a xlink:href="../proc/allocate_rank2_int32.html" xlink:title="allocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-1116 643,-1116 643,-1092 767,-1092 767,-1116"/>
+<text text-anchor="middle" x="705" y="-1101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge15" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M586.2,-1134.63C605.23,-1129.69 627.76,-1123.83 647.99,-1118.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="648.92,-1121.94 657.72,-1116.04 647.16,-1115.17 648.92,-1121.94"/>
+</g>
+<!-- proc~allocate_rank2_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node17" class="node">
+<title>proc~allocate_rank2_int64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node17"><a xlink:href="../proc/allocate_rank2_int64.html" xlink:title="allocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="767,-1074 643,-1074 643,-1050 767,-1050 767,-1074"/>
+<text text-anchor="middle" x="705" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge16" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M555.89,-1133.86C572.1,-1119.76 600.75,-1096.69 629,-1083 633.08,-1081.02 637.38,-1079.2 641.77,-1077.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="643.2,-1080.74 651.47,-1074.12 640.88,-1074.14 643.2,-1080.74"/>
+</g>
+<!-- proc~allocate_rank2_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node18" class="node">
+<title>proc~allocate_rank2_int8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node18"><a xlink:href="../proc/allocate_rank2_int8.html" xlink:title="allocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="763.5,-1032 646.5,-1032 646.5,-1008 763.5,-1008 763.5,-1032"/>
+<text text-anchor="middle" x="705" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge17" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_int8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M549.09,-1133.89C561.65,-1111.95 591.2,-1065.62 629,-1041 631.72,-1039.23 634.59,-1037.61 637.55,-1036.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="638.98,-1039.31 646.69,-1032.05 636.13,-1032.92 638.98,-1039.31"/>
+</g>
+<!-- proc~allocate_rank2_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node19" class="node">
+<title>proc~allocate_rank2_logical1</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node19"><a xlink:href="../proc/allocate_rank2_logical1.html" xlink:title="allocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-990 635.5,-990 635.5,-966 774.5,-966 774.5,-990"/>
+<text text-anchor="middle" x="705" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge18" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical1</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M546.23,-1133.59C555.41,-1105.22 581.83,-1035.3 629,-999 630.87,-997.56 632.84,-996.22 634.88,-994.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="636.99,-997.81 644.21,-990.06 633.73,-991.62 636.99,-997.81"/>
+</g>
+<!-- proc~allocate_rank2_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node20" class="node">
+<title>proc~allocate_rank2_logical4</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node20"><a xlink:href="../proc/allocate_rank2_logical4.html" xlink:title="allocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-948 635.5,-948 635.5,-924 774.5,-924 774.5,-948"/>
+<text text-anchor="middle" x="705" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge19" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical4</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M544.47,-1133.7C550.5,-1100.06 571.95,-1005.77 629,-957 630.54,-955.68 632.16,-954.45 633.84,-953.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.83,-956.18 642.7,-948.12 632.3,-950.13 635.83,-956.18"/>
+</g>
+<!-- proc~allocate_rank2_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node21" class="node">
+<title>proc~allocate_rank2_logical8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node21"><a xlink:href="../proc/allocate_rank2_logical8.html" xlink:title="allocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-906 635.5,-906 635.5,-882 774.5,-882 774.5,-906"/>
+<text text-anchor="middle" x="705" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge20" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_logical8</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M543.31,-1133.86C546.55,-1095.64 561.81,-976.69 629,-915 630.3,-913.81 631.66,-912.68 633.08,-911.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.1,-914.48 641.7,-906.19 631.37,-908.55 635.1,-914.48"/>
+</g>
+<!-- proc~allocate_rank2_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node22" class="node">
+<title>proc~allocate_rank2_real128</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node22"><a xlink:href="../proc/allocate_rank2_real128.html" xlink:title="allocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="773.5,-864 636.5,-864 636.5,-840 773.5,-840 773.5,-864"/>
+<text text-anchor="middle" x="705" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge21" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real128</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M542.52,-1133.85C543.25,-1091.34 551.61,-947.81 629,-873 630.12,-871.91 631.3,-870.88 632.52,-869.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="634.75,-872.62 641.14,-864.18 630.88,-866.79 634.75,-872.62"/>
+</g>
+<!-- proc~allocate_rank2_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node23" class="node">
+<title>proc~allocate_rank2_real32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node23"><a xlink:href="../proc/allocate_rank2_real32.html" xlink:title="allocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="770,-822 640,-822 640,-798 770,-798 770,-822"/>
+<text text-anchor="middle" x="705" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge22" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M541.92,-1134C540.37,-1087.74 541.2,-919.24 629,-831 630.1,-829.89 631.26,-828.84 632.46,-827.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="634.7,-830.55 640.99,-822.02 630.76,-824.77 634.7,-830.55"/>
+</g>
+<!-- proc~allocate_rank2_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node24" class="node">
+<title>proc~allocate_rank2_real64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node24"><a xlink:href="../proc/allocate_rank2_real64.html" xlink:title="allocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="770,-780 640,-780 640,-756 770,-756 770,-780"/>
+<text text-anchor="middle" x="705" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~allocate_array&#45;&gt;proc~allocate_rank2_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge23" class="edge">
+<title>interface~allocate_array&#45;&gt;proc~allocate_rank2_real64</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M543.81,-1133.83C550.11,-1077.28 579.17,-840.62 629,-789 630.06,-787.91 631.16,-786.87 632.32,-785.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="634.36,-788.73 640.52,-780.11 630.33,-783 634.36,-788.73"/>
+</g>
+<!-- proc~deallocate_rank1_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node25" class="node">
+<title>proc~deallocate_rank1_int32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node25"><a xlink:href="../proc/deallocate_rank1_int32.html" xlink:title="deallocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="773.5,-738 636.5,-738 636.5,-714 773.5,-714 773.5,-738"/>
+<text text-anchor="middle" x="705" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge24" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M541.92,-402C540.37,-448.26 541.2,-616.76 629,-705 630.1,-706.11 631.26,-707.16 632.46,-708.16"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="630.76,-711.23 640.99,-713.98 634.7,-705.45 630.76,-711.23"/>
+</g>
+<!-- proc~deallocate_rank1_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node26" class="node">
+<title>proc~deallocate_rank1_int64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node26"><a xlink:href="../proc/deallocate_rank1_int64.html" xlink:title="deallocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="773.5,-696 636.5,-696 636.5,-672 773.5,-672 773.5,-696"/>
+<text text-anchor="middle" x="705" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge25" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M542.52,-402.15C543.25,-444.66 551.61,-588.19 629,-663 630.12,-664.09 631.3,-665.12 632.52,-666.1"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="630.88,-669.21 641.14,-671.82 634.75,-663.38 630.88,-669.21"/>
+</g>
+<!-- proc~deallocate_rank1_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node27" class="node">
+<title>proc~deallocate_rank1_int8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node27"><a xlink:href="../proc/deallocate_rank1_int8.html" xlink:title="deallocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="770,-654 640,-654 640,-630 770,-630 770,-654"/>
+<text text-anchor="middle" x="705" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge26" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M543.31,-402.14C546.55,-440.36 561.81,-559.31 629,-621 630.3,-622.19 631.66,-623.32 633.08,-624.39"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="631.37,-627.45 641.7,-629.81 635.1,-621.52 631.37,-627.45"/>
+</g>
+<!-- proc~deallocate_rank1_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node28" class="node">
+<title>proc~deallocate_rank1_logical1</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node28"><a xlink:href="../proc/deallocate_rank1_logical1.html" xlink:title="deallocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="781,-612 629,-612 629,-588 781,-588 781,-612"/>
+<text text-anchor="middle" x="705" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge27" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M544.47,-402.3C550.5,-435.94 571.95,-530.23 629,-579 630.54,-580.32 632.16,-581.55 633.84,-582.71"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="632.3,-585.87 642.7,-587.88 635.83,-579.82 632.3,-585.87"/>
+</g>
+<!-- proc~deallocate_rank1_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node29" class="node">
+<title>proc~deallocate_rank1_logical4</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node29"><a xlink:href="../proc/deallocate_rank1_logical4.html" xlink:title="deallocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="781,-570 629,-570 629,-546 781,-546 781,-570"/>
+<text text-anchor="middle" x="705" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge28" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M546.23,-402.41C555.41,-430.78 581.83,-500.7 629,-537 630.87,-538.44 632.84,-539.78 634.88,-541.03"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="633.73,-544.38 644.21,-545.94 636.99,-538.19 633.73,-544.38"/>
+</g>
+<!-- proc~deallocate_rank1_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node30" class="node">
+<title>proc~deallocate_rank1_logical8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node30"><a xlink:href="../proc/deallocate_rank1_logical8.html" xlink:title="deallocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="781,-528 629,-528 629,-504 781,-504 781,-528"/>
+<text text-anchor="middle" x="705" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge29" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M549.09,-402.11C561.65,-424.05 591.2,-470.38 629,-495 631.72,-496.77 634.59,-498.39 637.55,-499.88"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="636.13,-503.08 646.69,-503.95 638.98,-496.69 636.13,-503.08"/>
+</g>
+<!-- proc~deallocate_rank1_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node31" class="node">
+<title>proc~deallocate_rank1_real128</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node31"><a xlink:href="../proc/deallocate_rank1_real128.html" xlink:title="deallocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="780.5,-486 629.5,-486 629.5,-462 780.5,-462 780.5,-486"/>
+<text text-anchor="middle" x="705" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge30" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M555.89,-402.14C572.1,-416.24 600.75,-439.31 629,-453 633.08,-454.98 637.38,-456.8 641.77,-458.47"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="640.88,-461.86 651.47,-461.88 643.2,-455.26 640.88,-461.86"/>
+</g>
+<!-- proc~deallocate_rank1_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node32" class="node">
+<title>proc~deallocate_rank1_real32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node32"><a xlink:href="../proc/deallocate_rank1_real32.html" xlink:title="deallocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="777,-444 633,-444 633,-420 777,-420 777,-444"/>
+<text text-anchor="middle" x="705" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge31" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M588.78,-402.04C607.19,-406.82 628.55,-412.38 647.84,-417.4"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="647.15,-420.83 657.71,-419.96 648.92,-414.06 647.15,-420.83"/>
+</g>
+<!-- proc~deallocate_rank1_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node33" class="node">
+<title>proc~deallocate_rank1_real64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node33"><a xlink:href="../proc/deallocate_rank1_real64.html" xlink:title="deallocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="777,-402 633,-402 633,-378 777,-378 777,-402"/>
+<text text-anchor="middle" x="705" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge32" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M593.16,-390C602.59,-390 612.67,-390 622.75,-390"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="622.82,-393.5 632.82,-390 622.82,-386.5 622.82,-393.5"/>
+</g>
+<!-- proc~deallocate_rank2_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node34" class="node">
+<title>proc~deallocate_rank2_int32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node34"><a xlink:href="../proc/deallocate_rank2_int32.html" xlink:title="deallocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="773.5,-360 636.5,-360 636.5,-336 773.5,-336 773.5,-360"/>
+<text text-anchor="middle" x="705" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge33" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M588.78,-377.96C607.19,-373.18 628.55,-367.62 647.84,-362.6"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="648.92,-365.94 657.71,-360.04 647.15,-359.17 648.92,-365.94"/>
+</g>
+<!-- proc~deallocate_rank2_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node35" class="node">
+<title>proc~deallocate_rank2_int64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node35"><a xlink:href="../proc/deallocate_rank2_int64.html" xlink:title="deallocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="773.5,-318 636.5,-318 636.5,-294 773.5,-294 773.5,-318"/>
+<text text-anchor="middle" x="705" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge34" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M555.89,-377.86C572.1,-363.76 600.75,-340.69 629,-327 633.08,-325.02 637.38,-323.2 641.77,-321.53"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="643.2,-324.74 651.47,-318.12 640.88,-318.14 643.2,-324.74"/>
+</g>
+<!-- proc~deallocate_rank2_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node36" class="node">
+<title>proc~deallocate_rank2_int8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node36"><a xlink:href="../proc/deallocate_rank2_int8.html" xlink:title="deallocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="770,-276 640,-276 640,-252 770,-252 770,-276"/>
+<text text-anchor="middle" x="705" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge35" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M549.09,-377.89C561.65,-355.95 591.2,-309.62 629,-285 631.72,-283.23 634.59,-281.61 637.55,-280.12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="638.98,-283.31 646.69,-276.05 636.13,-276.92 638.98,-283.31"/>
+</g>
+<!-- proc~deallocate_rank2_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node37" class="node">
+<title>proc~deallocate_rank2_logical1</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node37"><a xlink:href="../proc/deallocate_rank2_logical1.html" xlink:title="deallocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="781,-234 629,-234 629,-210 781,-210 781,-234"/>
+<text text-anchor="middle" x="705" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge36" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M546.23,-377.59C555.41,-349.22 581.83,-279.3 629,-243 630.87,-241.56 632.84,-240.22 634.88,-238.97"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="636.99,-241.81 644.21,-234.06 633.73,-235.62 636.99,-241.81"/>
+</g>
+<!-- proc~deallocate_rank2_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node38" class="node">
+<title>proc~deallocate_rank2_logical4</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node38"><a xlink:href="../proc/deallocate_rank2_logical4.html" xlink:title="deallocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="781,-192 629,-192 629,-168 781,-168 781,-192"/>
+<text text-anchor="middle" x="705" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge37" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M544.47,-377.7C550.5,-344.06 571.95,-249.77 629,-201 630.54,-199.68 632.16,-198.45 633.84,-197.29"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="635.83,-200.18 642.7,-192.12 632.3,-194.13 635.83,-200.18"/>
+</g>
+<!-- proc~deallocate_rank2_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node39" class="node">
+<title>proc~deallocate_rank2_logical8</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node39"><a xlink:href="../proc/deallocate_rank2_logical8.html" xlink:title="deallocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="781,-150 629,-150 629,-126 781,-126 781,-150"/>
+<text text-anchor="middle" x="705" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge38" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M543.31,-377.86C546.55,-339.64 561.81,-220.69 629,-159 630.3,-157.81 631.66,-156.68 633.08,-155.61"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="635.1,-158.48 641.7,-150.19 631.37,-152.55 635.1,-158.48"/>
+</g>
+<!-- proc~deallocate_rank2_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node40" class="node">
+<title>proc~deallocate_rank2_real128</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node40"><a xlink:href="../proc/deallocate_rank2_real128.html" xlink:title="deallocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="780.5,-108 629.5,-108 629.5,-84 780.5,-84 780.5,-108"/>
+<text text-anchor="middle" x="705" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge39" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M542.52,-377.85C543.25,-335.34 551.61,-191.81 629,-117 630.12,-115.91 631.3,-114.88 632.52,-113.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="634.75,-116.62 641.14,-108.18 630.88,-110.79 634.75,-116.62"/>
+</g>
+<!-- proc~deallocate_rank2_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node41" class="node">
+<title>proc~deallocate_rank2_real32</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node41"><a xlink:href="../proc/deallocate_rank2_real32.html" xlink:title="deallocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="777,-66 633,-66 633,-42 777,-42 777,-66"/>
+<text text-anchor="middle" x="705" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge40" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M541.92,-378C540.37,-331.74 541.2,-163.24 629,-75 630.1,-73.89 631.26,-72.84 632.46,-71.84"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="634.7,-74.55 640.99,-66.02 630.76,-68.77 634.7,-74.55"/>
+</g>
+<!-- proc~deallocate_rank2_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node42" class="node">
+<title>proc~deallocate_rank2_real64</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node42"><a xlink:href="../proc/deallocate_rank2_real64.html" xlink:title="deallocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="777,-24 633,-24 633,0 777,0 777,-24"/>
+<text text-anchor="middle" x="705" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64 -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge41" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M543.81,-377.83C550.11,-321.28 579.17,-84.62 629,-33 630.06,-31.91 631.16,-30.87 632.32,-29.88"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="634.36,-32.73 640.52,-24.11 630.33,-27 634.36,-32.73"/>
+</g>
+<!-- proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node43" class="node">
+<title>proc~error_message</title>
+<g id="a_interface~~create_inverse_permutation~~CallsGraph_node43"><a xlink:href="../proc/error_message.html" xlink:title="error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="909,-801 817,-801 817,-777 909,-777 909,-801"/>
+<text text-anchor="middle" x="863" y="-786.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~allocate_rank1_int16&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge42" class="edge">
+<title>proc~allocate_rank1_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0000" d="M767.21,-1555.99C772.42,-1553.14 777.16,-1549.54 781,-1545 829.73,-1487.41 856.03,-929.72 861.09,-811.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="864.59,-811.17 861.52,-801.03 857.6,-810.88 864.59,-811.17"/>
+</g>
+<!-- proc~allocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge43" class="edge">
+<title>proc~allocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff2800" d="M767.18,-1513.97C772.4,-1511.12 777.14,-1507.53 781,-1503 827.03,-1448.94 855.25,-926.32 860.93,-811.31"/>
+<polygon fill="#ff2800" stroke="#ff2800" points="864.44,-811.37 861.43,-801.21 857.44,-811.03 864.44,-811.37"/>
+</g>
+<!-- proc~allocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge44" class="edge">
+<title>proc~allocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff5000" d="M767.15,-1471.94C772.37,-1469.1 777.13,-1465.52 781,-1461 824.4,-1410.39 854.51,-921.35 860.78,-811.03"/>
+<polygon fill="#ff5000" stroke="#ff5000" points="864.28,-811.22 861.35,-801.04 857.29,-810.83 864.28,-811.22"/>
+</g>
+<!-- proc~allocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge45" class="edge">
+<title>proc~allocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff7800" d="M763.85,-1431.55C770.35,-1428.5 776.31,-1424.42 781,-1419 861.81,-1325.52 863.21,-912.88 862.3,-811.54"/>
+<polygon fill="#ff7800" stroke="#ff7800" points="865.8,-811.2 862.19,-801.24 858.8,-811.28 865.8,-811.2"/>
+</g>
+<!-- proc~allocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge46" class="edge">
+<title>proc~allocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffa100" d="M770.56,-1385.83C774.44,-1383.38 777.98,-1380.46 781,-1377 856.59,-1290.35 861.94,-907.94 862.07,-811.26"/>
+<polygon fill="#ffa100" stroke="#ffa100" points="865.57,-811.16 862.07,-801.16 858.57,-811.16 865.57,-811.16"/>
+</g>
+<!-- proc~allocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge47" class="edge">
+<title>proc~allocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ffc900" d="M770.52,-1343.79C774.4,-1341.35 777.96,-1338.45 781,-1335 851.26,-1255.3 860.58,-903.99 861.81,-811.42"/>
+<polygon fill="#ffc900" stroke="#ffc900" points="865.31,-811.27 861.93,-801.23 858.31,-811.19 865.31,-811.27"/>
+</g>
+<!-- proc~allocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge48" class="edge">
+<title>proc~allocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#fff100" d="M770.13,-1301.96C774.16,-1299.49 777.85,-1296.53 781,-1293 846.01,-1220.15 859.12,-899.33 861.51,-811.37"/>
+<polygon fill="#fff100" stroke="#fff100" points="865.01,-811.27 861.76,-801.19 858.01,-811.1 865.01,-811.27"/>
+</g>
+<!-- proc~allocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge49" class="edge">
+<title>proc~allocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#e4ff00" d="M770.08,-1259.91C774.11,-1257.45 777.82,-1254.51 781,-1251 840.82,-1184.91 857.57,-893.96 861.16,-811.09"/>
+<polygon fill="#e4ff00" stroke="#e4ff00" points="864.66,-811.16 861.58,-801.03 857.67,-810.87 864.66,-811.16"/>
+</g>
+<!-- proc~allocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge50" class="edge">
+<title>proc~allocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#bbff00" d="M770.01,-1217.85C774.06,-1215.4 777.79,-1212.48 781,-1209 835.53,-1149.77 855.8,-889.55 860.72,-811.32"/>
+<polygon fill="#bbff00" stroke="#bbff00" points="864.23,-811.34 861.34,-801.15 857.24,-810.92 864.23,-811.34"/>
+</g>
+<!-- proc~allocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge51" class="edge">
+<title>proc~allocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#93ff00" d="M769.58,-1175.99C773.79,-1173.51 777.67,-1170.55 781,-1167 830.3,-1114.55 853.86,-884.57 860.19,-811.42"/>
+<polygon fill="#93ff00" stroke="#93ff00" points="863.71,-811.34 861.06,-801.08 856.74,-810.75 863.71,-811.34"/>
+</g>
+<!-- proc~allocate_rank2_int16&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge52" class="edge">
+<title>proc~allocate_rank2_int16&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#6bff00" d="M767.34,-1135.08C772.39,-1132.4 777.06,-1129.09 781,-1125 825.19,-1079.17 851.77,-878.48 859.58,-811.13"/>
+<polygon fill="#6bff00" stroke="#6bff00" points="863.06,-811.5 860.71,-801.17 856.1,-810.71 863.06,-811.5"/>
+</g>
+<!-- proc~allocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge53" class="edge">
+<title>proc~allocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#43ff00" d="M767.21,-1092.95C772.28,-1090.29 776.99,-1087.02 781,-1083 857.03,-1006.65 863.37,-865.88 862.77,-811.37"/>
+<polygon fill="#43ff00" stroke="#43ff00" points="866.26,-811.03 862.56,-801.1 859.26,-811.17 866.26,-811.03"/>
+</g>
+<!-- proc~allocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge54" class="edge">
+<title>proc~allocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1aff00" d="M767.03,-1050.77C772.14,-1048.15 776.91,-1044.94 781,-1041 847.03,-977.43 859.34,-859.94 861.56,-811.14"/>
+<polygon fill="#1aff00" stroke="#1aff00" points="865.06,-811.16 861.91,-801.05 858.06,-810.92 865.06,-811.16"/>
+</g>
+<!-- proc~allocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge55" class="edge">
+<title>proc~allocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff0d" d="M763.82,-1009.92C770.09,-1007.12 776,-1003.55 781,-999 837,-948.09 854.63,-854 859.89,-811.22"/>
+<polygon fill="#00ff0d" stroke="#00ff0d" points="863.4,-811.37 861.03,-801.04 856.44,-810.59 863.4,-811.37"/>
+</g>
+<!-- proc~allocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge56" class="edge">
+<title>proc~allocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff35" d="M766.85,-965.98C771.94,-963.52 776.75,-960.56 781,-957 827.12,-918.37 848.96,-847.33 857.47,-811.27"/>
+<polygon fill="#00ff35" stroke="#00ff35" points="860.94,-811.79 859.7,-801.27 854.11,-810.27 860.94,-811.79"/>
+</g>
+<!-- proc~allocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge57" class="edge">
+<title>proc~allocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff5d" d="M765.27,-923.92C770.86,-921.48 776.21,-918.54 781,-915 817.7,-887.89 842.14,-838.76 853.89,-810.52"/>
+<polygon fill="#00ff5d" stroke="#00ff5d" points="857.18,-811.73 857.64,-801.14 850.68,-809.13 857.18,-811.73"/>
+</g>
+<!-- proc~allocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge58" class="edge">
+<title>proc~allocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ff86" d="M761.87,-881.97C768.54,-879.5 775.08,-876.54 781,-873 808.45,-856.61 832.84,-828.5 847.51,-809.35"/>
+<polygon fill="#00ff86" stroke="#00ff86" points="850.37,-811.37 853.54,-801.26 844.76,-807.19 850.37,-811.37"/>
+</g>
+<!-- proc~allocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge59" class="edge">
+<title>proc~allocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffae" d="M754.5,-840C763.42,-837.35 772.57,-834.32 781,-831 798.69,-824.02 817.61,-814.35 832.71,-806.04"/>
+<polygon fill="#00ffae" stroke="#00ffae" points="834.55,-809.02 841.57,-801.09 831.14,-802.91 834.55,-809.02"/>
+</g>
+<!-- proc~allocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge60" class="edge">
+<title>proc~allocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffd6" d="M770.35,-801.34C782.43,-799.71 794.95,-798.03 806.72,-796.44"/>
+<polygon fill="#00ffd6" stroke="#00ffd6" points="807.39,-799.88 816.84,-795.08 806.46,-792.95 807.39,-799.88"/>
+</g>
+<!-- proc~allocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge61" class="edge">
+<title>proc~allocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00ffff" d="M770.35,-776.66C782.43,-778.29 794.95,-779.97 806.72,-781.56"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="806.46,-785.05 816.84,-782.92 807.39,-778.12 806.46,-785.05"/>
+</g>
+<!-- proc~deallocate_rank1_int32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge62" class="edge">
+<title>proc~deallocate_rank1_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00d6ff" d="M754.5,-738C763.42,-740.65 772.57,-743.68 781,-747 798.69,-753.98 817.61,-763.65 832.71,-771.96"/>
+<polygon fill="#00d6ff" stroke="#00d6ff" points="831.14,-775.09 841.57,-776.91 834.55,-768.98 831.14,-775.09"/>
+</g>
+<!-- proc~deallocate_rank1_int64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge63" class="edge">
+<title>proc~deallocate_rank1_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#00aeff" d="M761.87,-696.03C768.54,-698.5 775.08,-701.46 781,-705 808.45,-721.39 832.84,-749.5 847.51,-768.65"/>
+<polygon fill="#00aeff" stroke="#00aeff" points="844.76,-770.81 853.54,-776.74 850.37,-766.63 844.76,-770.81"/>
+</g>
+<!-- proc~deallocate_rank1_int8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge64" class="edge">
+<title>proc~deallocate_rank1_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0086ff" d="M765.27,-654.08C770.86,-656.52 776.21,-659.46 781,-663 817.7,-690.11 842.14,-739.24 853.89,-767.48"/>
+<polygon fill="#0086ff" stroke="#0086ff" points="850.68,-768.87 857.64,-776.86 857.18,-766.27 850.68,-768.87"/>
+</g>
+<!-- proc~deallocate_rank1_logical1&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge65" class="edge">
+<title>proc~deallocate_rank1_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#005dff" d="M766.85,-612.02C771.94,-614.48 776.75,-617.44 781,-621 827.12,-659.63 848.96,-730.67 857.47,-766.73"/>
+<polygon fill="#005dff" stroke="#005dff" points="854.11,-767.73 859.7,-776.73 860.94,-766.21 854.11,-767.73"/>
+</g>
+<!-- proc~deallocate_rank1_logical4&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge66" class="edge">
+<title>proc~deallocate_rank1_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#0035ff" d="M767.9,-570.04C772.64,-572.5 777.1,-575.45 781,-579 837,-629.91 854.63,-724 859.89,-766.78"/>
+<polygon fill="#0035ff" stroke="#0035ff" points="856.44,-767.41 861.03,-776.96 863.4,-766.63 856.44,-767.41"/>
+</g>
+<!-- proc~deallocate_rank1_logical8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge67" class="edge">
+<title>proc~deallocate_rank1_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#000dff" d="M768.84,-528.19C773.27,-530.62 777.4,-533.53 781,-537 847.03,-600.57 859.34,-718.06 861.56,-766.86"/>
+<polygon fill="#000dff" stroke="#000dff" points="858.06,-767.08 861.91,-776.95 865.06,-766.84 858.06,-767.08"/>
+</g>
+<!-- proc~deallocate_rank1_real128&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge68" class="edge">
+<title>proc~deallocate_rank1_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#1a00ff" d="M769,-486.03C773.39,-488.5 777.47,-491.45 781,-495 857.03,-571.35 863.37,-712.12 862.77,-766.63"/>
+<polygon fill="#1a00ff" stroke="#1a00ff" points="859.26,-766.83 862.56,-776.9 866.26,-766.97 859.26,-766.83"/>
+</g>
+<!-- proc~deallocate_rank1_real32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge69" class="edge">
+<title>proc~deallocate_rank1_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#4300ff" d="M769.48,-444.11C773.71,-446.56 777.62,-449.5 781,-453 825.19,-498.83 851.77,-699.52 859.58,-766.87"/>
+<polygon fill="#4300ff" stroke="#4300ff" points="856.1,-767.29 860.71,-776.83 863.06,-766.5 856.1,-767.29"/>
+</g>
+<!-- proc~deallocate_rank1_real64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge70" class="edge">
+<title>proc~deallocate_rank1_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#6b00ff" d="M769.58,-402.01C773.79,-404.49 777.67,-407.45 781,-411 830.3,-463.45 853.86,-693.43 860.19,-766.58"/>
+<polygon fill="#6b00ff" stroke="#6b00ff" points="856.74,-767.25 861.06,-776.92 863.71,-766.66 856.74,-767.25"/>
+</g>
+<!-- proc~deallocate_rank2_int32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge71" class="edge">
+<title>proc~deallocate_rank2_int32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#9300ff" d="M770.01,-360.15C774.06,-362.6 777.79,-365.52 781,-369 835.53,-428.23 855.8,-688.45 860.72,-766.68"/>
+<polygon fill="#9300ff" stroke="#9300ff" points="857.24,-767.08 861.34,-776.85 864.23,-766.66 857.24,-767.08"/>
+</g>
+<!-- proc~deallocate_rank2_int64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge72" class="edge">
+<title>proc~deallocate_rank2_int64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#bb00ff" d="M770.08,-318.09C774.11,-320.55 777.82,-323.49 781,-327 840.82,-393.09 857.57,-684.04 861.16,-766.91"/>
+<polygon fill="#bb00ff" stroke="#bb00ff" points="857.67,-767.13 861.58,-776.97 864.66,-766.84 857.67,-767.13"/>
+</g>
+<!-- proc~deallocate_rank2_int8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge73" class="edge">
+<title>proc~deallocate_rank2_int8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#e400ff" d="M770.13,-276.04C774.16,-278.51 777.85,-281.47 781,-285 846.01,-357.85 859.12,-678.67 861.51,-766.63"/>
+<polygon fill="#e400ff" stroke="#e400ff" points="858.01,-766.9 861.76,-776.81 865.01,-766.73 858.01,-766.9"/>
+</g>
+<!-- proc~deallocate_rank2_logical1&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge74" class="edge">
+<title>proc~deallocate_rank2_logical1&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00f1" d="M770.52,-234.21C774.4,-236.65 777.96,-239.55 781,-243 851.26,-322.7 860.58,-674.01 861.81,-766.58"/>
+<polygon fill="#ff00f1" stroke="#ff00f1" points="858.31,-766.81 861.93,-776.77 865.31,-766.73 858.31,-766.81"/>
+</g>
+<!-- proc~deallocate_rank2_logical4&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge75" class="edge">
+<title>proc~deallocate_rank2_logical4&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00c9" d="M770.56,-192.17C774.44,-194.62 777.98,-197.54 781,-201 856.59,-287.65 861.94,-670.06 862.07,-766.74"/>
+<polygon fill="#ff00c9" stroke="#ff00c9" points="858.57,-766.84 862.07,-776.84 865.57,-766.84 858.57,-766.84"/>
+</g>
+<!-- proc~deallocate_rank2_logical8&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge76" class="edge">
+<title>proc~deallocate_rank2_logical8&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff00a1" d="M770.6,-150.14C774.46,-152.6 777.99,-155.52 781,-159 861.81,-252.48 863.21,-665.12 862.3,-766.46"/>
+<polygon fill="#ff00a1" stroke="#ff00a1" points="858.8,-766.72 862.19,-776.76 865.8,-766.8 858.8,-766.72"/>
+</g>
+<!-- proc~deallocate_rank2_real128&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge77" class="edge">
+<title>proc~deallocate_rank2_real128&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0078" d="M770.63,-108.11C774.49,-110.58 778.01,-113.51 781,-117 824.4,-167.61 854.51,-656.65 860.78,-766.97"/>
+<polygon fill="#ff0078" stroke="#ff0078" points="857.29,-767.17 861.35,-776.96 864.28,-766.78 857.29,-767.17"/>
+</g>
+<!-- proc~deallocate_rank2_real32&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge78" class="edge">
+<title>proc~deallocate_rank2_real32&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0050" d="M770.66,-66.09C774.51,-68.56 778.02,-71.5 781,-75 827.03,-129.06 855.25,-651.68 860.93,-766.69"/>
+<polygon fill="#ff0050" stroke="#ff0050" points="857.44,-766.97 861.43,-776.79 864.44,-766.63 857.44,-766.97"/>
+</g>
+<!-- proc~deallocate_rank2_real64&#45;&gt;proc~error_message -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge79" class="edge">
+<title>proc~deallocate_rank2_real64&#45;&gt;proc~error_message</title>
+<path fill="none" stroke="#ff0028" d="M770.68,-24.07C774.53,-26.54 778.03,-29.49 781,-33 829.73,-90.59 856.03,-648.28 861.09,-766.89"/>
+<polygon fill="#ff0028" stroke="#ff0028" points="857.6,-767.12 861.52,-776.97 864.59,-766.83 857.6,-767.12"/>
+</g>
+<!-- log_error -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_node44" class="node">
+<title>log_error</title>
+<polygon fill="#777777" stroke="#777777" points="1006,-801 945,-801 945,-777 1006,-777 1006,-801"/>
+<text text-anchor="middle" x="975.5" y="-786.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">log_error</text>
+</g>
+<!-- proc~error_message&#45;&gt;log_error -->
+<g id="interface~~create_inverse_permutation~~CallsGraph_edge80" class="edge">
+<title>proc~error_message&#45;&gt;log_error</title>
+<path fill="none" stroke="#ff0000" d="M909.26,-789C917.73,-789 926.52,-789 934.8,-789"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="934.95,-792.5 944.95,-789 934.95,-785.5 934.95,-792.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecreate_inverse_permutationCallsGraph = svgPanZoom('#interfacecreate_inverse_permutationCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~create_inverse_permutation~~CalledByGraph Pages: 1 -->
+<svg id="interfacecreate_inverse_permutationCalledByGraph" width="541pt" height="32pt"
+ viewBox="0.00 0.00 541.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~create_inverse_permutation~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~create_inverse_permutation~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 537,-28 537,4 -4,4"/>
+<!-- interface~create_inverse_permutation -->
+<g id="interface~~create_inverse_permutation~~CalledByGraph_node1" class="node">
+<title>interface~create_inverse_permutation</title>
+<polygon fill="none" stroke="black" points="533,-24 277,-24 277,0 533,0 533,-24"/>
+<text text-anchor="middle" x="405" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_reordering%create_inverse_permutation</text>
+</g>
+<!-- proc~initialize_type_reordering -->
+<g id="interface~~create_inverse_permutation~~CalledByGraph_node2" class="node">
+<title>proc~initialize_type_reordering</title>
+<g id="a_interface~~create_inverse_permutation~~CalledByGraph_node2"><a xlink:href="../proc/initialize_type_reordering.html" xlink:title="type_reordering%initialize_type_reordering">
+<polygon fill="#d9534f" stroke="#d9534f" points="241,-24 0,-24 0,0 241,0 241,-24"/>
+<text text-anchor="middle" x="120.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_reordering%initialize_type_reordering</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_reordering&#45;&gt;interface~create_inverse_permutation -->
+<g id="interface~~create_inverse_permutation~~CalledByGraph_edge1" class="edge">
+<title>proc~initialize_type_reordering&#45;&gt;interface~create_inverse_permutation</title>
+<path fill="none" stroke="#ff0000" d="M241.31,-12C249.64,-12 258.09,-12 266.51,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="266.77,-15.5 276.77,-12 266.77,-8.5 266.77,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private module subroutine create_inverse_permutation(self)  
+    <a href="../proc/create_inverse_permutation.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~83"></span>
+              class(<a href='../type/type_reordering.html'>type_reordering</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

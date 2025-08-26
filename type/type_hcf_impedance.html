@@ -10,7 +10,7 @@
     <meta name="author" content="Kikuchi Shun" >
     <link rel="icon" href="../favicon.png">
 
-    <title>Type_HCF_Impedance &ndash; FTDSS </title>
+    <title>type_hcf_impedance &ndash; FTDSS </title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -81,7 +81,7 @@
 
     <div class="container">
   <div class="row">
-    <h1>Type_HCF_Impedance
+    <h1>type_hcf_impedance
       <small>Derived Type</small>
       
     </h1>
@@ -92,21 +92,21 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.7% of total for derived types.</p>Including implementation: 6 statements,  0.2% of total for derived types.">10 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 4 statements,  0.1% of total for derived types.">4 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/HCF.F90"> Source File</a>
+              <a href="../src/hcf_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/hcf.f90.html'>HCF.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/calculate_hcf.html'>Calculate_HCF</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Type_HCF_Impedance</li>
+                <li class="breadcrumb-item"><a href='../sourcefile/hcf_interface.f90.html'>hcf_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/calculate_hcf.html'>calculate_hcf</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_hcf_impedance</li>
           </ol>
         </nav>
       </div>
@@ -127,34 +127,9 @@
       <div id="sidebar">
       <h3>Contents</h3>
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#vars-0"
-         aria-expanded="false" aria-controls="vars-0">
-         <h4 class="card-header bg-primary text-white">Variables</h4>
-      </a>
-      <div id="vars-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#variable-kflh~20">Kflh</a>
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#variable-ks~20">Ks</a>
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#variable-omega~12">Omega</a>
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#variable-nsize~20">nsize</a>
-        </div>
-      </div>
-    </div>
-
   
-      <div class="card mb-4">
-      <a data-bs-toggle="collapse" href="#cons-0"
-         aria-expanded="false" aria-controls="cons-0">
-         <h4 class="card-header bg-primary text-white">Constructor</h4>
-      </a>
-      <div id="cons-0" class="collapse">
-        <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#interface-type_hcf_impedance">Type_HCF_Impedance</a>
-        </div>
-      </div>
-    </div>
-
+  
+  
   
   
   
@@ -175,9 +150,7 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#boundprocedure-calculate_impedance~17">Calculate_Impedance</a>
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#boundprocedure-calculate_kflh~32">Calculate_Kflh</a>
-            <a class="list-group-item" href="../type/type_hcf_impedance.html#boundprocedure-update_kflh~32">Update_Kflh</a>
+            <a class="list-group-item" href="../type/type_hcf_impedance.html#boundprocedure-calc_kflh~3">calc_kflh</a>
         </div>
       </div>
     </div>
@@ -187,7 +160,7 @@
     <div class="card card-primary">
       <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
       <div class="list-group">
-        <a class="list-group-item" href="../type/type_hcf_impedance.html#src">Type_HCF_Impedance</a>
+        <a class="list-group-item" href="../type/type_hcf_impedance.html#src">type_hcf_impedance</a>
       </div>
     </div>
 
@@ -198,7 +171,7 @@
     
     <div class="col-md-9" id='text'>
       <h2 id="type-def-statement">
-        type, public, extends(<a href='abstract_hcf_impedance.html'>Abstract_HCF_Impedance</a>) :: Type_HCF_Impedance</h2>
+        type, public, extends(<a href='abst_hcf.html'>abst_hcf</a>) :: type_hcf_impedance</h2>
     
 <br>      <div class="card">
         <div class="card-header">
@@ -211,46 +184,79 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_hcf_impedance~~InheritsGraph Pages: 1 -->
-<svg id="typetype_hcf_impedanceInheritsGraph" width="442pt" height="32pt"
- viewBox="0.00 0.00 442.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_hcf_impedance~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg id="typetype_hcf_impedanceInheritsGraph" width="437pt" height="116pt"
+ viewBox="0.00 0.00 437.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_hcf_impedance~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
 <title>type~~type_hcf_impedance~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 438,-28 438,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 433,-112 433,4 -4,4"/>
 <!-- type~type_hcf_impedance -->
 <g id="type~~type_hcf_impedance~~InheritsGraph_node1" class="node">
 <title>type~type_hcf_impedance</title>
-<polygon fill="none" stroke="black" points="434,-24 305,-24 305,0 434,0 434,-24"/>
-<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">Type_HCF_Impedance</text>
+<polygon fill="none" stroke="black" points="429,-66 306,-66 306,-42 429,-42 429,-66"/>
+<text text-anchor="middle" x="367.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_hcf_impedance</text>
 </g>
-<!-- type~abstract_hcf_impedance -->
+<!-- type~abst_hcf -->
 <g id="type~~type_hcf_impedance~~InheritsGraph_node2" class="node">
-<title>type~abstract_hcf_impedance</title>
-<g id="a_type~~type_hcf_impedance~~InheritsGraph_node2"><a xlink:href="../type/abstract_hcf_impedance.html" xlink:title="Abstract_HCF_Impedance">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="269,-24 120,-24 120,0 269,0 269,-24"/>
-<text text-anchor="middle" x="194.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_HCF_Impedance</text>
+<title>type~abst_hcf</title>
+<g id="a_type~~type_hcf_impedance~~InheritsGraph_node2"><a xlink:href="../type/abst_hcf.html" xlink:title="abst_hcf">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="269,-66 212,-66 212,-42 269,-42 269,-66"/>
+<text text-anchor="middle" x="240.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf</text>
 </a>
 </g>
 </g>
-<!-- type~type_hcf_impedance&#45;&gt;type~abstract_hcf_impedance -->
+<!-- type~type_hcf_impedance&#45;&gt;type~abst_hcf -->
 <g id="type~~type_hcf_impedance~~InheritsGraph_edge1" class="edge">
-<title>type~type_hcf_impedance&#45;&gt;type~abstract_hcf_impedance</title>
-<path fill="none" stroke="#ff0000" d="M304.57,-12C296.27,-12 287.67,-12 279.11,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="279.09,-8.5 269.09,-12 279.09,-15.5 279.09,-8.5"/>
+<title>type~type_hcf_impedance&#45;&gt;type~abst_hcf</title>
+<path fill="none" stroke="#ff0000" d="M305.83,-54C296.82,-54 287.76,-54 279.4,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="279.24,-50.5 269.24,-54 279.24,-57.5 279.24,-50.5"/>
 </g>
-<!-- type~abstract_hcf -->
+<!-- type~abst_hcf_base -->
 <g id="type~~type_hcf_impedance~~InheritsGraph_node3" class="node">
-<title>type~abstract_hcf</title>
-<g id="a_type~~type_hcf_impedance~~InheritsGraph_node3"><a xlink:href="../type/abstract_hcf.html" xlink:title="Abstract_HCF">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="84,-24 0,-24 0,0 84,0 84,-24"/>
-<text text-anchor="middle" x="42" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_HCF</text>
+<title>type~abst_hcf_base</title>
+<g id="a_type~~type_hcf_impedance~~InheritsGraph_node3"><a xlink:href="../type/abst_hcf_base.html" xlink:title="abst_hcf_base">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="105,-108 17,-108 17,-84 105,-84 105,-108"/>
+<text text-anchor="middle" x="61" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_base</text>
 </a>
 </g>
 </g>
-<!-- type~abstract_hcf_impedance&#45;&gt;type~abstract_hcf -->
+<!-- type~abst_hcf&#45;&gt;type~abst_hcf_base -->
 <g id="type~~type_hcf_impedance~~InheritsGraph_edge2" class="edge">
-<title>type~abstract_hcf_impedance&#45;&gt;type~abstract_hcf</title>
-<path fill="none" stroke="#ff0000" d="M119.57,-12C111,-12 102.41,-12 94.23,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="94.14,-8.5 84.14,-12 94.14,-15.5 94.14,-8.5"/>
+<title>type~abst_hcf&#45;&gt;type~abst_hcf_base</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M211.7,-62.99C205.88,-64.75 199.76,-66.51 194,-68 168.21,-74.69 139.27,-80.96 115.08,-85.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="114.15,-82.49 105.03,-87.88 115.52,-89.35 114.15,-82.49"/>
+<text text-anchor="middle" x="167" y="-81.4" font-family="Helvetica,sans-Serif" font-size="9.50">base</text>
+</g>
+<!-- type~abst_hcf_impedance -->
+<g id="type~~type_hcf_impedance~~InheritsGraph_node4" class="node">
+<title>type~abst_hcf_impedance</title>
+<g id="a_type~~type_hcf_impedance~~InheritsGraph_node4"><a xlink:href="../type/abst_hcf_impedance.html" xlink:title="abst_hcf_impedance">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="122,-66 0,-66 0,-42 122,-42 122,-66"/>
+<text text-anchor="middle" x="61" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_impedance</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~abst_hcf_impedance -->
+<g id="type~~type_hcf_impedance~~InheritsGraph_edge3" class="edge">
+<title>type~abst_hcf&#45;&gt;type~abst_hcf_impedance</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M211.77,-54C190.49,-54 160.15,-54 132.33,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="132.22,-50.5 122.22,-54 132.22,-57.5 132.22,-50.5"/>
+<text text-anchor="middle" x="167" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">impedance</text>
+</g>
+<!-- type~abst_hcf_viscosity -->
+<g id="type~~type_hcf_impedance~~InheritsGraph_node5" class="node">
+<title>type~abst_hcf_viscosity</title>
+<g id="a_type~~type_hcf_impedance~~InheritsGraph_node5"><a xlink:href="../type/abst_hcf_viscosity.html" xlink:title="abst_hcf_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="114.5,-24 7.5,-24 7.5,0 114.5,0 114.5,-24"/>
+<text text-anchor="middle" x="61" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_viscosity</text>
+</a>
+</g>
+</g>
+<!-- type~abst_hcf&#45;&gt;type~abst_hcf_viscosity -->
+<g id="type~~type_hcf_impedance~~InheritsGraph_edge4" class="edge">
+<title>type~abst_hcf&#45;&gt;type~abst_hcf_viscosity</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M211.7,-45.01C205.88,-43.25 199.76,-41.49 194,-40 171.48,-34.16 146.58,-28.64 124.52,-24.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="125.1,-20.61 114.61,-22.03 123.7,-27.47 125.1,-20.61"/>
+<text text-anchor="middle" x="167" y="-42.4" font-family="Helvetica,sans-Serif" font-size="9.50">viscosity</text>
 </g>
 </g>
 </svg>
@@ -307,130 +313,7 @@ large graphs.</div>
       </div>
     <br>
 
-    <section>
-    <h2>Components</h2>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-<th></th><th scope="col">Initial</th>        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-kflh~20"></span>
-              real(kind=real64),
-            </td>
-              <td>public,</td>
-            <td>
-              allocatable
-            </td>
-            <td>::</td>
-            <td><strong>Kflh</strong>(:)</td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-ks~20"></span>
-              real(kind=real64),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Ks</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>saturated hydraulic conductivity</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-omega~12"></span>
-              real(kind=real64),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Omega</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                <p>Impedance factor</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-nsize~20"></span>
-              integer(kind=int32),
-            </td>
-              <td>public</td>
-            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>nsize</strong></td>
-                <td></td>
-                <td></td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    </section>
-    <br>
     
-      <section>
-        <h2>Constructor</h2>
-            <div class="card">
-    <div class="card-header bg-light codesum">
-      <span class="anchor" id="interface-type_hcf_impedance"></span>
-      <h3>public        interface <a href='../interface/type_hcf_impedance.html'>Type_HCF_Impedance</a> 
-      </h3>
-    </div>
-    <ul class="list-group">
-          <li class="list-group-item">
-                <h3>
-    private  interface <a href='../interface/construct_type_hcf_impedance.html'>Construct_Type_HCF_Impedance</a>()  
-
-    </h3>
-    
-  
-
-  <h4>Arguments</h4>
-    <em>None</em>
-
-          </li>
-          <li class="list-group-item">
-                <h3>
-    private  interface <a href='../interface/construct_type_hcf_impedance_minimal.html'>Construct_Type_HCF_Impedance_minimal</a>()  
-
-    </h3>
-    
-  
-
-  <h4>Arguments</h4>
-    <em>None</em>
-
-          </li>
-    </ul>
-  </div>
-
-      </section>
-      <br>
 
 
       <section>
@@ -438,85 +321,10 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calculate_impedance~17"></span>
-      <h3>
-          procedure, public, nopass ::
-  <strong>Calculate_Impedance</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calculate_impedance_base.html'>Calculate_Impedance_Base</a>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                <h3>interface </h3>
-                    <h3>
-    private module function Calculate_Impedance_Base(Omega, thetaI) result(Impedance)  
-    <a href="../proc/calculate_impedance_base.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
-</h3>
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>Omega</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>thetaI</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-    <h4>
-    Return Value
-    <small>real(kind=real64)</small>
-    </h4>
-    
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calculate_kflh~32"></span>
+      <span class="anchor" id="boundprocedure-calc_kflh~3"></span>
       <h3>
           procedure, public ::
-  <strong>Calculate_Kflh</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calculate_kflh_impedance.html'>Calculate_Kflh_Impedance</a>
+  <strong>calc_kflh</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/calc_kflh_impedance.html'>calc_kflh_impedance</a>
         
       </h3>
     </div>
@@ -524,8 +332,8 @@ large graphs.</div>
           <li class="list-group-item">
                 <h3>interface </h3>
                     <h3>
-    private module function Calculate_Kflh_Impedance(self, thetaI) result(Kflh)  
-    <a href="../proc/calculate_kflh_impedance.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+    private pure elemental module function calc_kflh_impedance(self, state) result(kflh)  
+    <a href="../proc/calc_kflh_impedance.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -544,7 +352,7 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              class(<a href='type_hcf_impedance.html'>Type_HCF_Impedance</a>),
+              class(<a href='type_hcf_impedance.html'>type_hcf_impedance</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -559,14 +367,14 @@ large graphs.</div>
         <tr>
             <td>
               <span class="anchor" ></span>
-              real(kind=real64),
+              type(<a href='type_state.html'>type_state</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>thetaI</strong></td>
+            <td><strong>state</strong></td>
             <td>
                 
             </td>
@@ -579,76 +387,6 @@ large graphs.</div>
     <small>real(kind=real64)</small>
     </h4>
     
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-update_kflh~32"></span>
-      <h3>
-          procedure, public ::
-  <strong>Update_Kflh</strong> => <a href='/home/runner/work/FTDSS/FTDSS/docs/api-docs/interface/update_kflh_impedance.html'>Update_Kflh_Impedance</a>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                <h3>interface </h3>
-                    <h3>
-    private module subroutine Update_Kflh_Impedance(self, arr_thetaI)  
-    <a href="../proc/update_kflh_impedance.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
-</h3>
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_hcf_impedance.html'>Type_HCF_Impedance</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>arr_thetaI</strong>(:)</td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
 
           </li>
       </ul>
@@ -659,12 +397,10 @@ large graphs.</div>
 
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">Abstract_HCF_Impedance</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Type_HCF_Impedance</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_hcf</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_hcf_impedance</span>
 <span class="w">    </span><span class="k">contains</span>
-<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">nopass</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Calculate_Impedance</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Calculate_Impedance_Base</span>
-<span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Calculate_Kflh</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Calculate_Kflh_Impedance</span>
-<span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Update_Kflh</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Update_Kflh_Impedance</span>
-<span class="w">    </span><span class="k">end type </span><span class="n">Type_HCF_Impedance</span>
+<span class="k">        procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_kflh</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">calc_kflh_impedance</span>
+<span class="w">    </span><span class="k">end type </span><span class="n">type_hcf_impedance</span>
 </pre></div>
 
     </section>
@@ -687,7 +423,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

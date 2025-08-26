@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">11 statements</a>
+                 title=" 0.1% of total for procedures.">12 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -159,7 +159,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>module function calc_den_gauss_point_3phase(self, state) result(density)  
+    <h2>pure elemental module function calc_den_gauss_point_3phase(self, state) result(density)  
     <a href="../interface/calc_den_gauss_point_3phase.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
 </h2>
     
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~326"></span>
+              <span class="anchor" id="variable-self~434"></span>
               class(<a href='../type/type_den_3phase.html'>type_den_3phase</a>),
             </td>
 <td>intent(in)</td>
@@ -194,8 +194,8 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-state~22"></span>
-              type(<a href='../type/type_gauss_point_state.html'>type_gauss_point_state</a>),
+              <span class="anchor" id="variable-state~64"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
@@ -212,7 +212,7 @@
 
       <h3>Return Value
         <small>
-          <span class="anchor" id="variable-density~5"></span>
+          <span class="anchor" id="variable-density~6"></span>
           real(kind=real64)
         </small>
       </h3>
@@ -487,16 +487,17 @@ large graphs.</div>
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module function </span><span class="n">calc_den_gauss_point_3phase</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">density</span><span class="p">)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module pure elemental function </span><span class="n">calc_den_gauss_point_3phase</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">density</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
 <span class="k">        class</span><span class="p">(</span><span class="n">type_den_3phase</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_gauss_point_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density</span>
 
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="n">phi3</span>
 
 <span class="w">        </span><span class="n">phi1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">state</span><span class="p">%</span><span class="n">porosity</span>
-<span class="w">        </span><span class="n">phi2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state</span><span class="p">%</span><span class="n">water_content</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">phi2</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">state</span><span class="p">%</span><span class="n">porosity</span><span class="p">)</span><span class="w"> </span><span class="n">phi2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state</span><span class="p">%</span><span class="n">porosity</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">phi2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="n">phi2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
 <span class="w">        </span><span class="n">phi3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">phi1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">phi2</span>
 
 <span class="w">        </span><span class="n">density</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calc_den_3</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">material1</span><span class="p">,</span><span class="w"> </span><span class="n">phi1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">material2</span><span class="p">,</span><span class="w"> </span><span class="n">phi2</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">material3</span><span class="p">,</span><span class="w"> </span><span class="n">phi3</span><span class="p">)</span>
@@ -524,7 +525,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

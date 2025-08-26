@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">66 statements</a>
+                 title=" 0.5% of total for procedures.">66 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -178,7 +178,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~519"></span>
+              <span class="anchor" id="variable-self~185"></span>
               class(<a href='../type/type_output_overall.html'>type_output_overall</a>),
             </td>
 <td>intent(inout)</td>
@@ -193,7 +193,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-file_counts~3"></span>
+              <span class="anchor" id="variable-file_counts"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -208,7 +208,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-domain~49"></span>
+              <span class="anchor" id="variable-domain~13"></span>
               type(<a href='../type/type_domain.html'>type_domain</a>),
             </td>
 <td>intent(in)</td>
@@ -223,7 +223,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-porosity~6"></span>
+              <span class="anchor" id="variable-porosity~3"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -238,7 +238,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-temperature~5"></span>
+              <span class="anchor" id="variable-temperature~6"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -253,7 +253,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-si~3"></span>
+              <span class="anchor" id="variable-si"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -268,7 +268,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-pressure~5"></span>
+              <span class="anchor" id="variable-pressure~4"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -283,7 +283,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-water_flux~3"></span>
+              <span class="anchor" id="variable-water_flux"></span>
               type(<a href='../type/type_dp_3d.html'>type_dp_3d</a>),
             </td>
 <td>intent(in),</td>
@@ -1443,7 +1443,7 @@ large graphs.</div>
 <span class="w">        </span><span class="c">! Initialize VTK file</span>
 <span class="w">        </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">output_name</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">format_output</span><span class="p">)</span><span class="w"> </span><span class="nb">trim</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dir_output_field</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;Out_&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">file_counts</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">file_extension</span>
 
-<span class="w">        </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vtu</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="k">format</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">filename</span><span class="o">=</span><span class="nb">trim</span><span class="p">(</span><span class="n">output_name</span><span class="p">),</span><span class="w"> </span><span class="n">mesh_topology</span><span class="o">=</span><span class="s1">&#39;UnstructuredGrid&#39;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vtu</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="k">format</span><span class="o">=</span><span class="s1">&#39;binary&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">filename</span><span class="o">=</span><span class="nb">trim</span><span class="p">(</span><span class="n">output_name</span><span class="p">),</span><span class="w"> </span><span class="n">mesh_topology</span><span class="o">=</span><span class="s1">&#39;UnstructuredGrid&#39;</span><span class="p">)</span>
 
 <span class="w">        </span><span class="c">! Write data</span>
 <span class="w">        </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vtu</span><span class="p">%</span><span class="n">xml_writer</span><span class="p">%</span><span class="n">write_piece</span><span class="p">(</span><span class="n">np</span><span class="o">=</span><span class="n">self</span><span class="p">%</span><span class="n">vtk</span><span class="p">%</span><span class="n">num_points</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
@@ -1538,7 +1538,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-07-18 08:47 +0000             </p>
+ on 2025-08-26 10:37 +0000             </p>
           </div>
         </div>
         <br>

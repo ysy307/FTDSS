@@ -1,0 +1,1624 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Calculate_hcf_mvg &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Calculate_hcf_mvg
+      <small>Submodule</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.3% of total for modules and submodules.">50 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hcf_mvg.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hcf_mvg.f90.html'>hcf_mvg.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Calculate_hcf_mvg</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#funcs-0"
+         aria-expanded="false" aria-controls="funcs-0">
+         <h4 class="card-header bg-primary text-white">Functions</h4>
+      </a>
+      <div id="funcs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/calculate_hcf_mvg.html#proc-calc_kr_mvg">calc_kr_mvg</a>
+        </div>
+      </div>
+    </div>
+
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#modfuncs-0"
+         aria-expanded="false" aria-controls="modfuncs-0">
+         <h4 class="card-header bg-primary text-white">Module Functions</h4>
+      </a>
+      <div id="modfuncs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/calculate_hcf_mvg.html#proc-calc_kr_base_mvg">calc_kr_base_mvg</a>
+            <a class="list-group-item" href="../module/calculate_hcf_mvg.html#proc-construct_type_hcf_base_mvg">construct_type_hcf_base_mvg</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                <li><h5>Ancestors:</h5></li>
+                  <li class="list-inline-item"><a href='calculate_hcf.html'>calculate_hcf</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~calculate_hcf_mvg~~UsesGraph Pages: 1 -->
+<svg id="modulecalculate_hcf_mvgUsesGraph" width="641pt" height="324pt"
+ viewBox="0.00 0.00 641.00 323.99" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~calculate_hcf_mvg~~UsesGraph" class="graph" transform="scale(0.32 0.32) rotate(0) translate(4 1022.06)">
+<title>module~~calculate_hcf_mvg~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1022.06 2026,-1022.06 2026,4 -4,4"/>
+<!-- module~calculate_hcf_mvg -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node1" class="node">
+<title>module~calculate_hcf_mvg</title>
+<polygon fill="none" stroke="black" points="2022,-964.16 1909,-964.16 1909,-940.16 2022,-940.16 2022,-964.16"/>
+<text text-anchor="middle" x="1965.5" y="-949.76" font-family="Helvetica,sans-Serif" font-size="10.50">Calculate_hcf_mvg</text>
+</g>
+<!-- module~calculate_hcf -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node2" class="node">
+<title>module~calculate_hcf</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node2"><a xlink:href="../module/calculate_hcf.html" xlink:title="calculate_hcf">
+<polygon fill="#337ab7" stroke="#337ab7" points="1873,-964.16 1790,-964.16 1790,-940.16 1873,-940.16 1873,-964.16"/>
+<text text-anchor="middle" x="1831.5" y="-949.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calculate_hcf</text>
+</a>
+</g>
+</g>
+<!-- module~calculate_hcf_mvg&#45;&gt;module~calculate_hcf -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge1" class="edge">
+<title>module~calculate_hcf_mvg&#45;&gt;module~calculate_hcf</title>
+<path fill="none" stroke="#ff0000" d="M1908.9,-952.16C1900.39,-952.16 1891.63,-952.16 1883.23,-952.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1883.19,-948.66 1873.19,-952.16 1883.19,-955.66 1883.19,-948.66"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node3" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node3"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-218.16 0,-218.16 0,-194.16 94,-194.16 94,-218.16"/>
+<text text-anchor="middle" x="47" y="-203.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~calculate_hcf&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge2" class="edge">
+<title>module~calculate_hcf&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1790.64,-964.17C1778.91,-967.42 1766.01,-970.7 1754,-973.16 1625.67,-999.45 1592.19,-998.74 1462,-1013.16"/>
+</g>
+<!-- module~module_core -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node4" class="node">
+<title>module~module_core</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node4"><a xlink:href="../module/module_core.html" xlink:title="module_core">
+<polygon fill="#337ab7" stroke="#337ab7" points="1361,-865.16 1279,-865.16 1279,-841.16 1361,-841.16 1361,-865.16"/>
+<text text-anchor="middle" x="1320" y="-850.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_core</text>
+</a>
+</g>
+</g>
+<!-- module~calculate_hcf&#45;&gt;module~module_core -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge3" class="edge">
+<title>module~calculate_hcf&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1789.68,-940.66C1778.16,-937.5 1765.61,-934.13 1754,-931.16 1652.67,-905.32 1627.98,-895.3 1525,-877.16 1472.87,-867.98 1412.62,-861.38 1371.18,-857.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1371.35,-853.95 1361.07,-856.51 1370.7,-860.92 1371.35,-853.95"/>
+</g>
+<!-- module~module_input -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node5" class="node">
+<title>module~module_input</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node5"><a xlink:href="../module/module_input.html" xlink:title="module_input">
+<polygon fill="#337ab7" stroke="#337ab7" points="1754,-964.16 1669,-964.16 1669,-940.16 1754,-940.16 1754,-964.16"/>
+<text text-anchor="middle" x="1711.5" y="-949.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_input</text>
+</a>
+</g>
+</g>
+<!-- module~calculate_hcf&#45;&gt;module~module_input -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge4" class="edge">
+<title>module~calculate_hcf&#45;&gt;module~module_input</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1789.89,-952.16C1781.74,-952.16 1773.07,-952.16 1764.59,-952.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1764.39,-948.66 1754.39,-952.16 1764.39,-955.66 1764.39,-948.66"/>
+</g>
+<!-- core_check_nan -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node6" class="node">
+<title>core_check_nan</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="1239.5,-867.16 1141.5,-867.16 1141.5,-843.16 1239.5,-843.16 1239.5,-867.16"/>
+<text text-anchor="middle" x="1190.5" y="-852.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_nan</text>
+</g>
+<!-- module~module_core&#45;&gt;core_check_nan -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge5" class="edge">
+<title>module~module_core&#45;&gt;core_check_nan</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1278.66,-853.8C1269.45,-853.94 1259.49,-854.1 1249.71,-854.25"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1249.56,-850.75 1239.61,-854.41 1249.67,-857.75 1249.56,-850.75"/>
+</g>
+<!-- module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node7" class="node">
+<title>module~core_allocate</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node7"><a xlink:href="../module/core_allocate.html" xlink:title="core_allocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="375.5,-393.16 291.5,-393.16 291.5,-369.16 375.5,-369.16 375.5,-393.16"/>
+<text text-anchor="middle" x="333.5" y="-378.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_allocate</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge6" class="edge">
+<title>module~module_core&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1189.5,-299.16C1117.64,-241.09 1077.78,-334.69 985.5,-339.16"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M983.5,-339.16C868.08,-344.75 838.97,-343.57 723.5,-339.16"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.5,-339.16C589.1,-334.12 554.85,-337.36 424,-358.16 411.12,-360.21 397.4,-363.28 384.67,-366.51"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="383.49,-363.2 374.71,-369.12 385.27,-369.97 383.49,-363.2"/>
+</g>
+<!-- module~core_check_range -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node8" class="node">
+<title>module~core_check_range</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node8"><a xlink:href="../module/core_check_range.html" xlink:title="core_check_range">
+<polygon fill="#337ab7" stroke="#337ab7" points="241,-729.16 132,-729.16 132,-705.16 241,-705.16 241,-729.16"/>
+<text text-anchor="middle" x="186.5" y="-714.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_check_range</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_check_range -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge7" class="edge">
+<title>module~module_core&#45;&gt;module~core_check_range</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1300.34,-865.31C1251.06,-896.17 1112.5,-975.16 985.5,-975.16 985.5,-975.16 985.5,-975.16 500,-975.16 397.99,-975.16 356.78,-979.18 279,-913.16 224.19,-866.64 200.18,-780.09 191.56,-739.39"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="194.96,-738.54 189.57,-729.42 188.1,-739.91 194.96,-738.54"/>
+</g>
+<!-- module~core_deallocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node9" class="node">
+<title>module~core_deallocate</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node9"><a xlink:href="../module/core_deallocate.html" xlink:title="core_deallocate">
+<polygon fill="#337ab7" stroke="#337ab7" points="382,-313.16 285,-313.16 285,-289.16 382,-289.16 382,-313.16"/>
+<text text-anchor="middle" x="333.5" y="-298.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_deallocate</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_deallocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge8" class="edge">
+<title>module~module_core&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.5,-182.16C672.55,-181.59 660.3,-190.26 614,-206.16 561.92,-224.05 555.97,-248.22 502,-259.16"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M500,-259.16C461.82,-266.91 419.23,-277.77 386.82,-286.5"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="385.84,-283.14 377.1,-289.14 387.67,-289.9 385.84,-283.14"/>
+</g>
+<!-- module~core_error -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node10" class="node">
+<title>module~core_error</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node10"><a xlink:href="../module/core_error.html" xlink:title="core_error">
+<polygon fill="#337ab7" stroke="#337ab7" points="220,-197.16 153,-197.16 153,-173.16 220,-173.16 220,-197.16"/>
+<text text-anchor="middle" x="186.5" y="-182.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_error</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_error -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge9" class="edge">
+<title>module~module_core&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1317.37,-841.11C1306.73,-762.3 1247.29,-323.48 1243,-318.16 1227.67,-299.18 1210.48,-314.5 1191.5,-299.16"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1189.5,-299.16C1023.42,-164.94 937.02,-184.68 723.5,-182.16"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.5,-182.16C657,-180.43 642.34,-165.07 578,-160.16 509.75,-154.96 492.35,-156.56 424,-160.16 356.15,-163.74 277.81,-173.05 230.5,-179.24"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="229.77,-175.81 220.32,-180.59 230.69,-182.75 229.77,-175.81"/>
+</g>
+<!-- module~core_fortran_utils -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node11" class="node">
+<title>module~core_fortran_utils</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node11"><a xlink:href="../module/core_fortran_utils.html" xlink:title="core_fortran_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="1243,-785.16 1138,-785.16 1138,-761.16 1243,-761.16 1243,-785.16"/>
+<text text-anchor="middle" x="1190.5" y="-770.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_fortran_utils -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge10" class="edge">
+<title>module~module_core&#45;&gt;module~core_fortran_utils</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1302.42,-841.1C1287.24,-830.22 1264,-814.01 1243,-801.16 1236.93,-797.45 1230.34,-793.68 1223.96,-790.16"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1225.32,-786.91 1214.86,-785.21 1221.98,-793.06 1225.32,-786.91"/>
+</g>
+<!-- module~core_string_utils -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node12" class="node">
+<title>module~core_string_utils</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node12"><a xlink:href="../module/core_string_utils.html" xlink:title="core_string_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="550,-193.16 452,-193.16 452,-169.16 550,-169.16 550,-193.16"/>
+<text text-anchor="middle" x="501" y="-178.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_string_utils</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_string_utils -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge11" class="edge">
+<title>module~module_core&#45;&gt;module~core_string_utils</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M721.5,-182.16C667,-181.52 604.88,-181.29 560.66,-181.2"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="560.4,-177.7 550.39,-181.18 560.38,-184.7 560.4,-177.7"/>
+</g>
+<!-- module~core_types -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node13" class="node">
+<title>module~core_types</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node13"><a xlink:href="../module/core_types.html" xlink:title="core_types">
+<polygon fill="#337ab7" stroke="#337ab7" points="1019.5,-273.16 949.5,-273.16 949.5,-249.16 1019.5,-249.16 1019.5,-273.16"/>
+<text text-anchor="middle" x="984.5" y="-258.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_types -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge12" class="edge">
+<title>module~module_core&#45;&gt;module~core_types</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1189.5,-299.16C1144.27,-262.61 1074.97,-257.05 1029.93,-257.92"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1029.76,-254.43 1019.88,-258.24 1029.98,-261.42 1029.76,-254.43"/>
+</g>
+<!-- module~core_unique -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node14" class="node">
+<title>module~core_unique</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node14"><a xlink:href="../module/core_unique.html" xlink:title="core_unique">
+<polygon fill="#337ab7" stroke="#337ab7" points="1023.5,-391.16 945.5,-391.16 945.5,-367.16 1023.5,-367.16 1023.5,-391.16"/>
+<text text-anchor="middle" x="984.5" y="-376.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_unique</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_unique -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge13" class="edge">
+<title>module~module_core&#45;&gt;module~core_unique</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1189.5,-299.16C1170.52,-283.83 1158.64,-305.16 1138,-318.16 1119.12,-330.06 1121.63,-342.55 1102,-353.16 1081.07,-364.48 1055.48,-370.87 1033.62,-374.48"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1032.91,-371.05 1023.55,-376 1033.96,-377.97 1032.91,-371.05"/>
+</g>
+<!-- module~core_vtk -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node15" class="node">
+<title>module~core_vtk</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node15"><a xlink:href="../module/core_vtk.html" xlink:title="core_vtk">
+<polygon fill="#337ab7" stroke="#337ab7" points="1219,-351.16 1162,-351.16 1162,-327.16 1219,-327.16 1219,-351.16"/>
+<text text-anchor="middle" x="1190.5" y="-336.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_vtk -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge14" class="edge">
+<title>module~module_core&#45;&gt;module~core_vtk</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1315.97,-840.97C1299.32,-773.83 1218.8,-449.24 1196.97,-361.22"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1200.36,-360.34 1194.55,-351.48 1193.56,-362.03 1200.36,-360.34"/>
+</g>
+<!-- module~core_vtk_vtk_constants -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node16" class="node">
+<title>module~core_vtk_vtk_constants</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node16"><a xlink:href="../module/core_vtk_vtk_constants.html" xlink:title="core_vtk_vtk_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="1051.5,-867.16 917.5,-867.16 917.5,-843.16 1051.5,-843.16 1051.5,-867.16"/>
+<text text-anchor="middle" x="984.5" y="-852.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_constants</text>
+</a>
+</g>
+</g>
+<!-- module~module_core&#45;&gt;module~core_vtk_vtk_constants -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge15" class="edge">
+<title>module~module_core&#45;&gt;module~core_vtk_vtk_constants</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1278.72,-841.15C1267.28,-838.27 1254.74,-835.61 1243,-834.16 1180.29,-826.44 1108.63,-833.58 1056.86,-841.56"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1056.1,-838.13 1046.78,-843.16 1057.2,-845.05 1056.1,-838.13"/>
+</g>
+<!-- module~inout_input -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node17" class="node">
+<title>module~inout_input</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node17"><a xlink:href="../module/inout_input.html" xlink:title="inout_input">
+<polygon fill="#337ab7" stroke="#337ab7" points="1633,-964.16 1561,-964.16 1561,-940.16 1633,-940.16 1633,-964.16"/>
+<text text-anchor="middle" x="1597" y="-949.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">inout_input</text>
+</a>
+</g>
+</g>
+<!-- module~module_input&#45;&gt;module~inout_input -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge16" class="edge">
+<title>module~module_input&#45;&gt;module~inout_input</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1668.93,-952.16C1660.56,-952.16 1651.73,-952.16 1643.25,-952.16"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1643.13,-948.66 1633.13,-952.16 1643.13,-955.66 1643.13,-948.66"/>
+</g>
+<!-- module~core_allocate&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge17" class="edge">
+<title>module~core_allocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M307.41,-393.23C270.94,-409.94 205.63,-436.42 187.5,-421.16"/>
+</g>
+<!-- module~core_allocate&#45;&gt;module~core_error -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge18" class="edge">
+<title>module~core_allocate&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#ff7f00" stroke-dasharray="5,2" d="M318.34,-368.9C306.33,-357.79 289.42,-340.42 279,-322.16 252.24,-275.28 279.99,-245.48 243,-206.16 239.16,-202.08 234.45,-198.79 229.41,-196.13"/>
+<polygon fill="#ff7f00" stroke="#ff7f00" points="230.66,-192.86 220.1,-192 227.82,-199.26 230.66,-192.86"/>
+</g>
+<!-- module~core_check_range&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge19" class="edge">
+<title>module~core_check_range&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M182.24,-705.04C164.28,-638.3 77.45,-315.59 53.9,-228.09"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="57.27,-227.15 51.29,-218.41 50.51,-228.97 57.27,-227.15"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge20" class="edge">
+<title>module~core_deallocate&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M303.14,-313.18C294.99,-317.11 286.37,-321.84 279,-327.16 231.74,-361.31 232.11,-458.71 187.5,-421.16"/>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M185.5,-421.16C119.42,-365.55 74.25,-269.97 56.46,-227.54"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="59.65,-226.1 52.62,-218.18 53.18,-228.76 59.65,-226.1"/>
+</g>
+<!-- module~core_deallocate&#45;&gt;module~core_error -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge21" class="edge">
+<title>module~core_deallocate&#45;&gt;module~core_error</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M323.95,-288.99C309.42,-269.11 278.06,-229.56 243,-206.16 238.77,-203.34 234.11,-200.83 229.34,-198.61"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="230.69,-195.38 220.12,-194.69 227.96,-201.82 230.69,-195.38"/>
+</g>
+<!-- module~core_error&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge22" class="edge">
+<title>module~core_error&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M152.91,-190.14C138.38,-192.36 120.83,-195.04 104.28,-197.57"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="103.5,-194.15 94.14,-199.12 104.55,-201.07 103.5,-194.15"/>
+</g>
+<!-- stdlib_logger -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node32" class="node">
+<title>stdlib_logger</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="87.5,-77.16 6.5,-77.16 6.5,-53.16 87.5,-53.16 87.5,-77.16"/>
+<text text-anchor="middle" x="47" y="-62.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_logger</text>
+</g>
+<!-- module~core_error&#45;&gt;stdlib_logger -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge23" class="edge">
+<title>module~core_error&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M171.56,-173C147.57,-152.06 98.33,-109.09 69.78,-84.17"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="71.81,-81.3 61.98,-77.36 67.21,-86.58 71.81,-81.3"/>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node20" class="node">
+<title>module~core_fortran_utils_memory_stats_wrapper</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node20"><a xlink:href="../module/core_fortran_utils_memory_stats_wrapper.html" xlink:title="core_fortran_utils_memory_stats_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1102,-783.16 867,-783.16 867,-759.16 1102,-759.16 1102,-783.16"/>
+<text text-anchor="middle" x="984.5" y="-768.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_memory_stats_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils&#45;&gt;module~core_fortran_utils_memory_stats_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge24" class="edge">
+<title>module~core_fortran_utils&#45;&gt;module~core_fortran_utils_memory_stats_wrapper</title>
+<path fill="none" stroke="#00ff7f" stroke-dasharray="5,2" d="M1137.76,-772.66C1129.7,-772.58 1121.08,-772.49 1112.19,-772.41"/>
+<polygon fill="#00ff7f" stroke="#00ff7f" points="1112.09,-768.91 1102.06,-772.31 1112.02,-775.9 1112.09,-768.91"/>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node21" class="node">
+<title>module~core_fortran_utils_signal_flag_wrapper</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node21"><a xlink:href="../module/core_fortran_utils_signal_flag_wrapper.html" xlink:title="core_fortran_utils_signal_flag_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="831,-749.16 614,-749.16 614,-725.16 831,-725.16 831,-749.16"/>
+<text text-anchor="middle" x="722.5" y="-734.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_signal_flag_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils&#45;&gt;module~core_fortran_utils_signal_flag_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge25" class="edge">
+<title>module~core_fortran_utils&#45;&gt;module~core_fortran_utils_signal_flag_wrapper</title>
+<path fill="none" stroke="#00ff7f" stroke-dasharray="5,2" d="M1151.12,-761.1C1135.97,-756.86 1118.32,-752.56 1102,-750.16 1015.48,-737.47 916.7,-734.46 841.76,-734.49"/>
+<polygon fill="#00ff7f" stroke="#00ff7f" points="841.33,-730.99 831.34,-734.52 841.35,-737.99 841.33,-730.99"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node22" class="node">
+<title>module~core_fortran_utils_system_info_wrapper</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node22"><a xlink:href="../module/core_fortran_utils_system_info_wrapper.html" xlink:title="core_fortran_utils_system_info_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1096,-825.16 873,-825.16 873,-801.16 1096,-801.16 1096,-825.16"/>
+<text text-anchor="middle" x="984.5" y="-810.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_fortran_utils_system_info_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils&#45;&gt;module~core_fortran_utils_system_info_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge26" class="edge">
+<title>module~core_fortran_utils&#45;&gt;module~core_fortran_utils_system_info_wrapper</title>
+<path fill="none" stroke="#00ff7f" stroke-dasharray="5,2" d="M1137.74,-784.72C1126.01,-787.25 1113.59,-789.86 1102,-792.16 1089.91,-794.57 1077.09,-796.99 1064.55,-799.31"/>
+<polygon fill="#00ff7f" stroke="#00ff7f" points="1063.78,-795.89 1054.57,-801.13 1065.04,-802.77 1063.78,-795.89"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge27" class="edge">
+<title>module~core_string_utils&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M451.88,-170.5C380.49,-156.56 242.83,-136.95 130,-164.16 110.11,-168.96 89.63,-179.45 74.11,-188.74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="72.24,-185.78 65.59,-194.03 75.93,-191.73 72.24,-185.78"/>
+</g>
+<!-- module~core_string_utils&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge28" class="edge">
+<title>module~core_string_utils&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M490.57,-193.24C467.51,-222.75 408.64,-297.86 388,-322.16 376.77,-335.4 363.69,-349.84 353.27,-361.12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="350.46,-359.01 346.22,-368.72 355.59,-363.77 350.46,-359.01"/>
+</g>
+<!-- module~core_types_array -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node23" class="node">
+<title>module~core_types_array</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node23"><a xlink:href="../module/core_types_array.html" xlink:title="core_types_array">
+<polygon fill="#337ab7" stroke="#337ab7" points="552.5,-311.16 449.5,-311.16 449.5,-287.16 552.5,-287.16 552.5,-311.16"/>
+<text text-anchor="middle" x="501" y="-296.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_array</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_array -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge29" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_array</title>
+<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M949.26,-263.87C868.46,-270.24 665.04,-286.3 562.74,-294.37"/>
+<polygon fill="#007fff" stroke="#007fff" points="562.26,-290.9 552.56,-295.17 562.81,-297.88 562.26,-290.9"/>
+</g>
+<!-- module~core_types_gauss -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node24" class="node">
+<title>module~core_types_gauss</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node24"><a xlink:href="../module/core_types_gauss.html" xlink:title="core_types_gauss">
+<polygon fill="#337ab7" stroke="#337ab7" points="239.5,-239.16 133.5,-239.16 133.5,-215.16 239.5,-215.16 239.5,-239.16"/>
+<text text-anchor="middle" x="186.5" y="-224.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_gauss</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_gauss -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge30" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_gauss</title>
+<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M721.5,-220.16C635.14,-194.13 371.56,-211.72 250.05,-221.65"/>
+<polygon fill="#007fff" stroke="#007fff" points="249.48,-218.19 239.8,-222.5 250.05,-225.16 249.48,-218.19"/>
+</g>
+<!-- module~core_types_pointer -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node25" class="node">
+<title>module~core_types_pointer</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node25"><a xlink:href="../module/core_types_pointer.html" xlink:title="core_types_pointer">
+<polygon fill="#337ab7" stroke="#337ab7" points="243,-117.16 130,-117.16 130,-93.16 243,-93.16 243,-117.16"/>
+<text text-anchor="middle" x="186.5" y="-102.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_pointer</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_pointer -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge31" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_pointer</title>
+<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M721.5,-220.16C674.73,-205.69 656.9,-219.74 614,-196.16 594.17,-185.27 598.25,-170.26 578,-160.16 473.12,-107.86 333.9,-100.91 253.16,-102.05"/>
+<polygon fill="#007fff" stroke="#007fff" points="253.06,-98.55 243.13,-102.24 253.19,-105.55 253.06,-98.55"/>
+</g>
+<!-- module~core_types_variable -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node26" class="node">
+<title>module~core_types_variable</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node26"><a xlink:href="../module/core_types_variable.html" xlink:title="core_types_variable">
+<polygon fill="#337ab7" stroke="#337ab7" points="560,-555.16 442,-555.16 442,-531.16 560,-531.16 560,-555.16"/>
+<text text-anchor="middle" x="501" y="-540.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_variable</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_variable -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge32" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_variable</title>
+<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M963.72,-273.35C938.36,-289.83 894.37,-321.45 867,-358.16 842.72,-390.73 862.34,-416.32 831,-442.16 754.87,-504.95 707.32,-457.07 614,-489.16 605.96,-491.93 565.44,-511.72 535.44,-526.55"/>
+<polygon fill="#007fff" stroke="#007fff" points="533.53,-523.59 526.12,-531.16 536.63,-529.86 533.53,-523.59"/>
+</g>
+<!-- module~core_types_vector -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node27" class="node">
+<title>module~core_types_vector</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node27"><a xlink:href="../module/core_types_vector.html" xlink:title="core_types_vector">
+<polygon fill="#337ab7" stroke="#337ab7" points="388,-37.16 279,-37.16 279,-13.16 388,-13.16 388,-37.16"/>
+<text text-anchor="middle" x="333.5" y="-22.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_vector</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~core_types_vector -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge33" class="edge">
+<title>module~core_types&#45;&gt;module~core_types_vector</title>
+<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M949.17,-258.8C898.77,-254.64 802.19,-244.1 723.5,-220.16"/>
+<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M721.5,-220.16C674.66,-205.92 649.02,-230.37 614,-196.16 566.49,-149.77 628.06,-94.79 578,-51.16 529.3,-8.72 452.62,-7.5 398.34,-13.52"/>
+<polygon fill="#007fff" stroke="#007fff" points="397.64,-10.08 388.13,-14.77 398.48,-17.03 397.64,-10.08"/>
+</g>
+<!-- module~module_type_matrix -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node31" class="node">
+<title>module~module_type_matrix</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node31"><a xlink:href="../module/module_type_matrix.html" xlink:title="module_type_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="783,-433.16 662,-433.16 662,-409.16 783,-409.16 783,-433.16"/>
+<text text-anchor="middle" x="722.5" y="-418.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_type_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~core_types&#45;&gt;module~module_type_matrix -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge34" class="edge">
+<title>module~core_types&#45;&gt;module~module_type_matrix</title>
+<path fill="none" stroke="#007fff" stroke-dasharray="5,2" d="M963.96,-273.19C918.41,-301.22 805.03,-370.99 751.87,-403.71"/>
+<polygon fill="#007fff" stroke="#007fff" points="749.95,-400.78 743.27,-409 753.62,-406.74 749.95,-400.78"/>
+</g>
+<!-- module~core_unique&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge35" class="edge">
+<title>module~core_unique&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M969.45,-391.29C943.8,-412.76 886.85,-457.33 831,-480.16 740.07,-517.34 698.92,-472.79 614,-522.16 592.75,-534.52 598.91,-551.24 578,-564.16 548.38,-582.47 536.68,-580.06 502,-583.16"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M500,-583.16C426.75,-589.89 403.48,-608.7 334.5,-583.16"/>
+</g>
+<!-- module~core_unique&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge36" class="edge">
+<title>module~core_unique&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M945.44,-370.51C895.01,-359.68 803.14,-342.2 723.5,-339.16"/>
+</g>
+<!-- stdlib_sorting -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node33" class="node">
+<title>stdlib_sorting</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="764,-555.16 681,-555.16 681,-531.16 764,-531.16 764,-555.16"/>
+<text text-anchor="middle" x="722.5" y="-540.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_sorting</text>
+</g>
+<!-- module~core_unique&#45;&gt;stdlib_sorting -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge37" class="edge">
+<title>module~core_unique&#45;&gt;stdlib_sorting</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M973.86,-391.29C951.7,-418.33 894.13,-483.78 831,-517.16 813.45,-526.45 792.53,-532.47 773.84,-536.36"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="773.16,-532.92 764,-538.25 774.49,-539.8 773.16,-532.92"/>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge39" class="edge">
+<title>module~core_vtk&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M983.5,-543.16C921.26,-571.58 899.09,-557.52 831,-564.16 685.23,-578.39 647.85,-569.78 502,-583.16"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge40" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1161.76,-338.31C1122.5,-337.31 1048.47,-336.11 985.5,-339.16"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_deallocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge41" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1161.97,-334.4C1144.76,-331.52 1122.12,-327.88 1102,-325.16 969.07,-307.23 633.22,-231.35 502,-259.16"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_types -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge42" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_types</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1163.66,-327.12C1155.32,-322.96 1146.13,-318.11 1138,-313.16 1121.14,-302.91 1120,-295.26 1102,-287.16 1079.14,-276.88 1051.87,-270.51 1029.46,-266.65"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1029.97,-263.19 1019.54,-265.05 1028.85,-270.1 1029.97,-263.19"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_unique -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge43" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_unique</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1161.99,-344.56C1129.1,-351.01 1073.5,-361.91 1033.49,-369.75"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1032.82,-366.32 1023.68,-371.68 1034.16,-373.19 1032.82,-366.32"/>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_constants -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge44" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_constants</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1188.18,-351.38C1180.19,-424.15 1137.58,-798.47 1102,-834.16 1091.11,-845.09 1076.59,-851.41 1061.51,-854.9"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1060.72,-851.48 1051.55,-856.79 1062.03,-858.36 1060.72,-851.48"/>
+</g>
+<!-- iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node18" class="node">
+<title>iso_c_binding</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node18"><a xlink:href="http://fortranwiki.org/fortran/show/iso_c_binding" xlink:title="iso_c_binding">
+<polygon fill="#337ab7" stroke="#337ab7" points="375.5,-791.16 291.5,-791.16 291.5,-767.16 375.5,-767.16 375.5,-791.16"/>
+<text text-anchor="middle" x="333.5" y="-776.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_c_binding</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge38" class="edge">
+<title>module~core_vtk&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1189.63,-351.33C1189.38,-393.83 1182.36,-536.74 1102,-604.16 1085.72,-617.82 744.61,-656.72 723.5,-659.16"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M721.5,-659.16C623.15,-670.57 598.5,-675.04 502,-697.16"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M500,-697.16C466.06,-704.94 455.66,-701.68 424,-716.16 398.76,-727.72 373.18,-746.6 355.87,-760.69"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="353.53,-758.08 348.07,-767.16 358,-763.46 353.53,-758.08"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node28" class="node">
+<title>module~core_vtk_vtk_wrapper</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node28"><a xlink:href="../module/core_vtk_vtk_wrapper.html" xlink:title="core_vtk_vtk_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1048,-595.16 921,-595.16 921,-571.16 1048,-571.16 1048,-595.16"/>
+<text text-anchor="middle" x="984.5" y="-580.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtk_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge45" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtk_wrapper</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1188.47,-351.31C1184.65,-388.42 1167.88,-501.18 1102,-557.16 1089.64,-567.67 1073.95,-574.18 1058.12,-578.15"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1057.29,-574.75 1048.28,-580.32 1058.8,-581.59 1057.29,-574.75"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node29" class="node">
+<title>module~core_vtk_vtu_wrapper</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node29"><a xlink:href="../module/core_vtk_vtu_wrapper.html" xlink:title="core_vtk_vtu_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="1048.5,-675.16 920.5,-675.16 920.5,-651.16 1048.5,-651.16 1048.5,-675.16"/>
+<text text-anchor="middle" x="984.5" y="-660.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_vtk_vtu_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge46" class="edge">
+<title>module~core_vtk&#45;&gt;module~core_vtk_vtu_wrapper</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1189.95,-351.29C1190.94,-396.49 1188.01,-556.65 1102,-637.16 1090.1,-648.31 1074.51,-655.05 1058.62,-659.06"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1057.75,-655.67 1048.72,-661.21 1059.24,-662.51 1057.75,-655.67"/>
+</g>
+<!-- module~core_vtk&#45;&gt;stdlib_sorting -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge47" class="edge">
+<title>module~core_vtk&#45;&gt;stdlib_sorting</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M1182.05,-351.26C1158.6,-388.1 1082.09,-499.06 985.5,-543.16"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M983.5,-543.16C947.55,-559.58 839.1,-553.54 774.18,-548.08"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="774.42,-544.59 764.15,-547.21 773.81,-551.56 774.42,-544.59"/>
+</g>
+<!-- module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge48" class="edge">
+<title>module~core_vtk_vtk_constants&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M961.63,-867.43C932.77,-882.85 879.89,-908.46 831,-918.16 722.7,-939.65 419.47,-969.68 334.5,-899.16"/>
+</g>
+<!-- module~inout_input&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge49" class="edge">
+<title>module~inout_input&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1578.86,-964.31C1554.34,-980.62 1507.22,-1008.16 1462,-1013.16"/>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1460,-1013.16C1398.6,-1019.96 1382.55,-1007.86 1321,-1013.16"/>
+</g>
+<!-- module~inout_input&#45;&gt;module~module_core -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge52" class="edge">
+<title>module~inout_input&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1460,-891.16C1445.33,-881.49 1404.91,-870.99 1371.42,-863.48"/>
+<polygon fill="#ff007f" stroke="#ff007f" points="1371.8,-859.98 1361.28,-861.26 1370.29,-866.82 1371.8,-859.98"/>
+</g>
+<!-- json_module -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node19" class="node">
+<title>json_module</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node19"><a xlink:href="http://jacobwilliams.github.io/json-fortran/" xlink:title="json_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="1501,-943.16 1421,-943.16 1421,-919.16 1501,-919.16 1501,-943.16"/>
+<text text-anchor="middle" x="1461" y="-928.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
+</g>
+<!-- module~inout_input&#45;&gt;json_module -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge50" class="edge">
+<title>module~inout_input&#45;&gt;json_module</title>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1560.79,-946.65C1545.64,-944.27 1527.66,-941.45 1511.22,-938.88"/>
+<polygon fill="#ff007f" stroke="#ff007f" points="1511.64,-935.4 1501.22,-937.31 1510.56,-942.32 1511.64,-935.4"/>
+</g>
+<!-- module~inout_project_settings -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node30" class="node">
+<title>module~inout_project_settings</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node30"><a xlink:href="../module/inout_project_settings.html" xlink:title="inout_project_settings">
+<polygon fill="#337ab7" stroke="#337ab7" points="1525,-985.16 1397,-985.16 1397,-961.16 1525,-961.16 1525,-985.16"/>
+<text text-anchor="middle" x="1461" y="-970.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">inout_project_settings</text>
+</a>
+</g>
+</g>
+<!-- module~inout_input&#45;&gt;module~inout_project_settings -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge51" class="edge">
+<title>module~inout_input&#45;&gt;module~inout_project_settings</title>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1560.79,-957.68C1552.85,-958.93 1544.13,-960.29 1535.26,-961.68"/>
+<polygon fill="#ff007f" stroke="#ff007f" points="1534.56,-958.25 1525.22,-963.26 1535.64,-965.17 1534.56,-958.25"/>
+</g>
+<!-- module~inout_input&#45;&gt;stdlib_logger -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge53" class="edge">
+<title>module~inout_input&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1578.26,-940.03C1564.27,-930.88 1544.02,-918.51 1525,-910.16 1498.22,-898.41 1486.31,-907.42 1462,-891.16"/>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1460,-891.16C1222.21,-732.11 1412.7,-515.48 1243,-285.16 1196.49,-222.05 1171.51,-215.43 1102,-179.16 884.69,-65.78 819.73,-47.78 578,-7.16 494.71,6.83 472.45,-4.83 388,-4.16 339.56,-3.78 327.19,0.8 279,-4.16 211.72,-11.09 195.04,-16.61 130,-35.16 115.81,-39.21 100.55,-44.52 87.09,-49.55"/>
+<polygon fill="#ff007f" stroke="#ff007f" points="85.75,-46.31 77.64,-53.13 88.24,-52.85 85.75,-46.31"/>
+</g>
+<!-- stdlib_strings -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node34" class="node">
+<title>stdlib_strings</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="763.5,-909.16 681.5,-909.16 681.5,-885.16 763.5,-885.16 763.5,-909.16"/>
+<text text-anchor="middle" x="722.5" y="-894.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">stdlib_strings</text>
+</g>
+<!-- module~inout_input&#45;&gt;stdlib_strings -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge54" class="edge">
+<title>module~inout_input&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#ff007f" stroke-dasharray="5,2" d="M1460,-891.16C1431.43,-872.31 935.17,-889.2 773.77,-895.23"/>
+<polygon fill="#ff007f" stroke="#ff007f" points="773.49,-891.73 763.63,-895.61 773.76,-898.73 773.49,-891.73"/>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge55" class="edge">
+<title>module~core_fortran_utils_memory_stats_wrapper&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M954.74,-759.08C924.44,-746.76 875.08,-727.83 831,-716.16 687.54,-678.18 641.85,-708.8 502,-659.16"/>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M500,-659.16C423.86,-631.69 410.41,-611.27 334.5,-583.16"/>
+</g>
+<!-- module~core_c_utils -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node35" class="node">
+<title>module~core_c_utils</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node35"><a xlink:href="../module/core_c_utils.html" xlink:title="core_c_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="759.5,-808.16 685.5,-808.16 685.5,-784.16 759.5,-784.16 759.5,-808.16"/>
+<text text-anchor="middle" x="722.5" y="-793.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_memory_stats_wrapper&#45;&gt;module~core_c_utils -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge56" class="edge">
+<title>module~core_fortran_utils_memory_stats_wrapper&#45;&gt;module~core_c_utils</title>
+<path fill="none" stroke="#ffb300" stroke-dasharray="5,2" d="M866.81,-782.38C832.45,-785.69 796.85,-789.11 769.72,-791.72"/>
+<polygon fill="#ffb300" stroke="#ffb300" points="769.38,-788.24 759.76,-792.68 770.05,-795.2 769.38,-788.24"/>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge58" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M652.61,-725.1C639.44,-721.52 626.02,-716.96 614,-711.16 595.74,-702.36 595.95,-692.59 578,-683.16 546.64,-666.7 535.38,-671.01 502,-659.16"/>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge57" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M667.94,-725.12C608.23,-712.06 517.93,-693.51 502,-697.16"/>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;stdlib_logger -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge60" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;stdlib_logger</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M710.86,-724.77C688.36,-697.74 636.19,-630.57 614,-564.16 585.44,-478.68 637.32,-228.03 578,-160.16 515.45,-88.6 217.82,-70.78 98.07,-66.48"/>
+<polygon fill="#f0ff00" stroke="#f0ff00" points="97.84,-62.97 87.73,-66.13 97.6,-69.97 97.84,-62.97"/>
+</g>
+<!-- module~core_c_utils_signal_flag -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node36" class="node">
+<title>module~core_c_utils_signal_flag</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node36"><a xlink:href="../module/core_c_utils_signal_flag.html" xlink:title="core_c_utils_signal_flag">
+<polygon fill="#337ab7" stroke="#337ab7" points="569,-749.16 433,-749.16 433,-725.16 569,-725.16 569,-749.16"/>
+<text text-anchor="middle" x="501" y="-734.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_signal_flag</text>
+</a>
+</g>
+</g>
+<!-- module~core_fortran_utils_signal_flag_wrapper&#45;&gt;module~core_c_utils_signal_flag -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge59" class="edge">
+<title>module~core_fortran_utils_signal_flag_wrapper&#45;&gt;module~core_c_utils_signal_flag</title>
+<path fill="none" stroke="#f0ff00" stroke-dasharray="5,2" d="M613.68,-737.16C602.06,-737.16 590.41,-737.16 579.25,-737.16"/>
+<polygon fill="#f0ff00" stroke="#f0ff00" points="579.16,-733.66 569.16,-737.16 579.16,-740.66 579.16,-733.66"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge62" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M500,-899.16C426.68,-893.25 391.1,-946.14 334.5,-899.16"/>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M332.5,-899.16C161.66,-757.39 357.29,-564.19 187.5,-421.16"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge61" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M908.35,-825.22C833.6,-837.38 715.69,-857.06 614,-876.16 564.06,-885.55 552.66,-903.14 502,-899.16"/>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M500,-899.16C465.3,-896.37 453.77,-898.22 424,-880.16 390.55,-859.87 362.66,-823.08 347.3,-799.94"/>
+<polygon fill="#96ff00" stroke="#96ff00" points="350.05,-797.75 341.69,-791.24 344.17,-801.54 350.05,-797.75"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;stdlib_strings -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge64" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;stdlib_strings</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M888.04,-825.24C880.73,-827.7 873.62,-830.64 867,-834.16 846.74,-844.94 850.93,-859.8 831,-871.16 813.54,-881.12 792.38,-887.28 773.47,-891.09"/>
+<polygon fill="#96ff00" stroke="#96ff00" points="772.73,-887.66 763.53,-892.92 774,-894.55 772.73,-887.66"/>
+</g>
+<!-- module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge63" class="edge">
+<title>module~core_fortran_utils_system_info_wrapper&#45;&gt;module~core_c_utils</title>
+<path fill="none" stroke="#96ff00" stroke-dasharray="5,2" d="M872.86,-805.93C836.67,-803.56 798.43,-801.06 769.71,-799.19"/>
+<polygon fill="#96ff00" stroke="#96ff00" points="769.78,-795.68 759.57,-798.52 769.32,-802.67 769.78,-795.68"/>
+</g>
+<!-- module~core_types_array&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge65" class="edge">
+<title>module~core_types_array&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#3cff00" stroke-dasharray="5,2" d="M449.26,-308.37C403.4,-317.79 334.75,-334.69 279,-360.16 234.55,-380.48 224.89,-452.64 187.5,-421.16"/>
+</g>
+<!-- module~core_types_array&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge66" class="edge">
+<title>module~core_types_array&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#3cff00" stroke-dasharray="5,2" d="M455.81,-311.24C445.07,-314.99 433.85,-319.63 424,-325.16 405.85,-335.37 405.49,-343.86 388,-355.16 382.94,-358.43 377.41,-361.56 371.89,-364.44"/>
+<polygon fill="#3cff00" stroke="#3cff00" points="370.07,-361.44 362.69,-369.04 373.2,-367.7 370.07,-361.44"/>
+</g>
+<!-- module~core_types_array&#45;&gt;module~core_deallocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge67" class="edge">
+<title>module~core_types_array&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#3cff00" stroke-dasharray="5,2" d="M449.45,-299.78C431.4,-299.99 410.93,-300.24 392.32,-300.47"/>
+<polygon fill="#3cff00" stroke="#3cff00" points="392.16,-296.97 382.2,-300.59 392.24,-303.97 392.16,-296.97"/>
+</g>
+<!-- module~core_types_gauss&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge68" class="edge">
+<title>module~core_types_gauss&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff1e" stroke-dasharray="5,2" d="M133.12,-219.17C123.76,-217.74 113.97,-216.24 104.5,-214.79"/>
+<polygon fill="#00ff1e" stroke="#00ff1e" points="104.79,-211.3 94.38,-213.25 103.73,-218.22 104.79,-211.3"/>
+</g>
+<!-- module~core_types_pointer&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge69" class="edge">
+<title>module~core_types_pointer&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff78" stroke-dasharray="5,2" d="M155.51,-117.2C146.98,-121.15 137.87,-125.9 130,-131.16 105.88,-147.29 81.8,-170.36 66.04,-186.64"/>
+<polygon fill="#00ff78" stroke="#00ff78" points="63.36,-184.37 59,-194.03 68.43,-189.2 63.36,-184.37"/>
+</g>
+<!-- module~core_types_variable&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge70" class="edge">
+<title>module~core_types_variable&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M460.11,-555.27C414.99,-568.57 346.25,-587.51 334.5,-583.16"/>
+</g>
+<!-- module~core_types_variable&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge71" class="edge">
+<title>module~core_types_variable&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#00ffd1" stroke-dasharray="5,2" d="M479.41,-531.05C462.73,-520.41 439.53,-503.61 424,-484.16 400.42,-454.65 414.51,-434.08 388,-407.16 384.77,-403.89 381.05,-400.97 377.1,-398.37"/>
+<polygon fill="#00ffd1" stroke="#00ffd1" points="378.61,-395.2 368.21,-393.21 375.1,-401.26 378.61,-395.2"/>
+</g>
+<!-- module~core_types_vector&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge72" class="edge">
+<title>module~core_types_vector&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00d1ff" stroke-dasharray="5,2" d="M278.59,-30.66C235.01,-37.36 173.9,-52.07 130,-84.16 94.19,-110.34 69.21,-157.2 56.86,-184.6"/>
+<polygon fill="#00d1ff" stroke="#00d1ff" points="53.52,-183.5 52.75,-194.07 59.94,-186.29 53.52,-183.5"/>
+</g>
+<!-- module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge73" class="edge">
+<title>module~core_vtk_vtk_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#0078ff" stroke-dasharray="5,2" d="M920.6,-589.2C793,-602.29 508.66,-635.93 424,-683.16 391.12,-701.51 363.4,-736.17 347.87,-758.44"/>
+<polygon fill="#0078ff" stroke="#0078ff" points="344.88,-756.62 342.17,-766.86 350.68,-760.54 344.88,-756.62"/>
+</g>
+<!-- module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge74" class="edge">
+<title>module~core_vtk_vtu_wrapper&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#001dff" stroke-dasharray="5,2" d="M920.49,-657.61C867.69,-654.05 790.43,-651.4 723.5,-659.16"/>
+</g>
+<!-- module~inout_project_settings&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge75" class="edge">
+<title>module~inout_project_settings&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M1431.36,-985.24C1403.7,-995.97 1360.33,-1010.39 1321,-1013.16"/>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M1319,-1013.16C1171.15,-1023.6 1133.72,-1013.16 985.5,-1013.16 985.5,-1013.16 985.5,-1013.16 332.5,-1013.16 274.27,-1013.16 219.81,-964.77 130,-738.16 55.99,-551.41 48.45,-303.18 47.94,-228.39"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="51.44,-228.27 47.91,-218.28 44.44,-228.29 51.44,-228.27"/>
+</g>
+<!-- module~inout_project_settings&#45;&gt;module~module_core -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge76" class="edge">
+<title>module~inout_project_settings&#45;&gt;module~module_core</title>
+<path fill="none" stroke="#3c00ff" stroke-dasharray="5,2" d="M1413.04,-961.04C1407.38,-958.57 1401.88,-955.64 1397,-952.16 1368.1,-931.58 1345.07,-896.82 1332.23,-874.44"/>
+<polygon fill="#3c00ff" stroke="#3c00ff" points="1335.13,-872.45 1327.22,-865.41 1329.01,-875.85 1335.13,-872.45"/>
+</g>
+<!-- module~core_types_matrix -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node37" class="node">
+<title>module~core_types_matrix</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node37"><a xlink:href="../module/core_types_matrix.html" xlink:title="core_types_matrix">
+<polygon fill="#337ab7" stroke="#337ab7" points="388,-473.16 279,-473.16 279,-449.16 388,-449.16 388,-473.16"/>
+<text text-anchor="middle" x="333.5" y="-458.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge77" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M661.92,-430.89C645.72,-435.06 628.62,-440.93 614,-449.16 594.56,-460.12 598.68,-475.77 578,-484.16 511.19,-511.29 425.88,-492.31 376.01,-476.46"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="376.81,-473.04 366.22,-473.24 374.63,-479.69 376.81,-473.04"/>
+</g>
+<!-- module~core_types_matrix_coo -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node38" class="node">
+<title>module~core_types_matrix_coo</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node38"><a xlink:href="../module/core_types_matrix_coo.html" xlink:title="core_types_matrix_coo">
+<polygon fill="#337ab7" stroke="#337ab7" points="568,-475.16 434,-475.16 434,-451.16 568,-451.16 568,-475.16"/>
+<text text-anchor="middle" x="501" y="-460.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix_coo</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix_coo -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge78" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix_coo</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M661.81,-432.59C634.9,-437.74 602.87,-443.86 574.58,-449.28"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="573.91,-445.84 564.75,-451.16 575.23,-452.72 573.91,-445.84"/>
+</g>
+<!-- module~core_types_matrix_crs -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node39" class="node">
+<title>module~core_types_matrix_crs</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node39"><a xlink:href="../module/core_types_matrix_crs.html" xlink:title="core_types_matrix_crs">
+<polygon fill="#337ab7" stroke="#337ab7" points="566,-433.16 436,-433.16 436,-409.16 566,-409.16 566,-433.16"/>
+<text text-anchor="middle" x="501" y="-418.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix_crs</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix_crs -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge79" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix_crs</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M661.81,-421.16C635.47,-421.16 604.22,-421.16 576.38,-421.16"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="576.3,-417.66 566.29,-421.16 576.29,-424.66 576.3,-417.66"/>
+</g>
+<!-- module~core_types_matrix_dense -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node40" class="node">
+<title>module~core_types_matrix_dense</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node40"><a xlink:href="../module/core_types_matrix_dense.html" xlink:title="core_types_matrix_dense">
+<polygon fill="#337ab7" stroke="#337ab7" points="574.5,-391.16 427.5,-391.16 427.5,-367.16 574.5,-367.16 574.5,-391.16"/>
+<text text-anchor="middle" x="501" y="-376.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_types_matrix_dense</text>
+</a>
+</g>
+</g>
+<!-- module~module_type_matrix&#45;&gt;module~core_types_matrix_dense -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge80" class="edge">
+<title>module~module_type_matrix&#45;&gt;module~core_types_matrix_dense</title>
+<path fill="none" stroke="#9500ff" stroke-dasharray="5,2" d="M661.81,-409.74C634.9,-404.59 602.87,-398.47 574.58,-393.05"/>
+<polygon fill="#9500ff" stroke="#9500ff" points="575.23,-389.61 564.75,-391.17 573.91,-396.49 575.23,-389.61"/>
+</g>
+<!-- module~core_c_utils&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge81" class="edge">
+<title>module~core_c_utils&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M685.17,-799.64C628.97,-804.36 517.64,-811 424,-800.16 411.36,-798.7 397.92,-796.11 385.4,-793.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="386.13,-789.82 375.59,-790.9 384.5,-796.63 386.13,-789.82"/>
+</g>
+<!-- module~core_c_utils&#45;&gt;module~core_c_utils_signal_flag -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge83" class="edge">
+<title>module~core_c_utils&#45;&gt;module~core_c_utils_signal_flag</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M685.25,-786.42C650.23,-777.01 596.73,-762.63 556.56,-751.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="557.22,-748.38 546.65,-749.17 555.4,-755.14 557.22,-748.38"/>
+</g>
+<!-- module~core_c_utils_memory_stats -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node41" class="node">
+<title>module~core_c_utils_memory_stats</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node41"><a xlink:href="../module/core_c_utils_memory_stats.html" xlink:title="core_c_utils_memory_stats">
+<polygon fill="#337ab7" stroke="#337ab7" points="578,-791.16 424,-791.16 424,-767.16 578,-767.16 578,-791.16"/>
+<text text-anchor="middle" x="501" y="-776.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_memory_stats</text>
+</a>
+</g>
+</g>
+<!-- module~core_c_utils&#45;&gt;module~core_c_utils_memory_stats -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge82" class="edge">
+<title>module~core_c_utils&#45;&gt;module~core_c_utils_memory_stats</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M685.25,-793.36C658.99,-791.32 622.33,-788.48 588.7,-785.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="588.62,-782.36 578.38,-785.08 588.08,-789.34 588.62,-782.36"/>
+</g>
+<!-- module~core_c_utils_system_info -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_node42" class="node">
+<title>module~core_c_utils_system_info</title>
+<g id="a_module~~calculate_hcf_mvg~~UsesGraph_node42"><a xlink:href="../module/core_c_utils_system_info.html" xlink:title="core_c_utils_system_info">
+<polygon fill="#337ab7" stroke="#337ab7" points="572,-871.16 430,-871.16 430,-847.16 572,-847.16 572,-871.16"/>
+<text text-anchor="middle" x="501" y="-856.76" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core_c_utils_system_info</text>
+</a>
+</g>
+</g>
+<!-- module~core_c_utils&#45;&gt;module~core_c_utils_system_info -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge84" class="edge">
+<title>module~core_c_utils&#45;&gt;module~core_c_utils_system_info</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M685.25,-806.57C649.37,-816.87 594.08,-832.74 553.62,-844.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="552.57,-841.01 543.93,-847.13 554.51,-847.74 552.57,-841.01"/>
+</g>
+<!-- module~core_c_utils_signal_flag&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge85" class="edge">
+<title>module~core_c_utils_signal_flag&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M452.57,-749.2C431.63,-754.51 406.97,-760.77 385.62,-766.19"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="384.58,-762.84 375.75,-768.7 386.3,-769.63 384.58,-762.84"/>
+</g>
+<!-- module~core_types_matrix&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge86" class="edge">
+<title>module~core_types_matrix&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M278.83,-457.25C249.04,-452.61 212.97,-442.6 187.5,-421.16"/>
+</g>
+<!-- module~core_types_matrix_coo&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge87" class="edge">
+<title>module~core_types_matrix_coo&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M484.02,-475.29C443.34,-506.08 338.79,-584.75 334.5,-583.16"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M332.5,-583.16C241.88,-549.61 261.4,-483.42 187.5,-421.16"/>
+</g>
+<!-- module~core_types_matrix_coo&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge88" class="edge">
+<title>module~core_types_matrix_coo&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M443.9,-451.15C436.98,-448.67 430.18,-445.7 424,-442.16 404.64,-431.07 406.27,-419.98 388,-407.16 383.18,-403.78 377.85,-400.62 372.48,-397.74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="373.99,-394.58 363.49,-393.18 370.83,-400.82 373.99,-394.58"/>
+</g>
+<!-- module~core_types_matrix_coo&#45;&gt;module~core_deallocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge89" class="edge">
+<title>module~core_types_matrix_coo&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M437.46,-451.01C432.61,-448.57 428.04,-445.66 424,-442.16 393.9,-416.12 409.65,-393.56 388,-360.16 378.68,-345.79 365.85,-331.5 355.09,-320.59"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="357.27,-317.83 347.7,-313.29 352.35,-322.81 357.27,-317.83"/>
+</g>
+<!-- module~core_types_matrix_coo&#45;&gt;module~core_types_matrix -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge90" class="edge">
+<title>module~core_types_matrix_coo&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M433.64,-462.36C421.95,-462.22 409.81,-462.07 398.2,-461.93"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="398.2,-458.43 388.16,-461.81 398.12,-465.43 398.2,-458.43"/>
+</g>
+<!-- module~core_types_matrix_crs&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge91" class="edge">
+<title>module~core_types_matrix_crs&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M435.89,-419.31C405.18,-418.89 367.91,-419.08 334.5,-421.16"/>
+</g>
+<!-- module~core_types_matrix_crs&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge92" class="edge">
+<title>module~core_types_matrix_crs&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M450.34,-409.16C429.89,-404.22 406.2,-398.49 385.6,-393.51"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="386.3,-390.08 375.76,-391.14 384.66,-396.89 386.3,-390.08"/>
+</g>
+<!-- module~core_types_matrix_crs&#45;&gt;module~core_deallocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge93" class="edge">
+<title>module~core_types_matrix_crs&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M442.48,-409.1C436.01,-406.64 429.71,-403.69 424,-400.16 403.66,-387.59 404.03,-377.91 388,-360.16 376.22,-347.12 362.94,-332.48 352.56,-321.05"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="354.89,-318.41 345.58,-313.36 349.71,-323.11 354.89,-318.41"/>
+</g>
+<!-- module~core_types_matrix_crs&#45;&gt;module~core_types_matrix -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge94" class="edge">
+<title>module~core_types_matrix_crs&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M450.34,-433.17C432.67,-437.44 412.58,-442.29 394.16,-446.75"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="393.3,-443.35 384.41,-449.1 394.95,-450.16 393.3,-443.35"/>
+</g>
+<!-- module~core_types_matrix_dense&#45;&gt;iso_fortran_env -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge95" class="edge">
+<title>module~core_types_matrix_dense&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M455.94,-391.25C411.14,-403.38 346.63,-420.41 334.5,-421.16"/>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M332.5,-421.16C268.18,-425.18 236.79,-462.68 187.5,-421.16"/>
+</g>
+<!-- module~core_types_matrix_dense&#45;&gt;module~core_allocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge96" class="edge">
+<title>module~core_types_matrix_dense&#45;&gt;module~core_allocate</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M427.41,-380.04C413.43,-380.21 399.06,-380.38 385.92,-380.54"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="385.64,-377.05 375.68,-380.67 385.72,-384.05 385.64,-377.05"/>
+</g>
+<!-- module~core_types_matrix_dense&#45;&gt;module~core_deallocate -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge97" class="edge">
+<title>module~core_types_matrix_dense&#45;&gt;module~core_deallocate</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M474.5,-367.15C446.32,-353.86 400.75,-332.39 369.3,-317.57"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="370.56,-314.29 360.03,-313.19 367.58,-320.62 370.56,-314.29"/>
+</g>
+<!-- module~core_types_matrix_dense&#45;&gt;module~core_types_matrix -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge98" class="edge">
+<title>module~core_types_matrix_dense&#45;&gt;module~core_types_matrix</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M443.9,-391.17C436.98,-393.66 430.18,-396.62 424,-400.16 404.64,-411.26 406.27,-422.35 388,-435.16 383.18,-438.55 377.85,-441.71 372.48,-444.59"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="370.83,-441.5 363.49,-449.15 373.99,-447.75 370.83,-441.5"/>
+</g>
+<!-- module~core_c_utils_memory_stats&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge99" class="edge">
+<title>module~core_c_utils_memory_stats&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M423.55,-779.16C410.84,-779.16 397.93,-779.16 386.03,-779.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="385.87,-775.66 375.87,-779.16 385.87,-782.66 385.87,-775.66"/>
+</g>
+<!-- module~core_c_utils_system_info&#45;&gt;iso_c_binding -->
+<g id="module~~calculate_hcf_mvg~~UsesGraph_edge100" class="edge">
+<title>module~core_c_utils_system_info&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M459.53,-847.1C447.86,-843.15 435.25,-838.41 424,-833.16 401.73,-822.78 377.98,-808.28 360.55,-796.91"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="362.32,-793.89 352.05,-791.3 358.46,-799.73 362.32,-793.89"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulecalculate_hcf_mvgUsesGraph = svgPanZoom('#modulecalculate_hcf_mvgUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      
+      <br>
+
+
+
+
+
+
+
+        <section>
+          <h2>Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-calc_kr_mvg"></span> <h3>pure elemental function <a href='../proc/calc_kr_mvg.html'>calc_kr_mvg</a>(theta_s, theta_r, alpha1, n1, m1, l, h_crit, h) result(kr)  
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-theta_s~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>theta_s</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-theta_r~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>theta_r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha1~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n1~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-m1"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>m1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l~4"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>l</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-h_crit~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>h_crit</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-h~12"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>h</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+
+        <section>
+          <h2>Module Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-calc_kr_base_mvg"></span> <h3>pure elemental module function <a href='../proc/calc_kr_base_mvg.html'>calc_kr_base_mvg</a>(self, h) result(kr)  
+    <a href="../interface/calc_kr_base_mvg.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~210"></span>
+              class(<a href='../type/type_hcf_base_mvg.html'>type_hcf_base_mvg</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-h~13"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>h</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-construct_type_hcf_base_mvg"></span> <h3>module function <a href='../proc/construct_type_hcf_base_mvg.html'>construct_type_hcf_base_mvg</a>(theta_s, theta_r, alpha1, n1, l, h_crit) result(structure)  
+    <a href="../interface/construct_type_hcf_base_mvg.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+    <div class="card-body">
+          
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-theta_s"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>theta_s</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-theta_r"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>theta_r</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-alpha1~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>alpha1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n1~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-l~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>l</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-h_crit"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>h_crit</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>class(<a href='../type/abst_hcf_base.html'>abst_hcf_base</a>), allocatable</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

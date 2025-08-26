@@ -1,0 +1,2228 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>hydraulic_interface.F90 &ndash; FTDSS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTDSS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>hydraulic_interface.F90
+      <small>Source File</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.8% of total for source files.">119 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hydraulic_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+            <li class="breadcrumb-item active" aria-current="page">hydraulic_interface.F90</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#mods-0"
+         aria-expanded="false" aria-controls="mods-0">
+         <h4 class="card-header bg-primary text-white">Modules</h4>
+      </a>
+      <div id="mods-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/main_hydraulic.html">main_hydraulic</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../sourcefile/hydraulic_interface.f90.html#src">hydraulic_interface.F90</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      
+      <br>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">This file depends on</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: sourcefile~~hydraulic_interface.f90~~EfferentGraph Pages: 1 -->
+<svg id="sourcefilehydraulic_interfacef90EfferentGraph" width="641pt" height="175pt"
+ viewBox="0.00 0.00 641.00 174.73" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph" class="graph" transform="scale(0.18 0.18) rotate(0) translate(4 946.26)">
+<title>sourcefile~~hydraulic_interface.f90~~EfferentGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-946.26 3482,-946.26 3482,4 -4,4"/>
+<!-- sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node1" class="node">
+<title>sourcefile~hydraulic_interface.f90</title>
+<polygon fill="none" stroke="black" points="3478,-628.09 3340,-628.09 3340,-604.09 3478,-604.09 3478,-628.09"/>
+<text text-anchor="middle" x="3409" y="-613.69" font-family="Helvetica,sans-Serif" font-size="10.50">hydraulic_interface.F90</text>
+</g>
+<!-- sourcefile~boundary.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node2" class="node">
+<title>sourcefile~boundary.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node2"><a xlink:href="../sourcefile/boundary.f90.html" xlink:title="boundary.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3304,-427.09 3219,-427.09 3219,-403.09 3304,-403.09 3304,-427.09"/>
+<text text-anchor="middle" x="3261.5" y="-412.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~boundary.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge1" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~boundary.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3399.12,-603.82C3374.86,-570.31 3307.3,-476.98 3277.25,-435.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3279.97,-433.25 3271.27,-427.2 3274.3,-437.36 3279.97,-433.25"/>
+</g>
+<!-- sourcefile~calculate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node3" class="node">
+<title>sourcefile~calculate.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node3"><a xlink:href="../sourcefile/calculate.f90.html" xlink:title="calculate.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1982,-668.09 1898,-668.09 1898,-644.09 1982,-644.09 1982,-668.09"/>
+<text text-anchor="middle" x="1940" y="-653.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calculate.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~calculate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge2" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~calculate.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2936.5,-656.09C2870.28,-655.67 2853.29,-648.55 2787.5,-656.09"/>
+</g>
+<!-- sourcefile~control.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node4" class="node">
+<title>sourcefile~control.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node4"><a xlink:href="../sourcefile/control.f90.html" xlink:title="control.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2314,-570.09 2242,-570.09 2242,-546.09 2314,-546.09 2314,-570.09"/>
+<text text-anchor="middle" x="2278" y="-555.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">control.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge3" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3112.5,-616.09C3033.2,-613.24 3017.84,-657.5 2938.5,-656.09"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2936.5,-656.09C2904.48,-655.53 2894.05,-654.23 2867,-637.09 2846.23,-623.94 2852.46,-607.09 2831,-595.09 2822.19,-590.17 2482.1,-538.13 2472,-538.09"/>
+</g>
+<!-- sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node5" class="node">
+<title>sourcefile~core.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node5"><a xlink:href="../sourcefile/core.f90.html" xlink:title="core.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="968,-736.09 910,-736.09 910,-712.09 968,-712.09 968,-736.09"/>
+<text text-anchor="middle" x="939" y="-721.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">core.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge4" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3403.94,-628.48C3383.58,-688.02 3286.61,-942.09 3114.5,-942.09 3114.5,-942.09 3114.5,-942.09 1779.5,-942.09 1638.58,-942.09 1602.54,-942.74 1463,-923.09 1420.61,-917.13 1411.8,-901.29 1369,-902.09"/>
+</g>
+<!-- sourcefile~domain.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node6" class="node">
+<title>sourcefile~domain.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node6"><a xlink:href="../sourcefile/domain.f90.html" xlink:title="domain.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2824.5,-320.09 2748.5,-320.09 2748.5,-296.09 2824.5,-296.09 2824.5,-320.09"/>
+<text text-anchor="middle" x="2786.5" y="-305.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">domain.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge5" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3406.05,-604.04C3399.33,-566.66 3373.65,-451.79 3304,-394.09 3165.89,-279.7 2933.94,-290.54 2834.77,-301.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2834.29,-298.07 2824.76,-302.7 2835.09,-305.02 2834.29,-298.07"/>
+</g>
+<!-- sourcefile~hydraulic_assemble.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node7" class="node">
+<title>sourcefile~hydraulic_assemble.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node7"><a xlink:href="../sourcefile/hydraulic_assemble.f90.html" xlink:title="hydraulic_assemble.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3008,-628.09 2867,-628.09 2867,-604.09 3008,-604.09 3008,-628.09"/>
+<text text-anchor="middle" x="2937.5" y="-613.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic_assemble.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~hydraulic_assemble.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge6" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~hydraulic_assemble.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3112.5,-616.09C3081.85,-614.99 3048.14,-614.76 3018.62,-614.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3018.35,-611.39 3008.37,-614.95 3018.39,-618.39 3018.35,-611.39"/>
+</g>
+<!-- sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node8" class="node">
+<title>sourcefile~input.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node8"><a xlink:href="../sourcefile/input.f90.html" xlink:title="input.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1399,-590.09 1337,-590.09 1337,-566.09 1399,-566.09 1399,-590.09"/>
+<text text-anchor="middle" x="1368" y="-575.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">input.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge7" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3339.77,-617.48C3280.27,-618.36 3191.65,-618.87 3114.5,-616.09"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3112.5,-616.09C2980.98,-610.92 2960.95,-544.99 2831,-524.09 2334.27,-444.23 2201.24,-492.44 1699,-522.09 1638.69,-525.66 1624.12,-532.08 1564,-538.09"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1562,-538.09C1508.32,-542.67 1447.68,-556.75 1408.93,-566.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1407.85,-563.57 1399.09,-569.53 1409.65,-570.34 1407.85,-563.57"/>
+</g>
+<!-- sourcefile~properties.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node9" class="node">
+<title>sourcefile~properties.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node9"><a xlink:href="../sourcefile/properties.f90.html" xlink:title="properties.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2831,-628.09 2742,-628.09 2742,-604.09 2831,-604.09 2831,-628.09"/>
+<text text-anchor="middle" x="2786.5" y="-613.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">properties.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~properties.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge8" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~properties.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2936.5,-656.09C2897.64,-655.4 2854.97,-642.65 2825.28,-631.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2826.33,-628.38 2815.74,-628.11 2823.85,-634.92 2826.33,-628.38"/>
+</g>
+<!-- sourcefile~solver.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node10" class="node">
+<title>sourcefile~solver.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node10"><a xlink:href="../sourcefile/solver.f90.html" xlink:title="solver.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3294.5,-791.09 3228.5,-791.09 3228.5,-767.09 3294.5,-767.09 3294.5,-791.09"/>
+<text text-anchor="middle" x="3261.5" y="-776.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solver.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~solver.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge9" class="edge">
+<title>sourcefile~hydraulic_interface.f90&#45;&gt;sourcefile~solver.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3397.06,-628.35C3372.1,-656.31 3310.73,-725.06 3280.26,-759.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3277.61,-756.91 3273.56,-766.7 3282.83,-761.57 3277.61,-756.91"/>
+</g>
+<!-- sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node13" class="node">
+<title>sourcefile~boundary_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node13"><a xlink:href="../sourcefile/boundary_interface.f90.html" xlink:title="boundary_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3007,-360.09 2868,-360.09 2868,-336.09 3007,-336.09 3007,-360.09"/>
+<text text-anchor="middle" x="2937.5" y="-345.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge10" class="edge">
+<title>sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3218.82,-403.15C3207.27,-400.02 3194.69,-396.77 3183,-394.09 3127.87,-381.46 3065.18,-369.72 3017.07,-361.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3017.49,-357.78 3007.04,-359.5 3016.29,-364.67 3017.49,-357.78"/>
+</g>
+<!-- sourcefile~boundary_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node14" class="node">
+<title>sourcefile~boundary_manager.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node14"><a xlink:href="../sourcefile/boundary_manager.f90.html" xlink:title="boundary_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="3183,-427.09 3044,-427.09 3044,-403.09 3183,-403.09 3183,-427.09"/>
+<text text-anchor="middle" x="3113.5" y="-412.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge11" class="edge">
+<title>sourcefile~boundary.f90&#45;&gt;sourcefile~boundary_manager.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3218.66,-415.09C3210.67,-415.09 3202.06,-415.09 3193.34,-415.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3193.08,-411.59 3183.08,-415.09 3193.08,-418.59 3193.08,-411.59"/>
+</g>
+<!-- sourcefile~density_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node17" class="node">
+<title>sourcefile~density_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node17"><a xlink:href="../sourcefile/density_interface.f90.html" xlink:title="density_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1626.5,-632.09 1499.5,-632.09 1499.5,-608.09 1626.5,-608.09 1626.5,-632.09"/>
+<text text-anchor="middle" x="1563" y="-617.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">density_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~calculate.f90&#45;&gt;sourcefile~density_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge12" class="edge">
+<title>sourcefile~calculate.f90&#45;&gt;sourcefile~density_interface.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1779.5,-620.09C1732.41,-612.54 1678.77,-612.51 1636.79,-614.38"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1636.47,-610.89 1626.66,-614.88 1636.82,-617.88 1636.47,-610.89"/>
+</g>
+<!-- sourcefile~gcc_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node21" class="node">
+<title>sourcefile~gcc_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node21"><a xlink:href="../sourcefile/gcc_interface.f90.html" xlink:title="gcc_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1616.5,-796.09 1509.5,-796.09 1509.5,-772.09 1616.5,-772.09 1616.5,-796.09"/>
+<text text-anchor="middle" x="1563" y="-781.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gcc_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~calculate.f90&#45;&gt;sourcefile~gcc_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge13" class="edge">
+<title>sourcefile~calculate.f90&#45;&gt;sourcefile~gcc_interface.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1779.5,-784.09C1729.7,-798.89 1670.51,-797.64 1626.78,-793.39"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1626.89,-789.88 1616.58,-792.32 1626.15,-796.84 1626.89,-789.88"/>
+</g>
+<!-- sourcefile~hcf_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node22" class="node">
+<title>sourcefile~hcf_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node22"><a xlink:href="../sourcefile/hcf_interface.f90.html" xlink:title="hcf_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1615.5,-754.09 1510.5,-754.09 1510.5,-730.09 1615.5,-730.09 1615.5,-754.09"/>
+<text text-anchor="middle" x="1563" y="-739.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hcf_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~calculate.f90&#45;&gt;sourcefile~hcf_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge14" class="edge">
+<title>sourcefile~calculate.f90&#45;&gt;sourcefile~hcf_interface.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1779.5,-784.09C1775.75,-785.21 1688.25,-767.63 1625.91,-754.87"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1626.25,-751.37 1615.75,-752.79 1624.85,-758.23 1626.25,-751.37"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node23" class="node">
+<title>sourcefile~heat_capacity_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node23"><a xlink:href="../sourcefile/heat_capacity_interface.f90.html" xlink:title="heat_capacity_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1862,-672.09 1699,-672.09 1699,-648.09 1862,-648.09 1862,-672.09"/>
+<text text-anchor="middle" x="1780.5" y="-657.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">heat_capacity_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~calculate.f90&#45;&gt;sourcefile~heat_capacity_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge15" class="edge">
+<title>sourcefile~calculate.f90&#45;&gt;sourcefile~heat_capacity_interface.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1897.62,-657.14C1889.67,-657.35 1881.07,-657.57 1872.25,-657.79"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1872.15,-654.29 1862.24,-658.04 1872.33,-661.29 1872.15,-654.29"/>
+</g>
+<!-- sourcefile~linalg.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node26" class="node">
+<title>sourcefile~linalg.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node26"><a xlink:href="../sourcefile/linalg.f90.html" xlink:title="linalg.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1247.5,-817.09 1183.5,-817.09 1183.5,-793.09 1247.5,-793.09 1247.5,-817.09"/>
+<text text-anchor="middle" x="1215.5" y="-802.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linalg.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~calculate.f90&#45;&gt;sourcefile~linalg.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge16" class="edge">
+<title>sourcefile~calculate.f90&#45;&gt;sourcefile~linalg.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1779.5,-784.09C1591.3,-840.02 1352.11,-821.16 1257.59,-810.4"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1257.91,-806.92 1247.58,-809.23 1257.1,-813.87 1257.91,-806.92"/>
+</g>
+<!-- sourcefile~specific_heat_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node34" class="node">
+<title>sourcefile~specific_heat_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node34"><a xlink:href="../sourcefile/specific_heat_interface.f90.html" xlink:title="specific_heat_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1642,-590.09 1484,-590.09 1484,-566.09 1642,-566.09 1642,-590.09"/>
+<text text-anchor="middle" x="1563" y="-575.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">specific_heat_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~calculate.f90&#45;&gt;sourcefile~specific_heat_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge17" class="edge">
+<title>sourcefile~calculate.f90&#45;&gt;sourcefile~specific_heat_interface.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1897.84,-645.13C1866.23,-637.08 1821.38,-626.49 1781.5,-620.09"/>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1779.5,-620.09C1729.33,-612.04 1672.97,-600.99 1630.47,-592.24"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1631.03,-588.78 1620.53,-590.18 1629.62,-595.64 1631.03,-588.78"/>
+</g>
+<!-- sourcefile~thermal_conductivity_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node36" class="node">
+<title>sourcefile~thermal_conductivity_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node36"><a xlink:href="../sourcefile/thermal_conductivity_interface.f90.html" xlink:title="thermal_conductivity_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1663,-712.09 1463,-712.09 1463,-688.09 1663,-688.09 1663,-712.09"/>
+<text text-anchor="middle" x="1563" y="-697.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">thermal_conductivity_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~calculate.f90&#45;&gt;sourcefile~thermal_conductivity_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge18" class="edge">
+<title>sourcefile~calculate.f90&#45;&gt;sourcefile~thermal_conductivity_interface.f90</title>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1918.57,-668.19C1911.87,-672.38 1904.48,-677.25 1898,-682.09 1842.89,-723.31 1847.47,-764.49 1781.5,-784.09"/>
+<path fill="none" stroke="#ffaa00" stroke-dasharray="5,2" d="M1779.5,-784.09C1723.08,-800.86 1718.25,-741.41 1663,-721.09 1656.63,-718.75 1649.93,-716.64 1643.14,-714.74"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="1643.72,-711.27 1633.16,-712.1 1641.93,-718.04 1643.72,-711.27"/>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge19" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M1779.5,-536.09C1743.97,-532.67 1494.47,-497.94 1463,-481.09 1409.51,-452.45 1429.67,-382.16 1369,-382.09"/>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge20" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M1779.5,-536.09C1684.16,-526.91 1659.31,-528.57 1564,-538.09"/>
+</g>
+<!-- sourcefile~iteration.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node25" class="node">
+<title>sourcefile~iteration.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node25"><a xlink:href="../sourcefile/iteration.f90.html" xlink:title="iteration.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2127,-588.09 2047,-588.09 2047,-564.09 2127,-564.09 2127,-588.09"/>
+<text text-anchor="middle" x="2087" y="-573.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iteration.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~iteration.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge21" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~iteration.f90</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M2241.89,-561.44C2212.51,-564.24 2170.25,-568.26 2137.45,-571.38"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="2136.78,-567.93 2127.16,-572.36 2137.45,-574.9 2136.78,-567.93"/>
+</g>
+<!-- sourcefile~openmp.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node30" class="node">
+<title>sourcefile~openmp.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node30"><a xlink:href="../sourcefile/openmp.f90.html" xlink:title="openmp.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1979.5,-588.09 1900.5,-588.09 1900.5,-564.09 1979.5,-564.09 1979.5,-588.09"/>
+<text text-anchor="middle" x="1940" y="-573.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">openmp.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~openmp.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge22" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~openmp.f90</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M2086,-536.09C2048.16,-536.48 2006.7,-549.25 1977.84,-560.25"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="1976.21,-557.13 1968.18,-564.05 1978.77,-563.65 1976.21,-557.13"/>
+</g>
+<!-- sourcefile~time.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node37" class="node">
+<title>sourcefile~time.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node37"><a xlink:href="../sourcefile/time.f90.html" xlink:title="time.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1592.5,-472.09 1533.5,-472.09 1533.5,-448.09 1592.5,-448.09 1592.5,-472.09"/>
+<text text-anchor="middle" x="1563" y="-457.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">time.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~control.f90&#45;&gt;sourcefile~time.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge23" class="edge">
+<title>sourcefile~control.f90&#45;&gt;sourcefile~time.f90</title>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M2241.96,-551.34C2204.12,-544.67 2142.01,-535.54 2088,-536.09"/>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M2086,-536.09C1950.67,-537.48 1916.36,-547.38 1781.5,-536.09"/>
+<path fill="none" stroke="#aaff00" stroke-dasharray="5,2" d="M1779.5,-536.09C1723.41,-530.69 1716.28,-504.41 1663,-486.09 1643.43,-479.37 1621.18,-473.38 1602.74,-468.85"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="1603.47,-465.43 1592.93,-466.49 1601.83,-472.23 1603.47,-465.43"/>
+</g>
+<!-- sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node12" class="node">
+<title>sourcefile~allocate.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node12"><a xlink:href="../sourcefile/allocate.f90.html" xlink:title="allocate.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="196.5,-755.09 118.5,-755.09 118.5,-731.09 196.5,-731.09 196.5,-755.09"/>
+<text text-anchor="middle" x="157.5" y="-740.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocate.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge24" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M936,-736.39C930.96,-763.11 915.07,-826.39 874,-856.09 795.15,-913.11 754.03,-877.85 657,-885.09"/>
+</g>
+<!-- sourcefile~check_range.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node15" class="node">
+<title>sourcefile~check_range.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node15"><a xlink:href="../sourcefile/check_range.f90.html" xlink:title="check_range.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="874,-554.09 771,-554.09 771,-530.09 874,-530.09 874,-554.09"/>
+<text text-anchor="middle" x="822.5" y="-539.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_range.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~check_range.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge25" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~check_range.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M935.99,-712.02C930.71,-683.61 913.97,-611.67 874,-568.09 871.08,-564.91 867.67,-562.05 864.03,-559.5"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="865.6,-556.35 855.25,-554.1 861.94,-562.32 865.6,-556.35"/>
+</g>
+<!-- sourcefile~deallocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node16" class="node">
+<title>sourcefile~deallocate.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node16"><a xlink:href="../sourcefile/deallocate.f90.html" xlink:title="deallocate.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="203,-572.09 112,-572.09 112,-548.09 203,-548.09 203,-572.09"/>
+<text text-anchor="middle" x="157.5" y="-557.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~deallocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge26" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~deallocate.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M309,-560.09C277.3,-558.02 241.77,-557.92 213.19,-558.38"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="212.93,-554.89 203,-558.57 213.07,-561.88 212.93,-554.89"/>
+</g>
+<!-- sourcefile~error.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node19" class="node">
+<title>sourcefile~error.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node19"><a xlink:href="../sourcefile/error.f90.html" xlink:title="error.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="60,-572.09 0,-572.09 0,-548.09 60,-548.09 60,-572.09"/>
+<text text-anchor="middle" x="30" y="-557.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">error.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~error.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge27" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~error.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M932.76,-711.93C919.49,-682.91 881.45,-609.93 823.5,-582.09"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M821.5,-582.09C719.15,-532.92 424.31,-567.49 311,-560.09"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M309,-560.09C268,-557.67 259.8,-543.79 219,-539.09 164.69,-532.84 150,-530.59 96,-539.09 87.41,-540.45 78.41,-542.75 69.94,-545.34"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="68.72,-542.06 60.29,-548.48 70.89,-548.71 68.72,-542.06"/>
+</g>
+<!-- sourcefile~fortran_utils.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node20" class="node">
+<title>sourcefile~fortran_utils.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node20"><a xlink:href="../sourcefile/fortran_utils.f90.html" xlink:title="fortran_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="872,-503.09 773,-503.09 773,-479.09 872,-479.09 872,-503.09"/>
+<text text-anchor="middle" x="822.5" y="-488.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fortran_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~fortran_utils.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge28" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~fortran_utils.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M937.13,-711.71C934.15,-677.7 921.74,-581.34 874,-521.09 870.27,-516.38 865.58,-512.25 860.57,-508.68"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="862.26,-505.61 851.95,-503.2 858.51,-511.52 862.26,-505.61"/>
+</g>
+<!-- sourcefile~string_utils.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node35" class="node">
+<title>sourcefile~string_utils.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node35"><a xlink:href="../sourcefile/string_utils.f90.html" xlink:title="string_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="868.5,-847.09 776.5,-847.09 776.5,-823.09 868.5,-823.09 868.5,-847.09"/>
+<text text-anchor="middle" x="822.5" y="-832.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">string_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~string_utils.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge29" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~string_utils.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M926.4,-736.27C913.72,-749.48 892.72,-771.09 874,-789.09 864.61,-798.12 853.99,-807.87 844.91,-816.06"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="842.51,-813.51 837.4,-822.8 847.18,-818.72 842.51,-813.51"/>
+</g>
+<!-- sourcefile~types.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node38" class="node">
+<title>sourcefile~types.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node38"><a xlink:href="../sourcefile/types.f90.html" xlink:title="types.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="688,-776.09 624,-776.09 624,-752.09 688,-752.09 688,-776.09"/>
+<text text-anchor="middle" x="656" y="-761.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~types.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge30" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~types.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M915.4,-736.19C892.76,-747.82 856.62,-765.07 823.5,-775.09"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M821.5,-775.09C780.78,-787.42 731.9,-781.73 698.05,-774.78"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="698.57,-771.31 688.06,-772.6 697.08,-778.15 698.57,-771.31"/>
+</g>
+<!-- sourcefile~unique.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node39" class="node">
+<title>sourcefile~unique.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node39"><a xlink:href="../sourcefile/unique.f90.html" xlink:title="unique.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="692,-857.09 620,-857.09 620,-833.09 692,-833.09 692,-857.09"/>
+<text text-anchor="middle" x="656" y="-842.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">unique.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~unique.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge31" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~unique.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M821.5,-775.09C780.22,-787.59 774.79,-802.45 735,-819.09 724.51,-823.48 713.01,-827.65 702.12,-831.32"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="700.76,-828.09 692.36,-834.54 702.95,-834.73 700.76,-828.09"/>
+</g>
+<!-- sourcefile~vtk.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node40" class="node">
+<title>sourcefile~vtk.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node40"><a xlink:href="../sourcefile/vtk.f90.html" xlink:title="vtk.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="849.5,-736.09 795.5,-736.09 795.5,-712.09 849.5,-712.09 849.5,-736.09"/>
+<text text-anchor="middle" x="822.5" y="-721.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~vtk.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge32" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~vtk.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M909.99,-724.09C894.89,-724.09 876.09,-724.09 859.87,-724.09"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="859.65,-720.59 849.65,-724.09 859.65,-727.59 859.65,-720.59"/>
+</g>
+<!-- sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node41" class="node">
+<title>sourcefile~vtk_constants.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node41"><a xlink:href="../sourcefile/vtk_constants.f90.html" xlink:title="vtk_constants.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="709.5,-612.09 602.5,-612.09 602.5,-588.09 709.5,-588.09 709.5,-612.09"/>
+<text text-anchor="middle" x="656" y="-597.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_constants.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~core.f90&#45;&gt;sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge33" class="edge">
+<title>sourcefile~core.f90&#45;&gt;sourcefile~vtk_constants.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M821.5,-582.09C781.67,-562.96 730.31,-573.32 695.67,-584.63"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="694.24,-581.42 685.92,-587.99 696.51,-588.04 694.24,-581.42"/>
+</g>
+<!-- sourcefile~adjacency.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node11" class="node">
+<title>sourcefile~adjacency.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node11"><a xlink:href="../sourcefile/adjacency.f90.html" xlink:title="adjacency.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2515,-204.09 2427,-204.09 2427,-180.09 2515,-180.09 2515,-204.09"/>
+<text text-anchor="middle" x="2471" y="-189.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">adjacency.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~adjacency.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge34" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~adjacency.f90</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M2752.84,-296.01C2695.67,-274.86 2577.57,-231.16 2514.26,-207.73"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2515.18,-204.34 2504.59,-204.15 2512.75,-210.91 2515.18,-204.34"/>
+</g>
+<!-- sourcefile~domain_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node18" class="node">
+<title>sourcefile~domain_manager.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node18"><a xlink:href="../sourcefile/domain_manager.f90.html" xlink:title="domain_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2706,-184.09 2578,-184.09 2578,-160.09 2706,-160.09 2706,-184.09"/>
+<text text-anchor="middle" x="2642" y="-169.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">domain_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~domain_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge35" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~domain_manager.f90</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M2772.85,-296.02C2748.09,-272.39 2693.03,-219.85 2663.18,-191.36"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2665.47,-188.7 2655.82,-184.33 2660.64,-193.77 2665.47,-188.7"/>
+</g>
+<!-- sourcefile~mesh.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node28" class="node">
+<title>sourcefile~mesh.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node28"><a xlink:href="../sourcefile/mesh.f90.html" xlink:title="mesh.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2119,-178.09 2055,-178.09 2055,-154.09 2119,-154.09 2119,-178.09"/>
+<text text-anchor="middle" x="2087" y="-163.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mesh.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~mesh.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge36" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~mesh.f90</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M2782.73,-295.92C2772.63,-254.79 2733.55,-120.81 2643,-70.09"/>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M2641,-70.09C2547.2,-17.55 2499.62,-8.65 2400,-49.09 2379.32,-57.49 2383.33,-72.94 2364,-84.09 2330,-103.71 2317.35,-99.71 2279,-108.09"/>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M2277,-108.09C2239.13,-116.14 2229.1,-116.05 2192,-127.09 2169.87,-133.68 2145.68,-142.64 2126.21,-150.31"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2124.76,-147.12 2116.77,-154.07 2127.36,-153.62 2124.76,-147.12"/>
+</g>
+<!-- sourcefile~multicoloring.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node29" class="node">
+<title>sourcefile~multicoloring.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node29"><a xlink:href="../sourcefile/multicoloring.f90.html" xlink:title="multicoloring.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2524,-124.09 2418,-124.09 2418,-100.09 2524,-100.09 2524,-124.09"/>
+<text text-anchor="middle" x="2471" y="-109.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">multicoloring.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~multicoloring.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge37" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~multicoloring.f90</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M2641,-70.09C2635.77,-67.16 2572.07,-84.01 2524.41,-97.24"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2523.2,-93.94 2514.51,-100 2525.08,-100.68 2523.2,-93.94"/>
+</g>
+<!-- sourcefile~reordering.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node32" class="node">
+<title>sourcefile~reordering.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node32"><a xlink:href="../sourcefile/reordering.f90.html" xlink:title="reordering.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2516.5,-82.09 2425.5,-82.09 2425.5,-58.09 2516.5,-58.09 2516.5,-82.09"/>
+<text text-anchor="middle" x="2471" y="-67.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">reordering.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~domain.f90&#45;&gt;sourcefile~reordering.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge38" class="edge">
+<title>sourcefile~domain.f90&#45;&gt;sourcefile~reordering.f90</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M2641,-70.09C2606.52,-50.78 2561.53,-51.79 2526.65,-57.08"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="2525.91,-53.66 2516.63,-58.76 2527.07,-60.56 2525.91,-53.66"/>
+</g>
+<!-- sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~calculate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge39" class="edge">
+<title>sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~calculate.f90</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2900.54,-628.15C2870.66,-637.59 2826.82,-650.09 2787.5,-656.09"/>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2785.5,-656.09C2741.92,-662.75 2250.58,-706.06 2156,-710.09 2094.72,-712.71 2076.49,-728.56 2018,-710.09 1996.26,-703.23 1975.34,-687.8 1960.8,-675.18"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="1962.79,-672.26 1953.02,-668.16 1958.1,-677.46 1962.79,-672.26"/>
+</g>
+<!-- sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge40" class="edge">
+<title>sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2641,-538.09C2566.34,-529.9 2547.11,-538.37 2472,-538.09"/>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2470,-538.09C2419.81,-537.91 2362.59,-544.86 2323.98,-550.61"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="2323.45,-547.15 2314.09,-552.12 2324.5,-554.07 2323.45,-547.15"/>
+</g>
+<!-- sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge41" class="edge">
+<title>sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2909.19,-603.95C2888.16,-594.97 2858.18,-582.98 2831,-575.09 2749.22,-551.36 2727.65,-547.39 2643,-538.09"/>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2641,-538.09C2347.61,-480.15 2278.98,-437.32 1982,-402.09 1711.31,-369.99 1641.59,-382.49 1369,-382.09"/>
+</g>
+<!-- sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge42" class="edge">
+<title>sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2930.66,-604.02C2908.18,-557.55 2827.05,-389.85 2797.97,-329.73"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="2800.97,-327.9 2793.46,-320.42 2794.67,-330.95 2800.97,-327.9"/>
+</g>
+<!-- sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~properties.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge43" class="edge">
+<title>sourcefile~hydraulic_assemble.f90&#45;&gt;sourcefile~properties.f90</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M2866.8,-616.09C2858.28,-616.09 2849.67,-616.09 2841.43,-616.09"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="2841.22,-612.59 2831.22,-616.09 2841.22,-619.59 2841.22,-612.59"/>
+</g>
+<!-- sourcefile~input_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node24" class="node">
+<title>sourcefile~input_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node24"><a xlink:href="../sourcefile/input_interface.f90.html" xlink:title="input_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1273,-676.09 1158,-676.09 1158,-652.09 1273,-652.09 1273,-676.09"/>
+<text text-anchor="middle" x="1215.5" y="-661.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">input_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input.f90&#45;&gt;sourcefile~input_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge44" class="edge">
+<title>sourcefile~input.f90&#45;&gt;sourcefile~input_interface.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1340.41,-590.17C1330.44,-594.9 1319.08,-600.52 1309,-606.09 1286.19,-618.7 1261.2,-634.5 1242.95,-646.42"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1241,-643.51 1234.57,-651.93 1244.85,-649.36 1241,-643.51"/>
+</g>
+<!-- sourcefile~materials_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node27" class="node">
+<title>sourcefile~materials_manager.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node27"><a xlink:href="../sourcefile/materials_manager.f90.html" xlink:title="materials_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2156,-668.09 2018,-668.09 2018,-644.09 2156,-644.09 2156,-668.09"/>
+<text text-anchor="middle" x="2087" y="-653.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">materials_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~properties.f90&#45;&gt;sourcefile~materials_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge45" class="edge">
+<title>sourcefile~properties.f90&#45;&gt;sourcefile~materials_manager.f90</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M2741.8,-614.78C2713.59,-614.26 2676.09,-614.16 2643,-616.09"/>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M2641,-616.09C2441.45,-627.72 2390.97,-622.97 2192,-642.09 2183.66,-642.9 2174.96,-643.86 2166.29,-644.91"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="2165.66,-641.46 2156.16,-646.16 2166.52,-648.4 2165.66,-641.46"/>
+</g>
+<!-- sourcefile~properties_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node31" class="node">
+<title>sourcefile~properties_manager.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node31"><a xlink:href="../sourcefile/properties_manager.f90.html" xlink:title="properties_manager.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2542,-668.09 2400,-668.09 2400,-644.09 2542,-644.09 2542,-668.09"/>
+<text text-anchor="middle" x="2471" y="-653.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">properties_manager.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~properties.f90&#45;&gt;sourcefile~properties_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge46" class="edge">
+<title>sourcefile~properties.f90&#45;&gt;sourcefile~properties_manager.f90</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M2641,-616.09C2597.99,-618.6 2550.34,-630.77 2516.63,-641.04"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="2515.58,-637.7 2507.07,-644.01 2517.66,-644.38 2515.58,-637.7"/>
+</g>
+<!-- sourcefile~solver_factory.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node33" class="node">
+<title>sourcefile~solver_factory.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node33"><a xlink:href="../sourcefile/solver_factory.f90.html" xlink:title="solver_factory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1617.5,-914.09 1508.5,-914.09 1508.5,-890.09 1617.5,-890.09 1617.5,-914.09"/>
+<text text-anchor="middle" x="1563" y="-899.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solver_factory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~solver.f90&#45;&gt;sourcefile~solver_factory.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge47" class="edge">
+<title>sourcefile~solver.f90&#45;&gt;sourcefile~solver_factory.f90</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M3240.62,-791.29C3191.37,-820.32 3058.95,-891.09 2938.5,-891.09 2938.5,-891.09 2938.5,-891.09 1939,-891.09 1829.67,-891.09 1702.49,-895.82 1627.87,-899.08"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="1627.54,-895.59 1617.7,-899.53 1627.85,-902.58 1627.54,-895.59"/>
+</g>
+<!-- sourcefile~adjacency_element.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node42" class="node">
+<title>sourcefile~adjacency_element.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node42"><a xlink:href="../sourcefile/adjacency_element.f90.html" xlink:title="adjacency_element.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2347.5,-244.09 2208.5,-244.09 2208.5,-220.09 2347.5,-220.09 2347.5,-244.09"/>
+<text text-anchor="middle" x="2278" y="-229.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">adjacency_element.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~adjacency.f90&#45;&gt;sourcefile~adjacency_element.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge48" class="edge">
+<title>sourcefile~adjacency.f90&#45;&gt;sourcefile~adjacency_element.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2426.66,-201.17C2402.94,-206.14 2373.04,-212.4 2346.35,-217.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2345.37,-214.62 2336.3,-220.09 2346.81,-221.47 2345.37,-214.62"/>
+</g>
+<!-- sourcefile~adjacency_node.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node43" class="node">
+<title>sourcefile~adjacency_node.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node43"><a xlink:href="../sourcefile/adjacency_node.f90.html" xlink:title="adjacency_node.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2339,-202.09 2217,-202.09 2217,-178.09 2339,-178.09 2339,-202.09"/>
+<text text-anchor="middle" x="2278" y="-187.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">adjacency_node.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~adjacency.f90&#45;&gt;sourcefile~adjacency_node.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge49" class="edge">
+<title>sourcefile~adjacency.f90&#45;&gt;sourcefile~adjacency_node.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2426.66,-191.64C2403.83,-191.4 2375.25,-191.1 2349.34,-190.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2349.22,-187.33 2339.18,-190.72 2349.14,-194.33 2349.22,-187.33"/>
+</g>
+<!-- sourcefile~adjacency_node_element.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node44" class="node">
+<title>sourcefile~adjacency_node_element.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node44"><a xlink:href="../sourcefile/adjacency_node_element.f90.html" xlink:title="adjacency_node_element.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="2364,-160.09 2192,-160.09 2192,-136.09 2364,-136.09 2364,-160.09"/>
+<text text-anchor="middle" x="2278" y="-145.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">adjacency_node_element.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~adjacency.f90&#45;&gt;sourcefile~adjacency_node_element.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge50" class="edge">
+<title>sourcefile~adjacency.f90&#45;&gt;sourcefile~adjacency_node_element.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2426.66,-182.11C2401.47,-176.31 2369.29,-168.89 2341.4,-162.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2341.88,-158.99 2331.35,-160.15 2340.31,-165.81 2341.88,-158.99"/>
+</g>
+<!-- sourcefile~allocate.f90&#45;&gt;sourcefile~error.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge51" class="edge">
+<title>sourcefile~allocate.f90&#45;&gt;sourcefile~error.f90</title>
+<path fill="none" stroke="#ff3100" stroke-dasharray="5,2" d="M118.21,-735.32C110.14,-732.26 102.2,-728 96,-722.09 55.63,-683.6 39.71,-616.7 33.95,-582.15"/>
+<polygon fill="#ff3100" stroke="#ff3100" points="37.39,-581.5 32.42,-572.15 30.47,-582.56 37.39,-581.5"/>
+</g>
+<!-- sourcefile~boundary_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge52" class="edge">
+<title>sourcefile~boundary_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff6200" stroke-dasharray="5,2" d="M2930.81,-335.95C2908.96,-290.75 2825.62,-130.97 2706,-56.09 2589.93,16.57 2534.32,6.56 2400,-20.09 2342.92,-31.42 2337.16,-68.29 2279,-70.09"/>
+<path fill="none" stroke="#ff6200" stroke-dasharray="5,2" d="M2277,-70.09C2127.68,-72.29 2090.33,-70.09 1941,-70.09 1941,-70.09 1941,-70.09 1779.5,-70.09 1638.2,-70.09 1592.15,-42.77 1463,-100.09 1411.24,-123.07 1416.58,-155.4 1369,-186.09"/>
+<path fill="none" stroke="#ff6200" stroke-dasharray="5,2" d="M1367,-186.09C1279.73,-240.65 1317.69,-343.3 1216.5,-362.09"/>
+<path fill="none" stroke="#ff6200" stroke-dasharray="5,2" d="M1214.5,-362.09C1047.43,-393.12 967.15,-628.3 945.91,-702.05"/>
+<polygon fill="#ff6200" stroke="#ff6200" points="942.42,-701.51 943.1,-712.08 949.16,-703.39 942.42,-701.51"/>
+</g>
+<!-- sourcefile~boundary_interface.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge53" class="edge">
+<title>sourcefile~boundary_interface.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ff6200" stroke-dasharray="5,2" d="M2891.8,-336.09C2873.71,-331.24 2852.83,-325.63 2834.52,-320.72"/>
+<polygon fill="#ff6200" stroke="#ff6200" points="2835.21,-317.28 2824.65,-318.07 2833.4,-324.04 2835.21,-317.28"/>
+</g>
+<!-- sourcefile~boundary_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge54" class="edge">
+<title>sourcefile~boundary_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff6200" stroke-dasharray="5,2" d="M2867.71,-348.09C2808.23,-348.09 2719.94,-348.09 2643,-348.09 2643,-348.09 2643,-348.09 2470,-348.09 2299.38,-348.09 2258.01,-295.74 2088,-310.09"/>
+<path fill="none" stroke="#ff6200" stroke-dasharray="5,2" d="M2086,-310.09C2028.26,-316.72 1611.59,-310.72 1564,-344.09"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge56" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff9400" stroke-dasharray="5,2" d="M2936.5,-424.09C2732.62,-391.65 2675.92,-456.29 2472,-424.09"/>
+<path fill="none" stroke="#ff9400" stroke-dasharray="5,2" d="M2470,-424.09C2379.97,-408.53 2178.98,-263.69 2088,-272.09"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~domain.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge57" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~domain.f90</title>
+<path fill="none" stroke="#ff9400" stroke-dasharray="5,2" d="M3043.97,-425.21C3011.79,-428.29 2973,-429.58 2938.5,-424.09"/>
+<path fill="none" stroke="#ff9400" stroke-dasharray="5,2" d="M2936.5,-424.09C2877.27,-414.67 2826.6,-359.48 2802.51,-328.74"/>
+<polygon fill="#ff9400" stroke="#ff9400" points="2805.01,-326.25 2796.17,-320.42 2799.45,-330.5 2805.01,-326.25"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge58" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff9400" stroke-dasharray="5,2" d="M2470,-424.09C2359.25,-408.08 1561.44,-385.88 1463,-439.09 1416.29,-464.34 1388.44,-524.1 1376.28,-556.43"/>
+<polygon fill="#ff9400" stroke="#ff9400" points="1372.97,-555.29 1372.87,-565.88 1379.55,-557.66 1372.97,-555.29"/>
+</g>
+<!-- sourcefile~boundary_manager.f90&#45;&gt;sourcefile~boundary_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge55" class="edge">
+<title>sourcefile~boundary_manager.f90&#45;&gt;sourcefile~boundary_interface.f90</title>
+<path fill="none" stroke="#ff9400" stroke-dasharray="5,2" d="M3080.99,-402.96C3052.53,-392 3010.49,-375.81 2979.44,-363.86"/>
+<polygon fill="#ff9400" stroke="#ff9400" points="2980.37,-360.46 2969.78,-360.14 2977.85,-367 2980.37,-360.46"/>
+</g>
+<!-- sourcefile~deallocate.f90&#45;&gt;sourcefile~error.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge59" class="edge">
+<title>sourcefile~deallocate.f90&#45;&gt;sourcefile~error.f90</title>
+<path fill="none" stroke="#fff600" stroke-dasharray="5,2" d="M111.9,-560.09C98.34,-560.09 83.53,-560.09 70.34,-560.09"/>
+<polygon fill="#fff600" stroke="#fff600" points="70.16,-556.59 60.16,-560.09 70.16,-563.59 70.16,-556.59"/>
+</g>
+<!-- sourcefile~density_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge60" class="edge">
+<title>sourcefile~density_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#d5ff00" stroke-dasharray="5,2" d="M1499.27,-610.69C1460.8,-607.21 1411.02,-606.85 1369,-620.09"/>
+</g>
+<!-- sourcefile~density_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge61" class="edge">
+<title>sourcefile~density_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#d5ff00" stroke-dasharray="5,2" d="M1504.65,-608.04C1491,-605.14 1476.48,-602.03 1463,-599.09 1445.27,-595.23 1425.69,-590.87 1409.01,-587.13"/>
+<polygon fill="#d5ff00" stroke="#d5ff00" points="1409.56,-583.67 1399.04,-584.89 1408.03,-590.5 1409.56,-583.67"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge63" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#a4ff00" stroke-dasharray="5,2" d="M2615.4,-184.12C2595.67,-193.04 2567.54,-205 2542,-213.09 2427.8,-249.28 2398.65,-266.16 2279,-272.09"/>
+<path fill="none" stroke="#a4ff00" stroke-dasharray="5,2" d="M2277,-272.09C2193.87,-284.17 2171.64,-264.37 2088,-272.09"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge64" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#a4ff00" stroke-dasharray="5,2" d="M2277,-272.09C2191.42,-276.34 2173.38,-302.89 2088,-310.09"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~adjacency.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge62" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~adjacency.f90</title>
+<path fill="none" stroke="#a4ff00" stroke-dasharray="5,2" d="M2577.59,-179.6C2560.37,-181.64 2541.9,-183.82 2525.3,-185.79"/>
+<polygon fill="#a4ff00" stroke="#a4ff00" points="2524.76,-182.33 2515.24,-186.98 2525.58,-189.28 2524.76,-182.33"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~mesh.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge65" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~mesh.f90</title>
+<path fill="none" stroke="#a4ff00" stroke-dasharray="5,2" d="M2577.95,-162.66C2529.25,-155.18 2460.23,-144.18 2400,-133.09 2345.99,-123.15 2332.72,-96.69 2279,-108.09"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~multicoloring.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge66" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~multicoloring.f90</title>
+<path fill="none" stroke="#a4ff00" stroke-dasharray="5,2" d="M2606.8,-159.95C2580.49,-150.61 2543.94,-137.63 2515.54,-127.55"/>
+<polygon fill="#a4ff00" stroke="#a4ff00" points="2516.45,-124.16 2505.86,-124.12 2514.11,-130.76 2516.45,-124.16"/>
+</g>
+<!-- sourcefile~domain_manager.f90&#45;&gt;sourcefile~reordering.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge67" class="edge">
+<title>sourcefile~domain_manager.f90&#45;&gt;sourcefile~reordering.f90</title>
+<path fill="none" stroke="#a4ff00" stroke-dasharray="5,2" d="M2629.34,-159.88C2611.9,-142.28 2577.3,-109.86 2542,-91.09 2537.1,-88.49 2531.83,-86.16 2526.46,-84.09"/>
+<polygon fill="#a4ff00" stroke="#a4ff00" points="2527.34,-80.69 2516.74,-80.64 2524.99,-87.28 2527.34,-80.69"/>
+</g>
+<!-- sourcefile~memory_stats_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node51" class="node">
+<title>sourcefile~memory_stats_wrapper.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node51"><a xlink:href="../sourcefile/memory_stats_wrapper.f90.html" xlink:title="memory_stats_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="735,-451.09 577,-451.09 577,-427.09 735,-427.09 735,-451.09"/>
+<text text-anchor="middle" x="656" y="-436.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory_stats_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fortran_utils.f90&#45;&gt;sourcefile~memory_stats_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge68" class="edge">
+<title>sourcefile~fortran_utils.f90&#45;&gt;sourcefile~memory_stats_wrapper.f90</title>
+<path fill="none" stroke="#41ff00" stroke-dasharray="5,2" d="M789.67,-478.99C773.42,-472.99 753.27,-465.82 735,-460.09 728.19,-457.96 721.01,-455.85 713.87,-453.83"/>
+<polygon fill="#41ff00" stroke="#41ff00" points="714.77,-450.45 704.2,-451.14 712.9,-457.19 714.77,-450.45"/>
+</g>
+<!-- sourcefile~signal_flag_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node56" class="node">
+<title>sourcefile~signal_flag_wrapper.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node56"><a xlink:href="../sourcefile/signal_flag_wrapper.f90.html" xlink:title="signal_flag_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="541,-532.09 401,-532.09 401,-508.09 541,-508.09 541,-532.09"/>
+<text text-anchor="middle" x="471" y="-517.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">signal_flag_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fortran_utils.f90&#45;&gt;sourcefile~signal_flag_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge69" class="edge">
+<title>sourcefile~fortran_utils.f90&#45;&gt;sourcefile~signal_flag_wrapper.f90</title>
+<path fill="none" stroke="#41ff00" stroke-dasharray="5,2" d="M772.61,-497.82C760.34,-499.36 747.2,-500.9 735,-502.09 673.4,-508.11 603.49,-512.8 551.24,-515.87"/>
+<polygon fill="#41ff00" stroke="#41ff00" points="550.81,-512.39 541.03,-516.47 551.22,-519.38 550.81,-512.39"/>
+</g>
+<!-- sourcefile~system_info_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node57" class="node">
+<title>sourcefile~system_info_wrapper.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node57"><a xlink:href="../sourcefile/system_info_wrapper.f90.html" xlink:title="system_info_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="729,-493.09 583,-493.09 583,-469.09 729,-469.09 729,-493.09"/>
+<text text-anchor="middle" x="656" y="-478.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_info_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fortran_utils.f90&#45;&gt;sourcefile~system_info_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge70" class="edge">
+<title>sourcefile~fortran_utils.f90&#45;&gt;sourcefile~system_info_wrapper.f90</title>
+<path fill="none" stroke="#41ff00" stroke-dasharray="5,2" d="M772.59,-488.12C762.04,-487.48 750.61,-486.78 739.19,-486.09"/>
+<polygon fill="#41ff00" stroke="#41ff00" points="739.36,-482.59 729.17,-485.48 738.94,-489.58 739.36,-482.59"/>
+</g>
+<!-- sourcefile~gcc_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge71" class="edge">
+<title>sourcefile~gcc_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#10ff00" stroke-dasharray="5,2" d="M1509.31,-773.03C1494.34,-769.85 1478.02,-766.36 1463,-763.09 1421.17,-753.99 1411.49,-747.31 1369,-742.09"/>
+</g>
+<!-- sourcefile~gcc_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge72" class="edge">
+<title>sourcefile~gcc_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#10ff00" stroke-dasharray="5,2" d="M1509.44,-783.77C1492.66,-781.08 1475.27,-775.17 1463,-763.09 1411.97,-712.89 1471.64,-662.06 1427,-606.09 1422.05,-599.89 1415.38,-594.97 1408.33,-591.1"/>
+<polygon fill="#10ff00" stroke="#10ff00" points="1409.82,-587.93 1399.3,-586.75 1406.79,-594.24 1409.82,-587.93"/>
+</g>
+<!-- sourcefile~hcf_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge73" class="edge">
+<title>sourcefile~hcf_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff20" stroke-dasharray="5,2" d="M1510.18,-745.51C1471.21,-747.25 1416.56,-747.93 1369,-742.09"/>
+</g>
+<!-- sourcefile~hcf_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge74" class="edge">
+<title>sourcefile~hcf_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#00ff20" stroke-dasharray="5,2" d="M1510.48,-741.29C1493.59,-738.59 1475.87,-732.8 1463,-721.09 1423.39,-685.05 1462,-646.63 1427,-606.09 1421.98,-600.28 1415.47,-595.56 1408.63,-591.78"/>
+<polygon fill="#00ff20" stroke="#00ff20" points="1409.75,-588.43 1399.22,-587.19 1406.67,-594.72 1409.75,-588.43"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge75" class="edge">
+<title>sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff52" stroke-dasharray="5,2" d="M1367,-704.09C1300.13,-705.51 1283.3,-700.74 1216.5,-704.09"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~density_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge76" class="edge">
+<title>sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~density_interface.f90</title>
+<path fill="none" stroke="#00ff52" stroke-dasharray="5,2" d="M1714.84,-648.09C1690.22,-643.52 1662,-638.28 1636.67,-633.58"/>
+<polygon fill="#00ff52" stroke="#00ff52" points="1637.23,-630.13 1626.76,-631.74 1635.95,-637.01 1637.23,-630.13"/>
+</g>
+<!-- sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~input_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge77" class="edge">
+<title>sourcefile~heat_capacity_interface.f90&#45;&gt;sourcefile~input_interface.f90</title>
+<path fill="none" stroke="#00ff52" stroke-dasharray="5,2" d="M1698.69,-660.51C1634.44,-661.9 1542.48,-666.27 1463,-679.09 1420.32,-685.98 1412.18,-702.12 1369,-704.09"/>
+<path fill="none" stroke="#00ff52" stroke-dasharray="5,2" d="M1367,-704.09C1327.05,-704.94 1283.07,-691.47 1253.02,-679.94"/>
+<polygon fill="#00ff52" stroke="#00ff52" points="1253.98,-676.56 1243.39,-676.13 1251.4,-683.07 1253.98,-676.56"/>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge78" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff83" stroke-dasharray="5,2" d="M1178.49,-676.16C1148.3,-685.67 1103.86,-698.27 1064,-704.09"/>
+<path fill="none" stroke="#00ff83" stroke-dasharray="5,2" d="M1062,-704.09C1033.88,-708.2 1002.21,-713.41 978.19,-717.48"/>
+<polygon fill="#00ff83" stroke="#00ff83" points="977.33,-714.08 968.06,-719.21 978.51,-720.98 977.33,-714.08"/>
+</g>
+<!-- sourcefile~project_settings.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node54" class="node">
+<title>sourcefile~project_settings.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node54"><a xlink:href="../sourcefile/project_settings.f90.html" xlink:title="project_settings.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1122,-676.09 1004,-676.09 1004,-652.09 1122,-652.09 1122,-676.09"/>
+<text text-anchor="middle" x="1063" y="-661.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">project_settings.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~input_interface.f90&#45;&gt;sourcefile~project_settings.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge79" class="edge">
+<title>sourcefile~input_interface.f90&#45;&gt;sourcefile~project_settings.f90</title>
+<path fill="none" stroke="#00ff83" stroke-dasharray="5,2" d="M1157.6,-664.09C1149.38,-664.09 1140.84,-664.09 1132.42,-664.09"/>
+<polygon fill="#00ff83" stroke="#00ff83" points="1132.23,-660.59 1122.23,-664.09 1132.23,-667.59 1132.23,-660.59"/>
+</g>
+<!-- sourcefile~iteration.f90&#45;&gt;sourcefile~calculate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge80" class="edge">
+<title>sourcefile~iteration.f90&#45;&gt;sourcefile~calculate.f90</title>
+<path fill="none" stroke="#00ffb4" stroke-dasharray="5,2" d="M2063.98,-588.24C2039.35,-601.83 1999.29,-623.93 1971.62,-639.2"/>
+<polygon fill="#00ffb4" stroke="#00ffb4" points="1969.82,-636.2 1962.75,-644.09 1973.2,-642.32 1969.82,-636.2"/>
+</g>
+<!-- sourcefile~iteration.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge81" class="edge">
+<title>sourcefile~iteration.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#00ffb4" stroke-dasharray="5,2" d="M2053.15,-588.18C2017.45,-600.77 1962.62,-618.37 1941,-616.09"/>
+<path fill="none" stroke="#00ffb4" stroke-dasharray="5,2" d="M1939,-616.09C1867.78,-608.59 1852.38,-592.34 1781.5,-582.09"/>
+</g>
+<!-- sourcefile~matrix_ops.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node49" class="node">
+<title>sourcefile~matrix_ops.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node49"><a xlink:href="../sourcefile/matrix_ops.f90.html" xlink:title="matrix_ops.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1110,-798.09 1016,-798.09 1016,-774.09 1110,-774.09 1110,-798.09"/>
+<text text-anchor="middle" x="1063" y="-783.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_ops.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~matrix_ops.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge82" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~matrix_ops.f90</title>
+<path fill="none" stroke="#00ffe6" stroke-dasharray="5,2" d="M1183.32,-801.16C1165.03,-798.85 1141.39,-795.86 1119.98,-793.16"/>
+<polygon fill="#00ffe6" stroke="#00ffe6" points="1120.36,-789.68 1110,-791.9 1119.48,-796.63 1120.36,-789.68"/>
+</g>
+<!-- sourcefile~matvec.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node50" class="node">
+<title>sourcefile~matvec.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node50"><a xlink:href="../sourcefile/matvec.f90.html" xlink:title="matvec.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1100.5,-756.09 1025.5,-756.09 1025.5,-732.09 1100.5,-732.09 1100.5,-756.09"/>
+<text text-anchor="middle" x="1063" y="-741.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~matvec.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge83" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~matvec.f90</title>
+<path fill="none" stroke="#00ffe6" stroke-dasharray="5,2" d="M1187.56,-792.93C1169.2,-784.77 1144.28,-773.93 1122,-765.09 1117.51,-763.31 1112.8,-761.5 1108.09,-759.74"/>
+<polygon fill="#00ffe6" stroke="#00ffe6" points="1109.07,-756.37 1098.48,-756.19 1106.65,-762.94 1109.07,-756.37"/>
+</g>
+<!-- sourcefile~vector_ops.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node60" class="node">
+<title>sourcefile~vector_ops.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node60"><a xlink:href="../sourcefile/vector_ops.f90.html" xlink:title="vector_ops.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1109.5,-840.09 1016.5,-840.09 1016.5,-816.09 1109.5,-816.09 1109.5,-840.09"/>
+<text text-anchor="middle" x="1063" y="-825.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_ops.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~linalg.f90&#45;&gt;sourcefile~vector_ops.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge84" class="edge">
+<title>sourcefile~linalg.f90&#45;&gt;sourcefile~vector_ops.f90</title>
+<path fill="none" stroke="#00ffe6" stroke-dasharray="5,2" d="M1183.32,-809.86C1164.96,-812.67 1141.2,-816.3 1119.72,-819.58"/>
+<polygon fill="#00ffe6" stroke="#00ffe6" points="1119.07,-816.14 1109.71,-821.11 1120.13,-823.06 1119.07,-816.14"/>
+</g>
+<!-- sourcefile~materials_manager.f90&#45;&gt;sourcefile~calculate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge85" class="edge">
+<title>sourcefile~materials_manager.f90&#45;&gt;sourcefile~calculate.f90</title>
+<path fill="none" stroke="#00e6ff" stroke-dasharray="5,2" d="M2017.75,-656.09C2009.17,-656.09 2000.52,-656.09 1992.27,-656.09"/>
+<polygon fill="#00e6ff" stroke="#00e6ff" points="1992.07,-652.59 1982.07,-656.09 1992.07,-659.59 1992.07,-652.59"/>
+</g>
+<!-- sourcefile~materials_manager.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge86" class="edge">
+<title>sourcefile~materials_manager.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#00e6ff" stroke-dasharray="5,2" d="M2054.05,-644.01C2025.05,-633.84 1980.86,-620.3 1941,-616.09"/>
+</g>
+<!-- sourcefile~element.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node46" class="node">
+<title>sourcefile~element.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node46"><a xlink:href="../sourcefile/element.f90.html" xlink:title="element.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1979.5,-178.09 1900.5,-178.09 1900.5,-154.09 1979.5,-154.09 1979.5,-178.09"/>
+<text text-anchor="middle" x="1940" y="-163.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~mesh.f90&#45;&gt;sourcefile~element.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge87" class="edge">
+<title>sourcefile~mesh.f90&#45;&gt;sourcefile~element.f90</title>
+<path fill="none" stroke="#00b4ff" stroke-dasharray="5,2" d="M2054.89,-166.09C2035.94,-166.09 2011.32,-166.09 1989.82,-166.09"/>
+<polygon fill="#00b4ff" stroke="#00b4ff" points="1989.55,-162.59 1979.55,-166.09 1989.55,-169.59 1989.55,-162.59"/>
+</g>
+<!-- sourcefile~mesh_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node52" class="node">
+<title>sourcefile~mesh_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node52"><a xlink:href="../sourcefile/mesh_interface.f90.html" xlink:title="mesh_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1427,-354.09 1309,-354.09 1309,-330.09 1427,-330.09 1427,-354.09"/>
+<text text-anchor="middle" x="1368" y="-339.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mesh_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~mesh.f90&#45;&gt;sourcefile~mesh_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge88" class="edge">
+<title>sourcefile~mesh.f90&#45;&gt;sourcefile~mesh_interface.f90</title>
+<path fill="none" stroke="#00b4ff" stroke-dasharray="5,2" d="M2054.97,-155.37C1958.27,-124.01 1657.21,-42.18 1463,-165.09 1434.21,-183.32 1394.45,-277.25 1377.36,-320.39"/>
+<polygon fill="#00b4ff" stroke="#00b4ff" points="1374,-319.37 1373.61,-329.95 1380.52,-321.92 1374,-319.37"/>
+</g>
+<!-- sourcefile~side.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node55" class="node">
+<title>sourcefile~side.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node55"><a xlink:href="../sourcefile/side.f90.html" xlink:title="side.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1968.5,-238.09 1911.5,-238.09 1911.5,-214.09 1968.5,-214.09 1968.5,-238.09"/>
+<text text-anchor="middle" x="1940" y="-223.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">side.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~mesh.f90&#45;&gt;sourcefile~side.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge89" class="edge">
+<title>sourcefile~mesh.f90&#45;&gt;sourcefile~side.f90</title>
+<path fill="none" stroke="#00b4ff" stroke-dasharray="5,2" d="M2056.66,-178.24C2034.01,-187.61 2002.53,-200.63 1978.13,-210.73"/>
+<polygon fill="#00b4ff" stroke="#00b4ff" points="1976.73,-207.52 1968.82,-214.58 1979.4,-213.99 1976.73,-207.52"/>
+</g>
+<!-- sourcefile~multicoloring.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge91" class="edge">
+<title>sourcefile~multicoloring.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0083ff" stroke-dasharray="5,2" d="M2427.07,-100.08C2379.98,-87.36 2307.34,-69.21 2279,-70.09"/>
+</g>
+<!-- sourcefile~multicoloring.f90&#45;&gt;sourcefile~adjacency_element.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge90" class="edge">
+<title>sourcefile~multicoloring.f90&#45;&gt;sourcefile~adjacency_element.f90</title>
+<path fill="none" stroke="#0083ff" stroke-dasharray="5,2" d="M2454.46,-124.17C2439.91,-135.71 2417.81,-153.85 2400,-171.09 2382.82,-187.73 2384.51,-198.79 2364,-211.09 2360.98,-212.91 2357.8,-214.56 2354.53,-216.08"/>
+<polygon fill="#0083ff" stroke="#0083ff" points="2352.99,-212.93 2345.09,-219.98 2355.67,-219.4 2352.99,-212.93"/>
+</g>
+<!-- sourcefile~openmp.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge92" class="edge">
+<title>sourcefile~openmp.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#0052ff" stroke-dasharray="5,2" d="M1900.28,-581.45C1868.27,-584.96 1821.72,-587.91 1781.5,-582.09"/>
+<path fill="none" stroke="#0052ff" stroke-dasharray="5,2" d="M1779.5,-582.09C1682.75,-568.11 1661.27,-528.37 1564,-538.09"/>
+</g>
+<!-- sourcefile~properties_manager.f90&#45;&gt;sourcefile~calculate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge93" class="edge">
+<title>sourcefile~properties_manager.f90&#45;&gt;sourcefile~calculate.f90</title>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M2277,-656.09C2191.14,-656.09 2173.81,-693.04 2088,-696.09"/>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M2086,-696.09C2047.2,-697.48 2004.55,-683.76 1975.62,-672.02"/>
+<polygon fill="#0020ff" stroke="#0020ff" points="1976.93,-668.77 1966.36,-668.13 1974.23,-675.23 1976.93,-668.77"/>
+</g>
+<!-- sourcefile~properties_manager.f90&#45;&gt;sourcefile~control.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge94" class="edge">
+<title>sourcefile~properties_manager.f90&#45;&gt;sourcefile~control.f90</title>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M2446.58,-644.08C2412.79,-626.74 2350.2,-594.63 2311.82,-574.93"/>
+<polygon fill="#0020ff" stroke="#0020ff" points="2313.11,-571.66 2302.61,-570.21 2309.91,-577.89 2313.11,-571.66"/>
+</g>
+<!-- sourcefile~properties_manager.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge95" class="edge">
+<title>sourcefile~properties_manager.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M2086,-696.09C1976.68,-699.99 1965.97,-764.08 1862,-798.09 1689.85,-854.42 1640.06,-842.9 1463,-881.09 1421.15,-890.12 1411.81,-902.09 1369,-902.09"/>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M1367,-902.09C1203.96,-901.95 1136.58,-944 1004,-849.09 969.19,-824.18 952.03,-774.64 944.68,-745.98"/>
+<polygon fill="#0020ff" stroke="#0020ff" points="948.05,-745.02 942.32,-736.11 941.24,-746.65 948.05,-745.02"/>
+</g>
+<!-- sourcefile~properties_manager.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge96" class="edge">
+<title>sourcefile~properties_manager.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M2399.7,-656.09C2363.62,-656.09 2318.96,-656.09 2279,-656.09"/>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M2277,-656.09C2222.42,-656.09 2210.12,-642.17 2156,-635.09 2060.88,-622.66 2036.4,-626.15 1941,-616.09"/>
+</g>
+<!-- sourcefile~properties_manager.f90&#45;&gt;sourcefile~materials_manager.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge97" class="edge">
+<title>sourcefile~properties_manager.f90&#45;&gt;sourcefile~materials_manager.f90</title>
+<path fill="none" stroke="#0020ff" stroke-dasharray="5,2" d="M2277,-656.09C2240.72,-656.09 2200.53,-656.09 2166.56,-656.09"/>
+<polygon fill="#0020ff" stroke="#0020ff" points="2166.24,-652.59 2156.24,-656.09 2166.24,-659.59 2166.24,-652.59"/>
+</g>
+<!-- sourcefile~reordering.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge99" class="edge">
+<title>sourcefile~reordering.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#1000ff" stroke-dasharray="5,2" d="M2425.22,-69.31C2386.51,-68.82 2329.05,-68.54 2279,-70.09"/>
+</g>
+<!-- sourcefile~reordering.f90&#45;&gt;sourcefile~mesh.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge100" class="edge">
+<title>sourcefile~reordering.f90&#45;&gt;sourcefile~mesh.f90</title>
+<path fill="none" stroke="#1000ff" stroke-dasharray="5,2" d="M2425.17,-78.68C2386.42,-86.17 2328.94,-97.49 2279,-108.09"/>
+</g>
+<!-- sourcefile~reordering.f90&#45;&gt;sourcefile~adjacency_node.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge98" class="edge">
+<title>sourcefile~reordering.f90&#45;&gt;sourcefile~adjacency_node.f90</title>
+<path fill="none" stroke="#1000ff" stroke-dasharray="5,2" d="M2425.28,-77.39C2416.17,-80.47 2407.19,-84.86 2400,-91.09 2371.17,-116.12 2393.44,-144.78 2364,-169.09 2359.42,-172.88 2354.26,-175.99 2348.8,-178.56"/>
+<polygon fill="#1000ff" stroke="#1000ff" points="2347.33,-175.38 2339.38,-182.38 2349.96,-181.87 2347.33,-175.38"/>
+</g>
+<!-- sourcefile~solver_factory.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge101" class="edge">
+<title>sourcefile~solver_factory.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#4100ff" stroke-dasharray="5,2" d="M1508.34,-902.09C1469.61,-902.09 1416.08,-902.09 1369,-902.09"/>
+</g>
+<!-- sourcefile~solver_factory.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge102" class="edge">
+<title>sourcefile~solver_factory.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#4100ff" stroke-dasharray="5,2" d="M1544.07,-890C1521.29,-873.61 1482.6,-842.09 1463,-805.09 1420.92,-725.68 1481.39,-677.65 1427,-606.09 1422.15,-599.71 1415.46,-594.71 1408.35,-590.81"/>
+<polygon fill="#4100ff" stroke="#4100ff" points="1409.75,-587.6 1399.22,-586.44 1406.73,-593.91 1409.75,-587.6"/>
+</g>
+<!-- sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge103" class="edge">
+<title>sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#7300ff" stroke-dasharray="5,2" d="M1491.97,-590.14C1454.98,-597.3 1409.06,-607.46 1369,-620.09"/>
+<path fill="none" stroke="#7300ff" stroke-dasharray="5,2" d="M1367,-620.09C1293.94,-643.12 1293.01,-700.26 1216.5,-704.09"/>
+<path fill="none" stroke="#7300ff" stroke-dasharray="5,2" d="M1214.5,-704.09C1147.7,-707.44 1130.19,-694.42 1064,-704.09"/>
+</g>
+<!-- sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge104" class="edge">
+<title>sourcefile~specific_heat_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#7300ff" stroke-dasharray="5,2" d="M1483.78,-578.09C1458.28,-578.09 1431.01,-578.09 1409.45,-578.09"/>
+<polygon fill="#7300ff" stroke="#7300ff" points="1409.36,-574.59 1399.36,-578.09 1409.36,-581.59 1409.36,-574.59"/>
+</g>
+<!-- sourcefile~string_utils.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge105" class="edge">
+<title>sourcefile~string_utils.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#a400ff" stroke-dasharray="5,2" d="M794.85,-847.19C762.88,-860.75 707.31,-881.34 657,-885.09"/>
+<path fill="none" stroke="#a400ff" stroke-dasharray="5,2" d="M655,-885.09C573.89,-891.15 552.87,-876.38 472,-885.09"/>
+</g>
+<!-- sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge106" class="edge">
+<title>sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#d500ff" stroke-dasharray="5,2" d="M1504.65,-712.15C1491,-715.05 1476.48,-718.16 1463,-721.09 1421.17,-730.2 1411.49,-747.31 1369,-742.09"/>
+<path fill="none" stroke="#d500ff" stroke-dasharray="5,2" d="M1367,-742.09C1298.53,-733.69 1285.4,-700.64 1216.5,-704.09"/>
+</g>
+<!-- sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge107" class="edge">
+<title>sourcefile~thermal_conductivity_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#d500ff" stroke-dasharray="5,2" d="M1538.21,-687.96C1517.51,-676.93 1487.13,-659.6 1463,-641.09 1445.29,-627.51 1445.28,-618.89 1427,-606.09 1421.02,-601.91 1414.31,-598.03 1407.64,-594.59"/>
+<polygon fill="#d500ff" stroke="#d500ff" points="1409.16,-591.43 1398.64,-590.16 1406.07,-597.71 1409.16,-591.43"/>
+</g>
+<!-- sourcefile~time.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge108" class="edge">
+<title>sourcefile~time.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff00f6" stroke-dasharray="5,2" d="M1544.85,-447.91C1512.26,-425.99 1438.39,-382.14 1369,-382.09"/>
+</g>
+<!-- sourcefile~time.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge109" class="edge">
+<title>sourcefile~time.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff00f6" stroke-dasharray="5,2" d="M1542.07,-472.28C1507.74,-493.27 1437.34,-536.31 1397.72,-560.53"/>
+<polygon fill="#ff00f6" stroke="#ff00f6" points="1395.53,-557.77 1388.82,-565.98 1399.18,-563.75 1395.53,-557.77"/>
+</g>
+<!-- sourcefile~array.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node45" class="node">
+<title>sourcefile~array.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node45"><a xlink:href="../sourcefile/array.f90.html" xlink:title="array.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="341,-650.09 279,-650.09 279,-626.09 341,-626.09 341,-650.09"/>
+<text text-anchor="middle" x="310" y="-635.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">array.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~array.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge110" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~array.f90</title>
+<path fill="none" stroke="#ff00c5" stroke-dasharray="5,2" d="M623.84,-759.83C608.18,-756.28 589.87,-749.83 577,-738.09 547.59,-711.27 573.45,-679.14 541,-656.09 484.91,-616.25 400.53,-621.77 351.09,-629.72"/>
+<polygon fill="#ff00c5" stroke="#ff00c5" points="350.35,-626.29 341.09,-631.44 351.54,-633.19 350.35,-626.29"/>
+</g>
+<!-- sourcefile~gauss.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node47" class="node">
+<title>sourcefile~gauss.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node47"><a xlink:href="../sourcefile/gauss.f90.html" xlink:title="gauss.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="504,-815.09 438,-815.09 438,-791.09 504,-791.09 504,-815.09"/>
+<text text-anchor="middle" x="471" y="-800.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gauss.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~gauss.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge111" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~gauss.f90</title>
+<path fill="none" stroke="#ff00c5" stroke-dasharray="5,2" d="M623.96,-770.71C593.74,-777.15 547.59,-786.98 514.08,-794.13"/>
+<polygon fill="#ff00c5" stroke="#ff00c5" points="513.17,-790.74 504.12,-796.25 514.63,-797.59 513.17,-790.74"/>
+</g>
+<!-- sourcefile~matrix.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node48" class="node">
+<title>sourcefile~matrix.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node48"><a xlink:href="../sourcefile/matrix.f90.html" xlink:title="matrix.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="506,-689.09 436,-689.09 436,-665.09 506,-665.09 506,-689.09"/>
+<text text-anchor="middle" x="471" y="-674.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~matrix.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge112" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~matrix.f90</title>
+<path fill="none" stroke="#ff00c5" stroke-dasharray="5,2" d="M623.72,-757.62C608.76,-753.57 591.09,-747.32 577,-738.09 556.99,-724.99 561.18,-710.93 541,-698.09 533.4,-693.26 524.63,-689.48 515.93,-686.55"/>
+<polygon fill="#ff00c5" stroke="#ff00c5" points="516.81,-683.16 506.22,-683.59 514.77,-689.86 516.81,-683.16"/>
+</g>
+<!-- sourcefile~pointer.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node53" class="node">
+<title>sourcefile~pointer.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node53"><a xlink:href="../sourcefile/pointer.f90.html" xlink:title="pointer.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="507,-773.09 435,-773.09 435,-749.09 507,-749.09 507,-773.09"/>
+<text text-anchor="middle" x="471" y="-758.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pointer.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~pointer.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge113" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~pointer.f90</title>
+<path fill="none" stroke="#ff00c5" stroke-dasharray="5,2" d="M623.96,-763.58C594.79,-763.11 550.78,-762.39 517.62,-761.84"/>
+<polygon fill="#ff00c5" stroke="#ff00c5" points="517.33,-758.34 507.27,-761.67 517.21,-765.34 517.33,-758.34"/>
+</g>
+<!-- sourcefile~variable.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node58" class="node">
+<title>sourcefile~variable.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node58"><a xlink:href="../sourcefile/variable.f90.html" xlink:title="variable.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="510.5,-857.09 431.5,-857.09 431.5,-833.09 510.5,-833.09 510.5,-857.09"/>
+<text text-anchor="middle" x="471" y="-842.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">variable.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~variable.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge114" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~variable.f90</title>
+<path fill="none" stroke="#ff00c5" stroke-dasharray="5,2" d="M623.72,-771.74C608.93,-776.13 591.4,-782.51 577,-791.09 558.36,-802.21 559.85,-813.33 541,-824.09 534.65,-827.72 527.6,-830.79 520.5,-833.36"/>
+<polygon fill="#ff00c5" stroke="#ff00c5" points="519.24,-830.09 510.86,-836.56 521.45,-836.73 519.24,-830.09"/>
+</g>
+<!-- sourcefile~vector.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node59" class="node">
+<title>sourcefile~vector.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node59"><a xlink:href="../sourcefile/vector.f90.html" xlink:title="vector.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="504.5,-731.09 437.5,-731.09 437.5,-707.09 504.5,-707.09 504.5,-731.09"/>
+<text text-anchor="middle" x="471" y="-716.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types.f90&#45;&gt;sourcefile~vector.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge115" class="edge">
+<title>sourcefile~types.f90&#45;&gt;sourcefile~vector.f90</title>
+<path fill="none" stroke="#ff00c5" stroke-dasharray="5,2" d="M623.96,-756.46C593.92,-749.07 548.16,-737.82 514.7,-729.59"/>
+<polygon fill="#ff00c5" stroke="#ff00c5" points="515.29,-726.13 504.74,-727.14 513.62,-732.93 515.29,-726.13"/>
+</g>
+<!-- sourcefile~unique.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge116" class="edge">
+<title>sourcefile~unique.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#ff0094" stroke-dasharray="5,2" d="M619.95,-855.14C583.39,-865.05 524.22,-879.51 472,-885.09"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge117" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M805.14,-736.12C782.23,-752.9 742.52,-781.66 735,-785.09 669.2,-815.12 638.58,-786.16 577,-824.09 556.07,-836.99 561.76,-852.92 541,-866.09 514.14,-883.14 503.63,-881.71 472,-885.09"/>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M470,-885.09C399.74,-892.66 378.23,-906.86 311,-885.09"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~deallocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge118" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~deallocate.f90</title>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M795.34,-730.18C747.11,-739.8 643.07,-752.86 577,-705.09 543.42,-680.82 573.64,-644.62 541,-619.09 537.78,-616.57 318.06,-583.74 213.13,-568.17"/>
+<polygon fill="#ff0062" stroke="#ff0062" points="213.45,-564.68 203.05,-566.68 212.42,-571.61 213.45,-564.68"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~types.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge119" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~types.f90</title>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M795.43,-730.43C769.31,-736.79 728.69,-746.66 698.2,-754.08"/>
+<polygon fill="#ff0062" stroke="#ff0062" points="697.17,-750.72 688.28,-756.49 698.82,-757.53 697.17,-750.72"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~unique.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge120" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~unique.f90</title>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M801.39,-736.22C791.51,-742.8 779.86,-751.52 771,-761.09 750.39,-783.36 758.81,-800.29 735,-819.09 725.37,-826.7 713.42,-832.13 701.79,-835.98"/>
+<polygon fill="#ff0062" stroke="#ff0062" points="700.73,-832.65 692.15,-838.87 702.73,-839.35 700.73,-832.65"/>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_constants.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge121" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_constants.f90</title>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M814.68,-711.84C801.94,-690.13 772.41,-644.95 735,-621.09 730.08,-617.95 724.69,-615.28 719.12,-613"/>
+<polygon fill="#ff0062" stroke="#ff0062" points="720.23,-609.68 709.63,-609.54 717.82,-616.26 720.23,-609.68"/>
+</g>
+<!-- sourcefile~vtk_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node61" class="node">
+<title>sourcefile~vtk_wrapper.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node61"><a xlink:href="../sourcefile/vtk_wrapper.f90.html" xlink:title="vtk_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="705.5,-696.09 606.5,-696.09 606.5,-672.09 705.5,-672.09 705.5,-696.09"/>
+<text text-anchor="middle" x="656" y="-681.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtk_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge122" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtk_wrapper.f90</title>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M795.43,-717.76C774.05,-712.56 742.97,-705 715.67,-698.36"/>
+<polygon fill="#ff0062" stroke="#ff0062" points="716.35,-694.92 705.81,-695.96 714.7,-701.73 716.35,-694.92"/>
+</g>
+<!-- sourcefile~vtu_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node62" class="node">
+<title>sourcefile~vtu_wrapper.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node62"><a xlink:href="../sourcefile/vtu_wrapper.f90.html" xlink:title="vtu_wrapper.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="706,-654.09 606,-654.09 606,-630.09 706,-630.09 706,-654.09"/>
+<text text-anchor="middle" x="656" y="-639.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vtu_wrapper.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~vtk.f90&#45;&gt;sourcefile~vtu_wrapper.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge123" class="edge">
+<title>sourcefile~vtk.f90&#45;&gt;sourcefile~vtu_wrapper.f90</title>
+<path fill="none" stroke="#ff0062" stroke-dasharray="5,2" d="M807.77,-712.07C791.47,-698.38 762.95,-676.2 735,-663.09 728.94,-660.25 722.44,-657.74 715.86,-655.54"/>
+<polygon fill="#ff0062" stroke="#ff0062" points="716.79,-652.16 706.21,-652.52 714.71,-658.84 716.79,-652.16"/>
+</g>
+<!-- sourcefile~adjacency_element.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge124" class="edge">
+<title>sourcefile~adjacency_element.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2231.96,-244.18C2193.91,-253.78 2137.83,-266.47 2088,-272.09"/>
+</g>
+<!-- sourcefile~adjacency_element.f90&#45;&gt;sourcefile~mesh.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge125" class="edge">
+<title>sourcefile~adjacency_element.f90&#45;&gt;sourcefile~mesh.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2222.2,-219.98C2212.07,-217.34 2201.65,-214.35 2192,-211.09 2168.13,-203.04 2142.12,-191.79 2122.08,-182.55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2123.3,-179.26 2112.76,-178.2 2120.34,-185.6 2123.3,-179.26"/>
+</g>
+<!-- sourcefile~adjacency_node.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge126" class="edge">
+<title>sourcefile~adjacency_node.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M2218.68,-202.13C2209.61,-204.68 2200.45,-207.66 2192,-211.09 2142.36,-231.28 2141.25,-266.09 2088,-272.09"/>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M2086,-272.09C1986.85,-283.28 1961.57,-280.59 1862,-287.09 1729.57,-295.75 1693.17,-275.62 1564,-306.09"/>
+</g>
+<!-- sourcefile~adjacency_node.f90&#45;&gt;sourcefile~mesh.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge127" class="edge">
+<title>sourcefile~adjacency_node.f90&#45;&gt;sourcefile~mesh.f90</title>
+<path fill="none" stroke="#ff4800" stroke-dasharray="5,2" d="M2216.94,-182.47C2188.34,-178.84 2154.88,-174.59 2129.2,-171.33"/>
+<polygon fill="#ff4800" stroke="#ff4800" points="2129.43,-167.83 2119.07,-170.04 2128.55,-174.77 2129.43,-167.83"/>
+</g>
+<!-- sourcefile~adjacency_node_element.f90&#45;&gt;sourcefile~mesh.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge128" class="edge">
+<title>sourcefile~adjacency_node_element.f90&#45;&gt;sourcefile~mesh.f90</title>
+<path fill="none" stroke="#ff9100" stroke-dasharray="5,2" d="M2191.9,-156.2C2170.18,-158.27 2147.78,-160.4 2129.37,-162.15"/>
+<polygon fill="#ff9100" stroke="#ff9100" points="2128.93,-158.68 2119.31,-163.11 2129.6,-165.65 2128.93,-158.68"/>
+</g>
+<!-- sourcefile~array.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge129" class="edge">
+<title>sourcefile~array.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M278.98,-645.68C270.57,-648.83 261.86,-653.18 255,-659.09 230.57,-680.15 243.81,-701.49 219,-722.09 215.04,-725.38 210.53,-728.17 205.8,-730.53"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="204.31,-727.36 196.53,-734.55 207.09,-733.78 204.31,-727.36"/>
+</g>
+<!-- sourcefile~array.f90&#45;&gt;sourcefile~deallocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge130" class="edge">
+<title>sourcefile~array.f90&#45;&gt;sourcefile~deallocate.f90</title>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M283.34,-626.03C274.33,-621.72 264.18,-616.77 255,-612.09 232.81,-600.78 208.08,-587.44 189.22,-577.11"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="190.65,-573.9 180.2,-572.15 187.27,-580.03 190.65,-573.9"/>
+</g>
+<!-- sourcefile~element_factory.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node64" class="node">
+<title>sourcefile~element_factory.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node64"><a xlink:href="../sourcefile/element_factory.f90.html" xlink:title="element_factory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1841,-198.09 1720,-198.09 1720,-174.09 1841,-174.09 1841,-198.09"/>
+<text text-anchor="middle" x="1780.5" y="-183.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_factory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~element.f90&#45;&gt;sourcefile~element_factory.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge131" class="edge">
+<title>sourcefile~element.f90&#45;&gt;sourcefile~element_factory.f90</title>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M1900.47,-170.99C1885.69,-172.86 1868.32,-175.07 1851.5,-177.21"/>
+<polygon fill="#daff00" stroke="#daff00" points="1850.6,-173.79 1841.12,-178.52 1851.48,-180.74 1850.6,-173.79"/>
+</g>
+<!-- sourcefile~element_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node65" class="node">
+<title>sourcefile~element_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node65"><a xlink:href="../sourcefile/element_interface.f90.html" xlink:title="element_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1629.5,-198.09 1496.5,-198.09 1496.5,-174.09 1629.5,-174.09 1629.5,-198.09"/>
+<text text-anchor="middle" x="1563" y="-183.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">element_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~element.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge132" class="edge">
+<title>sourcefile~element.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#daff00" stroke-dasharray="5,2" d="M1900.22,-165.49C1887.99,-165.33 1874.43,-165.17 1862,-165.09 1789.56,-164.62 1771.23,-159.51 1699,-165.09 1679.16,-166.63 1657.83,-169.41 1638.12,-172.46"/>
+<polygon fill="#daff00" stroke="#daff00" points="1637.3,-169.05 1627.97,-174.07 1638.4,-175.96 1637.3,-169.05"/>
+</g>
+<!-- sourcefile~matrix_coo.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node66" class="node">
+<title>sourcefile~matrix_coo.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node66"><a xlink:href="../sourcefile/matrix_coo.f90.html" xlink:title="matrix_coo.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="357,-734.09 263,-734.09 263,-710.09 357,-710.09 357,-734.09"/>
+<text text-anchor="middle" x="310" y="-719.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_coo.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_coo.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge133" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_coo.f90</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M435.89,-686.75C414.72,-692.74 387.09,-700.56 363.2,-707.32"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="362.23,-703.96 353.56,-710.05 364.14,-710.69 362.23,-703.96"/>
+</g>
+<!-- sourcefile~matrix_crs.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node67" class="node">
+<title>sourcefile~matrix_crs.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node67"><a xlink:href="../sourcefile/matrix_crs.f90.html" xlink:title="matrix_crs.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="355.5,-692.09 264.5,-692.09 264.5,-668.09 355.5,-668.09 355.5,-692.09"/>
+<text text-anchor="middle" x="310" y="-677.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_crs.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_crs.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge134" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_crs.f90</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M435.89,-677.74C415.46,-678.12 389.02,-678.62 365.73,-679.06"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="365.56,-675.56 355.63,-679.25 365.69,-682.56 365.56,-675.56"/>
+</g>
+<!-- sourcefile~matrix_dense.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node68" class="node">
+<title>sourcefile~matrix_dense.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node68"><a xlink:href="../sourcefile/matrix_dense.f90.html" xlink:title="matrix_dense.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="363.5,-814.09 256.5,-814.09 256.5,-790.09 363.5,-790.09 363.5,-814.09"/>
+<text text-anchor="middle" x="310" y="-799.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_dense.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_dense.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge135" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_dense.f90</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M435.94,-681.55C423.79,-684.56 410.72,-689.62 401,-698.09 372.22,-723.18 391.78,-748.88 365,-776.09 361.79,-779.35 358.1,-782.26 354.17,-784.84"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="352.22,-781.93 345.32,-789.97 355.73,-787.98 352.22,-781.93"/>
+</g>
+<!-- sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node69" class="node">
+<title>sourcefile~matrix_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node69"><a xlink:href="../sourcefile/matrix_interface.f90.html" xlink:title="matrix_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="219,-713.09 96,-713.09 96,-689.09 219,-689.09 219,-713.09"/>
+<text text-anchor="middle" x="157.5" y="-698.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge136" class="edge">
+<title>sourcefile~matrix.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M435.91,-683.16C424.16,-686.33 411.36,-691.07 401,-698.09 379.8,-712.47 388.08,-732 365,-743.09 320.94,-764.27 302.19,-755.85 255,-743.09 237.12,-738.26 235.83,-729.83 219,-722.09 214.97,-720.24 210.73,-718.45 206.44,-716.76"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="207.62,-713.47 197.03,-713.21 205.15,-720.01 207.62,-713.47"/>
+</g>
+<!-- sourcefile~matrix_ops.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge137" class="edge">
+<title>sourcefile~matrix_ops.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1024.98,-774.08C1017.89,-771.4 1010.63,-768.36 1004,-765.09 990.52,-758.44 976.36,-749.58 964.79,-741.81"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="966.74,-738.9 956.51,-736.12 962.78,-744.67 966.74,-738.9"/>
+</g>
+<!-- sourcefile~matvec.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge138" class="edge">
+<title>sourcefile~matvec.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ff48" stroke-dasharray="5,2" d="M1025.4,-738.09C1010.45,-735.64 993.18,-732.81 978.09,-730.34"/>
+<polygon fill="#00ff48" stroke="#00ff48" points="978.48,-726.86 968.04,-728.69 977.35,-733.76 978.48,-726.86"/>
+</g>
+<!-- sourcefile~c_utils.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node63" class="node">
+<title>sourcefile~c_utils.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node63"><a xlink:href="../sourcefile/c_utils.f90.html" xlink:title="c_utils.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="505,-490.09 437,-490.09 437,-466.09 505,-466.09 505,-490.09"/>
+<text text-anchor="middle" x="471" y="-475.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">c_utils.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~memory_stats_wrapper.f90&#45;&gt;sourcefile~c_utils.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge139" class="edge">
+<title>sourcefile~memory_stats_wrapper.f90&#45;&gt;sourcefile~c_utils.f90</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M598.6,-451.11C571.65,-456.86 539.91,-463.62 514.95,-468.94"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="514.1,-465.54 505.05,-471.05 515.56,-472.39 514.1,-465.54"/>
+</g>
+<!-- sourcefile~mesh_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge140" class="edge">
+<title>sourcefile~mesh_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#00ffda" stroke-dasharray="5,2" d="M1308.89,-348.4C1280.86,-351.8 1246.82,-356.46 1216.5,-362.09"/>
+</g>
+<!-- sourcefile~project_settings.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge141" class="edge">
+<title>sourcefile~project_settings.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M1034.09,-676.15C1024.49,-680.42 1013.71,-685.34 1004,-690.09 992.99,-695.48 981.08,-701.69 970.56,-707.32"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="968.87,-704.26 961.73,-712.08 972.2,-710.42 968.87,-704.26"/>
+</g>
+<!-- sourcefile~side_factory.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node70" class="node">
+<title>sourcefile~side_factory.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node70"><a xlink:href="../sourcefile/side_factory.f90.html" xlink:title="side_factory.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1829.5,-278.09 1731.5,-278.09 1731.5,-254.09 1829.5,-254.09 1829.5,-278.09"/>
+<text text-anchor="middle" x="1780.5" y="-263.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">side_factory.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~side.f90&#45;&gt;sourcefile~side_factory.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge142" class="edge">
+<title>sourcefile~side.f90&#45;&gt;sourcefile~side_factory.f90</title>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M1911.2,-233.15C1891.18,-238.24 1863.45,-245.28 1838.77,-251.55"/>
+<polygon fill="#0048ff" stroke="#0048ff" points="1837.6,-248.23 1828.77,-254.09 1839.32,-255.02 1837.6,-248.23"/>
+</g>
+<!-- sourcefile~side_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node71" class="node">
+<title>sourcefile~side_interface.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node71"><a xlink:href="../sourcefile/side_interface.f90.html" xlink:title="side_interface.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1618,-278.09 1508,-278.09 1508,-254.09 1618,-254.09 1618,-278.09"/>
+<text text-anchor="middle" x="1563" y="-263.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">side_interface.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~side.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge143" class="edge">
+<title>sourcefile~side.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#0048ff" stroke-dasharray="5,2" d="M1911.22,-227.61C1866.44,-230.21 1775.59,-236.12 1699,-245.09 1675.81,-247.81 1650.5,-251.54 1628.12,-255.11"/>
+<polygon fill="#0048ff" stroke="#0048ff" points="1627.38,-251.68 1618.07,-256.73 1628.5,-258.59 1627.38,-251.68"/>
+</g>
+<!-- sourcefile~signal_flag.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node72" class="node">
+<title>sourcefile~signal_flag.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node72"><a xlink:href="../sourcefile/signal_flag.f90.html" xlink:title="signal_flag.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="356,-532.09 264,-532.09 264,-508.09 356,-508.09 356,-532.09"/>
+<text text-anchor="middle" x="310" y="-517.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">signal_flag.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~signal_flag_wrapper.f90&#45;&gt;sourcefile~signal_flag.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge144" class="edge">
+<title>sourcefile~signal_flag_wrapper.f90&#45;&gt;sourcefile~signal_flag.f90</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M400.72,-520.09C389.31,-520.09 377.61,-520.09 366.58,-520.09"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="366.25,-516.59 356.25,-520.09 366.25,-523.59 366.25,-516.59"/>
+</g>
+<!-- sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~c_utils.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge145" class="edge">
+<title>sourcefile~system_info_wrapper.f90&#45;&gt;sourcefile~c_utils.f90</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M582.94,-479.91C560.11,-479.54 535.59,-479.14 515.42,-478.81"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="515.36,-475.3 505.31,-478.64 515.25,-482.3 515.36,-475.3"/>
+</g>
+<!-- sourcefile~variable.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge146" class="edge">
+<title>sourcefile~variable.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#9100ff" stroke-dasharray="5,2" d="M438.76,-857.12C399.55,-871.5 334.56,-892.72 311,-885.09"/>
+<path fill="none" stroke="#9100ff" stroke-dasharray="5,2" d="M309,-885.09C245.27,-864.46 194.53,-798.55 171.67,-764.26"/>
+<polygon fill="#9100ff" stroke="#9100ff" points="174.36,-761.98 165.98,-755.5 168.49,-765.79 174.36,-761.98"/>
+</g>
+<!-- sourcefile~c_utils.f90&#45;&gt;sourcefile~signal_flag.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge148" class="edge">
+<title>sourcefile~c_utils.f90&#45;&gt;sourcefile~signal_flag.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M436.67,-486.9C416.19,-492.31 389.46,-499.37 365.92,-505.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="364.83,-502.26 356.05,-508.19 366.61,-509.02 364.83,-502.26"/>
+</g>
+<!-- sourcefile~memory_stats.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node73" class="node">
+<title>sourcefile~memory_stats.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node73"><a xlink:href="../sourcefile/memory_stats.f90.html" xlink:title="memory_stats.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="365,-448.09 255,-448.09 255,-424.09 365,-424.09 365,-448.09"/>
+<text text-anchor="middle" x="310" y="-433.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">memory_stats.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~c_utils.f90&#45;&gt;sourcefile~memory_stats.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge147" class="edge">
+<title>sourcefile~c_utils.f90&#45;&gt;sourcefile~memory_stats.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M436.67,-469.29C416.35,-463.92 389.87,-456.93 366.47,-450.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="367.21,-447.32 356.65,-448.15 365.42,-454.09 367.21,-447.32"/>
+</g>
+<!-- sourcefile~system_info.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_node74" class="node">
+<title>sourcefile~system_info.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~EfferentGraph_node74"><a xlink:href="../sourcefile/system_info.f90.html" xlink:title="system_info.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="358.5,-490.09 261.5,-490.09 261.5,-466.09 358.5,-466.09 358.5,-490.09"/>
+<text text-anchor="middle" x="310" y="-475.69" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">system_info.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~c_utils.f90&#45;&gt;sourcefile~system_info.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge149" class="edge">
+<title>sourcefile~c_utils.f90&#45;&gt;sourcefile~system_info.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M436.67,-478.09C417.08,-478.09 391.78,-478.09 369.02,-478.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="368.77,-474.59 358.77,-478.09 368.77,-481.59 368.77,-474.59"/>
+</g>
+<!-- sourcefile~element_factory.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge150" class="edge">
+<title>sourcefile~element_factory.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1719.79,-196.83C1628.74,-213.25 1465.4,-242.95 1463,-245.09 1422.12,-281.64 1465.37,-323.93 1427,-363.09 1408.02,-382.47 1396.13,-382.11 1369,-382.09"/>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1367,-382.09C1299.52,-382.02 1282.84,-349.77 1216.5,-362.09"/>
+</g>
+<!-- sourcefile~element_factory.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge152" class="edge">
+<title>sourcefile~element_factory.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1757.35,-198.2C1739.73,-208.73 1715.38,-225.36 1699,-245.09 1675.38,-273.54 1691.74,-296.83 1663,-320.09 1627.81,-348.58 1601.07,-318.1 1564,-344.09"/>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1562,-344.09C1519.49,-373.9 1498.61,-368.31 1463,-406.09 1419.85,-451.88 1390,-521.24 1376.74,-556.24"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1373.34,-555.35 1373.17,-565.94 1379.91,-557.77 1373.34,-555.35"/>
+</g>
+<!-- sourcefile~element_factory.f90&#45;&gt;sourcefile~element_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge151" class="edge">
+<title>sourcefile~element_factory.f90&#45;&gt;sourcefile~element_interface.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1719.76,-186.09C1695.02,-186.09 1666.03,-186.09 1639.81,-186.09"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1639.54,-182.59 1629.54,-186.09 1639.54,-189.59 1639.54,-182.59"/>
+</g>
+<!-- sourcefile~element_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge153" class="edge">
+<title>sourcefile~element_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1520.72,-174.01C1478.98,-164.39 1414.33,-156.85 1369,-186.09"/>
+</g>
+<!-- sourcefile~element_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge154" class="edge">
+<title>sourcefile~element_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1528.23,-198.17C1506.44,-207.66 1479.23,-223 1463,-245.09 1422.15,-300.69 1445.49,-329.62 1427,-396.09 1410.8,-454.33 1388.27,-521.9 1376.63,-555.99"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1373.19,-555.24 1373.26,-565.83 1379.81,-557.51 1373.19,-555.24"/>
+</g>
+<!-- sourcefile~element_interface.f90&#45;&gt;sourcefile~mesh_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge155" class="edge">
+<title>sourcefile~element_interface.f90&#45;&gt;sourcefile~mesh_interface.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1496.37,-196.51C1484.63,-200.23 1472.97,-205.26 1463,-212.09 1422.31,-239.98 1392.93,-291.51 1378.68,-320.61"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1375.4,-319.36 1374.28,-329.9 1381.73,-322.36 1375.4,-319.36"/>
+</g>
+<!-- sourcefile~matrix_coo.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge156" class="edge">
+<title>sourcefile~matrix_coo.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M262.62,-728.57C244.92,-731.04 224.71,-733.86 206.83,-736.35"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="206.31,-732.89 196.89,-737.74 207.28,-739.82 206.31,-732.89"/>
+</g>
+<!-- sourcefile~matrix_coo.f90&#45;&gt;sourcefile~deallocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge157" class="edge">
+<title>sourcefile~matrix_coo.f90&#45;&gt;sourcefile~deallocate.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M269.7,-710.08C264.48,-707.57 259.41,-704.6 255,-701.09 213.46,-668.13 182.87,-612.44 168.2,-581.84"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="171.24,-580.08 163.84,-572.49 164.9,-583.04 171.24,-580.08"/>
+</g>
+<!-- sourcefile~matrix_coo.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge158" class="edge">
+<title>sourcefile~matrix_coo.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M262.62,-715.62C252,-714.14 240.47,-712.53 229.09,-710.94"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="229.54,-707.47 219.15,-709.56 228.57,-714.4 229.54,-707.47"/>
+</g>
+<!-- sourcefile~matrix_crs.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge159" class="edge">
+<title>sourcefile~matrix_crs.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M275.52,-692.17C268.65,-694.91 261.52,-697.95 255,-701.09 238.32,-709.14 235.83,-714.35 219,-722.09 214.91,-723.97 210.6,-725.78 206.25,-727.5"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="204.83,-724.29 196.71,-731.1 207.3,-730.85 204.83,-724.29"/>
+</g>
+<!-- sourcefile~matrix_crs.f90&#45;&gt;sourcefile~deallocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge160" class="edge">
+<title>sourcefile~matrix_crs.f90&#45;&gt;sourcefile~deallocate.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M271.64,-668C265.86,-665.44 260.12,-662.48 255,-659.09 221.96,-637.23 191.4,-602.39 173.86,-580.41"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="176.51,-578.11 167.59,-572.4 171,-582.43 176.51,-578.11"/>
+</g>
+<!-- sourcefile~matrix_crs.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge161" class="edge">
+<title>sourcefile~matrix_crs.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M264.25,-686.34C253.22,-687.88 241.13,-689.56 229.2,-691.23"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="228.66,-687.77 219.24,-692.62 229.62,-694.7 228.66,-687.77"/>
+</g>
+<!-- sourcefile~matrix_dense.f90&#45;&gt;sourcefile~allocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge162" class="edge">
+<title>sourcefile~matrix_dense.f90&#45;&gt;sourcefile~allocate.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M278.18,-790.01C255.25,-781.02 223.75,-768.67 198.82,-758.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="199.87,-755.55 189.28,-755.16 197.31,-762.07 199.87,-755.55"/>
+</g>
+<!-- sourcefile~matrix_dense.f90&#45;&gt;sourcefile~deallocate.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge163" class="edge">
+<title>sourcefile~matrix_dense.f90&#45;&gt;sourcefile~deallocate.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M295.97,-789.79C284.35,-778.38 267.31,-760.58 255,-743.09 244.74,-728.52 192.38,-626.53 169.37,-581.45"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="172.34,-579.57 164.68,-572.25 166.11,-582.75 172.34,-579.57"/>
+</g>
+<!-- sourcefile~matrix_dense.f90&#45;&gt;sourcefile~matrix_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge164" class="edge">
+<title>sourcefile~matrix_dense.f90&#45;&gt;sourcefile~matrix_interface.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M276.71,-790.01C269.1,-786.26 261.36,-781.62 255,-776.09 233.23,-757.17 241.81,-739.74 219,-722.09 217,-720.55 214.88,-719.11 212.67,-717.77"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="214.29,-714.67 203.81,-713.11 211.03,-720.86 214.29,-714.67"/>
+</g>
+<!-- sourcefile~side_factory.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge165" class="edge">
+<title>sourcefile~side_factory.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1731.28,-274.79C1672.8,-285.38 1580.02,-302.32 1564,-306.09"/>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1562,-306.09C1517.94,-316.49 1502.95,-308.79 1463,-330.09 1443.85,-340.31 1445.74,-352.13 1427,-363.09 1403.59,-376.79 1396.13,-382.11 1369,-382.09"/>
+</g>
+<!-- sourcefile~side_factory.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge166" class="edge">
+<title>sourcefile~side_factory.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1756.85,-278.22C1733.76,-290.18 1696.67,-308.34 1663,-320.09 1620.26,-335.02 1601.07,-318.1 1564,-344.09"/>
+</g>
+<!-- sourcefile~side_factory.f90&#45;&gt;sourcefile~side_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge167" class="edge">
+<title>sourcefile~side_factory.f90&#45;&gt;sourcefile~side_interface.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1731.41,-266.09C1700.94,-266.09 1661.18,-266.09 1628.06,-266.09"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1628.01,-262.59 1618.01,-266.09 1628.01,-269.59 1628.01,-262.59"/>
+</g>
+<!-- sourcefile~side_interface.f90&#45;&gt;sourcefile~core.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge168" class="edge">
+<title>sourcefile~side_interface.f90&#45;&gt;sourcefile~core.f90</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1507.83,-271.79C1492.08,-275.58 1475.72,-281.82 1463,-292.09 1435.47,-314.32 1453.85,-340.06 1427,-363.09 1406.41,-380.76 1396.13,-382.11 1369,-382.09"/>
+</g>
+<!-- sourcefile~side_interface.f90&#45;&gt;sourcefile~input.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge169" class="edge">
+<title>sourcefile~side_interface.f90&#45;&gt;sourcefile~input.f90</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1533.72,-278.29C1511.74,-289.06 1481.91,-306.69 1463,-330.09 1433.49,-366.62 1391.34,-502.35 1375.42,-556.04"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1371.98,-555.32 1372.51,-565.9 1378.69,-557.3 1371.98,-555.32"/>
+</g>
+<!-- sourcefile~side_interface.f90&#45;&gt;sourcefile~mesh_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~EfferentGraph_edge170" class="edge">
+<title>sourcefile~side_interface.f90&#45;&gt;sourcefile~mesh_interface.f90</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1507.84,-277.9C1493.08,-281.77 1477.23,-286.53 1463,-292.09 1440.03,-301.08 1415.46,-314.28 1397.21,-324.87"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1395.37,-321.88 1388.53,-329.97 1398.92,-327.92 1395.37,-321.88"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pansourcefilehydraulic_interfacef90EfferentGraph = svgPanZoom('#sourcefilehydraulic_interfacef90EfferentGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#EfferentGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="EfferentGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="202pt" height="32pt"
+ viewBox="0.00 0.00 201.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 197.5,-28 197.5,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node">
+<title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="193.5,-24 88.5,-24 88.5,0 193.5,0 193.5,-24"/>
+<text text-anchor="middle" x="141" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a file to a file which it depends on. A file
+is dependent upon another if the latter must be compiled before the former
+can be.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Files dependent on this one</h3>
+          </div>
+          <div class="card-body">
+            <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: sourcefile~~hydraulic_interface.f90~~AfferentGraph Pages: 1 -->
+<svg id="sourcefilehydraulic_interfacef90AfferentGraph" width="384pt" height="74pt"
+ viewBox="0.00 0.00 384.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>sourcefile~~hydraulic_interface.f90~~AfferentGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 380,-70 380,4 -4,4"/>
+<!-- sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph_node1" class="node">
+<title>sourcefile~hydraulic_interface.f90</title>
+<polygon fill="none" stroke="black" points="138,-45 0,-45 0,-21 138,-21 138,-45"/>
+<text text-anchor="middle" x="69" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">hydraulic_interface.F90</text>
+</g>
+<!-- sourcefile~hydraulic.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph_node2" class="node">
+<title>sourcefile~hydraulic.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~AfferentGraph_node2"><a xlink:href="../sourcefile/hydraulic.f90.html" xlink:title="hydraulic.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="269.5,-66 184.5,-66 184.5,-42 269.5,-42 269.5,-66"/>
+<text text-anchor="middle" x="227" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic.f90&#45;&gt;sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph_edge1" class="edge">
+<title>sourcefile~hydraulic.f90&#45;&gt;sourcefile~hydraulic_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M184.19,-48.37C173.01,-46.87 160.56,-45.19 148.1,-43.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="148.51,-40.04 138.13,-42.17 147.57,-46.97 148.51,-40.04"/>
+</g>
+<!-- sourcefile~hydraulic_crs.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph_node3" class="node">
+<title>sourcefile~hydraulic_crs.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~AfferentGraph_node3"><a xlink:href="../sourcefile/hydraulic_crs.f90.html" xlink:title="hydraulic_crs.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="280,-24 174,-24 174,0 280,0 280,-24"/>
+<text text-anchor="middle" x="227" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hydraulic_crs.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~hydraulic_crs.f90&#45;&gt;sourcefile~hydraulic_interface.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph_edge2" class="edge">
+<title>sourcefile~hydraulic_crs.f90&#45;&gt;sourcefile~hydraulic_interface.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M173.62,-19.05C165.41,-20.16 156.78,-21.32 148.15,-22.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="147.48,-19.04 138.03,-23.84 148.41,-25.98 147.48,-19.04"/>
+</g>
+<!-- sourcefile~ftdss.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph_node4" class="node">
+<title>sourcefile~ftdss.f90</title>
+<g id="a_sourcefile~~hydraulic_interface.f90~~AfferentGraph_node4"><a xlink:href="../sourcefile/ftdss.f90.html" xlink:title="ftdss.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="376,-66 316,-66 316,-42 376,-42 376,-66"/>
+<text text-anchor="middle" x="346" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ftdss.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~ftdss.f90&#45;&gt;sourcefile~hydraulic.f90 -->
+<g id="sourcefile~~hydraulic_interface.f90~~AfferentGraph_edge3" class="edge">
+<title>sourcefile~ftdss.f90&#45;&gt;sourcefile~hydraulic.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M315.78,-54C304.88,-54 292.17,-54 279.85,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="279.64,-50.5 269.64,-54 279.64,-57.5 279.64,-50.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#AfferentGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="AfferentGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="202pt" height="32pt"
+ viewBox="0.00 0.00 201.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 197.5,-28 197.5,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node">
+<title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="193.5,-24 88.5,-24 88.5,0 193.5,0 193.5,-24"/>
+<text text-anchor="middle" x="141" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a file to a file which it depends on. A file
+is dependent upon another if the latter must be compiled before the former
+can be.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+<br>
+      <section>
+        <h2><span class="anchor" id="src"></span>Source Code</h2>
+        <div class="hl codehilite"><pre><span></span><a id="ln-1" name="ln-1" href="#ln-1"></a><span class="k">module </span><span class="n">main_hydraulic</span>
+<a id="ln-2" name="ln-2" href="#ln-2"></a><span class="w">    </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iso_fortran_env</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">int32</span><span class="p">,</span><span class="w"> </span><span class="n">real64</span>
+<a id="ln-3" name="ln-3" href="#ln-3"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">stdlib_logger</span>
+<a id="ln-4" name="ln-4" href="#ln-4"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">stdlib_strings</span>
+<a id="ln-5" name="ln-5" href="#ln-5"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_core</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">allocate_array</span><span class="p">,</span><span class="w"> </span><span class="n">deallocate_array</span><span class="p">,</span><span class="w"> </span><span class="n">type_variable</span><span class="p">,</span><span class="w"> </span><span class="n">type_dp_3d</span><span class="p">,</span><span class="w"> </span><span class="n">type_state</span><span class="p">,</span><span class="w"> </span><span class="n">type_crs</span>
+<a id="ln-6" name="ln-6" href="#ln-6"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_domain</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">type_domain</span>
+<a id="ln-7" name="ln-7" href="#ln-7"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_properties</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">type_properties_manager</span>
+<a id="ln-8" name="ln-8" href="#ln-8"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_input</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">type_input</span>
+<a id="ln-9" name="ln-9" href="#ln-9"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_calculate</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">gemv</span><span class="p">,</span><span class="w"> </span><span class="n">add</span>
+<a id="ln-10" name="ln-10" href="#ln-10"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_boundary</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">type_bc</span><span class="p">,</span><span class="w"> </span><span class="n">mode_value</span><span class="p">,</span><span class="w"> </span><span class="n">mode_nr</span>
+<a id="ln-11" name="ln-11" href="#ln-11"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_solver</span>
+<a id="ln-12" name="ln-12" href="#ln-12"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">module_control</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="n">type_controls</span>
+<a id="ln-13" name="ln-13" href="#ln-13"></a><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hydraulic_hydraulic_assemble</span>
+<a id="ln-14" name="ln-14" href="#ln-14"></a><span class="w">    </span><span class="k">implicit none</span>
+<a id="ln-15" name="ln-15" href="#ln-15"></a><span class="k">    private</span>
+<a id="ln-16" name="ln-16" href="#ln-16"></a>
+<a id="ln-17" name="ln-17" href="#ln-17"></a><span class="k">    public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_hydraulic</span>
+<a id="ln-18" name="ln-18" href="#ln-18"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_hydraulic_crs</span>
+<a id="ln-19" name="ln-19" href="#ln-19"></a>
+<a id="ln-20" name="ln-20" href="#ln-20"></a><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">abstract</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_hydraulic</span>
+<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_dp_3d</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">water_flux</span>
+<a id="ln-22" name="ln-22" href="#ln-22"></a>
+<a id="ln-23" name="ln-23" href="#ln-23"></a><span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_crs</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">KH_star</span>
+<a id="ln-24" name="ln-24" href="#ln-24"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">FH</span><span class="p">(:)</span>
+<a id="ln-25" name="ln-25" href="#ln-25"></a><span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">PHIH</span><span class="p">(:)</span>
+<a id="ln-26" name="ln-26" href="#ln-26"></a>
+<a id="ln-27" name="ln-27" href="#ln-27"></a><span class="w">        </span><span class="c">!! Nonlinear solver</span>
+<a id="ln-28" name="ln-28" href="#ln-28"></a><span class="w">        </span><span class="kt">character</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">algorithm</span>
+<a id="ln-29" name="ln-29" href="#ln-29"></a>
+<a id="ln-30" name="ln-30" href="#ln-30"></a><span class="w">        </span><span class="c">!! Solver</span>
+<a id="ln-31" name="ln-31" href="#ln-31"></a><span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">abst_solver</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">solver</span>
+<a id="ln-32" name="ln-32" href="#ln-32"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">order</span>
+<a id="ln-33" name="ln-33" href="#ln-33"></a>
+<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">abst_assemble_global_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">nopass</span><span class="p">,</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">assemble_global</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
+<a id="ln-35" name="ln-35" href="#ln-35"></a><span class="w">    </span><span class="k">contains</span>
+<a id="ln-36" name="ln-36" href="#ln-36"></a><span class="k">        procedure</span><span class="p">(</span><span class="n">abst_hydraulic_update</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update</span>
+<a id="ln-37" name="ln-37" href="#ln-37"></a><span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">abst_shift</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">shift</span>
+<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">abst_solve</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">solve</span>
+<a id="ln-39" name="ln-39" href="#ln-39"></a><span class="w">        </span><span class="k">procedure</span><span class="p">(</span><span class="n">abst_compute</span><span class="p">),</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">deferred</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute</span>
+<a id="ln-40" name="ln-40" href="#ln-40"></a><span class="w">    </span><span class="k">end type </span><span class="n">abst_hydraulic</span>
+<a id="ln-41" name="ln-41" href="#ln-41"></a>
+<a id="ln-42" name="ln-42" href="#ln-42"></a><span class="w">    </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="k">extends</span><span class="p">(</span><span class="n">abst_hydraulic</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_hydraulic_crs</span>
+<a id="ln-43" name="ln-43" href="#ln-43"></a><span class="w">    </span><span class="k">contains</span>
+<a id="ln-44" name="ln-44" href="#ln-44"></a><span class="k">        procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">update_type_hydraulic_crs</span>
+<a id="ln-45" name="ln-45" href="#ln-45"></a><span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">shift</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">shift_type_hydraulic_crs</span>
+<a id="ln-46" name="ln-46" href="#ln-46"></a><span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">solve</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">solve_type_hydraulic_crs</span>
+<a id="ln-47" name="ln-47" href="#ln-47"></a><span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">compute_type_hydraulic_crs</span>
+<a id="ln-48" name="ln-48" href="#ln-48"></a><span class="w">    </span><span class="k">end type </span><span class="n">type_hydraulic_crs</span>
+<a id="ln-49" name="ln-49" href="#ln-49"></a>
+<a id="ln-50" name="ln-50" href="#ln-50"></a><span class="w">    </span><span class="k">abstract interface</span>
+<a id="ln-51" name="ln-51" href="#ln-51"></a><span class="k">        subroutine </span><span class="n">abst_hydraulic_update</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">property</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="n">porosity</span><span class="p">)</span>
+<a id="ln-52" name="ln-52" href="#ln-52"></a><span class="w">            </span><span class="k">import</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">type_domain</span><span class="p">,</span><span class="w"> </span><span class="n">type_properties_manager</span><span class="p">,</span><span class="w"> </span><span class="n">real64</span>
+<a id="ln-53" name="ln-53" href="#ln-53"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-54" name="ln-54" href="#ln-54"></a><span class="k">            class</span><span class="p">(</span><span class="n">abst_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-55" name="ln-55" href="#ln-55"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<a id="ln-56" name="ln-56" href="#ln-56"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_properties_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">property</span>
+<a id="ln-57" name="ln-57" href="#ln-57"></a><span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span><span class="p">(:)</span>
+<a id="ln-58" name="ln-58" href="#ln-58"></a><span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">porosity</span><span class="p">(:)</span>
+<a id="ln-59" name="ln-59" href="#ln-59"></a>
+<a id="ln-60" name="ln-60" href="#ln-60"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">abst_hydraulic_update</span>
+<a id="ln-61" name="ln-61" href="#ln-61"></a>
+<a id="ln-62" name="ln-62" href="#ln-62"></a><span class="w">        </span><span class="k">subroutine </span><span class="n">abst_shift</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a id="ln-63" name="ln-63" href="#ln-63"></a><span class="w">            </span><span class="k">import</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_hydraulic</span>
+<a id="ln-64" name="ln-64" href="#ln-64"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-65" name="ln-65" href="#ln-65"></a><span class="k">            class</span><span class="p">(</span><span class="n">abst_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-66" name="ln-66" href="#ln-66"></a>
+<a id="ln-67" name="ln-67" href="#ln-67"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">abst_shift</span>
+<a id="ln-68" name="ln-68" href="#ln-68"></a>
+<a id="ln-69" name="ln-69" href="#ln-69"></a><span class="w">        </span><span class="k">subroutine </span><span class="n">abst_solve</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">)</span>
+<a id="ln-70" name="ln-70" href="#ln-70"></a><span class="w">            </span><span class="k">import</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">type_controls</span><span class="p">,</span><span class="w"> </span><span class="n">type_variable</span>
+<a id="ln-71" name="ln-71" href="#ln-71"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-72" name="ln-72" href="#ln-72"></a><span class="k">            class</span><span class="p">(</span><span class="n">abst_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-73" name="ln-73" href="#ln-73"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_controls</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">controls</span>
+<a id="ln-74" name="ln-74" href="#ln-74"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span>
+<a id="ln-75" name="ln-75" href="#ln-75"></a>
+<a id="ln-76" name="ln-76" href="#ln-76"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">abst_solve</span>
+<a id="ln-77" name="ln-77" href="#ln-77"></a>
+<a id="ln-78" name="ln-78" href="#ln-78"></a><span class="w">        </span><span class="k">subroutine </span><span class="n">abst_compute</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">property</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">porosity</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">,</span><span class="w"> </span><span class="n">bc</span><span class="p">)</span>
+<a id="ln-79" name="ln-79" href="#ln-79"></a><span class="w">            </span><span class="k">import</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">abst_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">type_domain</span><span class="p">,</span><span class="w"> </span><span class="n">type_properties_manager</span><span class="p">,</span><span class="w"> </span><span class="n">type_variable</span><span class="p">,</span><span class="w"> </span><span class="n">type_controls</span><span class="p">,</span><span class="w"> </span><span class="n">type_bc</span>
+<a id="ln-80" name="ln-80" href="#ln-80"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-81" name="ln-81" href="#ln-81"></a><span class="k">            class</span><span class="p">(</span><span class="n">abst_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-82" name="ln-82" href="#ln-82"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<a id="ln-83" name="ln-83" href="#ln-83"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_properties_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">property</span>
+<a id="ln-84" name="ln-84" href="#ln-84"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span>
+<a id="ln-85" name="ln-85" href="#ln-85"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span>
+<a id="ln-86" name="ln-86" href="#ln-86"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">porosity</span>
+<a id="ln-87" name="ln-87" href="#ln-87"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ice</span>
+<a id="ln-88" name="ln-88" href="#ln-88"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_controls</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">controls</span>
+<a id="ln-89" name="ln-89" href="#ln-89"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_bc</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc</span>
+<a id="ln-90" name="ln-90" href="#ln-90"></a>
+<a id="ln-91" name="ln-91" href="#ln-91"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">abst_compute</span>
+<a id="ln-92" name="ln-92" href="#ln-92"></a><span class="w">    </span><span class="k">end interface</span>
+<a id="ln-93" name="ln-93" href="#ln-93"></a>
+<a id="ln-94" name="ln-94" href="#ln-94"></a><span class="k">    interface</span>
+<a id="ln-95" name="ln-95" href="#ln-95"></a><span class="k">        module function </span><span class="n">construct_type_hydraulic_crs</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">coordinate</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
+<a id="ln-96" name="ln-96" href="#ln-96"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-97" name="ln-97" href="#ln-97"></a><span class="k">            class</span><span class="p">(</span><span class="n">abst_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">structure</span>
+<a id="ln-98" name="ln-98" href="#ln-98"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_input</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">input</span>
+<a id="ln-99" name="ln-99" href="#ln-99"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_dp_3d</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">coordinate</span>
+<a id="ln-100" name="ln-100" href="#ln-100"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<a id="ln-101" name="ln-101" href="#ln-101"></a>
+<a id="ln-102" name="ln-102" href="#ln-102"></a><span class="w">        </span><span class="k">end function </span><span class="n">construct_type_hydraulic_crs</span>
+<a id="ln-103" name="ln-103" href="#ln-103"></a>
+<a id="ln-104" name="ln-104" href="#ln-104"></a><span class="w">        </span><span class="k">module subroutine </span><span class="n">update_type_hydraulic_crs</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">property</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="n">porosity</span><span class="p">)</span>
+<a id="ln-105" name="ln-105" href="#ln-105"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-106" name="ln-106" href="#ln-106"></a><span class="k">            class</span><span class="p">(</span><span class="n">type_hydraulic_crs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-107" name="ln-107" href="#ln-107"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">target</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<a id="ln-108" name="ln-108" href="#ln-108"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_properties_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">property</span>
+<a id="ln-109" name="ln-109" href="#ln-109"></a><span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span><span class="p">(:)</span>
+<a id="ln-110" name="ln-110" href="#ln-110"></a><span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">porosity</span><span class="p">(:)</span>
+<a id="ln-111" name="ln-111" href="#ln-111"></a>
+<a id="ln-112" name="ln-112" href="#ln-112"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">update_type_hydraulic_crs</span>
+<a id="ln-113" name="ln-113" href="#ln-113"></a>
+<a id="ln-114" name="ln-114" href="#ln-114"></a><span class="w">        </span><span class="k">module subroutine </span><span class="n">shift_type_hydraulic_crs</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a id="ln-115" name="ln-115" href="#ln-115"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-116" name="ln-116" href="#ln-116"></a><span class="k">            class</span><span class="p">(</span><span class="n">type_hydraulic_crs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-117" name="ln-117" href="#ln-117"></a>
+<a id="ln-118" name="ln-118" href="#ln-118"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">shift_type_hydraulic_crs</span>
+<a id="ln-119" name="ln-119" href="#ln-119"></a>
+<a id="ln-120" name="ln-120" href="#ln-120"></a><span class="w">        </span><span class="k">module subroutine </span><span class="n">solve_type_hydraulic_crs</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">)</span>
+<a id="ln-121" name="ln-121" href="#ln-121"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-122" name="ln-122" href="#ln-122"></a><span class="k">            class</span><span class="p">(</span><span class="n">type_hydraulic_crs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-123" name="ln-123" href="#ln-123"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span>
+<a id="ln-124" name="ln-124" href="#ln-124"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_controls</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">controls</span>
+<a id="ln-125" name="ln-125" href="#ln-125"></a>
+<a id="ln-126" name="ln-126" href="#ln-126"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">solve_type_hydraulic_crs</span>
+<a id="ln-127" name="ln-127" href="#ln-127"></a>
+<a id="ln-128" name="ln-128" href="#ln-128"></a><span class="w">        </span><span class="k">module subroutine </span><span class="n">compute_type_hydraulic_crs</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">property</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">porosity</span><span class="p">,</span><span class="w"> </span><span class="n">ice</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">,</span><span class="w"> </span><span class="n">bc</span><span class="p">)</span>
+<a id="ln-129" name="ln-129" href="#ln-129"></a><span class="w">            </span><span class="k">implicit none</span>
+<a id="ln-130" name="ln-130" href="#ln-130"></a><span class="k">            class</span><span class="p">(</span><span class="n">type_hydraulic_crs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<a id="ln-131" name="ln-131" href="#ln-131"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_domain</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">domain</span>
+<a id="ln-132" name="ln-132" href="#ln-132"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_properties_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">property</span>
+<a id="ln-133" name="ln-133" href="#ln-133"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span>
+<a id="ln-134" name="ln-134" href="#ln-134"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">temperature</span>
+<a id="ln-135" name="ln-135" href="#ln-135"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">porosity</span>
+<a id="ln-136" name="ln-136" href="#ln-136"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_variable</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ice</span>
+<a id="ln-137" name="ln-137" href="#ln-137"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_controls</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">controls</span>
+<a id="ln-138" name="ln-138" href="#ln-138"></a><span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="n">type_bc</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc</span>
+<a id="ln-139" name="ln-139" href="#ln-139"></a>
+<a id="ln-140" name="ln-140" href="#ln-140"></a><span class="w">        </span><span class="k">end subroutine </span><span class="n">compute_type_hydraulic_crs</span>
+<a id="ln-141" name="ln-141" href="#ln-141"></a>
+<a id="ln-142" name="ln-142" href="#ln-142"></a><span class="w">    </span><span class="k">end interface</span>
+<a id="ln-143" name="ln-143" href="#ln-143"></a>
+<a id="ln-144" name="ln-144" href="#ln-144"></a><span class="k">    interface </span><span class="n">type_hydraulic_crs</span>
+<a id="ln-145" name="ln-145" href="#ln-145"></a><span class="w">        </span><span class="k">module procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">construct_type_hydraulic_crs</span>
+<a id="ln-146" name="ln-146" href="#ln-146"></a><span class="w">    </span><span class="k">end interface</span>
+<a id="ln-147" name="ln-147" href="#ln-147"></a>
+<a id="ln-148" name="ln-148" href="#ln-148"></a><span class="k">contains</span>
+<a id="ln-149" name="ln-149" href="#ln-149"></a>
+<a id="ln-150" name="ln-150" href="#ln-150"></a><span class="k">end module </span><span class="n">main_hydraulic</span>
+</pre></div>
+
+      </section>
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTDSS
+ was developed by Kikuchi Shun<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 10:37 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
