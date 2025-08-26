@@ -11,7 +11,6 @@ target_link_libraries(HYDRAULIC PUBLIC
     INPUT
     DOMAIN
     PROPERTIES
-    MATRIX
     BOUNDARY
     INITIAL
     SOLVER

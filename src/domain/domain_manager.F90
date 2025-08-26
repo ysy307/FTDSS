@@ -18,11 +18,12 @@ module domain_manager
         integer(int32), private :: num_volumes
         integer(int32), private :: num_nodes
         integer(int32), private :: num_materials
-        type(holder_elements), allocatable :: elements(:)
-        type(holder_sides), allocatable :: sides(:)
+        type(holder_elements), allocatable :: elements(:) !&
+        type(holder_sides),    allocatable :: sides(:) !&
 
         type(type_coloring) :: colors
         type(type_reordering) :: reordering
+        type(type_node_adjacency) :: node_adjacency
         type(type_crs_adjacency_element) :: element_adjacency
         type(type_map_node_to_element) :: map_node_to_element
 
@@ -46,8 +47,6 @@ contains
         type(type_input), intent(in) :: input
         type(type_dp_3d), intent(inout), pointer :: Coordinate
         integer(int32), intent(inout) :: ierr
-
-        type(type_node_adjacency) :: node_adjacency
 
         integer(int32) :: count_sides, count_elements, count_volumes
         integer(int32) :: iCell, iElem, iSide
@@ -118,13 +117,14 @@ contains
         !===============================================================
         ! 3. 隣接行列の構築
         !===============================================================
+        call self%node_adjacency%initialize(self%num_nodes, self%computaion_dimension, self%sides, self%elements)
         call self%element_adjacency%initialize(self%elements)
         call self%map_node_to_element%initialize(self%num_nodes, self%elements, "fast")
 
         !===============================================================
         ! 4. RCM並べ替えの実行
         !===============================================================
-        call self%reordering%initialize(input%basic%solver_settings%reordering, self%elements)
+        call self%reordering%initialize(input%basic%solver_settings%reordering, self%node_adjacency)
         if (input%basic%solver_settings%reordering /= "none") then
             call self%apply_reordering()
             call global_logger%log_information(message="RCM reordering completed.")
@@ -137,6 +137,8 @@ contains
         call global_logger%log_information(message="Graph coloring completed using " &
                                            //trim(self%colors%algorithm_name)//" algorithm.")
 
+        call self%node_adjacency%destroy()
+        ! call self%element_adjacency%destroy()
         call global_logger%log_information(message="Initialization process completed successfully.")
 
     end subroutine initialize_type_domain

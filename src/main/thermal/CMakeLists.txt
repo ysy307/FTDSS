@@ -12,7 +12,6 @@ target_link_libraries(THERMAL PUBLIC
     DOMAIN
     CALCULATE
     PROPERTIES
-    MATRIX
     BOUNDARY
     INITIAL
     SOLVER

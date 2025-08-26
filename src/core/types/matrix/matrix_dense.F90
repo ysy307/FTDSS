@@ -1,46 +1,45 @@
-module matrix_dense
-!$  use :: omp_lib
+module core_types_matrix_dense
     use, intrinsic :: iso_fortran_env
-    use :: module_core, only:allocate_array, deallocate_array
-    use :: module_calculate, only:multiply_matrix_vector
-    use :: module_domain, only:type_domain
-    use :: matrix_base, only:abst_matrix
+    use :: core_allocate, only:allocate_array
+    use :: core_deallocate, only:deallocate_array
+    use :: core_types_matrix, only:abst_matrix
     implicit none
     private
 
     public :: type_dense
 
-    public :: type_dense_gemv
-    public :: type_dense_add
+    ! public :: type_dense_gemv
+    ! public :: type_dense_add
 
     type, extends(abst_matrix) :: type_dense
         integer(int32) :: num_row
         integer(int32) :: num_col
         real(real64), allocatable :: val(:, :)
     contains
-        procedure, public, pass(self) :: initialize       => initialize_type_dense_from_domain !&
+        procedure, public, pass(self) :: initialize       => initialize_type_dense !&
         procedure, public, pass(self) :: initialize_local => initialize_type_dense_from_node !&
         procedure, public, pass(self) :: find             => find_dense !&
         procedure, public, pass(self) :: set              => set_dense !&
         procedure, public, pass(self) :: set_all          => set_all_dense !&
+        procedure, public, pass(self) :: zero             => zero_dense !&
         procedure, public, pass(self) :: add              => add_dense !&
         procedure, public, pass(self) :: destroy          => destroy_dense !&
     end type
 contains
-    subroutine initialize_type_dense_from_domain(self, domain)
+    subroutine initialize_type_dense(self, num_nodes, row, col)
         implicit none
         class(type_dense), intent(inout) :: self
-        type(type_domain), intent(inout) :: domain
-        integer(int32) :: num_nodes
-
-        num_nodes = domain%get_num_nodes()
-        call allocate_array(self%val, num_nodes, num_nodes)
-        self%val(:, :) = 0.0d0
+        integer(int32), intent(in) :: num_nodes
+        integer(int32), intent(in), optional :: row(:)
+        integer(int32), intent(in), optional :: col(:)
 
         self%num_row = num_nodes
         self%num_col = num_nodes
 
-    end subroutine initialize_type_dense_from_domain
+        call allocate_array(self%val, self%num_row, self%num_col)
+        self%val(:, :) = 0.0d0
+
+    end subroutine initialize_type_dense
 
     subroutine initialize_type_dense_from_node(self, num_nodes)
         implicit none
@@ -95,6 +94,13 @@ contains
         end do
     end subroutine set_all_dense
 
+    subroutine zero_dense(self)
+        implicit none
+        class(type_dense), intent(inout) :: self
+
+        call self%set_all(0.0d0)
+    end subroutine zero_dense
+
     subroutine add_dense(self, row, col, value)
         implicit none
         class(type_dense), intent(inout) :: self
@@ -112,42 +118,42 @@ contains
         call deallocate_array(self%val)
     end subroutine destroy_dense
 
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Matrix calculation
-    !-------------------------------------------------------------------------------------------------------------------------------
-    subroutine type_dense_gemv(alpha, A, x, beta, y)
-        ! y := alpha*A*x + beta*y
-        implicit none
-        real(real64), intent(in) :: alpha
-        type(type_dense), intent(in) :: A
-        real(real64), intent(in) :: beta
-        real(real64), intent(in) :: x(:)
-        real(real64), intent(inout) :: y(:)
+    ! !-------------------------------------------------------------------------------------------------------------------------------
+    ! ! Matrix calculation
+    ! !-------------------------------------------------------------------------------------------------------------------------------
+    ! subroutine type_dense_gemv(alpha, A, x, beta, y)
+    !     ! y := alpha*A*x + beta*y
+    !     implicit none
+    !     real(real64), intent(in) :: alpha
+    !     type(type_dense), intent(in) :: A
+    !     real(real64), intent(in) :: beta
+    !     real(real64), intent(in) :: x(:)
+    !     real(real64), intent(inout) :: y(:)
 
-        call multiply_matrix_vector(alpha, A%val, x, beta, y)
+    !     call multiply_matrix_vector(alpha, A%val, x, beta, y)
 
-    end subroutine type_dense_gemv
+    ! end subroutine type_dense_gemv
 
-    subroutine type_dense_add(alpha, A, B, C)
-        ! C := alpha*A + B
-        !
-        ! [ATTENTION] Assumes A, B, and C have the exact same sparsity pattern.
-        !
-        implicit none
-        real(real64), intent(in) :: alpha
-        type(type_dense), intent(in) :: A
-        type(type_dense), intent(in) :: B
-        type(type_dense), intent(inout) :: C
+    ! subroutine type_dense_add(alpha, A, B, C)
+    !     ! C := alpha*A + B
+    !     !
+    !     ! [ATTENTION] Assumes A, B, and C have the exact same sparsity pattern.
+    !     !
+    !     implicit none
+    !     real(real64), intent(in) :: alpha
+    !     type(type_dense), intent(in) :: A
+    !     type(type_dense), intent(in) :: B
+    !     type(type_dense), intent(inout) :: C
 
-        integer(int32) :: i, j
+    !     integer(int32) :: i, j
 
-        !$omp parallel do private(i, j) collapse(2)
-        do i = 1, size(A%val, 1)
-            do j = 1, size(A%val, 2)
-                C%val(i, j) = alpha * A%val(i, j) + B%val(i, j)
-            end do
-        end do
-        !$omp end parallel do
+    !     !$omp parallel do private(i, j) collapse(2)
+    !     do i = 1, size(A%val, 1)
+    !         do j = 1, size(A%val, 2)
+    !             C%val(i, j) = alpha * A%val(i, j) + B%val(i, j)
+    !         end do
+    !     end do
+    !     !$omp end parallel do
 
-    end subroutine type_dense_add
-end module matrix_dense
+    ! end subroutine type_dense_add
+end module core_types_matrix_dense

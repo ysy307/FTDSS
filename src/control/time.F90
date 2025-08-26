@@ -56,7 +56,6 @@ contains
         character(*), intent(in), optional :: profiler_sections(:)
 
         integer(int32) :: i
-        integer(int32) :: dummy
 
         if (present(input)) then
             select case (trim(input%conditions%time_control%time_stepping%unit))
@@ -348,7 +347,6 @@ contains
         ! Local variables
         real(real64) :: dt_n, dt_nm1, dt_nm2, dt_nm3, dt_nm4, dt_nm5
         real(real64) :: rho1, rho2, rho3, rho4, rho5
-        real(real64) :: coef_k
 
         select case (order)
         case (1) ! BDF1 (Backward Euler)

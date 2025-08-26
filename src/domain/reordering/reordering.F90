@@ -2,7 +2,7 @@ module domain_reordering
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_sorting, only:sort, sort_index
     use :: module_core, only:allocate_array, deallocate_array, error_message
-    use :: module_mesh, only:holder_elements
+    use :: module_mesh, only:holder_elements, holder_sides
     use :: domain_adjacency_adjacency_node, only:type_node_adjacency
 
     implicit none
@@ -21,9 +21,8 @@ module domain_reordering
         procedure, public, pass(self) :: initialize => initialize_type_reordering
 
         procedure, private, pass(self) :: rcm_reorder_method
-        procedure, private, pass(self) :: rcm_inverse_method
         procedure, private, pass(self) :: cm_reorder_method
-        procedure, private, pass(self) :: cm_inverse_method
+        procedure, private, pass(self) :: create_inverse_permutation
 
         ! CM/RCM ordering -> original ordering
         procedure, private, pass(self) :: to_original_values_int32
@@ -51,32 +50,25 @@ module domain_reordering
     end type type_reordering
 
     interface
-        module subroutine rcm_reorder_method(self, elements)
+        module subroutine rcm_reorder_method(self, node_adj)
+            import :: type_reordering, type_node_adjacency
             implicit none
             class(type_reordering), intent(inout) :: self
-            type(holder_elements), intent(in) :: elements(:)
-
+            class(type_node_adjacency), intent(in) :: node_adj
         end subroutine rcm_reorder_method
 
-        module subroutine cm_reorder_method(self, elements)
+        module subroutine cm_reorder_method(self, node_adj)
+            import :: type_reordering, type_node_adjacency
             implicit none
             class(type_reordering), intent(inout) :: self
-            type(holder_elements), intent(in) :: elements(:)
-
+            class(type_node_adjacency), intent(in) :: node_adj
         end subroutine cm_reorder_method
 
-        module subroutine rcm_inverse_method(self)
+        module subroutine create_inverse_permutation(self)
+            import :: type_reordering
             implicit none
             class(type_reordering), intent(inout) :: self
-
-        end subroutine rcm_inverse_method
-
-        module subroutine cm_inverse_method(self)
-            implicit none
-            class(type_reordering), intent(inout) :: self
-            integer(int32) :: i
-
-        end subroutine cm_inverse_method
+        end subroutine create_inverse_permutation
     end interface
 
     interface
@@ -150,24 +142,25 @@ module domain_reordering
 
 contains
 
-    subroutine initialize_type_reordering(self, algorithm_name, elements)
+    subroutine initialize_type_reordering(self, algorithm_name, node_adj)
         implicit none
         class(type_reordering), intent(inout) :: self
         character(*), intent(in) :: algorithm_name
-        type(holder_elements), intent(in) :: elements(:)
+        class(type_node_adjacency), intent(in) :: node_adj
 
         self%algorithm_name = trim(adjustl(algorithm_name))
         select case (self%algorithm_name)
         case ("rcm")
-            call self%rcm_reorder_method(elements)
-            call self%rcm_inverse_method()
+            call self%rcm_reorder_method(node_adj)
+            call self%create_inverse_permutation()
         case ("cm")
-            call self%cm_reorder_method(elements)
-            call self%cm_inverse_method()
+            call self%cm_reorder_method(node_adj)
+            call self%create_inverse_permutation()
+        case default
+            ! No reordering
         end select
 
     end subroutine initialize_type_reordering
-
     function get_algorithm_name(self) result(name)
         implicit none
         class(type_reordering), intent(in) :: self

@@ -49,7 +49,6 @@ include(Toolchain)
 add_subdirectory(src/core)
 add_subdirectory(src/inout)
 add_subdirectory(src/inout/input)
-add_subdirectory(src/matrix)
 add_subdirectory(src/domain/mesh)
 add_subdirectory(src/domain)
 add_subdirectory(src/calculate/blas)
@@ -78,7 +77,6 @@ set(COMMON_LIBS
     CORE
     INOUT
     INPUT
-    MATRIX
     MESH
     DOMAIN
     CALC_WRF

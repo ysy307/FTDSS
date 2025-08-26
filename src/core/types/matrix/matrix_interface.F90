@@ -1,6 +1,5 @@
-module matrix_base
+module core_types_matrix
     use, intrinsic :: iso_fortran_env
-    use :: module_domain, only:type_domain
     implicit none
     private
 
@@ -13,16 +12,19 @@ module matrix_base
         procedure(abst_find),       pass(self), deferred :: find !&
         procedure(abst_set),        pass(self), deferred :: set !&
         procedure(abst_set_all),    pass(self), deferred :: set_all !&
+        procedure(abst_zero),       pass(self), deferred :: zero !&
         procedure(abst_add),        pass(self), deferred :: add !&
         procedure(abst_destroy),    pass(self), deferred :: destroy !&
     end type abst_matrix
 
     abstract interface
-        subroutine abst_initialize(self, domain)
-            import :: abst_matrix, type_domain
+        subroutine abst_initialize(self, num_nodes, row, col)
+            import :: abst_matrix, int32
             implicit none
             class(abst_matrix), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
+            integer(int32), intent(in) :: num_nodes
+            integer(int32), intent(in), optional :: row(:)
+            integer(int32), intent(in), optional :: col(:)
 
         end subroutine abst_initialize
 
@@ -46,12 +48,19 @@ module matrix_base
         end subroutine abst_set
 
         subroutine abst_set_all(self, value)
-            import :: abst_matrix, int32, real64
+            import :: abst_matrix, real64
             implicit none
             class(abst_matrix), intent(inout) :: self
             real(real64), intent(in) :: value
 
         end subroutine abst_set_all
+
+        subroutine abst_zero(self)
+            import :: abst_matrix
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+
+        end subroutine abst_zero
 
         subroutine abst_add(self, row, col, value)
             import :: abst_matrix, int32, real64
@@ -70,4 +79,4 @@ module matrix_base
         end subroutine abst_destroy
     end interface
 
-end module matrix_base
+end module core_types_matrix

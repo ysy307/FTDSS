@@ -10,6 +10,7 @@ contains
 
         integer(int32) :: i
         integer(int32) :: num_nodes
+        integer(int32), allocatable :: row_ptr(:), col_ind(:)
 
         integer(int32) :: ierr
 
@@ -17,8 +18,9 @@ contains
         allocate (type_thermal_crs :: structure)
 
         num_nodes = domain%get_num_nodes()
+        call domain%node_adjacency%get_csr(row_ptr, col_ind)
 
-        call structure%KT_star%initialize(domain)
+        call structure%KT_star%initialize(num_nodes, row_ptr, col_ind)
         structure%order = input%basic%solver_settings%bdf_order
 
         call allocate_array(structure%FT, num_nodes)

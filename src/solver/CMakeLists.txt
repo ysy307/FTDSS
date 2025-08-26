@@ -10,7 +10,6 @@ target_include_directories(SOLVER PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
 target_link_libraries(SOLVER PRIVATE
     CORE
     INPUT
-    MATRIX
     CALC_BLAS
 )
 enable_build_flags(SOLVER)

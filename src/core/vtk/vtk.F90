@@ -2,7 +2,7 @@ module core_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
     use :: stdlib_sorting, only:sort
-    use :: core_types_array, only:type_dp_3d
+    use :: core_types, only:type_dp_3d
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
     use :: core_unique, only:unique

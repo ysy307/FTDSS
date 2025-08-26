@@ -12,6 +12,7 @@ add_library(MESH STATIC
     side/side_second.F90
     side/side_factory.F90
     side/side.F90
+    mesh.F90
 )
 target_include_directories(MESH PUBLIC
     ${CMAKE_Fortran_MODULE_DIRECTORY}
