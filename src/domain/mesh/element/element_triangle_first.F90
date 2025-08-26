@@ -151,7 +151,7 @@ contains
     end function psi_triangle_first
 
     !----------------------------------------------------------------------!
-    ! dpsi_dxi_triangle_first:
+    ! dpsi_triangle_first:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
     ! shape function for a linear triangular element with respect to ξ
@@ -179,77 +179,45 @@ contains
     !       ∂ψ₁/∂ξ =  1.0
     !       ∂ψ₂/∂ξ =  0.0
     !       ∂ψ₃/∂ξ = -1.0
-    !   - Returns 0.0d0 for indices outside [1, 3].
-    !
-    !----------------------------------------------------------------------!
-    pure elemental module function dpsi_dxi_triangle_first(self, i, r) result(dpsi)
-        implicit none
-        class(type_triangle_first), intent(in) :: self
-        integer(int32), intent(in) :: i
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: dpsi
-
-        select case (i)
-        case (1)
-            dpsi = 1.0d0
-        case (2)
-            dpsi = 0.0d0
-        case (3)
-            dpsi = -1.0d0
-        case default
-            dpsi = 0.0d0
-        end select
-    end function dpsi_dxi_triangle_first
-
-    !----------------------------------------------------------------------!
-    ! dpsi_deta_triangle_first:
-    !----------------------------------------------------------------------!
-    ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
-    ! shape function for a linear triangular element with respect to η
-    ! at a given ξ coordinate.
-    !
-    ! Arguments:
-    !   self : triangle_first type object.
-    !          Represents the triangular element for which the derivative
-    !          is being evaluated.
-    !
-    !   i    : Integer (int32), index of the shape function (i = 1, 2, 3).
-    !
-    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
-    !
-    !   eta  : Real(real64), the η coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
-    !
-    ! Return Value:
-    !   dpsi : Real(real64), value of ∂ψ_i/∂η evaluated at (ξ, η).
-    !
-    ! Function Details:
-    !   - For a linear triangle element:
     !       ∂ψ₁/∂η =  0.0
     !       ∂ψ₂/∂η =  1.0
     !       ∂ψ₃/∂η = -1.0
     !   - Returns 0.0d0 for indices outside [1, 3].
     !
     !----------------------------------------------------------------------!
-    pure elemental module function dpsi_deta_triangle_first(self, i, r) result(dpsi)
+    pure elemental module function dpsi_triangle_first(self, i, j, r) result(dpsi)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i
+        integer(int32), intent(in) :: j
         type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
 
-        select case (i)
+        select case (j)
         case (1)
-            dpsi = 0.0d0
+            select case (i)
+            case (1)
+                dpsi = 1.0d0
+            case (2)
+                dpsi = 0.0d0
+            case (3)
+                dpsi = -1.0d0
+            case default
+                dpsi = 0.0d0
+            end select
         case (2)
-            dpsi = 1.0d0
-        case (3)
-            dpsi = -1.0d0
-        case default
-            dpsi = 0.0d0
+            select case (i)
+            case (1)
+                dpsi = 0.0d0
+            case (2)
+                dpsi = 1.0d0
+            case (3)
+                dpsi = -1.0d0
+            case default
+                dpsi = 0.0d0
+            end select
         end select
-    end function dpsi_deta_triangle_first
+    end function dpsi_triangle_first
 
     !----------------------------------------------------------------------!
     ! jacobian_triangle_first:
@@ -276,7 +244,7 @@ contains
     !   eta  : Real(real64), η coordinate in natural coordinate system.
     !
     ! Return Value:
-    !   Jval : Real(real64), the (i,j) component of the Jacobian matrix.
+    !   jacobian : Real(real64), the (i,j) component of the Jacobian matrix.
     !
     ! Function Details:
     !   - The Jacobian matrix J is a 2×2 matrix defined as:
@@ -298,17 +266,17 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    pure elemental module function jacobian_triangle_first(self, i, j, r) result(Jval)
+    pure elemental module function jacobian_triangle_first(self, i, j, r) result(jacobian)
         implicit none
         class(type_triangle_first), intent(in) :: self
         integer(int32), intent(in) :: i, j
         type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: Jval
+        real(real64) :: jacobian
 
         integer(int32) :: ii
         type(type_dp_vector_3d) :: coordinate
 
-        Jval = 0
+        jacobian = 0
         !! dx
         select case (i)
         case (1)
@@ -317,12 +285,12 @@ contains
                 !! dx_dxi
                 do ii = 1, self%get_num_nodes()
                     coordinate = self%get_coordinate(ii)
-                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%x
+                    jacobian = jacobian + self%dpsi(ii, 1, r) * coordinate%x
                 end do
             case (2)
                 !! dx_deta
                 do ii = 1, self%get_num_nodes()
-                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%y
+                    jacobian = jacobian + self%dpsi(ii, 2, r) * coordinate%y
                 end do
             end select
 
@@ -332,12 +300,12 @@ contains
             case (1)
                 !! dy_dxi
                 do ii = 1, self%get_num_nodes()
-                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%y
+                    jacobian = jacobian + self%dpsi(ii, 1, r) * coordinate%y
                 end do
             case (2)
                 !! dy_deta
                 do ii = 1, self%get_num_nodes()
-                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%y
+                    jacobian = jacobian + self%dpsi(ii, 2, r) * coordinate%y
                 end do
             end select
         end select
@@ -360,7 +328,7 @@ contains
     !   eta  : Real(real64), η coordinate in the natural coordinate system.
     !
     ! Return Value:
-    !   J_Det : Real(real64), the determinant of the Jacobian matrix J.
+    !   jacobian_det : Real(real64), the determinant of the Jacobian matrix J.
     !
     ! Function Details:
     !   - The Jacobian matrix J is a 2×2 matrix defined as:
@@ -378,23 +346,21 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    pure elemental module function jacobian_det_triangle_first(self, r) result(J_Det)
+    pure elemental module function jacobian_det_triangle_first(self, r) result(jacobian_det)
         implicit none
         class(type_triangle_first), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: J_Det
+        real(real64) :: jacobian_det
 
         real(real64) :: dx_xi, dx_eta
         real(real64) :: dy_xi, dy_eta
 
-        integer(int32) :: i
+        dx_xi  = self%jacobian(1, 1, r) !&
+        dx_eta = self%jacobian(1, 2, r) !&
+        dy_xi  = self%jacobian(2, 1, r) !&
+        dy_eta = self%jacobian(2, 2, r) !&
 
-        dx_xi = self%jacobian(1, 1, r)
-        dx_eta = self%jacobian(1, 2, r)
-        dy_xi = self%jacobian(2, 1, r)
-        dy_eta = self%jacobian(2, 2, r)
-
-        J_Det = dx_xi * dy_eta - dx_eta * dy_xi
+        jacobian_det = dx_xi * dy_eta - dx_eta * dy_xi
     end function jacobian_det_triangle_first
 
     !----------------------------------------------------------------------!

@@ -54,12 +54,9 @@ contains
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
-                            call create_element(self%elements(iObs)%e, &
-                                                local_id, &
-                                                coordinate, &
-                                                input%geometry%vtk%cells(local_id), &
-                                                input%basic%geometry_settings, &
-                                                ierr)
+                            self%elements(iObs)%e = create_element(local_id, &
+                                                                   coordinate, &
+                                                                   input)
                             self%coordinate_normalized = normalized
                             exit
                         end if
@@ -79,12 +76,9 @@ contains
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
-                            call create_element(self%elements(iObs)%e, &
-                                                local_id, &
-                                                coordinate, &
-                                                input%geometry%vtk%cells(local_id), &
-                                                input%basic%geometry_settings, &
-                                                ierr)
+                            self%elements(iObs)%e = create_element(local_id, &
+                                                                   coordinate, &
+                                                                   input)
                             self%coordinate_normalized = normalized
                             exit
                         end if
@@ -362,7 +356,7 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            obs_values(iObs) = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
+            obs_values(iObs) = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
         end do
 
         deallocate (original_temperature)
@@ -437,8 +431,8 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
-            state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
+            state%temperature = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
+            state%porosity = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_porosity(:))
             group_id = self%elements(iObs)%e%get_group()
             state%water_content = properties%calc_qw(group_id, state)
             if (state%water_content > state%porosity) state%water_content = state%porosity
@@ -535,8 +529,8 @@ contains
             end if
 
             do iObs = 1, self%num_observations
-                state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
-                state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
+                state%temperature = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
+                state%porosity = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
                 state%water_content = properties%calc_qw(group_id, state)
                 if (state%water_content > state%porosity) state%water_content = state%porosity
@@ -636,8 +630,8 @@ contains
             end if
 
             do iObs = 1, self%num_observations
-                state%temperature = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_temperature(:))
-                state%porosity = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_porosity(:))
+                state%temperature = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
+                state%porosity = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
                 state%water_content = properties%calc_qw(group_id, state)
                 if (state%water_content > state%porosity) state%water_content = state%porosity
@@ -726,7 +720,7 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            obs_values(iObs) = self%elements(iObs)%e%interpolate(self%coordinate_normalized(iObs), original_pressure(:))
+            obs_values(iObs) = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_pressure(:))
         end do
 
         deallocate (original_pressure)

@@ -170,7 +170,7 @@ contains
     end function psi_square_first
 
     !----------------------------------------------------------------------!
-    ! dpsi_dxi_square_first:
+    ! dpsi_square_first:
     !----------------------------------------------------------------------!
     ! This function evaluates the partial derivative ∂ψ_i/∂ξ of the i-th
     ! shape function for a linear square element with respect to ξ
@@ -198,52 +198,6 @@ contains
     !       ∂ψ₂/∂ξ =  0.25 * (1 - η)
     !       ∂ψ₃/∂ξ =  0.25 * (1 + η)
     !       ∂ψ₄/∂ξ = -0.25 * (1 + η)
-    !   - Returns 0.0d0 for indices outside [1, 4].
-    !
-    !----------------------------------------------------------------------!
-    pure elemental module function dpsi_dxi_square_first(self, i, r) result(dpsi)
-        implicit none
-        class(type_square_first), intent(in) :: self
-        integer(int32), intent(in) :: i
-        type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: dpsi
-
-        select case (i)
-        case (1)
-            dpsi = -0.25d0 * (1.0d0 - r%y)
-        case (2)
-            dpsi = 0.25d0 * (1.0d0 - r%y)
-        case (3)
-            dpsi = 0.25d0 * (1.0d0 + r%y)
-        case (4)
-            dpsi = -0.25d0 * (1.0d0 + r%y)
-        case default
-            dpsi = 0.0d0
-        end select
-    end function dpsi_dxi_square_first
-
-    !----------------------------------------------------------------------!
-    ! dpsi_deta_square_first:
-    !----------------------------------------------------------------------!
-    ! This function evaluates the partial derivative ∂ψ_i/∂η of the i-th
-    ! shape function for a linear square element with respect to η
-    ! at a given ξ coordinate.
-    !
-    ! Arguments:
-    !   self : square_first type object.
-    !          Represents the square element for which the derivative
-    !          is being evaluated.
-    !
-    !   i    : Integer (int32), index of the shape function (i = 1 ~ 4).
-    !
-    !   xi   : Real(real64), the ξ coordinate in the natural coordinate
-    !          system (not used in linear case, but included for interface).
-    !
-    ! Return Value:
-    !   dpsi : Real(real64), value of ∂ψ_i/∂η evaluated at (ξ, η).
-    !
-    ! Function Details:
-    !   - For a linear square element:
     !       ∂ψ₁/∂η = -0.25 * (1 - ξ)
     !       ∂ψ₂/∂η = -0.25 * (1 + ξ)
     !       ∂ψ₃/∂η =  0.25 * (1 + ξ)
@@ -251,26 +205,43 @@ contains
     !   - Returns 0.0d0 for indices outside [1, 4].
     !
     !----------------------------------------------------------------------!
-    pure elemental module function dpsi_deta_square_first(self, i, r) result(dpsi)
+    pure elemental module function dpsi_square_first(self, i, j, r) result(dpsi)
         implicit none
         class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
+        integer(int32), intent(in) :: j
         type(type_dp_vector_3d), intent(in) :: r
         real(real64) :: dpsi
 
-        select case (i)
+        select case (j)
         case (1)
-            dpsi = -0.25d0 * (1.0d0 - r%x)
+            select case (i)
+            case (1)
+                dpsi = -0.25d0 * (1.0d0 - r%y)
+            case (2)
+                dpsi = 0.25d0 * (1.0d0 - r%y)
+            case (3)
+                dpsi = 0.25d0 * (1.0d0 + r%y)
+            case (4)
+                dpsi = -0.25d0 * (1.0d0 + r%y)
+            case default
+                dpsi = 0.0d0
+            end select
         case (2)
-            dpsi = -0.25d0 * (1.0d0 + r%x)
-        case (3)
-            dpsi = 0.25d0 * (1.0d0 + r%x)
-        case (4)
-            dpsi = 0.25d0 * (1.0d0 - r%x)
-        case default
-            dpsi = 0.0d0
+            select case (i)
+            case (1)
+                dpsi = -0.25d0 * (1.0d0 - r%x)
+            case (2)
+                dpsi = -0.25d0 * (1.0d0 + r%x)
+            case (3)
+                dpsi = 0.25d0 * (1.0d0 + r%x)
+            case (4)
+                dpsi = 0.25d0 * (1.0d0 - r%x)
+            case default
+                dpsi = 0.0d0
+            end select
         end select
-    end function dpsi_deta_square_first
+    end function dpsi_square_first
 
     !----------------------------------------------------------------------!
     ! jacobian_square_first:
@@ -297,7 +268,7 @@ contains
     !   eta  : Real(real64), η coordinate in natural coordinate system.
     !
     ! Return Value:
-    !   Jval : Real(real64), the (i,j) component of the jacobian matrix.
+    !   jacobian : Real(real64), the (i,j) component of the jacobian matrix.
     !
     ! Function Details:
     !   - The jacobian matrix J is a 2×2 matrix defined as:
@@ -309,8 +280,8 @@ contains
     !     coordinates (X or Y) of the element's nodes.
     !
     !   - The derivatives of shape functions are accessed via:
-    !         self%dpsi_dxi(ii, eta)
-    !         self%dpsi_deta(ii, xi)
+    !         self%dpsi(ii,1, eta)
+    !         self%dpsi(ii,2, xi)
     !
     !   - For example:
     !       ∂x/∂ξ = Σ (∂ψ_i/∂ξ) * x_i
@@ -319,18 +290,18 @@ contains
     !   - This function supports 2D problems.
     !
     !----------------------------------------------------------------------!
-    pure elemental module function jacobian_square_first(self, i, j, r) result(Jval)
+    pure elemental module function jacobian_square_first(self, i, j, r) result(jacobian)
         implicit none
         class(type_square_first), intent(in) :: self
         integer(int32), intent(in) :: i
         integer(int32), intent(in) :: j
         type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: Jval
+        real(real64) :: jacobian
 
         integer(int32) :: ii
         type(type_dp_vector_3d) :: coordinate
 
-        Jval = 0
+        jacobian = 0
         !! dx
         select case (i)
         case (1)
@@ -339,13 +310,13 @@ contains
                 !! dx_dxi
                 do ii = 1, self%get_num_nodes()
                     coordinate = self%get_coordinate(ii)
-                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%x
+                    jacobian = jacobian + self%dpsi(ii, 1, r) * coordinate%x
                 end do
             case (2)
                 !! dx_deta
                 do ii = 1, self%get_num_nodes()
                     coordinate = self%get_coordinate(ii)
-                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%x
+                    jacobian = jacobian + self%dpsi(ii, 2, r) * coordinate%x
                 end do
             end select
 
@@ -356,13 +327,13 @@ contains
                 !! dy_dxi
                 do ii = 1, self%get_num_nodes()
                     coordinate = self%get_coordinate(ii)
-                    Jval = Jval + self%dpsi_dxi(ii, r) * coordinate%y
+                    jacobian = jacobian + self%dpsi(ii, 1, r) * coordinate%y
                 end do
             case (2)
                 !! dy_deta
                 do ii = 1, self%get_num_nodes()
                     coordinate = self%get_coordinate(ii)
-                    Jval = Jval + self%dpsi_deta(ii, r) * coordinate%y
+                    jacobian = jacobian + self%dpsi(ii, 2, r) * coordinate%y
                 end do
             end select
         end select
@@ -385,7 +356,7 @@ contains
     !   eta  : Real(real64), η coordinate in the natural coordinate system.
     !
     ! Return Value:
-    !   J_Det : Real(real64), the determinant of the jacobian matrix J.
+    !   jacobian_det : Real(real64), the determinant of the jacobian matrix J.
     !
     ! Function Details:
     !   - The jacobian matrix J is a 2×2 matrix defined as:
@@ -403,28 +374,21 @@ contains
     !     with the element geometry (e.g., inverted element).
     !
     !----------------------------------------------------------------------!
-    pure elemental module function jacobian_det_square_first(self, r) result(J_Det)
+    pure elemental module function jacobian_det_square_first(self, r) result(jacobian_det)
         implicit none
         class(type_square_first), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
-        real(real64) :: J_Det
+        real(real64) :: jacobian_det
 
         real(real64) :: dx_xi, dx_eta
         real(real64) :: dy_xi, dy_eta
 
-        integer(int32) :: i
+        dx_xi  = self%jacobian(1, 1, r) !&
+        dx_eta = self%jacobian(1, 2, r) !&
+        dy_xi  = self%jacobian(2, 1, r) !&
+        dy_eta = self%jacobian(2, 2, r) !&
 
-        dx_xi = 0.0d0
-        dx_eta = 0.0d0
-        dy_xi = 0.0d0
-        dy_eta = 0.0d0
-
-        dx_xi = self%jacobian(1, 1, r)
-        dx_eta = self%jacobian(1, 2, r)
-        dy_xi = self%jacobian(2, 1, r)
-        dy_eta = self%jacobian(2, 2, r)
-
-        J_Det = dx_xi * dy_eta - dx_eta * dy_xi
+        jacobian_det = dx_xi * dy_eta - dx_eta * dy_xi
 
     end function jacobian_det_square_first
 

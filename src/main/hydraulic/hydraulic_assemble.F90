@@ -1,10 +1,10 @@
 module hydraulic_hydraulic_assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:type_state, type_dp_vector_3d, assignment(=), type_variable, allocate_array, deallocate_array
-    use :: module_domain, only:type_domain, abst_element
+    use :: module_core, only:type_state, type_dp_vector_3d, assignment(=), type_variable, allocate_array, deallocate_array, type_crs, type_dense
+    use :: module_domain, only:type_domain, abst_mesh
     use :: module_properties, only:type_properties_manager
-    use :: module_matrix, only:type_crs, type_dense, gemv, add
+    use :: module_calculate, only:gemv, add
     use :: module_control
 
     implicit none
@@ -33,129 +33,129 @@ module hydraulic_hydraulic_assemble
     end interface
 contains
 
+    ! subroutine process_element_hydraulic_linear_1(J, R, element, pressure, temperature, ice, porosity, &
+    !                                               properties, controls, actual_order)
+    !     implicit none
+    !     ! --- 引数 ---
+    !     type(type_crs), intent(inout) :: J
+    !     real(real64), intent(inout) :: R(:)
+    !     class(abst_element), intent(in), pointer :: element
+    !     type(type_variable), intent(in) :: pressure
+    !     type(type_variable), intent(in) :: temperature
+    !     type(type_variable), intent(in) :: ice
+    !     type(type_variable), intent(in) :: porosity
+    !     type(type_properties_manager), intent(in) :: properties
+    !     type(type_controls), intent(in) :: controls
+    !     integer(int32), intent(in) :: actual_order
+
+    !     ! --- ローカル変数 ---
+    !     integer(int32) :: index, num_nodes, num_gauss, material_id, il, jl, iG, iO
+    !     real(real64) :: weight, detJ
+    !     real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
+    !     real(real64) :: val, zeta
+    !     real(real64) :: dt
+
+    !     ! --- スタック上のワークスペース (自動配列) ---
+    !     real(real64) :: CH_e(element%get_num_nodes(), element%get_num_nodes())
+    !     real(real64) :: KH_e(element%get_num_nodes(), element%get_num_nodes())
+    !     real(real64) :: J_e(element%get_num_nodes(), element%get_num_nodes())
+    !     real(real64) :: R_e(element%get_num_nodes())
+
+    !     ! --- ガウスポイントでの物理量 (自動配列) ---
+    !     type(type_state) :: state(element%get_num_gauss())
+    !     real(real64) :: kflh(element%get_num_gauss())
+    !     real(real64) :: dot_ice(element%get_num_gauss())
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 0: 初期化とサイズの取得
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     num_nodes   = element%get_num_nodes() !&
+    !     num_gauss   = element%get_num_gauss() !&
+    !     material_id = element%get_group() !&
+    !     if (.not. controls%is_target(calc_hydraulic, material_id)) return
+
+    !     CH_e(:, :) = 0.0d0
+    !     KH_e(:, :) = 0.0d0
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 1: 全ガウスポイントの物理量を一括計算
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     do iG = 1, num_gauss
+    !         state(iG)%temperature = element%lerp(gauss(iG), temperature%pre) !&
+    !         state(iG)%pressure    = element%lerp(gauss(iG), pressure%pre) !&
+    !         state(iG)%porosity    = element%lerp(gauss(iG), porosity%pre) !&
+    !     end do
+    !     call properties%calc_hydraulic(material_id, state, kflh)
+
+    !     dt = controls%time%get_dt()
+    !     dot_ice(:) = 0.0d0
+    !     do il = 1, num_nodes
+    !         dot_ice(il) = ice%dif(p_conn(il)) / dt
+    !     end do
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 2: 要素行列 CH_e と KH_e を計算
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     do iG = 1, num_gauss
+    !         weight = element%weight(iG)
+    !         detJ = element%jacobian_det(gauss(iG))
+    !         zeta = state(iG)%density_ice / state(iG)%density_water - 1.0d0
+    !         do il = 1, num_nodes
+    !             dNdx_i = ( element%jacobian(2, 2,p_gauss(iG)) * element%dpsi (il,1,p_gauss(iG)) - & !&
+    !                        element%jacobian(2, 1,p_gauss(iG)) * element%dpsi(il,2,p_gauss(iG))) / detJ !&
+    !             dNdy_i = (-element%jacobian(1, 2,p_gauss(iG)) * element%dpsi (il,1,p_gauss(iG)) + & !&
+    !                        element%jacobian(1, 1,p_gauss(iG)) * element%dpsi(il,2,p_gauss(iG))) / detJ !&
+    !             do jl = 1, num_nodes
+    !                 dNdx_j = ( element%jacobian(2, 2,p_gauss(iG)) * element%dpsi (jl,1,p_gauss(iG)) - & !&
+    !                            element%jacobian(2, 1,p_gauss(iG)) * element%dpsi(jl,2,p_gauss(iG))) / detJ !&
+    !                 dNdy_j = (-element%jacobian(1, 2,p_gauss(iG)) * element%dpsi (jl,1,p_gauss(iG)) + & !&
+    !                            element%jacobian(1, 1,p_gauss(iG)) * element%dpsi(jl,2,p_gauss(iG))) / detJ !&
+
+    !                 CH_e(il, jl) = CH_e(il, jl) + element%psi(il,p_gauss(iG)) * & !&
+    !                                               element%psi(jl,p_gauss(iG)) * zeta * weight * detJ
+    !                 KH_e(il, jl) = KH_e(il, jl) + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * kflh(iG) * weight * detJ
+    !             end do
+    !         end do
+    !     end do
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 3: 最終的な LHS(J_e) と RHS(R_e) を構築
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! --- 3a. LHS行列 J_e の構築 (物理的に正しい式) ---
+    !     J_e(:, :) = 0.0d0
+    !     do jl = 1, num_nodes
+    !         do il = 1, num_nodes
+    !             J_e(il, jl) = KH_e(il, jl)
+    !         end do
+    !     end do
+
+    !     do il = 1, num_nodes
+    !         val = 0.0d0
+    !         do jl = 1, num_nodes
+    !             val = val + CH_e(il, jl) * dot_ice(jl)
+    !         end do
+    !         R_e(il) = -val
+    !     end do
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 4: 全体行列・ベクトルへのアセンブル (数学的に正しい標準手順)
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     do il = 1, num_nodes
+    !         R(p_conn(il)) = R(p_conn(il)) + R_e(il)
+    !         do jl = 1, num_nodes
+    !             call J%add(p_conn(il), p_conn(jl), J_e(il, jl))
+    !         end do
+    !     end do
+
+    ! end subroutine process_element_hydraulic_linear_1
+
     subroutine process_element_hydraulic_linear_1(J, R, element, pressure, temperature, ice, porosity, &
                                                   properties, controls, actual_order)
-        implicit none
-        ! --- 引数 ---
-        type(type_crs), intent(inout) :: J
-        real(real64), intent(inout) :: R(:)
-        class(abst_element), intent(in), pointer :: element
-        type(type_variable), intent(in) :: pressure
-        type(type_variable), intent(in) :: temperature
-        type(type_variable), intent(in) :: ice
-        type(type_variable), intent(in) :: porosity
-        type(type_properties_manager), intent(in) :: properties
-        type(type_controls), intent(in) :: controls
-        integer(int32), intent(in) :: actual_order
-
-        ! --- ローカル変数 ---
-        integer(int32) :: index, num_nodes, num_gauss, material_id, il, jl, iG, iO
-        real(real64) :: weight, detJ
-        real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
-        real(real64) :: val, zeta
-        real(real64) :: dt
-
-        ! --- スタック上のワークスペース (自動配列) ---
-        real(real64) :: CH_e(element%get_num_nodes(), element%get_num_nodes())
-        real(real64) :: KH_e(element%get_num_nodes(), element%get_num_nodes())
-        real(real64) :: J_e(element%get_num_nodes(), element%get_num_nodes())
-        real(real64) :: R_e(element%get_num_nodes())
-
-        ! --- ガウスポイントでの物理量 (自動配列) ---
-        type(type_state) :: state(element%get_num_gauss())
-        real(real64) :: kflh(element%get_num_gauss())
-        real(real64) :: dot_ice(element%get_num_gauss())
-
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! STEP 0: 初期化とサイズの取得
-        !---------------------------------------------------------------------------------------------------------------------------
-        num_nodes   = element%get_num_nodes() !&
-        num_gauss   = element%get_num_gauss() !&
-        material_id = element%get_group() !&
-        if (.not. controls%is_target(calc_hydraulic, material_id)) return
-
-        CH_e(:, :) = 0.0d0
-        KH_e(:, :) = 0.0d0
-
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! STEP 1: 全ガウスポイントの物理量を一括計算
-        !---------------------------------------------------------------------------------------------------------------------------
-        do iG = 1, num_gauss
-            state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre) !&
-            state(iG)%pressure    = element%interpolate(element%gauss(iG), pressure%pre) !&
-            state(iG)%porosity    = element%interpolate(element%gauss(iG), porosity%pre) !&
-        end do
-        call properties%calc_hydraulic(material_id, state, kflh)
-
-        dt = controls%time%get_dt()
-        dot_ice(:) = 0.0d0
-        do il = 1, num_nodes
-            dot_ice(il) = ice%dif(element%get_connectivity(il)) / dt
-        end do
-
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! STEP 2: 要素行列 CH_e と KH_e を計算
-        !---------------------------------------------------------------------------------------------------------------------------
-        do iG = 1, num_gauss
-            weight = element%weight(iG)
-            detJ = element%jacobian_det(element%gauss(iG))
-            zeta = state(iG)%density_ice / state(iG)%density_water - 1.0d0
-            do il = 1, num_nodes
-                dNdx_i = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) - & !&
-                           element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
-                dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) + & !&
-                           element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
-                do jl = 1, num_nodes
-                    dNdx_j = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) - & !&
-                               element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
-                    dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) + & !&
-                               element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
-
-                    CH_e(il, jl) = CH_e(il, jl) + element%psi(il, element%gauss(iG)) * & !&
-                                                  element%psi(jl, element%gauss(iG)) * zeta * weight * detJ
-                    KH_e(il, jl) = KH_e(il, jl) + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * kflh(iG) * weight * detJ
-                end do
-            end do
-        end do
-
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! STEP 3: 最終的な LHS(J_e) と RHS(R_e) を構築
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! --- 3a. LHS行列 J_e の構築 (物理的に正しい式) ---
-        J_e(:, :) = 0.0d0
-        do jl = 1, num_nodes
-            do il = 1, num_nodes
-                J_e(il, jl) = KH_e(il, jl)
-            end do
-        end do
-
-        do il = 1, num_nodes
-            val = 0.0d0
-            do jl = 1, num_nodes
-                val = val + CH_e(il, jl) * dot_ice(jl)
-            end do
-            R_e(il) = -val
-        end do
-
-        !---------------------------------------------------------------------------------------------------------------------------
-        ! STEP 4: 全体行列・ベクトルへのアセンブル (数学的に正しい標準手順)
-        !---------------------------------------------------------------------------------------------------------------------------
-        do il = 1, num_nodes
-            R(element%get_connectivity(il)) = R(element%get_connectivity(il)) + R_e(il)
-            do jl = 1, num_nodes
-                call J%add(element%get_connectivity(il), element%get_connectivity(jl), J_e(il, jl))
-            end do
-        end do
-
-    end subroutine process_element_hydraulic_linear_1
-
-    subroutine process_element_hydraulic_linear_1_ns(J, R, element, pressure, temperature, ice, porosity, &
-                                                     properties, controls, actual_order)
         implicit none
         ! --- arguments ---
         type(type_crs), intent(inout) :: J
         real(real64), intent(inout) :: R(:)
-        class(abst_element), intent(in), pointer :: element
+        class(abst_mesh), intent(in), pointer :: element
         type(type_variable), intent(in) :: pressure
         type(type_variable), intent(in) :: temperature
         type(type_variable), intent(in) :: ice
@@ -179,8 +179,11 @@ contains
 
         ! --- Physical quantities at Gauss points ---
         type(type_state), allocatable :: state(:)
+        real(real64), dimension(:), pointer :: p_weight => null()
+        type(type_dp_vector_3d), dimension(:), pointer :: p_gauss => null()
         real(real64), allocatable :: kflh(:)
         real(real64), allocatable :: dot_ice(:)
+        integer(int32), dimension(:), pointer :: p_conn => null()
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 0: Initialize and obtain sizes
@@ -198,40 +201,44 @@ contains
         call allocate_array(kflh, num_gauss)
         call allocate_array(dot_ice, num_nodes)
 
+        dt = controls%time%get_dt()
+        p_weight => element%get_weight()
+        p_gauss => element%get_gauss()
+        p_conn => element%get_connectivity()
+
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 1: Compute the physical quantities at all Gauss points
         !---------------------------------------------------------------------------------------------------------------------------
         do iG = 1, num_gauss
-            state(iG)%temperature = element%interpolate(element%gauss(iG), temperature%pre) !&
-            state(iG)%pressure    = element%interpolate(element%gauss(iG), pressure%pre) !&
-            state(iG)%porosity    = element%interpolate(element%gauss(iG), porosity%pre) !&
+            state(iG)%temperature = element%lerp(p_gauss(iG), temperature%pre) !&
+            state(iG)%pressure    = element%lerp(p_gauss(iG), pressure%pre) !&
+            state(iG)%porosity    = element%lerp(p_gauss(iG), porosity%pre) !&
         end do
         call properties%calc_hydraulic(material_id, state, kflh)
 
-        dt = controls%time%get_dt()
         do il = 1, num_nodes
-            dot_ice(il) = ice%dif(element%get_connectivity(il)) / dt
+            dot_ice(il) = ice%dif(p_conn(il)) / dt
         end do
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 2: Compute the element matrices CH_e and KH_e
         !---------------------------------------------------------------------------------------------------------------------------
         do iG = 1, num_gauss
-            weight = element%weight(iG) !&
-            detJ   = element%jacobian_det(element%gauss(iG)) !&
+            weight = p_weight(iG) !&
+            detJ   = element%jacobian_det(p_gauss(iG)) !&
             zeta   = state(iG)%density_ice / state(iG)%density_water - 1.0d0 !&
             do il = 1, num_nodes
-                dNdx_i = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) - & !&
-                           element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
-                dNdy_i = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (il, element%gauss(iG)) + & !&
-                           element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(il, element%gauss(iG))) / detJ !&
+                dNdx_i = ( element%jacobian(2, 2, p_gauss(iG)) * element%dpsi(il, 1, p_gauss(iG)) - & !&
+                           element%jacobian(2, 1, p_gauss(iG)) * element%dpsi(il, 2, p_gauss(iG))) / detJ !&
+                dNdy_i = (-element%jacobian(1, 2, p_gauss(iG)) * element%dpsi(il, 1, p_gauss(iG)) + & !&
+                           element%jacobian(1, 1, p_gauss(iG)) * element%dpsi(il, 2, p_gauss(iG))) / detJ !&
                 do jl = 1, num_nodes
-                    dNdx_j = ( element%jacobian(2, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) - & !&
-                               element%jacobian(2, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
-                    dNdy_j = (-element%jacobian(1, 2, element%gauss(iG)) * element%dpsi_dxi (jl, element%gauss(iG)) + & !&
-                               element%jacobian(1, 1, element%gauss(iG)) * element%dpsi_deta(jl, element%gauss(iG))) / detJ !&
+                    dNdx_j = ( element%jacobian(2, 2, p_gauss(iG)) * element%dpsi(jl, 1, p_gauss(iG)) - & !&
+                               element%jacobian(2, 1, p_gauss(iG)) * element%dpsi(jl, 2, p_gauss(iG))) / detJ !&
+                    dNdy_j = (-element%jacobian(1, 2, p_gauss(iG)) * element%dpsi(jl, 1, p_gauss(iG)) + & !&
+                               element%jacobian(1, 1, p_gauss(iG)) * element%dpsi(jl, 2, p_gauss(iG))) / detJ !&
 
-                    val = element%psi(il, element%gauss(iG)) * element%psi(jl, element%gauss(iG)) * zeta * weight * detJ
+                    val = element%psi(il, p_gauss(iG)) * element%psi(jl, p_gauss(iG)) * zeta * weight * detJ
                     call CH_e%add(il, jl, val)
                     val = (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * kflh(iG) * weight * detJ
                     call KH_e%add(il, jl, val)
@@ -249,9 +256,9 @@ contains
         ! STEP 4: Assemble the global matrix and vector
         !---------------------------------------------------------------------------------------------------------------------------
         do il = 1, num_nodes
-            R(element%get_connectivity(il)) = R(element%get_connectivity(il)) + R_e(il)
+            R(p_conn(il)) = R(p_conn(il)) + R_e(il)
             do jl = 1, num_nodes
-                call J%add(element%get_connectivity(il), element%get_connectivity(jl), J_e%val(il, jl))
+                call J%add(p_conn(il), p_conn(jl), J_e%val(il, jl))
             end do
         end do
 
@@ -265,7 +272,7 @@ contains
         call CH_e%destroy()
         deallocate (state)
 
-    end subroutine process_element_hydraulic_linear_1_ns
+    end subroutine process_element_hydraulic_linear_1
 
     subroutine hydraulic_assemble_system_linear_1(J, R, domain, pressure, temperature, porosity, ice, &
                                                   properties, controls, actual_order)
@@ -281,7 +288,7 @@ contains
         type(type_controls), intent(in) :: controls
         integer(int32), intent(in) :: actual_order
 
-        class(abst_element), pointer :: element
+        class(abst_mesh), pointer :: element
         integer(int32) :: iE, num_elements
 
         num_elements = domain%get_num_elements()
@@ -310,7 +317,7 @@ contains
         integer(int32), intent(in) :: actual_order
 
         integer(int32) :: c, ie_idx
-        class(abst_element), pointer :: element
+        class(abst_mesh), pointer :: element
 
         call J%set_all(0.0d0)
         R(:) = 0.0d0

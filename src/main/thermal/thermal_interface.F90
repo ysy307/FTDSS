@@ -2,12 +2,12 @@ module main_thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
     use :: stdlib_strings
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, type_crs
     use :: module_domain, only:type_domain
     use :: module_calculate, only:abst_den
     use :: module_properties, only:type_properties_manager, type_phase_property
     use :: module_input, only:type_input
-    use :: module_matrix, only:type_crs, gemv, add
+    use :: module_calculate, only:gemv, add
     use :: module_boundary, only:type_bc, mode_value, mode_nr
     use :: module_solver
     use :: module_control

@@ -6,7 +6,7 @@ contains
         implicit none
         class(type_bc_thermal_dirichlet), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in) :: id
         integer(int32), intent(in) :: i_material
         real(real64), intent(in) :: time_conv
@@ -47,7 +47,7 @@ contains
         real(real64), intent(in) :: current_time
         real(real64), intent(inout), optional :: A(:, :)
         real(real64), intent(inout) :: b(:)
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
     end subroutine apply_dense_thermal_dirichlet
@@ -58,7 +58,7 @@ contains
         real(real64), intent(in) :: current_time
         type(type_crs), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
         real(real64) :: value_dirichlet, timeCoe
@@ -162,13 +162,13 @@ contains
             p2 = Edge(2)
 
             if (present(A)) then
-                call A%find(p1, p1, ind)
+                ind = A%find(p1, p1)
                 ps = A%ptr(p1)
                 pe = A%ptr(p1 + 1) - 1
                 A%val(ps:pe) = 0.0d0
                 A%val(ind) = 1.0d0
 
-                call A%find(p2, p2, ind)
+                ind = A%find(p2, p2)
                 ps = A%ptr(p2)
                 pe = A%ptr(p2 + 1) - 1
                 A%val(ps:pe) = 0.0d0

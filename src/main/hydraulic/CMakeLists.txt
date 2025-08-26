@@ -14,5 +14,6 @@ target_link_libraries(HYDRAULIC PUBLIC
     BOUNDARY
     INITIAL
     SOLVER
+    CALC
 )
 enable_build_flags(HYDRAULIC)

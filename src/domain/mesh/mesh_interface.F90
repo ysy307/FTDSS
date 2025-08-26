@@ -37,33 +37,67 @@ module domain_mesh
         procedure, pass(self), public :: get_order !&
         procedure, pass(self), public :: get_dimension !&
         procedure, pass(self), public :: get_num_gauss !&
+        procedure, pass(self), public :: get_weight !&
+        procedure, pass(self), public :: get_gauss !&
         procedure, pass(self), public :: get_coordinate !&
         procedure, pass(self), public :: get_connectivity !&
+        procedure, pass(self), public :: lerp !&
+        procedure, pass(self), public :: dlerp !&
 
-        procedure(abst_interpolate),            pass(self), public, deferred :: lerp !&
-        procedure(abst_derivative_interpolate), pass(self), public, deferred :: dlerp !&
+        procedure(abst_get_geometry), pass(self), public, deferred :: get_geometry
+        procedure(abst_psi), pass(self), public, deferred :: psi
+        procedure(abst_dpsi), pass(self), public, deferred :: dpsi
+        procedure(abst_jacobian), pass(self), public, deferred :: jacobian
+        procedure(abst_jacobian_det), pass(self), public, deferred :: jacobian_det
+
     end type
 
     abstract interface
-        function abst_interpolate(self, r, value) result(interpolated_value)
-            import :: abst_mesh, type_dp_vector_3d, real64
+        pure function abst_get_geometry(self) result(geometry)
+            import :: abst_mesh, real64
+            implicit none
+            class(abst_mesh), intent(in) :: self
+            real(real64) :: geometry
+        end function
+
+        pure elemental function abst_psi(self, i, r) result(psi)
+            import :: abst_mesh, type_dp_vector_3d, int32, real64
+            implicit none
+            class(abst_mesh), intent(in) :: self
+            integer(int32), intent(in) :: i
+            type(type_dp_vector_3d), intent(in) :: r
+            real(real64) :: psi
+        end function abst_psi
+
+        pure elemental function abst_dpsi(self, i, j, r) result(dpsi)
+            import :: abst_mesh, type_dp_vector_3d, int32, real64
+            implicit none
+            class(abst_mesh), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_dp_vector_3d), intent(in) :: r
+            real(real64) :: dpsi
+        end function abst_dpsi
+
+        pure elemental function abst_jacobian(self, i, j, r) result(jacobian)
+            import :: abst_mesh, type_dp_vector_3d, int32, real64
+            implicit none
+            class(abst_mesh), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_dp_vector_3d), intent(in) :: r
+            real(real64) :: jacobian
+        end function abst_jacobian
+
+        pure elemental function abst_jacobian_det(self, r) result(jacobian_det)
+            import :: abst_mesh, type_dp_vector_3d, int32, real64
             implicit none
             class(abst_mesh), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
-            real(real64), intent(in) :: value(:)
-            real(real64) :: interpolated_value
+            real(real64) :: jacobian_det
 
-        end function abst_interpolate
+        end function abst_jacobian_det
 
-        function abst_derivative_interpolate(self, r, value) result(interpolated_value)
-            import :: abst_mesh, type_dp_vector_3d, real64
-            implicit none
-            class(abst_mesh), intent(in) :: self
-            type(type_dp_vector_3d), intent(in) :: r
-            real(real64), intent(in) :: value(:)
-            type(type_dp_vector_3d) :: interpolated_value
-
-        end function abst_derivative_interpolate
     end interface
 
 contains
@@ -178,6 +212,22 @@ contains
         num_gauss = self%num_gauss
     end function get_num_gauss
 
+    function get_weight(self) result(weight)
+        implicit none
+        class(abst_mesh), intent(in), target :: self
+        real(real64), dimension(:), pointer :: weight
+
+        weight => self%weight(:)
+    end function get_weight
+
+    function get_gauss(self) result(gauss)
+        implicit none
+        class(abst_mesh), intent(in), target :: self
+        type(type_dp_vector_3d), dimension(:), pointer :: gauss
+
+        gauss => self%gauss(:)
+    end function get_gauss
+
     pure function get_coordinate(self, index) result(coordinate)
         implicit none
         class(abst_mesh), intent(in) :: self
@@ -196,5 +246,43 @@ contains
 
         connectivity => self%connectivity(:)
     end function get_connectivity
+
+    pure function lerp(self, r, value) result(val)
+        implicit none
+        class(abst_mesh), intent(in) :: self
+        type(type_dp_vector_3d), intent(in) :: r
+        real(real64), intent(in) :: value(:)
+        real(real64) :: val
+
+        integer(int32) :: i
+
+        val = 0.0d0
+
+        do i = 1, self%num_nodes
+            val = val + self%psi(i, r) * value(self%connectivity(i))
+        end do
+
+    end function lerp
+
+    pure function dlerp(self, r, value) result(val)
+        implicit none
+        class(abst_mesh), intent(in) :: self
+        type(type_dp_vector_3d), intent(in) :: r
+        real(real64), intent(in) :: value(:)
+        type(type_dp_vector_3d) :: val
+
+        integer(int32) :: i
+
+        val%x = 0.0d0
+        val%y = 0.0d0
+        val%z = 0.0d0
+
+        do i = 1, self%num_nodes
+            if (self%dimension >= 1) val%x = val%x + self%dpsi(i, 1, r) * value(self%connectivity(i))
+            if (self%dimension >= 2) val%y = val%y + self%dpsi(i, 2, r) * value(self%connectivity(i))
+            if (self%dimension >= 3) val%z = val%z + self%dpsi(i, 3, r) * value(self%connectivity(i))
+        end do
+
+    end function dlerp
 
 end module domain_mesh

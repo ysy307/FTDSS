@@ -7,14 +7,13 @@ module input_output
     use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, & !&
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                              get_cpu_architecture, get_os, get_openmp_version, get_memory_usage, & !&
-                             filter, type_dp_vector_3d, assignment(=)
+                             filter, type_dp_vector_3d, assignment(=), type_crs
 
     use :: module_input
     use :: inout_project_settings, only:get_project_path
     use :: module_domain, only:holder_elements, create_element, type_domain, type_reordering, abst_element
     use :: module_control, only:type_time, type_iteration
     use :: module_properties, only:type_properties_manager
-    use :: module_matrix
 
     implicit none
     private

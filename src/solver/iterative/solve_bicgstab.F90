@@ -82,7 +82,7 @@ contains
 
             do iter = 1, self%max_iterations
                 ! 7: (^r0, rk)
-                rho = dot(self%size, self%r(:), self%r0(:))
+                rho = dot(self%r(:), self%r0(:))
                 ! 8: rho check
                 if (rho == 0.0d0) then
                     status = 0
@@ -111,7 +111,7 @@ contains
                 call gemv(1.0d0, matrix, self%phat(:), 0.0d0, self%v(:))
                 ! call SpMV(self%CRS_A, self%phat, self%v)
                 ! 17: alpha_k = rho / (^r0, v)
-                alpha = rho / dot(self%size, self%r0(:), self%v(:))
+                alpha = rho / dot(self%r0(:), self%v(:))
                 ! 18: s = r_k - alpha_k * v
                 do iN = 1, self%size
                     self%s(iN) = self%r(iN) - alpha * self%v(iN)
@@ -123,7 +123,7 @@ contains
                 call gemv(1.0d0, matrix, self%shat(:), 0.0d0, self%t(:))
 
                 ! 21: omega_k = (t,s)/(t,t)
-                omega = dot(self%size, self%t(:), self%s(:)) / dot(self%size, self%t(:), self%t(:))
+                omega = dot(self%t(:), self%s(:)) / dot(self%t(:), self%t(:))
 
                 ! 22: omega breakdown check
                 if (omega == 0.0d0) then
@@ -139,7 +139,7 @@ contains
                 end do
 
                 ! 25: ||r_k+1||_2
-                resid = norm(self%r(:))
+                resid = norm_2(self%r(:))
                 if (resid < self%tolerance) then
                     status = 0
                     do iN = 1, self%size

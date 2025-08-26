@@ -51,7 +51,7 @@ add_subdirectory(src/inout)
 add_subdirectory(src/inout/input)
 add_subdirectory(src/domain/mesh)
 add_subdirectory(src/domain)
-add_subdirectory(src/calculate/blas)
+add_subdirectory(src/calculate/linalg)
 add_subdirectory(src/calculate/wrf)
 add_subdirectory(src/calculate/hcf)
 add_subdirectory(src/calculate/gcc)
@@ -79,6 +79,7 @@ set(COMMON_LIBS
     INPUT
     MESH
     DOMAIN
+    CALC_LINALG
     CALC_WRF
     # CALC_HCF
     CALC_GCC
@@ -87,7 +88,6 @@ set(COMMON_LIBS
     CALC_SPH
     CALC_VHC
     PROPERTIES
-    CALC_BLAS
     BOUNDARY
     INITIAL
     SOLVER

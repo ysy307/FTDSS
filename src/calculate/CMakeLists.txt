@@ -10,7 +10,7 @@ target_link_libraries(CALC PUBLIC
     CALC_VHC
     CALC_GCC
     CALC_WRF
-    CALC_BLAS
+    CALC_LINALG
 
 )
 enable_build_flags(CALC)

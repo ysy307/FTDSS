@@ -11,18 +11,4 @@ module module_type_matrix
     public :: type_crs
     public :: type_dense
 
-    ! public :: gemv
-    ! interface gemv
-    !     module procedure :: type_coo_gemv
-    !     module procedure :: type_crs_gemv
-    !     module procedure :: type_dense_gemv
-    ! end interface
-
-    ! public :: add
-    ! interface add
-    !     module procedure :: type_coo_add
-    !     module procedure :: type_crs_add
-    !     module procedure :: type_dense_add
-    ! end interface
-
 end module module_type_matrix

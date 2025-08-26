@@ -1,4 +1,5 @@
 module module_mesh
+    use :: domain_mesh, only:abst_mesh
     use :: module_mesh_side, only: &
         abst_side, type_side_first, type_side_second, holder_sides, create_side
     use :: module_mesh_element, only: &
@@ -15,6 +16,7 @@ module module_mesh
     !-------------------------------------------------------------------------------------------------------------------------------
     ! derived types
     !-------------------------------------------------------------------------------------------------------------------------------
+    public :: abst_mesh
     public :: abst_side
     public :: abst_element
     public :: type_side_first

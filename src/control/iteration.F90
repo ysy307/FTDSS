@@ -1,7 +1,7 @@
 module control_iteration
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_input, only:type_input, type_convergence
-    use :: module_calculate, only:norm_2, norm_infinity
+    use :: module_calculate, only:norm_2, norm_inf
     implicit none
     private
 
@@ -79,11 +79,11 @@ contains
         ! 初期ノルム値設定
         if (present(res_vec)) then
             self%init_res_norm_l2 = norm_2(res_vec)
-            self%init_res_norm_inf = norm_infinity(res_vec)
+            self%init_res_norm_inf = norm_inf(res_vec)
         end if
         if (present(upd_vec)) then
             self%init_upd_norm_l2 = norm_2(upd_vec)
-            self%init_upd_norm_inf = norm_infinity(upd_vec)
+            self%init_upd_norm_inf = norm_inf(upd_vec)
         end if
     end subroutine set_initial_norms
 

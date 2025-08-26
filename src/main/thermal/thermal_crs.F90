@@ -106,7 +106,7 @@ contains
                 material_id = domain%elements(element_id)%e%get_group()
                 if (.not. controls%is_target(calc_thermal, material_id)) cycle
 
-                element_area = domain%elements(element_id)%e%get_area()
+                element_area = domain%elements(element_id)%e%get_geometry()
                 num_elem_nodes = domain%elements(element_id)%e%get_num_nodes()
                 density = property%get_phase_dens(material_id)
                 weight = element_area / dble(num_elem_nodes)

@@ -118,42 +118,4 @@ contains
         call deallocate_array(self%val)
     end subroutine destroy_dense
 
-    ! !-------------------------------------------------------------------------------------------------------------------------------
-    ! ! Matrix calculation
-    ! !-------------------------------------------------------------------------------------------------------------------------------
-    ! subroutine type_dense_gemv(alpha, A, x, beta, y)
-    !     ! y := alpha*A*x + beta*y
-    !     implicit none
-    !     real(real64), intent(in) :: alpha
-    !     type(type_dense), intent(in) :: A
-    !     real(real64), intent(in) :: beta
-    !     real(real64), intent(in) :: x(:)
-    !     real(real64), intent(inout) :: y(:)
-
-    !     call multiply_matrix_vector(alpha, A%val, x, beta, y)
-
-    ! end subroutine type_dense_gemv
-
-    ! subroutine type_dense_add(alpha, A, B, C)
-    !     ! C := alpha*A + B
-    !     !
-    !     ! [ATTENTION] Assumes A, B, and C have the exact same sparsity pattern.
-    !     !
-    !     implicit none
-    !     real(real64), intent(in) :: alpha
-    !     type(type_dense), intent(in) :: A
-    !     type(type_dense), intent(in) :: B
-    !     type(type_dense), intent(inout) :: C
-
-    !     integer(int32) :: i, j
-
-    !     !$omp parallel do private(i, j) collapse(2)
-    !     do i = 1, size(A%val, 1)
-    !         do j = 1, size(A%val, 2)
-    !             C%val(i, j) = alpha * A%val(i, j) + B%val(i, j)
-    !         end do
-    !     end do
-    !     !$omp end parallel do
-
-    ! end subroutine type_dense_add
 end module core_types_matrix_dense

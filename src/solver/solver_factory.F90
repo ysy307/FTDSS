@@ -1,6 +1,6 @@
 module solver_solver_factory
     use :: module_input
-    use :: module_matrix, only:type_crs
+    use :: module_core, only:type_crs
     use :: solver_solve
     implicit none
 

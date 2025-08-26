@@ -140,48 +140,4 @@ contains
         self%nnz = 0
     end subroutine destroy_coo
 
-    ! !-------------------------------------------------------------------------------------------------------------------------------
-    ! ! Matrix calculation
-    ! !-------------------------------------------------------------------------------------------------------------------------------
-    ! subroutine type_coo_gemv(alpha, A, x, beta, y)
-    !     ! y := alpha*A*x + beta*y
-    !     use omp_lib
-    !     implicit none
-    !     real(real64), intent(in) :: alpha
-    !     type(type_coo), intent(in) :: A
-    !     real(real64), intent(in) :: x(:)
-    !     real(real64), intent(in) :: beta
-    !     real(real64), intent(inout) :: y(:)
-
-    !     integer(int32) :: i
-
-    !     !$omp parallel do default(shared) private(i)
-    !     do i = 1, A%nnz
-    !         !$omp atomic
-    !         y(A%row(i)) = alpha * A%val(i) * x(A%col(i)) + beta * y(A%row(i))
-    !     end do
-    !     !$omp end parallel do
-
-    ! end subroutine type_coo_gemv
-
-    ! subroutine type_coo_add(alpha, A, B, C)
-    !     ! C := alpha*A + B
-    !     !
-    !     ! [ATTENTION] Assumes A, B, and C have the exact same sparsity pattern.
-    !     !
-    !     implicit none
-    !     real(real64), intent(in) :: alpha
-    !     type(type_coo), intent(in) :: A
-    !     type(type_coo), intent(in) :: B
-    !     type(type_coo), intent(inout) :: C
-
-    !     integer(int32) :: i
-
-    !     !$omp parallel do
-    !     do i = 1, A%nnz
-    !         C%val(i) = alpha * A%val(i) + B%val(i)
-    !     end do
-    !     !$omp end parallel do
-    ! end subroutine type_coo_add
-
 end module core_types_matrix_coo

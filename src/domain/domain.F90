@@ -7,7 +7,7 @@ module module_domain
     implicit none
     private
 
-    public :: holder_elements, abst_element, create_element
+    public :: holder_elements, abst_element, create_element, abst_mesh
     public :: holder_sides, abst_side, create_side
     public :: type_crs_adjacency_element, type_node_adjacency
     public :: type_domain
