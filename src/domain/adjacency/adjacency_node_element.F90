@@ -115,6 +115,7 @@ contains
         integer(int32) :: i, ielem, inode_local, node_id, num_elements
         integer(int32), allocatable :: node_element_counts(:)
         integer(int32), allocatable :: current_indices(:)
+        integer(int32), dimension(:), pointer :: ptr_connectivity => null()
 
         num_elements = size(elements)
         allocate (self%map_data(num_nodes))
@@ -123,8 +124,9 @@ contains
         allocate (node_element_counts(num_nodes))
         node_element_counts = 0
         do ielem = 1, num_elements
+            ptr_connectivity => elements(ielem)%e%get_connectivity()
             do inode_local = 1, elements(ielem)%e%get_num_nodes()
-                node_id = elements(ielem)%e%get_connectivity(inode_local)
+                node_id = ptr_connectivity(inode_local)
                 if (node_id > 0 .and. node_id <= num_nodes) then
                     node_element_counts(node_id) = node_element_counts(node_id) + 1
                 end if
@@ -143,8 +145,9 @@ contains
         allocate (current_indices(num_nodes))
         current_indices = 1
         do ielem = 1, num_elements
+            ptr_connectivity => elements(ielem)%e%get_connectivity()
             do inode_local = 1, elements(ielem)%e%get_num_nodes()
-                node_id = elements(ielem)%e%get_connectivity(inode_local)
+                node_id = ptr_connectivity(inode_local)
                 if (node_id > 0 .and. node_id <= num_nodes) then
                     self%map_data(node_id)%ids(current_indices(node_id)) = ielem
                     current_indices(node_id) = current_indices(node_id) + 1
@@ -162,13 +165,15 @@ contains
 
         integer(int32) :: ielem, inode_local, node_id, num_elements, current_size
         integer(int32), allocatable :: temp_list(:)
+        integer(int32), dimension(:), pointer :: connectivity
 
         num_elements = size(elements)
         allocate (self%map_data(num_nodes))
 
         do ielem = 1, num_elements
+            connectivity => elements(ielem)%e%get_connectivity()
             do inode_local = 1, elements(ielem)%e%get_num_nodes()
-                node_id = elements(ielem)%e%get_connectivity(inode_local)
+                node_id = connectivity(inode_local)
                 if (node_id > 0 .and. node_id <= num_nodes) then
                     if (allocated(self%map_data(node_id)%ids)) then
                         current_size = size(self%map_data(node_id)%ids)

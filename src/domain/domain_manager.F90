@@ -190,39 +190,54 @@ contains
         implicit none
         class(type_domain), intent(inout) :: self
 
-        integer(int32) :: iElem, iSide
+        integer(int32) :: iElem, iSide, i
+        integer(int32), dimension(:), pointer :: ptr_connectivity => null()
+        integer(int32), allocatable :: connectivity(:)
+        integer(int32), allocatable :: connectivity_reordered(:)
+        integer(int32) :: node_per_mesh
 
         if (self%computaion_dimension >= 3) then
             !! TBI: Handle 3D reordering if necessary
         end if
 
         if (self%computaion_dimension >= 2) then
-            do iElem = 1, self%num_elements
-                call allocate_array(self%elements(iElem)%e%connectivity_reordered, self%elements(iElem)%e%get_num_nodes())
-                call self%reordering%to_reordered(self%elements(iElem)%e%connectivity, &
-                                                  self%elements(iElem)%e%connectivity_reordered)
-                if (associated(self%elements(iElem)%e%interpolate)) then
-                    nullify (self%elements(iElem)%e%interpolate)
-                end if
-                self%elements(iElem)%e%interpolate => interpolate_reordered
+            do iElem = 1, self%get_num_elements()
+                ptr_connectivity => self%elements(iElem)%e%get_connectivity()
+                node_per_mesh = self%elements(iElem)%e%get_num_nodes()
+                call allocate_array(connectivity, node_per_mesh)
+                call allocate_array(connectivity_reordered, node_per_mesh)
 
-                if (associated(self%elements(iElem)%e%deriv_interpolate)) then
-                    nullify (self%elements(iElem)%e%deriv_interpolate)
-                end if
-                self%elements(iElem)%e%deriv_interpolate => deriv_interpolate_reordered
+                do i = 1, node_per_mesh
+                    connectivity(i) = ptr_connectivity(i)
+                end do
+                call self%reordering%to_reordered(connectivity, connectivity_reordered)
+                do i = 1, node_per_mesh
+                    ptr_connectivity(i) = connectivity_reordered(i)
+                end do
 
-                if (associated(self%elements(iElem)%e%get_connectivity)) then
-                    nullify (self%elements(iElem)%e%get_connectivity)
-                end if
-                self%elements(iElem)%e%get_connectivity => get_connectivity_reordered
+                call deallocate_array(connectivity)
+                call deallocate_array(connectivity_reordered)
             end do
         end if
 
         if (self%computaion_dimension >= 1) then
-            do iSide = 1, self%num_sides
-                call allocate_array(self%sides(iSide)%s%connectivity_reordered, self%sides(iSide)%s%get_num_nodes())
-                call self%reordering%to_reordered(self%sides(iSide)%s%connectivity, &
-                                                  self%sides(iSide)%s%connectivity_reordered)
+            do iSide = 1, self%get_num_sides()
+                ptr_connectivity => self%sides(iSide)%s%get_connectivity()
+                node_per_mesh = self%sides(iSide)%s%get_num_nodes()
+                call allocate_array(connectivity, node_per_mesh)
+                call allocate_array(connectivity_reordered, node_per_mesh)
+
+                do i = 1, node_per_mesh
+                    connectivity(i) = ptr_connectivity(i)
+                end do
+                call self%reordering%to_reordered(connectivity, connectivity_reordered)
+                do i = 1, node_per_mesh
+                    ptr_connectivity(i) = connectivity_reordered(i)
+                end do
+
+                call deallocate_array(connectivity)
+                call deallocate_array(connectivity_reordered)
+
             end do
         end if
 

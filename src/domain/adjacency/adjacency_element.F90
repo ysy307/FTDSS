@@ -119,18 +119,19 @@ contains
         logical :: is_adjacent
         integer(int32) :: i, j
         integer(int32) :: num_nodes1, num_nodes2
-        integer(int32), allocatable :: conn1(:), conn2(:)
+        integer(int32), dimension(:), pointer :: ptr_conn1 => null()
+        integer(int32), dimension(:), pointer :: ptr_conn2 => null()
 
         is_adjacent = .false.
         num_nodes1 = elem1%get_num_nodes()
         num_nodes2 = elem2%get_num_nodes()
 
-        conn1 = elem1%connectivity
-        conn2 = elem2%connectivity
+        ptr_conn1 => elem1%get_connectivity()
+        ptr_conn2 => elem2%get_connectivity()
 
         do i = 1, num_nodes1
             do j = 1, num_nodes2
-                if (conn1(i) == conn2(j)) then
+                if (ptr_conn1(i) == ptr_conn2(j)) then
                     is_adjacent = .true.
                     return
                 end if

@@ -147,6 +147,8 @@ contains
         integer(int32) :: num_elements, num_nodes, total_conn_size
         integer(int32), allocatable :: elements_conn_data(:), elements_ptr(:)
         integer(int32) :: i, k, current_pos
+        integer(int32), dimension(:), pointer :: ptr_connectivity => null()
+        integer(int32) :: node_per_mesh
 
         num_elements = size(elements)
         if (num_elements == 0) then
@@ -156,19 +158,23 @@ contains
         num_nodes = 0
         total_conn_size = 0
         do i = 1, num_elements
-            if (size(elements(i)%e%connectivity) > 0) then
-                num_nodes = max(num_nodes, maxval(elements(i)%e%connectivity))
+            ptr_connectivity => elements(i)%e%get_connectivity()
+            node_per_mesh = elements(i)%e%get_num_nodes()
+            if (node_per_mesh > 0) then
+                num_nodes = max(num_nodes, maxval(ptr_connectivity))
             end if
-            total_conn_size = total_conn_size + size(elements(i)%e%connectivity)
+            total_conn_size = total_conn_size + node_per_mesh
         end do
         call allocate_array(elements_ptr, length=num_elements + 1_int32)
         call allocate_array(elements_conn_data, length=total_conn_size)
         current_pos = 1
         elements_ptr(1) = 1
         do i = 1, num_elements
-            k = size(elements(i)%e%connectivity)
+            ptr_connectivity => elements(i)%e%get_connectivity()
+            node_per_mesh = elements(i)%e%get_num_nodes()
+            k = node_per_mesh
             if (k > 0) then
-                elements_conn_data(current_pos:current_pos + k - 1) = elements(i)%e%connectivity
+                elements_conn_data(current_pos:current_pos + k - 1) = ptr_connectivity
             end if
             current_pos = current_pos + k
             elements_ptr(i + 1) = current_pos
