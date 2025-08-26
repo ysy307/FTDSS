@@ -1,4 +1,4 @@
-add_library(MESH STATIC
+add_library(MESH OBJECT
     mesh_interface.F90
     element/element_interface.F90
     element/element_triangle_first.F90

@@ -20,6 +20,12 @@ set_target_properties(VTK_C_WRAPPER PROPERTIES CXX_STANDARD 17)
 # --------------------------------------------------------------------
 add_library(CORE STATIC
     # CORE_UTILS sources
+    # C sources
+    c_utils/signal_flag.c
+    c_utils/system_info.c
+    c_utils/memory_stats.c
+
+    # Fortran sources
     c_utils/signal_flag.F90
     c_utils/system_info.F90
     c_utils/memory_stats.F90

@@ -47,8 +47,8 @@ contains
         self%num_row = size(row)
         self%num_ptr = self%num_row + 1
 
-        call allocate_array(self%ptr, self%num_row)
-        do i = 1, self%num_row
+        call allocate_array(self%ptr, self%num_ptr)
+        do i = 1, self%num_ptr
             self%ptr(i) = row(i)
         end do
 

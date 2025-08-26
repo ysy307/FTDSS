@@ -51,7 +51,7 @@ contains
         case ("full")
             num_gauss = 4_int32
             call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, num_gauss, 3_int32)
+            call allocate_array(gauss, 3_int32, num_gauss)
 
             weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
             gauss(:, 1) = [-sqrt(1.0d0 / 3.0d0), -sqrt(1.0d0 / 3.0d0), 0.0d0]
@@ -61,14 +61,14 @@ contains
         case ("reduced")
             num_gauss = 1_int32
             call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, num_gauss, 3_int32)
+            call allocate_array(gauss, 3_int32, num_gauss)
 
             weight(:) = [4.0d0]
             gauss(:, 1) = [0.0d0, 0.0d0, 0.0d0]
         case ("free")
             num_gauss = 4_int32
             call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, num_gauss, 3_int32)
+            call allocate_array(gauss, 3_int32, num_gauss)
 
             weight(:) = [1.0d0, 1.0d0, 1.0d0, 1.0d0]
             gauss(:, 1) = [-input%basic%geometry_settings%integration_points, -input%basic%geometry_settings%integration_points, 0.0d0]

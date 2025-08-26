@@ -10,7 +10,7 @@ target_link_libraries(THERMAL PUBLIC
     CORE
     INPUT
     DOMAIN
-    CALCULATE
+    CALC
     PROPERTIES
     BOUNDARY
     INITIAL

@@ -63,15 +63,22 @@ contains
 
         select case (trim(adjustl(algorithm_name)))
         case ("welsh-powell")
-            self%algorithm_name = "Welsh-Powell"
+            if (allocated(self%algorithm_name)) deallocate (self%algorithm_name)
+            allocate (character(len=len_trim("Welsh-Powell")) :: self%algorithm_name)
+            self%algorithm_name = "welsh-powell"
             call self%coloring_welsh_powell(adjacency)
-        case ("dsatur") ! DSATURのケースを追加
-            self%algorithm_name = "DSATUR"
+        case ("dsatur")
+            if (allocated(self%algorithm_name)) deallocate (self%algorithm_name)
+            allocate (character(len=len_trim("dsatur")) :: self%algorithm_name)
+            self%algorithm_name = "dsatur"
             call self%coloring_dsatur(adjacency)
         case ("lfo")
+            if (allocated(self%algorithm_name)) deallocate (self%algorithm_name)
+            allocate (character(len=len_trim("Largest First Order")) :: self%algorithm_name)
             self%algorithm_name = "Largest First Order"
-            call self%coloring_lfo(adjacency) ! LFOアルゴリズムの実行
+            call self%coloring_lfo(adjacency)
         end select
+
     end subroutine initialize_type_coloring
 
     subroutine populate_coloring_result(self)

@@ -42,8 +42,8 @@ contains
         class(type_ftdss), intent(inout) :: self
 
         type(type_input) :: input
-        integer(int32) :: nsize
         integer(int32) :: ierr
+        integer(int32) :: nsize
         character(len=10), allocatable :: profiler_labels(:)
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
@@ -57,7 +57,6 @@ contains
         call input%initialize()
         call self%controls%time%initialize(input=input)
         call self%controls%iteration%initialize(input)
-        call initialize_openmp(input)
 
         if (input%output_settings%standard_output%print_progress) then
             call global_logger%configure(level=information_level, &
@@ -65,7 +64,7 @@ contains
                                          max_width=0)
         else
             call global_logger%configure(level=warning_level, &
-                                         time_stamp=.false., &
+                                         time_stamp=.true., &
                                          max_width=0)
         end if
 
@@ -79,7 +78,7 @@ contains
         call self%coordinate%initialize(nsize)
         self%coordinate = input%geometry%vtk%POINTS
 
-        call self%domain%initialize(input, self%coordinate, ierr)
+        call self%domain%initialize(input, self%coordinate)
 
         call self%bc%initialize(input, self%domain)
         call self%ic%initialize(input)

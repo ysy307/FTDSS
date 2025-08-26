@@ -6,6 +6,7 @@
 !================================================================!
 module domain_adjacency_adjacency_node
     use, intrinsic :: iso_fortran_env, only: int32, int64
+    use :: stdlib_sorting, only:sort
     use :: module_core, only:allocate_array, deallocate_array, unique
     use :: module_mesh, only:holder_sides, holder_elements
 
@@ -345,6 +346,7 @@ contains
         integer(int32), intent(inout), allocatable :: ptr_out(:)
         integer(int32), intent(inout), allocatable :: ind_out(:)
 
+        print *, self%nnz
         if (self%nnz <= 0) return
 
         call allocate_array(ptr_out, self%num_nodes + 1_int32)

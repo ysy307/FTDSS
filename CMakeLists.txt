@@ -66,7 +66,7 @@ add_subdirectory(src/conditions/initial)
 add_subdirectory(src/solver)
 add_subdirectory(src/control)
 add_subdirectory(src/main/thermal)
-# add_subdirectory(src/main/hydraulic)
+add_subdirectory(src/main/hydraulic)
 add_subdirectory(src/inout/output)
 add_subdirectory(src/main/FTDSS)
 
@@ -81,18 +81,20 @@ set(COMMON_LIBS
     DOMAIN
     CALC_LINALG
     CALC_WRF
-    # CALC_HCF
+    CALC_HCF
     CALC_GCC
     CALC_THC
     CALC_DEN
     CALC_SPH
     CALC_VHC
+    CALC
     PROPERTIES
     BOUNDARY
     INITIAL
     SOLVER
     CONTROL
     THERMAL
+    HYDRAULIC
     OUTPUT
     FTDSS
 )

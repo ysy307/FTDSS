@@ -148,7 +148,10 @@ contains
         character(*), intent(in) :: algorithm_name
         class(type_node_adjacency), intent(in) :: node_adj
 
+        if (allocated(self%algorithm_name)) deallocate (self%algorithm_name)
+        allocate (character(len=len_trim(algorithm_name)) :: self%algorithm_name)
         self%algorithm_name = trim(adjustl(algorithm_name))
+
         select case (self%algorithm_name)
         case ("rcm")
             call self%rcm_reorder_method(node_adj)
@@ -159,8 +162,8 @@ contains
         case default
             ! No reordering
         end select
-
     end subroutine initialize_type_reordering
+
     function get_algorithm_name(self) result(name)
         implicit none
         class(type_reordering), intent(in) :: self

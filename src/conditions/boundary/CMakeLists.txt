@@ -10,7 +10,6 @@ target_include_directories(BOUNDARY PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
 target_link_libraries(BOUNDARY PUBLIC
     CORE
     DOMAIN
-    MATRIX
     INPUT
 )
 enable_build_flags(BOUNDARY)

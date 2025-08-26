@@ -27,7 +27,7 @@ module domain_manager
         type(type_crs_adjacency_element) :: element_adjacency
         type(type_map_node_to_element) :: map_node_to_element
 
-        integer(int32), private :: computaion_dimension
+        integer(int32), private :: computation_dimension
         ! ...
     contains
         procedure, pass(self) :: initialize => initialize_type_domain
@@ -41,22 +41,19 @@ module domain_manager
     end type type_domain
 
 contains
-    subroutine initialize_type_domain(self, input, Coordinate, ierr)
+    subroutine initialize_type_domain(self, input, Coordinate)
         implicit none
         class(type_domain), intent(inout) :: self
         type(type_input), intent(in) :: input
         type(type_dp_3d), intent(inout), pointer :: Coordinate
-        integer(int32), intent(inout) :: ierr
 
         integer(int32) :: count_sides, count_elements, count_volumes
         integer(int32) :: iCell, iElem, iSide
-        integer(int32) :: factory_ierr
         integer(int32) :: cell_dimension
 
         ! -----------------------------------------------------------------------------------
         ! 初期化処理
         ! -----------------------------------------------------------------------------------
-        ierr = 0
         count_sides = 0
         count_elements = 0
         count_volumes = 0
@@ -92,19 +89,11 @@ contains
                 self%sides(iSide)%s = create_side(id=iCell, &
                                                   global_coordinate=Coordinate, &
                                                   input=input)
-                if (factory_ierr /= 0) then
-                    ierr = -1
-                    return
-                end if
                 iSide = iSide + 1
             case (2)
                 self%elements(iElem)%e = create_element(id=iCell, &
                                                         global_coordinate=Coordinate, &
                                                         input=input)
-                if (factory_ierr /= 0) then
-                    ierr = -1
-                    return
-                end if
                 iElem = iElem + 1
             case (3)
                 !!TBI
@@ -112,12 +101,12 @@ contains
 
         end do
 
-        self%computaion_dimension = input%basic%simulation_settings%calculate_dimension
+        self%computation_dimension = input%basic%simulation_settings%calculate_dimension
 
         !===============================================================
         ! 3. 隣接行列の構築
         !===============================================================
-        call self%node_adjacency%initialize(self%num_nodes, self%computaion_dimension, self%sides, self%elements)
+        call self%node_adjacency%initialize(self%num_nodes, self%computation_dimension, self%sides, self%elements)
         call self%element_adjacency%initialize(self%elements)
         call self%map_node_to_element%initialize(self%num_nodes, self%elements, "fast")
 
@@ -137,7 +126,7 @@ contains
         call global_logger%log_information(message="Graph coloring completed using " &
                                            //trim(self%colors%algorithm_name)//" algorithm.")
 
-        call self%node_adjacency%destroy()
+        ! call self%node_adjacency%destroy()
         ! call self%element_adjacency%destroy()
         call global_logger%log_information(message="Initialization process completed successfully.")
 
@@ -179,12 +168,12 @@ contains
 
     end function get_num_materials
 
-    function get_computation_dimension(self) result(computaion_dimension)
+    function get_computation_dimension(self) result(computation_dimension)
         implicit none
         class(type_domain), intent(in) :: self
-        integer(int32) :: computaion_dimension
+        integer(int32) :: computation_dimension
 
-        computaion_dimension = self%computaion_dimension
+        computation_dimension = self%computation_dimension
 
     end function get_computation_dimension
 
@@ -198,11 +187,11 @@ contains
         integer(int32), allocatable :: connectivity_reordered(:)
         integer(int32) :: node_per_mesh
 
-        if (self%computaion_dimension >= 3) then
+        if (self%computation_dimension >= 3) then
             !! TBI: Handle 3D reordering if necessary
         end if
 
-        if (self%computaion_dimension >= 2) then
+        if (self%computation_dimension >= 2) then
             do iElem = 1, self%get_num_elements()
                 ptr_connectivity => self%elements(iElem)%e%get_connectivity()
                 node_per_mesh = self%elements(iElem)%e%get_num_nodes()
@@ -222,7 +211,7 @@ contains
             end do
         end if
 
-        if (self%computaion_dimension >= 1) then
+        if (self%computation_dimension >= 1) then
             do iSide = 1, self%get_num_sides()
                 ptr_connectivity => self%sides(iSide)%s%get_connectivity()
                 node_per_mesh = self%sides(iSide)%s%get_num_nodes()

@@ -20,7 +20,11 @@ contains
         num_nodes = domain%get_num_nodes()
         call domain%node_adjacency%get_csr(row_ptr, col_ind)
 
+        print *, 1
+        print *, row_ptr(:)
+        print *, col_ind(:)
         call structure%KT_star%initialize(num_nodes, row_ptr, col_ind)
+        print *, 2
         structure%order = input%basic%solver_settings%bdf_order
 
         call allocate_array(structure%FT, num_nodes)
