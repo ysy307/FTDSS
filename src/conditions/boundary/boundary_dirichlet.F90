@@ -6,7 +6,7 @@ contains
         implicit none
         class(type_bc_thermal_dirichlet), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in) :: id
         integer(int32), intent(in) :: i_material
         real(real64), intent(in) :: time_conv
@@ -47,7 +47,7 @@ contains
         real(real64), intent(in) :: current_time
         real(real64), intent(inout), optional :: A(:, :)
         real(real64), intent(inout) :: b(:)
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
     end subroutine apply_dense_thermal_dirichlet
@@ -58,7 +58,7 @@ contains
         real(real64), intent(in) :: current_time
         type(type_crs), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
         real(real64) :: value_dirichlet, timeCoe
@@ -82,14 +82,14 @@ contains
                 end do
             else
                 select case (mode)
-                case (1)
+                case (mode_value)
                     call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
                     ! print *, value_dirichlet
-                case (0)
+                case (mode_nr)
                     !! Newton-Raphson step
                     value_dirichlet = 0.0d0
-                case (-1)
+                case (mode_ic)
                     !! initial condition
                     value_dirichlet = self%values(1)
                 end select
@@ -115,14 +115,14 @@ contains
                 end do
             else
                 select case (mode)
-                case (1)
+                case (mode_value)
                     call calculate_time_coefficient(current_time, self%time_points, timeCoe, idx)
                     value_dirichlet = (self%values(idx) * (1.0d0 - timeCoe) + self%values(idx + 1) * timeCoe)
                     ! print *, value_dirichlet
-                case (0)
+                case (mode_nr)
                 !! Newton-Raphson step
                     value_dirichlet = 0.0d0
-                case (-1)
+                case (mode_ic)
                 !! initial condition
                     value_dirichlet = self%values(1)
                 end select
@@ -162,13 +162,13 @@ contains
             p2 = Edge(2)
 
             if (present(A)) then
-                call A%find(p1, p1, ind)
+                ind = A%find(p1, p1)
                 ps = A%ptr(p1)
                 pe = A%ptr(p1 + 1) - 1
                 A%val(ps:pe) = 0.0d0
                 A%val(ind) = 1.0d0
 
-                call A%find(p2, p2, ind)
+                ind = A%find(p2, p2)
                 ps = A%ptr(p2)
                 pe = A%ptr(p2 + 1) - 1
                 A%val(ps:pe) = 0.0d0

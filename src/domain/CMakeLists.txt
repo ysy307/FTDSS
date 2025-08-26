@@ -1,16 +1,7 @@
-add_library(Domain OBJECT
-    element/element.F90
-    element/element_triangle_first.F90
-    element/element_triangle_second.F90
-    element/element_square_first.F90
-    element/element_square_second.F90
-    element/element_factory.F90
-    side/side.F90
-    side/side_first.F90
-    side/side_second.F90
-    side/side_factory.F90
+add_library(DOMAIN STATIC
     adjacency/adjacency_element.F90
     adjacency/adjacency_node.F90
+    adjacency/adjacency_node_element.F90
     adjacency/adjacency.F90
     multicoloring/multicoloring.F90
     multicoloring/welch_powell.F90
@@ -23,9 +14,11 @@ add_library(Domain OBJECT
     domain_manager.F90
     domain.F90
 )
-target_link_libraries(Domain PRIVATE
-    Core
-    Input
+target_include_directories(DOMAIN PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(DOMAIN PUBLIC
+    CORE
+    INPUT
+    MESH
 )
-enable_build_flags(Domain)
-enable_thirdparty (Domain)
+enable_build_flags(DOMAIN)
+enable_thirdparty (DOMAIN)

@@ -74,16 +74,16 @@ Run the provided scripts to install the required external libraries:
 
 ```bash
 # Grant execute permissions
-chmod +x Scripts/Install_VTKFortran.sh
-chmod +x Scripts/Install_VTK_CXX.sh
-chmod +x Scripts/Install_stdlib.sh
-chmod +x Scripts/Install_JsonFortran.sh
+chmod +x scripts/Install_VTKFortran.sh
+chmod +x scripts/Install_VTK_CXX.sh
+chmod +x scripts/Install_stdlib.sh
+chmod +x scripts/Install_JsonFortran.sh
 
 # Execute the scripts
-./Scripts/Install_VTKFortran.sh
-./Scripts/Install_VTK_CXX.sh
-./Scripts/Install_stdlib.sh
-./Scripts/Install_JsonFortran.sh
+./scripts/Install_VTKFortran.sh
+./scripts/Install_VTK_CXX.sh
+./scripts/Install_stdlib.sh
+./scripts/Install_JsonFortran.sh
 ```
 
 ---

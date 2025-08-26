@@ -1,4 +1,4 @@
-add_library(Output OBJECT
+add_library(OUTPUT STATIC
     output_interface.F90
     output_base.F90
     output_observation.F90
@@ -8,15 +8,16 @@ add_library(Output OBJECT
     output_system_logger.F90
     output.F90
 )
-target_link_libraries(Output PRIVATE
-    Core
-    Inout
-    Input
-    Thermal
-    Domain
-    Properties
-    Solver
-    control
+target_include_directories(OUTPUT PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(OUTPUT PUBLIC
+    CORE
+    INOUT
+    INPUT
+    THERMAL
+    DOMAIN
+    PROPERTIES
+    SOLVER
+    CONTROL
 )
-enable_build_flags(Output)
-enable_thirdparty (Output)
+enable_build_flags(OUTPUT)
+enable_thirdparty (OUTPUT)

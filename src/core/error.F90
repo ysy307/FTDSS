@@ -137,6 +137,18 @@ contains
             write (msg, '(a)') "Pointer has already allocated."
         else if (err_number == 971) then
             write (msg, fmt) "#", err_number, ": Memory deallocation failed."
+        else if (err_number == 981) then
+            if (present(c_opt)) then
+                write (msg, fmt) "#", err_number, ": Unknown time unit in "//trim(adjustl(c_opt))//"."
+            else
+                write (msg, fmt) "#", err_number, ": Unknown time unit"
+            end if
+        else if (err_number == 982) then
+            if (present(c_opt)) then
+                write (msg, fmt) "#", err_number, ": Unknown time label in "//trim(adjustl(c_opt))//"."
+            else
+                write (msg, fmt) "#", err_number, ": Unknown time label"
+            end if
         else
             msg = "Unknown error"
         end if

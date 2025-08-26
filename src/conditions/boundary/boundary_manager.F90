@@ -1,8 +1,7 @@
 module conditions_boundary_manager
     use :: iso_fortran_env
-    use :: module_core, only:allocate_array, deallocate_array
+    use :: module_core, only:allocate_array, deallocate_array, type_crs
     use :: module_domain, only:type_domain
-    use :: module_matrix, only:type_crs
     use :: module_input, only:type_input
     use :: conditions_boundary, only:abst_bc_thermal, type_bc_thermal_adiabatic, type_bc_thermal_dirichlet
     implicit none
@@ -29,7 +28,7 @@ contains
     subroutine initialize_type_bc(self, input, domain)
         class(type_bc), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
 
         integer(int32), allocatable :: group_ids(:)
         integer(int32) :: i, i_material
@@ -87,7 +86,7 @@ contains
         real(real64), intent(in) :: current_time
         type(type_crs), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
         integer(int32) :: i

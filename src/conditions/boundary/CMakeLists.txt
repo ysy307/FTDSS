@@ -1,4 +1,4 @@
-add_library(Boundary OBJECT
+add_library(BOUNDARY STATIC
     boundary_interface.F90
     boundary_base.F90
     boundary_adiabatic.F90
@@ -6,10 +6,10 @@ add_library(Boundary OBJECT
     boundary_manager.F90
     boundary.F90
 )
-target_link_libraries(Boundary PRIVATE
-    Core
-    Domain
-    Matrix
-    Input
+target_include_directories(BOUNDARY PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(BOUNDARY PUBLIC
+    CORE
+    DOMAIN
+    INPUT
 )
-enable_build_flags(Boundary)
+enable_build_flags(BOUNDARY)

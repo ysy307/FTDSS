@@ -95,7 +95,7 @@ module calculate_wrf
     end type type_wrf_dvgch
 
     abstract interface
-        function abst_calc_wrf(self, h) result(theta_w)
+        pure elemental function abst_calc_wrf(self, h) result(theta_w)
             import :: abst_wrf, real64
             implicit none
             class(abst_wrf), intent(in) :: self
@@ -103,7 +103,7 @@ module calculate_wrf
             real(real64) :: theta_w
         end function abst_calc_wrf
 
-        function abst_calc_wrf_derivative(self, h) result(dqw_dh)
+        pure elemental function abst_calc_wrf_derivative(self, h) result(dqw_dh)
             import :: abst_wrf, real64
             implicit none
             class(abst_wrf), intent(in) :: self
@@ -130,7 +130,7 @@ module calculate_wrf
 
         end function construct_type_wrf_bc
 
-        module function calculate_wrf_bc(self, h) result(theta_w)
+        module pure elemental function calculate_wrf_bc(self, h) result(theta_w)
             implicit none
             class(type_wrf_bc), intent(in) :: self
             real(real64), intent(in) :: h
@@ -138,7 +138,7 @@ module calculate_wrf
 
         end function calculate_wrf_bc
 
-        module function calculate_wrf_bc_derivative(self, h) result(dqw_dh)
+        module pure elemental function calculate_wrf_bc_derivative(self, h) result(dqw_dh)
             implicit none
             class(type_wrf_bc), intent(in) :: self
             real(real64), intent(in) :: h
@@ -155,7 +155,7 @@ module calculate_wrf
 
         end function construct_type_wrf_vg
 
-        module function calculate_wrf_vg(self, h) result(theta_w)
+        module pure elemental function calculate_wrf_vg(self, h) result(theta_w)
             implicit none
             class(type_wrf_vg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -163,7 +163,7 @@ module calculate_wrf
 
         end function calculate_wrf_vg
 
-        module function calculate_wrf_vg_derivative(self, h) result(dqw_dh)
+        module pure elemental function calculate_wrf_vg_derivative(self, h) result(dqw_dh)
             implicit none
             class(type_wrf_vg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -180,7 +180,7 @@ module calculate_wrf
 
         end function construct_type_wrf_ko
 
-        module function calculate_wrf_ko(self, h) result(theta_w)
+        module pure elemental function calculate_wrf_ko(self, h) result(theta_w)
             implicit none
             class(type_wrf_ko), intent(in) :: self
             real(real64), intent(in) :: h
@@ -188,7 +188,7 @@ module calculate_wrf
 
         end function calculate_wrf_ko
 
-        module function calculate_wrf_ko_derivative(self, h) result(dqw_dh)
+        module pure elemental function calculate_wrf_ko_derivative(self, h) result(dqw_dh)
             implicit none
             class(type_wrf_ko), intent(in) :: self
             real(real64), intent(in) :: h
@@ -206,7 +206,7 @@ module calculate_wrf
 
         end function construct_type_wrf_mvg
 
-        module function calculate_wrf_mvg(self, h) result(theta_w)
+        module pure elemental function calculate_wrf_mvg(self, h) result(theta_w)
             implicit none
             class(type_wrf_mvg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -214,7 +214,7 @@ module calculate_wrf
 
         end function calculate_wrf_mvg
 
-        module function calculate_wrf_mvg_derivative(self, h) result(dqw_dh)
+        module pure elemental function calculate_wrf_mvg_derivative(self, h) result(dqw_dh)
             implicit none
             class(type_wrf_mvg), intent(in) :: self
             real(real64), intent(in) :: h
@@ -231,7 +231,7 @@ module calculate_wrf
 
         end function construct_type_wrf_durner
 
-        module function calculate_wrf_durner(self, h) result(theta_w)
+        module pure elemental function calculate_wrf_durner(self, h) result(theta_w)
             implicit none
             class(type_wrf_durner), intent(in) :: self
             real(real64), intent(in) :: h
@@ -239,7 +239,7 @@ module calculate_wrf
 
         end function calculate_wrf_durner
 
-        module function calculate_wrf_durner_derivative(self, h) result(dqw_dh)
+        module pure elemental function calculate_wrf_durner_derivative(self, h) result(dqw_dh)
             implicit none
             class(type_wrf_durner), intent(in) :: self
             real(real64), intent(in) :: h
@@ -256,7 +256,7 @@ module calculate_wrf
 
         end function construct_type_wrf_dvgch
 
-        module function calculate_wrf_dvgch(self, h) result(theta_w)
+        module pure elemental function calculate_wrf_dvgch(self, h) result(theta_w)
             implicit none
             class(type_wrf_dvgch), intent(in) :: self
             real(real64), intent(in) :: h
@@ -264,7 +264,7 @@ module calculate_wrf
 
         end function calculate_wrf_dvgch
 
-        module function calculate_wrf_dvgch_derivative(self, h) result(dqw_dh)
+        module pure elemental function calculate_wrf_dvgch_derivative(self, h) result(dqw_dh)
             implicit none
             class(type_wrf_dvgch), intent(in) :: self
             real(real64), intent(in) :: h

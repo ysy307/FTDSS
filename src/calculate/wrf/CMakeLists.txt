@@ -1,4 +1,4 @@
-add_library(Calc_WRF OBJECT
+add_library(CALC_WRF STATIC
     wrf_interface.F90
     wrf_bc.F90
     wrf_vg.F90
@@ -8,7 +8,8 @@ add_library(Calc_WRF OBJECT
     wrf_dvgch.F90
     wrf_base.F90
 )
-target_link_libraries(Calc_WRF PRIVATE
-    Input
+target_include_directories(CALC_WRF PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})
+target_link_libraries(CALC_WRF PUBLIC
+    INPUT
 )
-enable_build_flags(Calc_WRF)
+enable_build_flags(CALC_WRF)

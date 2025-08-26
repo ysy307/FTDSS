@@ -1,258 +1,345 @@
 module thermal_thermal_assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:type_gauss_point_state
-    use :: module_domain, only:type_domain, abst_element
-    use :: module_properties, only:type_proereties_manager
-    use :: module_matrix, only:type_crs
+    use :: module_core, only:type_state, type_dp_vector_3d, assignment(=), type_variable, allocate_array, deallocate_array, type_crs, type_dense
+    use :: module_domain, only:type_domain, abst_mesh
+    use :: module_properties, only:type_properties_manager
+    use :: module_calculate, only:gemv, add
+    use :: module_control
 
     implicit none
     private
 
-    public :: Assemble_Mass_Heat_1, Assemble_Diffusion_Heat_1
-    public :: Assemble_Mass_Heat_1_Parallel, Assemble_Diffusion_Heat_1_Parallel
+    public :: abst_assemble_global_thermal
+    public :: thermal_assemble_system_linear_1, thermal_assemble_system_linear_1_parallel
 
+    abstract interface
+        subroutine abst_assemble_global_thermal(J, R, domain, temperature, porosity, properties, controls, actual_order)
+            import :: type_crs, type_domain, type_properties_manager, type_variable, type_controls, int32, real64
+            implicit none
+            type(type_crs), intent(inout) :: J
+            real(real64), intent(inout) :: R(:)
+            type(type_domain), intent(inout), target :: domain
+            type(type_variable), intent(in) :: temperature
+            type(type_variable), intent(in) :: porosity
+            type(type_properties_manager), intent(in) :: properties
+            type(type_controls), intent(in) :: controls
+            integer(int32), intent(in) :: actual_order
+        end subroutine abst_assemble_global_thermal
+    end interface
 contains
 
-    subroutine process_single_element_mass(A, element, temperature, porosity, propeties)
+    ! subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, controls, actual_order)
+    !     implicit none
+    !     ! --- 引数 ---
+    !     type(type_crs), intent(inout) :: J
+    !     real(real64), intent(inout) :: R(:)
+    !     class(abst_mesh), intent(in), pointer :: element
+    !     type(type_variable), intent(in) :: temperature
+    !     type(type_variable), intent(in) :: porosity
+    !     type(type_properties_manager), intent(in) :: properties
+    !     type(type_controls), intent(in) :: controls
+    !     integer(int32), intent(in) :: actual_order
+
+    !     ! --- ローカル変数 ---
+    !     integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, iO
+    !     real(real64) :: weight, detJ
+    !     real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
+    !     real(real64) :: val
+    !     real(real64) :: dt_n
+    !     real(real64) :: coefficients(0:actual_order)
+
+    !     ! --- スタック上のワークスペース (自動配列) ---
+    !     real(real64) :: CT_e(element%get_num_nodes(), element%get_num_nodes())
+    !     real(real64) :: KT_e(element%get_num_nodes(), element%get_num_nodes())
+    !     real(real64) :: J_e(element%get_num_nodes(), element%get_num_nodes())
+    !     real(real64) :: R_e(element%get_num_nodes())
+    !     real(real64) :: T_hist_e(element%get_num_nodes())
+
+    !     ! --- ガウスポイントでの物理量 (自動配列) ---
+    !     type(type_state) :: state(element%get_num_gauss())
+    !     real(real64) :: Ca(element%get_num_gauss()), lambda(element%get_num_gauss())
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 0: 初期化とサイズの取得
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     num_nodes = element%get_num_nodes()
+    !     num_gauss = element%get_num_gauss()
+    !     i_material = element%get_group()
+    !     if (.not. controls%is_target(calc_thermal, i_material)) return
+
+    !     CT_e(:, :) = 0.0d0
+    !     KT_e(:, :) = 0.0d0
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 1: 全ガウスポイントの物理量を一括計算
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     do iG = 1, num_gauss
+    !         state(iG)%temperature = element%lerp(p_gauss(iG), temperature%pre) !&
+    !         state(iG)%porosity    = element%lerp(p_gauss(iG), porosity%pre) !&
+    !     end do
+    !     call properties%calc_thermal(i_material, state, lambda, Ca)
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 2: 要素行列 CT_e と KT_e を計算
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     do iG = 1, num_gauss
+    !         weight = p_weight(iG)
+    !         detJ = element%jacobian_det(p_gauss(iG))
+    !         do il = 1, num_nodes
+    !             dNdx_i = (element%jacobian(2, 2, p_gauss(iG)) * element%dpsi(il, 1, p_gauss(iG)) - &
+    !                       element%jacobian(2, 1, p_gauss(iG)) * element%dpsi(il, 2, p_gauss(iG))) / detJ
+    !             dNdy_i = (-element%jacobian(1, 2, p_gauss(iG)) * element%dpsi(il, 1, p_gauss(iG)) + &
+    !                       element%jacobian(1, 1, p_gauss(iG)) * element%dpsi(il, 2, p_gauss(iG))) / detJ
+    !             do jl = 1, num_nodes
+    !                 dNdx_j = (element%jacobian(2, 2, p_gauss(iG)) * element%dpsi(jl, 1, p_gauss(iG)) - &
+    !                           element%jacobian(2, 1, p_gauss(iG)) * element%dpsi(jl, 2, p_gauss(iG))) / detJ
+    !                 dNdy_j = (-element%jacobian(1, 2, p_gauss(iG)) * element%dpsi(jl, 1, p_gauss(iG)) + &
+    !                           element%jacobian(1, 1, p_gauss(iG)) * element%dpsi(jl, 2, p_gauss(iG))) / detJ
+
+    !                 CT_e(il, jl) = CT_e(il, jl) + element%psi(il, p_gauss(iG)) * & !&
+    !                                               element%psi(jl, p_gauss(iG)) * Ca(iG) * weight * detJ
+    !                 KT_e(il, jl) = KT_e(il, jl) + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda(iG) * weight * detJ
+    !             end do
+    !         end do
+    !     end do
+
+    !     dt_n = controls%time%get_dt()
+    !     call controls%time%get_time_coefficients(actual_order, coefficients)
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 3: 最終的な LHS(J_e) と RHS(R_e) を構築
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! --- 3a. LHS行列 J_e の構築 (物理的に正しい式) ---
+    !     J_e(:, :) = 0.0d0
+    !     do jl = 1, num_nodes
+    !         do il = 1, num_nodes
+    !             J_e(il, jl) = coefficients(0) * CT_e(il, jl) + dt_n * KT_e(il, jl)
+    !         end do
+    !     end do
+
+    !     T_hist_e(:) = 0.0d0
+    !     do il = 1, num_nodes
+    !         do iO = 1, actual_order
+    !             T_hist_e(il) = T_hist_e(il) + coefficients(iO) * temperature%old(p_conn(il), iO)
+    !         end do
+    !     end do
+
+    !     do il = 1, num_nodes
+    !         val = 0.0d0
+    !         do jl = 1, num_nodes
+    !             val = val + CT_e(il, jl) * T_hist_e(jl)
+    !         end do
+    !         R_e(il) = -val
+    !     end do
+
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     ! STEP 4: 全体行列・ベクトルへのアセンブル (数学的に正しい標準手順)
+    !     !---------------------------------------------------------------------------------------------------------------------------
+    !     do il = 1, num_nodes
+    !         R(p_conn(il)) = R(p_conn(il)) + R_e(il)
+    !         do jl = 1, num_nodes
+    !             call J%add(p_conn(il), element%get_connectivity(jl), J_e(il, jl))
+    !         end do
+    !     end do
+
+    ! end subroutine process_element_thermal_linear_1
+
+    subroutine process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, controls, actual_order)
         implicit none
-        ! --- 引数 ---
-        type(Type_CRS), intent(inout) :: A
-        class(abst_element), pointer, intent(inout) :: element
-        real(real64), intent(in) :: temperature(:)
-        real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        ! --- arguments ---
+        type(type_crs), intent(inout) :: J
+        real(real64), intent(inout) :: R(:)
+        class(abst_mesh), intent(in), pointer :: element
+        type(type_variable), intent(in) :: temperature
+        type(type_variable), intent(in) :: porosity
+        type(type_properties_manager), intent(in) :: properties
+        type(type_controls), intent(in) :: controls
+        integer(int32), intent(in) :: actual_order
 
-        ! --- ローカル変数 ---
-        integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG
-        real(real64) :: val, xi, eta, weight, detJ, Ca
-        type(type_gauss_point_state) :: state
-
-        ! 並列版のコードに合わせて、事前補間用の配列をローカルに用意
-        integer(int32), parameter :: MaxGauss = 10
-        real(real64) :: interp_temp(MaxGauss), interp_poro(MaxGauss)
-
-        state%pressure = 101325.0d0
-        state%water_content = 0.0d0
-
-        num_nodes = element%get_num_nodes()
-        i_material = element%get_group()
-        num_gauss = element%get_num_gauss()
-
-        ! 積分点での物理量を事前に補間
-        !$omp simd
-        do iG = 1, num_gauss
-            xi = element%gauss(1, iG)
-            eta = element%gauss(2, iG)
-            interp_temp(iG) = element%interpolate(xi, eta, temperature)
-            interp_poro(iG) = element%interpolate(xi, eta, porosity)
-        end do
-
-        ! 要素行列の計算とアセンブル
-        do il = 1, num_nodes
-            do jl = 1, num_nodes
-                val = 0.0d0
-
-                ! 積分ループ
-                !$omp simd reduction(+:val)
-                do iG = 1, num_gauss
-                    xi = element%gauss(1, iG)
-                    eta = element%gauss(2, iG)
-                    weight = element%weight(iG)
-                    detJ = element%jacobian_det(xi, eta)
-
-                    state%temperature = interp_temp(iG)
-                    state%porosity = interp_poro(iG)
-                    state%water_content = propeties%get_qw(state, i_material)
-                    Ca = propeties%get_vhc(state, i_material)
-                    val = val + (element%psi(il, xi, eta) * &
-                                 element%psi(jl, xi, eta) * &
-                                 detJ * weight * Ca)
-                end do
-
-                ! 全体行列へのアセンブル
-                call A%find(element%get_connectivity(il), element%get_connectivity(jl), index)
-                A%val(index) = A%val(index) + val
-            end do
-        end do
-
-    end subroutine process_single_element_mass
-
-    subroutine process_single_element_diffusion(A, element, temperature, porosity, propeties)
-        implicit none
-        ! --- 引数 ---
-        type(Type_CRS), intent(inout) :: A
-        class(abst_element), pointer, intent(inout) :: element
-        real(real64), intent(in) :: temperature(:)
-        real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
-
-        ! --- ローカル変数 ---
-        integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, global_il, global_jl
-        real(real64) :: val, xi, eta, weight, detJ
+        ! --- Local variables ---
+        integer(int32) :: index, num_nodes, num_gauss, i_material, il, jl, iG, iO
+        real(real64) :: weight, detJ
         real(real64) :: dNdx_i, dNdy_i, dNdx_j, dNdy_j
-        real(real64) :: lambda_gp
-        type(type_gauss_point_state) :: state
+        real(real64) :: val
+        real(real64) :: dt
+        real(real64), allocatable :: coefficients(:)
 
-        ! 並列版のコードに合わせて、事前補間用の配列をローカルに用意
-        integer(int32), parameter :: MaxGauss = 10
-        real(real64) :: interp_temp(MaxGauss), interp_poro(MaxGauss)
+        ! --- Workspace variables ---
+        type(type_dense) :: CT_e
+        type(type_dense) :: KT_e
+        type(type_dense) :: J_e
+        real(real64), allocatable :: R_e(:)
+        real(real64), allocatable :: T_hist_e(:)
 
-        state%pressure = 101325.0d0
-        state%water_content = 0.0d0
+        ! --- Physical quantities at Gauss points ---
+        type(type_state), allocatable :: state(:)
+        real(real64), dimension(:), pointer :: p_weight => null()
+        type(type_dp_vector_3d), dimension(:), pointer :: p_gauss => null()
+        real(real64), allocatable :: Ca(:)
+        real(real64), allocatable :: lambda(:)
+        integer(int32), dimension(:), pointer :: p_conn => null()
 
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! STEP 0: Initialize and obtain sizes
+        !---------------------------------------------------------------------------------------------------------------------------
         num_nodes = element%get_num_nodes()
-        i_material = element%get_group()
         num_gauss = element%get_num_gauss()
+        i_material = element%get_group()
+        ! print *, "Checking Element ID:", element%get_id(), "Material Group:", i_material, &
+        !     "Is Target?:", controls%is_target(calc_thermal, i_material)
+        if (.not. controls%is_target(calc_thermal, i_material)) return
 
-        ! 積分点での物理量を事前に補間
-        !$omp simd
+        call allocate_array(coefficients, bounds=[0:actual_order])
+        call CT_e%initialize_local(num_nodes)
+        call KT_e%initialize_local(num_nodes)
+        call J_e%initialize_local(num_nodes)
+        call allocate_array(R_e, num_nodes)
+        call allocate_array(T_hist_e, num_nodes)
+        allocate (state(num_gauss))
+        call allocate_array(Ca, num_gauss)
+        call allocate_array(lambda, num_gauss)
+
+        dt = controls%time%get_dt()
+        call controls%time%get_time_coefficients(actual_order, coefficients)
+        p_weight => element%get_weight()
+        p_gauss => element%get_gauss()
+        p_conn => element%get_connectivity()
+        ! print *, "Element ID:", element%get_id(), "Group:", i_material, "Num Nodes:", num_nodes, "Num Gauss:", num_gauss ! --- IGNORE ---
+        ! print *, "  Connectivity:", p_conn(1:num_nodes) ! --- IGNORE ---
+        ! print *, " Weight:", p_weight(1:num_gauss) ! --- IGNORE ---
+        ! print *, " Gauss Points:", p_gauss(1:num_gauss) ! --- IGNORE ---
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! STEP 1: Compute the physical quantities at all Gauss points
+        !---------------------------------------------------------------------------------------------------------------------------
         do iG = 1, num_gauss
-            xi = element%gauss(1, iG)
-            eta = element%gauss(2, iG)
-            interp_temp(iG) = element%interpolate(xi, eta, temperature)
-            interp_poro(iG) = element%interpolate(xi, eta, porosity)
+            state(iG)%temperature = element%lerp(p_gauss(iG), temperature%pre) !&
+            state(iG)%porosity    = element%lerp(p_gauss(iG), porosity%pre) !&
         end do
+        call properties%calc_thermal(i_material, state, lambda, Ca)
+        call controls%time%get_time_coefficients(actual_order, coefficients)
 
-        ! 要素行列の計算とアセンブル
-        do il = 1, num_nodes
-            do jl = 1, num_nodes
-                val = 0.0d0
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! STEP 2: Compute the element matrices CT_e and KT_e
+        !---------------------------------------------------------------------------------------------------------------------------
+        do iG = 1, num_gauss
+            weight = p_weight(iG)
+            detJ = element%jacobian_det(p_gauss(iG))
+            do il = 1, num_nodes
+                dNdx_i = ( element%jacobian(2, 2, p_gauss(iG)) * element%dpsi(il, 1, p_gauss(iG)) - & !&
+                           element%jacobian(2, 1, p_gauss(iG)) * element%dpsi(il, 2, p_gauss(iG))) / detJ !&
+                dNdy_i = (-element%jacobian(1, 2, p_gauss(iG)) * element%dpsi(il, 1, p_gauss(iG)) + & !&
+                           element%jacobian(1, 1, p_gauss(iG)) * element%dpsi(il, 2, p_gauss(iG))) / detJ !&
+                do jl = 1, num_nodes
+                    dNdx_j = ( element%jacobian(2, 2, p_gauss(iG)) * element%dpsi(jl, 1, p_gauss(iG)) - & !&
+                               element%jacobian(2, 1, p_gauss(iG)) * element%dpsi(jl, 2, p_gauss(iG))) / detJ !&
+                    dNdy_j = (-element%jacobian(1, 2, p_gauss(iG)) * element%dpsi(jl, 1, p_gauss(iG)) + & !&
+                               element%jacobian(1, 1, p_gauss(iG)) * element%dpsi(jl, 2, p_gauss(iG))) / detJ !&
 
-                ! 積分ループ
-                !$omp simd reduction(+:val)
-                do iG = 1, num_gauss
-                    xi = element%gauss(1, iG)
-                    eta = element%gauss(2, iG)
-                    weight = element%weight(iG)
-                    detJ = element%jacobian_det(xi, eta)
-                    ! 形状関数の勾配
-                    dNdx_i = (element%jacobian(2, 2, xi, eta) * &
-                              element%dpsi_dxi(il, xi, eta) - &
-                              element%jacobian(2, 1, xi, eta) * &
-                              element%dpsi_deta(il, xi, eta)) / detJ
-                    dNdy_i = (-element%jacobian(1, 2, xi, eta) * &
-                              element%dpsi_dxi(il, xi, eta) + &
-                              element%jacobian(1, 1, xi, eta) * &
-                              element%dpsi_deta(il, xi, eta)) / detJ
-                    dNdx_j = (element%jacobian(2, 2, xi, eta) * &
-                              element%dpsi_dxi(jl, xi, eta) - &
-                              element%jacobian(2, 1, xi, eta) * &
-                              element%dpsi_deta(jl, xi, eta)) / detJ
-                    dNdy_j = (-element%jacobian(1, 2, xi, eta) * &
-                              element%dpsi_dxi(jl, xi, eta) + &
-                              element%jacobian(1, 1, xi, eta) * &
-                              element%dpsi_deta(jl, xi, eta)) / detJ
-                    ! 状態の計算
-                    state%temperature = interp_temp(iG)
-                    state%porosity = interp_poro(iG)
-                    state%water_content = propeties%get_qw(state, i_material)
-                    ! 熱伝導率の取得
-                    lambda_gp = propeties%get_thc(state, i_material)
-                    ! 行列要素の計算
-                    val = val + (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda_gp * weight * detJ
+                    val = element%psi(il, p_gauss(iG)) * element%psi(jl, p_gauss(iG)) * Ca(iG) * weight * detJ
+                    ! print *, "CT_e:", val
+                    call CT_e%add(il, jl, val)
+                    val = (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda(iG) * weight * detJ
+                    ! print *, "KT_e:", val
+                    call KT_e%add(il, jl, val)
                 end do
-                ! 全体行列へのアセンブル
-                call A%find(element%get_connectivity(il), element%get_connectivity(jl), index)
-                A%val(index) = A%val(index) + val
             end do
         end do
 
-    end subroutine process_single_element_diffusion
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! STEP 3: Build the final local matrix (J_e) and vector (R_e)
+        !---------------------------------------------------------------------------------------------------------------------------
+        T_hist_e(:) = 0.0d0
+        do il = 1, num_nodes
+            do iO = 1, actual_order
+                T_hist_e(il) = T_hist_e(il) + coefficients(iO) * temperature%old(p_conn(il), iO)
+            end do
+        end do
 
-    subroutine Assemble_Mass_Heat_1(A, domain, temperature, porosity, propeties)
+        call add(coefficients(0) / dt, CT_e, KT_e, J_e)
+        call gemv(-1.0d0 / dt, CT_e, T_hist_e, 0.0d0, R_e)
+
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! STEP 4: Assemble the global matrix and vector
+        !---------------------------------------------------------------------------------------------------------------------------
+        do il = 1, num_nodes
+            R(p_conn(il)) = R(p_conn(il)) + R_e(il)
+            do jl = 1, num_nodes
+                call J%add(p_conn(il), p_conn(jl), J_e%val(il, jl))
+            end do
+        end do
+
+        !---------------------------------------------------------------------------------------------------------------------------
+        ! STEP 5: Finalization
+        !---------------------------------------------------------------------------------------------------------------------------
+        call deallocate_array(coefficients)
+        call deallocate_array(Ca)
+        call deallocate_array(lambda)
+        call deallocate_array(T_hist_e)
+        call deallocate_array(R_e)
+        call J_e%destroy()
+        call KT_e%destroy()
+        call CT_e%destroy()
+        deallocate (state)
+
+        ! stop
+
+    end subroutine process_element_thermal_linear_1
+
+    subroutine thermal_assemble_system_linear_1(J, R, domain, temperature, porosity, properties, controls, actual_order)
         implicit none
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: J
+        real(real64), intent(inout) :: R(:)
         type(type_domain), intent(inout), target :: domain
-        real(real64), intent(in) :: temperature(:)
-        real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_variable), intent(in) :: temperature
+        type(type_variable), intent(in) :: porosity
+        type(type_properties_manager), intent(in) :: properties
+        type(type_controls), intent(in) :: controls
+        integer(int32), intent(in) :: actual_order
 
-        class(abst_element), pointer :: element
+        class(abst_mesh), pointer :: element
+        integer(int32) :: iE, num_elements
 
-        integer(int32) :: iE
-        integer(int32) :: num_elements
         num_elements = domain%get_num_elements()
+        call J%zero()
+        R(:) = 0.0d0
 
         do iE = 1, num_elements
             element => domain%Elements(iE)%e
-            call process_single_element_mass(A, element, temperature, porosity, propeties)
+            call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, controls, actual_order)
         end do
+    end subroutine thermal_assemble_system_linear_1
 
-    end subroutine Assemble_Mass_Heat_1
-
-    ! ==============================================================================
-    ! Subroutine: Assemble_Mass_Heat_1_Parallel
-    ! Purpose:
-    !   カラーリングの結果を用いて行列アセンブルを並列化する
-    ! ==============================================================================
-    subroutine Assemble_Mass_Heat_1_Parallel(A, domain, temperature, porosity, propeties)
+    subroutine thermal_assemble_system_linear_1_parallel(J, R, domain, temperature, porosity, properties, controls, actual_order)
         implicit none
-        type(Type_CRS), intent(inout) :: A
+        type(type_crs), intent(inout) :: J
+        real(real64), intent(inout) :: R(:)
         type(type_domain), intent(inout), target :: domain
-        real(real64), intent(in) :: temperature(:)
-        real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
+        type(type_variable), intent(in) :: temperature
+        type(type_variable), intent(in) :: porosity
+        type(type_properties_manager), intent(in) :: properties
+        type(type_controls), intent(in) :: controls
+        integer(int32), intent(in) :: actual_order
 
         integer(int32) :: c, ie_idx
-        class(abst_element), pointer :: element
+        class(abst_mesh), pointer :: element
 
-        !$omp parallel private(c, ie_idx, element) shared(domain, A, temperature, porosity, propeties)
+        call J%zero()
+        R(:) = 0.0d0
+        ! print *, "Num Colors:", domain%colors%num_colors ! --- IGNORE ---
+
+        !$omp parallel private(c, ie_idx, element)
         do c = 1, domain%colors%num_colors
-            !$omp do schedule(guided)
-            do ie_idx = 1, domain%colors%Colored(c)%num_elements
-                element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
-                call process_single_element_mass(A, element, temperature, porosity, propeties)
+            !$omp do
+            do ie_idx = 1, domain%colors%colored(c)%num_elements
+                element => domain%Elements(domain%colors%colored(c)%Elements(ie_idx))%e
+                call process_element_thermal_linear_1(J, R, element, temperature, porosity, properties, controls, actual_order)
             end do
             !$omp end do
         end do
         !$omp end parallel
 
-    end subroutine Assemble_Mass_Heat_1_Parallel
-
-    subroutine Assemble_Diffusion_Heat_1(A, domain, temperature, porosity, propeties)
-        implicit none
-        ! --- 引数 ---
-        type(Type_CRS), intent(inout) :: A
-        type(type_domain), intent(inout), target :: domain
-        real(real64), intent(in) :: temperature(:)
-        real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties ! MaterialManagerに相当
-
-        ! --- ローカル変数 ---
-        class(abst_element), pointer :: element
-        integer(int32) :: iE
-        integer(int32) :: num_elements
-
-        num_elements = domain%get_num_elements()
-        do iE = 1, num_elements
-            element => domain%Elements(iE)%e
-            call process_single_element_diffusion(A, element, temperature, porosity, propeties)
-        end do
-
-    end subroutine Assemble_Diffusion_Heat_1
-
-    subroutine Assemble_Diffusion_Heat_1_Parallel(A, domain, temperature, porosity, propeties)
-        implicit none
-        type(Type_CRS), intent(inout) :: A
-        type(type_domain), intent(inout), target :: domain
-        real(real64), intent(in) :: temperature(:)
-        real(real64), intent(in) :: porosity(:)
-        type(type_proereties_manager), intent(inout) :: propeties
-
-        integer(int32) :: c, ie_idx
-        class(abst_element), pointer :: element
-
-        !$omp parallel private(c, ie_idx, element) shared(domain, A, temperature, porosity, propeties)
-        do c = 1, domain%colors%num_colors
-            !$omp  do schedule(guided)
-            do ie_idx = 1, domain%colors%Colored(c)%num_elements
-                element => domain%Elements(domain%colors%Colored(c)%Elements(ie_idx))%e
-                call process_single_element_diffusion(A, element, temperature, porosity, propeties)
-            end do
-            !$omp end do
-        end do
-        !$omp end parallel
-    end subroutine Assemble_Diffusion_Heat_1_Parallel
+        ! stop
+    end subroutine thermal_assemble_system_linear_1_parallel
 
 end module thermal_thermal_assemble

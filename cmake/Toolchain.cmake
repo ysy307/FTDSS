@@ -106,7 +106,7 @@ function(enable_build_flags target)
     if(ENABLE_DEBUG)
         if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
             target_compile_options(${target} PUBLIC
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -check all -traceback>
+                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -check all -fpe=0 -warn all -traceback>
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:-g -O0 -debug all -traceback>
                 $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:-g -O0 -debug all -traceback>
             )
@@ -141,9 +141,19 @@ function(enable_build_flags target)
         endif()
     endif()
 
-    # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    # ★★★         MKLとOpenMPのリンク競合を解決             ★★★
-    # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    # ================================
+    # ifx (IntelLLVM) 最適化レポート出力設定
+    # ================================
+    if(CMAKE_Fortran_COMPILER_ID MATCHES "IntelLLVM")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/opt_reports")
+        target_compile_options(${target} PUBLIC
+            $<$<COMPILE_LANGUAGE:Fortran>:
+                -qopt-report=3
+                -qopt-report-phase=loop,vec
+                # -qopt-report-file=${CMAKE_BINARY_DIR}/opt_reports/
+            >
+        )
+    endif()
 
     # OpenMPのコンパイル定義は、MKLの有無に関わらず設定する
     if(ENABLE_OPENMP)

@@ -13,6 +13,7 @@ contains
         integer(int32) :: iObs, iElem, num_elements
         integer(int32) :: local_id, local_type, ierr
         real(real64) :: tmp_xi, tmp_eta
+        type(type_dp_vector_3d) :: cartesian, normalized
 
         integer(int32) :: num_target_variables
 
@@ -39,31 +40,29 @@ contains
                 self%coordinate%z(iObs) = input%output_settings%history_output%coordinates(iObs)%z
             end do
             allocate (self%elements(self%num_observations))
-            allocate (self%xi(self%num_observations))
-            allocate (self%eta(self%num_observations))
+            allocate (self%coordinate_normalized(self%num_observations))
 
             select case (input%basic%simulation_settings%calculate_type)
 
             case (1)
                 do iObs = 1, self%num_observations
                     num_elements = domain%get_num_elements()
+                    call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0)
                     do iElem = 1, num_elements
-                        call domain%Elements(iElem)%e%is_inside(self%coordinate%x(iObs), &
-                                                                self%coordinate%y(iObs), &
-                                                                tmp_xi, &
-                                                                tmp_eta, &
+                        call domain%Elements(iElem)%e%is_inside(cartesian, &
+                                                                normalized, &
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
-                            call create_element(self%elements(iObs)%e, &
-                                                local_id, &
-                                                coordinate, &
-                                                input%geometry%vtk%cells(local_id), &
-                                                input%basic%geometry_settings, &
-                                                ierr)
-                            self%xi(iObs) = tmp_xi
-                            self%eta(iObs) = tmp_eta
+                            self%elements(iObs)%e = create_element(local_id, &
+                                                                   coordinate, &
+                                                                   input)
+                            self%coordinate_normalized = normalized
                             exit
+                        end if
+                        if (iElem == num_elements) then
+                            print *, "Error: Observation point ", iObs, " is not inside any element."
+                            stop
                         end if
                     end do
                 end do
@@ -71,24 +70,23 @@ contains
                 do iObs = 1, self%num_observations
                     num_elements = domain%get_num_elements()
                     do iElem = 1, num_elements
-                        call domain%Elements(iElem)%e%is_inside(self%coordinate%x(iObs), &
-                                                                self%coordinate%z(iObs), &
-                                                                tmp_xi, &
-                                                                tmp_eta, &
+                        call cartesian%set(self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0)
+                        call domain%Elements(iElem)%e%is_inside(cartesian, &
+                                                                normalized, &
                                                                 inside)
                         if (inside) then
                             local_id = domain%Elements(iElem)%e%get_id()
-                            call create_element(self%elements(iObs)%e, &
-                                                local_id, &
-                                                coordinate, &
-                                                input%geometry%vtk%cells(local_id), &
-                                                input%basic%geometry_settings, &
-                                                ierr)
-                            self%xi(iObs) = tmp_xi
-                            self%eta(iObs) = tmp_eta
+                            self%elements(iObs)%e = create_element(local_id, &
+                                                                   coordinate, &
+                                                                   input)
+                            self%coordinate_normalized = normalized
                             exit
                         end if
                     end do
+                    if (iElem == num_elements) then
+                        print *, "Error: Observation point ", iObs, " is not inside any element."
+                        stop
+                    end if
                 end do
             end select
         end select
@@ -337,7 +335,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -358,8 +356,7 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            obs_values(iObs) = self%elements(iObs)%e%interpolate( &
-                               self%xi(iObs), self%eta(iObs), original_temperature(:))
+            obs_values(iObs) = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
         end do
 
         deallocate (original_temperature)
@@ -371,7 +368,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
@@ -404,12 +401,12 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: original_temperature(:)
@@ -434,12 +431,12 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            state%temperature = self%elements(iObs)%e%interpolate( &
-                                self%xi(iObs), self%eta(iObs), original_temperature(:))
-            state%porosity = self%elements(iObs)%e%interpolate( &
-                             self%xi(iObs), self%eta(iObs), original_porosity(:))
+            state%temperature = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
+            state%porosity = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_porosity(:))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(state, group_id)
+            state%water_content = properties%calc_qw(group_id, state)
+            if (state%water_content > state%porosity) state%water_content = state%porosity
+            if (state%water_content < 0.0d0) state%water_content = 0.0d0
             obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
         end do
 
@@ -453,12 +450,12 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: original_temperature(:)
@@ -486,7 +483,9 @@ contains
             state%temperature = original_temperature(self%node_ids(iObs))
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(state, group_id)
+            state%water_content = properties%calc_qw(group_id, state)
+            if (state%water_content > state%porosity) state%water_content = state%porosity
+            if (state%water_content < 0.0d0) state%water_content = 0.0d0
             obs_values(iObs) = (state%porosity - state%water_content) / state%porosity
         end do
 
@@ -500,12 +499,12 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_temperature(:)
         real(real64), allocatable :: original_porosity(:)
@@ -530,13 +529,13 @@ contains
             end if
 
             do iObs = 1, self%num_observations
-                state%temperature = self%elements(iObs)%e%interpolate( &
-                                    self%xi(iObs), self%eta(iObs), original_temperature(:))
-                state%porosity = self%elements(iObs)%e%interpolate( &
-                                 self%xi(iObs), self%eta(iObs), original_porosity(:))
+                state%temperature = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
+                state%porosity = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
-                state%water_content = properties%get_qw(state, group_id)
-                obs_values(iObs) = properties%get_thc(state, group_id)
+                state%water_content = properties%calc_qw(group_id, state)
+                if (state%water_content > state%porosity) state%water_content = state%porosity
+                if (state%water_content < 0.0d0) state%water_content = 0.0d0
+                obs_values(iObs) = properties%calc_thc(group_id, state)
             end do
 
             deallocate (original_temperature)
@@ -551,12 +550,12 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_temperature(:)
         real(real64), allocatable :: original_porosity(:)
@@ -583,8 +582,10 @@ contains
             state%temperature = original_temperature(self%node_ids(iObs))
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(state, group_id)
-            obs_values(iObs) = properties%get_thc(state, group_id)
+            state%water_content = properties%calc_qw(group_id, state)
+            if (state%water_content > state%porosity) state%water_content = state%porosity
+            if (state%water_content < 0.0d0) state%water_content = 0.0d0
+            obs_values(iObs) = properties%calc_thc(group_id, state)
         end do
 
         deallocate (original_temperature)
@@ -598,12 +599,12 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
 
         real(real64), allocatable :: original_temperature(:)
@@ -629,13 +630,13 @@ contains
             end if
 
             do iObs = 1, self%num_observations
-                state%temperature = self%elements(iObs)%e%interpolate( &
-                                    self%xi(iObs), self%eta(iObs), original_temperature(:))
-                state%porosity = self%elements(iObs)%e%interpolate( &
-                                 self%xi(iObs), self%eta(iObs), original_porosity(:))
+                state%temperature = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_temperature(:))
+                state%porosity = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_porosity(:))
                 group_id = self%elements(iObs)%e%get_group()
-                state%water_content = properties%get_qw(state, group_id)
-                obs_values(iObs) = properties%get_vhc(state, group_id)
+                state%water_content = properties%calc_qw(group_id, state)
+                if (state%water_content > state%porosity) state%water_content = state%porosity
+                if (state%water_content < 0.0d0) state%water_content = 0.0d0
+                obs_values(iObs) = properties%calc_vhc(group_id, state)
             end do
 
             deallocate (original_temperature)
@@ -649,12 +650,12 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_temperature(:)
         real(real64), allocatable :: original_porosity(:)
@@ -681,8 +682,10 @@ contains
             state%temperature = original_temperature(self%node_ids(iObs))
             state%porosity = nodal_porosity(self%node_ids(iObs))
             group_id = self%elements(iObs)%e%get_group()
-            state%water_content = properties%get_qw(state, group_id)
-            obs_values(iObs) = properties%get_vhc(state, group_id)
+            state%water_content = properties%calc_qw(group_id, state)
+            if (state%water_content > state%porosity) state%water_content = state%porosity
+            if (state%water_content < 0.0d0) state%water_content = 0.0d0
+            obs_values(iObs) = properties%calc_vhc(group_id, state)
         end do
 
         deallocate (original_temperature)
@@ -695,12 +698,12 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)
 
-        type(type_gauss_point_state) :: state
+        type(type_state) :: state
         integer(int32) :: iObs, group_id
         real(real64), allocatable :: original_pressure(:)
         integer(int32) :: istat
@@ -717,8 +720,7 @@ contains
         end if
 
         do iObs = 1, self%num_observations
-            obs_values(iObs) = self%elements(iObs)%e%interpolate( &
-                               self%xi(iObs), self%eta(iObs), original_pressure(:))
+            obs_values(iObs) = self%elements(iObs)%e%lerp(self%coordinate_normalized(iObs), original_pressure(:))
         end do
 
         deallocate (original_pressure)
@@ -730,7 +732,7 @@ contains
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(out) :: obs_values(:)
         type(type_domain), intent(inout), optional :: domain
-        type(type_proereties_manager), intent(inout), optional :: properties
+        type(type_properties_manager), intent(inout), optional :: properties
         real(real64), intent(in), optional :: nodal_temperature(:)
         real(real64), intent(in), optional :: nodal_porosity(:)
         real(real64), intent(in), optional :: nodal_pw(:)

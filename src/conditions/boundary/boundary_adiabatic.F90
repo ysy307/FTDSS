@@ -6,7 +6,7 @@ contains
         implicit none
         class(type_bc_thermal_adiabatic), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_domain), intent(in) :: domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in) :: id
         integer(int32), intent(in) :: i_material
         real(real64), intent(in) :: time_conv
@@ -46,7 +46,7 @@ contains
         real(real64), intent(in) :: current_time
         real(real64), intent(inout), optional :: A(:, :)
         real(real64), intent(inout) :: b(:)
-        type(type_domain), intent(in) :: Domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
     end subroutine apply_Dense_Thermal_Adiabatic
@@ -57,7 +57,7 @@ contains
         real(real64), intent(in) :: current_time
         type(Type_CRS), intent(inout), optional :: A
         real(real64), intent(inout) :: b(:)
-        type(type_domain), intent(in) :: Domain
+        type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
         ! real(real64) :: Dval, timeCoe

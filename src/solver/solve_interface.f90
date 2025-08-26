@@ -1,9 +1,8 @@
 module solver_solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:allocate_array, deallocate_array, error_message
-    use :: module_calculate, only:norm => norm_2, dot => inner_product
-    use :: module_matrix, only:type_crs, operator(*), operator(+), type_dense, abst_matrix
+    use :: module_core, only:allocate_array, deallocate_array, error_message, was_interrupted, abst_matrix, type_crs, type_dense
+    use :: module_calculate, only:norm_2, dot, add, gemv
     implicit none
     private
 #ifdef _MKL
@@ -11,8 +10,6 @@ module solver_solve
 #endif
 
     public :: abst_solver
-    ! public :: abst_solver
-    ! public :: abst_solver
     public :: type_solver_sparse_crs_bicgstab
     public :: type_solver_sparse_crs_lu
     public :: type_solver_dense_lu
@@ -21,9 +18,6 @@ module solver_solve
     contains
         procedure(abst_solve), pass(self), deferred :: solve
         procedure(abst_check), pass(self), deferred :: check
-        ! generic :: solve => solve_sparse_crs
-        ! generic :: check => check_sparse_crs
-        ! final :: destruct_type_abst_solver
     end type abst_solver
 
     abstract interface
@@ -47,7 +41,7 @@ module solver_solve
     end interface
 
     type, extends(abst_solver) :: type_solver_sparse_crs_bicgstab
-        integer(int32) :: n
+        integer(int32) :: size
         real(real64), allocatable :: m(:)
         real(real64), allocatable :: p(:)
         real(real64), allocatable :: phat(:)
@@ -75,9 +69,9 @@ module solver_solve
     end type type_solver_sparse_crs_bicgstab
 
     interface
-        module function construct_type_solver_sparse_crs_bicgstab(N, tolerance, max_iterations, preconditioner) result(structure)
+        module function construct_type_solver_sparse_crs_bicgstab(size, tolerance, max_iterations, preconditioner) result(structure)
             implicit none
-            integer(int32), intent(in) :: N
+            integer(int32), intent(in) :: size
             real(real64), intent(in) :: tolerance
             integer(int32), intent(in) :: max_iterations
             integer(int32), intent(in) :: preconditioner

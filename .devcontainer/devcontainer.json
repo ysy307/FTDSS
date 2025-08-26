@@ -1,18 +1,30 @@
 {
     "name": "FTDSS",
     "dockerFile": "Dockerfile",
+    "build": {
+        "args": {
+            // Dockerfile内のUSERNAME引数に値を渡す
+            "USERNAME": "devuser"
+        }
+    },
     "mounts": [
-        "source=${localEnv:USERPROFILE}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached",
-        "source=${localWorkspaceFolder}/.fortls,target=/root/.fortls,type=bind,consistency=cached"
+        // .gitconfigと.fortlsをdevuserのホームディレクトリにマウント
+        "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/devuser/.gitconfig,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached"
     ],
     "runArgs": [
+        // 権限問題を解決するため、--userの指定はここから削除
         "--hostname=ftdss-dev",
         "--privileged",
         "--cap-add=SYS_ADMIN",
         "--cap-add=SYS_PTRACE",
         "-v",
-        "/sys/kernel/debug:/sys/kernel/debug"
+        "/sys/kernel/debug:/sys/kernel/debug",
+        "--cpus=32",
+        "--memory=96g"
     ],
+    // コンテナ内で作業するユーザーを 'devuser' に指定
+    "remoteUser": "devuser",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -28,5 +40,6 @@
             ]
         }
     },
-    "postCreateCommand": "sudo apt-get update"
+    // コンテナ作成後にワークスペースフォルダの所有権を devuser に変更し、書き込み権限を付与
+    "postCreateCommand": "sudo chown -R devuser:devuser /workspaces"
 }

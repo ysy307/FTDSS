@@ -25,7 +25,7 @@ contains
 
     end function construct_type_wrf_durner
 
-    module function calculate_wrf_durner(self, h) result(theta_w)
+    module pure elemental function calculate_wrf_durner(self, h) result(theta_w)
         implicit none
         class(type_wrf_durner), intent(in) :: self
         real(real64), intent(in) :: h
@@ -41,7 +41,7 @@ contains
 
     end function calculate_wrf_durner
 
-    module function calculate_wrf_durner_derivative(self, h) result(dqw_dh)
+    module pure elemental function calculate_wrf_durner_derivative(self, h) result(dqw_dh)
         implicit none
         class(type_wrf_durner), intent(in) :: self
         real(real64), intent(in) :: h

@@ -11,11 +11,10 @@ module module_core
     use :: core_vtk, only:type_vtk, type_vtk_cell
     use :: core_vtk_vtk_constants
     implicit none
+    public
 
 #ifdef _MPI
     include 'mpif.h'
 #endif
-
-contains
 
 end module module_core
