@@ -139,7 +139,7 @@ contains
 
         allocate (self%gauss(self%num_gauss))
         do i = 1, self%num_gauss
-            call self%gauss(i)%set(gauss(:, i))
+            call self%gauss(i)%set(gauss(1, i), gauss(2, i), gauss(3, i))
         end do
 
         allocate (self%x(self%num_nodes))

@@ -290,7 +290,8 @@ contains
             case (2)
                 !! dx_deta
                 do ii = 1, self%get_num_nodes()
-                    jacobian = jacobian + self%dpsi(ii, 2, r) * coordinate%y
+                    coordinate = self%get_coordinate(ii)
+                    jacobian = jacobian + self%dpsi(ii, 2, r) * coordinate%x
                 end do
             end select
 
@@ -298,13 +299,15 @@ contains
         case (2)
             select case (j)
             case (1)
-                !! dy_dxi
+            !! dy_dxi
                 do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
                     jacobian = jacobian + self%dpsi(ii, 1, r) * coordinate%y
                 end do
             case (2)
-                !! dy_deta
+            !! dy_deta
                 do ii = 1, self%get_num_nodes()
+                    coordinate = self%get_coordinate(ii)
                     jacobian = jacobian + self%dpsi(ii, 2, r) * coordinate%y
                 end do
             end select
@@ -399,6 +402,7 @@ contains
     !
     !----------------------------------------------------------------------!
     module subroutine is_in_triangle_first(self, cartesian, normalized, is_in)
+        implicit none
         class(type_triangle_first), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: cartesian
         type(type_dp_vector_3d), intent(inout) :: normalized
@@ -410,19 +414,18 @@ contains
         real(real64) :: dx_xi, dx_eta, dy_xi, dy_eta
         real(real64) :: detJ
         real(real64) :: dx, dy
-        integer(int32) :: iter, max_iter
+        integer(int32) :: iter, max_iterations
         real(real64) :: tol
         integer(int32) :: i
         logical :: converged
 
-        ! 初期化
-        call r%set([0.0d0, 0.0d0, 0.0d0])
+        call r%set(0.0d0, 0.0d0, 0.0d0)
         tol = 1.0d-15
-        max_iter = 100
+        max_iterations = 10
         converged = .false.
 
         ! Newton-Raphson 法による逆写像
-        do iter = 1, max_iter
+        do iter = 1, max_iterations
             x0 = 0.0d0
             y0 = 0.0d0
 
@@ -440,21 +443,23 @@ contains
                 exit
             end if
 
-            dx_xi = self%jacobian(1, 1, r)
-            dx_eta = self%jacobian(1, 2, r)
-            dy_xi = self%jacobian(2, 1, r)
-            dy_eta = self%jacobian(2, 2, r)
+            dx_xi  = self%jacobian(1, 1, r) !&
+            dx_eta = self%jacobian(1, 2, r) !&
+            dy_xi  = self%jacobian(2, 1, r) !&
+            dy_eta = self%jacobian(2, 2, r) !&
 
             detJ = self%jacobian_det(r)
-            if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
 
-            ! Newton-Raphson 更新
+            if (abs(detJ) < 1.0d-15) then
+                is_in = .false.
+                return
+            end if
+
             r%x = r%x + (dy_eta * dx - dx_eta * dy) / detJ
             r%y = r%y + (-dy_xi * dx + dx_xi * dy) / detJ
         end do
 
-        ! 最終判定：収束かつ自然座標が範囲内
-        is_in = converged .and. (r%x >= 0.0d0) .and. (r%y >= 0.0d0) .and. (r%x + r%y <= 1.0d0)
+        is_in = converged .and. (r%x >= -tol) .and. (r%y >= -tol) .and. (r%x + r%y <= 1.0d0 + tol)
         if (is_in) normalized = r
 
     end subroutine is_in_triangle_first

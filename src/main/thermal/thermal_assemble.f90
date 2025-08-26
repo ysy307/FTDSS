@@ -186,6 +186,8 @@ contains
         num_nodes = element%get_num_nodes()
         num_gauss = element%get_num_gauss()
         i_material = element%get_group()
+        ! print *, "Checking Element ID:", element%get_id(), "Material Group:", i_material, &
+        !     "Is Target?:", controls%is_target(calc_thermal, i_material)
         if (.not. controls%is_target(calc_thermal, i_material)) return
 
         call allocate_array(coefficients, bounds=[0:actual_order])
@@ -203,7 +205,10 @@ contains
         p_weight => element%get_weight()
         p_gauss => element%get_gauss()
         p_conn => element%get_connectivity()
-
+        ! print *, "Element ID:", element%get_id(), "Group:", i_material, "Num Nodes:", num_nodes, "Num Gauss:", num_gauss ! --- IGNORE ---
+        ! print *, "  Connectivity:", p_conn(1:num_nodes) ! --- IGNORE ---
+        ! print *, " Weight:", p_weight(1:num_gauss) ! --- IGNORE ---
+        ! print *, " Gauss Points:", p_gauss(1:num_gauss) ! --- IGNORE ---
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 1: Compute the physical quantities at all Gauss points
         !---------------------------------------------------------------------------------------------------------------------------
@@ -232,8 +237,10 @@ contains
                                element%jacobian(1, 1, p_gauss(iG)) * element%dpsi(jl, 2, p_gauss(iG))) / detJ !&
 
                     val = element%psi(il, p_gauss(iG)) * element%psi(jl, p_gauss(iG)) * Ca(iG) * weight * detJ
+                    ! print *, "CT_e:", val
                     call CT_e%add(il, jl, val)
                     val = (dNdx_i * dNdx_j + dNdy_i * dNdy_j) * lambda(iG) * weight * detJ
+                    ! print *, "KT_e:", val
                     call KT_e%add(il, jl, val)
                 end do
             end do
@@ -274,6 +281,8 @@ contains
         call KT_e%destroy()
         call CT_e%destroy()
         deallocate (state)
+
+        ! stop
 
     end subroutine process_element_thermal_linear_1
 
@@ -317,6 +326,7 @@ contains
 
         call J%zero()
         R(:) = 0.0d0
+        ! print *, "Num Colors:", domain%colors%num_colors ! --- IGNORE ---
 
         !$omp parallel private(c, ie_idx, element)
         do c = 1, domain%colors%num_colors
@@ -328,6 +338,8 @@ contains
             !$omp end do
         end do
         !$omp end parallel
+
+        ! stop
     end subroutine thermal_assemble_system_linear_1_parallel
 
 end module thermal_thermal_assemble

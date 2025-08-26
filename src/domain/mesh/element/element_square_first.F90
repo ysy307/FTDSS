@@ -447,7 +447,7 @@ contains
         logical :: converged
 
         ! 初期化
-        call r%set([0.0d0, 0.0d0, 0.0d0])
+        call r%set(0.0d0, 0.0d0, 0.0d0)
         tol = 1.0d-15
         max_iter = 100
         converged = .false.
@@ -476,7 +476,7 @@ contains
             dy_xi = self%jacobian(2, 1, r)
             dy_eta = self%jacobian(2, 2, r)
 
-            detJ = self%jacobian_Det(r)
+            detJ = self%jacobian_det(r)
             if (abs(detJ) < 1.0d-20) exit ! ヤコビ行列の特異性チェック
 
             ! Newton-Raphson 更新

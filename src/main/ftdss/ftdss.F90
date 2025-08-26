@@ -57,6 +57,7 @@ contains
         call input%initialize()
         call self%controls%time%initialize(input=input)
         call self%controls%iteration%initialize(input)
+        call self%controls%initialize(input)
 
         if (input%output_settings%standard_output%print_progress) then
             call global_logger%configure(level=information_level, &

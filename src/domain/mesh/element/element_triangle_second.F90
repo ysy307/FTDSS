@@ -455,9 +455,9 @@ contains
         logical :: converged
 
         ! 初期化
-        call r%set([0.0d0, 0.0d0, 0.0d0])
-        tol = 1.0d-15
-        max_iter = 100
+        call r%set(1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0)
+        tol = 1.0d-10
+        max_iter = 30
         converged = .false.
 
         ! Newton-Raphson 法による逆写像

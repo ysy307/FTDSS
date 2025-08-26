@@ -524,7 +524,7 @@ contains
         logical :: converged
 
         ! 初期化
-        call r%set([0.0d0, 0.0d0, 0.0d0])
+        call r%set(0.0d0, 0.0d0, 0.0d0)
 
         tol = 1.0d-15
         max_iter = 1000

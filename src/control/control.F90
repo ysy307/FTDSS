@@ -86,25 +86,29 @@ contains
         ! アクティブな各マテリアル領域に対してフラグを立てる
         do i = 1, num_unique_regions
             current_material_id = unique_material_ids(i)
-
             if (self%calculate_thermal) then
+                ! materials配列の添え字として実際の材料IDを使用
                 self%thermal(current_material_id) = input%basic%materials(i)%calculate_thermal
             end if
 
             if (self%calculate_hydraulic) then
+                ! materials配列の添え字として実際の材料IDを使用
                 self%hydraulic(current_material_id) = input%basic%materials(i)%calculate_hydraulic
             end if
 
             if (self%calculate_mechanical) then
+                ! materials配列の添え字として実際の材料IDを使用
                 self%mechanical(current_material_id) = input%basic%materials(i)%calculate_mechanical
             end if
         end do
 
+        ! print *,
+
         ! coupling_modeの設定
         self%coupling_mode = input%basic%analysis_controls%coupling_mode
 
-        call self%time%initialize(input)
-        call self%iteration%initialize(input)
+        ! call self%time%initialize(input)
+        ! call self%iteration%initialize(input)
 
         call initialize_openmp(input)
 

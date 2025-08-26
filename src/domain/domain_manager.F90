@@ -126,8 +126,6 @@ contains
         call global_logger%log_information(message="Graph coloring completed using " &
                                            //trim(self%colors%algorithm_name)//" algorithm.")
 
-        ! call self%node_adjacency%destroy()
-        ! call self%element_adjacency%destroy()
         call global_logger%log_information(message="Initialization process completed successfully.")
 
     end subroutine initialize_type_domain

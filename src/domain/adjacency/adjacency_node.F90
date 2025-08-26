@@ -20,7 +20,7 @@ module domain_adjacency_adjacency_node
         integer(int32) :: num_nodes = 0
         integer(int32) :: nnz = 0
 
-        ! COO (Coordinate list) 形式のデータ
+        ! COO (Coordinate list) 形式のデータ (ソート済み)
         integer(int32), allocatable :: row(:)
         integer(int32), allocatable :: col(:)
 
@@ -201,20 +201,18 @@ contains
             n1 = temp_row(i)
             n2 = temp_col(i)
 
-            ! 【修正点】自己ループ(i,i)の場合は、対称な(i,i)を追加する必要はない
             if (n1 == n2) then
                 edge_count = edge_count + 1
                 packed_edges(edge_count) = ishft(int(n1, int64), 32) + int(n2, int64)
             else
                 edge_count = edge_count + 1
                 packed_edges(edge_count) = ishft(int(n1, int64), 32) + int(n2, int64)
-
                 edge_count = edge_count + 1
                 packed_edges(edge_count) = ishft(int(n2, int64), 32) + int(n1, int64)
             end if
         end do
 
-        ! ソートしてユニークなエッジのみを抽出
+        ! ソートしてユニークなエッジのみを抽出し、ソート済みCOOを生成
         call unique(packed_edges(1:edge_count), unique_packed_edges)
         deallocate (packed_edges)
 
@@ -231,13 +229,12 @@ contains
     end subroutine create_unique_coo
 
     !================================================================!
-    !【CSR構築】自身のCOOメンバからCSR形式を構築
+    !【CSR構築】自身のCOOメンバからCSR形式を構築 (修正版)
     !================================================================!
     subroutine build_csr_from_coo(self)
         implicit none
         class(type_node_adjacency), intent(inout) :: self
         integer(int32) :: i
-        integer(int32), allocatable :: degree(:)
 
         if (self%nnz == 0) then
             if (self%num_nodes > 0) then
@@ -248,24 +245,26 @@ contains
             return
         end if
 
-        ! 1. 各ノードの次数を計算
-        call allocate_array(degree, self%num_nodes)
-        degree = 0
+        ! COOデータはcreate_unique_cooによって行でソート済み
+        call allocate_array(self%ptr, self%num_nodes + 1)
+        call allocate_array(self%ind, self%nnz)
+        self%ind = self%col ! col配列をindにコピー
+        self%ptr = 0
+
+        ! 1. 各行の非ゼロ要素数を数える (次数を計算)
         do i = 1, self%nnz
-            degree(self%row(i)) = degree(self%row(i)) + 1
+            self%ptr(self%row(i) + 1) = self%ptr(self%row(i) + 1) + 1
         end do
 
         ! 2. 次数の累積和からptr配列を構築
-        call allocate_array(self%ptr, self%num_nodes + 1)
-        self%ptr(1) = 1
         do i = 1, self%num_nodes
-            self%ptr(i + 1) = self%ptr(i) + degree(i)
+            self%ptr(i + 1) = self%ptr(i) + self%ptr(i + 1)
         end do
-        deallocate (degree)
 
-        ! 3. ind配列を構築 (COOのcol配列をソートして格納)
-        call allocate_array(self%ind, self%nnz)
-        self%ind = self%col
+        ! Fortranは1-based indexなので、全体に1を加算
+        self%ptr = self%ptr + 1
+
+        ! 3. 各行の列インデックスをソートする
         do i = 1, self%num_nodes
             if (self%ptr(i + 1) > self%ptr(i)) then
                 call sort(self%ind(self%ptr(i):self%ptr(i + 1) - 1))
@@ -302,19 +301,14 @@ contains
         integer(int32) :: start_p, end_p, degree
 
         if (node_id < 1 .or. node_id > self%num_nodes) then
-            allocate (neighbors(0))
-            return
+            allocate (neighbors(0)); return
         end if
-
         start_p = self%ptr(node_id)
         end_p = self%ptr(node_id + 1) - 1
         degree = end_p - start_p + 1
-
         if (degree <= 0) then
-            allocate (neighbors(0))
-            return
+            allocate (neighbors(0)); return
         end if
-
         allocate (neighbors(degree))
         neighbors = self%ind(start_p:end_p)
     end subroutine get_neighbors_csr
@@ -333,7 +327,6 @@ contains
         integer(int32), intent(inout), allocatable :: col_out(:)
 
         if (self%nnz <= 0) return
-
         call allocate_array(row_out, self%nnz)
         call allocate_array(col_out, self%nnz)
         row_out(:) = self%row(:)
@@ -346,9 +339,7 @@ contains
         integer(int32), intent(inout), allocatable :: ptr_out(:)
         integer(int32), intent(inout), allocatable :: ind_out(:)
 
-        print *, self%nnz
         if (self%nnz <= 0) return
-
         call allocate_array(ptr_out, self%num_nodes + 1_int32)
         call allocate_array(ind_out, self%nnz)
         ptr_out(:) = self%ptr(:)

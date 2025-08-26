@@ -47,8 +47,8 @@ contains
             case (1)
                 do iObs = 1, self%num_observations
                     num_elements = domain%get_num_elements()
+                    call cartesian%set(self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0)
                     do iElem = 1, num_elements
-                        call cartesian%set([self%coordinate%x(iObs), self%coordinate%y(iObs), 0.0d0])
                         call domain%Elements(iElem)%e%is_inside(cartesian, &
                                                                 normalized, &
                                                                 inside)
@@ -70,7 +70,7 @@ contains
                 do iObs = 1, self%num_observations
                     num_elements = domain%get_num_elements()
                     do iElem = 1, num_elements
-                        call cartesian%set([self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0])
+                        call cartesian%set(self%coordinate%x(iObs), self%coordinate%z(iObs), 0.0d0)
                         call domain%Elements(iElem)%e%is_inside(cartesian, &
                                                                 normalized, &
                                                                 inside)

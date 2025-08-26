@@ -44,7 +44,7 @@ contains
         end if
 
         self%nnz = size(col)
-        self%num_row = size(row)
+        self%num_row = num_nodes
         self%num_ptr = self%num_row + 1
 
         call allocate_array(self%ptr, self%num_ptr)
