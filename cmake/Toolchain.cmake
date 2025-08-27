@@ -99,7 +99,7 @@ endif()
 # =========================================================================
 function(enable_build_flags target)
     target_compile_options(${target} PUBLIC
-        $<$<COMPILE_LANGUAGE:Fortran>:-fpp -traceback>
+        $<$<COMPILE_LANGUAGE:Fortran>:-stand f2018 -fpp -traceback>
     )
 
     # Debug用フラグ

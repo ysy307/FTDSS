@@ -22,6 +22,7 @@ module core_types_matrix_coo
         procedure, public, pass(self) :: set_all    => set_all_coo !&
         procedure, public, pass(self) :: zero       => zero_coo !&
         procedure, public, pass(self) :: add        => add_coo !&
+        procedure, public, pass(self) :: display    => display_coo !&
         procedure, public, pass(self) :: destroy    => destroy_coo !&
     end type
 
@@ -60,23 +61,31 @@ contains
     pure function find_coo(self, row, col) result(index)
         implicit none
         class(type_coo), intent(in) :: self
-        integer(int32), intent(in) :: row
-        integer(int32), intent(in) :: col
+        integer(int32), intent(in) :: row, col
         integer(int32) :: index
+        integer(int32) :: lo, hi, mid
+        integer(int32) :: r, c
 
-        integer(int32) :: i
+        ! 初期値
+        index = 0
+        if (self%nnz == 0) return
 
-        if (self%nnz == 0) then
-            index = -1
-            return
-        end if
+        lo = 1
+        hi = self%nnz
 
-        ! --- 二分探索で行と列の組み合わせを探す ---
-        index = -1
-        do i = 1, self%nnz
-            if (self%row(i) == row .and. self%col(i) == col) then
-                index = i
+        ! 二分探索
+        do while (lo <= hi)
+            mid = (lo + hi) / 2
+            r = self%row(mid)
+            c = self%col(mid)
+
+            if (r == row .and. c == col) then
+                index = mid
                 return
+            else if (r < row .or. (r == row .and. c < col)) then
+                lo = mid + 1
+            else
+                hi = mid - 1
             end if
         end do
     end function find_coo
@@ -127,6 +136,17 @@ contains
         self%val(index) = self%val(index) + value
 
     end subroutine add_coo
+
+    subroutine display_coo(self)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32) :: i
+
+        do i = 1, self%nnz
+            write (*, '(i0, 2x, i0, 2X, es16.8)') self%row(i), self%col(i), self%val(i)
+        end do
+
+    end subroutine display_coo
 
     subroutine destroy_coo(self)
         implicit none

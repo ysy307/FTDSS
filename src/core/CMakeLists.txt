@@ -18,7 +18,7 @@ set_target_properties(VTK_C_WRAPPER PROPERTIES CXX_STANDARD 17)
 # --------------------------------------------------------------------
 # Fortran/C Core STATICライブラリ (すべてを一つに統合)
 # --------------------------------------------------------------------
-add_library(CORE STATIC
+add_library(CORE OBJECT
     # CORE_UTILS sources
     # C sources
     c_utils/signal_flag.c

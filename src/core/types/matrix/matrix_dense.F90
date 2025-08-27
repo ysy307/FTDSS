@@ -8,9 +8,6 @@ module core_types_matrix_dense
 
     public :: type_dense
 
-    ! public :: type_dense_gemv
-    ! public :: type_dense_add
-
     type, extends(abst_matrix) :: type_dense
         integer(int32) :: num_row
         integer(int32) :: num_col
@@ -23,6 +20,7 @@ module core_types_matrix_dense
         procedure, public, pass(self) :: set_all          => set_all_dense !&
         procedure, public, pass(self) :: zero             => zero_dense !&
         procedure, public, pass(self) :: add              => add_dense !&
+        procedure, public, pass(self) :: display          => display_dense !&
         procedure, public, pass(self) :: destroy          => destroy_dense !&
     end type
 contains
@@ -110,6 +108,19 @@ contains
         self%val(row, col) = self%val(row, col) + value
 
     end subroutine add_dense
+
+    subroutine display_dense(self)
+        implicit none
+        class(type_dense), intent(in) :: self
+        integer(int32) :: i, j
+
+        do i = 1, self%num_row
+            do j = 1, self%num_col
+                write (*, '(i0, 2x, i0, 2X, es16.8)') i, j, self%val(i, j)
+            end do
+        end do
+
+    end subroutine display_dense
 
     subroutine destroy_dense(self)
         implicit none

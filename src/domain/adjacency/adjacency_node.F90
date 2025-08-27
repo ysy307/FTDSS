@@ -195,7 +195,7 @@ contains
         if (size(temp_row) == 0) return
 
         ! (i,j) と (j,i) の両方を持つ対称COOリストを作成するため、2倍のサイズを確保
-        allocate (packed_edges(size(temp_row) * 2))
+        allocate (packed_edges(size(temp_row, kind=int64) * 2))
         edge_count = 0
         do i = 1, size(temp_row)
             n1 = temp_row(i)
@@ -216,7 +216,7 @@ contains
         call unique(packed_edges(1:edge_count), unique_packed_edges)
         deallocate (packed_edges)
 
-        self%nnz = size(unique_packed_edges)
+        self%nnz = size(unique_packed_edges, kind=int32)
         call allocate_array(self%row, self%nnz)
         call allocate_array(self%col, self%nnz)
 
@@ -234,7 +234,8 @@ contains
     subroutine build_csr_from_coo(self)
         implicit none
         class(type_node_adjacency), intent(inout) :: self
-        integer(int32) :: i
+        integer(int32) :: i, current_row, dest_pos
+        integer(int32), allocatable :: temp_ptr(:)
 
         if (self%nnz == 0) then
             if (self%num_nodes > 0) then
@@ -245,31 +246,43 @@ contains
             return
         end if
 
-        ! COOデータはcreate_unique_cooによって行でソート済み
         call allocate_array(self%ptr, self%num_nodes + 1)
         call allocate_array(self%ind, self%nnz)
-        self%ind = self%col ! col配列をindにコピー
         self%ptr = 0
 
-        ! 1. 各行の非ゼロ要素数を数える (次数を計算)
+        ! 1. 各行の非ゼロ要素数を数える
         do i = 1, self%nnz
             self%ptr(self%row(i) + 1) = self%ptr(self%row(i) + 1) + 1
         end do
 
-        ! 2. 次数の累積和からptr配列を構築
+        ! 2. 累積和からptr配列を構築 (0-based)
         do i = 1, self%num_nodes
             self%ptr(i + 1) = self%ptr(i) + self%ptr(i + 1)
         end do
 
-        ! Fortranは1-based indexなので、全体に1を加算
+        ! 3. ind配列を再配置する
+        call allocate_array(temp_ptr, self%num_nodes)
+        temp_ptr = self%ptr(1:self%num_nodes) ! 書き込み位置カウンタとしてptr配列をコピー
+
+        do i = 1, self%nnz
+            current_row = self%row(i)
+            dest_pos = temp_ptr(current_row) + 1
+            self%ind(dest_pos) = self%col(i)
+            temp_ptr(current_row) = temp_ptr(current_row) + 1
+        end do
+        call deallocate_array(temp_ptr)
+
+        ! 4. ptr配列を1-basedに調整
         self%ptr = self%ptr + 1
 
-        ! 3. 各行の列インデックスをソートする
+        ! 5. 各行の列インデックスをソートする
+        !$omp parallel do private(i)
         do i = 1, self%num_nodes
             if (self%ptr(i + 1) > self%ptr(i)) then
                 call sort(self%ind(self%ptr(i):self%ptr(i + 1) - 1))
             end if
         end do
+        !$omp end parallel do
     end subroutine build_csr_from_coo
 
     !================================================================!
@@ -313,11 +326,11 @@ contains
         neighbors = self%ind(start_p:end_p)
     end subroutine get_neighbors_csr
 
-    pure function get_nnz(self) result(nnz)
+    pure function get_nnz(self) result(nnz_out)
         implicit none
         class(type_node_adjacency), intent(in) :: self
-        integer(int32) :: nnz
-        nnz = self%nnz
+        integer(int32) :: nnz_out
+        nnz_out = self%nnz
     end function get_nnz
 
     subroutine get_coo(self, row_out, col_out)
@@ -340,7 +353,7 @@ contains
         integer(int32), intent(inout), allocatable :: ind_out(:)
 
         if (self%nnz <= 0) return
-        call allocate_array(ptr_out, self%num_nodes + 1_int32)
+        call allocate_array(ptr_out, self%num_nodes + 1)
         call allocate_array(ind_out, self%nnz)
         ptr_out(:) = self%ptr(:)
         ind_out(:) = self%ind(:)

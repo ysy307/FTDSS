@@ -21,6 +21,7 @@ contains
         call domain%node_adjacency%get_csr(row_ptr, col_ind)
 
         call structure%KT_star%initialize(num_nodes, row_ptr, col_ind)
+        call structure%KT_star%display()
         structure%order = input%basic%solver_settings%bdf_order
 
         call allocate_array(structure%FT, num_nodes)

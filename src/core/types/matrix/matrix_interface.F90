@@ -14,6 +14,7 @@ module core_types_matrix
         procedure(abst_set_all),    pass(self), deferred :: set_all !&
         procedure(abst_zero),       pass(self), deferred :: zero !&
         procedure(abst_add),        pass(self), deferred :: add !&
+        procedure(abst_display),    pass(self), deferred :: display !&
         procedure(abst_destroy),    pass(self), deferred :: destroy !&
     end type abst_matrix
 
@@ -70,6 +71,13 @@ module core_types_matrix
             real(real64), intent(in) :: value
 
         end subroutine abst_add
+
+        subroutine abst_display(self)
+            import :: abst_matrix
+            implicit none
+            class(abst_matrix), intent(in) :: self
+
+        end subroutine abst_display
 
         subroutine abst_destroy(self)
             import :: abst_matrix

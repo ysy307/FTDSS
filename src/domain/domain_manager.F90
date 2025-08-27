@@ -115,7 +115,9 @@ contains
         !===============================================================
         call self%reordering%initialize(input%basic%solver_settings%reordering, self%node_adjacency)
         if (input%basic%solver_settings%reordering /= "none") then
+            call self%node_adjacency%destroy()
             call self%apply_reordering()
+            call self%node_adjacency%initialize(self%num_nodes, self%computation_dimension, self%sides, self%elements)
             call global_logger%log_information(message="RCM reordering completed.")
         end if
 

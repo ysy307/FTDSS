@@ -7,16 +7,14 @@ module core_types_matrix_crs
     private
 
     public :: type_crs
-    ! public :: type_crs_gemv
-    ! public :: type_crs_add
 
     type, extends(abst_matrix) :: type_crs
         integer(int32) :: nnz ! number of non-zero elements
         integer(int32) :: num_row ! number of rows
         integer(int32) :: num_ptr ! size of ptr (num_row+1 entries)
-        integer(int32), allocatable :: ptr(:) ! pointers to row starts (1-based)
-        integer(int32), allocatable :: ind(:) ! column indices of non-zeros
-        real(real64), allocatable :: val(:) ! non-zero values
+        integer(int32), allocatable :: ptr(:) !& pointers to row starts (1-based)
+        integer(int32), allocatable :: ind(:) !& column indices of non-zeros
+        real(real64),   allocatable :: val(:) !& non-zero values
     contains
         procedure, public, pass(self) :: initialize => initialize_type_crs !&
         procedure, public, pass(self) :: find       => find_crs !&
@@ -24,6 +22,7 @@ module core_types_matrix_crs
         procedure, public, pass(self) :: set_all    => set_all_crs !&
         procedure, public, pass(self) :: zero       => zero_crs !&
         procedure, public, pass(self) :: add        => add_crs !&
+        procedure, public, pass(self) :: display    => display_crs !&
         procedure, public, pass(self) :: destroy    => destroy_crs !&
     end type type_crs
 
@@ -64,30 +63,28 @@ contains
     pure function find_crs(self, row, col) result(index)
         implicit none
         class(type_crs), intent(in) :: self
-        integer(int32), intent(in) :: row
-        integer(int32), intent(in) :: col
+        integer(int32), intent(in) :: row, col
         integer(int32) :: index
+        integer(int32) :: lo, hi, mid, i
+        integer(int32), parameter :: LINEAR_SEARCH_THRESHOLD = 32
 
-        integer(int32) :: i
-        integer(int32) :: search_start, search_end
+        index = 0
+        lo = self%ptr(row)
+        hi = self%ptr(row + 1) - 1
 
-        index = 0 ! 見つからなかった場合のデフォルト値
+        if (lo > hi) return
 
-        ! 検索範囲を設定
-        search_start = self%ptr(row)
-        search_end = self%ptr(row + 1) - 1
-
-        ! 範囲が存在しない場合は終了
-        if (search_start > search_end) return
-
-        ! 線形探索 (最初から最後まで順番に探す)
-        do i = search_start, search_end
-            if (self%ind(i) == col) then
-                index = i
-                return ! 見つかったら即座に終了
+        do while (lo <= hi)
+            mid = lo + (hi - lo) / 2
+            if (self%ind(mid) == col) then
+                index = mid
+                return
+            else if (self%ind(mid) < col) then
+                lo = mid + 1
+            else
+                hi = mid - 1
             end if
         end do
-
     end function find_crs
 
     subroutine set_crs(self, row, col, value)
@@ -136,6 +133,22 @@ contains
         self%val(index) = self%val(index) + value
 
     end subroutine add_crs
+
+    subroutine display_crs(self)
+        implicit none
+        class(type_crs), intent(in) :: self
+        integer(int32) :: i, row, col
+        integer(int32) :: row_start, row_end
+
+        do row = 1, self%num_row
+            row_start = self%ptr(row)
+            row_end = self%ptr(row + 1) - 1
+            do i = row_start, row_end
+                col = self%ind(i)
+                write (*, '(i0, 2x, i0, 2X, es16.8)') row, col, self%val(i)
+            end do
+        end do
+    end subroutine display_crs
 
     subroutine destroy_crs(self)
         implicit none
