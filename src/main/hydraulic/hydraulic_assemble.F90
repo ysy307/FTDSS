@@ -202,9 +202,9 @@ contains
         call allocate_array(dot_ice, num_nodes)
 
         dt = controls%time%get_dt()
-        p_weight => element%get_weight()
-        p_gauss => element%get_gauss()
-        p_conn => element%get_connectivity()
+        p_weight => element%get_weight_ptr()
+        p_gauss => element%get_gauss_ptr()
+        p_conn => element%get_connectivity_ptr()
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 1: Compute the physical quantities at all Gauss points

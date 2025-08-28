@@ -1,4 +1,5 @@
-add_library(THERMAL STATIC
+add_library(THERMAL OBJECT
+    thermal_workspace.F90
     thermal_assemble.F90
     thermal_interface.F90
     thermal_crs.F90
@@ -15,5 +16,6 @@ target_link_libraries(THERMAL PUBLIC
     BOUNDARY
     INITIAL
     SOLVER
+    FIELD
 )
 enable_build_flags(THERMAL)

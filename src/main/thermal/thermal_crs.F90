@@ -1,9 +1,9 @@
 submodule(main_thermal) main_thermal_crs
     implicit none
 contains
-    module function construct_type_thermal_crs(input, coordinate, domain) result(structure)
+    module subroutine initialize_type_thermal(self, input, coordinate, domain)
         implicit none
-        class(abst_thermal), allocatable :: structure
+        class(type_thermal), intent(inout) :: self
         type(type_input), intent(inout) :: input
         type(type_dp_3d), intent(inout), pointer :: coordinate
         type(type_domain), intent(inout) :: domain
@@ -14,52 +14,48 @@ contains
 
         integer(int32) :: ierr
 
-        if (allocated(structure)) deallocate (structure)
-        allocate (type_thermal_crs :: structure)
-
         num_nodes = domain%get_num_nodes()
         call domain%node_adjacency%get_csr(row_ptr, col_ind)
 
-        call structure%KT_star%initialize(num_nodes, row_ptr, col_ind)
-        call structure%KT_star%display()
-        structure%order = input%basic%solver_settings%bdf_order
+        call self%KT_star%initialize(num_nodes, row_ptr, col_ind)
+        self%order = input%basic%solver_settings%bdf_order
 
-        call allocate_array(structure%FT, num_nodes)
-        call allocate_array(structure%PHIT, num_nodes)
+        ! call allocate_array(self%FT, num_nodes)
+        ! call allocate_array(self%PHIT, num_nodes)
 
-        call structure%Qw%initialize(num_nodes, structure%order)
-        call structure%Qice%initialize(num_nodes, structure%order)
-        call structure%Si%initialize(num_nodes, structure%order)
+        call self%Qw%initialize(num_nodes, self%order)
+        call self%Qice%initialize(num_nodes, self%order)
+        call self%Si%initialize(num_nodes, self%order)
 
-        if (associated(structure%assemble_global)) nullify (structure%assemble_global)
+        if (associated(self%assemble_global)) nullify (self%assemble_global)
 
-        structure%algorithm = input%basic%solver_settings%nonlinear_solver%method
-        select case (structure%algorithm)
+        self%algorithm = input%basic%solver_settings%nonlinear_solver%method
+        select case (self%algorithm)
         case ("none")
             if (input%basic%solver_settings%parallel_settings%threads%is_parallel) then
-                structure%assemble_global => thermal_assemble_system_linear_1_parallel
+                self%assemble_global => thermal_assemble_system_linear_1_parallel
             else
-                structure%assemble_global => thermal_assemble_system_linear_1
+                self%assemble_global => thermal_assemble_system_linear_1
             end if
         case ("picard")
             if (input%basic%solver_settings%parallel_settings%threads%is_parallel) then
-                structure%assemble_global => thermal_assemble_system_linear_1_parallel
+                self%assemble_global => thermal_assemble_system_linear_1_parallel
             else
-                structure%assemble_global => thermal_assemble_system_linear_1
+                self%assemble_global => thermal_assemble_system_linear_1
             end if
         end select
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! 線形求解ソルバーの設定
         !---------------------------------------------------------------------------------------------------------------------------
-        structure%solver = create_solver(input, "thermal", structure%KT_star, num_nodes)
+        self%solver = create_solver(input, "thermal", self%KT_star%data, num_nodes)
         !---------------------------------------------------------------------------------------------------------------------------
 
-    end function construct_type_thermal_crs
+    end subroutine initialize_type_thermal
 
-    module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, controls)
+    module subroutine update_type_thermal(self, domain, property, temperature, porosity, controls)
         implicit none
-        class(type_thermal_crs), intent(inout) :: self
+        class(type_thermal), intent(inout) :: self
         type(type_domain), intent(inout), target :: domain
         type(type_properties_manager), intent(inout) :: property
         real(real64), intent(in) :: temperature(:)
@@ -153,21 +149,21 @@ contains
         deallocate (coefficients)
         deallocate (ratio_densities)
 
-    end subroutine update_type_thermal_crs
+    end subroutine update_type_thermal
 
-    module subroutine shift_type_thermal_crs(self)
+    module subroutine shift_type_thermal(self)
         implicit none
-        class(type_thermal_crs), intent(inout) :: self
+        class(type_thermal), intent(inout) :: self
 
         call self%Qw%shift()
         call self%Qice%shift()
         call self%Si%shift()
 
-    end subroutine shift_type_thermal_crs
+    end subroutine shift_type_thermal
 
-    module subroutine solve_type_thermal_crs(self, temperature, controls)
+    module subroutine solve_type_thermal(self, temperature, controls)
         implicit none
-        class(type_thermal_crs), intent(inout) :: self
+        class(type_thermal), intent(inout) :: self
         type(type_variable), intent(inout) :: temperature
         type(type_controls), intent(in) :: controls
 
@@ -182,12 +178,12 @@ contains
             temperature%new(:) = temperature%pre(:) + temperature%dif(:)
         end select
         call self%solver%check(stat, controls%time%get_time())
-    end subroutine solve_type_thermal_crs
+    end subroutine solve_type_thermal
 
-    module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, controls, bc)
+    module subroutine compute_type_thermal(self, domain, property, temperature, porosity, controls, bc)
         implicit none
         ! Arguments
-        class(type_thermal_crs), intent(inout) :: self
+        class(type_thermal), intent(inout) :: self
         type(type_domain), intent(inout) :: domain
         type(type_properties_manager), intent(in) :: property
         type(type_variable), intent(inout) :: temperature
@@ -240,6 +236,6 @@ contains
             call controls%time%profile_stop("Setup")
         end do NR_LOOP_THERMAL
 
-    end subroutine compute_type_thermal_crs
+    end subroutine compute_type_thermal
 
 end submodule main_thermal_crs

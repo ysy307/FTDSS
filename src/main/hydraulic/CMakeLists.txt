@@ -1,4 +1,4 @@
-add_library(HYDRAULIC STATIC
+add_library(HYDRAULIC OBJECT
     hydraulic_assemble.F90
     hydraulic_interface.F90
     hydraulic_crs.F90
@@ -15,5 +15,6 @@ target_link_libraries(HYDRAULIC PUBLIC
     INITIAL
     SOLVER
     CALC
+    FIELD
 )
 enable_build_flags(HYDRAULIC)

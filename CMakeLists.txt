@@ -96,7 +96,7 @@ set(COMMON_LIBS
     THERMAL
     HYDRAULIC
     OUTPUT
-    FTDSS
+    fdtss
 )
 
 # Debug Information

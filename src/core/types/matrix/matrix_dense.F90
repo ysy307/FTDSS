@@ -1,30 +1,12 @@
-module core_types_matrix_dense
-    use, intrinsic :: iso_fortran_env
-    use :: core_allocate, only:allocate_array
-    use :: core_deallocate, only:deallocate_array
-    use :: core_types_matrix, only:abst_matrix
+submodule(core_types_matrix) core_types_matrix_dense
     implicit none
-    private
 
-    public :: type_dense
-
-    type, extends(abst_matrix) :: type_dense
-        integer(int32) :: num_row
-        integer(int32) :: num_col
-        real(real64), allocatable :: val(:, :)
-    contains
-        procedure, public, pass(self) :: initialize       => initialize_type_dense !&
-        procedure, public, pass(self) :: initialize_local => initialize_type_dense_from_node !&
-        procedure, public, pass(self) :: find             => find_dense !&
-        procedure, public, pass(self) :: set              => set_dense !&
-        procedure, public, pass(self) :: set_all          => set_all_dense !&
-        procedure, public, pass(self) :: zero             => zero_dense !&
-        procedure, public, pass(self) :: add              => add_dense !&
-        procedure, public, pass(self) :: display          => display_dense !&
-        procedure, public, pass(self) :: destroy          => destroy_dense !&
-    end type
 contains
-    subroutine initialize_type_dense(self, num_nodes, row, col)
+
+    !----------------------------------------------------------
+    ! 初期化
+    !----------------------------------------------------------
+    module subroutine initialize_dense(self, num_nodes, row, col)
         implicit none
         class(type_dense), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
@@ -33,100 +15,142 @@ contains
 
         self%num_row = num_nodes
         self%num_col = num_nodes
-
         call allocate_array(self%val, self%num_row, self%num_col)
-        self%val(:, :) = 0.0d0
+        self%val = 0.0d0
+    end subroutine initialize_dense
 
-    end subroutine initialize_type_dense
-
-    subroutine initialize_type_dense_from_node(self, num_nodes)
+    !----------------------------------------------------------
+    ! メモリ解放
+    !----------------------------------------------------------
+    module subroutine destroy_dense(self)
         implicit none
         class(type_dense), intent(inout) :: self
-        integer(int32), intent(in) :: num_nodes
 
-        call allocate_array(self%val, num_nodes, num_nodes)
-        self%num_row = num_nodes
-        self%num_col = num_nodes
+        call deallocate_array(self%val)
+        self%num_row = 0
+        self%num_col = 0
+    end subroutine destroy_dense
 
-        self%val(:, :) = 0.0d0
-
-    end subroutine initialize_type_dense_from_node
-
-    pure function find_dense(self, row, col) result(index)
-        implicit none
-        class(type_dense), intent(in) :: self
-        integer(int32), intent(in) :: row
-        integer(int32), intent(in) :: col
-        integer(int32) :: index
-
-        if (row < 1 .or. row > self%num_row .or. col < 1 .or. col > self%num_col) then
-            index = 0
-        else
-            index = row + (col - 1) * self%num_row
-        end if
-
-        return
-    end function find_dense
-
-    subroutine set_dense(self, row, col, value)
+    !----------------------------------------------------------
+    ! 要素を設定
+    !----------------------------------------------------------
+    module subroutine set_value_dense(self, row, col, value)
         implicit none
         class(type_dense), intent(inout) :: self
         integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
 
         self%val(row, col) = value
+    end subroutine set_value_dense
 
-    end subroutine set_dense
-
-    subroutine set_all_dense(self, value)
-        implicit none
+    !----------------------------------------------------------
+    ! 全要素を一括設定
+    !----------------------------------------------------------
+    module subroutine set_all_dense(self, value)
         class(type_dense), intent(inout) :: self
         real(real64), intent(in) :: value
 
-        integer(int32) :: i, j
-
-        do j = 1, self%num_col
-            do i = 1, self%num_row
-                self%val(i, j) = value
-            end do
-        end do
+        self%val = value
     end subroutine set_all_dense
 
-    subroutine zero_dense(self)
+    !----------------------------------------------------------
+    ! 全要素をゼロにする
+    !----------------------------------------------------------
+    module subroutine zero_dense(self)
         implicit none
         class(type_dense), intent(inout) :: self
 
-        call self%set_all(0.0d0)
+        self%val = 0.0d0
     end subroutine zero_dense
 
-    subroutine add_dense(self, row, col, value)
+    !----------------------------------------------------------
+    ! 要素に値を加算
+    !----------------------------------------------------------
+    module subroutine add_value_dense(self, row, col, value)
         implicit none
         class(type_dense), intent(inout) :: self
         integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
 
         self%val(row, col) = self%val(row, col) + value
+    end subroutine add_value_dense
 
-    end subroutine add_dense
+    !----------------------------------------------------------
+    ! 行列加算: C = alpha*A + B
+    ! Aがselfとなり、Cが更新される
+    !----------------------------------------------------------
+    module subroutine add_matrix_dense(self, alpha, B, C)
+        implicit none
+        class(type_dense), intent(in) :: self ! This is matrix A
+        real(real64), intent(in) :: alpha
+        class(abst_matrix), intent(in) :: B
+        class(abst_matrix), intent(inout) :: C
 
-    subroutine display_dense(self)
+        select type (B_dense => B)
+        type is (type_dense)
+            select type (C_dense => C)
+            type is (type_dense)
+#ifdef USE_DEBUG
+                ! 次元チェック
+                if (any([self%num_row, self%num_col] /= [B_dense%num_row, B_dense%num_col]) .or. &
+                    any([self%num_row, self%num_col] /= [C_dense%num_row, C_dense%num_col])) then
+                    print *, "ERROR(add_matrix_dense): Matrix dimensions do not match."
+                    stop
+                end if
+#endif
+                C_dense%val = alpha * self%val + B_dense%val
+            end select
+        end select
+    end subroutine add_matrix_dense
+
+    subroutine gemv_dense(self, alpha, x, beta, y)
         implicit none
         class(type_dense), intent(in) :: self
-        integer(int32) :: i, j
+        real(real64), intent(in) :: alpha
+        real(real64), intent(in) :: x(:)
+        real(real64), intent(in) :: beta
+        real(real64), intent(inout) :: y(:)
 
+#ifdef _MKL
+        interface
+            subroutine dgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy)
+                use, intrinsic :: iso_fortran_env
+                implicit none
+                character(len=1), intent(in) :: trans
+                integer, intent(in) :: m, n, lda, incx, incy
+                real(real64), intent(in) :: alpha, beta
+                real(real64), intent(in) :: a(lda, *), x(*), y(*)
+            end subroutine dgemv
+        end interface
+
+        call dgemv('N', self%num_row, self%num_col, alpha, self%val, self%num_row, x, 1, beta, y, 1)
+#else
+        integer(int32) :: i
+
+        !$omp parallel do private(i)
         do i = 1, self%num_row
-            do j = 1, self%num_col
-                write (*, '(i0, 2x, i0, 2X, es16.8)') i, j, self%val(i, j)
-            end do
+            y(i) = alpha * dot_product(self%val(i, :), x) + beta * y(i)
         end do
+        !$omp end parallel do
+#endif
 
+    end subroutine gemv_dense
+
+    !----------------------------------------------------------
+    ! 行列を表示
+    !----------------------------------------------------------
+    module subroutine display_dense(self)
+        implicit none
+        class(type_dense), intent(in) :: self
+        integer :: i
+        if (.not. allocated(self%val)) then
+            print *, "Matrix is not allocated."
+            return
+        end if
+        print '("Matrix (", i0, "x", i0, "):")', self%num_row, self%num_col
+        do i = 1, self%num_row
+            write (*, '(10(es12.4e2))') self%val(i, :)
+        end do
     end subroutine display_dense
 
-    subroutine destroy_dense(self)
-        implicit none
-        class(type_dense), intent(inout) :: self
-
-        call deallocate_array(self%val)
-    end subroutine destroy_dense
-
-end module core_types_matrix_dense
+end submodule core_types_matrix_dense

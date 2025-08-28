@@ -193,7 +193,7 @@ contains
 
         if (self%computation_dimension >= 2) then
             do iElem = 1, self%get_num_elements()
-                ptr_connectivity => self%elements(iElem)%e%get_connectivity()
+                ptr_connectivity => self%elements(iElem)%e%get_connectivity_ptr()
                 node_per_mesh = self%elements(iElem)%e%get_num_nodes()
                 call allocate_array(connectivity, node_per_mesh)
                 call allocate_array(connectivity_reordered, node_per_mesh)
@@ -213,7 +213,7 @@ contains
 
         if (self%computation_dimension >= 1) then
             do iSide = 1, self%get_num_sides()
-                ptr_connectivity => self%sides(iSide)%s%get_connectivity()
+                ptr_connectivity => self%sides(iSide)%s%get_connectivity_ptr()
                 node_per_mesh = self%sides(iSide)%s%get_num_nodes()
                 call allocate_array(connectivity, node_per_mesh)
                 call allocate_array(connectivity_reordered, node_per_mesh)

@@ -22,7 +22,7 @@ module Main_FTDSS
         type(type_variable) :: T
         class(abst_thermal), allocatable :: thermal
         type(type_variable) :: P
-        class(abst_hydraulic), allocatable :: hydraulic
+        ! class(abst_hydraulic), allocatable :: hydraulic
 
         type(type_properties_manager) :: property
         type(type_bc) :: bc

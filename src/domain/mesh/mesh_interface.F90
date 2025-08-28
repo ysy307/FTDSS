@@ -8,16 +8,17 @@ module domain_mesh
     public :: abst_mesh
 
     type, abstract :: abst_mesh
-        integer(int32), private :: id !! Element ID
-        integer(int32), private :: type !! Element type (5: triangle 1st, 9: square 1st)
-        integer(int32), private :: num_nodes !! Number of nodes in the element
-        integer(int32), private :: group !! Element group number
-        integer(int32), private :: dimension
-        integer(int32), private :: order
-        integer(int32), allocatable, private :: connectivity(:) !! connectivity information
-        type(type_dp_pointer), allocatable, private :: x(:) !! X coordinate
-        type(type_dp_pointer), allocatable, private :: y(:) !! Y coordinate
-        type(type_dp_pointer), allocatable, private :: z(:) !! Z coordinate
+        private
+        integer(int32) :: id !! Element ID
+        integer(int32) :: type !! Element type (5: triangle 1st, 9: square 1st)
+        integer(int32) :: num_nodes !! Number of nodes in the element
+        integer(int32) :: group !! Element group number
+        integer(int32) :: dimension
+        integer(int32) :: order
+        integer(int32), allocatable :: connectivity(:) !! connectivity information
+        type(type_dp_pointer), allocatable :: x(:) !! X coordinate
+        type(type_dp_pointer), allocatable :: y(:) !! Y coordinate
+        type(type_dp_pointer), allocatable :: z(:) !! Z coordinate
         !----------------------------------------------------------------------------------
         ! Gauss Quadrature points and weights
         !  - Gauss Quadrature points are defined in the local coordinate system
@@ -25,9 +26,9 @@ module domain_mesh
         !  - The weights are used for numerical integration over the element
         !  - The Gauss points are used to evaluate the shape functions and their derivatives
         !----------------------------------------------------------------------------------
-        integer(int32), private :: num_gauss !! Number of Gauss Quadrature points
-        real(real64), allocatable, private :: weight(:) !! Gauss weight
-        type(type_dp_vector_3d), allocatable, private :: gauss(:) !! Gauss Quadrature points Coordinate
+        integer(int32)                       :: num_gauss !& Number of Gauss Quadrature points
+        real(real64), allocatable            :: weight(:) !& Gauss weight
+        type(type_dp_vector_3d), allocatable :: gauss(:) !& Gauss Quadrature points Coordinate
     contains
         procedure, pass(self), public :: initialize => initialize_abst_mesh !&
         procedure, pass(self), public :: get_id !&
@@ -37,18 +38,23 @@ module domain_mesh
         procedure, pass(self), public :: get_order !&
         procedure, pass(self), public :: get_dimension !&
         procedure, pass(self), public :: get_num_gauss !&
-        procedure, pass(self), public :: get_weight !&
-        procedure, pass(self), public :: get_gauss !&
         procedure, pass(self), public :: get_coordinate !&
+        procedure, pass(self), public :: get_weight !&
+        procedure, pass(self), public :: get_weight_ptr !&
+        procedure, pass(self), public :: get_gauss !&
+        procedure, pass(self), public :: get_gauss_ptr !&
         procedure, pass(self), public :: get_connectivity !&
+        procedure, pass(self), public :: get_connectivity_ptr !&
         procedure, pass(self), public :: lerp !&
         procedure, pass(self), public :: dlerp !&
 
-        procedure(abst_get_geometry), pass(self), public, deferred :: get_geometry
-        procedure(abst_psi), pass(self), public, deferred :: psi
-        procedure(abst_dpsi), pass(self), public, deferred :: dpsi
-        procedure(abst_jacobian), pass(self), public, deferred :: jacobian
-        procedure(abst_jacobian_det), pass(self), public, deferred :: jacobian_det
+        procedure(abst_get_geometry), pass(self), public, deferred :: get_geometry !&
+        procedure(abst_psi),          pass(self), public, deferred :: psi !&
+        procedure(abst_dpsi),         pass(self), public, deferred :: dpsi !&
+        procedure(abst_jacobian),     pass(self), public, deferred :: jacobian !&
+        procedure(abst_jacobian_det), pass(self), public, deferred :: jacobian_det !&
+
+        procedure, pass(self), public :: destroy => destroy_abst_mesh
 
     end type
 
@@ -215,18 +221,34 @@ contains
     function get_weight(self) result(weight)
         implicit none
         class(abst_mesh), intent(in), target :: self
+        real(real64), allocatable :: weight(:)
+
+        weight = self%weight
+    end function get_weight
+
+    function get_weight_ptr(self) result(weight)
+        implicit none
+        class(abst_mesh), intent(in), target :: self
         real(real64), dimension(:), pointer :: weight
 
         weight => self%weight(:)
-    end function get_weight
+    end function get_weight_ptr
 
     function get_gauss(self) result(gauss)
+        implicit none
+        class(abst_mesh), intent(in) :: self
+        type(type_dp_vector_3d), allocatable :: gauss(:)
+
+        gauss = self%gauss
+    end function get_gauss
+
+    function get_gauss_ptr(self) result(gauss)
         implicit none
         class(abst_mesh), intent(in), target :: self
         type(type_dp_vector_3d), dimension(:), pointer :: gauss
 
         gauss => self%gauss(:)
-    end function get_gauss
+    end function get_gauss_ptr
 
     pure function get_coordinate(self, index) result(coordinate)
         implicit none
@@ -242,10 +264,18 @@ contains
     function get_connectivity(self) result(connectivity)
         implicit none
         class(abst_mesh), intent(in), target :: self
+        integer(int32), allocatable :: connectivity(:)
+
+        connectivity = self%connectivity
+    end function get_connectivity
+
+    function get_connectivity_ptr(self) result(connectivity)
+        implicit none
+        class(abst_mesh), intent(in), target :: self
         integer(int32), dimension(:), pointer :: connectivity
 
         connectivity => self%connectivity(:)
-    end function get_connectivity
+    end function get_connectivity_ptr
 
     pure function lerp(self, r, value) result(val)
         implicit none
@@ -284,5 +314,30 @@ contains
         end do
 
     end function dlerp
+
+    subroutine destroy_abst_mesh(self)
+        implicit none
+        class(abst_mesh), intent(inout) :: self
+
+        if (allocated(self%connectivity)) then
+            call deallocate_array(self%connectivity)
+        end if
+        if (allocated(self%weight)) then
+            call deallocate_array(self%weight)
+        end if
+        if (allocated(self%gauss)) then
+            deallocate (self%gauss)
+        end if
+        if (allocated(self%x)) then
+            deallocate (self%x)
+        end if
+        if (allocated(self%y)) then
+            deallocate (self%y)
+        end if
+        if (allocated(self%z)) then
+            deallocate (self%z)
+        end if
+
+    end subroutine destroy_abst_mesh
 
 end module domain_mesh

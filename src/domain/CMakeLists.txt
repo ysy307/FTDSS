@@ -1,4 +1,4 @@
-add_library(DOMAIN STATIC
+add_library(DOMAIN OBJECT
     adjacency/adjacency_element.F90
     adjacency/adjacency_node.F90
     adjacency/adjacency_node_element.F90

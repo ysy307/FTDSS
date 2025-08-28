@@ -1,7 +1,7 @@
 add_library(CALC_LINALG STATIC
-    matrix_ops.F90
+    # matrix_ops.F90
     vector_ops.F90
-    matvec.F90
+    # matvec.F90
     linalg.F90
 )
 target_link_libraries(CALC_LINALG PUBLIC

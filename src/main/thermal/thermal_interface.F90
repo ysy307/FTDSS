@@ -4,6 +4,7 @@ module main_thermal
     use :: stdlib_strings
     use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, type_crs
     use :: module_domain, only:type_domain
+    use :: module_field, only:type_residual_vector, type_jacobian_matrix
     use :: module_calculate, only:abst_den
     use :: module_properties, only:type_properties_manager, type_phase_property
     use :: module_input, only:type_input
@@ -11,21 +12,20 @@ module main_thermal
     use :: module_boundary, only:type_bc, mode_value, mode_nr
     use :: module_solver
     use :: module_control
-    use :: thermal_thermal_assemble
+    use :: main_thermal_assemble
     implicit none
     private
 
-    public :: abst_thermal
-    public :: type_thermal_crs
+    ! public :: abst_thermal
+    public :: type_thermal
 
-    type, abstract :: abst_thermal
+    type :: type_thermal
         type(type_variable) :: Qw
         type(type_variable) :: Qice
         type(type_variable) :: Si
 
-        type(type_crs) :: KT_star
-        real(real64), allocatable :: FT(:)
-        real(real64), allocatable :: PHIT(:)
+        type(type_jacobian_matrix) :: KT_star
+        type(type_residual_vector) :: PHIT
 
         !! Nonlinear solver
         character(:), allocatable :: algorithm
@@ -36,101 +36,51 @@ module main_thermal
 
         procedure(abst_assemble_global_thermal), nopass, pointer :: assemble_global => null()
     contains
-        procedure(abst_update), pass(self), deferred :: update
-        procedure(abst_shift), pass(self), deferred :: shift
-        procedure(abst_solve), pass(self), deferred :: solve
-        procedure(abst_compute), pass(self), deferred :: compute
-    end type abst_thermal
-
-    type, extends(abst_thermal) :: type_thermal_crs
-    contains
-        procedure :: update => update_type_thermal_crs
-        procedure :: shift => shift_type_thermal_crs
-        procedure :: solve => solve_type_thermal_crs
-        procedure :: compute => compute_type_thermal_crs
-    end type type_thermal_crs
-
-    abstract interface
-        subroutine abst_update(self, domain, property, temperature, porosity, controls)
-            import :: abst_thermal, type_domain, type_properties_manager, real64, type_controls
-            implicit none
-            class(abst_thermal), intent(inout) :: self
-            type(type_domain), intent(inout), target :: domain
-            type(type_properties_manager), intent(inout) :: property
-            real(real64), intent(in) :: temperature(:)
-            real(real64), intent(in) :: porosity(:)
-            type(type_controls), intent(in) :: controls
-
-        end subroutine abst_update
-
-        subroutine abst_shift(self)
-            import :: abst_thermal
-            implicit none
-            class(abst_thermal), intent(inout) :: self
-
-        end subroutine abst_shift
-
-        subroutine abst_solve(self, temperature, controls)
-            import :: abst_thermal, type_controls, type_variable
-            implicit none
-            class(abst_thermal), intent(inout) :: self
-            type(type_variable), intent(inout) :: temperature
-            type(type_controls), intent(in) :: controls
-
-        end subroutine abst_solve
-
-        subroutine abst_compute(self, domain, property, temperature, porosity, controls, bc)
-            import :: abst_thermal, type_domain, type_properties_manager, type_variable, type_controls, type_bc
-            implicit none
-            class(abst_thermal), intent(inout) :: self
-            type(type_domain), intent(inout) :: domain
-            type(type_properties_manager), intent(in) :: property
-            type(type_variable), intent(inout) :: temperature
-            type(type_variable), intent(inout) :: porosity
-            type(type_controls), intent(inout) :: controls
-            type(type_bc), intent(inout) :: bc
-
-        end subroutine abst_compute
-    end interface
+        procedure, pass(self) :: initialize => initialize_type_thermal
+        procedure, pass(self) :: update => update_type_thermal
+        procedure, pass(self) :: shift => shift_type_thermal
+        procedure, pass(self) :: solve => solve_type_thermal
+        procedure, pass(self) :: compute => compute_type_thermal
+    end type type_thermal
 
     interface
-        module function construct_type_thermal_crs(input, coordinate, domain) result(structure)
+        module subroutine initialize_type_thermal(self, input, coordinate, domain)
             implicit none
-            class(abst_thermal), allocatable :: structure
+            class(type_thermal), intent(inout) :: self
             type(type_input), intent(inout) :: input
             type(type_dp_3d), intent(inout), pointer :: coordinate
             type(type_domain), intent(inout) :: domain
 
-        end function construct_type_thermal_crs
+        end subroutine initialize_type_thermal
 
-        module subroutine update_type_thermal_crs(self, domain, property, temperature, porosity, controls)
+        module subroutine update_type_thermal(self, domain, property, temperature, porosity, controls)
             implicit none
-            class(type_thermal_crs), intent(inout) :: self
+            class(type_thermal), intent(inout) :: self
             type(type_domain), intent(inout), target :: domain
             type(type_properties_manager), intent(inout) :: property
             real(real64), intent(in) :: temperature(:)
             real(real64), intent(in) :: porosity(:)
             type(type_controls), intent(in) :: controls
 
-        end subroutine update_type_thermal_crs
+        end subroutine update_type_thermal
 
-        module subroutine shift_type_thermal_crs(self)
+        module subroutine shift_type_thermal(self)
             implicit none
-            class(type_thermal_crs), intent(inout) :: self
+            class(type_thermal), intent(inout) :: self
 
-        end subroutine shift_type_thermal_crs
+        end subroutine shift_type_thermal
 
-        module subroutine solve_type_thermal_crs(self, temperature, controls)
+        module subroutine solve_type_thermal(self, temperature, controls)
             implicit none
-            class(type_thermal_crs), intent(inout) :: self
+            class(type_thermal), intent(inout) :: self
             type(type_variable), intent(inout) :: temperature
             type(type_controls), intent(in) :: controls
 
-        end subroutine solve_type_thermal_crs
+        end subroutine solve_type_thermal
 
-        module subroutine compute_type_thermal_crs(self, domain, property, temperature, porosity, controls, bc)
+        module subroutine compute_type_thermal(self, domain, property, temperature, porosity, controls, bc)
             implicit none
-            class(type_thermal_crs), intent(inout) :: self
+            class(type_thermal), intent(inout) :: self
             type(type_domain), intent(inout) :: domain
             type(type_properties_manager), intent(in) :: property
             type(type_variable), intent(inout) :: temperature
@@ -138,14 +88,8 @@ module main_thermal
             type(type_controls), intent(inout) :: controls
             type(type_bc), intent(inout) :: bc
 
-        end subroutine compute_type_thermal_crs
+        end subroutine compute_type_thermal
 
     end interface
-
-    interface type_thermal_crs
-        module procedure :: construct_type_thermal_crs
-    end interface
-
-contains
 
 end module main_thermal
