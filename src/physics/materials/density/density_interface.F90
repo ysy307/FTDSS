@@ -1,4 +1,4 @@
-module calculate_density
+module physics_material_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
     use :: module_input, only:type_input
@@ -95,4 +95,4 @@ module calculate_density
         module procedure construct_den_3phase
     end interface
 
-end module calculate_density
+end module physics_material_density

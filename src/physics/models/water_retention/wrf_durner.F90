@@ -1,9 +1,10 @@
-submodule(calculate_wrf) calculate_wrf_durner
+submodule(physics_models_wrf) wrf_durner
     implicit none
 contains
-    module function construct_type_wrf_durner(input) result(property)
+    module function construct_type_wrf_durner(input, i_material) result(property)
         implicit none
-        type(type_materials_wrf), intent(in) :: input
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
         class(abst_wrf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
@@ -11,14 +12,14 @@ contains
 
         select type (this => property)
         type is (type_wrf_durner)
-            this%theta_r = input%theta_r
-            this%theta_s = input%theta_s
-            this%alpha1 = input%alpha1
-            this%n1 = input%n1
+            this%theta_r = input%basic%materials(i_material)%thermal%phase_change%wrf%theta_r
+            this%theta_s = input%basic%materials(i_material)%thermal%phase_change%wrf%theta_s
+            this%alpha1 = input%basic%materials(i_material)%thermal%phase_change%wrf%alpha1
+            this%n1 = input%basic%materials(i_material)%thermal%phase_change%wrf%n1
             this%m1 = 1.0d0 - 1.0d0 / this%n1
-            this%w1 = input%w1
-            this%alpha2 = input%alpha2
-            this%n2 = input%n2
+            this%w1 = input%basic%materials(i_material)%thermal%phase_change%wrf%w1
+            this%alpha2 = input%basic%materials(i_material)%thermal%phase_change%wrf%alpha2
+            this%n2 = input%basic%materials(i_material)%thermal%phase_change%wrf%n2
             this%m2 = 1.0d0 - 1.0d0 / this%n2
             this%w2 = 1.0d0 - this%w1
         end select
@@ -59,4 +60,4 @@ contains
 
     end function calculate_wrf_durner_derivative
 
-end submodule calculate_wrf_durner
+end submodule wrf_durner

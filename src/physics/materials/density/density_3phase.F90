@@ -1,4 +1,4 @@
-submodule(calculate_density) calc_den_3phase
+submodule(physics_material_density) density_3phase
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -37,4 +37,4 @@ contains
         density = calc_den_3(self%material1, phi1, self%material2, phi2, self%material3, phi3)
     end function calc_den_gauss_point_3phase
 
-end submodule calc_den_3phase
+end submodule density_3phase

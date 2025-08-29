@@ -58,7 +58,7 @@ add_library(Solver_Main STATIC ${SOLVER_MAIN_SOURCES})
 target_include_directories(Solver_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # The factory depends on the Interface and ALL concrete implementations.
 target_link_libraries(Solver_Main PUBLIC
-    Solver::InOut
+    Solver::Input
     Solver_Interface
     Solver_Direct
     Solver_Iterative

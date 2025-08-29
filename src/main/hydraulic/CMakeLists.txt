@@ -12,7 +12,7 @@ target_include_directories(App_Hydraulic PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # 依存関係を新しいインターフェースライブラリに更新
 target_link_libraries(App_Hydraulic PUBLIC
     Solver::Core
-    Solver::InOut
+    Solver::Input
     Solver::Domain
     Solver::Physics
     Solver::Conditions

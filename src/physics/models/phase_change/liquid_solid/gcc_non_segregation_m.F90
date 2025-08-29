@@ -1,4 +1,4 @@
-submodule(calculate_gcc) gcc_non_segregation_m
+submodule(physics_models_gcc) gcc_non_segregation_m
     implicit none
 contains
 

@@ -1,4 +1,4 @@
-submodule(calculate_hcf) calculate_hcf_viscosity
+submodule(physics_models_hcf) hcf_viscosity
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -68,4 +68,4 @@ contains
 
     end function calc_mu_exponential_supercooled
 
-end submodule calculate_hcf_viscosity
+end submodule hcf_viscosity

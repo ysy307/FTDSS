@@ -1,4 +1,4 @@
-submodule(calculate_thermal_conductivity) calc_thc_3phase
+submodule(physics_material_thermal_conductivity) thermal_conductivity_3phase
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -39,4 +39,4 @@ contains
 
     end function calc_thc_gauss_point_3phase
 
-end submodule calc_thc_3phase
+end submodule thermal_conductivity_3phase

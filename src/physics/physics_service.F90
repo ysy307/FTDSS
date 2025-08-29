@@ -1,10 +1,16 @@
-module properties_properties_manager
+module physics_service
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
     use :: module_input, only:type_input
-    use :: module_calculate, only:abst_gcc, abst_wrf, abst_den, abst_sph, abst_vhc, abst_thc, abst_hcf
     use :: module_control
-    use :: properties_material_manager, only:type_material_manager
+    use :: physics_material_thermal_conductivity, only:abst_thc
+    use :: physics_material_heat_capacity, only:abst_vhc
+    use :: physics_material_density, only:abst_den
+    use :: physics_material_specific_heat, only:abst_sph
+    use :: physics_models_hcf, only:abst_hcf
+    use :: physics_models_gcc, only:abst_gcc
+    use :: physics_models_wrf, only:abst_wrf
+    use :: physics_registry, only:type_physics_registry
 
     implicit none
     private
@@ -35,7 +41,7 @@ module properties_properties_manager
     ! Main Derived Type with Generic Type-Bound Procedures
     !-------------------------------------------------------------------------------------------------------------------------------
     type :: type_properties_manager
-        type(type_material_manager) :: materials
+        type(type_physics_registry) :: materials
     contains
         procedure, public :: initialize => initialize_properties_manager
 
@@ -632,4 +638,4 @@ contains
 
     end function get_phase_thcs
 
-end module properties_properties_manager
+end module physics_service

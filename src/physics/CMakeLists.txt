@@ -1,6 +1,5 @@
 # CMakeLists.txt for src/physics
-#
-# Defines all components related to physical properties and constitutive models.
+# Physics materials and models with cycle-free dependencies
 
 # ====================================================================
 # 1. Material Property Libraries (materials/*)
@@ -14,7 +13,7 @@ set(PHYSICS_MATERIAL_DENSITY_SOURCES
 )
 add_library(Physics_Material_Density STATIC ${PHYSICS_MATERIAL_DENSITY_SOURCES})
 target_include_directories(Physics_Material_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_Density PUBLIC Solver::Core Solver::InOut)
+target_link_libraries(Physics_Material_Density PUBLIC Solver::Core Solver::Input)
 enable_build_flags(Physics_Material_Density)
 
 # --- Specific Heat ---
@@ -25,7 +24,7 @@ set(PHYSICS_MATERIAL_SPH_SOURCES
 )
 add_library(Physics_Material_SpecificHeat STATIC ${PHYSICS_MATERIAL_SPH_SOURCES})
 target_include_directories(Physics_Material_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_SpecificHeat PUBLIC Solver::Core Solver::InOut)
+target_link_libraries(Physics_Material_SpecificHeat PUBLIC Solver::Core Solver::Input)
 enable_build_flags(Physics_Material_SpecificHeat)
 
 # --- Thermal Conductivity ---
@@ -36,7 +35,7 @@ set(PHYSICS_MATERIAL_THC_SOURCES
 )
 add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_SOURCES})
 target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_ThermalConductivity PUBLIC Solver::Core Solver::InOut)
+target_link_libraries(Physics_Material_ThermalConductivity PUBLIC Solver::Core Solver::Input)
 enable_build_flags(Physics_Material_ThermalConductivity)
 
 # --- Heat Capacity (depends on Density) ---
@@ -50,12 +49,12 @@ add_library(Physics_Material_HeatCapacity STATIC ${PHYSICS_MATERIAL_VHC_SOURCES}
 target_include_directories(Physics_Material_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_HeatCapacity PUBLIC
     Solver::Core
-    Solver::InOut
-    Physics_Material_Density # ★ 密度ライブラリに依存
+    Solver::Input
+    Physics_Material_Density # 強依存
 )
 enable_build_flags(Physics_Material_HeatCapacity)
 
-# --- Intermediate aggregator for all materials ---
+# --- Materials aggregator ---
 add_library(Physics_Materials INTERFACE)
 target_link_libraries(Physics_Materials INTERFACE
     Physics_Material_Density
@@ -68,7 +67,7 @@ target_link_libraries(Physics_Materials INTERFACE
 # 2. Constitutive Model Libraries (models/*)
 # ====================================================================
 
-# --- Hydraulic Conductivity ---
+# Hydraulic Conductivity
 set(PHYSICS_MODEL_HCF_SOURCES
     models/hydraulic_conductivity/hcf_interface.F90
     models/hydraulic_conductivity/hcf_base.F90
@@ -83,10 +82,10 @@ set(PHYSICS_MODEL_HCF_SOURCES
 )
 add_library(Physics_Model_HydraulicConductivity STATIC ${PHYSICS_MODEL_HCF_SOURCES})
 target_include_directories(Physics_Model_HydraulicConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC Solver::Core Solver::InOut)
+target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC Solver::Core Solver::Input)
 enable_build_flags(Physics_Model_HydraulicConductivity)
 
-# --- Water Retention ---
+# Water Retention
 set(PHYSICS_MODEL_WRF_SOURCES
     models/water_retention/wrf_interface.f90
     models/water_retention/wrf_base.F90
@@ -99,10 +98,10 @@ set(PHYSICS_MODEL_WRF_SOURCES
 )
 add_library(Physics_Model_WaterRetention STATIC ${PHYSICS_MODEL_WRF_SOURCES})
 target_include_directories(Physics_Model_WaterRetention PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Model_WaterRetention PUBLIC Solver::Core Solver::InOut)
+target_link_libraries(Physics_Model_WaterRetention PUBLIC Solver::Core Solver::Input)
 enable_build_flags(Physics_Model_WaterRetention)
 
-# --- Phase Change ---
+# Phase Change
 set(PHYSICS_MODEL_GCC_SOURCES
     models/phase_change/liquid_solid/gcc_interface.F90
     models/phase_change/liquid_solid/gcc_base.F90
@@ -113,10 +112,10 @@ set(PHYSICS_MODEL_GCC_SOURCES
 )
 add_library(Physics_Model_PhaseChange STATIC ${PHYSICS_MODEL_GCC_SOURCES})
 target_include_directories(Physics_Model_PhaseChange PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Model_PhaseChange PUBLIC Solver::Core Solver::InOut)
+target_link_libraries(Physics_Model_PhaseChange PUBLIC Solver::Core Solver::Input)
 enable_build_flags(Physics_Model_PhaseChange)
 
-# --- Intermediate aggregator for all models ---
+# Models aggregator
 add_library(Physics_Models INTERFACE)
 target_link_libraries(Physics_Models INTERFACE
     Physics_Model_HydraulicConductivity
@@ -125,10 +124,9 @@ target_link_libraries(Physics_Models INTERFACE
 )
 
 # ====================================================================
-# 3. Service Layer and Final Aggregator
+# 3. Service Layer (トップレイヤー)
 # ====================================================================
 
-# --- Physics Service & Registry Library ---
 set(PHYSICS_SERVICE_SOURCES
     physics_registry.F90
     physics_service.F90
@@ -136,16 +134,18 @@ set(PHYSICS_SERVICE_SOURCES
 )
 add_library(Physics_Service STATIC ${PHYSICS_SERVICE_SOURCES})
 target_include_directories(Physics_Service PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# The service layer depends on all materials and models.
 target_link_libraries(Physics_Service PUBLIC
     Physics_Materials
     Physics_Models
+    Solver::Core
+    Solver::Control
+    Solver::Input
 )
 enable_build_flags(Physics_Service)
 
-# --- Public Facing Interface Library ---
+# Public Interface
 add_library(Physics_Interface INTERFACE)
 target_link_libraries(Physics_Interface INTERFACE
-    Physics_Service # Linking the service transitively links all materials and models
+    Physics_Service
 )
 add_library(Solver::Physics ALIAS Physics_Interface)

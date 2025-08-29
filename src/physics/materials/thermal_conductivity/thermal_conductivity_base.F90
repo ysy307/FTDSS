@@ -1,4 +1,4 @@
-submodule(calculate_thermal_conductivity) calc_thc_base
+submodule(physics_material_thermal_conductivity) thermal_conductivity_base
     implicit none
 contains
     module subroutine initialize_holder_thcs(self, input, material_id)
@@ -32,4 +32,4 @@ contains
 
     end function calc_thc_3
 
-end submodule calc_thc_base
+end submodule thermal_conductivity_base

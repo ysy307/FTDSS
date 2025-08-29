@@ -26,9 +26,10 @@ set(DOMAIN_MESH_SOURCES
 )
 add_library(Domain_Mesh STATIC ${DOMAIN_MESH_SOURCES})
 target_include_directories(Domain_Mesh PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# Mesh depends on Core for types and InOut for reading geometry.
-target_link_libraries(Domain_Mesh PUBLIC Solver::Core Solver::InOut)
+# Mesh depends on Core for types and Input for reading geometry.
+target_link_libraries(Domain_Mesh PUBLIC Solver::Core Solver::Input)
 enable_build_flags(Domain_Mesh)
+enable_thirdparty(Domain_Mesh)
 
 # --- Adjacency Library ---
 # Computes connectivity information (e.g., node-to-element).
@@ -43,6 +44,8 @@ target_include_directories(Domain_Adjacency PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # Adjacency calculations depend on the mesh structure.
 target_link_libraries(Domain_Adjacency PUBLIC Domain_Mesh)
 enable_build_flags(Domain_Adjacency)
+enable_thirdparty(Domain_Adjacency)
+
 
 # --- Multicoloring Library ---
 # Graph coloring algorithms for parallelization.
@@ -57,6 +60,7 @@ target_include_directories(Domain_Multicoloring PUBLIC ${CMAKE_CURRENT_BINARY_DI
 # Coloring depends on the graph, which is derived from adjacency info.
 target_link_libraries(Domain_Multicoloring PUBLIC Domain_Adjacency)
 enable_build_flags(Domain_Multicoloring)
+enable_thirdparty(Domain_Multicoloring)
 
 # --- Reordering Library ---
 # Node/element reordering algorithms to improve matrix properties.
@@ -71,6 +75,7 @@ target_include_directories(Domain_Reordering PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # Reordering also depends on the graph/adjacency info.
 target_link_libraries(Domain_Reordering PUBLIC Domain_Adjacency)
 enable_build_flags(Domain_Reordering)
+enable_thirdparty(Domain_Reordering)
 
 # --- Domain Manager Library ---
 # The main service/manager for the domain module.
@@ -88,6 +93,7 @@ target_link_libraries(Domain_Main PUBLIC
     Domain_Reordering
 )
 enable_build_flags(Domain_Main)
+enable_thirdparty(Domain_Main)
 
 
 # ====================================================================

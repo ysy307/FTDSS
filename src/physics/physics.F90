@@ -1,10 +1,10 @@
 module module_properties
-    use :: properties_material_manager, only:type_material_manager
-    use :: properties_properties_manager, only:type_properties_manager, type_phase_property
+    use :: physics_registry, only:type_physics_registry
+    use :: physics_service, only:type_properties_manager, type_phase_property
     implicit none
     private
 
-    public :: type_material_manager
+    public :: type_physics_registry
     public :: type_properties_manager
     public :: type_phase_property
 

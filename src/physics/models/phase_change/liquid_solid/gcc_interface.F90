@@ -1,4 +1,4 @@
-module calculate_gcc
+module physics_models_gcc
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
     use :: module_input, only:type_input
@@ -235,4 +235,4 @@ module calculate_gcc
         module procedure :: construct_type_gcc_seg_pa
     end interface
 
-end module calculate_gcc
+end module physics_models_gcc

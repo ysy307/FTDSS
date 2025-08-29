@@ -50,6 +50,7 @@ include(Toolchain)
 # ====================================================================
 # 各モジュールのトップディレクトリを一度だけ呼び出すことで、構造をクリーンに保つ
 add_subdirectory(src/core)
+add_subdirectory(src/inout)
 add_subdirectory(src/linalg)
 add_subdirectory(src/control)
 add_subdirectory(src/domain)
@@ -57,7 +58,6 @@ add_subdirectory(src/physics)
 add_subdirectory(src/solver)
 add_subdirectory(src/field)
 add_subdirectory(src/conditions)
-add_subdirectory(src/inout)
 add_subdirectory(src/main)
 
 

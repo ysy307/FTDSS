@@ -1,4 +1,4 @@
-submodule(calculate_volumetric_heat_capacity) Calc_VHC_Base
+submodule(physics_material_heat_capacity) heat_capacity_base
     implicit none
 
 contains
@@ -54,4 +54,4 @@ contains
 
     end function calc_vhc_3a
 
-end submodule Calc_VHC_Base
+end submodule heat_capacity_base

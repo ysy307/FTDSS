@@ -1,4 +1,4 @@
-submodule(calculate_gcc) gcc_base
+submodule(physics_models_gcc) gcc_base
     implicit none
 contains
 

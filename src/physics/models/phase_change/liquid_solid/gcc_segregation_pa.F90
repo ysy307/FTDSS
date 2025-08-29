@@ -1,4 +1,4 @@
-submodule(calculate_gcc) gcc_segregation_pa
+submodule(physics_models_gcc) gcc_segregation_pa
     implicit none
 contains
 

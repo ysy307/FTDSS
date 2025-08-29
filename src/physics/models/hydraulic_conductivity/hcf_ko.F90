@@ -1,4 +1,4 @@
-submodule(calculate_hcf) calculate_hcf_ko
+submodule(physics_models_hcf) hcf_ko
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -50,4 +50,4 @@ contains
 
     end function calc_kr_base_ko
 
-end submodule calculate_hcf_ko
+end submodule hcf_ko

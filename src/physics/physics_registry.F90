@@ -1,14 +1,18 @@
-module properties_material_manager
+module physics_registry
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_input, only:type_input
-    use :: module_calculate, only: &
-        holder_gccs, holder_wrfs, holder_dens, holder_sphs, holder_vhcs, holder_thcs, holder_hcfs, &
-        abst_gcc, abst_wrf, abst_den, abst_sph, abst_vhc, abst_thc, abst_hcf
+    use :: physics_material_thermal_conductivity, only:holder_thcs, abst_thc
+    use :: physics_material_heat_capacity, only:holder_vhcs, abst_vhc
+    use :: physics_material_density, only:holder_dens, abst_den
+    use :: physics_material_specific_heat, only:holder_sphs, abst_sph
+    use :: physics_models_hcf, only:holder_hcfs, abst_hcf
+    use :: physics_models_gcc, only:holder_gccs, abst_gcc
+    use :: physics_models_wrf, only:holder_wrfs, abst_wrf
     implicit none
 
-    public :: type_material_manager
+    public :: type_physics_registry
 
-    type :: type_material_manager
+    type :: type_physics_registry
         private
         type(holder_thcs), allocatable :: thc(:)
         type(holder_dens), allocatable :: den(:)
@@ -20,7 +24,7 @@ module properties_material_manager
 
         integer(int32), allocatable :: region_id_map(:)
     contains
-        procedure, public, pass(self) :: initialize => initialize_type_material_manager
+        procedure, public, pass(self) :: initialize => initialize_type_physics_registry
 
         procedure, public, pass(self) :: get_thc => get_thc_ptr
         procedure, public, pass(self) :: get_den => get_den_ptr
@@ -30,13 +34,13 @@ module properties_material_manager
         procedure, public, pass(self) :: get_wrf => get_wrf_ptr
         procedure, public, pass(self) :: get_hcf => get_hcf_ptr
 
-    end type type_material_manager
+    end type type_physics_registry
 
 contains
 
     ! 初期化（holder内部のinitialize呼ぶ）
-    subroutine initialize_type_material_manager(self, input, ierr)
-        class(type_material_manager), intent(inout) :: self
+    subroutine initialize_type_physics_registry(self, input, ierr)
+        class(type_physics_registry), intent(inout) :: self
         type(type_input), intent(in) :: input
         integer(int32), intent(inout) :: ierr
 
@@ -92,12 +96,12 @@ contains
 
             self%region_id_map(current_material_id) = model_idx
         end do
-    end subroutine initialize_type_material_manager
+    end subroutine initialize_type_physics_registry
 
     ! THC getter
     function get_thc_ptr(self, region_id) result(thc_ptr)
         implicit none
-        class(type_material_manager), intent(in), target :: self
+        class(type_physics_registry), intent(in), target :: self
         integer(int32), intent(in) :: region_id
         class(abst_thc), pointer :: thc_ptr
 
@@ -127,7 +131,7 @@ contains
     ! DEN getter
     function get_den_ptr(self, region_id) result(den_ptr)
         implicit none
-        class(type_material_manager), intent(in), target :: self
+        class(type_physics_registry), intent(in), target :: self
         integer(int32), intent(in) :: region_id
         class(abst_den), pointer :: den_ptr
 
@@ -157,7 +161,7 @@ contains
     ! SPH getter
     function get_sph_ptr(self, region_id) result(sph_ptr)
         implicit none
-        class(type_material_manager), intent(in), target :: self
+        class(type_physics_registry), intent(in), target :: self
         integer(int32), intent(in) :: region_id
         class(abst_sph), pointer :: sph_ptr
 
@@ -187,7 +191,7 @@ contains
     ! VHC getter
     function get_vhc_ptr(self, region_id) result(vhc_ptr)
         implicit none
-        class(type_material_manager), intent(in), target :: self
+        class(type_physics_registry), intent(in), target :: self
         integer(int32), intent(in) :: region_id
         class(abst_vhc), pointer :: vhc_ptr
 
@@ -217,7 +221,7 @@ contains
     ! GCC getter
     function get_gcc_ptr(self, region_id) result(gcc_ptr)
         implicit none
-        class(type_material_manager), intent(in), target :: self
+        class(type_physics_registry), intent(in), target :: self
         integer(int32), intent(in) :: region_id
         class(abst_gcc), pointer :: gcc_ptr
 
@@ -247,7 +251,7 @@ contains
     ! WRF getter
     function get_wrf_ptr(self, region_id) result(wrf_ptr)
         implicit none
-        class(type_material_manager), intent(in), target :: self
+        class(type_physics_registry), intent(in), target :: self
         integer(int32), intent(in) :: region_id
         class(abst_wrf), pointer :: wrf_ptr
 
@@ -277,7 +281,7 @@ contains
     ! HCF getter
     function get_hcf_ptr(self, region_id) result(hcf_ptr)
         implicit none
-        class(type_material_manager), intent(in), target :: self
+        class(type_physics_registry), intent(in), target :: self
         integer(int32), intent(in) :: region_id
         class(abst_hcf), pointer :: hcf_ptr
 
@@ -304,4 +308,4 @@ contains
         hcf_ptr => self%hcf(model_index)%p
     end function get_hcf_ptr
 
-end module properties_material_manager
+end module physics_registry

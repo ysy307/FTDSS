@@ -1,4 +1,4 @@
-submodule(calculate_hcf) calculate_hcf_impedance
+submodule(physics_models_hcf) hcf_impedance
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -39,4 +39,4 @@ contains
 
     end function calc_impedance_exponential
 
-end submodule calculate_hcf_impedance
+end submodule hcf_impedance

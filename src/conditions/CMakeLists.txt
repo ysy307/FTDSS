@@ -22,7 +22,7 @@ target_include_directories(Conditions_Boundary PUBLIC ${CMAKE_CURRENT_BINARY_DIR
 target_link_libraries(Conditions_Boundary PUBLIC
     Solver::Core
     Solver::Domain
-    Solver::InOut
+    Solver::Input
     Solver::Field
 )
 enable_build_flags(Conditions_Boundary)
@@ -43,7 +43,7 @@ target_link_libraries(Conditions_Initial PUBLIC
     Conditions_Boundary
     Solver::Core
     Solver::Domain
-    Solver::InOut
+    Solver::Input
 )
 enable_build_flags(Conditions_Initial)
 

@@ -1,6 +1,6 @@
-module calculate_wrf
+module physics_models_wrf
     use, intrinsic :: iso_fortran_env
-    use :: module_input, only:type_input, type_materials_wrf
+    use :: module_input, only:type_input, type_input
     implicit none
     private
     real(real64), parameter :: pi = 4 * atan(1.0d0)
@@ -123,9 +123,10 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_bc(input) result(property)
+        module function construct_type_wrf_bc(input, i_material) result(property)
             implicit none
-            type(type_materials_wrf), intent(in) :: input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_bc
@@ -148,9 +149,10 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_vg(input) result(property)
+        module function construct_type_wrf_vg(input, i_material) result(property)
             implicit none
-            type(type_materials_wrf), intent(in) :: input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_vg
@@ -173,9 +175,10 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_ko(input) result(property)
+        module function construct_type_wrf_ko(input, i_material) result(property)
             implicit none
-            type(type_materials_wrf), intent(in) :: input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_ko
@@ -199,9 +202,10 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_mvg(input) result(property)
+        module function construct_type_wrf_mvg(input, i_material) result(property)
             implicit none
-            type(type_materials_wrf), intent(in) :: input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_mvg
@@ -224,9 +228,10 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_durner(input) result(property)
+        module function construct_type_wrf_durner(input, i_material) result(property)
             implicit none
-            type(type_materials_wrf), intent(in) :: input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_durner
@@ -249,9 +254,10 @@ module calculate_wrf
     end interface
 
     interface
-        module function construct_type_wrf_dvgch(input) result(property)
+        module function construct_type_wrf_dvgch(input, i_material) result(property)
             implicit none
-            type(type_materials_wrf), intent(in) :: input
+            type(type_input), intent(in) :: input
+            integer(int32), intent(in) :: i_material
             class(abst_wrf), allocatable :: property
 
         end function construct_type_wrf_dvgch
@@ -297,4 +303,4 @@ module calculate_wrf
         module procedure :: construct_type_wrf_dvgch
     end interface
 
-end module calculate_wrf
+end module physics_models_wrf

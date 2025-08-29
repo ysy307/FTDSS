@@ -1,10 +1,10 @@
 module module_control
     use, intrinsic :: iso_fortran_env
     use :: module_core
+    use :: module_input, only:type_input
     use :: control_time, only:type_time
     use :: control_iteration, only:type_iteration
     use :: control_openmp, only:initialize_openmp
-    use :: module_input, only:type_input
     implicit none
     private
 

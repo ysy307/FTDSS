@@ -1,9 +1,10 @@
-submodule(calculate_wrf) calculate_wrf_bc
+submodule(physics_models_wrf) wrf_bc
     implicit none
 contains
-    module function construct_type_wrf_bc(input) result(property)
+    module function construct_type_wrf_bc(input, i_material) result(property)
         implicit none
-        type(type_materials_wrf), intent(in) :: input
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
         class(abst_wrf), allocatable :: property
 
         if (allocated(property)) deallocate (property)
@@ -11,10 +12,10 @@ contains
 
         select type (this => property)
         type is (type_wrf_bc)
-            this%theta_r = input%theta_r
-            this%theta_s = input%theta_S
-            this%alpha1 = input%alpha1
-            this%n1 = input%n1
+            this%theta_r = input%basic%materials(i_material)%thermal%phase_change%wrf%theta_r
+            this%theta_s = input%basic%materials(i_material)%thermal%phase_change%wrf%theta_s
+            this%alpha1 = input%basic%materials(i_material)%thermal%phase_change%wrf%alpha1
+            this%n1 = input%basic%materials(i_material)%thermal%phase_change%wrf%n1
         end select
 
     end function construct_type_wrf_bc
@@ -47,4 +48,4 @@ contains
         end if
     end function calculate_wrf_bc_derivative
 
-end submodule calculate_wrf_bc
+end submodule wrf_bc

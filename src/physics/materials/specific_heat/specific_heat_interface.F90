@@ -1,4 +1,4 @@
-module calculate_specific_heat
+module physics_material_specific_heat
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
     use :: module_input, only:type_input
@@ -92,4 +92,4 @@ module calculate_specific_heat
         module procedure construct_sph_3phase
     end interface
 
-end module calculate_specific_heat
+end module physics_material_specific_heat

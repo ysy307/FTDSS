@@ -1,7 +1,7 @@
-module calculate_hcf
+module physics_models_hcf
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
-    use :: module_input, only:type_input, type_materials_hcf
+    use :: module_input, only:type_input
     implicit none
     private
 
@@ -577,4 +577,4 @@ contains
         property%viscosity = construct_hcf_viscosity(input, material_id)
 
     end function create_type_hcf_base_impedance_viscosity
-end module calculate_hcf
+end module physics_models_hcf

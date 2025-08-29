@@ -12,7 +12,8 @@ target_link_libraries(App_FTDSS PUBLIC
     Solver::Hydraulic
     # FTDSSが直接利用する他のモジュールもここに追加
     Solver::Control 
-    Solver::InOut
+    Solver::Input
+    Solver::Output
 )
 enable_build_flags(App_FTDSS)
 

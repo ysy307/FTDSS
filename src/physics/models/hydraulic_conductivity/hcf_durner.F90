@@ -1,4 +1,4 @@
-submodule(calculate_hcf) calculate_hcf_durner
+submodule(physics_models_hcf) hcf_durner
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -66,4 +66,4 @@ contains
 
     end function calc_kr_base_durner
 
-end submodule calculate_hcf_durner
+end submodule hcf_durner

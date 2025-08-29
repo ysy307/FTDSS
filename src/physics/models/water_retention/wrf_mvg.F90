@@ -1,9 +1,10 @@
-submodule(calculate_wrf) calculate_wrf_mvg
+submodule(physics_models_wrf) wrf_mvg
     implicit none
 contains
-    module function construct_type_wrf_mvg(input) result(property)
+    module function construct_type_wrf_mvg(input, i_material) result(property)
         implicit none
-        type(type_materials_wrf), intent(in) :: input
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: i_material
         class(Abst_WRF), allocatable :: property
 
         if (allocated(property)) deallocate (property)
@@ -11,12 +12,12 @@ contains
 
         select type (this => property)
         type is (type_wrf_mvg)
-            this%theta_r = input%theta_r
-            this%theta_s = input%theta_s
-            this%alpha1 = input%alpha1
-            this%n1 = input%n1
-            this%m1 = 1.0d0 - 1.0d0 / input%n1
-            this%h_crit = input%h_crit
+            this%theta_r = input%basic%materials(i_material)%thermal%phase_change%wrf%theta_r
+            this%theta_s = input%basic%materials(i_material)%thermal%phase_change%wrf%theta_s
+            this%alpha1 = input%basic%materials(i_material)%thermal%phase_change%wrf%alpha1
+            this%n1 = input%basic%materials(i_material)%thermal%phase_change%wrf%n1
+            this%m1 = 1.0d0 - 1.0d0 / input%basic%materials(i_material)%thermal%phase_change%wrf%n1
+            this%h_crit = input%basic%materials(i_material)%thermal%phase_change%wrf%h_crit
         end select
 
     end function construct_type_wrf_mvg
@@ -51,4 +52,4 @@ contains
 
     end function calculate_wrf_mvg_derivative
 
-end submodule calculate_wrf_mvg
+end submodule wrf_mvg

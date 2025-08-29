@@ -1,7 +1,7 @@
 module control_iteration
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_input, only:type_input, type_convergence
-    use :: module_calculate, only:norm_2, norm_inf
+    use :: module_linalg, only:norm_2, norm_inf
     implicit none
     private
 

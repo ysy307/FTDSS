@@ -1,4 +1,4 @@
-module calculate_thermal_conductivity
+module physics_material_thermal_conductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
     use :: module_input, only:type_input
@@ -92,4 +92,4 @@ module calculate_thermal_conductivity
     interface type_thc_3phase
         module procedure construct_thc_3
     end interface
-end module calculate_thermal_conductivity
+end module physics_material_thermal_conductivity

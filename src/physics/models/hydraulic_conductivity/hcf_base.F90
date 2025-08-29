@@ -1,4 +1,4 @@
-submodule(calculate_hcf) calculate_hcf_base
+submodule(physics_models_hcf) hcf_base
     implicit none
 contains
 
@@ -102,4 +102,4 @@ contains
 
     end function calc_kflh_base_impedance_viscosity
 
-end submodule calculate_hcf_base
+end submodule hcf_base

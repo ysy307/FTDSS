@@ -21,7 +21,7 @@ target_include_directories(App_Thermal PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # Link to all the necessary solver modules using the clean interface libraries.
 target_link_libraries(App_Thermal PUBLIC
     Solver::Core
-    Solver::InOut
+    Solver::Input
     Solver::Domain
     Solver::Physics
     Solver::Conditions

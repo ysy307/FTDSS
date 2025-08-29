@@ -1,4 +1,4 @@
-submodule(calculate_specific_heat) calc_sph_3phase
+submodule(physics_material_specific_heat) specific_heat_3phase
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -38,4 +38,4 @@ contains
         SPH = calc_sph_3(self%material1, phi1, self%material2, phi2, self%material3, phi3)
     end function calc_sph_gauss_point_3phase
 
-end submodule calc_sph_3phase
+end submodule specific_heat_3phase

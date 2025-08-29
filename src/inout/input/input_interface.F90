@@ -11,6 +11,7 @@ module inout_input
     private
 
     public :: type_input
+    public :: type_convergence
 
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_simulation_settings

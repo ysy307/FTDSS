@@ -1,8 +1,8 @@
-module calculate_volumetric_heat_capacity
+module physics_material_heat_capacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
-    use :: Inout_Input, only:Type_Input
-    use :: calculate_density, only:holder_dens, abst_den
+    use :: module_input, only:type_input
+    use :: physics_material_density, only:holder_dens, abst_den
     implicit none
     private
 
@@ -134,4 +134,4 @@ module calculate_volumetric_heat_capacity
         module procedure construct_type_vhc_3phase_apparent
     end interface
 
-end module calculate_volumetric_heat_capacity
+end module physics_material_heat_capacity

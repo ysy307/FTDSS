@@ -1,4 +1,4 @@
-submodule(calculate_specific_heat) calc_sph_base
+submodule(physics_material_specific_heat) specific_heat_base
     implicit none
 
 contains
@@ -33,4 +33,4 @@ contains
                         + specific_heat_ice * phi_ice
 
     end function calc_sph_3
-end submodule calc_sph_base
+end submodule specific_heat_base

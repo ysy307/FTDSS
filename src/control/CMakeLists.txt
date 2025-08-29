@@ -22,8 +22,8 @@ target_include_directories(Control_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # It may also need Physics to access certain model parameters for convergence checks.
 target_link_libraries(Control_Main PUBLIC
     Solver::Core
-    Solver::InOut
-    Solver::Physics
+    Solver::Input
+    Solver::Linalg
 )
 enable_build_flags(Control_Main)
 

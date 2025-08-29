@@ -1,4 +1,4 @@
-submodule(calculate_hcf) calculate_hcf_vg
+submodule(physics_models_hcf) hcf_vg
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -57,4 +57,4 @@ contains
 
     end function calc_kr_base_vg
 
-end submodule calculate_hcf_vg
+end submodule hcf_vg

@@ -1,4 +1,4 @@
-submodule(calculate_volumetric_heat_capacity) calc_vhc_3phase_apparent
+submodule(physics_material_heat_capacity) heat_capacity_3phase_apparent
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -42,4 +42,4 @@ contains
                           state%latent_heat, state%density_water, state%dQw_dT)
     end function calc_vhc_gauss_point_3phase_apparent
 
-end submodule calc_vhc_3phase_apparent
+end submodule heat_capacity_3phase_apparent

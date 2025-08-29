@@ -1,4 +1,4 @@
-submodule(calculate_volumetric_heat_capacity) calc_vhc_3phase
+submodule(physics_material_heat_capacity) heat_capacity_3phase
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
@@ -41,4 +41,4 @@ contains
         VHC = calc_vhc_3(self%material1, phi1, self%material2, phi2, self%material3, phi3)
     end function calc_vhc_gauss_point_3phase
 
-end submodule calc_vhc_3phase
+end submodule heat_capacity_3phase
