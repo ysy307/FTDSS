@@ -151,7 +151,7 @@ contains
         do i = 1, num_elements
             if (computation_dimension < 2) cycle
             nodes_per_mesh = elements(i)%e%get_num_nodes()
-            p_conn => elements(i)%e%get_connectivity()
+            p_conn => elements(i)%e%get_connectivity_ptr()
             base = offsets_e(i)
             do j = 1, nodes_per_mesh
                 do k = 1, nodes_per_mesh
@@ -167,7 +167,7 @@ contains
         do i = 1, num_sides
             if (computation_dimension < 1) cycle
             nodes_per_mesh = sides(i)%s%get_num_nodes()
-            p_conn => sides(i)%s%get_connectivity()
+            p_conn => sides(i)%s%get_connectivity_ptr()
             do j = 1, nodes_per_mesh
                 do k = 1, nodes_per_mesh
                     row_indices(base + offsets_s(i) + (j - 1) * nodes_per_mesh + k) = p_conn(j)

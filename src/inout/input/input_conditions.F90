@@ -6,7 +6,7 @@ submodule(inout_input) inout_input_conditions
     character(*), parameter :: time_control = "time_control"
     character(*), parameter :: simulation_period = "simulation_period"
     character(*), parameter :: unit = "unit"
-    character(*), parameter :: valid_units(5) = ["second", "minute", "hour", "day", "year"]
+    character(*), parameter :: valid_units(5) = [character(len=16) :: "second", "minute", "hour", "day", "year"]
     character(*), parameter :: start = "start"
     character(*), parameter :: end = "end"
     character(*), parameter :: time_stepping = "time_stepping"
@@ -25,9 +25,11 @@ submodule(inout_input) inout_input_conditions
     character(*), parameter :: type = "type"
     character(*), parameter :: is_uniform = "is_uniform"
     character(*), parameter :: values = "values"
-    character(*), parameter :: valid_thermal_boundary_types(8) = ["dirichlet", "neumann", "flux", "robin", "adiabatic", &
-                                                                  "free", "heat_trasfer", "head_radiation"]
-    character(*), parameter :: valid_hydraulic_boundary_types(4) = ["dirichlet", "neumann", "flux", "impermeable"]
+    character(*), parameter :: valid_thermal_boundary_types(8) = [character(len=16) :: &
+                                                                  "dirichlet", "neumann", "flux", "robin", "adiabatic", &
+                                                                  "free", "heat_transfer", "head_radiation"]
+    character(*), parameter :: valid_hydraulic_boundary_types(4) = [character(len=16) :: &
+                                                                    "dirichlet", "neumann", "flux", "impermeable"]
     !!------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for initial conditions
     !!------------------------------------------------------------------------------------------------------------------------------

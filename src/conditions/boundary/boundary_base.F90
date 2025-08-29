@@ -67,7 +67,7 @@ contains
                 side_group = domain%Sides(i)%s%get_group()
                 if (side_group == i_material) then
                     side_order = domain%Sides(i)%s%get_order()
-                    p_conn => domain%Sides(i)%s%get_connectivity()
+                    p_conn => domain%Sides(i)%s%get_connectivity_ptr()
                     if (side_order == 1) then
                         current_segment_idx = current_segment_idx + 1
                         target_edges(:, current_segment_idx) = p_conn([1, 2])

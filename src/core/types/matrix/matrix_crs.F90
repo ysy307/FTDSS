@@ -16,9 +16,10 @@ contains
         end if
 
         self%num_row = num_nodes
+        self%num_ptr = num_nodes + 1
         self%nnz = size(col)
 
-        call allocate_array(self%ptr, self%num_row + 1)
+        call allocate_array(self%ptr, self%num_ptr + 1)
         self%ptr = row(:)
 
         call allocate_array(self%ind, self%nnz)
@@ -27,6 +28,33 @@ contains
         call allocate_array(self%val, self%nnz)
         self%val = 0.0d0
     end subroutine initialize_type_crs
+
+    module pure function get_nnz_crs(self) result(nnz)
+        implicit none
+        class(type_crs), intent(in) :: self
+        integer(int32) :: nnz
+
+        nnz = self%nnz
+
+    end function get_nnz_crs
+
+    module pure function get_num_ptr_crs(self) result(num_ptr)
+        implicit none
+        class(type_crs), intent(in) :: self
+        integer(int32) :: num_ptr
+
+        num_ptr = self%num_ptr
+
+    end function get_num_ptr_crs
+
+    module pure function get_num_row_crs(self) result(num_row)
+        implicit none
+        class(type_crs), intent(in) :: self
+        integer(int32) :: num_row
+
+        num_row = self%num_row
+
+    end function get_num_row_crs
 
     module pure function find_crs(self, row, col) result(index)
         implicit none

@@ -6,6 +6,9 @@ module core_types_matrix
     private
 
     public :: abst_matrix
+    public :: type_coo
+    public :: type_crs
+    public :: type_dense
 
     ! Abstract base type for matrices.
     type, abstract :: abst_matrix
@@ -102,6 +105,8 @@ module core_types_matrix
     contains
         procedure, pass(self) :: initialize => initialize_dense
         procedure, pass(self) :: destroy => destroy_dense
+        procedure, pass(self) :: get_num_row => get_num_row_dense
+        procedure, pass(self) :: get_num_col => get_num_col_dense
         procedure, pass(self) :: set_value => set_value_dense
         procedure, pass(self) :: set_all => set_all_dense
         procedure, pass(self) :: zero => zero_dense
@@ -125,6 +130,20 @@ module core_types_matrix
             class(type_dense), intent(inout) :: self
 
         end subroutine destroy_dense
+
+        module pure function get_num_row_dense(self) result(num_row)
+            implicit none
+            class(type_dense), intent(in) :: self
+            integer(int32) :: num_row
+
+        end function get_num_row_dense
+
+        module pure function get_num_col_dense(self) result(num_col)
+            implicit none
+            class(type_dense), intent(in) :: self
+            integer(int32) :: num_col
+
+        end function get_num_col_dense
 
         module subroutine set_value_dense(self, row, col, value)
             implicit none
@@ -173,12 +192,17 @@ module core_types_matrix
     type, extends(abst_matrix) :: type_crs
         integer(int32) :: nnz = 0 ! number of non-zero elements
         integer(int32) :: num_row = 0 ! number of rows
+        integer(int32) :: num_ptr = 0 ! number of pointers
         integer(int32), allocatable :: ptr(:) ! pointers to row starts (num_row + 1 entries)
         integer(int32), allocatable :: ind(:) ! column indices of non-zeros
         real(real64), allocatable :: val(:) ! non-zero values
     contains
         procedure, pass(self) :: initialize => initialize_type_crs
         procedure, pass(self) :: destroy => destroy_crs
+
+        procedure, pass(self) :: get_nnz => get_nnz_crs
+        procedure, pass(self) :: get_num_ptr => get_num_ptr_crs
+        procedure, pass(self) :: get_num_row => get_num_row_crs
 
         procedure, pass(self) :: set_value => set_crs
         procedure, pass(self) :: set_all => set_all_crs
@@ -209,6 +233,27 @@ module core_types_matrix
             class(type_crs), intent(inout) :: self
 
         end subroutine destroy_crs
+
+        module pure function get_nnz_crs(self) result(nnz)
+            implicit none
+            class(type_crs), intent(in) :: self
+            integer(int32) :: nnz
+
+        end function get_nnz_crs
+
+        module pure function get_num_ptr_crs(self) result(num_ptr)
+            implicit none
+            class(type_crs), intent(in) :: self
+            integer(int32) :: num_ptr
+
+        end function get_num_ptr_crs
+
+        module pure function get_num_row_crs(self) result(num_row)
+            implicit none
+            class(type_crs), intent(in) :: self
+            integer(int32) :: num_row
+
+        end function get_num_row_crs
 
         module pure function find_crs(self, row, col) result(index)
             implicit none
@@ -275,15 +320,19 @@ module core_types_matrix
     end interface
 
     type, extends(abst_matrix) :: type_coo
-        integer(int32) :: num_row_max = 0 ! 行列の全体サイズ
-        integer(int32) :: num_col_max = 0 ! 行列の全体サイズ
-        integer(int32) :: nnz = 0 ! number of non-zero elements
+        integer(int32) :: nnz = 0
+        integer(int32) :: num_row = 0
+        integer(int32) :: num_col = 0
         integer(int32), allocatable :: row(:)
         integer(int32), allocatable :: col(:)
         real(real64), allocatable :: val(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_coo
         procedure, pass(self) :: destroy => destroy_coo
+
+        procedure, pass(self) :: get_nnz => get_nnz_coo
+        procedure, pass(self) :: get_num_row => get_num_row_coo
+        procedure, pass(self) :: get_num_col => get_num_col_coo
 
         procedure, pass(self) :: set_value => set_coo
         procedure, pass(self) :: set_all => set_all_coo
@@ -305,6 +354,27 @@ module core_types_matrix
             integer(int32), intent(in), optional :: col(:)
 
         end subroutine initialize_type_coo
+
+        module pure function get_nnz_coo(self) result(nnz)
+            implicit none
+            class(type_coo), intent(in) :: self
+            integer(int32) :: nnz
+
+        end function get_nnz_coo
+
+        module pure function get_num_row_coo(self) result(num_row)
+            implicit none
+            class(type_coo), intent(in) :: self
+            integer(int32) :: num_row
+
+        end function get_num_row_coo
+
+        module pure function get_num_col_coo(self) result(num_col)
+            implicit none
+            class(type_coo), intent(in) :: self
+            integer(int32) :: num_col
+
+        end function get_num_col_coo
 
         module pure function find_coo(self, row, col) result(index)
             implicit none

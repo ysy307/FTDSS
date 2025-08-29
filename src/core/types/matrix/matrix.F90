@@ -1,8 +1,5 @@
 module module_type_matrix
-    use :: core_types_matrix, only:abst_matrix
-    use :: core_types_matrix_coo, only:type_coo
-    use :: core_types_matrix_crs, only:type_crs
-    use :: core_types_matrix_dense, only:type_dense
+    use :: core_types_matrix, only:abst_matrix, type_coo, type_crs, type_dense
     implicit none
     private
 

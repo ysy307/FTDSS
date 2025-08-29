@@ -8,7 +8,6 @@ module main_thermal
     use :: module_calculate, only:abst_den
     use :: module_properties, only:type_properties_manager, type_phase_property
     use :: module_input, only:type_input
-    use :: module_calculate, only:gemv, add
     use :: module_boundary, only:type_bc, mode_value, mode_nr
     use :: module_solver
     use :: module_control

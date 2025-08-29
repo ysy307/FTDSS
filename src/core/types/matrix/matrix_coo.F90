@@ -16,8 +16,8 @@ contains
             stop
         end if
 
-        self%num_row_max = num_nodes
-        self%num_col_max = num_nodes
+        self%num_row = num_nodes
+        self%num_col = num_nodes
         self%nnz = size(row)
 
         if (self%nnz > 0) then
@@ -29,6 +29,33 @@ contains
             self%val = 0.0d0
         end if
     end subroutine initialize_type_coo
+
+    module pure function get_nnz_coo(self) result(nnz)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32) :: nnz
+
+        nnz = self%nnz
+
+    end function get_nnz_coo
+
+    module pure function get_num_row_coo(self) result(num_row)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32) :: num_row
+
+        num_row = self%num_row
+
+    end function get_num_row_coo
+
+    module pure function get_num_col_coo(self) result(num_col)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32) :: num_col
+
+        num_col = self%num_col
+
+    end function get_num_col_coo
 
     module pure function find_coo(self, row, col) result(index)
         implicit none
@@ -146,7 +173,7 @@ contains
         class(type_coo), intent(in) :: self
         integer(int32) :: i
 
-        print *, "COO Matrix (max_dims=", self%num_row_max, "x", self%num_col_max, ", nnz=", self%nnz, ")"
+        print *, "COO Matrix (max_dims=", self%num_row, "x", self%num_col, ", nnz=", self%nnz, ")"
         do i = 1, self%nnz
             write (*, '(2(i8, ", "), es16.8)') self%row(i), self%col(i), self%val(i)
         end do

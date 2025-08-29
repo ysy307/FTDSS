@@ -73,28 +73,28 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: solver_settings = "solver_settings"
     character(*), parameter :: bdf_order = "bdf_order"
     character(*), parameter :: reordering = "reordering"
-    character(*), parameter :: valid_reordering_types(3) = ["none", "cm", "rcm"]
+    character(*), parameter :: valid_reordering_types(3) = [character(len=16) :: "none", "cm", "rcm"]
     character(*), parameter :: coloring = "coloring"
-    character(*), parameter :: coloring_types(4) = ["none", "welch_powell", "lfo", "dsatur"]
+    character(*), parameter :: coloring_types(4) = [character(len=16) :: "none", "welch_powell", "lfo", "dsatur"]
     character(*), parameter :: nonlinear_solver = "nonlinear_solver"
     character(*), parameter :: method = "method"
-    character(*), parameter :: valid_nonlinear_solver_methods(4) = ["none", "newton", "modified_newton", "picard"]
+    character(*), parameter :: valid_nonlinear_solver_methods(4) = [character(len=16) :: "none", "newton", "modified_newton", "picard"]
     character(*), parameter :: update_frequency = "update_frequency"
     character(*), parameter :: max_iterations = "max_iterations"
     character(*), parameter :: convergence = "convergence"
     character(*), parameter :: use_criteria = "use_criteria"
-    character(*), parameter :: valid_criteria_types(3) = ["residual", "update", "both"]
+    character(*), parameter :: valid_criteria_types(3) = [character(len=16) :: "residual", "update", "both"]
     character(*), parameter :: logic_between_criteria = "logic_between_criteria"
-    character(*), parameter :: valid_logic_types(2) = ["and", "or"]
+    character(*), parameter :: valid_logic_types(2) = [character(len=16) :: "and", "or"]
     character(*), parameter :: residual = "residual"
     character(*), parameter :: update = "update"
     character(*), parameter :: criteria = "criteria"
-    character(*), parameter :: valid_local_criteria_types(3) = ["absolute", "relative", "both"]
+    character(*), parameter :: valid_local_criteria_types(3) = [character(len=16) :: "absolute", "relative", "both"]
     character(*), parameter :: logic = "logic"
     character(*), parameter :: absolute_tolerance = "absolute_tolerance"
     character(*), parameter :: relative_tolerance = "relative_tolerance"
     character(*), parameter :: linear_solver = "linear_solver"
-    character(*), parameter :: valid_linear_solver_methods(2) = ["direct", "iterative"]
+    character(*), parameter :: valid_linear_solver_methods(2) = [character(len=16) :: "direct", "iterative"]
     character(*), parameter :: iterative_solver = "iterative_solver"
     character(*), parameter :: solver_type = "solver_type"
     character(*), parameter :: preconditioner_type = "preconditioner_type"
@@ -104,7 +104,8 @@ submodule(inout_input) inout_input_basic
     character(*), parameter :: is_parallel = "is_parallel"
     character(*), parameter :: num_threads = "num_threads"
     character(*), parameter :: schedule = "schedule"
-    character(*), parameter :: valid_schedule_types(6) = ["affinity", "auto", "dynamic", "guided", "runtime", "static"]
+    character(*), parameter :: valid_schedule_types(6) = [character(len=16) :: &
+                                                          "affinity", "auto", "dynamic", "guided", "runtime", "static"]
     character(*), parameter :: max_active_levels = "max_active_levels"
     !!------------------------------------------------------------------------------------------------------------------------------
 

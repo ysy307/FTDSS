@@ -1,5 +1,4 @@
 module module_core
-    use :: core_fortran_utils
     use :: core_error, only:error_message
     use :: core_check_nan, only:has_nan
     use :: core_check_range, only:value_in_range
@@ -7,8 +6,12 @@ module module_core
     use :: core_allocate, only:allocate_array, allocate_pointer
     use :: core_deallocate, only:deallocate_array
     use :: core_string_utils, only:join, filter
+    use :: core_fortran_utils_signal_flag_wrapper
+    use :: core_fortran_utils_memory_stats_wrapper
+    use :: core_fortran_utils_system_info_wrapper
+
     use :: core_types
-    use :: core_vtk, only:type_vtk, type_vtk_cell
+    use :: core_vtk
     use :: core_vtk_vtk_constants
     implicit none
     public

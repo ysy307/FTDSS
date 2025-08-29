@@ -11,12 +11,12 @@ submodule(inout_input) inout_input_output_settings
     character(*), parameter :: field_output = "field_output"
     character(*), parameter :: coloring = "coloring"
     character(*), parameter :: file_format = "file_format"
-    character(*), parameter :: valid_field_file_formats(3) = ["none", "vtk", "vtu"]
+    character(*), parameter :: valid_field_file_formats(3) = [character(len=16) :: "none", "vtk", "vtu"]
     character(*), parameter :: unit = "unit"
-    character(*), parameter :: valid_units(5) = ["second", "minute", "hour", "day", "year"]
+    character(*), parameter :: valid_units(5) = [character(len=16) :: "second", "minute", "hour", "day", "year"]
     character(*), parameter :: value = "value"
     character(*), parameter :: variables = "variables"
-    character(*), parameter :: variable_keys(3) = ["thermal", "ice", "water"]
+    character(*), parameter :: variable_keys(3) = [character(len=16) :: "thermal", "ice", "water"]
     type(type_variable_info), allocatable :: master_valid_variables(:)
     ! character(*), parameter :: valid_variables(7) = ["temperature", "ice_saturation", "thermal_conductivity", &
     !                                                  "volumetric_heat_capacity", "pressure", "water_flux", "hydraulic_conductivity"]
@@ -24,9 +24,9 @@ submodule(inout_input) inout_input_output_settings
     !! JSON key names for history output
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: history_output = "history_output"
-    character(*), parameter :: valid_history_file_formats(3) = ["none", "dat", "csv"]
+    character(*), parameter :: valid_history_file_formats(3) = [character(len=16) :: "none", "dat", "csv"]
     character(*), parameter :: observation_type = "observation_type"
-    character(*), parameter :: valid_observation_types(2) = ["node_ids", "coordinates"]
+    character(*), parameter :: valid_observation_types(2) = [character(len=16) :: "node_ids", "coordinates"]
     character(*), parameter :: output_interval = "output_interval"
     !!------------------------------------------------------------------------------------------------------------------------------
     !! JSON key names for standard output

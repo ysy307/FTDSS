@@ -27,16 +27,16 @@ contains
             this%NRHS = transfer(NRHS, this%NRHS)
             this%MSGLVL = transfer(MSGVLV, this%MSGLVL)
             allocate (this%PERM(N))
-            allocate (this%JA(A%nnz))
-            allocate (this%IA(A%num_ptr))
+            allocate (this%JA(A%get_nnz()))
+            allocate (this%IA(A%get_num_ptr()))
 
             this%IPARM(:) = 0
             call PARDISOINIT(this%PT, this%MTYPE, this%IPARM)
 
-            do i = 1, A%nnz
+            do i = 1, A%get_nnz()
                 this%JA(i) = transfer(A%Ind(i), this%JA(i))
             end do
-            do i = 1, A%num_ptr
+            do i = 1, A%get_num_ptr()
                 this%IA(i) = transfer(A%Ptr(i), this%IA(i))
             end do
         end select
@@ -95,6 +95,7 @@ contains
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
         integer(int32), intent(inout) :: status
+
         !* LU decomposition
         select type (matrix => A)
         type is (type_dense)

@@ -8,10 +8,9 @@ module inout_input
     use :: module_core, only:type_vtk, type_dp_3d, type_dp_vector_3d, allocate_array, deallocate_array, & !&
                              error_message, join, value_in_range, filter
     implicit none
-    public
+    private
 
-    !! Positive NaN
-    real(real64), parameter :: NaNValue = transfer(Z'7FF8000000000000', 0.0_real64)
+    public :: type_input
 
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_simulation_settings
@@ -314,7 +313,7 @@ contains
         ! Path settings
         self%project_path = trim(adjustl(get_project_path()))
 
-        inquire (directory=self%project_path//"Input/", exist=exists)
+        inquire (file=self%project_path//"Input/", exist=exists)
         if (.not. exists) call error_message(901)
 
         self%basic_file_name = self%project_path//"Input/Basic.json"

@@ -5,7 +5,6 @@ module main_thermal_assemble
     use :: module_domain, only:type_domain, abst_mesh
     use :: module_field, only:type_jacobian_matrix, type_residual_vector
     use :: module_properties, only:type_properties_manager
-    use :: module_calculate, only:gemv, add
     use :: module_control
     use :: main_thermal_workspace, only:type_workspace_thermal_assemble
 

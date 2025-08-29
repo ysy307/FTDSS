@@ -67,7 +67,7 @@ contains
             end do
 
             ! 3: r0 = b-Ax0
-            call gemv(1.0d0, matrix, self%x(:), 0.0d0, self%r(:))
+            call matrix%gemv(1.0d0, self%x(:), 0.0d0, self%r(:))
             ! self%r(:) = matrix * self%x(:)
             do iN = 1, self%size
                 self%r(iN) = b(iN) - self%r(iN)
@@ -108,7 +108,7 @@ contains
                 ! 15: phat = M^-1 * p
                 call self%Apply_Preconditioner(self%p(:), self%phat(:))
                 ! 16: v = A * phat
-                call gemv(1.0d0, matrix, self%phat(:), 0.0d0, self%v(:))
+                call matrix%gemv(1.0d0, self%phat(:), 0.0d0, self%v(:))
                 ! call SpMV(self%CRS_A, self%phat, self%v)
                 ! 17: alpha_k = rho / (^r0, v)
                 alpha = rho / dot(self%r0(:), self%v(:))
@@ -120,7 +120,7 @@ contains
                 ! 19: shat = M^-1 * s
                 call self%Apply_Preconditioner(self%s(:), self%shat(:))
                 ! 20: t = A * shat
-                call gemv(1.0d0, matrix, self%shat(:), 0.0d0, self%t(:))
+                call matrix%gemv(1.0d0, self%shat(:), 0.0d0, self%t(:))
 
                 ! 21: omega_k = (t,s)/(t,t)
                 omega = dot(self%t(:), self%s(:)) / dot(self%t(:), self%t(:))

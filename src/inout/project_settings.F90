@@ -13,11 +13,12 @@ contains
     subroutine inout_project_path_initialize()
         implicit none
         character(64), parameter :: dName = "ProjectPath.dir"
-        integer(int32) :: access, status, len_path, unit_num
+        integer(int32) :: status, len_path, unit_num
         integer(int32) :: i
+        logical :: found
 
-        status = access(dName, "r")
-        if (status /= 0) call error_message(901, c_opt=dName)
+        inquire (file=dName, exist=found)
+        if (.not. found) call error_message(900, c_opt=dName)
 
         open (newunit=unit_num, file=dName, iostat=status, status="old")
         if (status /= 0) call error_message(902, c_opt=dName)

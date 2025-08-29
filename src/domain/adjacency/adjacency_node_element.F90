@@ -124,7 +124,7 @@ contains
         allocate (node_element_counts(num_nodes))
         node_element_counts = 0
         do ielem = 1, num_elements
-            ptr_connectivity => elements(ielem)%e%get_connectivity()
+            ptr_connectivity => elements(ielem)%e%get_connectivity_ptr()
             do inode_local = 1, elements(ielem)%e%get_num_nodes()
                 node_id = ptr_connectivity(inode_local)
                 if (node_id > 0 .and. node_id <= num_nodes) then
@@ -145,7 +145,7 @@ contains
         allocate (current_indices(num_nodes))
         current_indices = 1
         do ielem = 1, num_elements
-            ptr_connectivity => elements(ielem)%e%get_connectivity()
+            ptr_connectivity => elements(ielem)%e%get_connectivity_ptr()
             do inode_local = 1, elements(ielem)%e%get_num_nodes()
                 node_id = ptr_connectivity(inode_local)
                 if (node_id > 0 .and. node_id <= num_nodes) then
@@ -171,7 +171,7 @@ contains
         allocate (self%map_data(num_nodes))
 
         do ielem = 1, num_elements
-            connectivity => elements(ielem)%e%get_connectivity()
+            connectivity => elements(ielem)%e%get_connectivity_ptr()
             do inode_local = 1, elements(ielem)%e%get_num_nodes()
                 node_id = connectivity(inode_local)
                 if (node_id > 0 .and. node_id <= num_nodes) then

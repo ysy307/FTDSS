@@ -2,7 +2,7 @@ module solver_solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
     use :: module_core, only:allocate_array, deallocate_array, error_message, was_interrupted, abst_matrix, type_crs, type_dense
-    use :: module_calculate, only:norm_2, dot, add, gemv
+    use :: module_linalg, only:norm_2, dot
     implicit none
     private
 #ifdef _MKL

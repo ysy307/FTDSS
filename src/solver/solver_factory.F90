@@ -1,4 +1,5 @@
 module solver_solver_factory
+    use, intrinsic :: iso_fortran_env
     use :: module_input
     use :: module_core, only:type_crs
     use :: solver_solve

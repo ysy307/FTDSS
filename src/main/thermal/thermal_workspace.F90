@@ -81,9 +81,9 @@ contains
             call deallocate_array(self%dpsi_dy)
             call deallocate_array(self%connectivity)
 
-            call self%CT_e%initialize_local(new_num_nodes)
-            call self%KT_e%initialize_local(new_num_nodes)
-            call self%J_e%initialize_local(new_num_nodes)
+            call self%CT_e%initialize(new_num_nodes)
+            call self%KT_e%initialize(new_num_nodes)
+            call self%J_e%initialize(new_num_nodes)
             call allocate_array(self%R_e, new_num_nodes)
             call allocate_array(self%T_hist_e, new_num_nodes)
             allocate (self%state(new_num_gauss))
@@ -133,7 +133,7 @@ contains
 
 #ifdef USE_DEBUG
         if (self%detJ <= 1.0d-12) then
-            cycle ! このガウス点の計算をスキップ
+            stop
         end if
 #endif
 

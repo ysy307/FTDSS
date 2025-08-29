@@ -31,6 +31,24 @@ contains
         self%num_col = 0
     end subroutine destroy_dense
 
+    module pure function get_num_row_dense(self) result(num_row)
+        implicit none
+        class(type_dense), intent(in) :: self
+        integer(int32) :: num_row
+
+        num_row = self%num_row
+
+    end function get_num_row_dense
+
+    module pure function get_num_col_dense(self) result(num_col)
+        implicit none
+        class(type_dense), intent(in) :: self
+        integer(int32) :: num_col
+
+        num_col = self%num_col
+
+    end function get_num_col_dense
+
     !----------------------------------------------------------
     ! 要素を設定
     !----------------------------------------------------------

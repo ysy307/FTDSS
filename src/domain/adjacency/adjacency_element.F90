@@ -126,8 +126,8 @@ contains
         num_nodes1 = elem1%get_num_nodes()
         num_nodes2 = elem2%get_num_nodes()
 
-        ptr_conn1 => elem1%get_connectivity()
-        ptr_conn2 => elem2%get_connectivity()
+        ptr_conn1 => elem1%get_connectivity_ptr()
+        ptr_conn2 => elem2%get_connectivity_ptr()
 
         do i = 1, num_nodes1
             do j = 1, num_nodes2
