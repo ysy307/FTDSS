@@ -1,71 +1,58 @@
-module solver_solver_factory
-    use, intrinsic :: iso_fortran_env
-    use :: module_input
-    use :: module_core, only:type_crs
-    use :: solver_solve
+submodule(solver_solve) solver_solver_factory
     implicit none
 
-    public :: create_solver
-
-    interface create_solver
-        module procedure :: create_solver_crs
-    end interface
-
 contains
-    function create_solver_crs(input, target_solver, target_matrix, num_node) result(solver)
+    module function create_solver(input, target_solver, target_matrix, num_node) result(solver)
         implicit none
         type(type_input), intent(in) :: input
-        class(abst_solver), allocatable :: solver
         character(*), intent(in) :: target_solver
-        type(type_crs), intent(in) :: target_matrix
+        type(type_jacobian_matrix), intent(in), target :: target_matrix
         integer(int32), intent(in) :: num_node
+        class(abst_solver), allocatable :: solver
 
-        if (allocated(solver)) deallocate (solver)
+        real(real64) :: tolerance
+        integer(int32) :: max_iterations
+        integer(int32) :: preconditioner
+        integer(int32) :: matrix_type
 
-        select case (trim(adjustl(target_solver)))
-        case ('thermal')
-            select case (input%basic%solver_settings%linear_solver%thermal%method)
-            case ('direct')
-                solver = type_solver_sparse_crs_lu(N=num_node, &
-                                                   MAXFCT=1, &
-                                                   MNUM=1, &
-                                                   MTYPE=1, &
-                                                   PHASE=13, &
-                                                   NRHS=1, &
-                                                   MSGVLV=0, &
-                                                   a=target_matrix)
-            case ('iterative')
-                select case (input%basic%solver_settings%linear_solver%thermal%iterative_solver%solver_type)
-                case (4)
-                    solver = type_solver_sparse_crs_bicgstab( &
-                             size=num_node, &
-                             tolerance=input%basic%solver_settings%linear_solver%thermal%iterative_solver%tolerance, &
-                             max_iterations=input%basic%solver_settings%linear_solver%thermal%iterative_solver%max_iterations, &
-                             preconditioner=input%basic%solver_settings%linear_solver%thermal%iterative_solver%preconditioner_type)
-                end select
-            end select
-        case ('hydraulic')
-            select case (input%basic%solver_settings%linear_solver%hydraulic%method)
-            case ('direct')
-                solver = type_solver_sparse_crs_lu(N=num_node, &
-                                                   MAXFCT=1, &
-                                                   MNUM=1, &
-                                                   MTYPE=1, &
-                                                   PHASE=13, &
-                                                   NRHS=1, &
-                                                   MSGVLV=0, &
-                                                   a=target_matrix)
-            case ('iterative')
-                select case (input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%solver_type)
-                case (4)
-                    solver = type_solver_sparse_crs_bicgstab( &
-                             size=num_node, &
-                             tolerance=input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%tolerance, &
-                             max_iterations=input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%max_iterations, &
-                             preconditioner=input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%preconditioner_type)
-                end select
+        select case (input%basic%solver_settings%linear_solver%thermal%method)
+        case ('iterative')
+            select case (trim(adjustl(target_solver)))
+            case ("thermal")
+                tolerance = input%basic%solver_settings%linear_solver%thermal%iterative_solver%tolerance
+                max_iterations = input%basic%solver_settings%linear_solver%thermal%iterative_solver%max_iterations
+                preconditioner = input%basic%solver_settings%linear_solver%thermal%iterative_solver%preconditioner_type
+            case ("hydraulic")
+                tolerance = input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%tolerance
+                max_iterations = input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%max_iterations
+                preconditioner = input%basic%solver_settings%linear_solver%hydraulic%iterative_solver%preconditioner_type
             end select
         end select
 
-    end function create_solver_crs
-end module solver_solver_factory
+        matrix_type = target_matrix%get_matrix_type()
+        select case (input%basic%solver_settings%linear_solver%thermal%method)
+        case ('direct')
+            select case (matrix_type)
+            case (matrix_crs)
+                solver = construct_type_solver_sparse_crs_lu(A=target_matrix, &
+                                                             MAXFCT=1, &
+                                                             MNUM=1, &
+                                                             MTYPE=1, &
+                                                             PHASE=13, &
+                                                             NRHS=1, &
+                                                             MSGVLV=0)
+            case (matrix_dense)
+                solver = type_solver_dense_lu(A=target_matrix)
+            end select
+        case ('iterative')
+            select case (input%basic%solver_settings%linear_solver%thermal%iterative_solver%solver_type)
+            case (4)
+                solver = construct_type_solver_bicgstab(A=target_matrix, &
+                                                        tolerance=tolerance, &
+                                                        max_iterations=max_iterations, &
+                                                        preconditioner=preconditioner)
+            end select
+        end select
+
+    end function create_solver
+end submodule solver_solver_factory

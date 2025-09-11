@@ -17,7 +17,7 @@ contains
         num_nodes = domain%get_num_nodes()
         call domain%node_adjacency%get_csr(row_ptr, col_ind)
 
-        call self%KT_star%initialize(num_nodes, row_ptr, col_ind)
+        call self%KT_star%initialize(num_nodes, matrix_crs, row_ptr, col_ind)
         self%order = input%basic%solver_settings%bdf_order
 
         ! call allocate_array(self%FT, num_nodes)
@@ -48,7 +48,7 @@ contains
         !---------------------------------------------------------------------------------------------------------------------------
         ! 線形求解ソルバーの設定
         !---------------------------------------------------------------------------------------------------------------------------
-        self%solver = create_solver(input, "thermal", self%KT_star%data, num_nodes)
+        self%solver = create_solver(input, "thermal", self%KT_star, num_nodes)
         !---------------------------------------------------------------------------------------------------------------------------
 
     end subroutine initialize_type_thermal
@@ -171,10 +171,10 @@ contains
 
         select case (trim(controls%iteration%get_algorithm_name()))
         case ("none")
-            call self%solver%solve(self%KT_star, self%PHIT, temperature%new(:), stat)
+            call self%solver%solve(self%PHIT, temperature%new(:), stat)
             temperature%dif(:) = temperature%new(:) - temperature%pre(:)
         case ("newton", "modified_newton", "picard")
-            call self%solver%solve(self%KT_star, self%PHIT, temperature%dif(:), stat)
+            call self%solver%solve(self%PHIT, temperature%dif(:), stat)
             temperature%new(:) = temperature%pre(:) + temperature%dif(:)
         end select
         call self%solver%check(stat, controls%time%get_time())
@@ -216,12 +216,12 @@ contains
             call controls%time%profile_stop("Assemble")
 
             call controls%time%profile_start("Setup")
-            call bc%apply_crs(boundary_target='thermal', &
-                              current_time=controls%time%get_time(), &
-                              A=self%KT_star, &
-                              b=self%PHIT, &
-                              Domain=Domain, &
-                              mode=mode_bc)
+            call bc%apply(boundary_target=calc_thermal, &
+                          current_time=controls%time%get_time(), &
+                          A=self%KT_star, &
+                          b=self%PHIT, &
+                          Domain=Domain, &
+                          mode=mode_bc)
             if (controls%iteration%get_step() == 1) call controls%iteration%set_initial_norms(res_vec=self%PHIT)
             call controls%time%profile_stop("Setup")
 

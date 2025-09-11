@@ -49,6 +49,14 @@ contains
 
     end function get_num_col_dense
 
+    module function get_val_dense(self) result(val)
+        implicit none
+        class(type_dense), intent(in), target :: self
+        real(real64), dimension(:, :), pointer :: val
+
+        val => self%val
+    end function get_val_dense
+
     !----------------------------------------------------------
     ! 要素を設定
     !----------------------------------------------------------
@@ -61,6 +69,15 @@ contains
         self%val(row, col) = value
     end subroutine set_value_dense
 
+    module subroutine set_row_dense(self, row, value)
+        implicit none
+        class(type_dense), intent(inout) :: self
+        integer(int32), intent(in) :: row
+        real(real64), intent(in) :: value
+
+        self%val(row, :) = value
+
+    end subroutine set_row_dense
     !----------------------------------------------------------
     ! 全要素を一括設定
     !----------------------------------------------------------
@@ -121,7 +138,7 @@ contains
         end select
     end subroutine add_matrix_dense
 
-    subroutine gemv_dense(self, alpha, x, beta, y)
+    module subroutine gemv_dense(self, alpha, x, beta, y)
         implicit none
         class(type_dense), intent(in) :: self
         real(real64), intent(in) :: alpha

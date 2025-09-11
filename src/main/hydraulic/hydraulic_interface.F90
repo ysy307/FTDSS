@@ -6,7 +6,6 @@ module main_hydraulic
     use :: module_domain, only:type_domain
     use :: module_properties, only:type_properties_manager
     use :: module_input, only:type_input
-    use :: module_calculate, only:gemv, add
     use :: module_boundary, only:type_bc, mode_value, mode_nr
     use :: module_solver
     use :: module_control, only:type_controls

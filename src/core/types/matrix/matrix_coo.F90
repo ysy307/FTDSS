@@ -57,6 +57,33 @@ contains
 
     end function get_num_col_coo
 
+    module function get_row_coo(self) result(row)
+        implicit none
+        class(type_coo), intent(in), target :: self
+        integer(int32), dimension(:), pointer :: row
+
+        row => self%row
+
+    end function get_row_coo
+
+    module function get_col_coo(self) result(col)
+        implicit none
+        class(type_coo), intent(in), target :: self
+        integer(int32), dimension(:), pointer :: col
+
+        col => self%col
+
+    end function get_col_coo
+
+    module function get_val_coo(self) result(val)
+        implicit none
+        class(type_coo), intent(in), target :: self
+        real(real64), dimension(:), pointer :: val
+
+        val => self%val
+
+    end function get_val_coo
+
     module pure function find_coo(self, row, col) result(index)
         implicit none
         class(type_coo), intent(in) :: self
@@ -90,6 +117,21 @@ contains
         end if
 #endif
     end subroutine set_coo
+
+    module subroutine set_row_coo(self, row, value)
+        implicit none
+        class(type_coo), intent(inout) :: self
+        integer(int32), intent(in) :: row
+        real(real64), intent(in) :: value
+
+        integer(int32) :: i
+        do i = 1, self%nnz
+            if (self%row(i) == row) then
+                self%val(i) = value
+            end if
+        end do
+
+    end subroutine set_row_coo
 
     module subroutine set_all_coo(self, value)
         implicit none

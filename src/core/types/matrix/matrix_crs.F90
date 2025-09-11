@@ -56,6 +56,33 @@ contains
 
     end function get_num_row_crs
 
+    module function get_ptr_crs(self) result(ptr)
+        implicit none
+        class(type_crs), intent(in), target :: self
+        integer(int32), dimension(:), pointer :: ptr
+
+        ptr = self%ptr
+
+    end function get_ptr_crs
+
+    module function get_ind_crs(self) result(ind)
+        implicit none
+        class(type_crs), intent(in), target :: self
+        integer(int32), dimension(:), pointer :: ind
+
+        ind = self%ind
+
+    end function get_ind_crs
+
+    module function get_val_crs(self) result(val)
+        implicit none
+        class(type_crs), intent(in), target :: self
+        real(real64), dimension(:), pointer :: val
+
+        val = self%val
+
+    end function get_val_crs
+
     module pure function find_crs(self, row, col) result(index)
         implicit none
         class(type_crs), intent(in) :: self
@@ -111,6 +138,19 @@ contains
 
         self%val = value
     end subroutine set_all_crs
+
+    module subroutine set_row_crs(self, row, value)
+        implicit none
+        class(type_crs), intent(inout) :: self
+        integer(int32), intent(in) :: row
+        real(real64), intent(in) :: value
+
+        integer(int32) :: is, ie
+
+        is = self%ptr(row)
+        ie = self%ptr(row + 1) - 1
+        self%val(is:ie) = value
+    end subroutine set_row_crs
 
     module subroutine zero_crs(self)
         implicit none

@@ -59,6 +59,8 @@ target_include_directories(Solver_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # The factory depends on the Interface and ALL concrete implementations.
 target_link_libraries(Solver_Main PUBLIC
     Solver::Input
+    Solver::Linalg
+    Solver::Field
     Solver_Interface
     Solver_Direct
     Solver_Iterative

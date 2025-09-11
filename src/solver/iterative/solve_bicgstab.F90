@@ -1,19 +1,20 @@
 submodule(solver_solve) solve_bicgstab
     implicit none
 contains
-    module function construct_type_solver_sparse_crs_bicgstab(size, tolerance, max_iterations, preconditioner) result(structure)
+    module function construct_type_solver_bicgstab(A, tolerance, max_iterations, preconditioner) result(structure)
         implicit none
-        integer(int32), intent(in) :: size
+        type(type_jacobian_matrix), intent(in), target :: A
         real(real64), intent(in) :: tolerance
         integer(int32), intent(in) :: max_iterations
         integer(int32), intent(in) :: preconditioner
         class(abst_solver), allocatable :: structure
 
-        allocate (type_solver_sparse_crs_bicgstab :: structure)
+        allocate (type_solver_bicgstab :: structure)
         select type (this => structure)
-        type is (type_solver_sparse_crs_bicgstab)
+        type is (type_solver_bicgstab)
 
-            this%size = size
+            this%A => A%get_matrix()
+            this%size = A%get_size()
             this%tolerance = tolerance
             this%max_iterations = max_iterations
             this%preconditioner = preconditioner
@@ -32,12 +33,11 @@ contains
 
         end select
 
-    end function construct_type_solver_sparse_crs_bicgstab
+    end function construct_type_solver_bicgstab
 
-    module subroutine solve_sparse_crs_bicgstab(self, A, b, x, status)
+    module subroutine solve_bicgstab(self, b, x, status)
         implicit none
-        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-        class(abst_matrix), intent(in) :: A
+        class(type_solver_bicgstab), intent(inout) :: self
         real(real64), intent(inout) :: b(:)
         real(real64), intent(inout) :: x(:)
         integer(int32), intent(inout) :: status
@@ -46,7 +46,7 @@ contains
         real(real64) :: resid
         integer(int32) :: iter, iN, vector_size
 
-        select type (matrix => A)
+        select type (matrix => self%A)
         type is (type_crs)
 
             ! 1:Initialize
@@ -155,11 +155,11 @@ contains
             status = -2
 
         end select
-    end subroutine solve_sparse_crs_bicgstab
+    end subroutine solve_bicgstab
 
-    module subroutine check_sparse_crs_bicgstab(self, status, time)
+    module subroutine check_bicgstab(self, status, time)
         implicit none
-        class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+        class(type_solver_bicgstab), intent(inout) :: self
         integer(int32), intent(in) :: status
         real(real64), intent(in) :: time
 
@@ -172,11 +172,11 @@ contains
             stop
         end if
 
-    end subroutine check_sparse_crs_bicgstab
+    end subroutine check_bicgstab
 
-    module subroutine destruct_type_solver_sparse_crs_bicgstab(self)
+    module subroutine destruct_type_solver_bicgstab(self)
         implicit none
-        type(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+        type(type_solver_bicgstab), intent(inout) :: self
 
         call deallocate_array(self%m)
         call deallocate_array(self%p)
@@ -189,5 +189,7 @@ contains
         call deallocate_array(self%v)
         call deallocate_array(self%x)
 
-    end subroutine destruct_type_solver_sparse_crs_bicgstab
+        self%A => null()
+
+    end subroutine destruct_type_solver_bicgstab
 end submodule solve_bicgstab

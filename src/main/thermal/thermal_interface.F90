@@ -2,7 +2,7 @@ module main_thermal
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
     use :: stdlib_strings
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, type_crs
+    use :: module_core
     use :: module_domain, only:type_domain
     use :: module_field, only:type_residual_vector, type_jacobian_matrix
     use :: physics_material_density, only:abst_den

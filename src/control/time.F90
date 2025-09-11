@@ -42,6 +42,7 @@ module control_time
         procedure, public, pass(self) :: profile_stop  => profile_stop_timer !&
         procedure, public, pass(self) :: get_record
         procedure, public, pass(self) :: get_time
+        procedure, public, nopass :: convert_time_unit
         procedure, public, pass(self) :: shift => shift_time
         procedure, public, pass(self) :: get_time_coefficients
         procedure, public, pass(self) :: get_dt
@@ -55,125 +56,27 @@ contains
         type(type_input), intent(in), optional :: input
         character(*), intent(in), optional :: profiler_sections(:)
 
+        real(real64) :: time_conv_coeff
+
         integer(int32) :: i
 
         if (present(input)) then
-            select case (trim(input%conditions%time_control%time_stepping%unit))
-            case ("second")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step !&
-            case ("minute")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 60.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 60.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 60.0d0 !&
-            case ("hour")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 3600.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 3600.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 3600.0d0 !&
-            case ("day")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 86400.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 86400.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 86400.0d0 !&
-            case ("year")
-                self%dt     = input%conditions%time_control%time_stepping%initial_step * 31557600.0d0 !&
-                self%dt_max = input%conditions%time_control%time_stepping%max_step     * 31557600.0d0 !&
-                self%dt_min = input%conditions%time_control%time_stepping%min_step     * 31557600.0d0 !&
-            case default
-                call error_message(981, c_opt="calculation time unit")
-            end select
+            time_conv_coeff = self%convert_time_unit(trim(input%conditions%time_control%time_stepping%unit), "second")
+            self%dt     = input%conditions%time_control%time_stepping%initial_step * time_conv_coeff !&
+            self%dt_max = input%conditions%time_control%time_stepping%max_step     * time_conv_coeff !&
+            self%dt_min = input%conditions%time_control%time_stepping%min_step     * time_conv_coeff !&
 
-            select case (trim(input%conditions%time_control%simulation_period%unit))
-            case ("second")
-                self%start_time = input%conditions%time_control%simulation_period%start !&
-                self%end_time   = input%conditions%time_control%simulation_period%end !&
-            case ("minute")
-                self%start_time = input%conditions%time_control%simulation_period%start * 60.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 60.0d0 !&
-            case ("hour")
-                self%start_time = input%conditions%time_control%simulation_period%start * 3600.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 3600.0d0 !&
-            case ("day")
-                self%start_time = input%conditions%time_control%simulation_period%start * 86400.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 86400.0d0 !&
-            case ("year")
-                self%start_time = input%conditions%time_control%simulation_period%start * 31557600.0d0 !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * 31557600.0d0 !&
-            case default
-                call error_message(981, c_opt="simulation period time unit")
-            end select
-
-            call Allocate_Array(self%dt_old, input%basic%solver_settings%bdf_order)
+            call allocate_array(self%dt_old, input%basic%solver_settings%bdf_order)
             self%dt_old(:) = 0.0d0
 
             if (allocated(input%output_settings%field_output%output_interval_unit)) then
-                select case (trim(input%output_settings%field_output%output_interval_unit))
-                case ("second")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 1.0d0
-                    case ("minute")
-                        self%time_conversion = 1.0d0 / 60.0d0
-                    case ("hour")
-                        self%time_conversion = 1.0d0 / 3600.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0 / 86400.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 31557600.0d0
-                    end select
-                case ("minute")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 60.0d0
-                    case ("minute")
-                        self%time_conversion = 1.0d0
-                    case ("hour")
-                        self%time_conversion = 1.0d0 / 60.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0 / 1440.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 525600.0d0
-                    end select
-                case ("hour")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 3600.0d0
-                    case ("minute")
-                        self%time_conversion = 60.0d0
-                    case ("hour")
-                        self%time_conversion = 1.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0 / 24.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 8760.0d0
-                    end select
-                case ("day")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 86400.0d0
-                    case ("minute")
-                        self%time_conversion = 1440.0d0
-                    case ("hour")
-                        self%time_conversion = 24.0d0
-                    case ("day")
-                        self%time_conversion = 1.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0 / 365.0d0
-                    end select
-                case ("year")
-                    select case (trim(input%conditions%time_control%simulation_period%unit))
-                    case ("second")
-                        self%time_conversion = 31557600.0d0
-                    case ("minute")
-                        self%time_conversion = 525600.0d0
-                    case ("hour")
-                        self%time_conversion = 8760.0d0
-                    case ("day")
-                        self%time_conversion = 365.0d0
-                    case ("year")
-                        self%time_conversion = 1.0d0
-                    end select
-                end select
+                time_conv_coeff = self%convert_time_unit(trim(input%conditions%time_control%simulation_period%unit), "second")
+                self%start_time = input%conditions%time_control%simulation_period%start * time_conv_coeff !&
+                self%end_time   = input%conditions%time_control%simulation_period%end   * time_conv_coeff !&
+
+                self%time_conversion = self%convert_time_unit(trim(input%output_settings%field_output%output_interval_unit), &
+                                                              trim(input%conditions%time_control%simulation_period%unit))
+
             end if
         end if
 
@@ -693,5 +596,46 @@ contains
 
         dt = self%dt
     end function get_dt
+
+    function convert_time_unit(source_unit, target_unit) result(coefficient)
+        implicit none
+        character(*), intent(in) :: source_unit
+        character(*), intent(in) :: target_unit
+        real(real64) :: coefficient
+        real(real64) :: source_factor, target_factor
+
+        select case (trim(source_unit))
+        case ("second")
+            source_factor = 1.0d0
+        case ("minute")
+            source_factor = 60.0d0
+        case ("hour")
+            source_factor = 3600.0d0
+        case ("day")
+            source_factor = 86400.0d0
+        case ("year")
+            source_factor = 31557600.0d0
+        case default
+            call error_message(981, c_opt="invalid source time unit")
+        end select
+
+        select case (trim(target_unit))
+        case ("second")
+            target_factor = 1.0d0
+        case ("minute")
+            target_factor = 60.0d0
+        case ("hour")
+            target_factor = 3600.0d0
+        case ("day")
+            target_factor = 86400.0d0
+        case ("year")
+            target_factor = 31557600.0d0
+        case default
+            call error_message(981, c_opt="invalid target time unit")
+        end select
+
+        coefficient = source_factor / target_factor
+
+    end function convert_time_unit
 
 end module control_time

@@ -3,7 +3,9 @@ module conditions_boundary_manager
     use :: module_core, only:allocate_array, deallocate_array, type_crs
     use :: module_domain, only:type_domain
     use :: module_input, only:type_input
-    use :: conditions_boundary, only:abst_bc_thermal, type_bc_thermal_adiabatic, type_bc_thermal_dirichlet
+    use :: module_control, only:type_controls, calc_thermal, calc_hydraulic, calc_mechanical
+    use :: conditions_boundary, only:abst_bc, type_bc_thermal_adiabatic, type_bc_thermal_dirichlet, thermal_bc_types
+    use :: module_field, only:type_jacobian_matrix, type_residual_vector
     implicit none
     private
 
@@ -11,171 +13,105 @@ module conditions_boundary_manager
     public :: type_bc
 
     type :: holder_bcs
-        class(abst_bc_thermal), allocatable :: t
+        class(abst_bc), allocatable :: p
     end type holder_bcs
 
     type :: type_bc
-        integer(int32) :: num_boundaries
-        type(holder_bcs), allocatable :: bc(:)
+        integer(int32) :: num_thermal_types = 0
+        type(holder_bcs), allocatable :: bc_thermal(:)
     contains
         procedure :: initialize => initialize_type_bc
-        procedure :: apply_crs => apply_type_bc_crs
+        procedure :: apply => apply_bc
         ! generic :: apply => apply_crs
     end type type_bc
 
 contains
 
-    subroutine initialize_type_bc(self, input, domain)
+    subroutine initialize_type_bc(self, input, domain, controls)
         class(type_bc), intent(inout) :: self
         type(type_input), intent(in) :: input
         type(type_domain), intent(inout) :: domain
+        type(type_controls), intent(in) :: controls
 
-        integer(int32), allocatable :: group_ids(:)
-        integer(int32) :: i, i_material
+        integer(int32), allocatable :: counts_thermal(:)
+        integer(int32) :: num_boundaries
+        integer(int32) :: i, j
+        integer(int32) :: current_index
 
-        real(real64) :: time_conv
+        num_boundaries = input%conditions%num_boundaries
+        self%num_thermal_types = 0
 
-        self%num_boundaries = input%conditions%num_boundaries
-
-        ! 2. 各グループのコンテナを確保
-        if (allocated(self%bc)) deallocate (self%bc)
-        allocate (self%bc(self%num_boundaries))
-
-        select case (input%conditions%time_control%simulation_period%unit)
-        case ("second")
-            time_conv = 1.0d0
-        case ("minute")
-            time_conv = 60.0d0
-        case ("hour")
-            time_conv = 3600.0d0
-        case ("day")
-            time_conv = 86400.0d0
-        case ("year")
-            time_conv = 31557600.0d0
-        end select
-
-        ! 3. 各グループをループして、対応するBCオブジェクトを生成・セットアップ
-        do i = 1, self%num_boundaries
-            i_material = input%conditions%boundary_conditions(i)%id
+        call allocate_array(counts_thermal, size(thermal_bc_types))
+        counts_thermal = 0
+        do i = 1, num_boundaries
             if (input%basic%analysis_controls%calculate_thermal) then
-                select case (input%conditions%boundary_conditions(i)%thermal%type)
-                case ("dirichlet")
-                    allocate (type_bc_thermal_dirichlet :: self%bc(i)%t)
-                    call self%bc(i)%t%initialize(input, domain, i, i_material, time_conv)
-                case ("adiabatic")
-                    allocate (type_bc_thermal_adiabatic :: self%bc(i)%t)
-                    call self%bc(i)%t%initialize(input, domain, i, i_material, time_conv)
-                end select
-            end if
-            if (input%basic%analysis_controls%calculate_hydraulic) then
-                ! select case (input%conditions%boundary_conditions(i)%thermal%type)
-                ! case ("dirichlet")
-                !     allocate (type_bc_thermal_dirichlet :: self%bc(i)%t)
-                !     call self%bc(i)%t%initialize(input, domain, i_material, time_conv)
-                ! case ("adiabatic")
-                !     allocate (type_bc_thermal_adiabatic :: self%bc(i)%t)
-                !     call self%bc(i)%t%initialize(input, domain, i_material, time_conv)
-                ! end select
+                bc_type: do j = 1, size(thermal_bc_types)
+                    if (trim(input%conditions%boundary_conditions(i)%thermal%type) == trim(thermal_bc_types(j))) then
+                        counts_thermal(j) = counts_thermal(j) + 1
+                        exit bc_type
+                    end if
+                end do bc_type
             end if
         end do
+
+        self%num_thermal_types = sum(counts_thermal)
+        if (self%num_thermal_types == 0) return
+
+        if (allocated(self%bc_thermal)) deallocate (self%bc_thermal)
+        allocate (self%bc_thermal(self%num_thermal_types))
+        current_index = 0
+
+        do j = 1, size(thermal_bc_types)
+            do i = 1, num_boundaries
+                if (input%basic%analysis_controls%calculate_thermal .and. &
+                    trim(input%conditions%boundary_conditions(i)%thermal%type) == trim(thermal_bc_types(j))) then
+                    current_index = current_index + 1
+                    select case (trim(adjustl(thermal_bc_types(j))))
+                    case ("neumann")
+                    case ("adiabatic")
+                        self%bc_thermal(current_index)%p = type_bc_thermal_adiabatic(input, domain, controls, i)
+                    case ("dirichlet")
+                        self%bc_thermal(current_index)%p = type_bc_thermal_dirichlet(input, domain, controls, i)
+                    case default
+                    end select
+                end if
+            end do
+        end do
+
+        call deallocate_array(counts_thermal)
     end subroutine initialize_type_bc
 
-    subroutine apply_type_bc_crs(self, boundary_target, current_time, A, b, domain, mode)
+    subroutine apply_bc(self, boundary_target, current_time, A, b, domain, mode)
+        implicit none
         class(type_bc), intent(inout) :: self
-        character(*), intent(in) :: boundary_target
+        integer(int32), intent(in) :: boundary_target
         real(real64), intent(in) :: current_time
-        type(type_crs), intent(inout), optional :: A
-        real(real64), intent(inout) :: b(:)
+        type(type_jacobian_matrix), intent(inout), optional :: A
+        type(type_residual_vector), intent(inout) :: b
         type(type_domain), intent(inout) :: domain
         integer(int32), intent(in), optional :: mode
 
         integer(int32) :: i
+        integer(int32) :: num_thermal_bcs
 
-        ! --------------------------------------------------------------------------
-        ! 1st Pass: Apply all non-Dirichlet boundary conditions (e.g., Neumann, Adiabatic)
-        ! --------------------------------------------------------------------------
-        select case (trim(adjustl(boundary_target)))
-        case ('thermal')
-            do i = 1, self%num_boundaries
-                if (allocated(self%bc(i)%t)) then
-                    select type (bc => self%bc(i)%t)
-                    type is (type_bc_thermal_dirichlet)
-                        ! This is a Dirichlet BC, so we skip it in the first pass.
-                        cycle
-                    class default
-                        ! This is any other type of BC, apply it now.
-                        if (present(A)) then
-                            ! Apply the BC using CRS matrix format.
-                            if (present(mode)) then
-                                call bc%apply_crs(current_time=current_time, &
-                                                  A=A, &
-                                                  b=b, &
-                                                  domain=domain, &
-                                                  mode=mode)
-                            else
-                                call bc%apply_crs(current_time=current_time, &
-                                                  b=b, &
-                                                  domain=domain)
-                            end if
-                        else
-                            ! Apply the BC without matrix A.
-                            if (present(mode)) then
-                                call bc%apply_crs(current_time=current_time, &
-                                                  b=b, &
-                                                  domain=domain, &
-                                                  mode=mode)
-                            else
-                                call bc%apply_crs(current_time=current_time, &
-                                                  b=b, &
-                                                  domain=domain)
-                            end if
-                        end if
-                    end select
-                end if
-            end do
+        num_thermal_bcs = size(self%bc_thermal)
+        if (num_thermal_bcs == 0) return
 
-            ! --------------------------------------------------------------------------
-            ! 2nd Pass: Apply ONLY the Dirichlet boundary conditions
-            ! --------------------------------------------------------------------------
-            do i = 1, self%num_boundaries
-                if (allocated(self%bc(i)%t)) then
-                    select type (bc => self%bc(i)%t)
-                    type is (type_bc_thermal_dirichlet)
-                        ! This is a Dirichlet BC, apply it in the final pass.
-                        if (present(A)) then
-                            ! Apply the BC using CRS matrix format.
-                            if (present(mode)) then
-                                call bc%apply_crs(current_time=current_time, &
-                                                  A=A, &
-                                                  b=b, &
-                                                  domain=domain, &
-                                                  mode=mode)
-                            else
-                                call bc%apply_crs(current_time=current_time, &
-                                                  b=b, &
-                                                  domain=domain)
-                            end if
-                        else
-                            ! Apply the BC without matrix A.
-                            if (present(mode)) then
-                                call bc%apply_crs(current_time=current_time, &
-                                                  b=b, &
-                                                  domain=domain, &
-                                                  mode=mode)
-                            else
-                                call bc%apply_crs(current_time=current_time, &
-                                                  b=b, &
-                                                  domain=domain)
-                            end if
-                        end if
-                    class default
-                        ! All other types were handled in the first pass, so do nothing.
-                        cycle
-                    end select
-                end if
+        select case (boundary_target)
+        case (calc_thermal)
+            do i = 1, num_thermal_bcs
+            if (allocated(self%bc_thermal(i)%p)) then
+                select type (bc => self%bc_thermal(i)%p)
+                class default
+                    if (present(mode)) then
+                        call bc%apply(current_time=current_time, A=A, b=b, domain=domain, mode=mode)
+                    else
+                        call bc%apply(current_time=current_time, A=A, b=b, domain=domain)
+                    end if
+                end select
+            end if
             end do
         end select
-
-    end subroutine apply_type_bc_crs
+    end subroutine apply_bc
 
 end module conditions_boundary_manager

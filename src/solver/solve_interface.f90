@@ -1,8 +1,10 @@
 module solver_solve
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:allocate_array, deallocate_array, error_message, was_interrupted, abst_matrix, type_crs, type_dense
+    use :: module_input, only:type_input
+    use :: module_core
     use :: module_linalg, only:norm_2, dot
+    use :: module_field, only:type_jacobian_matrix
     implicit none
     private
 #ifdef _MKL
@@ -10,22 +12,24 @@ module solver_solve
 #endif
 
     public :: abst_solver
-    public :: type_solver_sparse_crs_bicgstab
+    public :: type_solver_bicgstab
     public :: type_solver_sparse_crs_lu
     public :: type_solver_dense_lu
+    public :: create_solver
 
     type, abstract :: abst_solver
+        private
+        class(abst_matrix), pointer :: A => null()
     contains
         procedure(abst_solve), pass(self), deferred :: solve
         procedure(abst_check), pass(self), deferred :: check
     end type abst_solver
 
     abstract interface
-        subroutine abst_solve(self, A, b, x, status)
+        subroutine abst_solve(self, b, x, status)
             import :: abst_solver, abst_matrix, int32, real64
             implicit none
             class(abst_solver), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
             real(real64), intent(inout) :: b(:)
             real(real64), intent(inout) :: x(:)
             integer(int32), intent(inout) :: status
@@ -40,7 +44,7 @@ module solver_solve
         end subroutine abst_check
     end interface
 
-    type, extends(abst_solver) :: type_solver_sparse_crs_bicgstab
+    type, extends(abst_solver) :: type_solver_bicgstab
         integer(int32) :: size
         real(real64), allocatable :: m(:)
         real(real64), allocatable :: p(:)
@@ -61,41 +65,44 @@ module solver_solve
         ! 1: Jacobi preconditioner
         ! 2: ILU preconditioner (No implemented)
     contains
-        procedure :: solve => solve_sparse_crs_bicgstab
-        procedure :: check => check_sparse_crs_bicgstab
-        procedure, private, pass(self) :: create_preconditioner => create_preconditioner_sparse_crs_bicgstab
-        procedure, private, pass(self) :: apply_preconditioner => apply_preconditioner_sparse_crs_bicgstab
-        final :: destruct_type_solver_sparse_crs_bicgstab
-    end type type_solver_sparse_crs_bicgstab
+        procedure :: solve => solve_bicgstab
+        procedure :: check => check_bicgstab
+        procedure, private, pass(self) :: create_preconditioner => create_preconditioner_bicgstab
+        procedure, private, pass(self) :: apply_preconditioner => apply_preconditioner_bicgstab
+        final :: destruct_type_solver_bicgstab
+    end type type_solver_bicgstab
 
     interface
-        module function construct_type_solver_sparse_crs_bicgstab(size, tolerance, max_iterations, preconditioner) result(structure)
+        module function construct_type_solver_bicgstab(A, tolerance, max_iterations, preconditioner) result(structure)
             implicit none
-            integer(int32), intent(in) :: size
+            type(type_jacobian_matrix), intent(in), target :: A
             real(real64), intent(in) :: tolerance
             integer(int32), intent(in) :: max_iterations
             integer(int32), intent(in) :: preconditioner
             class(abst_solver), allocatable :: structure
 
-        end function construct_type_solver_sparse_crs_bicgstab
+        end function construct_type_solver_bicgstab
 
-        module subroutine solve_sparse_crs_bicgstab(self, A, b, x, status)
+        module subroutine solve_bicgstab(self, b, x, status)
             implicit none
-            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
+            class(type_solver_bicgstab), intent(inout) :: self
             real(real64), intent(inout) :: b(:)
             real(real64), intent(inout) :: x(:)
             integer(int32), intent(inout) :: status
 
-        end subroutine solve_sparse_crs_bicgstab
+        end subroutine solve_bicgstab
 
-        module subroutine check_sparse_crs_bicgstab(self, status, time)
+        module subroutine check_bicgstab(self, status, time)
             implicit none
-            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+            class(type_solver_bicgstab), intent(inout) :: self
             integer(int32), intent(in) :: status
             real(real64), intent(in) :: time
 
-        end subroutine check_sparse_crs_bicgstab
+        end subroutine check_bicgstab
+    end interface
+
+    interface
+
     end interface
 
     type, extends(abst_solver) :: type_solver_sparse_crs_lu
@@ -183,24 +190,22 @@ module solver_solve
     end type type_solver_sparse_crs_lu
 
     interface
-        module function construct_type_solver_sparse_crs_lu(N, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV, A) result(structure)
+        module function construct_type_solver_sparse_crs_lu(A, MAXFCT, MNUM, MTYPE, PHASE, NRHS, MSGVLV) result(structure)
             implicit none
-            integer(int32), intent(in) :: N
+            type(type_jacobian_matrix), intent(in), target :: A
             integer(int32), intent(in) :: MAXFCT
             integer(int32), intent(in) :: MNUM
             integer(int32), intent(in) :: MTYPE
             integer(int32), intent(in) :: PHASE
             integer(int32), intent(in) :: NRHS
             integer(int32), intent(in) :: MSGVLV
-            type(type_crs), intent(in) :: A
             class(abst_solver), allocatable :: structure
 
         end function construct_type_solver_sparse_crs_lu
 
-        module subroutine solve_sparse_crs_lu(self, A, b, x, status)
+        module subroutine solve_sparse_crs_lu(self, b, x, status)
             implicit none
             class(type_solver_sparse_crs_lu), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
             real(real64), intent(inout) :: b(:)
             real(real64), intent(inout) :: x(:)
             integer(int32), intent(inout) :: status
@@ -228,17 +233,16 @@ module solver_solve
 
     interface
 
-        module function construct_type_solver_dense_lu(N) result(structure)
+        module function construct_type_solver_dense_lu(A) result(structure)
             implicit none
-            integer(int32), intent(in) :: N
+            type(type_jacobian_matrix), intent(in), target :: A
             class(abst_solver), allocatable :: structure
 
         end function construct_type_solver_dense_lu
 
-        module subroutine solve_dense_lu(self, A, b, x, status)
+        module subroutine solve_dense_lu(self, b, x, status)
             implicit none
             class(type_solver_dense_lu), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
             real(real64), intent(inout) :: b(:)
             real(real64), intent(inout) :: x(:)
             integer(int32), intent(inout) :: status
@@ -254,8 +258,8 @@ module solver_solve
         end subroutine check_dense_lu
     end interface
 
-    interface type_solver_sparse_crs_bicgstab
-        module procedure :: construct_type_solver_sparse_crs_bicgstab
+    interface type_solver_bicgstab
+        module procedure :: construct_type_solver_bicgstab
     end interface
 
     interface type_solver_sparse_crs_lu
@@ -271,7 +275,7 @@ module solver_solve
         module subroutine create_preconditioner_jacobi(N, A, M)
             implicit none
             integer(int32), intent(in) :: N
-            type(type_crs), intent(in) :: A
+            class(abst_matrix), intent(in) :: A
             real(real64), intent(inout) :: M(:)
 
         end subroutine create_preconditioner_jacobi
@@ -285,25 +289,37 @@ module solver_solve
 
         end subroutine apply_preconditioner_jacobi
 
-        module subroutine create_preconditioner_sparse_crs_bicgstab(self, A)
+        module subroutine create_preconditioner_bicgstab(self, A)
             implicit none
-            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
-            type(type_crs), intent(in) :: A
+            class(type_solver_bicgstab), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
 
-        end subroutine create_preconditioner_sparse_crs_bicgstab
+        end subroutine create_preconditioner_bicgstab
 
-        module subroutine apply_preconditioner_sparse_crs_bicgstab(self, b, x)
+        module subroutine apply_preconditioner_bicgstab(self, b, x)
             implicit none
-            class(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+            class(type_solver_bicgstab), intent(inout) :: self
             real(real64), intent(inout) :: b(:)
             real(real64), intent(inout) :: x(:)
-        end subroutine apply_preconditioner_sparse_crs_bicgstab
+        end subroutine apply_preconditioner_bicgstab
 
-        module subroutine destruct_type_solver_sparse_crs_bicgstab(self)
+        module subroutine destruct_type_solver_bicgstab(self)
             implicit none
-            type(type_solver_sparse_crs_bicgstab), intent(inout) :: self
+            type(type_solver_bicgstab), intent(inout) :: self
 
-        end subroutine destruct_type_solver_sparse_crs_bicgstab
+        end subroutine destruct_type_solver_bicgstab
 
     end interface
+
+    interface
+        module function create_solver(input, target_solver, target_matrix, num_node) result(solver)
+            implicit none
+            type(type_input), intent(in) :: input
+            character(*), intent(in) :: target_solver
+            type(type_jacobian_matrix), intent(in), target :: target_matrix
+            integer(int32), intent(in) :: num_node
+            class(abst_solver), allocatable :: solver
+        end function create_solver
+    end interface
+
 end module solver_solve

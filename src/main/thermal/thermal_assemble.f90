@@ -80,14 +80,14 @@ contains
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 3: Build the final local matrix (J_e) and vector (R_e)
         !---------------------------------------------------------------------------------------------------------------------------
-        call add(workspace%coefficients(0) / workspace%dt, workspace%CT_e, workspace%KT_e, workspace%J_e)
-        call gemv(-1.0d0 / workspace%dt, workspace%CT_e, workspace%T_hist_e, 0.0d0, workspace%R_e)
+        call workspace%CT_e%add(workspace%coefficients(0) / workspace%dt, workspace%KT_e, workspace%J_e)
+        call workspace%CT_e%gemv(-1.0d0 / workspace%dt, workspace%T_hist_e, 0.0d0, workspace%R_e)
 
         !---------------------------------------------------------------------------------------------------------------------------
         ! STEP 4: Assemble the global matrix and vector
         !---------------------------------------------------------------------------------------------------------------------------
-        call J%set_local(workspace%connectivity, workspace%J_e)
-        call R%set_local(workspace%connectivity, workspace%R_e)
+        call J%add(workspace%connectivity, workspace%J_e)
+        call R%add(workspace%connectivity, workspace%R_e)
 
     end subroutine process_mesh_thermal_linear_1
 

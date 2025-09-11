@@ -18,14 +18,16 @@ module core_types_matrix
         procedure(abst_destroy), public, pass(self), deferred :: destroy
 
         procedure(abst_set_value), private, pass(self), deferred :: set_value
+        procedure(abst_set_row), private, pass(self), deferred :: set_row
         procedure(abst_set_all), private, pass(self), deferred :: set_all
-        generic, public :: set => set_value, set_all
+        generic, public :: set => set_value, set_row, set_all
 
         procedure(abst_zero), public, pass(self), deferred :: zero
         procedure(abst_add_value), private, pass(self), deferred :: add_value
         procedure(abst_add_matrix), private, pass(self), deferred :: add_matrix
         generic, public :: add => add_value, add_matrix
-        ! pr
+
+        procedure(abst_gemv), public, pass(self), deferred :: gemv
 
         procedure(abst_display), public, pass(self), deferred :: display
     end type abst_matrix
@@ -49,6 +51,15 @@ module core_types_matrix
             real(real64), intent(in) :: value
 
         end subroutine abst_set_value
+
+        subroutine abst_set_row(self, row, value)
+            import :: abst_matrix, real64, int32
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            real(real64), intent(in) :: value
+
+        end subroutine abst_set_row
 
         subroutine abst_set_all(self, value)
             import :: abst_matrix, real64
@@ -83,6 +94,17 @@ module core_types_matrix
             class(abst_matrix), intent(inout) :: C
         end subroutine abst_add_matrix
 
+        subroutine abst_gemv(self, alpha, x, beta, y)
+            import :: abst_matrix, real64
+            implicit none
+            class(abst_matrix), intent(in) :: self
+            real(real64), intent(in) :: alpha
+            real(real64), intent(in) :: x(:)
+            real(real64), intent(in) :: beta
+            real(real64), intent(inout) :: y(:)
+
+        end subroutine abst_gemv
+
         subroutine abst_display(self)
             import :: abst_matrix
             implicit none
@@ -103,15 +125,29 @@ module core_types_matrix
         integer(int32) :: num_col = 0
         real(real64), allocatable :: val(:, :)
     contains
+        ! --- initialize/destroy ---
         procedure, pass(self) :: initialize => initialize_dense
         procedure, pass(self) :: destroy => destroy_dense
+
+        ! --- getter ---
         procedure, pass(self) :: get_num_row => get_num_row_dense
         procedure, pass(self) :: get_num_col => get_num_col_dense
+        procedure, pass(self) :: get_val => get_val_dense
+
+        ! --- setter ---
         procedure, pass(self) :: set_value => set_value_dense
+        procedure, pass(self) :: set_row => set_row_dense
         procedure, pass(self) :: set_all => set_all_dense
+
+        ! --- zero ----
         procedure, pass(self) :: zero => zero_dense
+
+        ! --- addition ---
         procedure, pass(self) :: add_value => add_value_dense
         procedure, pass(self) :: add_matrix => add_matrix_dense
+        procedure, pass(self) :: gemv => gemv_dense
+
+        ! --- display ---
         procedure, pass(self) :: display => display_dense
     end type type_dense
 
@@ -145,6 +181,13 @@ module core_types_matrix
 
         end function get_num_col_dense
 
+        module function get_val_dense(self) result(val)
+            implicit none
+            class(type_dense), intent(in), target :: self
+            real(real64), dimension(:, :), pointer :: val
+
+        end function get_val_dense
+
         module subroutine set_value_dense(self, row, col, value)
             implicit none
             class(type_dense), intent(inout) :: self
@@ -152,6 +195,14 @@ module core_types_matrix
             real(real64), intent(in) :: value
 
         end subroutine set_value_dense
+
+        module subroutine set_row_dense(self, row, value)
+            implicit none
+            class(type_dense), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            real(real64), intent(in) :: value
+
+        end subroutine set_row_dense
 
         module subroutine set_all_dense(self, value)
             class(type_dense), intent(inout) :: self
@@ -182,6 +233,16 @@ module core_types_matrix
 
         end subroutine add_matrix_dense
 
+        module subroutine gemv_dense(self, alpha, x, beta, y)
+            implicit none
+            class(type_dense), intent(in) :: self
+            real(real64), intent(in) :: alpha
+            real(real64), intent(in) :: x(:)
+            real(real64), intent(in) :: beta
+            real(real64), intent(inout) :: y(:)
+
+        end subroutine gemv_dense
+
         module subroutine display_dense(self)
             implicit none
             class(type_dense), intent(in) :: self
@@ -197,23 +258,34 @@ module core_types_matrix
         integer(int32), allocatable :: ind(:) ! column indices of non-zeros
         real(real64), allocatable :: val(:) ! non-zero values
     contains
+        ! --- initialize/destroy ---
         procedure, pass(self) :: initialize => initialize_type_crs
         procedure, pass(self) :: destroy => destroy_crs
 
+        ! --- getter ---
         procedure, pass(self) :: get_nnz => get_nnz_crs
         procedure, pass(self) :: get_num_ptr => get_num_ptr_crs
         procedure, pass(self) :: get_num_row => get_num_row_crs
+        procedure, pass(self) :: get_ptr => get_ptr_crs
+        procedure, pass(self) :: get_ind => get_ind_crs
+        procedure, pass(self) :: get_val => get_val_crs
 
+        ! --- setter ---
         procedure, pass(self) :: set_value => set_crs
+        procedure, pass(self) :: set_row => set_row_crs
         procedure, pass(self) :: set_all => set_all_crs
+
+        ! --- zero ----
         procedure, pass(self) :: zero => zero_crs
 
-        procedure, pass(self) :: find => find_crs
+        procedure, private, pass(self) :: find => find_crs
 
+        ! --- addition ---
         procedure, pass(self) :: add_value => add_crs
         procedure, pass(self) :: add_matrix => add_matrix_crs
         procedure, pass(self) :: gemv => gemv_crs
 
+        ! --- display ---
         procedure, pass(self) :: display => display_crs
 
     end type type_crs
@@ -255,6 +327,27 @@ module core_types_matrix
 
         end function get_num_row_crs
 
+        module function get_ptr_crs(self) result(ptr)
+            implicit none
+            class(type_crs), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: ptr
+
+        end function get_ptr_crs
+
+        module function get_ind_crs(self) result(ind)
+            implicit none
+            class(type_crs), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: ind
+
+        end function get_ind_crs
+
+        module function get_val_crs(self) result(val)
+            implicit none
+            class(type_crs), intent(in), target :: self
+            real(real64), dimension(:), pointer :: val
+
+        end function get_val_crs
+
         module pure function find_crs(self, row, col) result(index)
             implicit none
             class(type_crs), intent(in) :: self
@@ -270,6 +363,14 @@ module core_types_matrix
             real(real64), intent(in) :: value
 
         end subroutine set_crs
+
+        module subroutine set_row_crs(self, row, value)
+            implicit none
+            class(type_crs), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            real(real64), intent(in) :: value
+
+        end subroutine set_row_crs
 
         module subroutine set_all_crs(self, value)
             implicit none
@@ -327,20 +428,34 @@ module core_types_matrix
         integer(int32), allocatable :: col(:)
         real(real64), allocatable :: val(:)
     contains
+        ! --- initialize/destroy ---
         procedure, pass(self) :: initialize => initialize_type_coo
         procedure, pass(self) :: destroy => destroy_coo
 
+        ! --- getter ---
         procedure, pass(self) :: get_nnz => get_nnz_coo
         procedure, pass(self) :: get_num_row => get_num_row_coo
         procedure, pass(self) :: get_num_col => get_num_col_coo
+        procedure, pass(self) :: get_row => get_row_coo
+        procedure, pass(self) :: get_col => get_col_coo
+        procedure, pass(self) :: get_val => get_val_coo
 
+        ! --- setter ---
         procedure, pass(self) :: set_value => set_coo
         procedure, pass(self) :: set_all => set_all_coo
+        procedure, pass(self) :: set_row => set_row_coo
+
         procedure, private, pass(self) :: find => find_coo
+
+        ! --- zero ----
         procedure, pass(self) :: zero => zero_coo
+
+        ! --- addition ---
         procedure, pass(self) :: add_value => add_coo
         procedure, pass(self) :: add_matrix => add_matrix_coo
         procedure, pass(self) :: gemv => gemv_coo
+
+        ! --- display ---
         procedure, pass(self) :: display => display_coo
 
     end type type_coo
@@ -376,6 +491,27 @@ module core_types_matrix
 
         end function get_num_col_coo
 
+        module function get_row_coo(self) result(row)
+            implicit none
+            class(type_coo), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: row
+
+        end function get_row_coo
+
+        module function get_col_coo(self) result(col)
+            implicit none
+            class(type_coo), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: col
+
+        end function get_col_coo
+
+        module function get_val_coo(self) result(val)
+            implicit none
+            class(type_coo), intent(in), target :: self
+            real(real64), dimension(:), pointer :: val
+
+        end function get_val_coo
+
         module pure function find_coo(self, row, col) result(index)
             implicit none
             class(type_coo), intent(in) :: self
@@ -391,6 +527,14 @@ module core_types_matrix
             real(real64), intent(in) :: value
 
         end subroutine set_coo
+
+        module subroutine set_row_coo(self, row, value)
+            implicit none
+            class(type_coo), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            real(real64), intent(in) :: value
+
+        end subroutine set_row_coo
 
         module subroutine set_all_coo(self, value)
             implicit none

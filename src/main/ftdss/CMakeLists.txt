@@ -13,6 +13,7 @@ target_link_libraries(App_FTDSS PUBLIC
     # FTDSSが直接利用する他のモジュールもここに追加
     Solver::Control 
     Solver::Input
+    Solver::Conditions
     Solver::Output
 )
 enable_build_flags(App_FTDSS)
