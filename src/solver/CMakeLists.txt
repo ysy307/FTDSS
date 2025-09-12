@@ -15,7 +15,12 @@ set(SOLVER_INTERFACE_SOURCES
 add_library(Solver_Interface STATIC ${SOLVER_INTERFACE_SOURCES})
 target_include_directories(Solver_Interface PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # The interface itself depends on Core and Linalg for types.
-target_link_libraries(Solver_Interface PUBLIC Solver::Core Solver::Linalg)
+target_link_libraries(Solver_Interface PUBLIC 
+    Solver::Input
+    Solver::Core
+    Solver::Linalg
+    Solver::Field
+)
 enable_build_flags(Solver_Interface)
 
 

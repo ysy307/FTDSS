@@ -1,5 +1,8 @@
 module inout_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+#ifdef _MPI
+    use :: mpi_f08
+#endif
 !$  use :: omp_lib
     use :: stdlib_strings, only:to_string, ends_with
     use :: stdlib_logger
@@ -309,32 +312,94 @@ contains
         implicit none
         class(type_input), intent(inout) :: self
 
-        logical :: exists ! File existence status
+        character(len=:), allocatable :: fullpath
+        character(len=:), allocatable :: local_input_path
 
-        ! Path settings
-        self%project_path = trim(adjustl(get_project_path()))
+#ifdef _MPI
+        integer(int32) :: ierr, myrank
+        integer(int32) :: error_flag = 0
+#endif
 
-        inquire (file=self%project_path//"Input/", exist=exists)
-        if (.not. exists) call error_message(901)
+        ! project_pathの取得は全員が行う
+        self%project_path = get_project_path()
 
-        self%basic_file_name = self%project_path//"Input/Basic.json"
-        self%conditions_file_name = self%project_path//"Input/Conditions.json"
-        self%output_file_name = self%project_path//"Input/Output.json"
+#ifdef _MPI
+        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 
-        ! Check the existence of the file
-        inquire (file=self%basic_file_name, exist=exists)
-        if (.not. exists) call error_message(902, c_opt=self%basic_file_name)
+        if (myrank == 0) then
 
-        inquire (file=self%conditions_file_name, exist=exists)
-        if (.not. exists) call error_message(902, c_opt=self%conditions_file_name)
+            fullpath = trim(self%project_path)//"Input/"
 
-        inquire (file=self%output_file_name, exist=exists)
-        if (.not. exists) call error_message(902, c_opt=self%output_file_name)
+            ! 1. ランク0が、新しい関数を使って各ファイルの存在をチェック
+            if (.not. file_exists(fullpath//"Basic.json")) error_flag = 2
+            if (.not. file_exists(fullpath//"Conditions.json")) error_flag = 3
+            if (.not. file_exists(fullpath//"Output.json")) error_flag = 4
+        end if
+
+        ! 2. ランク0のチェック結果(error_flag)を全員にブロードキャスト
+        call MPI_Bcast(error_flag, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+
+        ! 3. もしエラーがあれば全員で停止
+        if (error_flag /= 0) then
+            if (myrank == 0) then
+                print *, "FATAL ERROR: A required input file was not found. Aborting."
+                ! ここでどのファイルがなかったかを示すメッセージを追加すると、さらに親切
+                select case (error_flag)
+                case (2); print *, "-> Basic.json is missing."
+                case (3); print *, "-> Conditions.json is missing."
+                case (4); print *, "-> Output.json is missing."
+                end select
+            end if
+            call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
+        end if
+
+#else
+        ! --- シリアル実行時の処理 ---
+        fullpath = trim(self%project_path)//"Input/"
+        if (.not. file_exists(fullpath//"Basic.json")) call error_message(902, c_opt=fullpath//"Basic.json")
+        if (.not. file_exists(fullpath//"Conditions.json")) call error_message(902, c_opt=fullpath//"Conditions.json")
+        if (.not. file_exists(fullpath//"Output.json")) call error_message(902, c_opt=fullpath//"Output.json")
+#endif
+
+        ! --- ここから先の処理は、全プロセスが同じファイル名を持っており、
+        ! --- そのファイルが存在することが保証された状態で実行される ---
+
+        local_input_path = trim(self%project_path)//"Input/"
+
+        self%basic_file_name = local_input_path//"Basic.json"
+        self%conditions_file_name = local_input_path//"Conditions.json"
+        self%output_file_name = local_input_path//"Output.json"
 
         call self%read_parameters()
         call self%read_conditions()
         call self%read_output_settings()
         call self%read_geometry()
+
     end subroutine initialize_type_input
+
+    !-----------------------------------------------------------------------
+    ! 機能: ファイルの存在を open/close を使って確実にチェックする
+    ! 引数: file_path - チェックしたいファイルのパス
+    ! 戻り値: .true. (ファイルが存在し、読み取り可能), .false. (それ以外)
+    !-----------------------------------------------------------------------
+    function file_exists(file_path) result(found)
+        implicit none
+        character(len=*), intent(in) :: file_path
+        logical :: found
+        integer(int32) :: unit_num, io_status
+
+        ! status='old' でファイルを開こうと試みる
+        open (newunit=unit_num, file=trim(file_path), status="old", action="read", iostat=io_status)
+
+        if (io_status == 0) then
+            ! openに成功した場合: ファイルは存在する。すぐに閉じる。
+            close (unit_num)
+            found = .true.
+        else
+            ! openに失敗した場合: ファイルは存在しないか、アクセスできない。
+            found = .false.
+        end if
+
+    end function file_exists
 
 end module inout_input

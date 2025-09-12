@@ -1,5 +1,8 @@
 module Main_FTDSS
     use, intrinsic :: iso_fortran_env
+#ifdef _MPI
+    use :: mpi
+#endif
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
@@ -45,6 +48,17 @@ contains
         integer(int32) :: ierr
         integer(int32) :: nsize
         character(len=10), allocatable :: profiler_labels(:)
+
+#ifdef _MPI
+        integer(int32) :: num_procs, myrank
+        call MPI_INIT(ierr)
+        call MPI_Comm_size(MPI_COMM_WORLD, num_procs, ierr)
+        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+
+        if (ierr /= 0 .and. myrank == 0) then
+            call global_logger%log_fatal(message="MPI initialization failed.")
+        end if
+#endif
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
         call self%controls%time%initialize(profiler_sections=profiler_labels)

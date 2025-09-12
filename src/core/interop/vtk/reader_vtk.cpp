@@ -21,21 +21,17 @@ int VtkReader::initialize(const char *filename)
         return -1;
     }
 
-    // ★★★ 修正点①: 毎回新しいリーダーのインスタンスを生成する ★★★
     this->reader = vtkSmartPointer<vtkUnstructuredGridReader>::New();
     this->reader->SetFileName(filename);
     this->reader->Update();
 
-    // ★★★ 修正点②: 新しいグリッドのインスタンスに結果をコピーする ★★★
     this->grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     this->grid->ShallowCopy(this->reader->GetOutput());
 
-    // 結果が有効か（NULLでないか、中身が空でないか）をチェック
     if (!this->grid || this->grid->GetNumberOfPoints() == 0)
     {
         std::cerr << "Error: Failed to read valid UnstructuredGrid data from: " << filename << std::endl;
         this->initialized = false;
-        // 失敗した場合も、gridをクリーンな状態に保つ
         this->grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
         return -1; // エラーコード
     }
@@ -107,7 +103,7 @@ void VtkReader::getCellInfo(long long *connectivity, long long *offsets, int *ty
     long long num_conn_values = conn_array->GetNumberOfTuples();
     for (long long i = 0; i < num_conn_values; ++i)
     {
-        connectivity[i] = conn_array->GetTuple1(i) + 1; // 0-origin to 1-origin
+        connectivity[i] = conn_array->GetTuple1(i);
     }
 
     // --- Offsets and Typesの計算 (Legacy VTK対応) ---
@@ -152,6 +148,46 @@ void VtkReader::getCellDataInt32(const char *dataName, int *data)
     for (int i = 0; i < num_tuples; ++i)
     {
         data[i] = static_cast<int>(data_array->GetTuple1(i));
+    }
+}
+
+void VtkReader::getCellDataFloat64(const char *dataName, double *data)
+{
+    if (!initialized)
+        return;
+
+    vtkDataArray *data_array = this->grid->GetCellData()->GetArray(dataName);
+    if (!data_array)
+    {
+        std::cerr << "Warning: Cell data '" << dataName << "' not found." << std::endl;
+        return;
+    }
+
+    int num_tuples = data_array->GetNumberOfTuples();
+    for (int i = 0; i < num_tuples; ++i)
+    {
+        data[i] = static_cast<int>(data_array->GetTuple1(i));
+    }
+}
+
+void VtkReader::getPointDataInt32(const char *dataName, int *data)
+{
+    if (!initialized)
+        return;
+
+    // 節点データを名前で取得
+    vtkDataArray *data_array = this->grid->GetPointData()->GetArray(dataName);
+    if (!data_array)
+    {
+        std::cerr << "Warning: Point data array '" << dataName << "' not found in the file." << std::endl;
+        return;
+    }
+
+    long long num_tuples = data_array->GetNumberOfTuples();
+    for (long long i = 0; i < num_tuples; ++i)
+    {
+        // doubleで取得して格納
+        data[i] = data_array->GetTuple1(i);
     }
 }
 

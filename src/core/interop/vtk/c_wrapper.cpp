@@ -110,19 +110,31 @@ extern "C"
     }
 
     /**
-     * @brief 名前で指定されたセルID配列を取得する
+     * @brief 名前で指定されたセルデータ配列を取得する
      */
-    void c_vtk_get_cell_ids(void *handle, const char *array_name, int *ids)
+    void c_vtk_get_cell_data_int32(void *handle, const char *array_name, int *data)
     {
         if (!handle)
             return;
-        static_cast<VtkReader *>(handle)->getCellDataInt32(array_name, ids);
+        static_cast<VtkReader *>(handle)->getCellDataInt32(array_name, data);
+    }
+    void c_vtk_get_cell_data_float64(void *handle, const char *array_name, double *data)
+    {
+        if (!handle)
+            return;
+        static_cast<VtkReader *>(handle)->getCellDataFloat64(array_name, data);
     }
 
     /**
-     * @brief 名前で指定されたポイントデータを取得する
+     * @brief 名前で指定されたポイントデータ配列を取得する
      */
-    void c_vtk_get_point_data(void *handle, const char *array_name, double *data)
+    void c_vtk_get_point_data_int32(void *handle, const char *array_name, int *data)
+    {
+        if (!handle)
+            return;
+        static_cast<VtkReader *>(handle)->getPointDataInt32(array_name, data);
+    }
+    void c_vtk_get_point_data_float64(void *handle, const char *array_name, double *data)
     {
         if (!handle)
             return;
@@ -229,19 +241,33 @@ extern "C"
     }
 
     /**
-     * @brief 名前で指定されたセルID配列を取得する
+     * @brief 名前で指定されたセルデータ配列を取得する
      */
-    void c_vtu_get_cell_ids(void *handle, const char *array_name, int *ids)
+    void c_vtu_get_cell_data_int32(void *handle, const char *array_name, int *ids)
     {
         if (!handle)
             return;
         static_cast<VtuReader *>(handle)->getCellDataInt32(array_name, ids);
     }
 
+    void c_vtu_get_cell_data_float64(void *handle, const char *array_name, double *data)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuReader *>(handle)->getCellDataFloat64(array_name, data);
+    }
+
     /**
-     * @brief 名前で指定されたポイントデータを取得する
+     * @brief 名前で指定されたポイントデータ配列を取得する
      */
-    void c_vtu_get_point_data(void *handle, const char *array_name, double *data)
+    void c_vtu_get_point_data_int32(void *handle, const char *array_name, int *data)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuReader *>(handle)->getPointDataInt32(array_name, data);
+    }
+
+    void c_vtu_get_point_data_float64(void *handle, const char *array_name, double *data)
     {
         if (!handle)
             return;

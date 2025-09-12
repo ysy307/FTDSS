@@ -1,5 +1,8 @@
 module domain_manager
     use, intrinsic :: iso_fortran_env, only: int32
+#ifdef _MPI
+    use :: mpi_f08
+#endif
     use :: stdlib_logger
     use :: module_core, only:type_dp_3d, allocate_array, deallocate_array
     use :: module_input, only:type_input
@@ -50,6 +53,11 @@ contains
         integer(int32) :: count_sides, count_elements, count_volumes
         integer(int32) :: iCell, iElem, iSide
         integer(int32) :: cell_dimension
+
+#ifdef _MPI
+        integer(int32) :: my_rank, ierr
+        call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
+#endif
 
         ! -----------------------------------------------------------------------------------
         ! 初期化処理
@@ -106,9 +114,15 @@ contains
         !===============================================================
         ! 3. 隣接行列の構築
         !===============================================================
+#ifdef _MPI
+        call self%node_adjacency%initialize(input%geometry%vtk%global_num_points, self%computation_dimension, self%sides, self%elements)
+        call self%element_adjacency%initialize(self%elements)
+        call self%map_node_to_element%initialize(input%geometry%vtk%global_num_points, self%elements, "fast")
+#else
         call self%node_adjacency%initialize(self%num_nodes, self%computation_dimension, self%sides, self%elements)
         call self%element_adjacency%initialize(self%elements)
         call self%map_node_to_element%initialize(self%num_nodes, self%elements, "fast")
+#endif
 
         !===============================================================
         ! 4. RCM並べ替えの実行
@@ -117,18 +131,31 @@ contains
         if (input%basic%solver_settings%reordering /= "none") then
             call self%node_adjacency%destroy()
             call self%apply_reordering()
+#ifdef _MPI
+            call self%node_adjacency%initialize(input%geometry%vtk%global_num_points, &
+                                                self%computation_dimension, self%sides, self%elements)
+            if (my_rank == 0) call global_logger%log_information(message="RCM reordering completed.")
+#else
             call self%node_adjacency%initialize(self%num_nodes, self%computation_dimension, self%sides, self%elements)
             call global_logger%log_information(message="RCM reordering completed.")
+#endif
+
         end if
 
         !===============================================================
         ! 5. グラフ彩色の実行
         !===============================================================
         call self%colors%initialize(input%basic%solver_settings%coloring, self%element_adjacency)
-        call global_logger%log_information(message="Graph coloring completed using " &
-                                           //trim(self%colors%algorithm_name)//" algorithm.")
+#ifdef _MPI
+        if (my_rank == 0) then
+#endif
+            call global_logger%log_information(message="Graph coloring completed using " &
+                                               //trim(self%colors%algorithm_name)//" algorithm.")
 
-        call global_logger%log_information(message="Initialization process completed successfully.")
+            call global_logger%log_information(message="Initialization process completed successfully.")
+#ifdef _MPI
+        end if
+#endif
 
     end subroutine initialize_type_domain
 

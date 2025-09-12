@@ -1,18 +1,22 @@
 module core_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
+#ifdef _MPI
+    use mpi_f08
+#endif
+    use :: stdlib_strings, only:to_string
     use :: stdlib_sorting, only:sort
     use :: core_types, only:type_dp_3d
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
     use :: core_unique, only:unique
     use :: core_vtk_vtk_constants
-    use :: core_vtk_vtk_wrapper, only: vtk_initialize, vtk_read_header, vtk_get_num_points, & !&
-                                       vtk_get_points, vtk_get_num_cells, vtk_get_total_connectivity_size, & !&
-                                       vtk_get_cell_info, vtk_get_cell_ids, vtk_get_point_data, vtk_finalize !&
-    use :: core_vtk_vtu_wrapper, only: vtu_initialize, vtu_read_header, vtu_get_num_points, & !&
-                                       vtu_get_points, vtu_get_num_cells, vtu_get_total_connectivity_size, & !&
-                                       vtu_get_cell_info, vtu_get_cell_ids, vtu_get_point_data, vtu_finalize !&
+    use :: core_vtk_vtk_wrapper, only:vtk_initialize, vtk_read_header, vtk_get_num_points, &
+        vtk_get_points, vtk_get_num_cells, vtk_get_total_connectivity_size, &
+        vtk_get_cell_info, vtk_get_cell_data_int32, vtk_get_cell_data_float64, vtk_get_point_data_int32, vtk_get_point_data_float64, vtk_finalize
+    use :: core_vtk_vtu_wrapper, only:vtu_initialize, vtu_read_header, vtu_get_num_points, &
+        vtu_get_points, vtu_get_num_cells, vtu_get_total_connectivity_size, &
+        vtu_get_cell_info, vtu_get_cell_data_int32, vtu_get_cell_data_float64, vtu_get_point_data_int32, vtu_get_point_data_float64, vtu_finalize
 
     implicit none
     private
@@ -30,6 +34,7 @@ module core_vtk
         integer(int32) :: cell_dimension
         integer(int32) :: cell_order
         integer(int32), allocatable :: connectivity(:)
+
     contains
         procedure :: set => type_vtk_cell_set
         procedure :: get_dimension => type_vtk_cell_get_dimension
@@ -40,11 +45,20 @@ module core_vtk
         character(:), allocatable :: format
         character(:), allocatable :: dataset
         ! VTK Points data
-        integer(int32) :: num_points
+        integer(int32) :: num_points ! Local number of points
         type(type_dp_3d) :: points
         ! VTK Cells data
-        integer(int32) :: num_total_cells
+        integer(int32) :: num_total_cells ! Local number of cells
         type(type_vtk_cell), allocatable :: cells(:)
+
+#ifdef _MPI
+        ! --- MPI-specific members ---
+        integer(int32) :: my_rank = 0
+        integer(int32) :: num_procs = 1
+        integer(int32) :: global_num_points = 0
+        integer(int32) :: global_num_total_cells = 0
+        integer(int32), allocatable :: global_node_ids(:)
+#endif
 
         type(c_ptr), private :: handle = c_null_ptr
         character(4), private :: reader_type = "none"
@@ -84,6 +98,11 @@ contains
         integer(int32) :: connectivity_first, connectivity_last, num_nodes_in_cell
         character(50, kind=c_char) :: f_format, f_dataset
         integer(c_int) :: len_f_format, len_f_dataset
+#ifdef _MPI
+        integer(int32) :: global_max_node_id, local_max_node_id
+        integer(int32) :: my_rank
+        integer(int32) :: dot_pos
+#endif
 
         !----------------------------------------------------------------!
         ! 1. C++リーダーの初期化とハンドルの取得
@@ -99,7 +118,19 @@ contains
         end if
 
         ! C言語で扱えるように文字列を準備
+#ifdef _MPI
+        call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
+
+        dot_pos = index(trim(file_name), '.', back=.true.)
+        if (dot_pos > 0) then
+            c_file_name = file_name(1:dot_pos - 1)//"_"//to_string(my_rank) &
+                          //file_name(dot_pos:len_trim(file_name))//c_null_char
+        else
+            c_file_name = trim(file_name)//"_"//to_string(my_rank)//c_null_char
+        end if
+#else
         c_file_name = trim(file_name)//c_null_char
+#endif
         c_cell_id_array_name = trim(cell_id_array_name)//c_null_char
 
         ! C++リーダーを初期化し、返されたポインタをハンドルとして保存
@@ -107,7 +138,8 @@ contains
 
         ! ハンドルが有効か、エラーコードが0かを確認
         if (.not. c_associated(self%handle) .or. ierr /= 0) then
-            write (*, *) "C++ VTK Reader failed to initialize. Error code: ", ierr
+            write (*, *) "C++ VTK Reader failed to initialize for file: ", trim(c_file_name)
+            write (*, *) "Error code: ", ierr
             stop "VTK Initialization Failed"
         end if
 
@@ -143,7 +175,7 @@ contains
 
             ! 生データをCから取得
             call vtk_get_cell_info(self%handle, raw_connectivity, raw_offsets, raw_cell_types)
-            call vtk_get_cell_ids(self%handle, c_cell_id_array_name, raw_cell_entity_ids)
+            call vtk_get_cell_data_int32(self%handle, c_cell_id_array_name, raw_cell_entity_ids)
 
             ! Fortran構造体にデータを格納し直す
             allocate (self%cells(self%num_total_cells))
@@ -156,7 +188,8 @@ contains
                 num_nodes_in_cell = connectivity_last - connectivity_first + 1
 
                 call allocate_array(self%cells(i)%connectivity, num_nodes_in_cell)
-                self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32)
+                ! Connectivity read from file is 0-based, needs to be converted to 1-based for Fortran
+                self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32) + 1
                 call self%cells(i)%set(num_nodes_in_cell)
             end do
         end if
@@ -167,13 +200,46 @@ contains
                 allocate (field_values(self%num_points, size(field_names)))
                 do i = 1, size(field_names)
                     c_field_name = trim(field_names(i))//c_null_char
-                    call vtk_get_point_data(self%handle, c_field_name, field_values(:, i))
+                    call vtk_get_point_data_float64(self%handle, c_field_name, field_values(:, i))
                 end do
             end if
         end if
 
+#ifdef _MPI
+        ! --- 3. MPI: グローバル情報の計算とインデックスの更新 ---
+        call MPI_Comm_rank(MPI_COMM_WORLD, self%my_rank, ierr)
+        call MPI_Comm_size(MPI_COMM_WORLD, self%num_procs, ierr)
+
+        ! [MODIFIED] Read global_node_id from point data
+        if (self%num_points > 0) then
+            allocate (self%global_node_ids(self%num_points))
+            c_field_name = "global_node_id"//c_null_char
+            call vtk_get_point_data_int32(self%handle, c_field_name, self%global_node_ids)
+            self%global_node_ids = self%global_node_ids + 1 ! Convert to 1-based indexing
+        end if
+
+        ! グローバルな総数を計算 (global_num_pointsは最大IDから推定するか、別途ファイルで渡すのが堅牢)
+        if (self%num_points > 0) then
+            local_max_node_id = maxval(self%global_node_ids)
+        else
+            local_max_node_id = 0
+        end if
+
+        call MPI_Allreduce(local_max_node_id, global_max_node_id, 1, MPI_INTEGER4, MPI_MAX, MPI_COMM_WORLD, ierr)
+        self%global_num_points = global_max_node_id
+        call MPI_Allreduce(self%num_total_cells, self%global_num_total_cells, 1, MPI_INTEGER4, MPI_SUM, MPI_COMM_WORLD, ierr)
+
+        ! [MODIFIED] Convert connectivity to global indices using the map
+        if (self%num_total_cells > 0 .and. self%num_points > 0) then
+            do i = 1, self%num_total_cells
+                self%cells(i)%connectivity(:) = self%global_node_ids(self%cells(i)%connectivity(:))
+            end do
+        end if
+
+#endif
+
         !----------------------------------------------------------------!
-        ! 3. 後片付け (C++オブジェクトのfinalizeは呼ばない)
+        ! 4. 後片付け (C++オブジェクトのfinalizeは呼ばない)
         !----------------------------------------------------------------!
         call deallocate_array(raw_connectivity)
         call deallocate_array(raw_offsets)
@@ -183,7 +249,7 @@ contains
     end subroutine type_vtk_vtk_initialize
 
     subroutine type_vtk_vtu_initialize(self, file_name, cell_id_array_name, field_names, field_values)
-        !> Read VTK file using C++ backend with the handle pattern
+        !> Read VTU file using C++ backend with the handle pattern
         implicit none
         class(type_vtk), intent(inout) :: self
         character(*), intent(in) :: file_name
@@ -207,6 +273,11 @@ contains
         integer(int32) :: connectivity_first, connectivity_last, num_nodes_in_cell
         character(50, kind=c_char) :: f_format, f_dataset
         integer(c_int) :: len_f_format, len_f_dataset
+#ifdef _MPI
+        integer(int32) :: my_rank
+        integer(int32) :: dot_pos
+        integer(int32) :: local_max_node_id, global_max_node_id
+#endif
 
         !----------------------------------------------------------------!
         ! 1. C++リーダーの初期化とハンドルの取得
@@ -221,8 +292,19 @@ contains
             self%handle = c_null_ptr
         end if
 
-        ! C言語で扱えるように文字列を準備
+#ifdef _MPI
+        call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
+
+        dot_pos = index(trim(file_name), '.', back=.true.)
+        if (dot_pos > 0) then
+            c_file_name = trim(file_name(1:dot_pos - 1))//"_"//trim(adjustl(to_string(my_rank))) &
+                          //trim(file_name(dot_pos:len_trim(file_name)))//c_null_char
+        else
+            c_file_name = trim(file_name)//"_"//trim(adjustl(to_string(my_rank)))//c_null_char
+        end if
+#else
         c_file_name = trim(file_name)//c_null_char
+#endif
         c_cell_id_array_name = trim(cell_id_array_name)//c_null_char
 
         ! C++リーダーを初期化し、返されたポインタをハンドルとして保存
@@ -230,7 +312,8 @@ contains
 
         ! ハンドルが有効か、エラーコードが0かを確認
         if (.not. c_associated(self%handle) .or. ierr /= 0) then
-            write (*, *) "C++ VTU Reader failed to initialize. Error code: ", ierr
+            write (*, *) "C++ VTU Reader failed to initialize for file: ", trim(c_file_name)
+            write (*, *) "Error code: ", ierr
             stop "VTU Initialization Failed"
         end if
 
@@ -266,7 +349,7 @@ contains
 
             ! 生データをCから取得
             call vtu_get_cell_info(self%handle, raw_connectivity, raw_offsets, raw_cell_types)
-            call vtu_get_cell_ids(self%handle, c_cell_id_array_name, raw_cell_entity_ids)
+            call vtu_get_cell_data_int32(self%handle, c_cell_id_array_name, raw_cell_entity_ids)
 
             ! Fortran構造体にデータを格納し直す
             allocate (self%cells(self%num_total_cells))
@@ -279,7 +362,8 @@ contains
                 num_nodes_in_cell = connectivity_last - connectivity_first + 1
 
                 call allocate_array(self%cells(i)%connectivity, num_nodes_in_cell)
-                self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32)
+                ! Connectivity read from file is 0-based, needs to be converted to 1-based for Fortran
+                self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32) + 1
                 call self%cells(i)%set(num_nodes_in_cell)
             end do
         end if
@@ -290,13 +374,48 @@ contains
                 allocate (field_values(self%num_points, size(field_names)))
                 do i = 1, size(field_names)
                     c_field_name = trim(field_names(i))//c_null_char
-                    call vtu_get_point_data(self%handle, c_field_name, field_values(:, i))
+                    call vtu_get_point_data_float64(self%handle, c_field_name, field_values(:, i))
                 end do
             end if
         end if
 
+#ifdef _MPI
+        ! --- 3. MPI: グローバル情報の計算とインデックスの更新 ---
+        call MPI_Comm_rank(MPI_COMM_WORLD, self%my_rank, ierr)
+        call MPI_Comm_size(MPI_COMM_WORLD, self%num_procs, ierr)
+
+        ! [MODIFIED] Read global_node_id from point data
+        if (self%num_points > 0) then
+            allocate (self%global_node_ids(self%num_points))
+            c_field_name = "global_node_id"//c_null_char
+            ! NOTE: vtu_get_point_data should be able to handle integer arrays.
+            ! Assuming a generic or specific integer version exists.
+            call vtu_get_point_data_int32(self%handle, c_field_name, self%global_node_ids)
+            self%global_node_ids = self%global_node_ids + 1 ! Convert to 1-based indexing
+        end if
+
+        ! グローバルな総数を計算
+        if (self%num_points > 0) then
+            local_max_node_id = maxval(self%global_node_ids)
+        else
+            local_max_node_id = 0
+        end if
+        call MPI_Allreduce(local_max_node_id, global_max_node_id, 1, MPI_INTEGER4, MPI_MAX, MPI_COMM_WORLD, ierr)
+        self%global_num_points = global_max_node_id
+        call MPI_Allreduce(self%num_total_cells, self%global_num_total_cells, 1, MPI_INTEGER4, MPI_SUM, MPI_COMM_WORLD, ierr)
+
+        ! [MODIFIED] Convert connectivity to global indices using the map
+        ! The connectivity array holds 1-based local indices. Use them to look up the global ID.
+        if (self%num_total_cells > 0 .and. self%num_points > 0) then
+            do i = 1, self%num_total_cells
+                self%cells(i)%connectivity(:) = self%global_node_ids(self%cells(i)%connectivity(:))
+            end do
+        end if
+
+#endif
+
         !----------------------------------------------------------------!
-        ! 3. 後片付け (C++オブジェクトのfinalizeは呼ばない)
+        ! 4. 後片付け (C++オブジェクトのfinalizeは呼ばない)
         !----------------------------------------------------------------!
         call deallocate_array(raw_connectivity)
         call deallocate_array(raw_offsets)
@@ -737,16 +856,23 @@ contains
         ! --- 引数 ---
         implicit none
         class(Type_VTK), intent(in) :: self !! VTK data
-        integer(int32), allocatable, intent(inout) :: unique_ids(:)
+        integer(int32), allocatable, intent(out) :: unique_ids(:)
         integer(int32), intent(out) :: ierr
 
         ! --- ローカル変数 ---
-        integer(int32) :: max_dim
+        integer(int32) :: local_max_dim
         integer(int32), allocatable :: collected_ids(:)
         integer(int32) :: i_cell, count
         logical(4) :: is_max_dim_element
 
-        max_dim = 0
+#ifdef _MPI
+        integer(int32) :: global_max_dim
+        integer(int32), allocatable :: all_counts(:), displs(:)
+        integer(int32), allocatable :: global_collected_ids(:)
+        integer(int32) :: total_collected_count, j
+#endif
+
+        local_max_dim = 0
         ierr = 0
 
         ! --- ステップ1: メッシュ内の最大次元を判定 ---
@@ -755,21 +881,32 @@ contains
             case (VTK_TETRA, VTK_HEXAHEDRON, &
                   VTK_WEDGE, VTK_PYRAMID, &
                   VTK_QUADRATIC_TETRA, VTK_QUADRATIC_HEXAHEDRON)
-                max_dim = 3
+                local_max_dim = 3
                 exit ! 3Dが見つかったら、それ以上探す必要はない
             case (VTK_TRIANGLE, VTK_PIXEL, &
                   VTK_QUAD, VTK_QUADRATIC_TRIANGLE, &
                   VTK_QUADRATIC_QUAD)
-                max_dim = max(max_dim, 2)
+                local_max_dim = max(local_max_dim, 2)
             case (VTK_LINE, VTK_QUADRATIC_EDGE)
-                max_dim = max(max_dim, 1)
+                local_max_dim = max(local_max_dim, 1)
             end select
         end do
 
-        if (max_dim == 0) then
+#ifdef _MPI
+        ! MPI: 全プロセスの最大次元を求め、グローバルな最大次元を決定
+        call MPI_Allreduce(local_max_dim, global_max_dim, 1, MPI_INTEGER4, MPI_MAX, MPI_COMM_WORLD, ierr)
+        if (global_max_dim == 0) then
             ierr = -1
+            allocate (unique_ids(0))
+            return
+        end if
+#else
+        if (local_max_dim == 0) then
+            ierr = -1
+            allocate (unique_ids(0))
             return ! アクティブな要素がない
         end if
+#endif
 
         ! --- ステップ2: 最大次元を持つ要素から、すべてのCellEntityIdを収集 ---
         allocate (collected_ids(self%num_total_cells))
@@ -780,13 +917,25 @@ contains
             case (VTK_TETRA, VTK_HEXAHEDRON, &
                   VTK_WEDGE, VTK_PYRAMID, &
                   VTK_QUADRATIC_TETRA, VTK_QUADRATIC_HEXAHEDRON)
-                if (max_dim == 3) is_max_dim_element = .true.
+#ifdef _MPI
+                if (global_max_dim == 3) is_max_dim_element = .true.
+#else
+                if (local_max_dim == 3) is_max_dim_element = .true.
+#endif
             case (VTK_TRIANGLE, VTK_PIXEL, &
                   VTK_QUAD, VTK_QUADRATIC_TRIANGLE, &
                   VTK_QUADRATIC_QUAD)
-                if (max_dim == 2) is_max_dim_element = .true.
+#ifdef _MPI
+                if (global_max_dim == 2) is_max_dim_element = .true.
+#else
+                if (local_max_dim == 2) is_max_dim_element = .true.
+#endif
             case (VTK_LINE, VTK_QUADRATIC_EDGE)
-                if (max_dim == 1) is_max_dim_element = .true.
+#ifdef _MPI
+                if (global_max_dim == 1) is_max_dim_element = .true.
+#else
+                if (local_max_dim == 1) is_max_dim_element = .true.
+#endif
             end select
 
             if (is_max_dim_element) then
@@ -796,12 +945,35 @@ contains
         end do
 
         ! --- ステップ3: 収集したIDリストから、ユニークなものだけを抽出 ---
-        ! (これはFortranの標準的なユニーク化のアルゴリズム)
+#ifdef _MPI
+        ! MPI: 全プロセスのIDを収集し、グローバルにユニークなものを抽出
+        allocate (all_counts(self%num_procs))
+        allocate (displs(self%num_procs))
+        call MPI_Allgather(count, 1, MPI_INTEGER4, all_counts, 1, MPI_INTEGER4, MPI_COMM_WORLD, ierr)
+
+        total_collected_count = sum(all_counts)
+        if (total_collected_count > 0) then
+            displs(1) = 0
+            do j = 2, self%num_procs
+                displs(j) = displs(j - 1) + all_counts(j - 1)
+            end do
+            allocate (global_collected_ids(total_collected_count))
+            call MPI_Allgatherv(collected_ids(1:count), count, MPI_INTEGER4, &
+                                global_collected_ids, all_counts, displs, MPI_INTEGER4, MPI_COMM_WORLD, ierr)
+            call unique(global_collected_ids, unique_ids)
+            deallocate (global_collected_ids)
+        else
+            allocate (unique_ids(0))
+        end if
+        deallocate (all_counts, displs)
+#else
         if (count > 0) then
             call unique(collected_ids(1:count), unique_ids)
         else
             allocate (unique_ids(0))
         end if
+#endif
+        deallocate (collected_ids)
 
     end subroutine get_active_region_info
 
@@ -824,3 +996,4 @@ contains
         end if
     end subroutine finalize_vtk_object
 end module core_vtk
+

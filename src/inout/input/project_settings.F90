@@ -1,68 +1,78 @@
 module inout_project_settings
-    use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:error_message
+#ifdef _MPI
+    use mpi_f08
+#endif
+    use, intrinsic :: iso_fortran_env, only: int32
     implicit none
     private
 
-    character(256) :: ProjectPath
+    character(len=:), allocatable :: ProjectPath
     logical :: is_initialize_project_path = .false.
 
     public :: get_project_path
 
 contains
+
     subroutine inout_project_path_initialize()
         implicit none
-        character(64), parameter :: dName = "ProjectPath.dir"
-        integer(int32) :: status, len_path, unit_num
-        integer(int32) :: i
-        logical :: found
+        character(len=*), parameter :: ENV_VAR_NAME = "FTDSS_PROJECT_PATH"
+        character(len=2048) :: path_buffer
+        integer(int32) :: stat, i, null_pos
 
-        inquire (file=dName, exist=found)
-        if (.not. found) call error_message(900, c_opt=dName)
+#ifdef _MPI
+        integer(int32) :: my_rank, ierr
+#endif
 
-        open (newunit=unit_num, file=dName, iostat=status, status="old")
-        if (status /= 0) call error_message(902, c_opt=dName)
+#ifdef _MPI
+        call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
+        if (my_rank == 0) then
+            call get_environment_variable(ENV_VAR_NAME, path_buffer, status=stat)
+            if (stat /= 0) path_buffer = ''
+        end if
+        call MPI_Bcast(path_buffer, len(path_buffer), MPI_CHARACTER, 0, MPI_COMM_WORLD, ierr)
+        if (len_trim(path_buffer) == 0) then
+            if (my_rank == 0) print *, "FATAL ERROR: Could not get project path. Check if '", trim(ENV_VAR_NAME), "' is set."
+            call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
+        end if
+#else
+        call get_environment_variable(ENV_VAR_NAME, path_buffer, status=stat)
+        if (stat /= 0) then
+            print *, "FATAL ERROR: Environment variable '", trim(ENV_VAR_NAME), "' is not set."
+            call exit(1)
+        end if
+#endif
 
-        read (unit_num, '(a)') ProjectPath
-        close (unit_num)
-        len_path = len_trim(ProjectPath)
-        ProjectPath = trim(adjustl(ProjectPath))
+        ProjectPath = trim(path_buffer)
 
-        ! For windows, replace "\\" with "/"
-        i = index(ProjectPath, "\\")
-        do while (i > 0)
-            ProjectPath(i:i + 1) = "/"
-            if (i + 2 <= len_path) then
-                ProjectPath(i + 1:) = ProjectPath(i + 2:)//" "
+        ! Delete any trailing null characters
+        null_pos = index(ProjectPath, char(0))
+        if (null_pos > 0) then
+            ProjectPath = ProjectPath(:null_pos - 1)
+        end if
+
+        ! Replace backslashes with forward slashes for cross-platform compatibility
+        do i = 1, len(ProjectPath)
+            if (ProjectPath(i:i) == '\') then
+                ProjectPath(i:i) = '/'
             end if
-            len_path = len_path - 1
-            i = index(ProjectPath, "\\")
         end do
 
-        ! For UNIX, replace "\" with "/"
-        i = index(ProjectPath, "\")
-        do while (i > 0)
-            ProjectPath(i:i) = "/"
-            len_path = len_trim(ProjectPath)
-            i = index(ProjectPath, "\")
-        end do
-
-        ! Add "/" to end to path
-        if (len_path > 0 .and. ProjectPath(len_path:len_path) /= "/") then
-            ProjectPath = trim(adjustl(ProjectPath))//"/"
+        ! Ensure the path ends with a slash
+        if (len_trim(ProjectPath) > 0 .and. ProjectPath(len_trim(ProjectPath):len_trim(ProjectPath)) /= "/") then
+            ProjectPath = trim(ProjectPath)//"/"
         end if
 
         is_initialize_project_path = .true.
 
     end subroutine inout_project_path_initialize
 
-    function get_project_path() result(project_path)
+    function get_project_path() result(res)
         implicit none
-        character(256) :: project_path
+        character(len=:), allocatable :: res
 
         if (.not. is_initialize_project_path) call inout_project_path_initialize
 
-        project_path = ProjectPath
+        res = ProjectPath
 
     end function get_project_path
 

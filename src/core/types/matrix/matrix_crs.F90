@@ -61,7 +61,7 @@ contains
         class(type_crs), intent(in), target :: self
         integer(int32), dimension(:), pointer :: ptr
 
-        ptr = self%ptr
+        ptr => self%ptr
 
     end function get_ptr_crs
 
@@ -70,7 +70,7 @@ contains
         class(type_crs), intent(in), target :: self
         integer(int32), dimension(:), pointer :: ind
 
-        ind = self%ind
+        ind => self%ind
 
     end function get_ind_crs
 
@@ -79,7 +79,7 @@ contains
         class(type_crs), intent(in), target :: self
         real(real64), dimension(:), pointer :: val
 
-        val = self%val
+        val => self%val
 
     end function get_val_crs
 

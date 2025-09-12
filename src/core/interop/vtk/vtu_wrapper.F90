@@ -11,8 +11,10 @@ module core_vtk_vtu_wrapper
     public :: vtu_get_num_cells
     public :: vtu_get_total_connectivity_size
     public :: vtu_get_cell_info
-    public :: vtu_get_cell_ids
-    public :: vtu_get_point_data
+    public :: vtu_get_cell_data_int32
+    public :: vtu_get_cell_data_float64
+    public :: vtu_get_point_data_int32
+    public :: vtu_get_point_data_float64
     public :: vtu_finalize
 
     !----------------------------------------------------------------!
@@ -74,20 +76,33 @@ module core_vtk_vtu_wrapper
             integer(c_int), intent(out) :: types(*)
         end subroutine vtu_get_cell_info
 
-        subroutine vtu_get_cell_ids(handle, array_name, ids) bind(C, name='c_vtu_get_cell_ids')
+        subroutine vtu_get_cell_data_int32(handle, array_name, ids) bind(C, name='c_vtu_get_cell_data_int32')
             import :: c_ptr, c_int, c_char
             type(c_ptr), value, intent(in) :: handle
             character(kind=c_char), intent(in) :: array_name(*)
             integer(c_int), intent(out) :: ids(*)
-        end subroutine vtu_get_cell_ids
+        end subroutine vtu_get_cell_data_int32
 
-        subroutine vtu_get_point_data(handle, array_name, point_data) bind(C, name='c_vtu_get_point_data')
+        subroutine vtu_get_cell_data_float64(handle, array_name, data) bind(C, name='c_vtu_get_cell_data_float64')
+            import :: c_ptr, c_double, c_char
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            real(c_double), intent(out) :: data(*)
+        end subroutine vtu_get_cell_data_float64
+
+        subroutine vtu_get_point_data_int32(handle, array_name, point_data) bind(C, name='c_vtu_get_point_data_int32')
+            import :: c_ptr, c_int, c_char
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: point_data(*)
+        end subroutine vtu_get_point_data_int32
+
+        subroutine vtu_get_point_data_float64(handle, array_name, point_data) bind(C, name='c_vtu_get_point_data_float64')
             import :: c_ptr, c_double, c_char
             type(c_ptr), value, intent(in) :: handle
             character(kind=c_char), intent(in) :: array_name(*)
             real(c_double), intent(out) :: point_data(*)
-        end subroutine vtu_get_point_data
+        end subroutine vtu_get_point_data_float64
 
     end interface
-
 end module core_vtk_vtu_wrapper

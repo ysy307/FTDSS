@@ -17,7 +17,8 @@ public:
     long long getTotalConnectivitySize();
     void getCellInfo(long long *connectivity, long long *offsets, int *types);
     void getCellDataInt32(const char *dataName, int *data);
-    // .vtkリーダーと同じインターフェースを持つ節点データ取得関数
+    void getCellDataFloat64(const char *dataName, double *data);
+    void getPointDataInt32(const char *dataName, int *data);
     void getPointDataFloat64(const char *dataName, double *data);
 
 private:

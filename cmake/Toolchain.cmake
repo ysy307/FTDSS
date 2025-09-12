@@ -2,6 +2,7 @@
 # 必須パッケージの探索 (OpenMP, MPI)
 # =========================================================================
 if(ENABLE_MPI AND NOT TARGET MPI::MPI_Fortran)
+    # CMAKE_Fortran_COMPILER=mpiifx を指定していれば、FindMPIは自動で設定を検出します。
     find_package(MPI REQUIRED)
 endif()
 
@@ -10,54 +11,46 @@ endif()
 # =========================================================================
 if(ENABLE_MKL AND NOT TARGET MKL::MKL)
 
+    # MKLの基本的な設定
     set(MKL_LINK static)
     set(MKL_INTERFACE lp64)
-    set(MKL_INTERFACE_LAYER "_lp64")
-    set(MKL_SYCL_INTERFACE_FULL intel_lp64)
 
-    set(MKL_THREADING "")
-    set(OPENMP_FORTRAN_LIB "")
-
-    if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+    # MKLのスレッディング層をコンパイラに基づいて決定
+    # ifort (Intel) と ifx (IntelLLVM) の両方に対応
+    if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
         set(MKL_THREADING "intel_thread")
-        message(STATUS "MKL Threading: Intel OpenMP")
+        message(STATUS "MKL Threading: Intel OpenMP (for ${CMAKE_Fortran_COMPILER_ID})")
     elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
         set(MKL_THREADING "gnu_thread")
         message(STATUS "MKL Threading: GNU OpenMP (libgomp)")
     else()
+        # 不明なコンパイラの場合、IntelのOpenMPをデフォルトにする
         set(MKL_THREADING "intel_thread")
-        message(WARNING "MKL Threading: Unknown compiler, defaulting to Intel OpenMP.")
+        message(WARNING "MKL Threading: Unknown compiler '${CMAKE_Fortran_COMPILER_ID}', defaulting to Intel OpenMP.")
     endif()
 
+    # OpenMPが有効な場合、OpenMPパッケージを探す
     if(ENABLE_OPENMP)
         find_package(OpenMP REQUIRED)
-        set(OPENMP_FORTRAN_LIB OpenMP::OpenMP_Fortran)
     endif()
 
+    # 上記の MKL_* 変数に基づいて、MKLパッケージを探索
     find_package(MKL CONFIG REQUIRED)
 
+    # BLAS/LAPACKのエイリアスターゲットを作成
     add_library(BLAS::BLAS INTERFACE IMPORTED)
     add_library(LAPACK::LAPACK INTERFACE IMPORTED)
 
-    # MKL に OpenMP もリンクさせる（必要なら）
-    if(OPENMP_FORTRAN_LIB)
-        set_target_properties(BLAS::BLAS PROPERTIES
-            INTERFACE_LINK_LIBRARIES "MKL::MKL;${OPENMP_FORTRAN_LIB}"
-        )
-        set_target_properties(LAPACK::LAPACK PROPERTIES
-            INTERFACE_LINK_LIBRARIES "MKL::MKL;${OPENMP_FORTRAN_LIB}"
-        )
+    # MKLターゲットに、必要に応じてOpenMPライブラリもリンク
+    if(ENABLE_OPENMP AND TARGET OpenMP::OpenMP_Fortran)
+        target_link_libraries(BLAS::BLAS INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
+        target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
     else()
-        set_target_properties(BLAS::BLAS PROPERTIES
-            INTERFACE_LINK_LIBRARIES MKL::MKL
-        )
-        set_target_properties(LAPACK::LAPACK PROPERTIES
-            INTERFACE_LINK_LIBRARIES MKL::MKL
-        )
+        target_link_libraries(BLAS::BLAS INTERFACE MKL::MKL)
+        target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL)
     endif()
 
 endif()
-
 
 
 # =========================================================================

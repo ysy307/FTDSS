@@ -228,11 +228,13 @@ contains
         end if
 
         self%geometry_file_name = self%project_path//"Input/"//trim(adjustl(self%basic%geometry_settings%file_name))
+#ifndef _MPI
         inquire (file=self%geometry_file_name, exist=found)
         if (.not. found) then
             call json%destroy()
             call error_message(902, c_opt=self%geometry_file_name)
         end if
+#endif
 
         key = join([geometry_settings, cell_id_array_name])
         call json%get(key, self%basic%geometry_settings%cell_id_array_name, found)

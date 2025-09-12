@@ -27,7 +27,10 @@ set(DOMAIN_MESH_SOURCES
 add_library(Domain_Mesh STATIC ${DOMAIN_MESH_SOURCES})
 target_include_directories(Domain_Mesh PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # Mesh depends on Core for types and Input for reading geometry.
-target_link_libraries(Domain_Mesh PUBLIC Solver::Core Solver::Input)
+target_link_libraries(Domain_Mesh PUBLIC
+    Solver::Core
+    Solver::Input
+)
 enable_build_flags(Domain_Mesh)
 enable_thirdparty(Domain_Mesh)
 
@@ -103,7 +106,7 @@ add_library(Domain_Interface INTERFACE)
 
 # Link all component libraries to this target.
 target_link_libraries(Domain_Interface INTERFACE
-    Domain_Main # Linking to the top-level manager transitively links everything else.
+    Domain_Main
 )
 
 # Create a clean, namespaced ALIAS for other directories to use.

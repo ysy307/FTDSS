@@ -7,10 +7,10 @@ trap '/usr/bin/python3 /workspaces/FTDSS/scripts/check.py' EXIT
 
 cmake -S . -B CMakeBuild \
     -DBUILD_APP=test \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_Fortran_COMPILER=ifx \
-    -DCMAKE_C_COMPILER=icx \
-    -DCMAKE_CXX_COMPILER=icpx \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_Fortran_COMPILER=mpiifx \
+    -DCMAKE_C_COMPILER=mpiicx \
+    -DCMAKE_CXX_COMPILER=mpiicpx \
     -G "Ninja"
 
 cmake --build CMakeBuild

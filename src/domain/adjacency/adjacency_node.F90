@@ -6,6 +6,9 @@
 !================================================================!
 module domain_adjacency_adjacency_node
     use, intrinsic :: iso_fortran_env, only: int32, int64
+#ifdef _MPI
+    use :: mpi_f08
+#endif
     use :: stdlib_sorting, only:sort
     use :: module_core, only:allocate_array, deallocate_array, unique
     use :: module_mesh, only:holder_sides, holder_elements
@@ -236,6 +239,7 @@ contains
         class(type_node_adjacency), intent(inout) :: self
         integer(int32) :: i, current_row, dest_pos
         integer(int32), allocatable :: temp_ptr(:)
+        integer(int32) :: my_rank, ierr
 
         if (self%nnz == 0) then
             if (self%num_nodes > 0) then

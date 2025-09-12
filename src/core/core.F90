@@ -16,8 +16,4 @@ module module_core
     implicit none
     public
 
-#ifdef _MPI
-    include 'mpif.h'
-#endif
-
 end module module_core

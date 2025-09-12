@@ -1,5 +1,8 @@
 module core_error
     use, intrinsic :: iso_fortran_env, only: int32, real32, real64, real128
+#ifdef _MPI
+    use :: mpi_f08
+#endif
     use :: stdlib_logger
     implicit none
     private
@@ -8,15 +11,14 @@ module core_error
 
 contains
 
-    subroutine error_message(err_number, myrank, opt, c_opt)
+    subroutine error_message(err_number, opt, c_opt)
         implicit none
         integer(int32), intent(in) :: err_number
-        integer(int32), optional, intent(in) :: myrank
         real(real64), optional, intent(in) :: opt
         character(*), optional, intent(in) :: c_opt
 
         character(256) :: msg
-        integer(int32) :: ierr
+        integer(int32) :: ierr, rank
         character(8) :: fmt = '(a,i3,a)'
 
         if (err_number == 901) then
@@ -154,15 +156,10 @@ contains
         end if
 
 #ifdef _MPI
-        if (myrank == 0) then
-            call MPI_Finalize(ierr)
-#endif
-
-            call global_logger%log_error(message=msg)
-            stop
-
-#ifdef _MPI
-        end if
+        call MPI_Comm_rank(MPI_COMM_WORLD, rank, ierr)
+        if (rank == 0) call global_logger%log_error(message=msg)
+#else
+        call global_logger%log_error(message=msg)
 #endif
     end subroutine error_message
 
