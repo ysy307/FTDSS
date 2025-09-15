@@ -20,6 +20,8 @@ public:
     void getCellDataFloat64(const char *dataName, double *data);
     void getPointDataInt32(const char *dataName, int *data);
     void getPointDataFloat64(const char *dataName, double *data);
+    int getNumberOfPointDataComponents(const char *dataName);
+    int getNumberOfCellDataComponents(const char *dataName);
 
 private:
     vtkSmartPointer<vtkXMLUnstructuredGridReader> reader; // .vtu用のリーダー

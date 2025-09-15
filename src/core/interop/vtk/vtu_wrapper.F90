@@ -11,6 +11,8 @@ module core_vtk_vtu_wrapper
     public :: vtu_get_num_cells
     public :: vtu_get_total_connectivity_size
     public :: vtu_get_cell_info
+    public :: vtu_get_num_cell_data_components
+    public :: vtu_get_num_point_data_components
     public :: vtu_get_cell_data_int32
     public :: vtu_get_cell_data_float64
     public :: vtu_get_point_data_int32
@@ -75,6 +77,22 @@ module core_vtk_vtu_wrapper
             integer(c_long_long), intent(out) :: offsets(*)
             integer(c_int), intent(out) :: types(*)
         end subroutine vtu_get_cell_info
+
+        ! --- ここから追加 ---
+        subroutine vtu_get_num_cell_data_components(handle, array_name, num_components) bind(C, name='c_vtu_get_num_cell_data_components')
+            import :: c_ptr, c_char, c_int
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: num_components
+        end subroutine vtu_get_num_cell_data_components
+
+        subroutine vtu_get_num_point_data_components(handle, array_name, num_components) bind(C, name='c_vtu_get_num_point_data_components')
+            import :: c_ptr, c_char, c_int
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: num_components
+        end subroutine vtu_get_num_point_data_components
+        ! --- ここまで追加 ---
 
         subroutine vtu_get_cell_data_int32(handle, array_name, ids) bind(C, name='c_vtu_get_cell_data_int32')
             import :: c_ptr, c_int, c_char

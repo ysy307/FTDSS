@@ -7,14 +7,24 @@
         "calculate_thermal": true,
         "calculate_hydraulic": false,
         "calculate_mechanical": false,
-        "coupling_mode": "weak"
+        "coupling_mode": "weak",
+        "partitioning": true
     },
     "geometry_settings": {
-        "file_name": "mesh.vtu",
-        "cell_id_array_name": "CellEntityIds",
+        "mesh_file_name": "mesh_@RANK@.vtu",
+        "global_node_id_key": "global_node_id",
+        "node_type_key": "node_type",
+        "num_sharing_ranks_key": "num_sharing_ranks",
+        "owner_ranks_key": "owner_ranks",
+        "communication_partners_key": "communication_partners",
+        "cell_id_key": "CellEntityIds",
+        "rank_key": "rank",
+        "original_id_key": "original_id",
+        "color_key": "color",
+        "dimension": 1,
         "integration": {
-            "type": "full",
-            "points": 0.8165
+            "integration_type": "full",
+            "integration_points": 0.8165
         }
     },
     "materials": [

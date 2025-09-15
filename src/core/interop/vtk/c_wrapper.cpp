@@ -109,6 +109,34 @@ extern "C"
         static_cast<VtkReader *>(handle)->getCellInfo(connectivity, offsets, types);
     }
 
+    // --- ここから追加 ---
+    /**
+     * @brief 名前で指定されたセルデータ配列の成分数を取得する
+     */
+    void c_vtk_get_num_cell_data_components(void *handle, const char *array_name, int *num_components)
+    {
+        if (!handle)
+        {
+            *num_components = 0;
+            return;
+        }
+        *num_components = static_cast<VtkReader *>(handle)->getNumberOfCellDataComponents(array_name);
+    }
+
+    /**
+     * @brief 名前で指定されたポイントデータ配列の成分数を取得する
+     */
+    void c_vtk_get_num_point_data_components(void *handle, const char *array_name, int *num_components)
+    {
+        if (!handle)
+        {
+            *num_components = 0;
+            return;
+        }
+        *num_components = static_cast<VtkReader *>(handle)->getNumberOfPointDataComponents(array_name);
+    }
+    // --- ここまで追加 ---
+
     /**
      * @brief 名前で指定されたセルデータ配列を取得する
      */
@@ -239,6 +267,34 @@ extern "C"
             return;
         static_cast<VtuReader *>(handle)->getCellInfo(connectivity, offsets, types);
     }
+
+    // --- ここから追加 ---
+    /**
+     * @brief 名前で指定されたセルデータ配列の成分数を取得する
+     */
+    void c_vtu_get_num_cell_data_components(void *handle, const char *array_name, int *num_components)
+    {
+        if (!handle)
+        {
+            *num_components = 0;
+            return;
+        }
+        *num_components = static_cast<VtuReader *>(handle)->getNumberOfCellDataComponents(array_name);
+    }
+
+    /**
+     * @brief 名前で指定されたポイントデータ配列の成分数を取得する
+     */
+    void c_vtu_get_num_point_data_components(void *handle, const char *array_name, int *num_components)
+    {
+        if (!handle)
+        {
+            *num_components = 0;
+            return;
+        }
+        *num_components = static_cast<VtuReader *>(handle)->getNumberOfPointDataComponents(array_name);
+    }
+    // --- ここまで追加 ---
 
     /**
      * @brief 名前で指定されたセルデータ配列を取得する

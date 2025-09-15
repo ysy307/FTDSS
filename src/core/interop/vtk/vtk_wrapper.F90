@@ -11,6 +11,8 @@ module core_vtk_vtk_wrapper
     public :: vtk_get_num_cells
     public :: vtk_get_total_connectivity_size
     public :: vtk_get_cell_info
+    public :: vtk_get_num_cell_data_components
+    public :: vtk_get_num_point_data_components
     public :: vtk_get_cell_data_int32
     public :: vtk_get_cell_data_float64
     public :: vtk_get_point_data_int32
@@ -75,6 +77,22 @@ module core_vtk_vtk_wrapper
             integer(c_long_long), intent(out) :: offsets(*)
             integer(c_int), intent(out) :: types(*)
         end subroutine vtk_get_cell_info
+
+        ! --- ここから追加 ---
+        subroutine vtk_get_num_cell_data_components(handle, array_name, num_components) bind(C, name='c_vtk_get_num_cell_data_components')
+            import :: c_ptr, c_char, c_int
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: num_components
+        end subroutine vtk_get_num_cell_data_components
+
+        subroutine vtk_get_num_point_data_components(handle, array_name, num_components) bind(C, name='c_vtk_get_num_point_data_components')
+            import :: c_ptr, c_char, c_int
+            type(c_ptr), value, intent(in) :: handle
+            character(kind=c_char), intent(in) :: array_name(*)
+            integer(c_int), intent(out) :: num_components
+        end subroutine vtk_get_num_point_data_components
+        ! --- ここまで追加 ---
 
         subroutine vtk_get_cell_data_int32(handle, array_name, ids) bind(C, name='c_vtk_get_cell_data_int32')
             import :: c_ptr, c_int, c_char

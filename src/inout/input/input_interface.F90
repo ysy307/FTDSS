@@ -28,6 +28,7 @@ module inout_input
         logical :: calculate_hydraulic
         logical :: calculate_mechanical
         character(:), allocatable :: coupling_mode
+        logical :: partitioning
     end type type_analysis_controls
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_geometry_settings

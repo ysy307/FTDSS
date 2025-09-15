@@ -108,6 +108,8 @@ void VtuReader::getCellInfo(long long *connectivity, long long *offsets, int *ty
     }
 }
 
+// --- ここから修正 ---
+
 void VtuReader::getCellDataInt32(const char *dataName, int *data)
 {
     if (!initialized)
@@ -119,9 +121,14 @@ void VtuReader::getCellDataInt32(const char *dataName, int *data)
         return;
     }
     long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents(); // 成分数を取得
+    long long k = 0;
     for (long long i = 0; i < num_tuples; ++i)
     {
-        data[i] = static_cast<int>(data_array->GetTuple1(i));
+        for (int j = 0; j < num_components; ++j) // 各成分をループ
+        {
+            data[k++] = static_cast<int>(data_array->GetComponent(i, j));
+        }
     }
 }
 
@@ -136,9 +143,14 @@ void VtuReader::getCellDataFloat64(const char *dataName, double *data)
         return;
     }
     long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents(); // 成分数を取得
+    long long k = 0;
     for (long long i = 0; i < num_tuples; ++i)
     {
-        data[i] = static_cast<int>(data_array->GetTuple1(i));
+        for (int j = 0; j < num_components; ++j) // 各成分をループ
+        {
+            data[k++] = data_array->GetComponent(i, j); // 元のコードのバグも修正
+        }
     }
 }
 
@@ -153,9 +165,14 @@ void VtuReader::getPointDataFloat64(const char *dataName, double *data)
         return;
     }
     long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents();
+    long long k = 0;
     for (long long i = 0; i < num_tuples; ++i)
     {
-        data[i] = data_array->GetTuple1(i);
+        for (int j = 0; j < num_components; ++j)
+        {
+            data[k++] = data_array->GetComponent(i, j);
+        }
     }
 }
 
@@ -170,8 +187,41 @@ void VtuReader::getPointDataInt32(const char *dataName, int *data)
         return;
     }
     long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents(); // 成分数を取得
+    long long k = 0;
     for (long long i = 0; i < num_tuples; ++i)
     {
-        data[i] = data_array->GetTuple1(i);
+        for (int j = 0; j < num_components; ++j) // 各成分をループ
+        {
+            data[k++] = static_cast<int>(data_array->GetComponent(i, j));
+        }
     }
+}
+
+// --- ここから追加 ---
+
+int VtuReader::getNumberOfPointDataComponents(const char *dataName)
+{
+    if (!initialized)
+        return 0;
+    vtkDataArray *data_array = this->grid->GetPointData()->GetArray(dataName);
+    if (!data_array)
+    {
+        std::cerr << "Warning: Point data array '" << dataName << "' not found." << std::endl;
+        return 0;
+    }
+    return data_array->GetNumberOfComponents();
+}
+
+int VtuReader::getNumberOfCellDataComponents(const char *dataName)
+{
+    if (!initialized)
+        return 0;
+    vtkDataArray *data_array = this->grid->GetCellData()->GetArray(dataName);
+    if (!data_array)
+    {
+        std::cerr << "Warning: Cell data array '" << dataName << "' not found." << std::endl;
+        return 0;
+    }
+    return data_array->GetNumberOfComponents();
 }

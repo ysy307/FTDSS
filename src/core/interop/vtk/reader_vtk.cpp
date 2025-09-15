@@ -1,10 +1,10 @@
 #include "reader_vtk.h"
 #include <cstring>
 #include <iostream>
-#include <vector>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
+#include <vtkIdList.h>
 #include <vtkPointData.h>
 
 VtkReader::VtkReader() : initialized(false)
@@ -45,14 +45,12 @@ void VtkReader::getHeaderInfo(char *format, int format_len, char *dataset, int d
     if (!initialized)
         return;
 
-    // フォーマット
-    const char *fmt = this->reader->GetInputString(); // Legacy VTKはASCII/BINARYを判定する良い方法がない
-    strncpy(format, "ASCII", format_len - 1);         // ここではASCIIと仮定
+    // Legacy VTKはASCIIかBINARYかをファイルから直接判断するのが難しいため、ASCIIと仮定
+    strncpy(format, "ASCII", format_len - 1);
     format[format_len - 1] = '\0';
 
     // データセットタイプ
-    const char *ds_type = this->grid->GetClassName();       // e.g., "vtkUnstructuredGrid"
-    strncpy(dataset, "UNSTRUCTURED_GRID", dataset_len - 1); // 一般的な名称に変換
+    strncpy(dataset, "UNSTRUCTURED_GRID", dataset_len - 1);
     dataset[dataset_len - 1] = '\0';
 }
 
@@ -97,7 +95,6 @@ void VtkReader::getCellInfo(long long *connectivity, long long *offsets, int *ty
     if (!initialized)
         return;
 
-    // --- Connectivity and Types (変更なし) ---
     vtkCellArray *cells = this->grid->GetCells();
     vtkDataArray *conn_array = cells->GetConnectivityArray();
     long long num_conn_values = conn_array->GetNumberOfTuples();
@@ -106,31 +103,28 @@ void VtkReader::getCellInfo(long long *connectivity, long long *offsets, int *ty
         connectivity[i] = conn_array->GetTuple1(i);
     }
 
-    // --- Offsets and Typesの計算 (Legacy VTK対応) ---
+    // Legacy VTKではOffsetsが直接取得できないため、手動で計算する
     long long num_cells = this->grid->GetNumberOfCells();
     long long current_offset = 0;
     offsets[0] = 0;
 
     for (long long i = 0; i < num_cells; ++i)
     {
-        // Cell Typeを取得
         types[i] = this->grid->GetCellType(i);
 
-        // 現在のセルの頂点数を取得
-        vtkIdList *cell_points = vtkIdList::New();
-        this->grid->GetCellPoints(i, cell_points);
-        long long num_points_in_cell = cell_points->GetNumberOfIds();
-        cell_points->Delete();
+        vtkIdType num_points_in_cell;
+        const vtkIdType *point_ids;
+        this->grid->GetCellPoints(i, num_points_in_cell, point_ids);
 
-        // 次のオフセットを、現在のオフセットに頂点数を足して計算
         current_offset += num_points_in_cell;
-        // offsets配列の範囲外に書き込まないようにチェック
         if (i + 1 <= num_cells)
         {
             offsets[i + 1] = current_offset;
         }
     }
 }
+
+// --- ここから修正 ---
 
 void VtkReader::getCellDataInt32(const char *dataName, int *data)
 {
@@ -144,10 +138,15 @@ void VtkReader::getCellDataInt32(const char *dataName, int *data)
         return;
     }
 
-    int num_tuples = data_array->GetNumberOfTuples();
-    for (int i = 0; i < num_tuples; ++i)
+    long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents();
+    long long k = 0;
+    for (long long i = 0; i < num_tuples; ++i)
     {
-        data[i] = static_cast<int>(data_array->GetTuple1(i));
+        for (int j = 0; j < num_components; ++j)
+        {
+            data[k++] = static_cast<int>(data_array->GetComponent(i, j));
+        }
     }
 }
 
@@ -163,10 +162,15 @@ void VtkReader::getCellDataFloat64(const char *dataName, double *data)
         return;
     }
 
-    int num_tuples = data_array->GetNumberOfTuples();
-    for (int i = 0; i < num_tuples; ++i)
+    long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents();
+    long long k = 0;
+    for (long long i = 0; i < num_tuples; ++i)
     {
-        data[i] = static_cast<int>(data_array->GetTuple1(i));
+        for (int j = 0; j < num_components; ++j)
+        {
+            data[k++] = data_array->GetComponent(i, j); // 元のコードのバグも修正
+        }
     }
 }
 
@@ -175,7 +179,6 @@ void VtkReader::getPointDataInt32(const char *dataName, int *data)
     if (!initialized)
         return;
 
-    // 節点データを名前で取得
     vtkDataArray *data_array = this->grid->GetPointData()->GetArray(dataName);
     if (!data_array)
     {
@@ -184,10 +187,14 @@ void VtkReader::getPointDataInt32(const char *dataName, int *data)
     }
 
     long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents();
+    long long k = 0;
     for (long long i = 0; i < num_tuples; ++i)
     {
-        // doubleで取得して格納
-        data[i] = data_array->GetTuple1(i);
+        for (int j = 0; j < num_components; ++j)
+        {
+            data[k++] = static_cast<int>(data_array->GetComponent(i, j));
+        }
     }
 }
 
@@ -196,7 +203,6 @@ void VtkReader::getPointDataFloat64(const char *dataName, double *data)
     if (!initialized)
         return;
 
-    // 節点データを名前で取得
     vtkDataArray *data_array = this->grid->GetPointData()->GetArray(dataName);
     if (!data_array)
     {
@@ -205,9 +211,39 @@ void VtkReader::getPointDataFloat64(const char *dataName, double *data)
     }
 
     long long num_tuples = data_array->GetNumberOfTuples();
+    int num_components = data_array->GetNumberOfComponents();
+    long long k = 0;
     for (long long i = 0; i < num_tuples; ++i)
     {
-        // doubleで取得して格納
-        data[i] = data_array->GetTuple1(i);
+        for (int j = 0; j < num_components; ++j)
+        {
+            data[k++] = data_array->GetComponent(i, j);
+        }
     }
+}
+
+int VtkReader::getNumberOfPointDataComponents(const char *dataName)
+{
+    if (!initialized)
+        return 0;
+    vtkDataArray *data_array = this->grid->GetPointData()->GetArray(dataName);
+    if (!data_array)
+    {
+        // 配列が見つからない場合、警告は出さずに0を返す
+        return 0;
+    }
+    return data_array->GetNumberOfComponents();
+}
+
+int VtkReader::getNumberOfCellDataComponents(const char *dataName)
+{
+    if (!initialized)
+        return 0;
+    vtkDataArray *data_array = this->grid->GetCellData()->GetArray(dataName);
+    if (!data_array)
+    {
+        // 配列が見つからない場合、警告は出さずに0を返す
+        return 0;
+    }
+    return data_array->GetNumberOfComponents();
 }
