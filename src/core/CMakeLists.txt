@@ -146,6 +146,7 @@ set(CORE_INTEROP_VTK_FORT_SOURCES
     interop/vtk/vtk_constants.F90
     interop/vtk/vtk_initialize.F90
     interop/vtk/vtu_initialize.F90
+    interop/vtk/vtk_base.F90
     interop/vtk/vtk.F90
 )
 add_library(Core_Interop_VTK_Fortran STATIC ${CORE_INTEROP_VTK_FORT_SOURCES})

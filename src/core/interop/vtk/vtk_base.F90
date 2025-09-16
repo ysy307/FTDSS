@@ -441,24 +441,5 @@ contains
 
     end subroutine get_active_region_info
 
-    module subroutine finalize_vtk_object(self)
-        type(type_vtk), intent(inout) :: self
-
-        if (c_associated(self%handle)) then
-
-            select case (strip(self%reader_type))
-            case ("vtk")
-                call vtk_finalize(self%handle)
-            case ("vtu")
-                call vtu_finalize(self%handle)
-            case default
-                ! 知らないリーダータイプの場合は何もしない
-            end select
-
-            self%handle = c_null_ptr
-
-        end if
-    end subroutine finalize_vtk_object
-
 end submodule core_vtk_base
 

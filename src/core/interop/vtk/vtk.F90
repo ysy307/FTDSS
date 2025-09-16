@@ -100,11 +100,6 @@ module core_vtk
             integer(int32), allocatable, intent(out) :: unique_ids(:)
             integer(int32), intent(out) :: ierr
         end subroutine get_active_region_info
-
-        module subroutine finalize_vtk_object(self)
-            implicit none
-            type(type_vtk), intent(inout) :: self
-        end subroutine finalize_vtk_object
     end interface
 
     interface
@@ -148,5 +143,23 @@ module core_vtk
     end interface
 
 contains
+    subroutine finalize_vtk_object(self)
+        type(type_vtk), intent(inout) :: self
+
+        if (c_associated(self%handle)) then
+
+            select case (trim(adjustl(self%reader_type)))
+            case ("vtk")
+                call vtk_finalize(self%handle)
+            case ("vtu")
+                call vtu_finalize(self%handle)
+            case default
+                ! 知らないリーダータイプの場合は何もしない
+            end select
+
+            self%handle = c_null_ptr
+
+        end if
+    end subroutine finalize_vtk_object
 
 end module core_vtk

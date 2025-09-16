@@ -13,11 +13,8 @@ contains
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
 
-        character(:), allocatable :: key
-        character(256) :: buffer(2)
-        logical :: found
+        character(256) :: buffer(2) = [character(256) :: simulation_settins, ""]
 
-        buffer(1) = simulation_settins
         buffer(2) = title
         call get_json_value(json, join(buffer), self%simulation_settings%title, default_value="FTDSS Simulation")
 

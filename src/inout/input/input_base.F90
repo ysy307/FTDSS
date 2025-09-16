@@ -173,7 +173,7 @@ contains
     !----------------------------------------------------------------!
     ! INTEGER ARRAY版
     !----------------------------------------------------------------!
-    subroutine get_json_integer_array(json, key, target_var, is_required, default_value)
+    subroutine get_json_integer_array(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
@@ -181,9 +181,13 @@ contains
 
         logical, intent(in), optional :: is_required
         integer(int32), intent(in), optional :: default_value(:)
+        integer(int32), intent(in), optional :: valid_range(2)
+        integer(int32), intent(in), optional :: valid_list(:)
+        integer(int32), intent(in), optional :: array_size
 
         logical :: found
         logical :: required = .false.
+        integer :: i ! ## 修正点1: ループ変数iを宣言
 
         if (present(is_required)) required = is_required
 
@@ -200,13 +204,30 @@ contains
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (target_var(0))
             end if
+        else
+            if (present(array_size)) then
+                if (size(target_var) /= array_size) then
+                    call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
+                end if
+            end if
+            if (present(valid_range)) then
+                if (any(target_var < valid_range(1)) .or. any(target_var > valid_range(2))) then
+                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are out of range.")
+                end if
+            end if
+            if (present(valid_list)) then
+                if (.not. all(merge(.true., .false., [(any(valid_list == target_var(i)), i=1, size(target_var))]))) then
+                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are not in the valid list.")
+                end if
+            end if
         end if
+
     end subroutine get_json_integer_array
 
     !----------------------------------------------------------------!
     ! REAL ARRAY版
     !----------------------------------------------------------------!
-    subroutine get_json_real_array(json, key, target_var, is_required, default_value)
+    subroutine get_json_real_array(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
@@ -214,9 +235,13 @@ contains
 
         logical, intent(in), optional :: is_required
         real(real64), intent(in), optional :: default_value(:)
+        real(real64), intent(in), optional :: valid_range(2)
+        real(real64), intent(in), optional :: valid_list(:)
+        integer(int32), intent(in), optional :: array_size
 
         logical :: found
         logical :: required = .false.
+        integer :: i ! ## 修正点1: ループ変数iを宣言
 
         if (present(is_required)) required = is_required
 
@@ -229,16 +254,34 @@ contains
             else if (required) then
                 call error_message(904, c_opt="Required key not found: "//trim(key))
             else
+                ! 見つからず、必須でもなく、デフォルト値もない場合は空配列にする
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (target_var(0))
             end if
+        else
+            if (present(array_size)) then
+                if (size(target_var) /= array_size) then
+                    call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
+                end if
+            end if
+            if (present(valid_range)) then
+                if (any(target_var < valid_range(1)) .or. any(target_var > valid_range(2))) then
+                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are out of range.")
+                end if
+            end if
+            if (present(valid_list)) then
+                if (.not. all(merge(.true., .false., [(any(valid_list == target_var(i)), i=1, size(target_var))]))) then
+                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are not in the valid list.")
+                end if
+            end if
         end if
+
     end subroutine get_json_real_array
 
     !----------------------------------------------------------------!
     ! STRING ARRAY版
     !----------------------------------------------------------------!
-    subroutine get_json_string_array(json, key, target_var, is_required, default_value)
+    subroutine get_json_string_array(json, key, target_var, is_required, default_value, valid_list, array_size)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
@@ -246,9 +289,12 @@ contains
 
         logical, intent(in), optional :: is_required
         character(len=*), intent(in), optional :: default_value(:)
+        character(len=*), intent(in), optional :: valid_list(:)
+        integer(int32), intent(in), optional :: array_size
 
         logical :: found
         logical :: required = .false.
+        integer :: i
 
         if (present(is_required)) required = is_required
 
@@ -260,8 +306,26 @@ contains
                 target_var = default_value
             else if (required) then
                 call error_message(904, c_opt="Required key not found: "//trim(key))
+            else
+                ! 見つからず、必須でもなく、デフォルト値もない場合は空配列にする
+                if (allocated(target_var)) deallocate (target_var)
+                ! ## 修正点2: 文字長を指定せずにallocateする
+                allocate (target_var(0))
+            end if
+        else
+            if (present(array_size)) then
+                if (size(target_var) /= array_size) then
+                    call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
+                end if
+            end if
+            ! 文字列型では範囲(valid_range)チェックは一般的でないため実装しない
+            if (present(valid_list)) then
+                ! ## 修正点3: trimはスカラ変数にのみ適用する
+                if (.not. all(merge(.true., .false., [(any(valid_list == trim(target_var(i))), i=1, size(target_var))]))) then
+                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are not in the valid list.")
+                end if
             end if
         end if
-    end subroutine get_json_string_array
 
+    end subroutine get_json_string_array
 end module inout_input_base

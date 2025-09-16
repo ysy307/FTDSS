@@ -4,12 +4,13 @@ module inout_input
     use :: mpi_f08
 #endif
 !$  use :: omp_lib
-    use :: stdlib_strings, only:to_string, ends_with
+    use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
-    use :: inout_project_settings, only:get_project_path
+    ! use :: inout_project_settings, only:get_project_path
+    use :: inout_input_basic, only:type_input_basic
     use :: module_core, only:type_vtk, type_dp_3d, type_dp_vector_3d, allocate_array, deallocate_array, & !&
-                             error_message, join, value_in_range, filter
+                             error_message, join, value_in_range, filter, modify_path_format, get_env_string
     implicit none
     private
 
@@ -266,44 +267,44 @@ module inout_input
         character(:), allocatable, private :: geometry_file_name
         character(:), allocatable, private :: output_file_name
 
-        type(input_basic) :: basic
+        type(type_input_basic) :: basic
         type(type_conditions) :: conditions
         type(type_output_settings) :: output_settings
         type(type_geometry) :: geometry
     contains
         procedure, pass(self), public :: initialize => initialize_type_input
 
-        procedure :: read_parameters => inout_read_basic_parameters
-        procedure :: read_conditions => inout_read_conditions
-        procedure :: read_output_settings => inout_read_output_settings
-        procedure :: read_geometry => inout_read_geometry
+        ! procedure :: read_parameters => inout_read_basic_parameters
+        ! procedure :: read_conditions => inout_read_conditions
+        ! procedure :: read_output_settings => inout_read_output_settings
+        ! procedure :: read_geometry => inout_read_geometry
 
     end type type_input
 
     interface
-        module subroutine inout_read_basic_parameters(self)
-            implicit none
-            class(type_input), intent(inout) :: self
+        ! module subroutine inout_read_basic_parameters(self)
+        !     implicit none
+        !     class(type_input), intent(inout) :: self
 
-        end subroutine inout_read_basic_parameters
+        ! end subroutine inout_read_basic_parameters
 
-        module subroutine inout_read_conditions(self)
-            implicit none
-            class(type_input), intent(inout) :: self
+        ! module subroutine inout_read_conditions(self)
+        !     implicit none
+        !     class(type_input), intent(inout) :: self
 
-        end subroutine inout_read_conditions
+        ! end subroutine inout_read_conditions
 
-        module subroutine inout_read_output_settings(self)
-            implicit none
-            class(type_input), intent(inout) :: self
+        ! module subroutine inout_read_output_settings(self)
+        !     implicit none
+        !     class(type_input), intent(inout) :: self
 
-        end subroutine inout_read_output_settings
+        ! end subroutine inout_read_output_settings
 
-        module subroutine inout_read_geometry(self)
-            implicit none
-            class(type_input), intent(inout) :: self
+        ! module subroutine inout_read_geometry(self)
+        !     implicit none
+        !     class(type_input), intent(inout) :: self
 
-        end subroutine inout_read_geometry
+        ! end subroutine inout_read_geometry
 
     end interface
 
@@ -315,23 +316,23 @@ contains
 
         character(len=:), allocatable :: fullpath
         character(len=:), allocatable :: local_input_path
+        character(len=:), allocatable :: project_path_env
 
-#ifdef _MPI
+        character(*), parameter :: PROJECT_ENV = "FTDSS_PROJECT_PATH"
+
         integer(int32) :: ierr, myrank
         integer(int32) :: error_flag = 0
-#endif
 
-        ! project_pathの取得は全員が行う
-        self%project_path = get_project_path()
-
-#ifdef _MPI
         call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+
+        call get_env_string(PROJECT_ENV, project_path_env)
+        call modify_path_format(project_path_env)
+        self%project_path = project_path_env
 
         if (myrank == 0) then
 
-            fullpath = trim(self%project_path)//"Input/"
+            fullpath = strip(self%project_path)//"Input/"
 
-            ! 1. ランク0が、新しい関数を使って各ファイルの存在をチェック
             if (.not. file_exists(fullpath//"Basic.json")) error_flag = 2
             if (.not. file_exists(fullpath//"Conditions.json")) error_flag = 3
             if (.not. file_exists(fullpath//"Output.json")) error_flag = 4
@@ -354,27 +355,16 @@ contains
             call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
         end if
 
-#else
-        ! --- シリアル実行時の処理 ---
-        fullpath = trim(self%project_path)//"Input/"
-        if (.not. file_exists(fullpath//"Basic.json")) call error_message(902, c_opt=fullpath//"Basic.json")
-        if (.not. file_exists(fullpath//"Conditions.json")) call error_message(902, c_opt=fullpath//"Conditions.json")
-        if (.not. file_exists(fullpath//"Output.json")) call error_message(902, c_opt=fullpath//"Output.json")
-#endif
+        local_input_path = strip(self%project_path)//"Input/"
 
-        ! --- ここから先の処理は、全プロセスが同じファイル名を持っており、
-        ! --- そのファイルが存在することが保証された状態で実行される ---
-
-        local_input_path = trim(self%project_path)//"Input/"
-
-        self%basic_file_name = local_input_path//"Basic.json"
+        self%basic%file_name = local_input_path//"Basic.json"
         self%conditions_file_name = local_input_path//"Conditions.json"
         self%output_file_name = local_input_path//"Output.json"
 
-        call self%read_parameters()
-        call self%read_conditions()
-        call self%read_output_settings()
-        call self%read_geometry()
+        call self%basic%initialize()
+        ! call self%read_conditions()
+        ! call self%read_output_settings()
+        ! call self%read_geometry()
 
     end subroutine initialize_type_input
 

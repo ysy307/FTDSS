@@ -8,7 +8,7 @@ submodule(inout_input_basic) inout_input_basic_analysis_controls
     character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: calculate_mechanical = "calculate_mechanical"
     character(*), parameter :: coupling_mode = "coupling_mode"
-    character(*), parameter :: coupling_modes(3) = ["none", "weak", "strong"]
+    character(*), parameter :: coupling_modes(3) = [character(len=16) :: "none", "weak", "strong"]
     character(*), parameter :: partitioning = "partitioning"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -17,11 +17,8 @@ contains
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
 
-        character(:), allocatable :: key
-        character(256) :: buffer(2)
-        logical :: found
+        character(256) :: buffer(2) = [character(256) :: analysis_controls, ""]
 
-        buffer(1) = analysis_controls
         buffer(2) = calculate_thermal
         call get_json_value(json, join(buffer), self%analysis_controls%calculate_thermal, &
                             is_required=.true., default_value=.false.)
