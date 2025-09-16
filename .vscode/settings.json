@@ -52,9 +52,9 @@
         "-module",
         "/workspaces/FTDSS/CMakeBuild/.mod",
         "-module",
-        "/opt/intel/oneapi/mpi/2021.14/include/mpi",
+        "/opt/intel/oneapi/mkl/latest/include",
         "-module",
-        "/opt/intel/oneapi/2025.2/include/mpi/",
+        "/opt/intel/oneapi/mpi/latest/include",
         "-D_MKL",
         "-D_MPI"
     ],
@@ -82,17 +82,12 @@
         "${workspaceFolder}/Inout",
         "${workspaceFolder}/log"
     ],
-    // "fortran.fortls.preprocessor.definitions": {
-    //     "_MKL": "1"
-    // },
     "fortran.fortls.notifyInit": true,
     "fortran.fortls.sortKeywords": true,
-    "fortran.linter.fypp.path": "",
     "fortran.linter.includePaths": [
         "/workspaces/FTDSS/CMakeBuild/.mod",
         "/opt/intel/oneapi/mkl/latest/include",
-        "/opt/intel/oneapi/2025.2/include/mpi/",
-        "/opt/intel/oneapi/2025.2/include",
+        "/opt/intel/oneapi/mpi/latest/include/mpi",
         "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.2.0",
         "/workspaces/FTDSS/third_party/.local/include/VTKFortran",
         "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib"
@@ -145,7 +140,6 @@
         "**/.git": true,
         "**/.tmp.drive*": true
     },
-    "docker.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
     "workbench.colorCustomizations": {
         "editor.background": "#2e282c"
     },
@@ -165,7 +159,6 @@
         132
     ],
     "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
-    "fortran.linter.fypp.lineNumberingMode": "nocontlines",
     "python.analysis.include": [
         "scripts/*"
     ]

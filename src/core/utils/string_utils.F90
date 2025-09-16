@@ -6,6 +6,7 @@ module core_string_utils
 
     public :: join
     public :: filter
+    public :: modify_path_format
 
     interface filter
         module procedure :: filter_character_array
@@ -114,4 +115,22 @@ contains
         deallocate (mask, packed_array)
 
     end subroutine filter_character_array
+
+    subroutine modify_path_format(path)
+        implicit none
+        character(len=:), allocatable, intent(inout) :: path
+        integer :: i
+
+        ! バックスラッシュをフォワードスラッシュに置換
+        do i = 1, len(path)
+            if (path(i:i) == '\') then
+                path(i:i) = '/'
+            end if
+        end do
+
+        ! パスが空でなく、かつスラッシュで終わらない場合にスラッシュを追加
+        if (len_trim(path) > 0 .and. path(len_trim(path):len_trim(path)) /= "/") then
+            path = trim(path)//"/"
+        end if
+    end subroutine modify_path_format
 end module core_string_utils

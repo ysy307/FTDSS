@@ -55,7 +55,7 @@ add_subdirectory(src/core)
 add_subdirectory(src/inout)
 # add_subdirectory(src/linalg)
 # add_subdirectory(src/control)
-add_subdirectory(src/domain)
+# add_subdirectory(src/domain)
 # add_subdirectory(src/physics)
 # add_subdirectory(src/solver)
 # add_subdirectory(src/field)
@@ -69,7 +69,7 @@ add_subdirectory(src/domain)
 
 # 実行ファイルのソースを指定
 set(MAIN_APP_SOURCE "app/ysy_fc.F90")
-set(TEST_APP_SOURCE "test/test_domain.F90")
+set(TEST_APP_SOURCE "test/test_input.F90")
 
 # Build Targets
 if(BUILD_APP STREQUAL "ysy_fc")
@@ -86,7 +86,7 @@ endif()
 # ライブラリのリンク
 if(TARGET ${APP_TARGET})
     # まず、アプリケーションのコアとなるライブラリをリンク
-    target_link_libraries(${APP_TARGET} PRIVATE Solver::Input Solver::Domain Solver::Core)
+    target_link_libraries(${APP_TARGET} PRIVATE Solver::Input Solver::Core)
 
     # MPIが有効な場合、MPIライブラリを追加でリンク
     if(ENABLE_MPI AND TARGET MPI::MPI_Fortran)
