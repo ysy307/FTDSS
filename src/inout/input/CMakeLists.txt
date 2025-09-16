@@ -8,6 +8,9 @@ set(INPUT_SOURCES
     basic_geometry_settings.F90
     basic_materials.F90
     basic_solver_settings.F90
+    conditions_interface.F90
+    conditions_time_controls.F90
+    conditions_boundary.F90
     input_interface.F90
     # input_basic.F90
     # input_conditions.F90

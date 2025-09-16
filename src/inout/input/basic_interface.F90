@@ -258,8 +258,8 @@ contains
         class(type_input_basic), intent(inout) :: self
         type(json_file) :: json
 
-        integer(int32) :: ierr, myrank
-        integer(int32) :: i
+        ! integer(int32) :: ierr, myrank
+        ! integer(int32) :: i
 
         call json%initialize()
 
@@ -272,21 +272,21 @@ contains
         call read_parameters_materials(self, json)
         call read_parameters_solver_settings(self, json)
 
-        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
-        if (myrank == 0) then
-            write (*, '(A)') "=== Simulation Settings ==="
-            call self%simulation_settings%display()
-            write (*, '(A)') "=== Analysis Controls ==="
-            call self%analysis_controls%display()
-            write (*, '(A)') "=== Geometry Settings ==="
-            call self%geometry_settings%display()
-            write (*, '(A)') "=== Material Settings ==="
-            do i = 1, self%num_materials
-                call self%materials(i)%display()
-            end do
-            write (*, '(A)') "=== Solver Settings ==="
-            call self%solver_settings%display()
-        end if
+        ! call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+        ! if (myrank == 0) then
+        !     write (*, '(A)') "=== Simulation Settings ==="
+        !     call self%simulation_settings%display()
+        !     write (*, '(A)') "=== Analysis Controls ==="
+        !     call self%analysis_controls%display()
+        !     write (*, '(A)') "=== Geometry Settings ==="
+        !     call self%geometry_settings%display()
+        !     write (*, '(A)') "=== Material Settings ==="
+        !     do i = 1, self%num_materials
+        !         call self%materials(i)%display()
+        !     end do
+        !     write (*, '(A)') "=== Solver Settings ==="
+        !     call self%solver_settings%display()
+        ! end if
         call json%destroy()
         call json%print_error_message(output_unit)
 

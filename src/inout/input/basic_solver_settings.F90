@@ -75,13 +75,13 @@ contains
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%method, &
                             is_required=.true., default_value="none", valid_list=valid_nonlinear_solver_methods)
 
-        if (self%solver_settings%nonlinear_solver%method == "modified_newton") then
+        if (self%solver_settings%nonlinear_solver%method == valid_nonlinear_solver_methods(3)) then
             buffer(3) = update_frequency
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%update_frequency, &
                                 is_required=.true., default_value=5, valid_range=[1, huge(1)])
         end if
 
-        if (any(self%solver_settings%nonlinear_solver%method == ["newton", "modified_newton", "picard"])) then
+        if (any(self%solver_settings%nonlinear_solver%method == valid_nonlinear_solver_methods(2:4))) then
             buffer(3) = max_iterations
             call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%max_iterations, &
                                 is_required=.true., default_value=1000, valid_range=[1, huge(1)])
@@ -97,12 +97,12 @@ contains
                                     is_required=.true., default_value="and", valid_list=valid_logic_types)
             end if
 
-            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == ["residual", "both"])) then
+            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == valid_criteria_types([1, 3]))) then
                 buffer(4) = residual
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%residual, json, buffer, 4)
             end if
-            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == ["update", "both"])) then
+            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == valid_criteria_types([2, 3]))) then
                 buffer(4) = update
                 call read_parameters_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
@@ -131,12 +131,12 @@ contains
                                 is_required=.true., default_value="and", valid_list=valid_logic_types)
         end if
 
-        if (any(convergence_obj%criteria == ["absolute", "both"])) then
+        if (any(convergence_obj%criteria == valid_local_criteria_types([1, 3]))) then
             local_buffer(end_index + 1) = absolute_tolerance
             call get_json_value(json, join(local_buffer), convergence_obj%absolute_tolerance, &
                                 is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
         end if
-        if (any(convergence_obj%criteria == ["relative", "both"])) then
+        if (any(convergence_obj%criteria == valid_local_criteria_types([2, 3]))) then
             local_buffer(end_index + 1) = relative_tolerance
             call get_json_value(json, join(local_buffer), convergence_obj%relative_tolerance, &
                                 is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
