@@ -2,14 +2,7 @@
 !     implicit none
 !
 !
-!     !!------------------------------------------------------------------------------------------------------------------------------
-!     ! JSON key names for initial conditions
-!     !!------------------------------------------------------------------------------------------------------------------------------
-!     character(*), parameter :: initial_conditions = "initial_conditions"
-!     character(*), parameter :: value = "value"
-!     character(*), parameter :: valid_initial_condition_types(3) = ["uniform", "laplace", "file"]
-!     character(*), parameter :: field_name = "field_name"
-!     !!------------------------------------------------------------------------------------------------------------------------------
+!
 
 !     subroutine read_conditions_boundary_conditions(self, json)
 !         implicit none

@@ -75,18 +75,27 @@ module inout_input_conditions
         character(:), allocatable :: field_name
     end type type_initial_local
 
-    type :: type_initail_conditions
+    type :: type_initial_conditions
         type(type_initial_local) :: thermal
         type(type_initial_local) :: hydraulic
         type(type_initial_local) :: porosity
-    end type type_initail_conditions
+    contains
+        procedure, pass(self) :: display => display_initial_conditions
+    end type type_initial_conditions
+
+    interface
+        module subroutine display_initial_conditions(self)
+            implicit none
+            class(type_initial_conditions), intent(in) :: self
+        end subroutine display_initial_conditions
+    end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_conditions
         character(:), allocatable :: file_name
         type(type_time_controls) :: time_control
         type(type_boundary_conditions), allocatable :: boundary_conditions(:)
         integer(int32) :: num_boundaries
-        type(type_initail_conditions) :: initial_conditions
+        type(type_initial_conditions) :: initial_conditions
     contains
         procedure, pass(self) :: initialize => initialize_type_conditions
     end type type_conditions
@@ -103,6 +112,12 @@ module inout_input_conditions
             class(type_conditions), intent(inout) :: self
             type(json_file), intent(inout) :: json
         end subroutine read_conditions_boundary_conditions
+
+        module subroutine read_conditions_initial_conditions(self, json)
+            implicit none
+            class(type_conditions), intent(inout) :: self
+            type(json_file), intent(inout) :: json
+        end subroutine read_conditions_initial_conditions
     end interface
 
 contains
@@ -120,7 +135,7 @@ contains
 
         call read_conditions_time_controls(self, json)
         call read_conditions_boundary_conditions(self, json)
-        ! call read_conditions_initial_conditions(self, json)
+        call read_conditions_initial_conditions(self, json)
 
         call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
         if (my_rank == 0) then

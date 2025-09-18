@@ -1,9 +1,8 @@
 module Main_FTDSS
     use, intrinsic :: iso_fortran_env
-#ifdef _MPI
-    use :: mpi
-#endif
+    use :: mpi_f08
     use :: stdlib_logger
+    use :: petsc
     use :: module_core
     use :: module_input, only:type_input
     use :: module_control, only:type_controls
@@ -18,6 +17,7 @@ module Main_FTDSS
     implicit none
 
     type :: type_ftdss
+        type(tDM) :: dm
         type(type_dp_3d), pointer :: coordinate
         type(type_domain) :: domain
 
@@ -49,16 +49,7 @@ contains
         integer(int32) :: nsize
         character(len=10), allocatable :: profiler_labels(:)
 
-#ifdef _MPI
-        integer(int32) :: num_procs, myrank
-        call MPI_INIT(ierr)
-        call MPI_Comm_size(MPI_COMM_WORLD, num_procs, ierr)
-        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
-
-        if (ierr /= 0 .and. myrank == 0) then
-            call global_logger%log_fatal(message="MPI initialization failed.")
-        end if
-#endif
+        call PetscInitialize(ierr)
 
         profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
         call self%controls%time%initialize(profiler_sections=profiler_labels)
@@ -69,6 +60,7 @@ contains
         call setup_handler()
 
         call input%initialize()
+        call DMPlexCreateFromFile(PETSC_COMM_WORLD, 'mesh.msh', 'FTDSS', PETSC_TRUE, dm, ierr)
         call self%controls%time%initialize(input=input)
         call self%controls%iteration%initialize(input)
         call self%controls%initialize(input)

@@ -51,8 +51,8 @@ include(Toolchain)
 # 2. Source Tree Definition
 # ====================================================================
 # このセクションは変更ありません
-add_subdirectory(src/core)
-add_subdirectory(src/inout)
+# add_subdirectory(src/core)
+# add_subdirectory(src/inout)
 # add_subdirectory(src/linalg)
 # add_subdirectory(src/control)
 # add_subdirectory(src/domain)
@@ -69,7 +69,7 @@ add_subdirectory(src/inout)
 
 # 実行ファイルのソースを指定
 set(MAIN_APP_SOURCE "app/ysy_fc.F90")
-set(TEST_APP_SOURCE "test/test_input.F90")
+set(TEST_APP_SOURCE "test/test_pestc.F90")
 
 # Build Targets
 if(BUILD_APP STREQUAL "ysy_fc")
@@ -81,12 +81,15 @@ elseif(BUILD_APP STREQUAL "test")
     add_executable(test ${TEST_APP_SOURCE})
     set_target_properties(test PROPERTIES LINKER_LANGUAGE Fortran)
     set(APP_TARGET test)
+    enable_build_flags(test)
+    enable_thirdparty(test)
 endif()
 
 # ライブラリのリンク
 if(TARGET ${APP_TARGET})
     # まず、アプリケーションのコアとなるライブラリをリンク
-    target_link_libraries(${APP_TARGET} PRIVATE Solver::Input Solver::Core)
+    # target_link_libraries(${APP_TARGET} PRIVATE Solver::Input Solver::Core)
+    # target_link_libraries(${APP_TARGET} PRIVATE Solver::Input Solver::Core)
 
     # MPIが有効な場合、MPIライブラリを追加でリンク
     if(ENABLE_MPI AND TARGET MPI::MPI_Fortran)

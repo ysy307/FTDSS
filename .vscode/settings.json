@@ -90,8 +90,11 @@
         "/opt/intel/oneapi/mpi/latest/include/mpi",
         "/workspaces/FTDSS/third_party/.local/include/fortran_stdlib/IntelLLVM-2025.2.0",
         "/workspaces/FTDSS/third_party/.local/include/VTKFortran",
-        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib"
+        "/workspaces/FTDSS/third_party/.local/jsonfortran-intelllvm-9.0.3/lib",
+        "/workspaces/FTDSS/third_party/.local/include/petsc/finclude",
+        "/workspaces/FTDSS/third_party/.local/include/"
     ],
+    "fortran.fortls.preprocessor.enabled": true,
     "fortran.formatting.formatter": "fprettify",
     "fortran.formatting.fprettifyArgs": [
         "--indent",
@@ -161,5 +164,10 @@
     "containers.commands.attach": "${containerCommand} exec -it ${containerId} zsh",
     "python.analysis.include": [
         "scripts/*"
-    ]
+    ],
+    "fortran.fortls.preprocessor.directories": [
+        "/workspaces/FTDSS/third_party/.local/include/pestc/finclude",
+        "/workspaces/FTDSS/third_party/.local/include/"
+    ],
+    "fortran.fortls.disableDiagnostics": true
 }

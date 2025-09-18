@@ -30,7 +30,6 @@ target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
 # サードパーティライブラリの探索
 # =========================================================================
 # --- PETSc (pkg-configを使用) ---
-# --- PETSc (pkg-configを使用) ---
 set(PETSC_INSTALL_DIR "/workspaces/FTDSS/third_party/.local")
 
 # 1. 現在のパスを一時変数に読み込む
@@ -101,6 +100,7 @@ endfunction()
 function(enable_thirdparty target)
     # --- ヘッダファイルのインクルードディレクトリ ---
     target_include_directories(${target} PUBLIC
+        ${PETSC_INCLUDE_DIRS}/pestc/finclude
         ${PROJECT_SOURCE_DIR}/third_party/.local/include/VTKFortran
         $<TARGET_PROPERTY:fortran_stdlib::fortran_stdlib,INTERFACE_INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:jsonfortran-intelllvm::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
