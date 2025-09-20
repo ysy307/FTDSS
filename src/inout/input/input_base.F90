@@ -278,19 +278,19 @@ contains
 
     end subroutine get_json_real_array
 
-    !----------------------------------------------------------------!
-    ! STRING ARRAY版
-    !----------------------------------------------------------------!
     subroutine get_json_string_array(json, key, target_var, is_required, default_value, valid_list, array_size)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
-        character(len=*), allocatable, intent(inout) :: target_var(:)
+        character(len=:), allocatable, intent(inout) :: target_var(:)
 
         logical, intent(in), optional :: is_required
         character(len=*), intent(in), optional :: default_value(:)
         character(len=*), intent(in), optional :: valid_list(:)
         integer(int32), intent(in), optional :: array_size
+
+        ! 一時領域：json%get は固定長要求なので 256 で受ける
+        character(len=256), allocatable :: tmp(:)
 
         logical :: found
         logical :: required = .false.
@@ -298,34 +298,51 @@ contains
 
         if (present(is_required)) required = is_required
 
-        call json%get(key, target_var, found)
+        call json%get(key, tmp, found)
         call json%print_error_message(output_unit)
 
         if (.not. found) then
             if (present(default_value)) then
+                ! デフォルト値を設定
+                if (allocated(target_var)) deallocate (target_var)
+                allocate (character(len=len(default_value(1))) :: target_var(size(default_value)))
                 target_var = default_value
             else if (required) then
                 call error_message(904, c_opt="Required key not found: "//trim(key))
             else
-                ! 見つからず、必須でもなく、デフォルト値もない場合は空配列にする
+                ! 見つからず、必須でもなく、デフォルト値もない場合は空配列
                 if (allocated(target_var)) deallocate (target_var)
-                ! ## 修正点2: 文字長を指定せずにallocateする
-                allocate (target_var(0))
+                allocate (character(len=0) :: target_var(0))
             end if
         else
+            ! json%get で得た tmp を target_var にコピー（長さを揃える）
+            if (allocated(target_var)) deallocate (target_var)
+            if (size(tmp) > 0) then
+                allocate (character(len=len(tmp(1))) :: target_var(size(tmp)))
+                do i = 1, size(tmp)
+                    target_var(i) = trim(tmp(i)) ! ★ 要素ごとに trim
+                end do
+            else
+                allocate (character(len=0) :: target_var(0))
+            end if
+
+            ! 配列サイズチェック
             if (present(array_size)) then
                 if (size(target_var) /= array_size) then
                     call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
                 end if
             end if
-            ! 文字列型では範囲(valid_range)チェックは一般的でないため実装しない
+
+            ! 値のバリデーション
             if (present(valid_list)) then
-                ! ## 修正点3: trimはスカラ変数にのみ適用する
-                if (.not. all(merge(.true., .false., [(any(valid_list == trim(target_var(i))), i=1, size(target_var))]))) then
-                    call error_message(905, c_opt="One or more values for key '"//trim(key)//"' are not in the valid list.")
-                end if
+                do i = 1, size(target_var)
+                    if (.not. any(valid_list == trim(target_var(i)))) then
+                        call error_message(905, c_opt="Invalid value '"//trim(target_var(i))//"' for key '"//trim(key)//"'")
+                    end if
+                end do
             end if
         end if
 
     end subroutine get_json_string_array
+
 end module inout_input_base

@@ -137,13 +137,6 @@ contains
         call read_conditions_boundary_conditions(self, json)
         call read_conditions_initial_conditions(self, json)
 
-        call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
-        if (my_rank == 0) then
-            call self%time_control%display()
-            do i = 1, self%num_boundaries
-                call self%boundary_conditions(i)%display()
-            end do
-        end if
         call json%destroy()
         call json%print_error_message(output_unit)
 

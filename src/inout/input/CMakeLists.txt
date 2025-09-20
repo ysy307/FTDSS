@@ -11,6 +11,11 @@ set(INPUT_SOURCES
     conditions_interface.F90
     conditions_time_controls.F90
     conditions_boundary.F90
+    conditions_initial.F90
+    output_interface.F90
+    output_fields.F90
+    output_history.F90
+    output_standard.F90
     input_interface.F90
     # input_basic.F90
     # input_conditions.F90

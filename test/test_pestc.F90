@@ -1,144 +1,96 @@
-program Poisson2D
-#include <petsc/finclude/petsc.h>
-    use petsc
+program manual_fem
+#include "petsc/finclude/petsc.h"
+    use :: petsc
     implicit none
 
-    type(tDM) :: dm
-    type(tSNES) :: snes
-    type(tVec) :: u_glob
-    type(tPetscDS) :: ds
-    type(tDMLabel) :: boundaryLabel
+    DM :: dm
+    Mat :: A
+    Vec :: x, b
+    KSP :: ksp
+    PetscSection :: section
+
     PetscErrorCode :: ierr
-    PetscInt, parameter :: boundary_ids(1) = (/1/)
-    character(len=256) :: mesh_file
+    PetscMPIInt :: rank
+    character(len=256) :: filename
     PetscBool :: flg
-    PetscInt :: bd
+    PetscInt :: cell, cStart, cEnd
+    PetscInt :: n_nodes
+    PetscInt, pointer :: global_indices(:)
+    PetscScalar :: ke(9)
+    PetscScalar :: fe(3)
+    PetscInt :: i
+    PetscInt :: ids(4)
+    IS :: is_parts(4), boundary_faces_is, boundary_nodes_is
 
-    ! Initialize
-    call PetscInitialize(ierr)
-
-    ! Ensure FE parsing for msh if needed
-    call PetscOptionsSetValue(PETSC_NULL_OPTIONS, '-dm_plex_msh_parse_fe', '', ierr)
-
-    ! Read mesh filename from options
-    call PetscOptionsGetString(PETSC_NULL_OPTIONS, PETSC_NULL_CHARACTER, '-mesh_file', mesh_file, flg, ierr)
-    if (.not. flg) then
-        print *, 'Error: supply -mesh_file <path>'
-        call PetscFinalize(ierr)
-        stop 1
-    end if
-
-    ! Create DM from file
-    call DMPlexCreateFromFile(PETSC_COMM_WORLD, trim(mesh_file), "FTDSS", PETSC_TRUE, dm, ierr)
+    call PetscInitialize(PETSC_NULL_CHARACTER, ierr)
+    call MPI_Comm_rank(PETSC_COMM_WORLD, rank, ierr)
+    call PetscOptionsGetString(PETSC_NULL_OBJECT, PETSC_NULL_CHARACTER, "-f", filename, flg, ierr)
+    call DMPlexCreateFromFile(PETSC_COMM_WORLD, filename, PETSC_TRUE, dm, ierr)
     call DMSetFromOptions(dm, ierr)
-    call DMSetUp(dm, ierr)
+    call DMGetLocalSection(dm, section, ierr)
 
-    ! Set pointwise residuals/Jacobian in PetscDS
-    call DMGetDS(dm, ds, ierr)
-    call PetscDSSetResidual(ds, 0, f0_u, f1_u, ierr)
-    call PetscDSSetJacobian(ds, 0, 0, PETSC_NULL_FUNCTION, PETSC_NULL_FUNCTION, PETSC_NULL_FUNCTION, g3_uu, ierr)
+    call DMCreateMatrix(dm, A, ierr)
+    call DMCreateGlobalVector(dm, x, ierr)
+    call VecDuplicate(x, b, ierr)
+    call VecSet(b, 0.0_8, ierr)
 
-    ! Boundary: look up label and add essential BC (u=0 on ids in boundary_ids)
-    call DMGetLabel(dm, 'Face Sets', boundaryLabel, ierr)
-    call DMAddBoundary(dm, DM_BC_ESSENTIAL, 'wall', boundaryLabel, 1, boundary_ids, 0, 0, PETSC_NULL_INTEGER, u_exact, PETSC_NULL_FUNCTION, PETSC_NULL_OBJECT, bd, ierr)
+    if (rank == 0) print *, "Assembling matrix and vector manually..."
 
-    ! SNES setup and solve
-    call SNESCreate(PETSC_COMM_WORLD, snes, ierr)
-    call SNESSetDM(snes, dm, ierr)
-    call SNESSetFromOptions(snes, ierr)
+    ! Set element stiffness matrix (ke) and load vector (fe) in row-major order
+    ke(1) = 0.5_8; ke(2) = -0.5_8; ke(3) = 0.0_8
+    ke(4) = -0.5_8; ke(5) = 1.0_8; ke(6) = -0.5_8
+    ke(7) = 0.0_8; ke(8) = -0.5_8; ke(9) = 0.5_8
+    fe = 1.0_8 / 6.0_8
 
-    call DMCreateGlobalVector(dm, u_glob, ierr)
-    call VecSet(u_glob, 0.0d0, ierr)
-    call PetscObjectSetName(u_glob, 'solution', ierr)
+    ! Element Loop
+    call DMPlexGetHeightStratum(dm, 0, cStart, cEnd, ierr)
+    do cell = cStart, cEnd - 1
+        ! --- FIX 1: Use correct NULL types ---
+        call DMPlexGetClosureIndices(dm, section, section, cell, PETSC_TRUE, n_nodes, global_indices, PETSC_NULL_OBJECT, PETSC_NULL_OBJECT, ierr)
+        call MatSetValues(A, n_nodes, global_indices, n_nodes, global_indices, ke, ADD_VALUES, ierr)
+        call VecSetValues(b, n_nodes, global_indices, fe, ADD_VALUES, ierr)
+        call DMPlexRestoreClosureIndices(dm, section, section, cell, PETSC_TRUE, n_nodes, global_indices, PETSC_NULL_OBJECT, PETSC_NULL_OBJECT, ierr)
+    end do
 
-    call SNESSolve(snes, PETSC_NULL_VEC, u_glob, ierr)
+    call MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY, ierr)
+    call MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY, ierr)
+    call VecAssemblyBegin(b, ierr)
+    call VecAssemblyEnd(b, ierr)
 
-    ! Output
-    call DMViewFromOptions(dm, PETSC_NULL_OBJECT, '-dm_view', ierr)
-    call VecViewFromOptions(u_glob, PETSC_NULL_OBJECT, '-vec_view', ierr)
+    ! --- FIX 2: Correct Boundary Condition Logic ---
+    if (rank == 0) print *, "Applying boundary conditions..."
+    ! (a) Get an IS of all boundary faces
+    ids = [1, 2, 3, 4]
+    do i = 1, 4
+        call DMGetStratumIS(dm, 'Face Sets', ids(i), is_parts(i), ierr)
+    end do
+    call ISConcatenate(PETSC_COMM_WORLD, 4, is_parts, boundary_faces_is, ierr)
+    do i = 1, 4
+        call ISDestroy(is_parts(i), ierr)
+    end do
 
-    ! Cleanup
+    ! (b) Get the IS of all unique nodes on those faces
+    call DMPlexGetClosureIS(dm, section, boundary_faces_is, PETSC_TRUE, boundary_nodes_is, PETSC_NULL_IS, ierr)
+    call ISDestroy(boundary_faces_is, ierr)
+
+    ! (c) Apply u=0 using the correct IS of nodes
+    call MatZeroRowsIS(A, boundary_nodes_is, 1.0_8, x, b, ierr)
+    call ISDestroy(boundary_nodes_is, ierr)
+
+    if (rank == 0) print *, "Solving system..."
+    call KSPCreate(PETSC_COMM_WORLD, ksp, ierr)
+    call KSPSetOperators(ksp, A, A, ierr)
+    call KSPSetFromOptions(ksp, ierr)
+    call KSPSolve(ksp, b, x, ierr)
+    if (rank == 0) print *, "System solved."
+
+    call VecViewFromOptions(x, PETSC_NULL_OBJECT, '-vec_view', ierr)
+
+    call KSPDestroy(ksp, ierr)
+    call VecDestroy(x, ierr)
+    call VecDestroy(b, ierr)
+    call MatDestroy(A, ierr)
     call DMDestroy(dm, ierr)
-    call SNESDestroy(snes, ierr)
-    call VecDestroy(u_glob, ierr)
     call PetscFinalize(ierr)
 
-contains
-
-    ! f0: forcing term = -6.0
-    subroutine f0_u(dim, Nf, NfAux, uOff, uOff_x, u, u_t, u_x, aOff, aOff_x, a, a_t, a_x, t, x, numConstants, constants, f0, ierr)
-        implicit none
-        PetscInt, intent(in) :: dim, Nf, NfAux, numConstants
-        PetscInt, intent(in), dimension(*) :: uOff, uOff_x, aOff, aOff_x
-        PetscScalar, intent(in), dimension(*) :: u, u_t, u_x, a, a_t, a_x, constants
-        PetscReal, intent(in) :: t
-        PetscReal, intent(in), dimension(*) :: x
-        PetscScalar, intent(out), dimension(*) :: f0
-        PetscErrorCode, intent(out) :: ierr
-
-        f0(1) = -6.0d0
-        ierr = 0
-    end subroutine f0_u
-
-    ! f1: gradient term (∇u)
-    subroutine f1_u(dim, Nf, NfAux, uOff, uOff_x, u, u_t, u_x, aOff, aOff_x, a, a_t, a_x, t, x, numConstants, constants, f1, ierr)
-        implicit none
-        PetscInt, intent(in) :: dim, Nf, NfAux, numConstants
-        PetscInt, intent(in), dimension(*) :: uOff, uOff_x, aOff, aOff_x
-        PetscScalar, intent(in), dimension(*) :: u, u_t, u_x, a, a_t, a_x, constants
-        PetscReal, intent(in) :: t
-        PetscReal, intent(in), dimension(*) :: x
-        PetscScalar, intent(out), dimension(*) :: f1
-        PetscErrorCode, intent(out) :: ierr
-        integer :: i
-
-        do i = 1, dim
-            ! uOff_x(1) is a C-based offset; Fortran indexing of u_x starts at 1.
-            f1(i) = u_x(uOff_x(1) + i)
-        end do
-        ierr = 0
-    end subroutine f1_u
-
-    ! g3: derivative dF1/d(grad u) -> identity matrix in each block
-    subroutine g3_uu(dim, Nf, NfAux, uOff, uOff_x, u, u_t, u_x, aOff, aOff_x, a, a_t, a_x, t, x, numConstants, constants, g3, ierr)
-        implicit none
-        PetscInt, intent(in) :: dim, Nf, NfAux, numConstants
-        PetscInt, intent(in), dimension(*) :: uOff, uOff_x, aOff, aOff_x
-        PetscScalar, intent(in), dimension(*) :: u, u_t, u_x, a, a_t, a_x, constants
-        PetscReal, intent(in) :: t
-        PetscReal, intent(in), dimension(*) :: x
-        PetscScalar, intent(out), dimension(*) :: g3
-        PetscErrorCode, intent(out) :: ierr
-        integer :: i, j, n
-
-        n = dim * dim
-        do i = 1, n
-            g3(i) = 0.0d0
-        end do
-        do i = 1, dim
-            do j = 1, dim
-                if (i .eq. j) then
-                    g3((i - 1) * dim + j) = 1.0d0
-                else
-                    g3((i - 1) * dim + j) = 0.0d0
-                end if
-            end do
-        end do
-        ierr = 0
-    end subroutine g3_uu
-
-    ! Boundary value u = 0
-    subroutine u_exact(dim, time, x, Nc, u, ctx, ierr)
-        implicit none
-        PetscInt, intent(in) :: dim, Nc
-        PetscReal, intent(in) :: time
-        PetscReal, intent(in), dimension(*) :: x
-        type(tPetscObject), intent(in) :: ctx
-        PetscScalar, intent(out), dimension(*) :: u
-        PetscErrorCode, intent(out) :: ierr
-
-        u(1) = 0.0d0
-        ierr = 0
-    end subroutine u_exact
-
-end program Poisson2D
+end program manual_fem

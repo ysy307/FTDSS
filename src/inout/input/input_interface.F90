@@ -1,15 +1,13 @@
 module inout_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
-#ifdef _MPI
     use :: mpi_f08
-#endif
 !$  use :: omp_lib
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
-    ! use :: inout_project_settings, only:get_project_path
     use :: inout_input_basic, only:type_input_basic
     use :: inout_input_conditions, only:type_conditions
+    use :: inout_output_conditions, only:type_output_settings
     use :: module_core, only:type_vtk, type_dp_3d, type_dp_vector_3d, allocate_array, deallocate_array, & !&
                              error_message, join, value_in_range, filter, modify_path_format, get_env_string
     implicit none
@@ -17,37 +15,6 @@ module inout_input
 
     public :: type_input
 
-    !!------------------------------------------------------------------------------------------------------------------------------
-    type :: type_field_output
-        character(:), allocatable :: file_format
-        logical :: coloring
-        character(:), allocatable :: output_interval_unit
-        real(real64) :: output_interval_step
-        character(:), allocatable :: variable_names(:)
-    end type type_field_output
-    !!------------------------------------------------------------------------------------------------------------------------------
-    type :: types_history_output
-        character(:), allocatable :: file_format
-        character(:), allocatable :: observation_type
-        character(:), allocatable :: output_interval_unit
-        real(real64) :: output_interval_step
-        character(:), allocatable :: variable_names(:)
-        integer(int32) :: num_observations
-        type(type_dp_vector_3d), allocatable :: coordinates(:)
-        integer(int32), allocatable :: node_ids(:)
-    end type types_history_output
-    !!------------------------------------------------------------------------------------------------------------------------------
-    type :: type_standard_output
-        logical :: print_progress
-        character(:), allocatable :: print_progress_unit
-        real(real64) :: print_progress_interval
-    end type type_standard_output
-    !!------------------------------------------------------------------------------------------------------------------------------
-    type :: type_output_settings
-        type(type_field_output) :: field_output
-        type(types_history_output) :: history_output
-        type(type_standard_output) :: standard_output
-    end type type_output_settings
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_geometry
         type(type_vtk) :: vtk
@@ -69,40 +36,7 @@ module inout_input
         type(type_geometry) :: geometry
     contains
         procedure, pass(self), public :: initialize => initialize_type_input
-
-        ! procedure :: read_parameters => inout_read_basic_parameters
-        ! procedure :: read_conditions => inout_read_conditions
-        ! procedure :: read_output_settings => inout_read_output_settings
-        ! procedure :: read_geometry => inout_read_geometry
-
     end type type_input
-
-    interface
-        ! module subroutine inout_read_basic_parameters(self)
-        !     implicit none
-        !     class(type_input), intent(inout) :: self
-
-        ! end subroutine inout_read_basic_parameters
-
-        ! module subroutine inout_read_conditions(self)
-        !     implicit none
-        !     class(type_input), intent(inout) :: self
-
-        ! end subroutine inout_read_conditions
-
-        ! module subroutine inout_read_output_settings(self)
-        !     implicit none
-        !     class(type_input), intent(inout) :: self
-
-        ! end subroutine inout_read_output_settings
-
-        ! module subroutine inout_read_geometry(self)
-        !     implicit none
-        !     class(type_input), intent(inout) :: self
-
-        ! end subroutine inout_read_geometry
-
-    end interface
 
 contains
 
@@ -155,10 +89,11 @@ contains
 
         self%basic%file_name = local_input_path//"Basic.json"
         self%conditions%file_name = local_input_path//"Conditions.json"
-        self%output_file_name = local_input_path//"Output.json"
+        self%output_settings%file_name = local_input_path//"Output.json"
 
         call self%basic%initialize()
         call self%conditions%initialize()
+        call self%output_settings%initialize()
         ! call self%read_output_settings()
         ! call self%read_geometry()
 
