@@ -1,4 +1,4 @@
-module inout_output_conditions
+module inout_input_output_conditions
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
     use :: mpi_f08
@@ -124,19 +124,9 @@ contains
         call read_output_settings_history(self, json)
         call read_output_settings_standard(self, json)
 
-        block
-            integer(int32) :: my_rank, ierr
-            call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
-            if (my_rank == 0) then
-                call self%field_output%display()
-                call self%history_output%display()
-                call self%standard_output%display()
-            end if
-        end block
-
         call json%destroy()
         call json%print_error_message(output_unit)
 
     end subroutine initialize_type_output_settings
 
-end module inout_output_conditions
+end module inout_input_output_conditions

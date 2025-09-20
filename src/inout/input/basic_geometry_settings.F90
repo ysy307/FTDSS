@@ -7,6 +7,7 @@ submodule(inout_input_basic) inout_input_basic_geometry_settings
     character(*), parameter :: mesh_file_name = "mesh_file_name"
     character(*), parameter :: global_node_id_key = "global_node_id_key"
     character(*), parameter :: node_type_key = "node_type_key"
+    character(*), parameter :: num_sharing_ranks_key = "num_sharing_ranks_key"
     character(*), parameter :: owner_ranks_key = "owner_ranks_key"
     character(*), parameter :: communication_partners_key = "communication_partners_key"
     character(*), parameter :: cell_id_key = "cell_id_key"
@@ -35,18 +36,27 @@ contains
         buffer(2) = node_type_key
         call get_json_value(json, join(buffer), self%geometry_settings%node_type_key, &
                             is_required=.true., default_value=node_type_key)
+
+        buffer(2) = num_sharing_ranks_key
+        call get_json_value(json, join(buffer), self%geometry_settings%num_sharing_ranks_key, &
+                            is_required=.true., default_value=num_sharing_ranks_key)
+
         buffer(2) = owner_ranks_key
         call get_json_value(json, join(buffer), self%geometry_settings%owner_ranks_key, &
                             is_required=.true., default_value=owner_ranks_key)
+
         buffer(2) = communication_partners_key
         call get_json_value(json, join(buffer), self%geometry_settings%communication_partners_key, &
                             is_required=.true., default_value=communication_partners_key)
+
         buffer(2) = cell_id_key
         call get_json_value(json, join(buffer), self%geometry_settings%cell_id_key, &
                             is_required=.true., default_value=cell_id_key)
+
         buffer(2) = rank_key
         call get_json_value(json, join(buffer), self%geometry_settings%rank_key, &
                             is_required=.true., default_value=rank_key)
+
         buffer(2) = original_id_key
         call get_json_value(json, join(buffer), self%geometry_settings%original_id_key, &
                             is_required=.true., default_value=original_id_key)
@@ -54,6 +64,7 @@ contains
         buffer(2) = color_key
         call get_json_value(json, join(buffer), self%geometry_settings%color_key, &
                             is_required=.true., default_value=color_key)
+
         buffer(2) = integration
         buffer(3) = integration_type
         call get_json_value(json, join(buffer), self%geometry_settings%integration_type, &

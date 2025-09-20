@@ -14,6 +14,8 @@ submodule(inout_input_basic) inout_input_basic_solver_settings
     character(*), parameter :: max_iterations = "max_iterations"
     character(*), parameter :: convergence = "convergence"
     character(*), parameter :: use_criteria = "use_criteria"
+    character(*), parameter :: norm_type = "norm_type"
+    character(len=16), parameter :: valid_norm_types(2) = [character(len=4) :: "l2", "linf"]
     character(len=16), parameter :: valid_criteria_types(3) = [character(len=16) :: "residual", "update", "both"]
     character(*), parameter :: logic_between_criteria = "logic_between_criteria"
     character(len=16), parameter :: valid_logic_types(2) = [character(len=16) :: "and", "or"]
@@ -96,6 +98,10 @@ contains
                 call get_json_value(json, join(buffer), self%solver_settings%nonlinear_solver%convergence%use_logic, &
                                     is_required=.true., default_value="and", valid_list=valid_logic_types)
             end if
+
+            buffer(4) = norm_type
+            call get_json_value(json, join(buffer), self%solver_settings%nonlinear_solver%convergence%norm_type, &
+                                is_required=.true., default_value="l2", valid_list=valid_norm_types)
 
             if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == valid_criteria_types([1, 3]))) then
                 buffer(4) = residual

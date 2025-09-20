@@ -16,11 +16,8 @@ set(INPUT_SOURCES
     output_fields.F90
     output_history.F90
     output_standard.F90
+    geometry_interface.F90
     input_interface.F90
-    # input_basic.F90
-    # input_conditions.F90
-    # input_output.F90
-    # input_geometry.F90
     input.F90
 )
 add_library(Input_Main STATIC ${INPUT_SOURCES})

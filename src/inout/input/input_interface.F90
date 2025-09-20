@@ -7,7 +7,8 @@ module inout_input
     use :: json_module, only:json_file
     use :: inout_input_basic, only:type_input_basic
     use :: inout_input_conditions, only:type_conditions
-    use :: inout_output_conditions, only:type_output_settings
+    use :: inout_input_output_conditions, only:type_output_settings
+    use :: inout_input_geometry, only:type_input_geometry
     use :: module_core, only:type_vtk, type_dp_3d, type_dp_vector_3d, allocate_array, deallocate_array, & !&
                              error_message, join, value_in_range, filter, modify_path_format, get_env_string
     implicit none
@@ -16,11 +17,7 @@ module inout_input
     public :: type_input
 
     !!------------------------------------------------------------------------------------------------------------------------------
-    type :: type_geometry
-        type(type_vtk) :: vtk
-        character(:), allocatable :: point_data_names(:)
-        real(real64), allocatable :: initial_values(:, :)
-    end type type_geometry
+
     !!------------------------------------------------------------------------------------------------------------------------------
 
     type :: type_input
@@ -33,7 +30,7 @@ module inout_input
         type(type_input_basic) :: basic
         type(type_conditions) :: conditions
         type(type_output_settings) :: output_settings
-        type(type_geometry) :: geometry
+        type(type_input_geometry) :: geometry
     contains
         procedure, pass(self), public :: initialize => initialize_type_input
     end type type_input
@@ -94,8 +91,7 @@ contains
         call self%basic%initialize()
         call self%conditions%initialize()
         call self%output_settings%initialize()
-        ! call self%read_output_settings()
-        ! call self%read_geometry()
+        call self%geometry%initialize(local_input_path, self%basic, self%conditions)
 
     end subroutine initialize_type_input
 

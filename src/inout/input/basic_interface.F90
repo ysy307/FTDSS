@@ -148,6 +148,7 @@ module inout_input_basic
 
     type :: type_convergence
         character(:), allocatable :: use_criteria
+        character(:), allocatable :: norm_type
         character(:), allocatable :: use_logic
         type(type_convergence_criteria) :: residual
         type(type_convergence_criteria) :: update

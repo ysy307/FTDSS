@@ -1,9 +1,7 @@
 module core_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
-#ifdef _MPI
     use :: mpi_f08
-#endif
     use :: stdlib_strings, only:to_string, replace_all, strip
     use :: stdlib_sorting, only:sort
     use :: stdlib_logger
@@ -31,10 +29,8 @@ module core_vtk
         integer(int32) :: cell_dimension
         integer(int32) :: cell_order
         integer(int32), allocatable :: connectivity(:)
-#ifdef _MPI
         integer(int32) :: rank
         integer(int32) :: original_id
-#endif
         integer(int32) :: color
     contains
         procedure :: set => type_vtk_cell_set
@@ -53,7 +49,6 @@ module core_vtk
         type(type_vtk_cell), allocatable :: cells(:)
         real(real64), allocatable :: point_field_values(:, :)
 
-#ifdef _MPI
         integer(int32) :: my_rank = -1
         integer(int32) :: num_procs = -1
         integer(int32) :: global_num_points = 0
@@ -64,7 +59,6 @@ module core_vtk
         integer(int32), allocatable :: owner_rank(:, :)
         integer(int32), allocatable :: communication_partners(:, :)
 
-#endif
         type(c_ptr), private :: handle = c_null_ptr
         character(4), private :: reader_type = "none"
     contains

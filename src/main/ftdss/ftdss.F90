@@ -51,18 +51,11 @@ contains
 
         call PetscInitialize(ierr)
 
-        profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
-        call self%controls%time%initialize(profiler_sections=profiler_labels)
-        call self%controls%time%Record("Start")
-        call self%controls%time%Profile_Start("Total")
-        call self%controls%time%Profile_Start("IO")
+        call self%controls%time%initialize()
 
         call setup_handler()
 
         call input%initialize()
-        call DMPlexCreateFromFile(PETSC_COMM_WORLD, 'mesh.msh', 'FTDSS', PETSC_TRUE, dm, ierr)
-        call self%controls%time%initialize(input=input)
-        call self%controls%iteration%initialize(input)
         call self%controls%initialize(input)
 
         if (input%output_settings%standard_output%print_progress) then
