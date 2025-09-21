@@ -1,91 +1,66 @@
 # =========================================================================
-# 必須パッケージの探索 (OpenMP, MPI)
+# 必須パッケージの探索 (OpenMP, MPI, PkgConfig)
 # =========================================================================
-if(ENABLE_MPI AND NOT TARGET MPI::MPI_Fortran)
-    # CMAKE_Fortran_COMPILER=mpiifx を指定していれば、FindMPIは自動で設定を検出します。
-    find_package(MPI REQUIRED)
-endif()
+include(FindPkgConfig REQUIRED)
+find_package(MPI REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # =========================================================================
 # MKL (BLAS/LAPACKを提供) の探索
 # =========================================================================
-if(ENABLE_MKL AND NOT TARGET MKL::MKL)
-
-    # MKLの基本的な設定
-    set(MKL_LINK static)
-    set(MKL_INTERFACE lp64)
-
-    # MKLのスレッディング層をコンパイラに基づいて決定
-    # ifort (Intel) と ifx (IntelLLVM) の両方に対応
-    if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
-        set(MKL_THREADING "intel_thread")
-        message(STATUS "MKL Threading: Intel OpenMP (for ${CMAKE_Fortran_COMPILER_ID})")
-    elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-        set(MKL_THREADING "gnu_thread")
-        message(STATUS "MKL Threading: GNU OpenMP (libgomp)")
-    else()
-        # 不明なコンパイラの場合、IntelのOpenMPをデフォルトにする
-        set(MKL_THREADING "intel_thread")
-        message(WARNING "MKL Threading: Unknown compiler '${CMAKE_Fortran_COMPILER_ID}', defaulting to Intel OpenMP.")
-    endif()
-
-    # OpenMPが有効な場合、OpenMPパッケージを探す
-    if(ENABLE_OPENMP)
-        find_package(OpenMP REQUIRED)
-    endif()
-
-    # 上記の MKL_* 変数に基づいて、MKLパッケージを探索
-    find_package(MKL CONFIG REQUIRED)
-
-    # BLAS/LAPACKのエイリアスターゲットを作成
-    add_library(BLAS::BLAS INTERFACE IMPORTED)
-    add_library(LAPACK::LAPACK INTERFACE IMPORTED)
-
-    # MKLターゲットに、必要に応じてOpenMPライブラリもリンク
-    if(ENABLE_OPENMP AND TARGET OpenMP::OpenMP_Fortran)
-        target_link_libraries(BLAS::BLAS INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
-        target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
-    else()
-        target_link_libraries(BLAS::BLAS INTERFACE MKL::MKL)
-        target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL)
-    endif()
-
+set(MKL_LINK static)
+set(MKL_INTERFACE lp64)
+if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
+    set(MKL_THREADING "intel_thread")
+    message(STATUS "MKL Threading: Intel OpenMP (for ${CMAKE_Fortran_COMPILER_ID})")
+elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+    set(MKL_THREADING "gnu_thread")
+    message(STATUS "MKL Threading: GNU OpenMP (libgomp)")
+else()
+    set(MKL_THREADING "intel_thread")
+    message(WARNING "MKL Threading: Unknown compiler '${CMAKE_Fortran_COMPILER_ID}', defaulting to Intel OpenMP.")
 endif()
-
+find_package(MKL CONFIG REQUIRED)
+add_library(BLAS::BLAS INTERFACE IMPORTED)
+add_library(LAPACK::LAPACK INTERFACE IMPORTED)
+target_link_libraries(BLAS::BLAS INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
+target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
 
 # =========================================================================
 # サードパーティライブラリの探索
 # =========================================================================
+# --- PETSc (pkg-configを使用) ---
+set(PETSC_INSTALL_DIR "/workspaces/FTDSS/third_party/.local")
+
+# 1. 現在のパスを一時変数に読み込む
+set(CURRENT_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
+# 2. 新しいパス文字列を組み立てる
+set(NEW_PKG_CONFIG_PATH "${PETSC_INSTALL_DIR}/lib/pkgconfig")
+if(CURRENT_PKG_CONFIG_PATH)
+  set(NEW_PKG_CONFIG_PATH "${NEW_PKG_CONFIG_PATH}:${CURRENT_PKG_CONFIG_PATH}")
+endif()
+# 3. 組み立てたパスで環境変数を設定する
+set(ENV{PKG_CONFIG_PATH} "${NEW_PKG_CONFIG_PATH}")
+
+pkg_search_module(PETSC REQUIRED IMPORTED_TARGET PETSc)
+
 # --- ライブラリ探索パスを一元管理 ---
 list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/.local)
 
 # --- fortran-stdlib ---
-if(NOT TARGET fortran_stdlib::fortran_stdlib)
-    find_package(fortran_stdlib REQUIRED)
-endif()
+find_package(fortran_stdlib REQUIRED)
 
 # --- json-fortran ---
-if(NOT TARGET jsonfortran-intelllvm::jsonfortran-static)
-    find_package(jsonfortran-intelllvm REQUIRED)
-endif()
+find_package(jsonfortran-intelllvm REQUIRED)
 
-# --- VTK (Fortranラッパーではなく、本体ライブラリ) ---
-find_package(VTK REQUIRED
-    COMPONENTS
-        CommonCore
-        CommonDataModel
-        IOLegacy         # .vtkリーダーのために必要
-        IOXML            # .vtuリーダーのために必要
-)
+# --- VTK ---
+find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
 
 # --- VTKFortran (静的ライブラリとしてインポート) ---
-if(NOT TARGET VTK::VTKFortran)
-    add_library(VTK::VTKFortran STATIC IMPORTED GLOBAL)
-    set_target_properties(VTK::VTKFortran PROPERTIES
-        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/third_party/.local/lib/libvtkfortran.a"
-    )
-endif()
-
+add_library(VTK::VTKFortran STATIC IMPORTED GLOBAL)
+set_target_properties(VTK::VTKFortran PROPERTIES
+    IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/third_party/.local/lib/libvtkfortran.a"
+)
 
 # =========================================================================
 # ビルドフラグとライブラリリンクを行う関数
@@ -95,96 +70,47 @@ function(enable_build_flags target)
         $<$<COMPILE_LANGUAGE:Fortran>:-stand f2018 -fpp -traceback>
     )
 
-    # Debug用フラグ
-    if(ENABLE_DEBUG)
-        if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
-            target_compile_options(${target} PUBLIC
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -check all -fpe=0 -warn all -traceback>
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:-g -O0 -debug all -traceback>
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:-g -O0 -debug all -traceback>
-            )
-            target_compile_definitions(${target} PUBLIC USE_DEBUG)
-        elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-            target_compile_options(${target} PUBLIC
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:Fortran>>:-g -O0 -fcheck=all -fbacktrace>
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:
-                    -g -O0 -Wall -Wextra -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer>
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:
-                    -g -O0 -Wall -Wextra -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer>
-            )
-            target_link_options(${target} PUBLIC
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C>>:
-                    -fsanitize=address -fsanitize=undefined>
-                $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CXX>>:
-                    -fsanitize=address -fsanitize=undefined>
-            )
-        endif()
+    # Release最適化オプションを常時有効化
+    if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
+        target_compile_options(${target} PUBLIC
+            $<$<CONFIG:Release>:-O3 -xHost>
+        )
+    elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+        target_compile_options(${target} PUBLIC
+            $<$<CONFIG:Release>:-O3 -march=native>
+        )
     endif()
 
-    # Release最適化オプション
-    if(ENABLE_OPTIMIZE)
-        if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
-            target_compile_options(${target} PUBLIC
-                $<$<CONFIG:Release>:-O3 -xCORE-AVX2>
-            )
-        elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-            target_compile_options(${target} PUBLIC
-                $<$<CONFIG:Release>:-O3 -march=native>
-            )
-        endif()
-    endif()
-
-    # ================================
     # ifx (IntelLLVM) 最適化レポート出力設定
-    # ================================
     if(CMAKE_Fortran_COMPILER_ID MATCHES "IntelLLVM")
         file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/opt_reports")
         target_compile_options(${target} PUBLIC
             $<$<COMPILE_LANGUAGE:Fortran>:
                 -qopt-report=3
                 -qopt-report-phase=loop,vec
-                # -qopt-report-file=${CMAKE_BINARY_DIR}/opt_reports/
             >
         )
     endif()
 
-    # OpenMPのコンパイル定義は、MKLの有無に関わらず設定する
-    if(ENABLE_OPENMP)
-        target_compile_definitions(${target} PUBLIC USE_OPENMP)
-    endif()
-
-    if(ENABLE_MPI)
-        target_link_libraries(${target} PUBLIC MPI::MPI_Fortran)
-        target_compile_definitions(${target} PUBLIC _MPI)
-    endif()
-
-    if(ENABLE_MKL)
-        target_link_libraries(${target} PUBLIC MKL::MKL)
-        target_compile_definitions(${target} PUBLIC _MKL)
-    elseif(ENABLE_OPENMP)
-        # MKLが無効で、OpenMPが有効な場合のみ、標準のOpenMPターゲットをリンクする
-        target_link_libraries(${target} PUBLIC OpenMP::OpenMP_Fortran)
-    endif()
+    # OpenMP, MPI, MKLの定義とリンクを常時有効化
+    target_compile_definitions(${target} PUBLIC USE_OPENMP _MPI _MKL)
+    target_link_libraries(${target} PUBLIC MPI::MPI_Fortran MKL::MKL)
 endfunction()
 
 function(enable_thirdparty target)
     # --- ヘッダファイルのインクルードディレクトリ ---
     target_include_directories(${target} PUBLIC
-        # VTKFortran
+        ${PETSC_INCLUDE_DIRS}/pestc/finclude
         ${PROJECT_SOURCE_DIR}/third_party/.local/include/VTKFortran
-        # fortran-stdlib
         $<TARGET_PROPERTY:fortran_stdlib::fortran_stdlib,INTERFACE_INCLUDE_DIRECTORIES>
-        # json-fortran
         $<TARGET_PROPERTY:jsonfortran-intelllvm::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
     )
 
     # --- ライブラリのリンク ---
     target_link_libraries(${target} PUBLIC
-        # VTKFortran (IMPORTEDターゲットをリンク)
         VTK::VTKFortran
-        # fortran-stdlib
         fortran_stdlib::fortran_stdlib
-        # json-fortran
         jsonfortran-intelllvm::jsonfortran-static
+        PkgConfig::PETSC  # PETScをpkg-config経由でリンク
     )
 endfunction()

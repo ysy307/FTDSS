@@ -18,6 +18,14 @@ contains
         order = self%cell_order
     end function type_vtk_cell_get_order
 
+    module function type_vtk_cell_get_size_connectivity(self) result(size)
+        implicit none
+        class(type_vtk_cell), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%num_nodes_in_cell
+    end function type_vtk_cell_get_size_connectivity
+
     module subroutine type_vtk_cell_set(self, num_nodes_in_cell)
         implicit none
         class(type_vtk_cell), intent(inout) :: self !! VTK cells data
@@ -440,25 +448,6 @@ contains
         deallocate (collected_ids)
 
     end subroutine get_active_region_info
-
-    module subroutine finalize_vtk_object(self)
-        type(type_vtk), intent(inout) :: self
-
-        if (c_associated(self%handle)) then
-
-            select case (strip(self%reader_type))
-            case ("vtk")
-                call vtk_finalize(self%handle)
-            case ("vtu")
-                call vtu_finalize(self%handle)
-            case default
-                ! 知らないリーダータイプの場合は何もしない
-            end select
-
-            self%handle = c_null_ptr
-
-        end if
-    end subroutine finalize_vtk_object
 
 end submodule core_vtk_base
 

@@ -1,9 +1,7 @@
 module core_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
-#ifdef _MPI
     use :: mpi_f08
-#endif
     use :: stdlib_strings, only:to_string, replace_all, strip
     use :: stdlib_sorting, only:sort
     use :: stdlib_logger
@@ -31,15 +29,14 @@ module core_vtk
         integer(int32) :: cell_dimension
         integer(int32) :: cell_order
         integer(int32), allocatable :: connectivity(:)
-#ifdef _MPI
         integer(int32) :: rank
         integer(int32) :: original_id
-#endif
         integer(int32) :: color
     contains
         procedure :: set => type_vtk_cell_set
         procedure :: get_dimension => type_vtk_cell_get_dimension
         procedure :: get_order => type_vtk_cell_get_order
+        procedure :: get_size => type_vtk_cell_get_size_connectivity
     end type type_vtk_cell
 
     type :: type_vtk
@@ -53,7 +50,6 @@ module core_vtk
         type(type_vtk_cell), allocatable :: cells(:)
         real(real64), allocatable :: point_field_values(:, :)
 
-#ifdef _MPI
         integer(int32) :: my_rank = -1
         integer(int32) :: num_procs = -1
         integer(int32) :: global_num_points = 0
@@ -64,7 +60,6 @@ module core_vtk
         integer(int32), allocatable :: owner_rank(:, :)
         integer(int32), allocatable :: communication_partners(:, :)
 
-#endif
         type(c_ptr), private :: handle = c_null_ptr
         character(4), private :: reader_type = "none"
     contains
@@ -93,6 +88,12 @@ module core_vtk
             integer(int32) :: order
         end function type_vtk_cell_get_order
 
+        module function type_vtk_cell_get_size_connectivity(self) result(size)
+            implicit none
+            class(type_vtk_cell), intent(in) :: self
+            integer(int32) :: size
+        end function type_vtk_cell_get_size_connectivity
+
         module subroutine get_active_region_info(self, unique_ids, ierr)
             !> Extract unique CellEntityIds of the highest-dimensional elements
             implicit none
@@ -100,11 +101,6 @@ module core_vtk
             integer(int32), allocatable, intent(out) :: unique_ids(:)
             integer(int32), intent(out) :: ierr
         end subroutine get_active_region_info
-
-        module subroutine finalize_vtk_object(self)
-            implicit none
-            type(type_vtk), intent(inout) :: self
-        end subroutine finalize_vtk_object
     end interface
 
     interface
@@ -148,5 +144,23 @@ module core_vtk
     end interface
 
 contains
+    subroutine finalize_vtk_object(self)
+        type(type_vtk), intent(inout) :: self
+
+        if (c_associated(self%handle)) then
+
+            select case (trim(adjustl(self%reader_type)))
+            case ("vtk")
+                call vtk_finalize(self%handle)
+            case ("vtu")
+                call vtu_finalize(self%handle)
+            case default
+                ! 知らないリーダータイプの場合は何もしない
+            end select
+
+            self%handle = c_null_ptr
+
+        end if
+    end subroutine finalize_vtk_object
 
 end module core_vtk

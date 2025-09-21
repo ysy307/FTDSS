@@ -1,5 +1,5 @@
 {
-    "time_control": {
+    "time_controls": {
         "simulation_period": {
             "unit": "day",
             "start": 0.0,
@@ -19,6 +19,9 @@
     "boundary_conditions": [
         {
             "id": 2,
+            "calculate_thermal": true,
+            "calculate_hydraulic": false,
+            "calculate_mechanical": false,
             "thermal": {
                 "type": "dirichlet",
                 "is_uniform": true,
@@ -33,6 +36,9 @@
         },
         {
             "id": 3,
+            "calculate_thermal": true,
+            "calculate_hydraulic": false,
+            "calculate_mechanical": false,
             "thermal": {
                 "type": "adiabatic"
             },
@@ -47,6 +53,9 @@
         },
         {
             "id": 4,
+            "calculate_thermal": true,
+            "calculate_hydraulic": false,
+            "calculate_mechanical": false,
             "thermal": {
                 "type": "adiabatic"
             },
@@ -56,6 +65,9 @@
         },
         {
             "id": 5,
+            "calculate_thermal": true,
+            "calculate_hydraulic": false,
+            "calculate_mechanical": false,
             "thermal": {
                 "type": "adiabatic"
             },
@@ -70,6 +82,9 @@
         }
     ],
     "initial_conditions": {
+        "calculate_thermal": true,
+        "calculate_hydraulic": false,
+        "calculate_mechanical": false,
         "thermal": {
             "type": "uniform",
             "value": 18.0,
@@ -85,7 +100,6 @@
                 {
                     "id": 3,
                     "type": "dirichlet",
-                    "is_uniform": true,
                     "values": [
                         0.1
                     ]
@@ -97,7 +111,6 @@
                 {
                     "id": 5,
                     "type": "dirichlet",
-                    "is_uniform": true,
                     "values": [
                         0.0
                     ]

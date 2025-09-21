@@ -38,79 +38,85 @@ contains
     subroutine initialize_type_controls(self, input)
         implicit none
         class(type_controls), intent(inout) :: self
-        class(type_input), intent(in) :: input
+        class(type_input), intent(in), optional :: input
 
         integer(int32), allocatable :: unique_material_ids(:)
         integer(int32) :: ierr
         integer(int32) :: i, num_unique_regions, max_region_id
         integer(int32) :: current_material_id
+        character(len=10), allocatable :: profiler_labels(:)
 
-        ierr = 0
-        ! アクティブなマテリアル領域の情報を取得
-        call input%geometry%vtk%get_active_region_info(unique_material_ids, ierr)
-        if (ierr /= 0) return
-        if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
-            ierr = -1 ! エラーコード
-            print *, "Error: No active material regions found."
-            stop 1
-        end if
+        if (present(input)) then
 
-        num_unique_regions = size(unique_material_ids)
-        max_region_id = maxval(unique_material_ids)
-
-        ! 全体的な計算フラグを設定し、配列を割り当てて初期化
-        if (input%basic%analysis_controls%calculate_thermal) then
-            self%calculate_thermal = .true.
-            allocate (self%thermal(max_region_id))
-            self%thermal = .false. ! 配列全体を .false. で初期化
-        else
-            self%calculate_thermal = .false.
-        end if
-
-        if (input%basic%analysis_controls%calculate_hydraulic) then
-            self%calculate_hydraulic = .true.
-            allocate (self%hydraulic(max_region_id))
-            self%hydraulic = .false.
-        else
-            self%calculate_hydraulic = .false.
-        end if
-
-        if (input%basic%analysis_controls%calculate_mechanical) then
-            self%calculate_mechanical = .true.
-            allocate (self%mechanical(max_region_id))
-            self%mechanical = .false.
-        else
-            self%calculate_mechanical = .false.
-        end if
-
-        ! アクティブな各マテリアル領域に対してフラグを立てる
-        do i = 1, num_unique_regions
-            current_material_id = unique_material_ids(i)
-            if (self%calculate_thermal) then
-                ! materials配列の添え字として実際の材料IDを使用
-                self%thermal(current_material_id) = input%basic%materials(i)%calculate_thermal
+            ierr = 0
+            ! アクティブなマテリアル領域の情報を取得
+            call input%geometry%vtk%get_active_region_info(unique_material_ids, ierr)
+            if (ierr /= 0) return
+            if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
+                ierr = -1 ! エラーコード
+                print *, "Error: No active material regions found."
+                stop 1
             end if
 
-            if (self%calculate_hydraulic) then
-                ! materials配列の添え字として実際の材料IDを使用
-                self%hydraulic(current_material_id) = input%basic%materials(i)%calculate_hydraulic
+            num_unique_regions = size(unique_material_ids)
+            max_region_id = maxval(unique_material_ids)
+
+            ! 全体的な計算フラグを設定し、配列を割り当てて初期化
+            if (input%basic%analysis_controls%calculate_thermal) then
+                self%calculate_thermal = .true.
+                allocate (self%thermal(max_region_id))
+                self%thermal = .false. ! 配列全体を .false. で初期化
+            else
+                self%calculate_thermal = .false.
             end if
 
-            if (self%calculate_mechanical) then
-                ! materials配列の添え字として実際の材料IDを使用
-                self%mechanical(current_material_id) = input%basic%materials(i)%calculate_mechanical
+            if (input%basic%analysis_controls%calculate_hydraulic) then
+                self%calculate_hydraulic = .true.
+                allocate (self%hydraulic(max_region_id))
+                self%hydraulic = .false.
+            else
+                self%calculate_hydraulic = .false.
             end if
-        end do
 
-        ! print *,
+            if (input%basic%analysis_controls%calculate_mechanical) then
+                self%calculate_mechanical = .true.
+                allocate (self%mechanical(max_region_id))
+                self%mechanical = .false.
+            else
+                self%calculate_mechanical = .false.
+            end if
 
-        ! coupling_modeの設定
-        self%coupling_mode = input%basic%analysis_controls%coupling_mode
+            ! アクティブな各マテリアル領域に対してフラグを立てる
+            do i = 1, num_unique_regions
+                current_material_id = unique_material_ids(i)
+                if (self%calculate_thermal) then
+                    ! materials配列の添え字として実際の材料IDを使用
+                    self%thermal(current_material_id) = input%basic%materials(i)%calculate_thermal
+                end if
 
-        ! call self%time%initialize(input)
-        ! call self%iteration%initialize(input)
+                if (self%calculate_hydraulic) then
+                    ! materials配列の添え字として実際の材料IDを使用
+                    self%hydraulic(current_material_id) = input%basic%materials(i)%calculate_hydraulic
+                end if
 
-        call initialize_openmp(input)
+                if (self%calculate_mechanical) then
+                    ! materials配列の添え字として実際の材料IDを使用
+                    self%mechanical(current_material_id) = input%basic%materials(i)%calculate_mechanical
+                end if
+            end do
+
+            self%coupling_mode = input%basic%analysis_controls%coupling_mode
+
+            call self%time%initialize(input=input)
+            call self%iteration%initialize(input)
+            call initialize_openmp(input)
+        else
+            profiler_labels = [character(len=10) :: "IO", "Setup", "Assemble", "Solve", "Total"]
+            call self%time%initialize(profiler_sections=profiler_labels)
+            call self%time%Record("Start")
+            call self%time%Profile_Start("Total")
+            call self%time%Profile_Start("IO")
+        end if
 
         call deallocate_array(unique_material_ids)
 

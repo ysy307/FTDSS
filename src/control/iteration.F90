@@ -1,82 +1,125 @@
 module control_iteration
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_input, only:type_input, type_convergence
+    use :: module_input, only:type_input
     use :: module_linalg, only:norm_2, norm_inf
     implicit none
     private
 
     public :: type_iteration
 
-    ! --- プライベート: イテレータ設定格納型 ---
-    type, private :: type_iterator_config
+    type :: type_convergence_control
+        character(:), allocatable :: norm_type
+        character(:), allocatable :: combination_logic
+        logical :: check_residual
+        character(:), allocatable :: res_criteria
+        real(real64) :: res_abs_tol = 1.0d-8
+        real(real64) :: res_rel_tol = 1.0d-6
+        logical :: check_update
+        character(:), allocatable :: upd_criteria
+        real(real64) :: upd_abs_tol = 1.0d-8
+        real(real64) :: upd_rel_tol = 1.0d-6
+    end type type_convergence_control
+
+    type :: type_iterator_config
         integer(int32) :: max_iterations
         integer(int32) :: update_frequency
-        type(type_convergence) :: convergence
+        type(type_convergence_control) :: conv_ctrl
     end type type_iterator_config
 
-    ! --- パブリック: イテレーション管理派生型 ---
     type :: type_iteration
         private
-        integer(int32) :: iter = 0 ! 非線形反復回数
-        integer(int32) :: step = 0 ! ステップカウンタ
-        logical :: is_converged = .false.
+        ! --- 全体管理 ---
+        integer(int32) :: total_iter = 0 ! 全体計算での総イテレーション
 
+        ! --- 非線形ステップごとの管理 ---
+        integer(int32) :: nonlinear_iter = 0
+
+        logical :: is_converged = .false.
         real(real64) :: init_res_norm_l2 = 0.0d0
         real(real64) :: init_res_norm_inf = 0.0d0
         real(real64) :: init_upd_norm_l2 = 0.0d0
         real(real64) :: init_upd_norm_inf = 0.0d0
-
         character(:), allocatable :: algorithm
         type(type_iterator_config) :: config
     contains
-        procedure, pass(self), public :: initialize => initialize_type_iteration
-        procedure, pass(self), public :: reset_step
+        procedure, pass(self), public :: initialize
+        procedure, pass(self), public :: reset_nonlinear
         procedure, pass(self), public :: set_initial_norms
-        procedure, pass(self), public :: reset_timestep
         procedure, pass(self), public :: check_convergence
-        procedure, pass(self), public :: increment_iter
-        procedure, pass(self), public :: increment_step
-        procedure, pass(self), public :: should_continue => continue_loop
-        procedure, pass(self), public :: get_iter
-        procedure, pass(self), public :: get_step
-        procedure, pass(self), public :: get_algorithm_name
-        procedure, pass(self), public :: has_converged => get_status
+        procedure, pass(self), public :: increment_nonlinear
+        procedure, pass(self), public :: increment_total
+        procedure, pass(self), public :: should_continue
+        procedure, pass(self), public :: get_nonlinear_iter
+        procedure, pass(self), public :: get_total_iter
+        procedure, pass(self), public :: has_converged
+        procedure, pass(self), public :: get_max_iterations
     end type type_iteration
+
+    real(real64), private, parameter :: TINY_NORM = 1.0d-12
 
 contains
 
-    subroutine initialize_type_iteration(self, input)
-        implicit none
+    subroutine initialize(self, input)
         class(type_iteration), intent(out) :: self
         type(type_input), intent(in) :: input
 
-        self%iter = 0
-        self%step = 0
+        self%total_iter = 0
+        self%nonlinear_iter = 0
         self%is_converged = .false.
-
         self%algorithm = input%basic%solver_settings%nonlinear_solver%method
+
         select case (trim(self%algorithm))
         case ("newton", "modified_newton", "picard")
             self%config%max_iterations = input%basic%solver_settings%nonlinear_solver%max_iterations
             self%config%update_frequency = input%basic%solver_settings%nonlinear_solver%update_frequency
-            self%config%convergence = input%basic%solver_settings%nonlinear_solver%convergence
+
+            self%config%conv_ctrl%norm_type = input%basic%solver_settings%nonlinear_solver%convergence%norm_type
+            self%config%conv_ctrl%combination_logic = input%basic%solver_settings%nonlinear_solver%convergence%use_logic
+
+            select case (trim(input%basic%solver_settings%nonlinear_solver%convergence%use_criteria))
+            case ("residual")
+                self%config%conv_ctrl%check_residual = .true.
+                self%config%conv_ctrl%check_update = .false.
+            case ("update")
+                self%config%conv_ctrl%check_residual = .false.
+                self%config%conv_ctrl%check_update = .true.
+            case ("both")
+                self%config%conv_ctrl%check_residual = .true.
+                self%config%conv_ctrl%check_update = .true.
+            case default
+                self%config%conv_ctrl%check_residual = .false.
+                self%config%conv_ctrl%check_update = .false.
+            end select
+
+            if (self%config%conv_ctrl%check_residual) then
+                self%config%conv_ctrl%res_criteria = input%basic%solver_settings%nonlinear_solver%convergence%residual%criteria
+                self%config%conv_ctrl%res_abs_tol = input%basic%solver_settings%nonlinear_solver%convergence%residual%absolute_tolerance
+                self%config%conv_ctrl%res_rel_tol = input%basic%solver_settings%nonlinear_solver%convergence%residual%relative_tolerance
+            end if
+
+            if (self%config%conv_ctrl%check_update) then
+                self%config%conv_ctrl%upd_criteria = input%basic%solver_settings%nonlinear_solver%convergence%update%criteria
+                self%config%conv_ctrl%upd_abs_tol = input%basic%solver_settings%nonlinear_solver%convergence%update%absolute_tolerance
+                self%config%conv_ctrl%upd_rel_tol = input%basic%solver_settings%nonlinear_solver%convergence%update%relative_tolerance
+            end if
+        case default
+            self%config%max_iterations = 1
         end select
-    end subroutine initialize_type_iteration
+    end subroutine initialize
 
-    subroutine reset_step(self)
-        implicit none
+    subroutine reset_nonlinear(self)
         class(type_iteration), intent(inout) :: self
-
-        self%step = 0
+        self%nonlinear_iter = 0
         self%is_converged = .false.
-    end subroutine reset_step
+        self%init_res_norm_l2 = 0.0d0
+        self%init_res_norm_inf = 0.0d0
+        self%init_upd_norm_l2 = 0.0d0
+        self%init_upd_norm_inf = 0.0d0
+    end subroutine reset_nonlinear
 
     subroutine set_initial_norms(self, res_vec, upd_vec)
-        implicit none
         class(type_iteration), intent(inout) :: self
         real(real64), intent(in), optional :: res_vec(:), upd_vec(:)
-
-        ! 初期ノルム値設定
         if (present(res_vec)) then
             self%init_res_norm_l2 = norm_2(res_vec)
             self%init_res_norm_inf = norm_inf(res_vec)
@@ -87,152 +130,117 @@ contains
         end if
     end subroutine set_initial_norms
 
-    subroutine reset_timestep(self)
-        implicit none
-        class(type_iteration), intent(inout) :: self
-
-        self%step = 0
-        self%iter = 0
-        self%is_converged = .false.
-        self%init_res_norm_l2 = 0.0d0
-        self%init_res_norm_inf = 0.0d0
-        self%init_upd_norm_l2 = 0.0d0
-        self%init_upd_norm_inf = 0.0d0
-    end subroutine reset_timestep
-
     subroutine check_convergence(self, res_vec, upd_vec)
-        implicit none
         class(type_iteration), intent(inout) :: self
         real(real64), intent(in) :: res_vec(:), upd_vec(:)
-        logical :: ok_res, ok_upd
-        real(real64) :: abs_res, rel_res, abs_upd, rel_upd
+        logical :: is_res_ok = .false., is_upd_ok = .false.
 
         if (trim(self%algorithm) == "none") then
             self%is_converged = .true.
             return
         end if
 
-        ! --- ノルム計算 ---
-        abs_res = norm_2(res_vec)
-        abs_upd = norm_2(upd_vec)
-        if (self%init_res_norm_l2 > 1.0d-12) then
-            rel_res = abs_res / self%init_res_norm_l2
-        else
-            rel_res = 0.0d0
-        end if
-        if (self%init_upd_norm_l2 > 1.0d-12) then
-            rel_upd = abs_upd / self%init_upd_norm_l2
-        else
-            rel_upd = 0.0d0
+        if (self%config%conv_ctrl%check_residual) then
+            is_res_ok = check_single_criterion(self%config%conv_ctrl%norm_type, self%config%conv_ctrl%res_criteria, &
+                                               self%config%conv_ctrl%res_abs_tol, self%config%conv_ctrl%res_rel_tol, res_vec, self%init_res_norm_l2, self%init_res_norm_inf)
         end if
 
-        ! --- 残差基準 ---
-        select case (trim(self%config%convergence%residual%criteria))
-        case ("absolute")
-            ok_res = abs_res < self%config%convergence%residual%absolute_tolerance
-        case ("relative")
-            ok_res = rel_res < self%config%convergence%residual%relative_tolerance
-        case ("both")
-            if (trim(self%config%convergence%residual%logic) == "and") then
-                ok_res = (abs_res < self%config%convergence%residual%absolute_tolerance) .and. &
-                         (rel_res < self%config%convergence%residual%relative_tolerance)
-            else
-                ok_res = (abs_res < self%config%convergence%residual%absolute_tolerance) .or. &
-                         (rel_res < self%config%convergence%residual%relative_tolerance)
-            end if
-        end select
+        if (self%config%conv_ctrl%check_update) then
+            is_upd_ok = check_single_criterion(self%config%conv_ctrl%norm_type, self%config%conv_ctrl%upd_criteria, &
+                                               self%config%conv_ctrl%upd_abs_tol, self%config%conv_ctrl%upd_rel_tol, upd_vec, self%init_upd_norm_l2, self%init_upd_norm_inf)
+        end if
 
-        ! --- 更新基準 ---
-        select case (trim(self%config%convergence%update%criteria))
-        case ("absolute")
-            ok_upd = abs_upd < self%config%convergence%update%absolute_tolerance
-        case ("relative")
-            ok_upd = rel_upd < self%config%convergence%update%relative_tolerance
-        case ("both")
-            if (trim(self%config%convergence%update%logic) == "and") then
-                ok_upd = (abs_upd < self%config%convergence%update%absolute_tolerance) .and. &
-                         (rel_upd < self%config%convergence%update%relative_tolerance)
+        if (.not. self%config%conv_ctrl%check_residual .and. .not. self%config%conv_ctrl%check_update) then
+            self%is_converged = .true.
+        elseif (self%config%conv_ctrl%check_residual .and. .not. self%config%conv_ctrl%check_update) then
+            self%is_converged = is_res_ok
+        elseif (.not. self%config%conv_ctrl%check_residual .and. self%config%conv_ctrl%check_update) then
+            self%is_converged = is_upd_ok
+        else
+            if (trim(self%config%conv_ctrl%combination_logic) == "and") then
+                self%is_converged = is_res_ok .and. is_upd_ok
             else
-                ok_upd = (abs_upd < self%config%convergence%update%absolute_tolerance) .or. &
-                         (rel_upd < self%config%convergence%update%relative_tolerance)
+                self%is_converged = is_res_ok .or. is_upd_ok
             end if
-        end select
-
-        ! --- 総合判定 ---
-        select case (trim(self%config%convergence%use_criteria))
-        case ("residual")
-            self%is_converged = ok_res
-        case ("update")
-            self%is_converged = ok_upd
-        case ("both")
-            if (trim(self%config%convergence%use_logic) == "and") then
-                self%is_converged = ok_res .and. ok_upd
-            else
-                self%is_converged = ok_res .or. ok_upd
-            end if
-        end select
+        end if
     end subroutine check_convergence
 
-    subroutine increment_iter(self)
-        implicit none
-        class(type_iteration), intent(inout) :: self
+    function check_single_criterion(norm_type, criteria, abs_tol, rel_tol, &
+                                    vec, init_norm_l2, init_norm_inf) result(is_ok)
+        character(*), intent(in) :: norm_type, criteria
+        real(real64), intent(in) :: abs_tol, rel_tol, vec(:), init_norm_l2, init_norm_inf
+        logical :: is_ok
+        real(real64) :: current_norm, init_norm, rel_val
+        logical :: abs_ok, rel_ok
 
-        self%iter = self%iter + 1
-    end subroutine increment_iter
-
-    subroutine increment_step(self)
-        implicit none
-        class(type_iteration), intent(inout) :: self
-
-        self%step = self%step + 1
-    end subroutine increment_step
-
-    function continue_loop(self) result(should_continue_loop)
-        implicit none
-        class(type_iteration), intent(in) :: self
-        logical :: should_continue_loop
-
-        if (self%is_converged) then
-            should_continue_loop = .false.
+        if (trim(norm_type) == "inf") then
+            current_norm = norm_inf(vec)
+            init_norm = init_norm_inf
         else
-            if (self%step == 0) then
-                should_continue_loop = .true.
-            else
-                should_continue_loop = (self%step < self%config%max_iterations)
-            end if
+            current_norm = norm_2(vec)
+            init_norm = init_norm_l2
         end if
-    end function continue_loop
 
-    pure function get_iter(self) result(iter)
-        implicit none
+        if (init_norm > TINY_NORM) then
+            rel_val = current_norm / init_norm
+        else
+            rel_val = 0.0d0
+        end if
+
+        abs_ok = current_norm < abs_tol
+        rel_ok = rel_val < rel_tol
+
+        select case (trim(criteria))
+        case ("absolute")
+            is_ok = abs_ok
+        case ("relative")
+            is_ok = rel_ok
+        case ("both")
+            is_ok = abs_ok .and. rel_ok
+        case default
+            is_ok = .false.
+        end select
+    end function check_single_criterion
+
+    subroutine increment_nonlinear(self)
+        class(type_iteration), intent(inout) :: self
+        self%nonlinear_iter = self%nonlinear_iter + 1
+    end subroutine increment_nonlinear
+
+    subroutine increment_total(self)
+        class(type_iteration), intent(inout) :: self
+        self%total_iter = self%total_iter + 1
+    end subroutine increment_total
+
+    function should_continue(self) result(continue_flag)
         class(type_iteration), intent(in) :: self
-        integer(int32) :: iter
+        logical :: continue_flag
+        continue_flag = (.not. self%is_converged) .and. &
+                        (self%nonlinear_iter < self%config%max_iterations)
+    end function should_continue
 
-        iter = self%iter
-    end function get_iter
-
-    pure function get_step(self) result(step)
-        implicit none
+    pure function get_nonlinear_iter(self) result(val)
         class(type_iteration), intent(in) :: self
-        integer(int32) :: step
+        integer(int32) :: val
+        val = self%nonlinear_iter
+    end function get_nonlinear_iter
 
-        step = self%step
-    end function get_step
-
-    pure function get_status(self) result(is_converged)
-        implicit none
+    pure function get_total_iter(self) result(val)
         class(type_iteration), intent(in) :: self
-        logical :: is_converged
+        integer(int32) :: val
+        val = self%total_iter
+    end function get_total_iter
 
-        is_converged = self%is_converged
-    end function get_status
-
-    pure function get_algorithm_name(self) result(algorithm_name)
-        implicit none
+    pure function has_converged(self) result(val)
         class(type_iteration), intent(in) :: self
-        character(:), allocatable :: algorithm_name
+        logical :: val
+        val = self%is_converged
+    end function has_converged
 
-        algorithm_name = self%algorithm
-    end function get_algorithm_name
+    pure function get_max_iterations(self) result(val)
+        class(type_iteration), intent(in) :: self
+        integer(int32) :: val
+        val = self%config%max_iterations
+    end function get_max_iterations
 
 end module control_iteration

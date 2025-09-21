@@ -54,9 +54,9 @@ enable_thirdparty(Domain_Adjacency)
 # Graph coloring algorithms for parallelization.
 set(DOMAIN_MULTICOLORING_SOURCES
     multicoloring/multicoloring.F90
-    multicoloring/welch_powell.F90
-    multicoloring/dsatur.F90
-    multicoloring/lfo.F90
+    # multicoloring/welch_powell.F90
+    # multicoloring/dsatur.F90
+    # multicoloring/lfo.F90
 )
 add_library(Domain_Multicoloring STATIC ${DOMAIN_MULTICOLORING_SOURCES})
 target_include_directories(Domain_Multicoloring PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
@@ -94,6 +94,7 @@ target_link_libraries(Domain_Main PUBLIC
     Domain_Adjacency
     Domain_Multicoloring
     Domain_Reordering
+    Solver::Physics
 )
 enable_build_flags(Domain_Main)
 enable_thirdparty(Domain_Main)

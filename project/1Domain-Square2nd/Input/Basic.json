@@ -21,7 +21,6 @@
         "rank_key": "rank",
         "original_id_key": "original_id",
         "color_key": "color",
-        "dimension": 1,
         "integration": {
             "integration_type": "full",
             "integration_points": 0.8165
@@ -31,12 +30,12 @@
         {
             "id": 1,
             "name": "soil",
-            "phase": 3,
-            "is_frozen": true,
-            "is_dispersed": false,
             "calculate_thermal": true,
             "calculate_hydraulic": false,
             "calculate_mechanical": false,
+            "phase": 3,
+            "is_frozen": true,
+            "is_dispersed": false,
             "thermal": {
                 "density": [
                     2800.0,
@@ -103,14 +102,13 @@
     ],
     "solver_settings": {
         "bdf_order": 2,
-        "reordering": "rcm",
-        "coloring": "dsatur",
         "nonlinear_solver": {
-            "method": "none",
+            "method": "newton",
             "update_frequency": 5,
             "max_iterations": 100,
             "convergence": {
                 "use_criteria": "both",
+                "norm_type": "l2",
                 "logic_between_criteria": "and",
                 "residual": {
                     "criteria": "both",

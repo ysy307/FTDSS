@@ -1,11 +1,13 @@
 module core_string_utils
     use, intrinsic :: iso_fortran_env, only: int32
+    use :: stdlib_strings, only:strip
     use :: core_allocate, only:allocate_array
     implicit none
     private
 
     public :: join
     public :: filter
+    public :: modify_path_format
 
     interface filter
         module procedure :: filter_character_array
@@ -14,22 +16,28 @@ module core_string_utils
 contains
 
     function join(strings, delimiter) result(key)
+        implicit none
         character(*), intent(in) :: strings(:)
         character(*), intent(in), optional :: delimiter
         character(:), allocatable :: key
 
-        integer(int32) :: i, n, total_len, current_pos
-        integer(int32) :: length_delimiter, length_strings
-        character(len=1) :: write_delimiter
+        integer :: i, n, total_len, current_pos
+        integer :: length_strings
+        character(:), allocatable :: effective_delimiter
+        integer :: length_delimiter
+        logical :: is_first_element
 
+        ! 使用する区切り文字を決定する
         if (present(delimiter)) then
-            length_delimiter = 0
-            length_delimiter = len_trim(delimiter)
-            write_delimiter = trim(adjustl(delimiter))
+            effective_delimiter = strip(delimiter)
+            ! 区切り文字が空白のみの場合はデフォルトの "." を使用する
+            if (len(effective_delimiter) == 0) then
+                effective_delimiter = "."
+            end if
         else
-            length_delimiter = 1
-            write_delimiter = "."
+            effective_delimiter = "."
         end if
+        length_delimiter = len(effective_delimiter)
 
         n = size(strings)
         if (n == 0) then
@@ -37,32 +45,52 @@ contains
             return
         end if
 
-        ! 1. 連結後の全体の長さを計算する
-        total_len = len_trim(strings(1))
-        do i = 2, n
-            total_len = total_len + length_delimiter + len_trim(strings(i))
+        ! 1. 連結後の全体の長さを計算する (修正)
+        !    - 中身のある文字列だけを数える
+        total_len = 0
+        is_first_element = .true.
+        do i = 1, n
+            length_strings = len_trim(strings(i))
+            ! 中身が空でない文字列のみを処理の対象とする
+            if (length_strings > 0) then
+                if (is_first_element) then
+                    ! 最初の有効な要素の場合、その長さだけを加算
+                    total_len = length_strings
+                    is_first_element = .false.
+                else
+                    ! 2番目以降の有効な要素の場合、区切り文字の長さと文字列の長さを加算
+                    total_len = total_len + length_delimiter + length_strings
+                end if
+            end if
         end do
+
+        ! 全ての要素が空だった場合
+        if (total_len == 0) then
+            key = ""
+            return
+        end if
 
         ! 2. 計算した長さでメモリを一度だけ確保する
         allocate (character(len=total_len) :: key)
 
-        ! 3. 確保したメモリに文字列を直接書き込んでいく
+        ! 3. 確保したメモリに文字列を直接書き込んでいく (修正)
         current_pos = 1
-
-        length_strings = len_trim(strings(1))
-        key(current_pos:current_pos + length_strings - 1) = trim(adjustl(strings(1)))
-        current_pos = current_pos + length_strings
-
-        ! 2番目以降の要素
-        do i = 2, n
-            key(current_pos:current_pos + length_delimiter - 1) = write_delimiter
-            current_pos = current_pos + length_delimiter
-
+        is_first_element = .true.
+        do i = 1, n
             length_strings = len_trim(strings(i))
-            if (length_strings == 0) cycle ! 空の文字列はスキップ
+            if (length_strings > 0) then
+                if (is_first_element) then
+                    is_first_element = .false.
+                else
+                    ! 2番目以降の有効な要素の前に区切り文字を書き込む
+                    key(current_pos:current_pos + length_delimiter - 1) = effective_delimiter
+                    current_pos = current_pos + length_delimiter
+                end if
 
-            key(current_pos:current_pos + length_strings - 1) = trim(adjustl(strings(i)))
-            current_pos = current_pos + length_strings
+                ! 文字列本体を書き込む
+                key(current_pos:current_pos + length_strings - 1) = strip(strings(i))
+                current_pos = current_pos + length_strings
+            end if
         end do
 
     end function join
@@ -114,4 +142,22 @@ contains
         deallocate (mask, packed_array)
 
     end subroutine filter_character_array
+
+    subroutine modify_path_format(path)
+        implicit none
+        character(len=:), allocatable, intent(inout) :: path
+        integer :: i
+
+        ! バックスラッシュをフォワードスラッシュに置換
+        do i = 1, len(path)
+            if (path(i:i) == '\') then
+                path(i:i) = '/'
+            end if
+        end do
+
+        ! パスが空でなく、かつスラッシュで終わらない場合にスラッシュを追加
+        if (len_trim(path) > 0 .and. path(len_trim(path):len_trim(path)) /= "/") then
+            path = trim(path)//"/"
+        end if
+    end subroutine modify_path_format
 end module core_string_utils
