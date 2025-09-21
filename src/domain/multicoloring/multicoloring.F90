@@ -2,110 +2,117 @@ module domain_multicoloring
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_sorting, only:sort_index
     use :: module_core, only:allocate_array, deallocate_array
-    use :: domain_adjacency_adjacency_element, only:type_crs_adjacency_element
+    use :: module_input, only:type_input
 
     implicit none
     private
 
     public :: type_coloring
-    public :: type_colored_info
 
-    ! 各色に属する要素の情報を格納する型
     type :: type_colored_info
         integer(int32) :: num_elements = 0
         integer(int32), allocatable :: elements(:)
     end type type_colored_info
 
-    ! 着色結果全体を管理する型
     type :: type_coloring
-        character(:), allocatable :: algorithm_name ! 使用するアルゴリズム名
         integer(int32) :: num_colors = 0
-        integer(int32), allocatable :: color(:) ! 各要素の色
         type(type_colored_info), allocatable :: colored(:) ! 色ごとの要素リスト
     contains
         procedure, pass(self) :: initialize => initialize_type_coloring
-        procedure, pass(self) :: coloring_welsh_powell
-        procedure, pass(self) :: coloring_dsatur
-        procedure, pass(self) :: coloring_lfo
-        procedure, pass(self) :: populate => populate_coloring_result
+        procedure, pass(self) :: destroy => destroy_type_coloring
     end type type_coloring
-
-    interface
-        module subroutine coloring_welsh_powell(self, graph)
-            implicit none
-            class(type_coloring), intent(inout) :: self
-            class(type_crs_adjacency_element), intent(in) :: graph
-        end subroutine coloring_welsh_powell
-
-        module subroutine coloring_dsatur(self, graph)
-            implicit none
-            class(type_coloring), intent(inout) :: self
-            type(type_crs_adjacency_element), intent(in) :: graph
-        end subroutine coloring_dsatur
-
-        module subroutine coloring_lfo(self, graph)
-            implicit none
-            class(type_coloring), intent(inout) :: self
-            type(type_crs_adjacency_element), intent(in) :: graph
-        end subroutine coloring_lfo
-    end interface
 
 contains
 
-    !================================================================!
-    !【初期化メソッド】アルゴリズム名に応じて処理を分岐
-    !================================================================!
-    subroutine initialize_type_coloring(self, algorithm_name, adjacency)
+    subroutine initialize_type_coloring(self, input)
         implicit none
         class(type_coloring), intent(inout) :: self
-        class(type_crs_adjacency_element), intent(in) :: adjacency
-        character(*), intent(in) :: algorithm_name
+        class(type_input), intent(in) :: input
 
-        select case (trim(adjustl(algorithm_name)))
-        case ("welsh-powell")
-            if (allocated(self%algorithm_name)) deallocate (self%algorithm_name)
-            allocate (character(len=len_trim("Welsh-Powell")) :: self%algorithm_name)
-            self%algorithm_name = "welsh-powell"
-            call self%coloring_welsh_powell(adjacency)
-        case ("dsatur")
-            if (allocated(self%algorithm_name)) deallocate (self%algorithm_name)
-            allocate (character(len=len_trim("dsatur")) :: self%algorithm_name)
-            self%algorithm_name = "dsatur"
-            call self%coloring_dsatur(adjacency)
-        case ("lfo")
-            if (allocated(self%algorithm_name)) deallocate (self%algorithm_name)
-            allocate (character(len=len_trim("Largest First Order")) :: self%algorithm_name)
-            self%algorithm_name = "Largest First Order"
-            call self%coloring_lfo(adjacency)
-        end select
+        integer(int32) :: i, c
+        integer(int32) :: cell_color
+        integer(int32) :: domain_element_id
+        integer(int32) :: comp_dim
+
+        integer(int32), allocatable :: counts_per_color(:) ! 各色の要素数を数える一時配列
+        integer(int32), allocatable :: current_indices(:) ! 各色のリストに次に格納する場所を指すカウンタ
+
+        comp_dim = input%basic%simulation_settings%calculate_dimension
+
+        ! ==========================================================
+        ! パス1：計測 (Sizing Pass)
+        ! ==========================================================
+
+        ! 1a. 色の最大値と、各色の要素数を同時に数える
+        self%num_colors = 0
+        do i = 1, input%geometry%vtk%num_total_cells
+            if (input%geometry%vtk%cells(i)%get_dimension() == comp_dim) then
+                self%num_colors = max(self%num_colors, input%geometry%vtk%cells(i)%color)
+            end if
+        end do
+        if (self%num_colors == 0) return
+
+        ! 1b. 各色の要素数を数える
+        allocate (counts_per_color(self%num_colors))
+        counts_per_color = 0
+        do i = 1, input%geometry%vtk%num_total_cells
+            if (input%geometry%vtk%cells(i)%get_dimension() == comp_dim) then
+                cell_color = input%geometry%vtk%cells(i)%color
+                if (cell_color > 0) then
+                    counts_per_color(cell_color) = counts_per_color(cell_color) + 1
+                end if
+            end if
+        end do
+
+        ! ==========================================================
+        ! メモリ確保 (Allocation)
+        ! ==========================================================
+        allocate (self%colored(self%num_colors))
+        do c = 1, self%num_colors
+            self%colored(c)%num_elements = counts_per_color(c)
+            if (self%colored(c)%num_elements > 0) then
+                allocate (self%colored(c)%elements(self%colored(c)%num_elements))
+            end if
+        end do
+        deallocate (counts_per_color)
+
+        ! ==========================================================
+        ! パス2：格納 (Filling Pass)
+        ! ==========================================================
+        allocate (current_indices(self%num_colors))
+        current_indices = 0
+        domain_element_id = 0
+        do i = 1, input%geometry%vtk%num_total_cells
+            if (input%geometry%vtk%cells(i)%get_dimension() == comp_dim) then
+                domain_element_id = domain_element_id + 1
+                cell_color = input%geometry%vtk%cells(i)%color
+                if (cell_color > 0) then
+                    current_indices(cell_color) = current_indices(cell_color) + 1
+                    self%colored(cell_color)%elements(current_indices(cell_color)) = domain_element_id
+                end if
+            end if
+        end do
+        deallocate (current_indices)
 
     end subroutine initialize_type_coloring
 
-    subroutine populate_coloring_result(self)
+    subroutine destroy_type_coloring(self)
         implicit none
         class(type_coloring), intent(inout) :: self
-        integer(int32) :: i, j, counts, num_nodes
 
-        num_nodes = size(self%color)
-        if (num_nodes == 0) then
-            self%num_colors = 0
-            return
+        integer(int32) :: i
+
+        if (allocated(self%colored)) then
+            do i = 1, self%num_colors
+                if (allocated(self%colored(i)%elements)) then
+                    deallocate (self%colored(i)%elements)
+                end if
+            end do
+            deallocate (self%colored)
         end if
 
-        self%num_colors = maxval(self%color)
-        if (self%num_colors == 0) return
+        self%num_colors = 0
 
-        if (allocated(self%colored)) deallocate (self%colored)
-        allocate (self%colored(self%num_colors))
-
-        do i = 1, self%num_colors
-            counts = count(self%color == i)
-            self%colored(i)%num_elements = counts
-            if (counts > 0) then
-                allocate (self%colored(i)%elements(counts))
-                self%colored(i)%elements = pack([(j, j=1, num_nodes)], self%color == i)
-            end if
-        end do
-    end subroutine populate_coloring_result
+    end subroutine destroy_type_coloring
 
 end module domain_multicoloring

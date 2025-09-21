@@ -18,6 +18,14 @@ contains
         order = self%cell_order
     end function type_vtk_cell_get_order
 
+    module function type_vtk_cell_get_size_connectivity(self) result(size)
+        implicit none
+        class(type_vtk_cell), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%num_nodes_in_cell
+    end function type_vtk_cell_get_size_connectivity
+
     module subroutine type_vtk_cell_set(self, num_nodes_in_cell)
         implicit none
         class(type_vtk_cell), intent(inout) :: self !! VTK cells data

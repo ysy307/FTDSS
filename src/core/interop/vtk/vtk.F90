@@ -36,6 +36,7 @@ module core_vtk
         procedure :: set => type_vtk_cell_set
         procedure :: get_dimension => type_vtk_cell_get_dimension
         procedure :: get_order => type_vtk_cell_get_order
+        procedure :: get_size => type_vtk_cell_get_size_connectivity
     end type type_vtk_cell
 
     type :: type_vtk
@@ -86,6 +87,12 @@ module core_vtk
             class(type_vtk_cell), intent(in) :: self
             integer(int32) :: order
         end function type_vtk_cell_get_order
+
+        module function type_vtk_cell_get_size_connectivity(self) result(size)
+            implicit none
+            class(type_vtk_cell), intent(in) :: self
+            integer(int32) :: size
+        end function type_vtk_cell_get_size_connectivity
 
         module subroutine get_active_region_info(self, unique_ids, ierr)
             !> Extract unique CellEntityIds of the highest-dimensional elements
