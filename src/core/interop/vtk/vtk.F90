@@ -30,7 +30,6 @@ module core_vtk
         integer(int32) :: cell_order
         integer(int32), allocatable :: connectivity(:)
         integer(int32) :: rank
-        integer(int32) :: original_id
         integer(int32) :: color
     contains
         procedure :: set => type_vtk_cell_set
@@ -106,7 +105,7 @@ module core_vtk
     interface
         module subroutine type_vtk_vtk_initialize(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, &
                                                   owner_ranks_key, communication_partners_key, cell_id_key, rank_key, &
-                                                  original_id_key, color_key, point_field_names)
+                                                  color_key, point_field_names)
             !> Read VTK file using C++ backend with the handle pattern
             implicit none
             class(type_vtk), intent(inout) :: self
@@ -118,14 +117,13 @@ module core_vtk
             character(*), intent(in), optional :: communication_partners_key
             character(*), intent(in), optional :: cell_id_key
             character(*), intent(in), optional :: rank_key
-            character(*), intent(in), optional :: original_id_key
             character(*), intent(in), optional :: color_key
             character(*), intent(in), optional :: point_field_names(:)
         end subroutine type_vtk_vtk_initialize
 
         module subroutine type_vtk_vtu_initialize(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, &
                                                   owner_ranks_key, communication_partners_key, cell_id_key, rank_key, &
-                                                  original_id_key, color_key, point_field_names)
+                                                  color_key, point_field_names)
             !> Read VTU file using C++ backend with the handle pattern
             implicit none
             class(type_vtk), intent(inout) :: self
@@ -137,7 +135,6 @@ module core_vtk
             character(*), intent(in), optional :: communication_partners_key
             character(*), intent(in), optional :: cell_id_key
             character(*), intent(in), optional :: rank_key
-            character(*), intent(in), optional :: original_id_key
             character(*), intent(in), optional :: color_key
             character(*), intent(in), optional :: point_field_names(:)
         end subroutine type_vtk_vtu_initialize

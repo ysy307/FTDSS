@@ -3,7 +3,7 @@ submodule(core_vtk) core_vtk_vtu_initialize
 contains
     module subroutine type_vtk_vtu_initialize(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, &
                                               owner_ranks_key, communication_partners_key, cell_id_key, rank_key, &
-                                              original_id_key, color_key, point_field_names)
+                                              color_key, point_field_names)
         !> VTUファイルをC++バックエンドを用いて読み込み、vtkデータ構造を初期化する
         !> [最終修正] メモリリーク防止、必須の並列処理ロジックの有効化、データ代入漏れと変数名の修正を実施
         implicit none
@@ -16,7 +16,6 @@ contains
         character(*), intent(in), optional :: communication_partners_key
         character(*), intent(in), optional :: cell_id_key
         character(*), intent(in), optional :: rank_key
-        character(*), intent(in), optional :: original_id_key
         character(*), intent(in), optional :: color_key
         character(*), intent(in), optional :: point_field_names(:)
 
@@ -42,7 +41,6 @@ contains
         integer(int32), allocatable :: raw_owner_ranks(:, :)
         integer(int32), allocatable :: raw_communication_partners(:, :)
         integer(int32), allocatable :: raw_ranks(:)
-        integer(int32), allocatable :: raw_original_ids(:)
         integer(int32) :: local_max_node_id, global_max_node_id
         integer(int32), allocatable :: raw_colors(:)
 
@@ -157,12 +155,6 @@ contains
                 c_array_name = strip(rank_key)//c_null_char
                 call vtu_get_cell_data_int32(self%handle, c_array_name, raw_ranks)
             end if
-            if (present(original_id_key)) then
-                call allocate_array(raw_original_ids, self%num_total_cells)
-                c_array_name = strip(original_id_key)//c_null_char
-                call vtu_get_cell_data_int32(self%handle, c_array_name, raw_original_ids)
-                raw_original_ids = raw_original_ids + 1
-            end if
 
             if (present(color_key)) then
                 call allocate_array(raw_colors, self%num_total_cells)
@@ -183,7 +175,6 @@ contains
                 call self%cells(i)%set(num_nodes_in_cell)
 
                 if (allocated(raw_ranks)) self%cells(i)%rank = raw_ranks(i)
-                if (allocated(raw_original_ids)) self%cells(i)%original_id = raw_original_ids(i)
                 if (allocated(raw_colors)) self%cells(i)%color = raw_colors(i)
             end do
         end if
@@ -222,7 +213,6 @@ contains
         call deallocate_array(raw_owner_ranks)
         call deallocate_array(raw_communication_partners)
         call deallocate_array(raw_ranks)
-        call deallocate_array(raw_original_ids)
         call deallocate_array(raw_colors)
 
     end subroutine type_vtk_vtu_initialize

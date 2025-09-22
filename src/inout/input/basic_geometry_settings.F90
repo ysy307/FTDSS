@@ -12,7 +12,6 @@ submodule(inout_input_basic) inout_input_basic_geometry_settings
     character(*), parameter :: communication_partners_key = "communication_partners_key"
     character(*), parameter :: cell_id_key = "cell_id_key"
     character(*), parameter :: rank_key = "rank_key"
-    character(*), parameter :: original_id_key = "original_id_key"
     character(*), parameter :: color_key = "color_key"
     character(*), parameter :: integration = "integration"
     character(*), parameter :: integration_type = "integration_type"
@@ -56,10 +55,6 @@ contains
         buffer(2) = rank_key
         call get_json_value(json, join(buffer), self%geometry_settings%rank_key, &
                             is_required=.true., default_value=rank_key)
-
-        buffer(2) = original_id_key
-        call get_json_value(json, join(buffer), self%geometry_settings%original_id_key, &
-                            is_required=.true., default_value=original_id_key)
 
         buffer(2) = color_key
         call get_json_value(json, join(buffer), self%geometry_settings%color_key, &

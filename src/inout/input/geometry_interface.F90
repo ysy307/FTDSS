@@ -54,7 +54,6 @@ contains
                     communication_partners_key=strip(input_basic%geometry_settings%communication_partners_key), &
                     cell_id_key=strip(input_basic%geometry_settings%cell_id_key), &
                     rank_key=strip(input_basic%geometry_settings%rank_key), &
-                    original_id_key=strip(input_basic%geometry_settings%original_id_key), &
                     color_key=strip(input_basic%geometry_settings%color_key), &
                     point_field_names=fields_to_read)
 
@@ -68,7 +67,6 @@ contains
                     communication_partners_key=strip(input_basic%geometry_settings%communication_partners_key), &
                     cell_id_key=strip(input_basic%geometry_settings%cell_id_key), &
                     rank_key=strip(input_basic%geometry_settings%rank_key), &
-                    original_id_key=strip(input_basic%geometry_settings%original_id_key), &
                     color_key=strip(input_basic%geometry_settings%color_key), &
                     point_field_names=fields_to_read)
 

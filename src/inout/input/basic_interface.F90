@@ -54,7 +54,6 @@ module inout_input_basic
         character(:), allocatable :: communication_partners_key
         character(:), allocatable :: cell_id_key
         character(:), allocatable :: rank_key
-        character(:), allocatable :: original_id_key
         character(:), allocatable :: color_key
         character(:), allocatable :: integration_type
         real(real64) :: integration_points
