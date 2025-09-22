@@ -42,7 +42,6 @@ contains
 
         fullpath = trim(path)//'/'//trim(input_basic%geometry_settings%file_name)
 
-        ! 2. 読み込むべきフィールドが1つ以上あれば、ジオメトリリーダーを呼び出す
         if (allocated(fields_to_read)) then
             if (ends_with(input_basic%geometry_settings%file_name, '.vtk')) then
                 call self%vtk%initialize_vtk( &
@@ -75,6 +74,32 @@ contains
             ! 読み込んだフィールド名を後で参照できるように保存
             allocate (self%point_data_names, source=fields_to_read)
             deallocate (fields_to_read)
+        else
+            if (ends_with(input_basic%geometry_settings%file_name, '.vtk')) then
+                call self%vtk%initialize_vtk( &
+                    file_name=strip(fullpath), &
+                    global_node_id_key=strip(input_basic%geometry_settings%global_node_id_key), &
+                    node_type_key=strip(input_basic%geometry_settings%node_type_key), &
+                    num_sharing_ranks_key=strip(input_basic%geometry_settings%num_sharing_ranks_key), &
+                    owner_ranks_key=strip(input_basic%geometry_settings%owner_ranks_key), &
+                    communication_partners_key=strip(input_basic%geometry_settings%communication_partners_key), &
+                    cell_id_key=strip(input_basic%geometry_settings%cell_id_key), &
+                    rank_key=strip(input_basic%geometry_settings%rank_key), &
+                    color_key=strip(input_basic%geometry_settings%color_key))
+
+            else if (ends_with(input_basic%geometry_settings%file_name, '.vtu')) then
+                call self%vtk%initialize_vtu( &
+                    file_name=strip(fullpath), &
+                    global_node_id_key=strip(input_basic%geometry_settings%global_node_id_key), &
+                    node_type_key=strip(input_basic%geometry_settings%node_type_key), &
+                    num_sharing_ranks_key=strip(input_basic%geometry_settings%num_sharing_ranks_key), &
+                    owner_ranks_key=strip(input_basic%geometry_settings%owner_ranks_key), &
+                    communication_partners_key=strip(input_basic%geometry_settings%communication_partners_key), &
+                    cell_id_key=strip(input_basic%geometry_settings%cell_id_key), &
+                    rank_key=strip(input_basic%geometry_settings%rank_key), &
+                    color_key=strip(input_basic%geometry_settings%color_key))
+            end if
+
         end if
 
     end subroutine initialize_type_input_geometry
