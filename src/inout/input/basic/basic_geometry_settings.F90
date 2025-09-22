@@ -84,7 +84,6 @@ contains
         write (*, '(a)') "Communication Partners Key: "//strip(self%communication_partners_key)
         write (*, '(a)') "Cell ID Key: "//strip(self%cell_id_key)
         write (*, '(a)') "Rank Key: "//strip(self%rank_key)
-        write (*, '(a)') "Original ID Key: "//strip(self%original_id_key)
         write (*, '(a)') "Color Key: "//strip(self%color_key)
         write (*, '(a)') "Integration Type: "//strip(self%integration_type)
         if (strip(self%integration_type) == "free") then
