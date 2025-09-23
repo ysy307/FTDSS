@@ -55,6 +55,7 @@ contains
 
         call MPI_Comm_rank(MPI_COMM_WORLD, self%my_rank, ierr)
         call MPI_Comm_size(MPI_COMM_WORLD, self%num_procs, ierr)
+        call initialize_vtk_constants()
         c_file_name = replace_all(strip(file_name), pattern="@RANK@", replacement=to_string(self%my_rank))//c_null_char
 
         self%handle = vtu_initialize(c_file_name, ierr)

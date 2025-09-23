@@ -46,7 +46,7 @@ set(CORE_UTILS_SOURCES
 )
 add_library(Core_Utils STATIC ${CORE_UTILS_SOURCES})
 target_include_directories(Core_Utils PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Utils PUBLIC Core_Memory)
+target_link_libraries(Core_Utils PUBLIC Core_Memory Core_Constants)
 enable_build_flags(Core_Utils)
 
 # --- Types Library (Memoryに依存) ---

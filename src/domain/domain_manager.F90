@@ -260,15 +260,19 @@ contains
         integer(int32), intent(in) :: physics_type_id
         type(type_input), intent(in) :: input
 
-        ! ローカル変数
-        integer(int32) :: i, j, k
-        integer(int32) :: bc_id_i, bc_id_j, seq_pos, seq_pos_j
-        integer(int32), allocatable :: bc_sequence(:)
-        integer(int32), allocatable :: bc_idx_list(:)
-        integer(int32), allocatable :: active_region_id(:)
+        ! --- ローカル変数 ---
+        integer(int32) :: i, bc_type, num_groups
+        integer(int32) :: max_id, bc_id, group_idx
+        integer(int32) :: target_dimension
+        integer(int32), allocatable :: bc_sequence(:), bc_idx_list(:), bc_key(:), active_region_id(:)
+        integer(int32), allocatable :: input_idx_to_group_idx_map(:)
+        integer(int32), allocatable :: entity_id_to_group_idx_map(:)
+        integer(int32), allocatable :: total_conn_per_group(:), current_elem_indices(:)
+        integer(int32) :: num_total_cells, cell_id, current_group_idx, num_nodes
 
         ! 対象次元チェック
-        if (self%parent%computation_dimension - 1 < 1) return
+        target_dimension = self%parent%computation_dimension - 1
+        if (target_dimension < 1) return
 
         ! --- 物理種別ごとに BC_SEQUENCE を選択
         select case (physics_type_id)
@@ -281,120 +285,247 @@ contains
         end select
 
         ! --- 有効な境界条件の index を収集 ---
-        call input%geometry%vtk%get_active_region_info(active_region_id, self%parent%computation_dimension - 1)
+        call input%geometry%vtk%get_active_region_info(active_region_id, target_dimension)
 
         ! 条件に合う境界条件 index を一時配列に集める
         allocate (bc_idx_list(0))
         do i = 1, input%conditions%num_boundaries
             select case (physics_type_id)
             case (PHYSICS_TYPE_THERMAL)
-                if (input%conditions%boundary_conditions(i)%calculate_thermal) then
-                    if (any(active_region_id == input%conditions%boundary_conditions(i)%id)) then
-                        bc_idx_list = [bc_idx_list, i]
-                    end if
+                if (input%conditions%boundary_conditions(i)%calculate_thermal .and. &
+                    any(active_region_id == input%conditions%boundary_conditions(i)%id)) then
+                    bc_idx_list = [bc_idx_list, i]
                 end if
             case (PHYSICS_TYPE_HYDRAULIC)
-                if (input%conditions%boundary_conditions(i)%calculate_hydraulic) then
-                    if (any(active_region_id == input%conditions%boundary_conditions(i)%id)) then
-                        bc_idx_list = [bc_idx_list, i]
-                    end if
+                if (input%conditions%boundary_conditions(i)%calculate_hydraulic .and. &
+                    any(active_region_id == input%conditions%boundary_conditions(i)%id)) then
+                    bc_idx_list = [bc_idx_list, i]
                 end if
-            case (PHYSICS_TYPE_MECHANICAL)
-                return ! 未実装
             end select
         end do
 
-        ! BC_SEQUENCE に基づき並べ替え（挿入ソートで内部完結）
-        do i = 2, size(bc_idx_list)
-            j = i
-            do while (j > 1)
-                ! seq_pos を見つける
-                bc_id_i = input%conditions%boundary_conditions(bc_idx_list(j))%id
-                bc_id_j = input%conditions%boundary_conditions(bc_idx_list(j - 1))%id
-                seq_pos = 0
-                do k = 1, size(THERMAL_BC_SEQUENCE)
-                    if (THERMAL_BC_SEQUENCE(k) == bc_id_i) seq_pos = k
-                end do
-                if (seq_pos == 0) seq_pos = size(THERMAL_BC_SEQUENCE) + 1
-                ! bc_id_j の seq_pos
-                seq_pos_j = 0
-                do k = 1, size(THERMAL_BC_SEQUENCE)
-                    if (THERMAL_BC_SEQUENCE(k) == bc_id_j) seq_pos_j = k
-                end do
-                if (seq_pos_j == 0) seq_pos_j = size(THERMAL_BC_SEQUENCE) + 1
-
-                if (seq_pos < seq_pos_j) then
-                    ! swap
-                    k = bc_idx_list(j)
-                    bc_idx_list(j) = bc_idx_list(j - 1)
-                    bc_idx_list(j - 1) = k
-                    j = j - 1
-                else
-                    exit
-                end if
-            end do
+        ! --- 並び替え用キー配列作成 ---
+        call allocate_array(bc_key, size(bc_idx_list))
+        do i = 1, size(bc_idx_list)
+            select case (physics_type_id)
+            case (PHYSICS_TYPE_THERMAL)
+                bc_type = get_bc_type_from_string( &
+                          input%conditions%boundary_conditions(bc_idx_list(i))%thermal%type, &
+                          physics_type_id)
+            case (PHYSICS_TYPE_HYDRAULIC)
+                bc_type = get_bc_type_from_string( &
+                          input%conditions%boundary_conditions(bc_idx_list(i))%hydraulic%type, &
+                          physics_type_id)
+            end select
+            bc_key(i) = get_bc_seq_pos(bc_type, bc_sequence)
         end do
 
-        write (*, '(A,I12,A)') 'Rank', self%parent%my_rank, ': Initializing Boundary Manager with BC IDs:'
-        write (*, '(8I12)') (input%conditions%boundary_conditions(bc_idx_list(i))%id, i=1, size(bc_idx_list))
+        ! --- bc_key をキーにソート ---
+        call sort_by_key(bc_idx_list, bc_key)
 
-        ! ! physics_bc_mgr_local の配列を allocate
-        ! num_total_bcs = 0
-        ! ! 同じ BC ID かつ条件値が同じならスキップ
-        ! do i = 1, size(bc_idx_list)
-        !     duplicate_found = .false.
-        !     do j = 1, num_total_bcs
-        !         if (input%conditions%boundary_conditions(bc_idx_list(i))%id == &
-        !             physics_bc_mgr_local%bcs(j)%connectivity%bc_id) then
-        !             ! 条件値も同じかチェック
-        !             if (input%conditions%boundary_conditions(bc_idx_list(i))%connectivity%value == &
-        !                 physics_bc_mgr_local%bcs(j)%connectivity%value) then
-        !                 duplicate_found = .true.
-        !                 exit
-        !             end if
-        !         end if
-        !     end do
-        !     if (.not. duplicate_found) num_total_bcs = num_total_bcs + 1
-        ! end do
+        if (size(bc_idx_list) == 0) then
+            self%physics(physics_type_id)%num_bcs = 0
+            return
+        end if
 
-        ! physics_bc_mgr_local%num_bcs = num_total_bcs
-        ! allocate (physics_bc_mgr_local%bcs(num_total_bcs))
+        ! --- ステップA: グルーピングと最終的なBC数の決定 ---
+        ! ソート済みリストを走査し、隣接要素を比較してグループ数を数える
+        call allocate_array(input_idx_to_group_idx_map, size(bc_idx_list))
+        num_groups = 1
+        input_idx_to_group_idx_map(1) = num_groups
 
-        ! ! single_bc を割り当て
-        ! k = 0
-        ! do i = 1, size(bc_idx_list)
-        !     duplicate_found = .false.
-        !     do j = 1, k
-        !         if (input%conditions%boundary_conditions(bc_idx_list(i))%id == &
-        !             physics_bc_mgr_local%bcs(j)%connectivity%bc_id) then
-        !             if (input%conditions%boundary_conditions(bc_idx_list(i))%connectivity%value == &
-        !                 physics_bc_mgr_local%bcs(j)%connectivity%value) then
-        !                 duplicate_found = .true.
-        !                 exit
-        !             end if
-        !         end if
-        !     end do
-        !     if (.not. duplicate_found) then
-        !         k = k + 1
-        !         j = bc_idx_list(i)
-        !         num_elements = input%conditions%boundary_conditions(j)%num_elements
-        !         physics_bc_mgr_local%bcs(k)%num_elements = num_elements
-        !         allocate (physics_bc_mgr_local%bcs(k)%element_types(num_elements))
-        !         physics_bc_mgr_local%bcs(k)%element_types = &
-        !             input%conditions%boundary_conditions(j)%element_types
-        !         physics_bc_mgr_local%bcs(k)%connectivity = &
-        !             input%conditions%boundary_conditions(j)%connectivity
-        !     end if
-        ! end do
+        do i = 2, size(bc_idx_list)
+            if (.not. are_bcs_identical(bc_idx_list(i), bc_idx_list(i - 1), input, physics_type_id)) then
+                num_groups = num_groups + 1
+            end if
+            input_idx_to_group_idx_map(i) = num_groups
+        end do
 
-        ! ! 最終的に self に割り当て
-        ! select case (physics_type_id)
-        ! case (PHYSICS_TYPE_THERMAL)
-        !     self%thermal_bc_mgr = physics_bc_mgr_local
-        ! case (PHYSICS_TYPE_HYDRAULIC)
-        !     self%hydraulic_bc_mgr = physics_bc_mgr_local
-        ! end select
+        self%physics(physics_type_id)%num_bcs = num_groups
+        allocate (self%physics(physics_type_id)%bcs(num_groups))
 
+        ! --- ステップB: どの入力IDがどのグループに属すかのマッピングを作成 ---
+        max_id = maxval(input%conditions%boundary_conditions%id)
+        call allocate_array(entity_id_to_group_idx_map, max_id)
+        entity_id_to_group_idx_map = 0
+
+        do i = 1, size(bc_idx_list)
+            bc_id = input%conditions%boundary_conditions(bc_idx_list(i))%id
+            group_idx = input_idx_to_group_idx_map(i)
+            entity_id_to_group_idx_map(bc_id) = group_idx
+        end do
+        call deallocate_array(input_idx_to_group_idx_map)
+        call deallocate_array(bc_idx_list)
+
+        ! --- ステップC: 幾何情報格納 (2パス処理) ---
+        call allocate_array(total_conn_per_group, num_groups)
+        total_conn_per_group = 0
+
+        ! パス1: 計測
+        num_total_cells = input%geometry%vtk%num_total_cells
+        do i = 1, num_total_cells
+            if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
+                cell_id = input%geometry%vtk%cells(i)%cell_entity_id
+                if (cell_id > size(entity_id_to_group_idx_map) .or. entity_id_to_group_idx_map(cell_id) == 0) cycle
+
+                current_group_idx = entity_id_to_group_idx_map(cell_id)
+                self%physics(physics_type_id)%bcs(current_group_idx)%num_elements = &
+                    self%physics(physics_type_id)%bcs(current_group_idx)%num_elements + 1
+                total_conn_per_group(current_group_idx) = total_conn_per_group(current_group_idx) &
+                                                          + input%geometry%vtk%cells(i)%num_nodes_in_cell
+            end if
+        end do
+
+        ! パス2: 格納
+        do i = 1, num_groups
+            if (self%physics(physics_type_id)%bcs(i)%num_elements > 0) then
+                call allocate_array(self%physics(physics_type_id)%bcs(i)%element_types, &
+                                    self%physics(physics_type_id)%bcs(i)%num_elements)
+                call allocate_array(self%physics(physics_type_id)%bcs(i)%connectivity%ind, &
+                                    self%physics(physics_type_id)%bcs(i)%num_elements + 1)
+                call allocate_array(self%physics(physics_type_id)%bcs(i)%connectivity%val, &
+                                    total_conn_per_group(i))
+                self%physics(physics_type_id)%bcs(i)%connectivity%ind(1) = 1
+            end if
+        end do
+        call deallocate_array(total_conn_per_group)
+
+        call allocate_array(current_elem_indices, num_groups)
+        current_elem_indices = 0
+        do i = 1, num_total_cells
+            if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
+                cell_id = input%geometry%vtk%cells(i)%cell_entity_id
+                if (cell_id > size(entity_id_to_group_idx_map) .or. entity_id_to_group_idx_map(cell_id) == 0) cycle
+
+                current_group_idx = entity_id_to_group_idx_map(cell_id)
+                current_elem_indices(current_group_idx) = current_elem_indices(current_group_idx) + 1
+
+                num_nodes = input%geometry%vtk%cells(i)%num_nodes_in_cell
+                self%physics(physics_type_id)%bcs(current_group_idx)%element_types(current_elem_indices(current_group_idx)) &
+                    = input%geometry%vtk%cells(i)%cell_type
+
+                self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%ind(current_elem_indices(current_group_idx) + 1) = &
+                    self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%ind(current_elem_indices(current_group_idx)) + num_nodes
+
+                self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%val( &
+                    self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%ind(current_elem_indices(current_group_idx)): &
+                    self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%ind(current_elem_indices(current_group_idx) + 1) - 1) = &
+                    input%geometry%vtk%cells(i)%connectivity(1:num_nodes)
+            end if
+        end do
+
+        call deallocate_array(current_elem_indices)
+        call deallocate_array(entity_id_to_group_idx_map)
+        call deallocate_array(bc_key)
+        call deallocate_array(bc_sequence)
+        call deallocate_array(active_region_id)
     end subroutine process_single_physics_bcs
 
+    pure function get_bc_seq_pos(bc_id, bc_sequence) result(pos)
+        implicit none
+        integer(int32), intent(in) :: bc_id
+        integer(int32), intent(in) :: bc_sequence(:)
+        integer(int32) :: pos
+
+        integer(int32) :: k
+
+        pos = size(bc_sequence) + 1
+        do k = 1, size(bc_sequence)
+            if (bc_sequence(k) == bc_id) then
+                pos = k
+                exit
+            end if
+        end do
+    end function get_bc_seq_pos
+
+    subroutine sort_by_key(idx, key)
+        implicit none
+        integer(int32), intent(inout) :: idx(:)
+        integer(int32), intent(inout) :: key(:)
+
+        integer(int32) :: i, j, tmp_idx, tmp_key
+
+        do i = 2, size(idx)
+            j = i
+            do while (j > 1 .and. key(j) < key(j - 1))
+                tmp_idx = idx(j)
+                idx(j) = idx(j - 1)
+                idx(j - 1) = tmp_idx
+                tmp_key = key(j)
+                key(j) = key(j - 1)
+                key(j - 1) = tmp_key
+                j = j - 1
+            end do
+        end do
+    end subroutine sort_by_key
+
+    pure function are_bcs_identical(idx1, idx2, input, physics_type_id) result(is_identical)
+        implicit none
+        integer(int32), intent(in) :: idx1, idx2
+        type(type_input), intent(in) :: input
+        integer(int32), intent(in) :: physics_type_id
+        logical :: is_identical
+
+        integer(int32) :: bc_type1, bc_type2
+        logical :: alloc1, alloc2
+
+        is_identical = .false.
+
+        select case (physics_type_id)
+        case (PHYSICS_TYPE_THERMAL)
+            ! --- 関数を使い、typeを文字列から整数IDに変換 ---
+            bc_type1 = get_bc_type_from_string(input%conditions%boundary_conditions(idx1)%thermal%type, physics_type_id)
+            bc_type2 = get_bc_type_from_string(input%conditions%boundary_conditions(idx2)%thermal%type, physics_type_id)
+
+            ! --- 整数IDで比較 ---
+            if (bc_type1 /= bc_type2) then
+                return
+            end if
+
+            ! --- allocated() を使った安全な値の比較 ---
+            alloc1 = allocated(input%conditions%boundary_conditions(idx1)%thermal%values)
+            alloc2 = allocated(input%conditions%boundary_conditions(idx2)%thermal%values)
+
+            if (alloc1 .and. alloc2) then
+                if (size(input%conditions%boundary_conditions(idx1)%thermal%values) == &
+                    size(input%conditions%boundary_conditions(idx2)%thermal%values)) then
+
+                    if (all(input%conditions%boundary_conditions(idx1)%thermal%values == &
+                            input%conditions%boundary_conditions(idx2)%thermal%values)) then
+                        is_identical = .true.
+                    end if
+                end if
+            else if (.not. alloc1 .and. .not. alloc2) then
+                is_identical = .true.
+            end if
+
+        case (PHYSICS_TYPE_HYDRAULIC)
+            ! --- 関数を使い、typeを文字列から整数IDに変換 ---
+            bc_type1 = get_bc_type_from_string(input%conditions%boundary_conditions(idx1)%hydraulic%type, physics_type_id)
+            bc_type2 = get_bc_type_from_string(input%conditions%boundary_conditions(idx2)%hydraulic%type, physics_type_id)
+
+            ! --- 整数IDで比較 ---
+            if (bc_type1 /= bc_type2) then
+                return
+            end if
+
+            ! --- allocated() を使った安全な値の比較 ---
+            alloc1 = allocated(input%conditions%boundary_conditions(idx1)%hydraulic%values)
+            alloc2 = allocated(input%conditions%boundary_conditions(idx2)%hydraulic%values)
+
+            if (alloc1 .and. alloc2) then
+                if (size(input%conditions%boundary_conditions(idx1)%hydraulic%values) == &
+                    size(input%conditions%boundary_conditions(idx2)%hydraulic%values)) then
+
+                    if (all(input%conditions%boundary_conditions(idx1)%hydraulic%values == &
+                            input%conditions%boundary_conditions(idx2)%hydraulic%values)) then
+                        is_identical = .true.
+                    end if
+                end if
+            else
+                is_identical = .true.
+            end if
+        end select
+
+    end function are_bcs_identical
 end module domain_manager

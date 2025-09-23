@@ -1,6 +1,6 @@
 module domain_mesh_element_factory
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_dp_3d
+    use :: module_core
     use :: module_input, only:type_input
     use :: domain_mesh_element, only:abst_element, & !&
                                 type_triangle_first, type_triangle_second, & !&
@@ -11,28 +11,25 @@ module domain_mesh_element_factory
     public :: create_element
 
 contains
-    function create_element(id, global_coordinate, input) result(new_element)
+    function create_element(mesh_id, input) result(new_element)
         implicit none
-        integer(int32), intent(in) :: id
-        type(type_dp_3d), pointer, intent(in) :: global_coordinate
+        integer(int32), intent(in) :: mesh_id
         type(type_input), intent(in) :: input
         class(abst_element), allocatable :: new_element
 
-        character(:), allocatable :: type_name
+        character(:), allocatable :: cell_name
 
-        type_name = input%geometry%vtk%cells(id)%cell_type_name
+        cell_name = vtk_constants%get_cell_name(mesh_id)
 
-        select case (type_name)
+        select case (cell_name)
         case ("Triangle")
-            new_element = type_triangle_first(id, global_coordinate, input)
+            new_element = type_triangle_first(input)
         case ("Quad")
-            new_element = type_square_first(id, global_coordinate, input)
+            new_element = type_square_first(input)
         case ("QuadraticTriangle")
-            new_element = type_triangle_second(id, global_coordinate, input)
+            new_element = type_triangle_second(input)
         case ("QuadraticQuad")
-            new_element = type_square_second(id, global_coordinate, input)
-        case default
-            write (*, '(a)') "Error: Unknown side shape type = "//type_name
+            new_element = type_square_second(input)
         end select
 
     end function create_element

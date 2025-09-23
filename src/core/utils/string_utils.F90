@@ -1,6 +1,7 @@
 module core_string_utils
     use, intrinsic :: iso_fortran_env, only: int32
     use :: stdlib_strings, only:strip
+    use :: core_constants
     use :: core_allocate, only:allocate_array
     implicit none
     private
@@ -8,6 +9,7 @@ module core_string_utils
     public :: join
     public :: filter
     public :: modify_path_format
+    public :: get_bc_type_from_string
 
     interface filter
         module procedure :: filter_character_array
@@ -127,7 +129,7 @@ contains
         ! input_arrayの各要素がvalid_listに存在するかチェックし、マスクを作成
         mask = .false.
         do i = 1, size(input_array)
-            mask(i) = any(valid_list(:) == trim(adjustl(input_array(i))))
+            mask(i) = any(valid_list(:) == strip(input_array(i)))
         end do
 
         ! マスクを使って有効な要素だけを抽出
@@ -160,4 +162,51 @@ contains
             path = trim(path)//"/"
         end if
     end subroutine modify_path_format
+
+    pure function get_bc_type_from_string(str, physics_type_id) result(bc_type)
+        implicit none
+        character(*), intent(in) :: str
+        integer(int32), intent(in) :: physics_type_id
+        integer(int32) :: bc_type
+
+        select case (physics_type_id)
+        case (PHYSICS_TYPE_THERMAL)
+            select case (strip(str))
+            case ("dirichlet")
+                bc_type = THERMAL_BC_DIRICHLET
+            case ("neumann")
+                bc_type = THERMAL_BC_NEUMANN
+            case ("flux")
+                bc_type = THERMAL_BC_FLUX
+            case ("robin")
+                bc_type = THERMAL_BC_ROBIN
+            case ("convective")
+                bc_type = THERMAL_BC_CONVECTIVE
+            case ("radiation")
+                bc_type = THERMAL_BC_RADIATION
+            case ("adiabatic")
+                bc_type = THERMAL_BC_ADIABATIC
+            case ("free")
+                bc_type = THERMAL_BC_FREE
+            case default
+                bc_type = -1
+            end select
+        case (PHYSICS_TYPE_HYDRAULIC)
+            select case (strip(str))
+            case ("dirichlet")
+                bc_type = HYDRAULIC_BC_DIRICHLET
+            case ("neumann")
+                bc_type = HYDRAULIC_BC_NEUMANN
+            case ("flux")
+                bc_type = HYDRAULIC_BC_FLUX
+            case ("impermeable")
+                bc_type = HYDRAULIC_BC_IMPERMEABLE
+            case ("seepage")
+                bc_type = HYDRAULIC_BC_SEEPAGE
+            case default
+                bc_type = -1
+            end select
+        end select
+    end function get_bc_type_from_string
+
 end module core_string_utils

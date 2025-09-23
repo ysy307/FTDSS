@@ -1,8 +1,8 @@
 module domain_mesh_element
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: stdlib_strings, only:strip
     use :: stdlib_logger
-    use :: module_core, only:type_dp_3d, type_dp_vector_3d, assignment(=), operator(+), & !&
-                             type_dp_pointer, type_vtk_cell, allocate_array, deallocate_array
+    use :: module_core
     use :: module_input, only:type_input
     use :: domain_mesh, only:abst_mesh
     implicit none
@@ -86,12 +86,13 @@ module domain_mesh_element
     !----- 抽象インターフェース定義 -----
     !
     abstract interface
-        subroutine abst_is_inside(self, cartesian, normalized, is_in)
-            import abst_element, type_dp_vector_3d
+        subroutine abst_is_inside(self, cartesian, normalized, node_coords, is_in)
+            import abst_element, type_dp_vector_3d, real64
             implicit none
             class(abst_element), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: cartesian
             type(type_dp_vector_3d), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
         end subroutine abst_is_inside
 
@@ -101,18 +102,17 @@ module domain_mesh_element
     !   三角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_triangle_first(id, global_coordinate, input) result(element)
+        module function construct_triangle_first(input) result(element)
             implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_input), intent(in) :: input
             class(abst_element), allocatable :: element
 
         end function construct_triangle_first
 
-        pure module function get_area_triangle_first(self) result(area)
+        module function get_area_triangle_first(self, node_coords) result(area)
             implicit none
             class(type_triangle_first), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: area
 
         end function get_area_triangle_first
@@ -136,29 +136,30 @@ module domain_mesh_element
 
         end function dpsi_triangle_first
 
-        pure elemental module function jacobian_triangle_first(self, i, j, r) result(jacobian)
+        pure module function jacobian_triangle_first(self, r, node_coords) result(jacobian)
             implicit none
             class(type_triangle_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
             type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
 
         end function jacobian_triangle_first
 
-        pure elemental module function jacobian_det_triangle_first(self, r) result(jacobian_det)
+        pure module function jacobian_det_triangle_first(self, r, node_coords) result(jacobian_det)
             implicit none
             class(type_triangle_first), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: jacobian_det
 
         end function jacobian_det_triangle_first
 
-        module subroutine is_in_triangle_first(self, cartesian, normalized, is_in)
+        module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, is_in)
             implicit none
             class(type_triangle_first), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: cartesian
             type(type_dp_vector_3d), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
 
         end subroutine is_in_triangle_first
@@ -168,18 +169,17 @@ module domain_mesh_element
     !   四角形一次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_square_first(id, global_coordinate, input) result(element)
+        module function construct_square_first(input) result(element)
             implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_input), intent(in) :: input
             class(abst_element), allocatable :: element
 
         end function construct_square_first
 
-        pure module function get_area_square_first(self) result(area)
+        module function get_area_square_first(self, node_coords) result(area)
             implicit none
             class(type_square_first), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: area
 
         end function get_area_square_first
@@ -203,29 +203,30 @@ module domain_mesh_element
 
         end function dpsi_square_first
 
-        pure elemental module function jacobian_square_first(self, i, j, r) result(jacobian)
+        pure module function jacobian_square_first(self, r, node_coords) result(jacobian)
             implicit none
             class(type_square_first), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
             type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
 
         end function jacobian_square_first
 
-        pure elemental module function jacobian_det_square_first(self, r) result(jacobian_det)
+        pure module function jacobian_det_square_first(self, r, node_coords) result(jacobian_det)
             implicit none
             class(type_square_first), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: jacobian_det
 
         end function jacobian_det_square_first
 
-        module subroutine is_in_square_first(self, cartesian, normalized, is_in)
+        module subroutine is_in_square_first(self, cartesian, normalized, node_coords, is_in)
             implicit none
             class(type_square_first), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: cartesian
             type(type_dp_vector_3d), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
 
         end subroutine is_in_square_first
@@ -235,18 +236,17 @@ module domain_mesh_element
     !   三角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_triangle_second(id, global_coordinate, input) result(element)
+        module function construct_triangle_second(input) result(element)
             implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_input), intent(in) :: input
             class(abst_element), allocatable :: element
 
         end function construct_triangle_second
 
-        pure module function get_area_triangle_second(self) result(area)
+        module function get_area_triangle_second(self, node_coords) result(area)
             implicit none
             class(type_triangle_second), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: area
 
         end function get_area_triangle_second
@@ -280,29 +280,30 @@ module domain_mesh_element
 
         end function dpsi_deta_triangle_second
 
-        pure elemental module function jacobian_triangle_second(self, i, j, r) result(jacobian)
+        pure module function jacobian_triangle_second(self, r, node_coords) result(jacobian)
             implicit none
             class(type_triangle_second), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
             type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
 
         end function jacobian_triangle_second
 
-        pure elemental module function jacobian_det_triangle_second(self, r) result(jacobian_det)
+        pure module function jacobian_det_triangle_second(self, r, node_coords) result(jacobian_det)
             implicit none
             class(type_triangle_second), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: jacobian_det
 
         end function jacobian_det_triangle_second
 
-        module subroutine is_in_triangle_second(self, cartesian, normalized, is_in)
+        module subroutine is_in_triangle_second(self, cartesian, normalized, node_coords, is_in)
             implicit none
             class(type_triangle_second), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: cartesian
             type(type_dp_vector_3d), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
 
         end subroutine is_in_triangle_second
@@ -313,18 +314,17 @@ module domain_mesh_element
     !   四角形二次要素型 procedures interface
     !--------------------------------------------------------------------------------------
     interface
-        module function construct_square_second(id, global_coordinate, input) result(element)
+        module function construct_square_second(input) result(element)
             implicit none
-            integer(int32), intent(in) :: id
-            type(type_dp_3d), pointer, intent(in) :: global_coordinate
             type(type_input), intent(in) :: input
             class(abst_element), allocatable :: element
 
         end function construct_square_second
 
-        pure module function get_area_square_second(self) result(area)
+        module function get_area_square_second(self, node_coords) result(area)
             implicit none
             class(type_square_second), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: area
 
         end function get_area_square_second
@@ -348,29 +348,30 @@ module domain_mesh_element
 
         end function dpsi_square_second
 
-        pure elemental module function jacobian_square_second(self, i, j, r) result(jacobian)
+        pure module function jacobian_square_second(self, r, node_coords) result(jacobian)
             implicit none
             class(type_square_second), intent(in) :: self
-            integer(int32), intent(in) :: i
-            integer(int32), intent(in) :: j
             type(type_dp_vector_3d), intent(in) :: r
-            real(real64) :: jacobian
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
 
         end function jacobian_square_second
 
-        pure elemental module function jacobian_det_square_second(self, r) result(jacobian_det)
+        pure module function jacobian_det_square_second(self, r, node_coords) result(jacobian_det)
             implicit none
             class(type_square_second), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
             real(real64) :: jacobian_det
 
         end function jacobian_det_square_second
 
-        module subroutine is_in_square_second(self, cartesian, normalized, is_in)
+        module subroutine is_in_square_second(self, cartesian, normalized, node_coords, is_in)
             implicit none
             class(type_square_second), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: cartesian
             type(type_dp_vector_3d), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
 
         end subroutine is_in_square_second
