@@ -94,7 +94,8 @@ target_link_libraries(Domain_Main PUBLIC
     Domain_Adjacency
     Domain_Multicoloring
     Domain_Reordering
-    Solver::Physics
+    Solver::Core
+    Solver::Input
 )
 enable_build_flags(Domain_Main)
 enable_thirdparty(Domain_Main)

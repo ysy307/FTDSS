@@ -12,6 +12,7 @@ module module_domain
     ! public :: type_crs_adjacency_element, type_node_adjacency
     public :: type_domain
     ! public :: type_coloring
+
     ! public :: type_reordering
 
 end module module_domain

@@ -1,5 +1,5 @@
-module physics_constants
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+module core_constants
+    use, intrinsic :: iso_fortran_env, only: int32
     implicit none
     private
 
@@ -41,11 +41,11 @@ module physics_constants
                                          THERMAL_BC_DIRICHLET]
 
     ! Definition of boundary condition type IDs for hydraulic analysis
-    integer(int32), parameter, public :: HYDRAULIC_BC_DIRICHLET    = 201 !&
-    integer(int32), parameter, public :: HYDRAULIC_BC_NEUMANN      = 202 !&
-    integer(int32), parameter, public :: HYDRAULIC_BC_FLUX         = 203 !&
-    integer(int32), parameter, public :: HYDRAULIC_BC_IMPERMEABLE  = 204 !&
-    integer(int32), parameter, public :: HYDRAULIC_BC_SEEPAGE      = 205 !&
+    integer(int32), parameter, public :: HYDRAULIC_BC_DIRICHLET   = 201 !&
+    integer(int32), parameter, public :: HYDRAULIC_BC_NEUMANN     = 202 !&
+    integer(int32), parameter, public :: HYDRAULIC_BC_FLUX        = 203 !&
+    integer(int32), parameter, public :: HYDRAULIC_BC_IMPERMEABLE = 204 !&
+    integer(int32), parameter, public :: HYDRAULIC_BC_SEEPAGE     = 205 !&
 
     ! -----------------------------
     ! Hydraulic BC application sequence
@@ -57,4 +57,4 @@ module physics_constants
                                          HYDRAULIC_BC_NEUMANN, &
                                          HYDRAULIC_BC_DIRICHLET]
 
-end module physics_constants
+end module core_constants

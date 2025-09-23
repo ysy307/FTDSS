@@ -1,7 +1,6 @@
 module module_properties
     use :: physics_registry, only:type_physics_registry
     use :: physics_service, only:type_properties_manager, type_phase_property
-    use :: physics_constants
     implicit none
     ! private
 

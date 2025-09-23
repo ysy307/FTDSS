@@ -29,21 +29,6 @@ target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL OpenMP::OpenMP_Fortran)
 # =========================================================================
 # サードパーティライブラリの探索
 # =========================================================================
-# --- PETSc (pkg-configを使用) ---
-set(PETSC_INSTALL_DIR "/workspaces/FTDSS/third_party/.local")
-
-# 1. 現在のパスを一時変数に読み込む
-set(CURRENT_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
-# 2. 新しいパス文字列を組み立てる
-set(NEW_PKG_CONFIG_PATH "${PETSC_INSTALL_DIR}/lib/pkgconfig")
-if(CURRENT_PKG_CONFIG_PATH)
-  set(NEW_PKG_CONFIG_PATH "${NEW_PKG_CONFIG_PATH}:${CURRENT_PKG_CONFIG_PATH}")
-endif()
-# 3. 組み立てたパスで環境変数を設定する
-set(ENV{PKG_CONFIG_PATH} "${NEW_PKG_CONFIG_PATH}")
-
-pkg_search_module(PETSC REQUIRED IMPORTED_TARGET PETSc)
-
 # --- ライブラリ探索パスを一元管理 ---
 list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/.local)
 
@@ -111,6 +96,5 @@ function(enable_thirdparty target)
         VTK::VTKFortran
         fortran_stdlib::fortran_stdlib
         jsonfortran-intelllvm::jsonfortran-static
-        PkgConfig::PETSC  # PETScをpkg-config経由でリンク
     )
 endfunction()

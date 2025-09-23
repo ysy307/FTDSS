@@ -355,98 +355,52 @@ contains
         end select
     end subroutine type_vtk_cell_set
 
-    module subroutine get_active_region_info(self, unique_ids, ierr)
-        ! --- 引数 ---
+    module subroutine get_active_region_info(self, unique_ids, target_dim)
         implicit none
         class(Type_VTK), intent(in) :: self !! VTK data
-        integer(int32), allocatable, intent(out) :: unique_ids(:)
-        integer(int32), intent(out) :: ierr
+        integer(int32), allocatable, intent(inout) :: unique_ids(:)
+        integer(int32), intent(in), optional :: target_dim
 
         ! --- ローカル変数 ---
-        integer(int32) :: local_max_dim
+        integer(int32) :: i_cell, count, dim
         integer(int32), allocatable :: collected_ids(:)
-        integer(int32) :: i_cell, count
-        logical(4) :: is_max_dim_element
-        integer(int32) :: max_dim
+        integer(int32) :: max_dim_local
 
-#ifdef _MPI
-        integer(int32) :: global_max_dim
-        integer(int32), allocatable :: all_counts(:), displs(:)
-        integer(int32), allocatable :: global_collected_ids(:)
-        integer(int32) :: total_collected_count, j
-#endif
-
-        local_max_dim = 0
-        ierr = 0
-
-        ! --- ステップ1: メッシュ内の最大次元を判定 ---
-        do i_cell = 1, self%num_total_cells
-            local_max_dim = max(local_max_dim, self%CELLS(i_cell)%get_dimension())
-        end do
-
-#ifdef _MPI
-        call MPI_Allreduce(local_max_dim, global_max_dim, 1, MPI_INTEGER4, MPI_MAX, MPI_COMM_WORLD, ierr)
-        if (global_max_dim <= 0) then
-            ierr = -1
-            allocate (unique_ids(0))
-            return
-        end if
-#else
-        if (local_max_dim <= 0) then
-            ierr = -1
-            allocate (unique_ids(0))
-            return ! アクティブな要素がない
-        end if
-#endif
-
-        ! --- ステップ2: 最大次元を持つ要素から、すべてのCellEntityIdを収集 ---
-        allocate (collected_ids(self%num_total_cells))
+        max_dim_local = 0
         count = 0
+
+        ! --- ステップ1: 収集する次元を決定 ---
+        if (present(target_dim)) then
+            max_dim_local = target_dim
+        else
+            ! 指定がなければ自プロセス内で最大次元を判定
+            do i_cell = 1, self%num_total_cells
+                max_dim_local = max(max_dim_local, self%CELLS(i_cell)%get_dimension())
+            end do
+            if (max_dim_local <= 0) then
+                allocate (unique_ids(0))
+                return
+            end if
+        end if
+
+        ! --- ステップ2: 指定次元のCellEntityIdを収集 ---
+        allocate (collected_ids(self%num_total_cells))
         do i_cell = 1, self%num_total_cells
-#ifdef _MPI
-            max_dim = global_max_dim
-#else
-            max_dim = local_max_dim
-#endif
-
-            if (self%CELLS(i_cell)%get_dimension() == max_dim) then
-
+            dim = self%CELLS(i_cell)%get_dimension()
+            if (dim == max_dim_local) then
                 count = count + 1
                 collected_ids(count) = self%CELLS(i_cell)%cell_entity_id
             end if
         end do
 
-        ! --- ステップ3: 収集したIDリストから、ユニークなものだけを抽出 ---
-#ifdef _MPI
-        ! MPI: 全プロセスのIDを収集し、グローバルにユニークなものを抽出
-        allocate (all_counts(self%num_procs))
-        allocate (displs(self%num_procs))
-        call MPI_Allgather(count, 1, MPI_INTEGER4, all_counts, 1, MPI_INTEGER4, MPI_COMM_WORLD, ierr)
-
-        total_collected_count = sum(all_counts)
-        if (total_collected_count > 0) then
-            displs(1) = 0
-            do j = 2, self%num_procs
-                displs(j) = displs(j - 1) + all_counts(j - 1)
-            end do
-            allocate (global_collected_ids(total_collected_count))
-            call MPI_Allgatherv(collected_ids(1:count), count, MPI_INTEGER4, &
-                                global_collected_ids, all_counts, displs, MPI_INTEGER4, MPI_COMM_WORLD, ierr)
-            call unique(global_collected_ids, unique_ids)
-            deallocate (global_collected_ids)
-        else
-            allocate (unique_ids(0))
-        end if
-        deallocate (all_counts, displs)
-#else
+        ! --- ステップ3: ユニークなIDのみ抽出 ---
         if (count > 0) then
             call unique(collected_ids(1:count), unique_ids)
         else
             allocate (unique_ids(0))
         end if
-#endif
-        deallocate (collected_ids)
 
+        deallocate (collected_ids)
     end subroutine get_active_region_info
 
 end submodule core_vtk_base

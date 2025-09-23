@@ -50,7 +50,7 @@ contains
 
             ierr = 0
             ! アクティブなマテリアル領域の情報を取得
-            call input%geometry%vtk%get_active_region_info(unique_material_ids, ierr)
+            call input%geometry%vtk%get_active_region_info(unique_material_ids)
             if (ierr /= 0) return
             if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
                 ierr = -1 ! エラーコード

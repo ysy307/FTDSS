@@ -54,7 +54,7 @@ add_subdirectory(src/core)
 add_subdirectory(src/inout)
 add_subdirectory(src/linalg)
 add_subdirectory(src/control)
-add_subdirectory(src/physics)
+# add_subdirectory(src/physics)
 add_subdirectory(src/domain)
 # add_subdirectory(src/solver)
 # add_subdirectory(src/field)
@@ -87,7 +87,7 @@ endif()
 # ライブラリのリンク
 if(TARGET ${APP_TARGET})
     # まず、アプリケーションのコアとなるライブラリをリンク
-    target_link_libraries(${APP_TARGET} PRIVATE Solver::Input Solver::Core Solver::Control Solver::Physics Solver::Domain Solver::Linalg)
+    target_link_libraries(${APP_TARGET} PRIVATE Solver::Input Solver::Core Solver::Control Solver::Domain Solver::Linalg)
 
     # MPIが有効な場合、MPIライブラリを追加でリンク
     if(ENABLE_MPI AND TARGET MPI::MPI_Fortran)

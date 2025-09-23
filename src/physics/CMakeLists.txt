@@ -130,7 +130,6 @@ target_link_libraries(Physics_Models INTERFACE
 set(PHYSICS_SERVICE_SOURCES
     physics_registry.F90
     physics_service.F90
-    physics_constants.F90
     physics.F90
 )
 add_library(Physics_Service STATIC ${PHYSICS_SERVICE_SOURCES})

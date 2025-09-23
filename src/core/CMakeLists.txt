@@ -15,6 +15,14 @@ target_include_directories(Core_Validation PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Core_Validation)
 enable_thirdparty(Core_Validation)
 
+set(CORE_CONSTANTS_SOURCES
+    constants/constants.F90
+)
+add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES})
+target_include_directories(Core_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+enable_build_flags(Core_Constants)
+enable_thirdparty(Core_Constants)
+
 
 # ====================================================================
 # 2. Dependent Libraries
@@ -172,6 +180,7 @@ add_library(Core_Main STATIC ${CORE_MAIN_SOURCE})
 target_include_directories(Core_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # ★ Core_Mainが他の全ての部品ライブラリに依存することを明記 ★
 target_link_libraries(Core_Main PUBLIC
+    Core_Constants
     Core_Types
     Core_Memory
     Core_Validation

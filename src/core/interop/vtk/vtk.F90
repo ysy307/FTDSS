@@ -93,12 +93,11 @@ module core_vtk
             integer(int32) :: size
         end function type_vtk_cell_get_size_connectivity
 
-        module subroutine get_active_region_info(self, unique_ids, ierr)
-            !> Extract unique CellEntityIds of the highest-dimensional elements
+        module subroutine get_active_region_info(self, unique_ids, target_dim)
             implicit none
-            class(Type_VTK), intent(in) :: self
-            integer(int32), allocatable, intent(out) :: unique_ids(:)
-            integer(int32), intent(out) :: ierr
+            class(type_vtk), intent(in) :: self !! VTK data
+            integer(int32), allocatable, intent(inout) :: unique_ids(:)
+            integer(int32), intent(in), optional :: target_dim
         end subroutine get_active_region_info
     end interface
 

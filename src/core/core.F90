@@ -14,6 +14,7 @@ module module_core
     use :: core_types
     use :: core_vtk
     use :: core_vtk_vtk_constants
+    use :: core_constants
     implicit none
     public
 
