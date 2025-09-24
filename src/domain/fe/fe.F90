@@ -1,23 +1,27 @@
-module module_mesh_element
-    use :: domain_mesh_element, only:abst_element, type_triangle_first, type_triangle_second, type_square_first, type_square_second, & !&
-                                holder_elements
-    use :: domain_mesh_element_factory, only:create_element
+module module_fe
+    use :: domain_fe, only:abst_fe
+    use :: module_fe_side, only:type_side_first, type_side_second
+    use :: module_fe_element, only:type_triangle_first, type_triangle_second, &
+        type_square_first, type_square_second
+    use :: domain_fe_factory, only:create_fe
     implicit none
     private
 
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! element types
+    ! derived types
     !-------------------------------------------------------------------------------------------------------------------------------
-    public :: abst_element
+    public :: abst_fe
+    public :: type_side_first
+    public :: type_side_second
     public :: type_triangle_first
     public :: type_triangle_second
     public :: type_square_first
     public :: type_square_second
-    public :: holder_elements
+
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! element operation procedures
+    ! operation procedures
     !-------------------------------------------------------------------------------------------------------------------------------
-    public :: create_element
+    public :: create_fe
     !-------------------------------------------------------------------------------------------------------------------------------
 
-end module module_mesh_element
+end module module_fe

@@ -4,7 +4,6 @@ module core_vtk_vtk_constants
     implicit none
     private
 
-    public :: initialize_vtk_constants
     public :: vtk_constants
 
     type :: type_vtk_constants_local
@@ -16,11 +15,16 @@ module core_vtk_vtk_constants
     end type type_vtk_constants_local
 
     type :: type_vtk_constants
-        type(type_vtk_constants_local), allocatable :: cell(:)
+        logical, private :: is_initialized = .false.
+        integer(int32) :: max_cell_id
+        type(type_vtk_constants_local), allocatable, private :: cell(:)
     contains
-        procedure, public :: get_cell_info
+        procedure, public :: initialize => initialize_vtk_constants
+        procedure, public :: get_cell_info_from_cell_name
+        procedure, public :: get_cell_info_from_cell_type
         procedure, public :: get_cell_name
-        procedure, private :: get_cell_type
+        procedure, public :: get_max_cell_id
+        procedure, public :: get_cell_type
     end type type_vtk_constants
 
     type(type_vtk_constants) :: vtk_constants
@@ -118,468 +122,471 @@ module core_vtk_vtk_constants
     integer(int32), parameter :: VTK_BEZIER_WEDGE = 80
     integer(int32), parameter :: VTK_BEZIER_PYRAMID = 81
     !------------------------------------------------------------------------
-
     integer(int32), parameter :: NUM_VTK_CELL_TYPES = 81
 
 contains
-    subroutine initialize_vtk_constants()
+    subroutine initialize_vtk_constants(self)
         implicit none
+        class(type_vtk_constants), intent(inout) :: self
 
         ! Allocate the array to hold all cell type definitions
-        if (allocated(vtk_constants%cell)) deallocate (vtk_constants%cell)
-        allocate (vtk_constants%cell(0:NUM_VTK_CELL_TYPES))
+        if (allocated(self%cell)) deallocate (self%cell)
+        allocate (self%cell(0:NUM_VTK_CELL_TYPES))
+        self%max_cell_id = NUM_VTK_CELL_TYPES
 
         !------------------------------------------------------------------------
         ! Initialize each cell type
         !------------------------------------------------------------------------
 
         ! VTK_EMPTY_CELL
-        vtk_constants%cell(VTK_EMPTY_CELL)%cell_name = "Empty"
-        vtk_constants%cell(VTK_EMPTY_CELL)%cell_type = VTK_EMPTY_CELL
-        vtk_constants%cell(VTK_EMPTY_CELL)%num_nodes_in_cell = 0
-        vtk_constants%cell(VTK_EMPTY_CELL)%cell_dimension = -1
-        vtk_constants%cell(VTK_EMPTY_CELL)%cell_order = 0
+        self%cell(VTK_EMPTY_CELL)%cell_name = "Empty"
+        self%cell(VTK_EMPTY_CELL)%cell_type = VTK_EMPTY_CELL
+        self%cell(VTK_EMPTY_CELL)%num_nodes_in_cell = 0
+        self%cell(VTK_EMPTY_CELL)%cell_dimension = -1
+        self%cell(VTK_EMPTY_CELL)%cell_order = 0
 
         ! VTK_VERTEX
-        vtk_constants%cell(VTK_VERTEX)%cell_name = "Vertex"
-        vtk_constants%cell(VTK_VERTEX)%cell_type = VTK_VERTEX
-        vtk_constants%cell(VTK_VERTEX)%num_nodes_in_cell = 1
-        vtk_constants%cell(VTK_VERTEX)%cell_dimension = 0
-        vtk_constants%cell(VTK_VERTEX)%cell_order = 1
+        self%cell(VTK_VERTEX)%cell_name = "Vertex"
+        self%cell(VTK_VERTEX)%cell_type = VTK_VERTEX
+        self%cell(VTK_VERTEX)%num_nodes_in_cell = 1
+        self%cell(VTK_VERTEX)%cell_dimension = 0
+        self%cell(VTK_VERTEX)%cell_order = 1
 
         ! VTK_POLY_VERTEX
-        vtk_constants%cell(VTK_POLY_VERTEX)%cell_name = "PolyVertex"
-        vtk_constants%cell(VTK_POLY_VERTEX)%cell_type = VTK_POLY_VERTEX
-        vtk_constants%cell(VTK_POLY_VERTEX)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_POLY_VERTEX)%cell_dimension = 0
-        vtk_constants%cell(VTK_POLY_VERTEX)%cell_order = 1
+        self%cell(VTK_POLY_VERTEX)%cell_name = "PolyVertex"
+        self%cell(VTK_POLY_VERTEX)%cell_type = VTK_POLY_VERTEX
+        self%cell(VTK_POLY_VERTEX)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_POLY_VERTEX)%cell_dimension = 0
+        self%cell(VTK_POLY_VERTEX)%cell_order = 1
 
         ! VTK_LINE
-        vtk_constants%cell(VTK_LINE)%cell_name = "Line"
-        vtk_constants%cell(VTK_LINE)%cell_type = VTK_LINE
-        vtk_constants%cell(VTK_LINE)%num_nodes_in_cell = 2
-        vtk_constants%cell(VTK_LINE)%cell_dimension = 1
-        vtk_constants%cell(VTK_LINE)%cell_order = 1
+        self%cell(VTK_LINE)%cell_name = "Line"
+        self%cell(VTK_LINE)%cell_type = VTK_LINE
+        self%cell(VTK_LINE)%num_nodes_in_cell = 2
+        self%cell(VTK_LINE)%cell_dimension = 1
+        self%cell(VTK_LINE)%cell_order = 1
 
         ! VTK_POLY_LINE
-        vtk_constants%cell(VTK_POLY_LINE)%cell_name = "PolyLine"
-        vtk_constants%cell(VTK_POLY_LINE)%cell_type = VTK_POLY_LINE
-        vtk_constants%cell(VTK_POLY_LINE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_POLY_LINE)%cell_dimension = 1
-        vtk_constants%cell(VTK_POLY_LINE)%cell_order = -1 ! Variable
+        self%cell(VTK_POLY_LINE)%cell_name = "PolyLine"
+        self%cell(VTK_POLY_LINE)%cell_type = VTK_POLY_LINE
+        self%cell(VTK_POLY_LINE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_POLY_LINE)%cell_dimension = 1
+        self%cell(VTK_POLY_LINE)%cell_order = -1 ! Variable
 
         ! VTK_TRIANGLE
-        vtk_constants%cell(VTK_TRIANGLE)%cell_name = "Triangle"
-        vtk_constants%cell(VTK_TRIANGLE)%cell_type = VTK_TRIANGLE
-        vtk_constants%cell(VTK_TRIANGLE)%num_nodes_in_cell = 3
-        vtk_constants%cell(VTK_TRIANGLE)%cell_dimension = 2
-        vtk_constants%cell(VTK_TRIANGLE)%cell_order = 1
+        self%cell(VTK_TRIANGLE)%cell_name = "Triangle"
+        self%cell(VTK_TRIANGLE)%cell_type = VTK_TRIANGLE
+        self%cell(VTK_TRIANGLE)%num_nodes_in_cell = 3
+        self%cell(VTK_TRIANGLE)%cell_dimension = 2
+        self%cell(VTK_TRIANGLE)%cell_order = 1
 
         ! VTK_TRIANGLE_STRIP
-        vtk_constants%cell(VTK_TRIANGLE_STRIP)%cell_name = "TriangleStrip"
-        vtk_constants%cell(VTK_TRIANGLE_STRIP)%cell_type = VTK_TRIANGLE_STRIP
-        vtk_constants%cell(VTK_TRIANGLE_STRIP)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_TRIANGLE_STRIP)%cell_dimension = 2
-        vtk_constants%cell(VTK_TRIANGLE_STRIP)%cell_order = 1
+        self%cell(VTK_TRIANGLE_STRIP)%cell_name = "TriangleStrip"
+        self%cell(VTK_TRIANGLE_STRIP)%cell_type = VTK_TRIANGLE_STRIP
+        self%cell(VTK_TRIANGLE_STRIP)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_TRIANGLE_STRIP)%cell_dimension = 2
+        self%cell(VTK_TRIANGLE_STRIP)%cell_order = 1
 
         ! VTK_POLYGON
-        vtk_constants%cell(VTK_POLYGON)%cell_name = "Polygon"
-        vtk_constants%cell(VTK_POLYGON)%cell_type = VTK_POLYGON
-        vtk_constants%cell(VTK_POLYGON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_POLYGON)%cell_dimension = 2
-        vtk_constants%cell(VTK_POLYGON)%cell_order = -1 ! Variable
+        self%cell(VTK_POLYGON)%cell_name = "Polygon"
+        self%cell(VTK_POLYGON)%cell_type = VTK_POLYGON
+        self%cell(VTK_POLYGON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_POLYGON)%cell_dimension = 2
+        self%cell(VTK_POLYGON)%cell_order = -1 ! Variable
 
         ! VTK_PIXEL
-        vtk_constants%cell(VTK_PIXEL)%cell_name = "Pixel"
-        vtk_constants%cell(VTK_PIXEL)%cell_type = VTK_PIXEL
-        vtk_constants%cell(VTK_PIXEL)%num_nodes_in_cell = 4
-        vtk_constants%cell(VTK_PIXEL)%cell_dimension = 2
-        vtk_constants%cell(VTK_PIXEL)%cell_order = 1
+        self%cell(VTK_PIXEL)%cell_name = "Pixel"
+        self%cell(VTK_PIXEL)%cell_type = VTK_PIXEL
+        self%cell(VTK_PIXEL)%num_nodes_in_cell = 4
+        self%cell(VTK_PIXEL)%cell_dimension = 2
+        self%cell(VTK_PIXEL)%cell_order = 1
 
         ! VTK_QUAD
-        vtk_constants%cell(VTK_QUAD)%cell_name = "Quad"
-        vtk_constants%cell(VTK_QUAD)%cell_type = VTK_QUAD
-        vtk_constants%cell(VTK_QUAD)%num_nodes_in_cell = 4
-        vtk_constants%cell(VTK_QUAD)%cell_dimension = 2
-        vtk_constants%cell(VTK_QUAD)%cell_order = 1
+        self%cell(VTK_QUAD)%cell_name = "Quad"
+        self%cell(VTK_QUAD)%cell_type = VTK_QUAD
+        self%cell(VTK_QUAD)%num_nodes_in_cell = 4
+        self%cell(VTK_QUAD)%cell_dimension = 2
+        self%cell(VTK_QUAD)%cell_order = 1
 
         ! VTK_TETRA
-        vtk_constants%cell(VTK_TETRA)%cell_name = "Tetra"
-        vtk_constants%cell(VTK_TETRA)%cell_type = VTK_TETRA
-        vtk_constants%cell(VTK_TETRA)%num_nodes_in_cell = 4
-        vtk_constants%cell(VTK_TETRA)%cell_dimension = 3
-        vtk_constants%cell(VTK_TETRA)%cell_order = 1
+        self%cell(VTK_TETRA)%cell_name = "Tetra"
+        self%cell(VTK_TETRA)%cell_type = VTK_TETRA
+        self%cell(VTK_TETRA)%num_nodes_in_cell = 4
+        self%cell(VTK_TETRA)%cell_dimension = 3
+        self%cell(VTK_TETRA)%cell_order = 1
 
         ! VTK_VOXEL
-        vtk_constants%cell(VTK_VOXEL)%cell_name = "Voxel"
-        vtk_constants%cell(VTK_VOXEL)%cell_type = VTK_VOXEL
-        vtk_constants%cell(VTK_VOXEL)%num_nodes_in_cell = 8
-        vtk_constants%cell(VTK_VOXEL)%cell_dimension = 3
-        vtk_constants%cell(VTK_VOXEL)%cell_order = 1
+        self%cell(VTK_VOXEL)%cell_name = "Voxel"
+        self%cell(VTK_VOXEL)%cell_type = VTK_VOXEL
+        self%cell(VTK_VOXEL)%num_nodes_in_cell = 8
+        self%cell(VTK_VOXEL)%cell_dimension = 3
+        self%cell(VTK_VOXEL)%cell_order = 1
 
         ! VTK_HEXAHEDRON
-        vtk_constants%cell(VTK_HEXAHEDRON)%cell_name = "Hexahedron"
-        vtk_constants%cell(VTK_HEXAHEDRON)%cell_type = VTK_HEXAHEDRON
-        vtk_constants%cell(VTK_HEXAHEDRON)%num_nodes_in_cell = 8
-        vtk_constants%cell(VTK_HEXAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_HEXAHEDRON)%cell_order = 1
+        self%cell(VTK_HEXAHEDRON)%cell_name = "Hexahedron"
+        self%cell(VTK_HEXAHEDRON)%cell_type = VTK_HEXAHEDRON
+        self%cell(VTK_HEXAHEDRON)%num_nodes_in_cell = 8
+        self%cell(VTK_HEXAHEDRON)%cell_dimension = 3
+        self%cell(VTK_HEXAHEDRON)%cell_order = 1
 
         ! VTK_WEDGE
-        vtk_constants%cell(VTK_WEDGE)%cell_name = "Wedge"
-        vtk_constants%cell(VTK_WEDGE)%cell_type = VTK_WEDGE
-        vtk_constants%cell(VTK_WEDGE)%num_nodes_in_cell = 6
-        vtk_constants%cell(VTK_WEDGE)%cell_dimension = 3
-        vtk_constants%cell(VTK_WEDGE)%cell_order = 1
+        self%cell(VTK_WEDGE)%cell_name = "Wedge"
+        self%cell(VTK_WEDGE)%cell_type = VTK_WEDGE
+        self%cell(VTK_WEDGE)%num_nodes_in_cell = 6
+        self%cell(VTK_WEDGE)%cell_dimension = 3
+        self%cell(VTK_WEDGE)%cell_order = 1
 
         ! VTK_PYRAMID
-        vtk_constants%cell(VTK_PYRAMID)%cell_name = "Pyramid"
-        vtk_constants%cell(VTK_PYRAMID)%cell_type = VTK_PYRAMID
-        vtk_constants%cell(VTK_PYRAMID)%num_nodes_in_cell = 5
-        vtk_constants%cell(VTK_PYRAMID)%cell_dimension = 3
-        vtk_constants%cell(VTK_PYRAMID)%cell_order = 1
+        self%cell(VTK_PYRAMID)%cell_name = "Pyramid"
+        self%cell(VTK_PYRAMID)%cell_type = VTK_PYRAMID
+        self%cell(VTK_PYRAMID)%num_nodes_in_cell = 5
+        self%cell(VTK_PYRAMID)%cell_dimension = 3
+        self%cell(VTK_PYRAMID)%cell_order = 1
 
         ! VTK_PENTAGONAL_PRISM
-        vtk_constants%cell(VTK_PENTAGONAL_PRISM)%cell_name = "PentagonalPrism"
-        vtk_constants%cell(VTK_PENTAGONAL_PRISM)%cell_type = VTK_PENTAGONAL_PRISM
-        vtk_constants%cell(VTK_PENTAGONAL_PRISM)%num_nodes_in_cell = 10
-        vtk_constants%cell(VTK_PENTAGONAL_PRISM)%cell_dimension = 3
-        vtk_constants%cell(VTK_PENTAGONAL_PRISM)%cell_order = 1
+        self%cell(VTK_PENTAGONAL_PRISM)%cell_name = "PentagonalPrism"
+        self%cell(VTK_PENTAGONAL_PRISM)%cell_type = VTK_PENTAGONAL_PRISM
+        self%cell(VTK_PENTAGONAL_PRISM)%num_nodes_in_cell = 10
+        self%cell(VTK_PENTAGONAL_PRISM)%cell_dimension = 3
+        self%cell(VTK_PENTAGONAL_PRISM)%cell_order = 1
 
         ! VTK_HEXAGONAL_PRISM
-        vtk_constants%cell(VTK_HEXAGONAL_PRISM)%cell_name = "HexagonalPrism"
-        vtk_constants%cell(VTK_HEXAGONAL_PRISM)%cell_type = VTK_HEXAGONAL_PRISM
-        vtk_constants%cell(VTK_HEXAGONAL_PRISM)%num_nodes_in_cell = 12
-        vtk_constants%cell(VTK_HEXAGONAL_PRISM)%cell_dimension = 3
-        vtk_constants%cell(VTK_HEXAGONAL_PRISM)%cell_order = 1
+        self%cell(VTK_HEXAGONAL_PRISM)%cell_name = "HexagonalPrism"
+        self%cell(VTK_HEXAGONAL_PRISM)%cell_type = VTK_HEXAGONAL_PRISM
+        self%cell(VTK_HEXAGONAL_PRISM)%num_nodes_in_cell = 12
+        self%cell(VTK_HEXAGONAL_PRISM)%cell_dimension = 3
+        self%cell(VTK_HEXAGONAL_PRISM)%cell_order = 1
 
         ! VTK_QUADRATIC_EDGE
-        vtk_constants%cell(VTK_QUADRATIC_EDGE)%cell_name = "QuadraticEdge"
-        vtk_constants%cell(VTK_QUADRATIC_EDGE)%cell_type = VTK_QUADRATIC_EDGE
-        vtk_constants%cell(VTK_QUADRATIC_EDGE)%num_nodes_in_cell = 3
-        vtk_constants%cell(VTK_QUADRATIC_EDGE)%cell_dimension = 1
-        vtk_constants%cell(VTK_QUADRATIC_EDGE)%cell_order = 2
+        self%cell(VTK_QUADRATIC_EDGE)%cell_name = "QuadraticEdge"
+        self%cell(VTK_QUADRATIC_EDGE)%cell_type = VTK_QUADRATIC_EDGE
+        self%cell(VTK_QUADRATIC_EDGE)%num_nodes_in_cell = 3
+        self%cell(VTK_QUADRATIC_EDGE)%cell_dimension = 1
+        self%cell(VTK_QUADRATIC_EDGE)%cell_order = 2
 
         ! VTK_QUADRATIC_TRIANGLE
-        vtk_constants%cell(VTK_QUADRATIC_TRIANGLE)%cell_name = "QuadraticTriangle"
-        vtk_constants%cell(VTK_QUADRATIC_TRIANGLE)%cell_type = VTK_QUADRATIC_TRIANGLE
-        vtk_constants%cell(VTK_QUADRATIC_TRIANGLE)%num_nodes_in_cell = 6
-        vtk_constants%cell(VTK_QUADRATIC_TRIANGLE)%cell_dimension = 2
-        vtk_constants%cell(VTK_QUADRATIC_TRIANGLE)%cell_order = 2
+        self%cell(VTK_QUADRATIC_TRIANGLE)%cell_name = "QuadraticTriangle"
+        self%cell(VTK_QUADRATIC_TRIANGLE)%cell_type = VTK_QUADRATIC_TRIANGLE
+        self%cell(VTK_QUADRATIC_TRIANGLE)%num_nodes_in_cell = 6
+        self%cell(VTK_QUADRATIC_TRIANGLE)%cell_dimension = 2
+        self%cell(VTK_QUADRATIC_TRIANGLE)%cell_order = 2
 
         ! VTK_QUADRATIC_QUAD
-        vtk_constants%cell(VTK_QUADRATIC_QUAD)%cell_name = "QuadraticQuad"
-        vtk_constants%cell(VTK_QUADRATIC_QUAD)%cell_type = VTK_QUADRATIC_QUAD
-        vtk_constants%cell(VTK_QUADRATIC_QUAD)%num_nodes_in_cell = 8
-        vtk_constants%cell(VTK_QUADRATIC_QUAD)%cell_dimension = 2
-        vtk_constants%cell(VTK_QUADRATIC_QUAD)%cell_order = 2
+        self%cell(VTK_QUADRATIC_QUAD)%cell_name = "QuadraticQuad"
+        self%cell(VTK_QUADRATIC_QUAD)%cell_type = VTK_QUADRATIC_QUAD
+        self%cell(VTK_QUADRATIC_QUAD)%num_nodes_in_cell = 8
+        self%cell(VTK_QUADRATIC_QUAD)%cell_dimension = 2
+        self%cell(VTK_QUADRATIC_QUAD)%cell_order = 2
 
         ! VTK_QUADRATIC_POLYGON
-        vtk_constants%cell(VTK_QUADRATIC_POLYGON)%cell_name = "QuadraticPolygon"
-        vtk_constants%cell(VTK_QUADRATIC_POLYGON)%cell_type = VTK_QUADRATIC_POLYGON
-        vtk_constants%cell(VTK_QUADRATIC_POLYGON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_QUADRATIC_POLYGON)%cell_dimension = 2
-        vtk_constants%cell(VTK_QUADRATIC_POLYGON)%cell_order = 2
+        self%cell(VTK_QUADRATIC_POLYGON)%cell_name = "QuadraticPolygon"
+        self%cell(VTK_QUADRATIC_POLYGON)%cell_type = VTK_QUADRATIC_POLYGON
+        self%cell(VTK_QUADRATIC_POLYGON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_QUADRATIC_POLYGON)%cell_dimension = 2
+        self%cell(VTK_QUADRATIC_POLYGON)%cell_order = 2
 
         ! VTK_QUADRATIC_TETRA
-        vtk_constants%cell(VTK_QUADRATIC_TETRA)%cell_name = "QuadraticTetra"
-        vtk_constants%cell(VTK_QUADRATIC_TETRA)%cell_type = VTK_QUADRATIC_TETRA
-        vtk_constants%cell(VTK_QUADRATIC_TETRA)%num_nodes_in_cell = 10
-        vtk_constants%cell(VTK_QUADRATIC_TETRA)%cell_dimension = 3
-        vtk_constants%cell(VTK_QUADRATIC_TETRA)%cell_order = 2
+        self%cell(VTK_QUADRATIC_TETRA)%cell_name = "QuadraticTetra"
+        self%cell(VTK_QUADRATIC_TETRA)%cell_type = VTK_QUADRATIC_TETRA
+        self%cell(VTK_QUADRATIC_TETRA)%num_nodes_in_cell = 10
+        self%cell(VTK_QUADRATIC_TETRA)%cell_dimension = 3
+        self%cell(VTK_QUADRATIC_TETRA)%cell_order = 2
 
         ! VTK_QUADRATIC_HEXAHEDRON
-        vtk_constants%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_name = "QuadraticHexahedron"
-        vtk_constants%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_type = VTK_QUADRATIC_HEXAHEDRON
-        vtk_constants%cell(VTK_QUADRATIC_HEXAHEDRON)%num_nodes_in_cell = 20
-        vtk_constants%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_order = 2
+        self%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_name = "QuadraticHexahedron"
+        self%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_type = VTK_QUADRATIC_HEXAHEDRON
+        self%cell(VTK_QUADRATIC_HEXAHEDRON)%num_nodes_in_cell = 20
+        self%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_dimension = 3
+        self%cell(VTK_QUADRATIC_HEXAHEDRON)%cell_order = 2
 
         ! VTK_QUADRATIC_WEDGE
-        vtk_constants%cell(VTK_QUADRATIC_WEDGE)%cell_name = "QuadraticWedge"
-        vtk_constants%cell(VTK_QUADRATIC_WEDGE)%cell_type = VTK_QUADRATIC_WEDGE
-        vtk_constants%cell(VTK_QUADRATIC_WEDGE)%num_nodes_in_cell = 15
-        vtk_constants%cell(VTK_QUADRATIC_WEDGE)%cell_dimension = 3
-        vtk_constants%cell(VTK_QUADRATIC_WEDGE)%cell_order = 2
+        self%cell(VTK_QUADRATIC_WEDGE)%cell_name = "QuadraticWedge"
+        self%cell(VTK_QUADRATIC_WEDGE)%cell_type = VTK_QUADRATIC_WEDGE
+        self%cell(VTK_QUADRATIC_WEDGE)%num_nodes_in_cell = 15
+        self%cell(VTK_QUADRATIC_WEDGE)%cell_dimension = 3
+        self%cell(VTK_QUADRATIC_WEDGE)%cell_order = 2
 
         ! VTK_QUADRATIC_PYRAMID
-        vtk_constants%cell(VTK_QUADRATIC_PYRAMID)%cell_name = "QuadraticPyramid"
-        vtk_constants%cell(VTK_QUADRATIC_PYRAMID)%cell_type = VTK_QUADRATIC_PYRAMID
-        vtk_constants%cell(VTK_QUADRATIC_PYRAMID)%num_nodes_in_cell = 13
-        vtk_constants%cell(VTK_QUADRATIC_PYRAMID)%cell_dimension = 3
-        vtk_constants%cell(VTK_QUADRATIC_PYRAMID)%cell_order = 2
+        self%cell(VTK_QUADRATIC_PYRAMID)%cell_name = "QuadraticPyramid"
+        self%cell(VTK_QUADRATIC_PYRAMID)%cell_type = VTK_QUADRATIC_PYRAMID
+        self%cell(VTK_QUADRATIC_PYRAMID)%num_nodes_in_cell = 13
+        self%cell(VTK_QUADRATIC_PYRAMID)%cell_dimension = 3
+        self%cell(VTK_QUADRATIC_PYRAMID)%cell_order = 2
 
         ! VTK_BIQUADRATIC_QUAD
-        vtk_constants%cell(VTK_BIQUADRATIC_QUAD)%cell_name = "BiQuadraticQuad"
-        vtk_constants%cell(VTK_BIQUADRATIC_QUAD)%cell_type = VTK_BIQUADRATIC_QUAD
-        vtk_constants%cell(VTK_BIQUADRATIC_QUAD)%num_nodes_in_cell = 9
-        vtk_constants%cell(VTK_BIQUADRATIC_QUAD)%cell_dimension = 2
-        vtk_constants%cell(VTK_BIQUADRATIC_QUAD)%cell_order = 2
+        self%cell(VTK_BIQUADRATIC_QUAD)%cell_name = "BiQuadraticQuad"
+        self%cell(VTK_BIQUADRATIC_QUAD)%cell_type = VTK_BIQUADRATIC_QUAD
+        self%cell(VTK_BIQUADRATIC_QUAD)%num_nodes_in_cell = 9
+        self%cell(VTK_BIQUADRATIC_QUAD)%cell_dimension = 2
+        self%cell(VTK_BIQUADRATIC_QUAD)%cell_order = 2
 
         ! VTK_TRIQUADRATIC_HEXAHEDRON
-        vtk_constants%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_name = "TriQuadraticHexahedron"
-        vtk_constants%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_type = VTK_TRIQUADRATIC_HEXAHEDRON
-        vtk_constants%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%num_nodes_in_cell = 27
-        vtk_constants%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_order = 2
+        self%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_name = "TriQuadraticHexahedron"
+        self%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_type = VTK_TRIQUADRATIC_HEXAHEDRON
+        self%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%num_nodes_in_cell = 27
+        self%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_dimension = 3
+        self%cell(VTK_TRIQUADRATIC_HEXAHEDRON)%cell_order = 2
 
         ! VTK_TRIQUADRATIC_PYRAMID
-        vtk_constants%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_name = "TriQuadraticPyramid"
-        vtk_constants%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_type = VTK_TRIQUADRATIC_PYRAMID
-        vtk_constants%cell(VTK_TRIQUADRATIC_PYRAMID)%num_nodes_in_cell = 19
-        vtk_constants%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_dimension = 3
-        vtk_constants%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_order = 2
+        self%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_name = "TriQuadraticPyramid"
+        self%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_type = VTK_TRIQUADRATIC_PYRAMID
+        self%cell(VTK_TRIQUADRATIC_PYRAMID)%num_nodes_in_cell = 19
+        self%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_dimension = 3
+        self%cell(VTK_TRIQUADRATIC_PYRAMID)%cell_order = 2
 
         ! VTK_QUADRATIC_LINEAR_QUAD
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_name = "QuadraticLinearQuad"
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_type = VTK_QUADRATIC_LINEAR_QUAD
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_QUAD)%num_nodes_in_cell = 6
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_dimension = 2
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_order = 2
+        self%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_name = "QuadraticLinearQuad"
+        self%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_type = VTK_QUADRATIC_LINEAR_QUAD
+        self%cell(VTK_QUADRATIC_LINEAR_QUAD)%num_nodes_in_cell = 6
+        self%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_dimension = 2
+        self%cell(VTK_QUADRATIC_LINEAR_QUAD)%cell_order = 2
 
         ! VTK_QUADRATIC_LINEAR_WEDGE
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_name = "QuadraticLinearWedge"
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_type = VTK_QUADRATIC_LINEAR_WEDGE
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_WEDGE)%num_nodes_in_cell = 12
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_dimension = 3
-        vtk_constants%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_order = 2
+        self%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_name = "QuadraticLinearWedge"
+        self%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_type = VTK_QUADRATIC_LINEAR_WEDGE
+        self%cell(VTK_QUADRATIC_LINEAR_WEDGE)%num_nodes_in_cell = 12
+        self%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_dimension = 3
+        self%cell(VTK_QUADRATIC_LINEAR_WEDGE)%cell_order = 2
 
         ! VTK_BIQUADRATIC_QUADRATIC_WEDGE
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_name = "BiQuadraticQuadraticWedge"
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_type = VTK_BIQUADRATIC_QUADRATIC_WEDGE
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%num_nodes_in_cell = 18
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_dimension = 3
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_order = 2
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_name = "BiQuadraticQuadraticWedge"
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_type = VTK_BIQUADRATIC_QUADRATIC_WEDGE
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%num_nodes_in_cell = 18
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_dimension = 3
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_WEDGE)%cell_order = 2
 
         ! VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_name = "BiQuadraticQuadraticHexahedron"
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_type = VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%num_nodes_in_cell = 24
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_order = 2
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_name = "BiQuadraticQuadraticHexahedron"
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_type = VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%num_nodes_in_cell = 24
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_dimension = 3
+        self%cell(VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON)%cell_order = 2
 
         ! VTK_BIQUADRATIC_TRIANGLE
-        vtk_constants%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_name = "BiQuadraticTriangle"
-        vtk_constants%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_type = VTK_BIQUADRATIC_TRIANGLE
-        vtk_constants%cell(VTK_BIQUADRATIC_TRIANGLE)%num_nodes_in_cell = 7
-        vtk_constants%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_dimension = 2
-        vtk_constants%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_order = 2
+        self%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_name = "BiQuadraticTriangle"
+        self%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_type = VTK_BIQUADRATIC_TRIANGLE
+        self%cell(VTK_BIQUADRATIC_TRIANGLE)%num_nodes_in_cell = 7
+        self%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_dimension = 2
+        self%cell(VTK_BIQUADRATIC_TRIANGLE)%cell_order = 2
 
         ! VTK_CUBIC_LINE
-        vtk_constants%cell(VTK_CUBIC_LINE)%cell_name = "CubicLine"
-        vtk_constants%cell(VTK_CUBIC_LINE)%cell_type = VTK_CUBIC_LINE
-        vtk_constants%cell(VTK_CUBIC_LINE)%num_nodes_in_cell = 4
-        vtk_constants%cell(VTK_CUBIC_LINE)%cell_dimension = 1
-        vtk_constants%cell(VTK_CUBIC_LINE)%cell_order = 3
+        self%cell(VTK_CUBIC_LINE)%cell_name = "CubicLine"
+        self%cell(VTK_CUBIC_LINE)%cell_type = VTK_CUBIC_LINE
+        self%cell(VTK_CUBIC_LINE)%num_nodes_in_cell = 4
+        self%cell(VTK_CUBIC_LINE)%cell_dimension = 1
+        self%cell(VTK_CUBIC_LINE)%cell_order = 3
 
         ! VTK_CONVEX_POINT_SET
-        vtk_constants%cell(VTK_CONVEX_POINT_SET)%cell_name = "ConvexPointSet"
-        vtk_constants%cell(VTK_CONVEX_POINT_SET)%cell_type = VTK_CONVEX_POINT_SET
-        vtk_constants%cell(VTK_CONVEX_POINT_SET)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_CONVEX_POINT_SET)%cell_dimension = -1 ! Variable
-        vtk_constants%cell(VTK_CONVEX_POINT_SET)%cell_order = -1 ! Variable
+        self%cell(VTK_CONVEX_POINT_SET)%cell_name = "ConvexPointSet"
+        self%cell(VTK_CONVEX_POINT_SET)%cell_type = VTK_CONVEX_POINT_SET
+        self%cell(VTK_CONVEX_POINT_SET)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_CONVEX_POINT_SET)%cell_dimension = -1 ! Variable
+        self%cell(VTK_CONVEX_POINT_SET)%cell_order = -1 ! Variable
 
         ! VTK_POLYHEDRON
-        vtk_constants%cell(VTK_POLYHEDRON)%cell_name = "Polyhedron"
-        vtk_constants%cell(VTK_POLYHEDRON)%cell_type = VTK_POLYHEDRON
-        vtk_constants%cell(VTK_POLYHEDRON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_POLYHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_POLYHEDRON)%cell_order = 1
+        self%cell(VTK_POLYHEDRON)%cell_name = "Polyhedron"
+        self%cell(VTK_POLYHEDRON)%cell_type = VTK_POLYHEDRON
+        self%cell(VTK_POLYHEDRON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_POLYHEDRON)%cell_dimension = 3
+        self%cell(VTK_POLYHEDRON)%cell_order = 1
 
         ! VTK_PARAMETRIC_CURVE
-        vtk_constants%cell(VTK_PARAMETRIC_CURVE)%cell_name = "ParametricCurve"
-        vtk_constants%cell(VTK_PARAMETRIC_CURVE)%cell_type = VTK_PARAMETRIC_CURVE
-        vtk_constants%cell(VTK_PARAMETRIC_CURVE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_PARAMETRIC_CURVE)%cell_dimension = 1
-        vtk_constants%cell(VTK_PARAMETRIC_CURVE)%cell_order = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_CURVE)%cell_name = "ParametricCurve"
+        self%cell(VTK_PARAMETRIC_CURVE)%cell_type = VTK_PARAMETRIC_CURVE
+        self%cell(VTK_PARAMETRIC_CURVE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_CURVE)%cell_dimension = 1
+        self%cell(VTK_PARAMETRIC_CURVE)%cell_order = -1 ! Variable
 
         ! VTK_PARAMETRIC_SURFACE
-        vtk_constants%cell(VTK_PARAMETRIC_SURFACE)%cell_name = "ParametricSurface"
-        vtk_constants%cell(VTK_PARAMETRIC_SURFACE)%cell_type = VTK_PARAMETRIC_SURFACE
-        vtk_constants%cell(VTK_PARAMETRIC_SURFACE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_PARAMETRIC_SURFACE)%cell_dimension = 2
-        vtk_constants%cell(VTK_PARAMETRIC_SURFACE)%cell_order = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_SURFACE)%cell_name = "ParametricSurface"
+        self%cell(VTK_PARAMETRIC_SURFACE)%cell_type = VTK_PARAMETRIC_SURFACE
+        self%cell(VTK_PARAMETRIC_SURFACE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_SURFACE)%cell_dimension = 2
+        self%cell(VTK_PARAMETRIC_SURFACE)%cell_order = -1 ! Variable
 
         ! VTK_PARAMETRIC_TRI_SURFACE
-        vtk_constants%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_name = "ParametricTriSurface"
-        vtk_constants%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_type = VTK_PARAMETRIC_TRI_SURFACE
-        vtk_constants%cell(VTK_PARAMETRIC_TRI_SURFACE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_dimension = 2
-        vtk_constants%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_order = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_name = "ParametricTriSurface"
+        self%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_type = VTK_PARAMETRIC_TRI_SURFACE
+        self%cell(VTK_PARAMETRIC_TRI_SURFACE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_dimension = 2
+        self%cell(VTK_PARAMETRIC_TRI_SURFACE)%cell_order = -1 ! Variable
 
         ! VTK_PARAMETRIC_QUAD_SURFACE
-        vtk_constants%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_name = "ParametricQuadSurface"
-        vtk_constants%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_type = VTK_PARAMETRIC_QUAD_SURFACE
-        vtk_constants%cell(VTK_PARAMETRIC_QUAD_SURFACE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_dimension = 2
-        vtk_constants%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_order = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_name = "ParametricQuadSurface"
+        self%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_type = VTK_PARAMETRIC_QUAD_SURFACE
+        self%cell(VTK_PARAMETRIC_QUAD_SURFACE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_dimension = 2
+        self%cell(VTK_PARAMETRIC_QUAD_SURFACE)%cell_order = -1 ! Variable
 
         ! VTK_PARAMETRIC_TETRA_REGION
-        vtk_constants%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_name = "ParametricTetraRegion"
-        vtk_constants%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_type = VTK_PARAMETRIC_TETRA_REGION
-        vtk_constants%cell(VTK_PARAMETRIC_TETRA_REGION)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_dimension = 3
-        vtk_constants%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_order = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_name = "ParametricTetraRegion"
+        self%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_type = VTK_PARAMETRIC_TETRA_REGION
+        self%cell(VTK_PARAMETRIC_TETRA_REGION)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_dimension = 3
+        self%cell(VTK_PARAMETRIC_TETRA_REGION)%cell_order = -1 ! Variable
 
         ! VTK_PARAMETRIC_HEX_REGION
-        vtk_constants%cell(VTK_PARAMETRIC_HEX_REGION)%cell_name = "ParametricHexRegion"
-        vtk_constants%cell(VTK_PARAMETRIC_HEX_REGION)%cell_type = VTK_PARAMETRIC_HEX_REGION
-        vtk_constants%cell(VTK_PARAMETRIC_HEX_REGION)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_PARAMETRIC_HEX_REGION)%cell_dimension = 3
-        vtk_constants%cell(VTK_PARAMETRIC_HEX_REGION)%cell_order = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_HEX_REGION)%cell_name = "ParametricHexRegion"
+        self%cell(VTK_PARAMETRIC_HEX_REGION)%cell_type = VTK_PARAMETRIC_HEX_REGION
+        self%cell(VTK_PARAMETRIC_HEX_REGION)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_PARAMETRIC_HEX_REGION)%cell_dimension = 3
+        self%cell(VTK_PARAMETRIC_HEX_REGION)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_EDGE
-        vtk_constants%cell(VTK_HIGHER_ORDER_EDGE)%cell_name = "HigherOrderEdge"
-        vtk_constants%cell(VTK_HIGHER_ORDER_EDGE)%cell_type = VTK_HIGHER_ORDER_EDGE
-        vtk_constants%cell(VTK_HIGHER_ORDER_EDGE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_EDGE)%cell_dimension = 1
-        vtk_constants%cell(VTK_HIGHER_ORDER_EDGE)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_EDGE)%cell_name = "HigherOrderEdge"
+        self%cell(VTK_HIGHER_ORDER_EDGE)%cell_type = VTK_HIGHER_ORDER_EDGE
+        self%cell(VTK_HIGHER_ORDER_EDGE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_EDGE)%cell_dimension = 1
+        self%cell(VTK_HIGHER_ORDER_EDGE)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_TRIANGLE
-        vtk_constants%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_name = "HigherOrderTriangle"
-        vtk_constants%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_type = VTK_HIGHER_ORDER_TRIANGLE
-        vtk_constants%cell(VTK_HIGHER_ORDER_TRIANGLE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_dimension = 2
-        vtk_constants%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_name = "HigherOrderTriangle"
+        self%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_type = VTK_HIGHER_ORDER_TRIANGLE
+        self%cell(VTK_HIGHER_ORDER_TRIANGLE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_dimension = 2
+        self%cell(VTK_HIGHER_ORDER_TRIANGLE)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_QUAD
-        vtk_constants%cell(VTK_HIGHER_ORDER_QUAD)%cell_name = "HigherOrderQuad"
-        vtk_constants%cell(VTK_HIGHER_ORDER_QUAD)%cell_type = VTK_HIGHER_ORDER_QUAD
-        vtk_constants%cell(VTK_HIGHER_ORDER_QUAD)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_QUAD)%cell_dimension = 2
-        vtk_constants%cell(VTK_HIGHER_ORDER_QUAD)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_QUAD)%cell_name = "HigherOrderQuad"
+        self%cell(VTK_HIGHER_ORDER_QUAD)%cell_type = VTK_HIGHER_ORDER_QUAD
+        self%cell(VTK_HIGHER_ORDER_QUAD)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_QUAD)%cell_dimension = 2
+        self%cell(VTK_HIGHER_ORDER_QUAD)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_POLYGON
-        vtk_constants%cell(VTK_HIGHER_ORDER_POLYGON)%cell_name = "HigherOrderPolygon"
-        vtk_constants%cell(VTK_HIGHER_ORDER_POLYGON)%cell_type = VTK_HIGHER_ORDER_POLYGON
-        vtk_constants%cell(VTK_HIGHER_ORDER_POLYGON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_POLYGON)%cell_dimension = 2
-        vtk_constants%cell(VTK_HIGHER_ORDER_POLYGON)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_POLYGON)%cell_name = "HigherOrderPolygon"
+        self%cell(VTK_HIGHER_ORDER_POLYGON)%cell_type = VTK_HIGHER_ORDER_POLYGON
+        self%cell(VTK_HIGHER_ORDER_POLYGON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_POLYGON)%cell_dimension = 2
+        self%cell(VTK_HIGHER_ORDER_POLYGON)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_TETRAHEDRON
-        vtk_constants%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_name = "HigherOrderTetrahedron"
-        vtk_constants%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_type = VTK_HIGHER_ORDER_TETRAHEDRON
-        vtk_constants%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_name = "HigherOrderTetrahedron"
+        self%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_type = VTK_HIGHER_ORDER_TETRAHEDRON
+        self%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_dimension = 3
+        self%cell(VTK_HIGHER_ORDER_TETRAHEDRON)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_WEDGE
-        vtk_constants%cell(VTK_HIGHER_ORDER_WEDGE)%cell_name = "HigherOrderWedge"
-        vtk_constants%cell(VTK_HIGHER_ORDER_WEDGE)%cell_type = VTK_HIGHER_ORDER_WEDGE
-        vtk_constants%cell(VTK_HIGHER_ORDER_WEDGE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_WEDGE)%cell_dimension = 3
-        vtk_constants%cell(VTK_HIGHER_ORDER_WEDGE)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_WEDGE)%cell_name = "HigherOrderWedge"
+        self%cell(VTK_HIGHER_ORDER_WEDGE)%cell_type = VTK_HIGHER_ORDER_WEDGE
+        self%cell(VTK_HIGHER_ORDER_WEDGE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_WEDGE)%cell_dimension = 3
+        self%cell(VTK_HIGHER_ORDER_WEDGE)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_PYRAMID
-        vtk_constants%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_name = "HigherOrderPyramid"
-        vtk_constants%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_type = VTK_HIGHER_ORDER_PYRAMID
-        vtk_constants%cell(VTK_HIGHER_ORDER_PYRAMID)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_dimension = 3
-        vtk_constants%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_name = "HigherOrderPyramid"
+        self%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_type = VTK_HIGHER_ORDER_PYRAMID
+        self%cell(VTK_HIGHER_ORDER_PYRAMID)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_dimension = 3
+        self%cell(VTK_HIGHER_ORDER_PYRAMID)%cell_order = -1 ! Variable
 
         ! VTK_HIGHER_ORDER_HEXAHEDRON
-        vtk_constants%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_name = "HigherOrderHexahedron"
-        vtk_constants%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_type = VTK_HIGHER_ORDER_HEXAHEDRON
-        vtk_constants%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_order = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_name = "HigherOrderHexahedron"
+        self%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_type = VTK_HIGHER_ORDER_HEXAHEDRON
+        self%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_dimension = 3
+        self%cell(VTK_HIGHER_ORDER_HEXAHEDRON)%cell_order = -1 ! Variable
 
         ! VTK_LAGRANGE_CURVE
-        vtk_constants%cell(VTK_LAGRANGE_CURVE)%cell_name = "LagrangeCurve"
-        vtk_constants%cell(VTK_LAGRANGE_CURVE)%cell_type = VTK_LAGRANGE_CURVE
-        vtk_constants%cell(VTK_LAGRANGE_CURVE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_LAGRANGE_CURVE)%cell_dimension = 1
-        vtk_constants%cell(VTK_LAGRANGE_CURVE)%cell_order = -1 ! Variable
+        self%cell(VTK_LAGRANGE_CURVE)%cell_name = "LagrangeCurve"
+        self%cell(VTK_LAGRANGE_CURVE)%cell_type = VTK_LAGRANGE_CURVE
+        self%cell(VTK_LAGRANGE_CURVE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_LAGRANGE_CURVE)%cell_dimension = 1
+        self%cell(VTK_LAGRANGE_CURVE)%cell_order = -1 ! Variable
 
         ! VTK_LAGRANGE_TRIANGLE
-        vtk_constants%cell(VTK_LAGRANGE_TRIANGLE)%cell_name = "LagrangeTriangle"
-        vtk_constants%cell(VTK_LAGRANGE_TRIANGLE)%cell_type = VTK_LAGRANGE_TRIANGLE
-        vtk_constants%cell(VTK_LAGRANGE_TRIANGLE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_LAGRANGE_TRIANGLE)%cell_dimension = 2
-        vtk_constants%cell(VTK_LAGRANGE_TRIANGLE)%cell_order = -1 ! Variable
+        self%cell(VTK_LAGRANGE_TRIANGLE)%cell_name = "LagrangeTriangle"
+        self%cell(VTK_LAGRANGE_TRIANGLE)%cell_type = VTK_LAGRANGE_TRIANGLE
+        self%cell(VTK_LAGRANGE_TRIANGLE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_LAGRANGE_TRIANGLE)%cell_dimension = 2
+        self%cell(VTK_LAGRANGE_TRIANGLE)%cell_order = -1 ! Variable
 
         ! VTK_LAGRANGE_QUADRILATERAL
-        vtk_constants%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_name = "LagrangeQuadrilateral"
-        vtk_constants%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_type = VTK_LAGRANGE_QUADRILATERAL
-        vtk_constants%cell(VTK_LAGRANGE_QUADRILATERAL)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_dimension = 2
-        vtk_constants%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_order = -1 ! Variable
+        self%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_name = "LagrangeQuadrilateral"
+        self%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_type = VTK_LAGRANGE_QUADRILATERAL
+        self%cell(VTK_LAGRANGE_QUADRILATERAL)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_dimension = 2
+        self%cell(VTK_LAGRANGE_QUADRILATERAL)%cell_order = -1 ! Variable
 
         ! VTK_LAGRANGE_TETRAHEDRON
-        vtk_constants%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_name = "LagrangeTetrahedron"
-        vtk_constants%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_type = VTK_LAGRANGE_TETRAHEDRON
-        vtk_constants%cell(VTK_LAGRANGE_TETRAHEDRON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_order = -1 ! Variable
+        self%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_name = "LagrangeTetrahedron"
+        self%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_type = VTK_LAGRANGE_TETRAHEDRON
+        self%cell(VTK_LAGRANGE_TETRAHEDRON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_dimension = 3
+        self%cell(VTK_LAGRANGE_TETRAHEDRON)%cell_order = -1 ! Variable
 
         ! VTK_LAGRANGE_HEXAHEDRON
-        vtk_constants%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_name = "LagrangeHexahedron"
-        vtk_constants%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_type = VTK_LAGRANGE_HEXAHEDRON
-        vtk_constants%cell(VTK_LAGRANGE_HEXAHEDRON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_order = -1 ! Variable
+        self%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_name = "LagrangeHexahedron"
+        self%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_type = VTK_LAGRANGE_HEXAHEDRON
+        self%cell(VTK_LAGRANGE_HEXAHEDRON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_dimension = 3
+        self%cell(VTK_LAGRANGE_HEXAHEDRON)%cell_order = -1 ! Variable
 
         ! VTK_LAGRANGE_WEDGE
-        vtk_constants%cell(VTK_LAGRANGE_WEDGE)%cell_name = "LagrangeWedge"
-        vtk_constants%cell(VTK_LAGRANGE_WEDGE)%cell_type = VTK_LAGRANGE_WEDGE
-        vtk_constants%cell(VTK_LAGRANGE_WEDGE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_LAGRANGE_WEDGE)%cell_dimension = 3
-        vtk_constants%cell(VTK_LAGRANGE_WEDGE)%cell_order = -1 ! Variable
+        self%cell(VTK_LAGRANGE_WEDGE)%cell_name = "LagrangeWedge"
+        self%cell(VTK_LAGRANGE_WEDGE)%cell_type = VTK_LAGRANGE_WEDGE
+        self%cell(VTK_LAGRANGE_WEDGE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_LAGRANGE_WEDGE)%cell_dimension = 3
+        self%cell(VTK_LAGRANGE_WEDGE)%cell_order = -1 ! Variable
 
         ! VTK_LAGRANGE_PYRAMID
-        vtk_constants%cell(VTK_LAGRANGE_PYRAMID)%cell_name = "LagrangePyramid"
-        vtk_constants%cell(VTK_LAGRANGE_PYRAMID)%cell_type = VTK_LAGRANGE_PYRAMID
-        vtk_constants%cell(VTK_LAGRANGE_PYRAMID)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_LAGRANGE_PYRAMID)%cell_dimension = 3
-        vtk_constants%cell(VTK_LAGRANGE_PYRAMID)%cell_order = -1 ! Variable
+        self%cell(VTK_LAGRANGE_PYRAMID)%cell_name = "LagrangePyramid"
+        self%cell(VTK_LAGRANGE_PYRAMID)%cell_type = VTK_LAGRANGE_PYRAMID
+        self%cell(VTK_LAGRANGE_PYRAMID)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_LAGRANGE_PYRAMID)%cell_dimension = 3
+        self%cell(VTK_LAGRANGE_PYRAMID)%cell_order = -1 ! Variable
 
         ! VTK_BEZIER_CURVE
-        vtk_constants%cell(VTK_BEZIER_CURVE)%cell_name = "BezierCurve"
-        vtk_constants%cell(VTK_BEZIER_CURVE)%cell_type = VTK_BEZIER_CURVE
-        vtk_constants%cell(VTK_BEZIER_CURVE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_BEZIER_CURVE)%cell_dimension = 1
-        vtk_constants%cell(VTK_BEZIER_CURVE)%cell_order = -1 ! Variable
+        self%cell(VTK_BEZIER_CURVE)%cell_name = "BezierCurve"
+        self%cell(VTK_BEZIER_CURVE)%cell_type = VTK_BEZIER_CURVE
+        self%cell(VTK_BEZIER_CURVE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_BEZIER_CURVE)%cell_dimension = 1
+        self%cell(VTK_BEZIER_CURVE)%cell_order = -1 ! Variable
 
         ! VTK_BEZIER_TRIANGLE
-        vtk_constants%cell(VTK_BEZIER_TRIANGLE)%cell_name = "BezierTriangle"
-        vtk_constants%cell(VTK_BEZIER_TRIANGLE)%cell_type = VTK_BEZIER_TRIANGLE
-        vtk_constants%cell(VTK_BEZIER_TRIANGLE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_BEZIER_TRIANGLE)%cell_dimension = 2
-        vtk_constants%cell(VTK_BEZIER_TRIANGLE)%cell_order = -1 ! Variable
+        self%cell(VTK_BEZIER_TRIANGLE)%cell_name = "BezierTriangle"
+        self%cell(VTK_BEZIER_TRIANGLE)%cell_type = VTK_BEZIER_TRIANGLE
+        self%cell(VTK_BEZIER_TRIANGLE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_BEZIER_TRIANGLE)%cell_dimension = 2
+        self%cell(VTK_BEZIER_TRIANGLE)%cell_order = -1 ! Variable
 
         ! VTK_BEZIER_QUADRILATERAL
-        vtk_constants%cell(VTK_BEZIER_QUADRILATERAL)%cell_name = "BezierQuadrilateral"
-        vtk_constants%cell(VTK_BEZIER_QUADRILATERAL)%cell_type = VTK_BEZIER_QUADRILATERAL
-        vtk_constants%cell(VTK_BEZIER_QUADRILATERAL)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_BEZIER_QUADRILATERAL)%cell_dimension = 2
-        vtk_constants%cell(VTK_BEZIER_QUADRILATERAL)%cell_order = -1 ! Variable
+        self%cell(VTK_BEZIER_QUADRILATERAL)%cell_name = "BezierQuadrilateral"
+        self%cell(VTK_BEZIER_QUADRILATERAL)%cell_type = VTK_BEZIER_QUADRILATERAL
+        self%cell(VTK_BEZIER_QUADRILATERAL)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_BEZIER_QUADRILATERAL)%cell_dimension = 2
+        self%cell(VTK_BEZIER_QUADRILATERAL)%cell_order = -1 ! Variable
 
         ! VTK_BEZIER_TETRAHEDRON
-        vtk_constants%cell(VTK_BEZIER_TETRAHEDRON)%cell_name = "BezierTetrahedron"
-        vtk_constants%cell(VTK_BEZIER_TETRAHEDRON)%cell_type = VTK_BEZIER_TETRAHEDRON
-        vtk_constants%cell(VTK_BEZIER_TETRAHEDRON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_BEZIER_TETRAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_BEZIER_TETRAHEDRON)%cell_order = -1 ! Variable
+        self%cell(VTK_BEZIER_TETRAHEDRON)%cell_name = "BezierTetrahedron"
+        self%cell(VTK_BEZIER_TETRAHEDRON)%cell_type = VTK_BEZIER_TETRAHEDRON
+        self%cell(VTK_BEZIER_TETRAHEDRON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_BEZIER_TETRAHEDRON)%cell_dimension = 3
+        self%cell(VTK_BEZIER_TETRAHEDRON)%cell_order = -1 ! Variable
 
         ! VTK_BEZIER_HEXAHEDRON
-        vtk_constants%cell(VTK_BEZIER_HEXAHEDRON)%cell_name = "BezierHexahedron"
-        vtk_constants%cell(VTK_BEZIER_HEXAHEDRON)%cell_type = VTK_BEZIER_HEXAHEDRON
-        vtk_constants%cell(VTK_BEZIER_HEXAHEDRON)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_BEZIER_HEXAHEDRON)%cell_dimension = 3
-        vtk_constants%cell(VTK_BEZIER_HEXAHEDRON)%cell_order = -1 ! Variable
+        self%cell(VTK_BEZIER_HEXAHEDRON)%cell_name = "BezierHexahedron"
+        self%cell(VTK_BEZIER_HEXAHEDRON)%cell_type = VTK_BEZIER_HEXAHEDRON
+        self%cell(VTK_BEZIER_HEXAHEDRON)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_BEZIER_HEXAHEDRON)%cell_dimension = 3
+        self%cell(VTK_BEZIER_HEXAHEDRON)%cell_order = -1 ! Variable
 
         ! VTK_BEZIER_WEDGE
-        vtk_constants%cell(VTK_BEZIER_WEDGE)%cell_name = "BezierWedge"
-        vtk_constants%cell(VTK_BEZIER_WEDGE)%cell_type = VTK_BEZIER_WEDGE
-        vtk_constants%cell(VTK_BEZIER_WEDGE)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_BEZIER_WEDGE)%cell_dimension = 3
-        vtk_constants%cell(VTK_BEZIER_WEDGE)%cell_order = -1 ! Variable
+        self%cell(VTK_BEZIER_WEDGE)%cell_name = "BezierWedge"
+        self%cell(VTK_BEZIER_WEDGE)%cell_type = VTK_BEZIER_WEDGE
+        self%cell(VTK_BEZIER_WEDGE)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_BEZIER_WEDGE)%cell_dimension = 3
+        self%cell(VTK_BEZIER_WEDGE)%cell_order = -1 ! Variable
 
         ! VTK_BEZIER_PYRAMID
-        vtk_constants%cell(VTK_BEZIER_PYRAMID)%cell_name = "BezierPyramid"
-        vtk_constants%cell(VTK_BEZIER_PYRAMID)%cell_type = VTK_BEZIER_PYRAMID
-        vtk_constants%cell(VTK_BEZIER_PYRAMID)%num_nodes_in_cell = -1 ! Variable
-        vtk_constants%cell(VTK_BEZIER_PYRAMID)%cell_dimension = 3
-        vtk_constants%cell(VTK_BEZIER_PYRAMID)%cell_order = -1 ! Variable
+        self%cell(VTK_BEZIER_PYRAMID)%cell_name = "BezierPyramid"
+        self%cell(VTK_BEZIER_PYRAMID)%cell_type = VTK_BEZIER_PYRAMID
+        self%cell(VTK_BEZIER_PYRAMID)%num_nodes_in_cell = -1 ! Variable
+        self%cell(VTK_BEZIER_PYRAMID)%cell_dimension = 3
+        self%cell(VTK_BEZIER_PYRAMID)%cell_order = -1 ! Variable
+
+        self%is_initialized = .true.
 
     end subroutine initialize_vtk_constants
 
@@ -724,26 +731,54 @@ contains
         end select
     end function get_cell_type
 
-    subroutine get_cell_info(self, cell_name, cell_type, num_nodes_in_cell, cell_dimension, cell_order)
-        class(type_vtk_constants), intent(in) :: self
+    subroutine get_cell_info_from_cell_name(self, cell_name, cell_type, num_nodes_in_cell, cell_dimension, cell_order)
+        implicit none
+        class(type_vtk_constants), intent(inout) :: self
         character(len=*), intent(in) :: cell_name
         integer(int32), intent(inout) :: cell_type
         integer(int32), intent(inout) :: num_nodes_in_cell
         integer(int32), intent(inout) :: cell_dimension
         integer(int32), intent(inout) :: cell_order
 
+        if (.not. self%is_initialized) call self%initialize()
+
         cell_type = self%get_cell_type(trim(adjustl(cell_name)))
         num_nodes_in_cell = self%cell(cell_type)%num_nodes_in_cell
         cell_dimension = self%cell(cell_type)%cell_dimension
         cell_order = self%cell(cell_type)%cell_order
 
-    end subroutine get_cell_info
+    end subroutine get_cell_info_from_cell_name
+
+    subroutine get_cell_info_from_cell_type(self, cell_type, cell_name, num_nodes_in_cell, cell_dimension, cell_order)
+        implicit none
+        class(type_vtk_constants), intent(inout) :: self
+        integer(int32), intent(in) :: cell_type
+        character(:), allocatable, intent(inout) :: cell_name
+        integer(int32), intent(inout) :: num_nodes_in_cell
+        integer(int32), intent(inout) :: cell_dimension
+        integer(int32), intent(inout) :: cell_order
+
+        if (.not. self%is_initialized) call self%initialize()
+
+        if (cell_type < 0 .or. cell_type > VTK_BEZIER_PYRAMID) then
+            print *, "Error: Unknown VTK cell type ", cell_type
+            stop
+        end if
+
+        cell_name = self%cell(cell_type)%cell_name
+        num_nodes_in_cell = self%cell(cell_type)%num_nodes_in_cell
+        cell_dimension = self%cell(cell_type)%cell_dimension
+        cell_order = self%cell(cell_type)%cell_order
+
+    end subroutine get_cell_info_from_cell_type
 
     function get_cell_name(self, cell_type) result(cell_name)
         implicit none
-        class(type_vtk_constants), intent(in) :: self
+        class(type_vtk_constants), intent(inout) :: self
         integer(int32), intent(in) :: cell_type
         character(len=30) :: cell_name
+
+        if (.not. self%is_initialized) call self%initialize()
 
         if (cell_type < 0 .or. cell_type > VTK_BEZIER_PYRAMID) then
             print *, "Error: Unknown VTK cell type ", cell_type
@@ -753,4 +788,15 @@ contains
         cell_name = self%cell(cell_type)%cell_name
 
     end function get_cell_name
+
+    function get_max_cell_id(self) result(max_cell_id)
+        implicit none
+        class(type_vtk_constants), intent(inout) :: self
+        integer(int32) :: max_cell_id
+
+        if (.not. self%is_initialized) call self%initialize()
+
+        max_cell_id = self%max_cell_id
+
+    end function get_max_cell_id
 end module core_vtk_vtk_constants

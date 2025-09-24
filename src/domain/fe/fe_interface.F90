@@ -1,4 +1,4 @@
-module domain_mesh
+module domain_fe
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
     use :: module_core, only:type_dp_vector_3d, assignment(=), allocate_array, deallocate_array
@@ -6,12 +6,12 @@ module domain_mesh
     implicit none
     private
 
-    public :: abst_mesh
+    public :: abst_fe
 
     ! ==========================================================
     ! 型定義
     ! ==========================================================
-    type, abstract :: abst_mesh
+    type, abstract :: abst_fe
         private
         integer(int32) :: type
         integer(int32) :: num_nodes
@@ -21,8 +21,8 @@ module domain_mesh
         real(real64), allocatable :: weight(:)
         type(type_dp_vector_3d), allocatable :: gauss(:)
     contains
-        procedure, pass(self), public :: initialize => initialize_abst_mesh
-        procedure, pass(self), public :: destroy => destroy_abst_mesh
+        procedure, pass(self), public :: initialize => initialize_abst_fe
+        procedure, pass(self), public :: destroy => destroy_abst_fe
         procedure, pass(self), public :: get_type
         procedure, pass(self), public :: get_num_nodes
         procedure, pass(self), public :: get_dimension
@@ -38,15 +38,30 @@ module domain_mesh
         procedure(abst_dpsi), pass(self), public, deferred :: dpsi
         procedure(abst_jacobian), pass(self), public, deferred :: jacobian
         procedure(abst_jacobian_det), pass(self), public, deferred :: jacobian_det
+        procedure(abst_is_inside), pass(self), public, deferred :: is_inside
     end type
 
     abstract interface
 
-        function abst_get_geometry(self, node_coords) result(geometry)
-            import :: abst_mesh, real64
+        !----------------------------------------------------------------------
+        ! abst_get_geometry: Computes a geometric property of the element
+        !----------------------------------------------------------------------
+        ! For 1D elements, this returns the length.
+        ! For 2D elements, this returns the area.
+        ! For 3D elements, this returns the volume.
+        ! Arguments:
+        !   self        : The fe element object.
+        !   node_coords : The global coordinates of the element's nodes.
+        !   connectivity: The mapping from local node indices to global node indices.
+        ! Returns:
+        !   The geometric property (length, area, or volume).
+        !----------------------------------------------------------------------
+        function abst_get_geometry(self, node_coords, connectivity) result(geometry)
+            import :: abst_fe, int32, real64
             implicit none
-            class(abst_mesh), intent(in) :: self
+            class(abst_fe), intent(in) :: self
             real(real64), intent(in) :: node_coords(:, :)
+            integer(int32), intent(in) :: connectivity(:)
             real(real64) :: geometry
         end function
 
@@ -57,7 +72,7 @@ module domain_mesh
         ! r = (xi, eta, zeta).
         !
         ! Arguments:
-        !   self: The mesh element object.
+        !   self: The fe element object.
         !   i   : The index of the shape function (corresponding to a node).
         !   r   : The local coordinate vector.
         !
@@ -65,9 +80,9 @@ module domain_mesh
         !   The value of the shape function, N_i(r).
         !----------------------------------------------------------------------
         pure elemental function abst_psi(self, i, r) result(psi_val)
-            import :: abst_mesh, type_dp_vector_3d, int32, real64
+            import :: abst_fe, type_dp_vector_3d, int32, real64
             implicit none
-            class(abst_mesh), intent(in) :: self
+            class(abst_fe), intent(in) :: self
             integer(int32), intent(in) :: i
             type(type_dp_vector_3d), intent(in) :: r
             real(real64) :: psi_val
@@ -80,7 +95,7 @@ module domain_mesh
         ! respect to the j-th local coordinate (e.g., d(N_i)/d(xi) for j=1).
         !
         ! Arguments:
-        !   self: The mesh element object.
+        !   self: The fe element object.
         !   i   : The index of the shape function (corresponding to a node).
         !   j   : The index of the local coordinate (1=xi, 2=eta, 3=zeta).
         !   r   : The local coordinate vector.
@@ -89,9 +104,9 @@ module domain_mesh
         !   The value of the derivative, d(N_i)/d(r_j).
         !----------------------------------------------------------------------
         pure elemental function abst_dpsi(self, i, j, r) result(dpsi_val)
-            import :: abst_mesh, type_dp_vector_3d, int32, real64
+            import :: abst_fe, type_dp_vector_3d, int32, real64
             implicit none
-            class(abst_mesh), intent(in) :: self
+            class(abst_fe), intent(in) :: self
             integer(int32), intent(in) :: i
             integer(int32), intent(in) :: j
             type(type_dp_vector_3d), intent(in) :: r
@@ -106,19 +121,21 @@ module domain_mesh
         ! J_ij = d(x_i) / d(xi_j)
         !
         ! Arguments:
-        !   self        : The mesh element object.
+        !   self        : The fe element object.
         !   r           : The local coordinate vector where the Jacobian is evaluated.
         !   node_coords : The global coordinates of the element's nodes.
+        !   connectivity: The mapping from local node indices to global node indices.
         !
         ! Returns:
         !   The Jacobian matrix at the specified local coordinate.
         !----------------------------------------------------------------------
-        pure function abst_jacobian(self, r, node_coords) result(jac)
-            import :: abst_mesh, type_dp_vector_3d, int32, real64
+        pure function abst_jacobian(self, r, node_coords, connectivity) result(jac)
+            import :: abst_fe, type_dp_vector_3d, int32, real64
             implicit none
-            class(abst_mesh), intent(in) :: self
+            class(abst_fe), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :) ! (dimension, num_nodes)
+            integer(int32), intent(in) :: connectivity(:)
             real(real64) :: jac(self%dimension, self%dimension)
         end function abst_jacobian
 
@@ -129,29 +146,55 @@ module domain_mesh
         ! used as the scaling factor for integration (e.g., dV = |J| d(xi)d(eta)).
         !
         ! Arguments:
-        !   self        : The mesh element object.
+        !   self        : The fe element object.
         !   r           : The local coordinate vector where the determinant is evaluated.
         !   node_coords : The global coordinates of the element's nodes.
         !
         ! Returns:
         !   The determinant of the Jacobian matrix.
         !----------------------------------------------------------------------
-        pure function abst_jacobian_det(self, r, node_coords) result(det_j)
-            import :: abst_mesh, type_dp_vector_3d, int32, real64
+        pure function abst_jacobian_det(self, r, node_coords, connectivity) result(det_j)
+            import :: abst_fe, type_dp_vector_3d, int32, real64
             implicit none
-            class(abst_mesh), intent(in) :: self
+            class(abst_fe), intent(in) :: self
             type(type_dp_vector_3d), intent(in) :: r
             real(real64), intent(in) :: node_coords(:, :) ! (dimension, num_nodes)
+            integer(int32), intent(in) :: connectivity(:)
             real(real64) :: det_j
         end function abst_jacobian_det
+
+        !----------------------------------------------------------------------
+        ! abst_is_inside: Checks if a point is inside the element
+        !----------------------------------------------------------------------
+        ! Determines if a point given in global coordinates lies within the
+        ! boundaries of the finite element. If the point is inside, the local
+        ! coordinates (xi, eta) are computed.
+        ! Arguments:
+        !   self        : The fe element object.
+        !   cartesian   : The point in global coordinates to check.
+        !   normalized  : The local coordinates (xi, eta) if the point is inside.
+        !   node_coords : The global coordinates of the element's nodes.
+        !   connectivity: The mapping from local node indices to global node indices.
+        !   is_in       : Logical flag set to true if the point is inside the element.
+        !----------------------------------------------------------------------
+        subroutine abst_is_inside(self, cartesian, normalized, node_coords, connectivity, is_in)
+            import abst_fe, type_dp_vector_3d, int32, real64
+            implicit none
+            class(abst_fe), intent(in) :: self
+            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_dp_vector_3d), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
+            integer(int32), intent(in) :: connectivity(:)
+            logical, intent(inout) :: is_in
+        end subroutine abst_is_inside
 
     end interface
 
 contains
 
-    subroutine initialize_abst_mesh(self, type, dimension, order, num_nodes, num_gauss, weight, gauss)
+    subroutine initialize_abst_fe(self, type, dimension, order, num_nodes, num_gauss, weight, gauss)
         implicit none
-        class(abst_mesh), intent(inout) :: self
+        class(abst_fe), intent(inout) :: self
         integer(int32), intent(in) :: type, dimension, order, num_nodes, num_gauss
         real(real64), intent(in) :: weight(:)
         real(real64), intent(in) :: gauss(:, :) ! (3, num_gauss)
@@ -170,60 +213,60 @@ contains
         do i = 1, self%num_gauss
             call self%gauss(i)%set(gauss(1, i), gauss(2, i), gauss(3, i))
         end do
-    end subroutine initialize_abst_mesh
+    end subroutine initialize_abst_fe
 
     pure function get_type(self) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         integer(int32) :: val
         val = self%type
     end function get_type
 
     pure function get_num_nodes(self) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         integer(int32) :: val
         val = self%num_nodes
     end function get_num_nodes
 
     pure function get_dimension(self) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         integer(int32) :: val
         val = self%dimension
     end function get_dimension
 
     pure function get_order(self) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         integer(int32) :: val
         val = self%order
     end function get_order
 
     pure function get_num_gauss(self) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         integer(int32) :: val
         val = self%num_gauss
     end function get_num_gauss
 
     function get_weight(self) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         real(real64), allocatable :: val(:)
         val = self%weight
     end function get_weight
 
     function get_gauss(self) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         type(type_dp_vector_3d), allocatable :: val(:)
         val = self%gauss
     end function get_gauss
 
     pure function lerp(self, r, global_values, connectivity) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
         real(real64), intent(in) :: global_values(:)
         integer(int32), intent(in) :: connectivity(:)
@@ -238,7 +281,7 @@ contains
 
     pure function dlerp(self, r, global_values, connectivity) result(val)
         implicit none
-        class(abst_mesh), intent(in) :: self
+        class(abst_fe), intent(in) :: self
         type(type_dp_vector_3d), intent(in) :: r
         real(real64), intent(in) :: global_values(:)
         integer(int32), intent(in) :: connectivity(:)
@@ -261,15 +304,15 @@ contains
         end do
     end function dlerp
 
-    subroutine destroy_abst_mesh(self)
+    subroutine destroy_abst_fe(self)
         implicit none
-        class(abst_mesh), intent(inout) :: self
+        class(abst_fe), intent(inout) :: self
         if (allocated(self%weight)) then
             deallocate (self%weight)
         end if
         if (allocated(self%gauss)) then
             deallocate (self%gauss)
         end if
-    end subroutine destroy_abst_mesh
+    end subroutine destroy_abst_fe
 
-end module domain_mesh
+end module domain_fe
