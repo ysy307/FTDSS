@@ -16,7 +16,7 @@ contains
         class(abst_fe), allocatable :: fe
 
         ! Local variables
-        character(len=32), parameter :: cell_name = "QUAD"
+        character(len=32), parameter :: cell_name = "Quad"
         integer(int32) :: vtk_type
         integer(int32) :: num_nodes
         integer(int32) :: dimension

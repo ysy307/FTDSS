@@ -10,7 +10,7 @@ contains
         type(type_input), intent(in) :: input
         class(abst_fe), allocatable :: fe
 
-        character(len=32), parameter :: cell_name = "QUADRATIC_QUAD"
+        character(len=32), parameter :: cell_name = "QuadraticQuad"
         integer(int32) :: vtk_type, num_nodes, dimension, order, num_gauss
         real(real64) :: p
         real(real64), allocatable :: weight(:), gauss(:, :)

@@ -14,7 +14,7 @@ contains
         type(type_input), intent(in) :: input
         class(abst_fe), allocatable :: fe
 
-        character(len=32), parameter :: cell_name = "TRIANGLE"
+        character(len=32), parameter :: cell_name = "Triangle"
         integer(int32) :: vtk_type
         integer(int32) :: num_nodes
         integer(int32) :: dimension

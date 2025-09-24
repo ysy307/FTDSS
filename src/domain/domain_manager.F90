@@ -1,3 +1,6 @@
+!>
+!>  @brief Manager for computation domain and related data
+!>
 module domain_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
@@ -5,6 +8,7 @@ module domain_manager
     use :: module_core
     use :: module_input, only:type_input
     use :: domain_multicoloring, only:type_coloring
+    use :: module_fe, only:type_fe_manager
     ! use :: conditions_boundary, only:abst_bc, construct_type_bc_thermal_dirichlet, &
     !     construct_type_bc_thermal_adiabatic ! 他のconstruct_*も同様にUSE
 
@@ -69,6 +73,7 @@ module domain_manager
         integer(int32) :: num_elements = 0
         integer(int32), allocatable :: fe_types(:)
         integer(int32), allocatable :: fe_material_ids(:)
+        type(type_fe_manager) :: fe_manager
         type(type_fe_connectivity) :: connectivity
         type(type_coloring) :: colors
     contains
@@ -193,6 +198,7 @@ contains
         class(type_element_manager), intent(inout) :: self
         type(type_input), intent(in) :: input
         integer(int32) :: i, ind, cell_dimension, num_total_cells, num_total_connectivity
+        integer(int32), allocatable :: unique_fe_types(:)
 
         num_total_cells = input%geometry%vtk%num_total_cells
 
@@ -228,6 +234,11 @@ contains
                 end if
             end do
         end if
+
+        ! FEマネージャを初期化
+        call unique(self%fe_types, unique_fe_types)
+        print *, unique_fe_types
+        call self%fe_manager%initialize(input, self%num_elements, self%fe_types)
 
         ! カラーリング情報を構築
         call self%colors%initialize(input)

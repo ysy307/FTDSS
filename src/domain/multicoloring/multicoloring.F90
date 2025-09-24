@@ -1,22 +1,42 @@
+!>
+!> @brief Module for handling multicoloring of domain elements
+!>
 module domain_multicoloring
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_sorting, only:sort_index
     use :: module_core, only:allocate_array, deallocate_array
     use :: module_input, only:type_input
-
     implicit none
     private
 
     public :: type_coloring
 
+    !>
+    !> @brief Information for a single color group
+    !>
     type :: type_colored_info
+        !>
+        !> @brief Number of elements in this color
+        !>
         integer(int32) :: num_elements = 0
+        !>
+        !> @brief List of element indices in this color
+        !>
         integer(int32), allocatable :: elements(:)
     end type type_colored_info
 
+    !>
+    !> @brief Stores element grouping by colors
+    !>
     type :: type_coloring
+        !>
+        !> @brief Total number of colors
+        !>
         integer(int32) :: num_colors = 0
-        type(type_colored_info), allocatable :: colored(:) ! 色ごとの要素リスト
+        !>
+        !> @brief Array of colored info, one per color
+        !>
+        type(type_colored_info), allocatable :: colored(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_coloring
         procedure, pass(self) :: destroy => destroy_type_coloring
@@ -24,6 +44,10 @@ module domain_multicoloring
 
 contains
 
+    !>
+    !> @brief Initialize the coloring object
+    !> @param[inout] self  Coloring object to initialize
+    !> @param[in] input    Input data containing domain geometry and coloring
     subroutine initialize_type_coloring(self, input)
         implicit none
         class(type_coloring), intent(inout) :: self
@@ -34,16 +58,12 @@ contains
         integer(int32) :: domain_element_id
         integer(int32) :: comp_dim
 
-        integer(int32), allocatable :: counts_per_color(:) ! 各色の要素数を数える一時配列
-        integer(int32), allocatable :: current_indices(:) ! 各色のリストに次に格納する場所を指すカウンタ
+        integer(int32), allocatable :: counts_per_color(:)
+        integer(int32), allocatable :: current_indices(:)
 
         comp_dim = input%basic%simulation_settings%calculate_dimension
 
-        ! ==========================================================
-        ! パス1：計測 (Sizing Pass)
-        ! ==========================================================
-
-        ! 1a. 色の最大値と、各色の要素数を同時に数える
+        ! Pass 1: Determine number of colors and count elements
         self%num_colors = 0
         do i = 1, input%geometry%vtk%num_total_cells
             if (input%geometry%vtk%cells(i)%get_dimension() == comp_dim) then
@@ -52,7 +72,6 @@ contains
         end do
         if (self%num_colors == 0) return
 
-        ! 1b. 各色の要素数を数える
         allocate (counts_per_color(self%num_colors))
         counts_per_color = 0
         do i = 1, input%geometry%vtk%num_total_cells
@@ -64,9 +83,7 @@ contains
             end if
         end do
 
-        ! ==========================================================
-        ! メモリ確保 (Allocation)
-        ! ==========================================================
+        ! Allocation of arrays per color
         allocate (self%colored(self%num_colors))
         do c = 1, self%num_colors
             self%colored(c)%num_elements = counts_per_color(c)
@@ -76,9 +93,7 @@ contains
         end do
         deallocate (counts_per_color)
 
-        ! ==========================================================
-        ! パス2：格納 (Filling Pass)
-        ! ==========================================================
+        ! Pass 2: Fill element indices for each color
         allocate (current_indices(self%num_colors))
         current_indices = 0
         domain_element_id = 0
@@ -96,6 +111,9 @@ contains
 
     end subroutine initialize_type_coloring
 
+    !>
+    !> @brief Destroy the coloring object and deallocate arrays
+    !> @param[inout] self  Coloring object to destroy
     subroutine destroy_type_coloring(self)
         implicit none
         class(type_coloring), intent(inout) :: self

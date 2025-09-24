@@ -20,6 +20,8 @@ set(DOMAIN_MESH_SOURCES
     fe/side/side_first.F90
     fe/side/side_second.F90
     fe/side/side.F90
+    fe/fe_interface.F90
+    fe/fe_factory.F90
     fe/fe.F90
 )
 add_library(Domain_Mesh STATIC ${DOMAIN_MESH_SOURCES})
@@ -34,18 +36,18 @@ enable_thirdparty(Domain_Mesh)
 
 # --- Adjacency Library ---
 # Computes connectivity information (e.g., node-to-element).
-set(DOMAIN_ADJACENCY_SOURCES
-    adjacency/adjacency_element.F90
-    adjacency/adjacency_node.F90
-    adjacency/adjacency_node_element.F90
-    adjacency/adjacency.F90
-)
-add_library(Domain_Adjacency STATIC ${DOMAIN_ADJACENCY_SOURCES})
-target_include_directories(Domain_Adjacency PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# Adjacency calculations depend on the mesh structure.
-target_link_libraries(Domain_Adjacency PUBLIC Domain_Mesh)
-enable_build_flags(Domain_Adjacency)
-enable_thirdparty(Domain_Adjacency)
+# set(DOMAIN_ADJACENCY_SOURCES
+#     adjacency/adjacency_element.F90
+#     adjacency/adjacency_node.F90
+#     adjacency/adjacency_node_element.F90
+#     adjacency/adjacency.F90
+# )
+# add_library(Domain_Adjacency STATIC ${DOMAIN_ADJACENCY_SOURCES})
+# target_include_directories(Domain_Adjacency PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+# # Adjacency calculations depend on the mesh structure.
+# target_link_libraries(Domain_Adjacency PUBLIC Domain_Mesh)
+# enable_build_flags(Domain_Adjacency)
+# enable_thirdparty(Domain_Adjacency)
 
 
 # --- Multicoloring Library ---
@@ -59,24 +61,27 @@ set(DOMAIN_MULTICOLORING_SOURCES
 add_library(Domain_Multicoloring STATIC ${DOMAIN_MULTICOLORING_SOURCES})
 target_include_directories(Domain_Multicoloring PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # Coloring depends on the graph, which is derived from adjacency info.
-target_link_libraries(Domain_Multicoloring PUBLIC Domain_Adjacency)
+target_link_libraries(Domain_Multicoloring PUBLIC
+    Solver::Core
+    Solver::Input
+)
 enable_build_flags(Domain_Multicoloring)
 enable_thirdparty(Domain_Multicoloring)
 
-# --- Reordering Library ---
-# Node/element reordering algorithms to improve matrix properties.
-set(DOMAIN_REORDERING_SOURCES
-    reordering/reordering.F90
-    reordering/methods.F90
-    reordering/to_original.F90
-    reordering/to_reordered.F90
-)
-add_library(Domain_Reordering STATIC ${DOMAIN_REORDERING_SOURCES})
-target_include_directories(Domain_Reordering PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# Reordering also depends on the graph/adjacency info.
-target_link_libraries(Domain_Reordering PUBLIC Domain_Adjacency)
-enable_build_flags(Domain_Reordering)
-enable_thirdparty(Domain_Reordering)
+# # --- Reordering Library ---
+# # Node/element reordering algorithms to improve matrix properties.
+# set(DOMAIN_REORDERING_SOURCES
+#     reordering/reordering.F90
+#     reordering/methods.F90
+#     reordering/to_original.F90
+#     reordering/to_reordered.F90
+# )
+# add_library(Domain_Reordering STATIC ${DOMAIN_REORDERING_SOURCES})
+# target_include_directories(Domain_Reordering PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+# # Reordering also depends on the graph/adjacency info.
+# target_link_libraries(Domain_Reordering PUBLIC Domain_Adjacency)
+# enable_build_flags(Domain_Reordering)
+# enable_thirdparty(Domain_Reordering)
 
 # --- Domain Manager Library ---
 # The main service/manager for the domain module.
@@ -89,9 +94,9 @@ target_include_directories(Domain_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # The manager uses all other domain components.
 target_link_libraries(Domain_Main PUBLIC
     Domain_Mesh
-    Domain_Adjacency
+    # Domain_Adjacency
     Domain_Multicoloring
-    Domain_Reordering
+    # Domain_Reordering
     Solver::Core
     Solver::Input
 )
