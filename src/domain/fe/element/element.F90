@@ -1,3 +1,6 @@
+!>
+!> Module for defining 2-dimensional finite element types.
+!>
 module module_fe_element
     use :: domain_fe_element
     implicit none

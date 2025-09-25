@@ -1,18 +1,21 @@
+!>
+!> Implements the procedures for the first-order quadrilateral (4-node) finite element.
+!>
 submodule(domain_fe_element) domain_fe_element_square_first
     implicit none
 
 contains
 
-    !----------------------------------------------------------------------
-    ! CONSTRUCTOR for a first-order square element calculator.
-    !----------------------------------------------------------------------
-    ! This function constructs a generic computational object for a 4-node
-    ! quadrilateral element. It creates the object based on global settings
-    ! found in the 'input' object.
-    !----------------------------------------------------------------------
+    !>
+    !> Creates and initializes a first-order quadrilateral (4-node) element object.
+    !> This function sets up the element properties, including the number of nodes,
+    !> dimension, order, and Gauss integration rule based on the input settings.
+    !>
     module function construct_square_first(input) result(fe)
         implicit none
+        !> The main input data structure containing simulation settings.
         type(type_input), intent(in) :: input
+        !> The newly created and allocated first-order quadrilateral element object.
         class(abst_fe), allocatable :: fe
 
         ! Local variables
@@ -77,14 +80,20 @@ contains
 
     end function construct_square_first
 
-    !----------------------------------------------------------------------
-    ! get_area: Computes the area of a specific element instance.
-    !----------------------------------------------------------------------
+    !>
+    !> Computes the area of a specific element instance using Gauss quadrature.
+    !> The area is calculated by integrating the Jacobian determinant over the element's
+    !> local coordinate domain.
+    !>
     module function get_area_square_first(self, node_coords, connectivity) result(area)
         implicit none
+        !> The first-order quadrilateral element object.
         class(type_square_first), intent(in) :: self
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> The computed area of the element.
         real(real64) :: area
 
         integer(int32) :: i
@@ -95,7 +104,7 @@ contains
         gauss_pts = self%get_gauss()
         weights = self%get_weight()
 
-        ! Area is the integral of |J| over the element area
+        ! Area is the integral of |J| over the element domain
         do i = 1, self%get_num_gauss()
             area = area + self%jacobian_det(gauss_pts(i), node_coords, connectivity) * weights(i)
         end do
@@ -105,14 +114,19 @@ contains
 
     end function get_area_square_first
 
-    !----------------------------------------------------------------------
-    ! psi: Shape function N_i at local coordinate r = (xi, eta)
-    !----------------------------------------------------------------------
+    !>
+    !> Evaluates the shape function \( \psi_i \) for a 4-node bilinear quadrilateral element.
+    !> For example, \( \psi_1(\xi, \eta) = \frac{1}{4}(1-\xi)(1-\eta) \).
+    !>
     pure elemental module function psi_square_first(self, i, r) result(psi)
         implicit none
+        !> The first-order quadrilateral element object.
         class(type_square_first), intent(in) :: self
+        !> The index of the shape function (1 to 4).
         integer(int32), intent(in) :: i
+        !> The local coordinate vector, where \( \xi = r\%x \) and \( \eta = r\%y \).
         type(type_dp_vector_3d), intent(in) :: r
+        !> The value of the shape function \( \psi_i(\xi, \eta) \).
         real(real64) :: psi
 
         select case (i)
@@ -129,16 +143,21 @@ contains
         end select
     end function psi_square_first
 
-    !----------------------------------------------------------------------
-    ! dpsi: Derivative of shape function w.r.t. local coordinates
-    !       j=1 -> d/d(xi), j=2 -> d/d(eta)
-    !----------------------------------------------------------------------
+    !>
+    !> Evaluates the derivative of the shape function with respect to the local
+    !> coordinates, \( \frac{\partial\psi_i}{\partial r_j} \).
+    !>
     pure elemental module function dpsi_square_first(self, i, j, r) result(dpsi)
         implicit none
+        !> The first-order quadrilateral element object.
         class(type_square_first), intent(in) :: self
+        !> The index of the shape function (1 to 4).
         integer(int32), intent(in) :: i
+        !> The index of the local coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
         integer(int32), intent(in) :: j
+        !> The local coordinate vector, where \( \xi = r\%x \) and \( \eta = r\%y \).
         type(type_dp_vector_3d), intent(in) :: r
+        !> The value of the derivative.
         real(real64) :: dpsi
 
         dpsi = 0.0d0
@@ -168,15 +187,21 @@ contains
         end select
     end function dpsi_square_first
 
-    !----------------------------------------------------------------------
-    ! jacobian: Computes the Jacobian matrix J.
-    !----------------------------------------------------------------------
+    !>
+    !> Computes the Jacobian matrix \( J \), which maps derivatives from local
+    !> to global coordinates.
+    !>
     pure module function jacobian_square_first(self, r, node_coords, connectivity) result(jac)
         implicit none
+        !> The first-order quadrilateral element object.
         class(type_square_first), intent(in) :: self
+        !> The local coordinate vector where the Jacobian is evaluated.
         type(type_dp_vector_3d), intent(in) :: r
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> The computed 2x2 Jacobian matrix.
         real(real64) :: jac(self%get_dimension(), self%get_dimension())
 
         integer(int32) :: i, node_id
@@ -191,15 +216,20 @@ contains
         end do
     end function jacobian_square_first
 
-    !----------------------------------------------------------------------
-    ! jacobian_det: Computes the determinant of the Jacobian matrix |J|.
-    !----------------------------------------------------------------------
+    !>
+    !> Computes the determinant of the Jacobian matrix, \( |J| \).
+    !>
     pure module function jacobian_det_square_first(self, r, node_coords, connectivity) result(det_j)
         implicit none
+        !> The first-order quadrilateral element object.
         class(type_square_first), intent(in) :: self
+        !> The local coordinate vector where the determinant is evaluated.
         type(type_dp_vector_3d), intent(in) :: r
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> The Jacobian determinant.
         real(real64) :: det_j
 
         real(real64) :: jac(self%get_dimension(), self%get_dimension())
@@ -208,16 +238,24 @@ contains
         det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
     end function jacobian_det_square_first
 
-    !----------------------------------------------------------------------
-    ! is_in: Checks if a point in global coordinates is inside the element.
-    !----------------------------------------------------------------------
+    !>
+    !> Determines if a point in global coordinates lies inside the element.
+    !> This is solved by using the Newton-Raphson method to find the local
+    !> coordinates \( (\xi, \eta) \) corresponding to the given global point.
+    !>
     module subroutine is_in_square_first(self, cartesian, normalized, node_coords, connectivity, is_in)
         implicit none
+        !> The first-order quadrilateral element object.
         class(type_square_first), intent(in) :: self
+        !> The point in global (Cartesian) coordinates to check.
         type(type_dp_vector_3d), intent(in) :: cartesian
+        !> The resulting local (normalized) coordinate if the point is inside.
         type(type_dp_vector_3d), intent(inout) :: normalized
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> A logical flag, set to true if the point is inside, false otherwise.
         logical, intent(inout) :: is_in
 
         type(type_dp_vector_3d) :: r
@@ -260,12 +298,13 @@ contains
 
             jac = self%jacobian(r, node_coords, connectivity)
 
+            ! Update local coordinates using the inverse of the Jacobian
             r%x = r%x + (jac(2, 2) * dx - jac(1, 2) * dy) / det_j
             r%y = r%y + (-jac(2, 1) * dx + jac(1, 1) * dy) / det_j
         end do
 
         ! Check if the converged local coordinate is within the element bounds [-1, 1]
-        is_in = converged .and. (abs(r%x) <= 1.0d0) .and. (abs(r%y) <= 1.0d0)
+        is_in = converged .and. (abs(r%x) <= 1.0d0 + tol) .and. (abs(r%y) <= 1.0d0 + tol)
         if (is_in) then
             normalized = r
         end if

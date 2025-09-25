@@ -1,5 +1,5 @@
 !>
-!> @brief Module for finite element definitions and management
+!> Module for finite element definitions and management
 !>
 module module_fe
     use, intrinsic :: iso_fortran_env, only: int32
@@ -32,18 +32,12 @@ module module_fe
     ! manager for finite elements
     !-------------------------------------------------------------------------------------------------------------------------------
     public :: type_fe_manager
-    !>
-    !> @brief Manager type for handling multiple FE objects
-    !>
+    !> Manager type for handling multiple FE objects
     type :: type_fe_manager
         private
-        !>
-        !> @brief List of wrapper objects holding FE instances
-        !>
+        !> List of wrapper objects holding FE instances
         type(holder_fes), allocatable :: fe_list(:)
-        !>
-        !> @brief Map from FE IDs to indices in fe_list
-        !>
+        !> Map from FE IDs to indices in fe_list
         integer(int32), allocatable :: fe_map(:)
     contains
         procedure, pass(self), public :: initialize => initialize_fe_manager
@@ -51,19 +45,16 @@ module module_fe
     end type type_fe_manager
 
 contains
-    !>
-    !> @brief Initialize the FE manager with specified input, number of FEs, and target IDs
-    !>
-    !> @param[in] self       The FE manager object to initialize
-    !> @param[in] input      Input data for FE creation
-    !> @param[in] num_fe     Number of FE objects to create
-    !> @param[in] target_ids Array of FE IDs to initialize
-    !>
+    !> Initialize the FE manager with specified input, number of FEs, and target IDs
     subroutine initialize_fe_manager(self, input, num_fe, target_ids)
         implicit none
+        !> The FE manager object to initialize
         class(type_fe_manager), intent(inout) :: self
+        !> Input data for FE creation
         type(type_input), intent(in) :: input
+        !> Number of FE objects to create
         integer(int32), intent(in) :: num_fe
+        !> Array of FE IDs to initialize
         integer(int32), intent(in) :: target_ids(:)
 
         integer(int32) :: i
@@ -80,17 +71,14 @@ contains
 
     end subroutine initialize_fe_manager
 
-    !>
-    !> @brief Get a pointer to the FE object corresponding to a given ID
-    !>
-    !> @param[in] self  The FE manager object
-    !> @param[in] fe_id The ID of the FE object
-    !> @return Pointer to the requested FE object
-    !>
+    !> Get a pointer to the FE object corresponding to a given ID
     function get_fe(self, fe_id) result(fe)
         implicit none
+        !> The FE manager object
         class(type_fe_manager), intent(in), target :: self
+        !> The ID of the FE object
         integer, intent(in) :: fe_id
+        !> Pointer to the requested FE object
         class(abst_fe), pointer :: fe
 
         fe => self%fe_list(self%fe_map(fe_id))%fe

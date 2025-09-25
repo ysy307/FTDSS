@@ -1,3 +1,6 @@
+!>
+!> Module for defining 1-dimensional finite element side types.
+!>
 module module_fe_side
     use :: domain_fe_side
     implicit none

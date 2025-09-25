@@ -1,6 +1,6 @@
 !>
-!>  @brief Manager for computation domain and related data
-!>
+!> Manages the computational domain, including mesh, boundary conditions, and parallel data.
+!>s
 module domain_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
@@ -10,87 +10,180 @@ module domain_manager
     use :: domain_multicoloring, only:type_coloring
     use :: module_fe, only:type_fe_manager
     ! use :: conditions_boundary, only:abst_bc, construct_type_bc_thermal_dirichlet, &
-    !     construct_type_bc_thermal_adiabatic ! 他のconstruct_*も同様にUSE
+    !     construct_type_bc_thermal_adiabatic ! Other construct_* would be USEd similarly
 
     implicit none
     private
 
     public :: type_domain
 
-    ! ==========================================================
-    ! コンポーネントの型定義
-    ! ==========================================================
-
-    ! --- CSR形式コネクティビティ ---
+    !>
+    !>  Stores element connectivity in Compressed Sparse Row (CSR) format.
+    !>
     type :: type_fe_connectivity
+        !>
+        !> Index array for CSR format. Stores the starting position
+        !>        of each element's nodes in 'val'. Size is (num_elements + 1).
+        !>
         integer(int32), allocatable :: ind(:)
+        !>
+        !> Value array for CSR format. Stores the concatenated node IDs for all elements.
+        !>
         integer(int32), allocatable :: val(:)
     end type type_fe_connectivity
 
-    ! --- 単一の物理条件＋ジオメトリ＋振る舞い ---
+    !>
+    !> Represents a single, unique boundary condition applied to a set of geometric entities.
+    !>
     type :: type_single_bc
-        ! class(abst_bc), allocatable :: bc_model
+        !>
+        !> The number of elements (sides) this boundary condition applies to.
+        !>
         integer(int32) :: num_elements = 0
+        !>
+        !> Array of finite element type IDs for each element in this BC set.
+        !>
         integer(int32), allocatable :: element_types(:)
+        !>
+        !> Connectivity data for the elements in this BC set.
+        !>
         type(type_fe_connectivity) :: connectivity
     end type type_single_bc
 
-    ! --- 単一物理のBCマネージャ ---
+    !>
+    !> Manages all boundary conditions for a single physics type (e.g., thermal).
+    !>
     type :: type_physics_bc_manager
+        !>
+        !> The number of unique boundary conditions for this physics.
+        !>
         integer(int32) :: num_bcs = 0
+        !>
+        !> Array of unique boundary condition sets.
+        !>
         type(type_single_bc), allocatable :: bcs(:)
     end type type_physics_bc_manager
 
-    ! --- トップレベル境界マネージャ ---
+    !>
+    !> Top-level manager for all boundary conditions across all physics types.
+    !>
     type :: type_boundary_manager
+        !>
+        !> Pointer to the parent domain object.
+        !>
         type(type_domain), pointer, private :: parent => null()
+        !>
+        !> Array of BC managers, one for each physics type.
+        !>
         type(type_physics_bc_manager) :: physics(NUM_PHYSICS_TYPES)
     contains
         procedure, public, pass(self) :: initialize => initialize_boundary_manager
         procedure, private, pass(self) :: process_single_physics_bcs
     end type type_boundary_manager
 
-    ! --- 自由度マップ ---
+    !>
+    !> Stores the mapping and layout of degrees of freedom (DOF) per node.
+    !>
     type :: type_dof_map
+        !>
+        !> Total number of degrees of freedom per node for the active physics.
+        !>
         integer(int32) :: num_dof_per_node = 0
+        !>
+        !> Number of DOFs for each individual physics type (e.g., thermal=1, mechanical=3).
+        !>
         integer(int32) :: num_dof_of_physics(NUM_PHYSICS_TYPES) = 0
+        !>
+        !> The starting index for each physics' DOFs within the block of DOFs for a single node.
+        !>
         integer(int32) :: start_dof_index(NUM_PHYSICS_TYPES) = 0
     end type type_dof_map
 
-    ! --- 節点データマネージャ ---
+    !>
+    !> Manages all data related to nodes (points) in the domain.
+    !>
     type :: type_node_manager
+        !>
+        !> Pointer to the parent domain object.
+        !>
         type(type_domain), pointer, private :: parent => null()
+        !>
+        !> Number of nodes in this subdomain.
+        !>
         integer(int32) :: num_nodes = 0
+        !>
+        !> Nodal coordinates. Size: (computation_dimension, num_nodes).
+        !>
         real(real64), allocatable :: coordinates(:, :)
+        !>
+        !> Global ID for each node in this subdomain.
+        !>
         integer(int32), allocatable :: node_global_ids(:)
     contains
         procedure, public, pass(self) :: initialize => initialize_node_manager
     end type type_node_manager
 
-    ! --- 要素データマネージャ ---
+    !>
+    !> Manages all data related to volume elements in the domain.
+    !>
     type :: type_element_manager
+        !>
+        !> Pointer to the parent domain object.
+        !>
         type(type_domain), pointer, private :: parent => null()
+        !>
+        !> Number of elements in this subdomain.
+        !>
         integer(int32) :: num_elements = 0
+        !>
+        !> Finite element type ID for each element.
+        !>
         integer(int32), allocatable :: fe_types(:)
+        !>
+        !> Material ID for each element.
+        !>
         integer(int32), allocatable :: fe_material_ids(:)
+        !>
+        !> Manager for FE type-specific operations (shape functions, etc.).
+        !>
         type(type_fe_manager) :: fe_manager
+        !>
+        !> Connectivity data for all elements.
+        !>
         type(type_fe_connectivity) :: connectivity
+        !>
+        !> Coloring information for parallel element processing.
+        !>
         type(type_coloring) :: colors
     contains
         procedure, public, pass(self) :: initialize => initialize_element_manager
     end type type_element_manager
 
     ! ==========================================================
-    ! 最上位のコンテナとなるdomain型
+    ! Top-level Domain Container Type
     ! ==========================================================
+    !>
+    !> The main container for all simulation domain data.
+    !>
+    !>  This type acts as the top-level object that holds and manages the mesh (nodes, elements),
+    !>          boundary conditions, DOF mappings, and parallel processing information.
+    !>
     type :: type_domain
+        !> MPI rank of the current process.
         integer(int32) :: my_rank = -1
+        !> Total number of MPI processes.
         integer(int32) :: num_procs = -1
+        !> The spatial dimension of the computation (e.g., 2 for 2D, 3 for 3D).
         integer(int32) :: computation_dimension
+        !> The type of computation (e.g., 1 for XY-plane, 2 for XZ-plane, 3 for 3D).
         integer(int32), private :: computation_type
+        !> Manages the degree of freedom layout.
         type(type_dof_map) :: dof_map
+        !> Manages all nodal data.
         type(type_node_manager) :: nodes
+        !> Manages all element data.
         type(type_element_manager) :: elements
+        !> Manages all boundary condition data.
         type(type_boundary_manager) :: boundaries
     contains
         procedure, public, pass(self) :: initialize => initialize_type_domain
@@ -100,12 +193,15 @@ module domain_manager
 
 contains
 
-    ! ==========================================================
-    ! メインの初期化サブルーチン (司令塔)
-    ! ==========================================================
+    !> Initializes the entire domain object and its components.
+    !>
+    !>  This is the main entry point for setting up the domain. It orchestrates the
+    !>          initialization of basic info, nodes, elements, and boundaries.
     subroutine initialize_type_domain(self, input)
         implicit none
+        !> The domain object to be initialized.
         class(type_domain), intent(inout) :: self
+        !> The parsed input data from a file.
         type(type_input), intent(in) :: input
 
         call self%associate_parent(self%nodes, self%elements, self%boundaries)
@@ -116,11 +212,16 @@ contains
         call self%boundaries%initialize(input)
     end subroutine initialize_type_domain
 
+    !> Associates child manager components with this parent domain object.
     subroutine associate_parent(self, node, element, boundary)
         implicit none
+        !> The parent domain object.
         class(type_domain), intent(inout), target :: self
+        !> The node manager component.
         class(type_node_manager), intent(inout) :: node
+        !> The boundary manager component.
         class(type_element_manager), intent(inout) :: element
+        !> The element manager component.
         class(type_boundary_manager), intent(inout) :: boundary
 
         node%parent => self
@@ -128,13 +229,14 @@ contains
         boundary%parent => self
     end subroutine associate_parent
 
-    ! ==========================================================
-    ! ヘルパー：基本情報とDOFマップを設定
-    ! ==========================================================
+    !> Sets basic simulation info and configures the DOF map based on input settings.
     subroutine set_basic_info_and_dof_map(self, input)
         implicit none
+        !> The domain object.
         class(type_domain), intent(inout) :: self
+        !> The parsed input data.
         type(type_input), intent(in) :: input
+
         integer(int32) :: current_dof_index
 
         call MPI_Comm_rank(MPI_COMM_WORLD, self%my_rank)
@@ -162,12 +264,12 @@ contains
         self%dof_map%num_dof_per_node = current_dof_index - 1
     end subroutine set_basic_info_and_dof_map
 
-    ! ==========================================================
-    ! Node Managerの初期化
-    ! ==========================================================
+    !> Initializes the node manager by reading data from the input object.
     subroutine initialize_node_manager(self, input)
         implicit none
+        !> The node manager object.
         class(type_node_manager), intent(inout) :: self
+        !> The parsed input data.
         type(type_input), intent(in) :: input
 
         self%num_nodes = input%geometry%vtk%num_points
@@ -190,19 +292,24 @@ contains
         self%node_global_ids(:) = input%geometry%vtk%global_node_ids(1:self%num_nodes)
     end subroutine initialize_node_manager
 
-    ! ==========================================================
-    ! Element Managerの初期化
-    ! ==========================================================
+    !> Initializes the element manager by reading and organizing element data.
+    !>
+    !>  This routine extracts volume elements that match the computation dimension from the
+    !>          input data, stores their properties and connectivity, and initializes the
+    !>          FE and coloring sub-managers.
     subroutine initialize_element_manager(self, input)
         implicit none
+        !> The element manager object.
         class(type_element_manager), intent(inout) :: self
+        !> The parsed input data.
         type(type_input), intent(in) :: input
+
         integer(int32) :: i, ind, cell_dimension, num_total_cells, num_total_connectivity
         integer(int32), allocatable :: unique_fe_types(:)
 
         num_total_cells = input%geometry%vtk%num_total_cells
 
-        ! パス1：計測
+        ! Pass 1: Count elements and total connectivity size
         self%num_elements = 0
         num_total_connectivity = 0
         do i = 1, num_total_cells
@@ -219,7 +326,7 @@ contains
             allocate (self%connectivity%val(num_total_connectivity))
         end if
 
-        ! パス2：格納
+        ! Pass 2: Store element data
         if (self%num_elements > 0) then
             self%connectivity%ind(1) = 1
             ind = 0
@@ -235,20 +342,20 @@ contains
             end do
         end if
 
-        ! FEマネージャを初期化
+        ! Initialize the FE manager with the unique element types found
         call unique(self%fe_types, unique_fe_types)
         print *, unique_fe_types
         call self%fe_manager%initialize(input, self%num_elements, self%fe_types)
 
-        ! カラーリング情報を構築
+        ! Initialize coloring information
         call self%colors%initialize(input)
     end subroutine initialize_element_manager
 
-    ! ==========================================================
-    ! Boundary Managerの初期化
-    ! ==========================================================
+    !> Initializes the boundary manager by processing BCs for all active physics.
     subroutine initialize_boundary_manager(self, input)
+        !> The boundary manager object.
         class(type_boundary_manager), intent(inout) :: self
+        !> The parsed input data.
         type(type_input), intent(in) :: input
 
         if (input%basic%analysis_controls%calculate_thermal) then
@@ -263,15 +370,20 @@ contains
 
     end subroutine initialize_boundary_manager
 
-    ! ==========================================================
-    ! Boundary Managerのヘルパーサブルーチン
-    ! ==========================================================
+    !> Processes, sorts, and groups all boundary conditions for a single physics type.
+    !>
+    !> This routine identifies active boundary entities, groups them by identical condition
+    !>          (type and values), and stores the geometric information in CSR format for each group.
     subroutine process_single_physics_bcs(self, physics_type_id, input)
+        implicit none
+        !> The boundary manager object.
         class(type_boundary_manager), intent(inout) :: self
+        !> The integer ID of the physics to process.
         integer(int32), intent(in) :: physics_type_id
+        !> The parsed input data.
         type(type_input), intent(in) :: input
 
-        ! --- ローカル変数 ---
+        ! --- Local variables ---
         integer(int32) :: i, bc_type, num_groups
         integer(int32) :: max_id, bc_id, group_idx
         integer(int32) :: target_dimension
@@ -281,24 +393,24 @@ contains
         integer(int32), allocatable :: total_conn_per_group(:), current_elem_indices(:)
         integer(int32) :: num_total_cells, cell_id, current_group_idx, num_nodes
 
-        ! 対象次元チェック
+        ! Check target dimension
         target_dimension = self%parent%computation_dimension - 1
         if (target_dimension < 1) return
 
-        ! --- 物理種別ごとに BC_SEQUENCE を選択
+        ! --- Select BC_SEQUENCE for the given physics type
         select case (physics_type_id)
         case (PHYSICS_TYPE_THERMAL)
             allocate (bc_sequence, source=THERMAL_BC_SEQUENCE)
         case (PHYSICS_TYPE_HYDRAULIC)
             allocate (bc_sequence, source=HYDRAULIC_BC_SEQUENCE)
         case (PHYSICS_TYPE_MECHANICAL)
-            return ! 未実装
+            return ! Not implemented
         end select
 
-        ! --- 有効な境界条件の index を収集 ---
+        ! --- Collect indices of active boundary conditions ---
         call input%geometry%vtk%get_active_region_info(active_region_id, target_dimension)
 
-        ! 条件に合う境界条件 index を一時配列に集める
+        ! Collect relevant boundary condition indices into a temporary array
         allocate (bc_idx_list(0))
         do i = 1, input%conditions%num_boundaries
             select case (physics_type_id)
@@ -315,7 +427,7 @@ contains
             end select
         end do
 
-        ! --- 並び替え用キー配列作成 ---
+        ! --- Create a key array for sorting ---
         call allocate_array(bc_key, size(bc_idx_list))
         do i = 1, size(bc_idx_list)
             select case (physics_type_id)
@@ -331,7 +443,7 @@ contains
             bc_key(i) = get_bc_seq_pos(bc_type, bc_sequence)
         end do
 
-        ! --- bc_key をキーにソート ---
+        ! --- Sort using the key array ---
         call sort_by_key(bc_idx_list, bc_key)
 
         if (size(bc_idx_list) == 0) then
@@ -339,8 +451,8 @@ contains
             return
         end if
 
-        ! --- ステップA: グルーピングと最終的なBC数の決定 ---
-        ! ソート済みリストを走査し、隣接要素を比較してグループ数を数える
+        ! --- Step A: Grouping and determining the final number of BCs ---
+        ! Scan the sorted list and compare adjacent elements to count groups
         call allocate_array(input_idx_to_group_idx_map, size(bc_idx_list))
         num_groups = 1
         input_idx_to_group_idx_map(1) = num_groups
@@ -355,7 +467,7 @@ contains
         self%physics(physics_type_id)%num_bcs = num_groups
         allocate (self%physics(physics_type_id)%bcs(num_groups))
 
-        ! --- ステップB: どの入力IDがどのグループに属すかのマッピングを作成 ---
+        ! --- Step B: Create a map from entity ID to group index ---
         max_id = maxval(input%conditions%boundary_conditions%id)
         call allocate_array(entity_id_to_group_idx_map, max_id)
         entity_id_to_group_idx_map = 0
@@ -368,11 +480,11 @@ contains
         call deallocate_array(input_idx_to_group_idx_map)
         call deallocate_array(bc_idx_list)
 
-        ! --- ステップC: 幾何情報格納 (2パス処理) ---
+        ! --- Step C: Store geometric information (2-pass process) ---
         call allocate_array(total_conn_per_group, num_groups)
         total_conn_per_group = 0
 
-        ! パス1: 計測
+        ! Pass 1: Measure
         num_total_cells = input%geometry%vtk%num_total_cells
         do i = 1, num_total_cells
             if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
@@ -387,7 +499,7 @@ contains
             end if
         end do
 
-        ! パス2: 格納
+        ! Pass 2: Allocate and Store
         do i = 1, num_groups
             if (self%physics(physics_type_id)%bcs(i)%num_elements > 0) then
                 call allocate_array(self%physics(physics_type_id)%bcs(i)%element_types, &
@@ -432,10 +544,14 @@ contains
         call deallocate_array(active_region_id)
     end subroutine process_single_physics_bcs
 
+    !> Finds the position of a BC ID within a predefined sequence array.
     pure function get_bc_seq_pos(bc_id, bc_sequence) result(pos)
         implicit none
+        !> The boundary condition ID to find.
         integer(int32), intent(in) :: bc_id
+        !> The array defining the order of BC types.
         integer(int32), intent(in) :: bc_sequence(:)
+        !> The 1-based index of the BC ID in the sequence. Returns size+1 if not found.
         integer(int32) :: pos
 
         integer(int32) :: k
@@ -449,9 +565,12 @@ contains
         end do
     end function get_bc_seq_pos
 
+    !> Sorts an index array based on a corresponding key array using insertion sort.
     subroutine sort_by_key(idx, key)
         implicit none
+        !> The index array to be sorted.
         integer(int32), intent(inout) :: idx(:)
+        !> The key array to sort by. Both arrays are modified in place.
         integer(int32), intent(inout) :: key(:)
 
         integer(int32) :: i, j, tmp_idx, tmp_key
@@ -470,11 +589,18 @@ contains
         end do
     end subroutine sort_by_key
 
+    !> Checks if two boundary conditions from the input are functionally identical.
     pure function are_bcs_identical(idx1, idx2, input, physics_type_id) result(is_identical)
         implicit none
-        integer(int32), intent(in) :: idx1, idx2
+        !> Index of the first BC in the input array.
+        integer(int32), intent(in) :: idx1
+        !> Index of the second BC in the input array.
+        integer(int32), intent(in) :: idx2
+        !> The parsed input data.
         type(type_input), intent(in) :: input
+        !> physics_type_id The integer ID of the physics to compare.
         integer(int32), intent(in) :: physics_type_id
+        !> If the BCs are identical, `.true.` (same type and values), `.false.` otherwise.
         logical :: is_identical
 
         integer(int32) :: bc_type1, bc_type2
@@ -484,16 +610,16 @@ contains
 
         select case (physics_type_id)
         case (PHYSICS_TYPE_THERMAL)
-            ! --- 関数を使い、typeを文字列から整数IDに変換 ---
+            ! --- Convert type from string to integer ID using a helper function ---
             bc_type1 = get_bc_type_from_string(input%conditions%boundary_conditions(idx1)%thermal%type, physics_type_id)
             bc_type2 = get_bc_type_from_string(input%conditions%boundary_conditions(idx2)%thermal%type, physics_type_id)
 
-            ! --- 整数IDで比較 ---
+            ! --- Compare by integer ID ---
             if (bc_type1 /= bc_type2) then
                 return
             end if
 
-            ! --- allocated() を使った安全な値の比較 ---
+            ! --- Safe value comparison using allocated() ---
             alloc1 = allocated(input%conditions%boundary_conditions(idx1)%thermal%values)
             alloc2 = allocated(input%conditions%boundary_conditions(idx2)%thermal%values)
 
@@ -511,16 +637,16 @@ contains
             end if
 
         case (PHYSICS_TYPE_HYDRAULIC)
-            ! --- 関数を使い、typeを文字列から整数IDに変換 ---
+            ! --- Convert type from string to integer ID using a helper function ---
             bc_type1 = get_bc_type_from_string(input%conditions%boundary_conditions(idx1)%hydraulic%type, physics_type_id)
             bc_type2 = get_bc_type_from_string(input%conditions%boundary_conditions(idx2)%hydraulic%type, physics_type_id)
 
-            ! --- 整数IDで比較 ---
+            ! --- Compare by integer ID ---
             if (bc_type1 /= bc_type2) then
                 return
             end if
 
-            ! --- allocated() を使った安全な値の比較 ---
+            ! --- Safe value comparison using allocated() ---
             alloc1 = allocated(input%conditions%boundary_conditions(idx1)%hydraulic%values)
             alloc2 = allocated(input%conditions%boundary_conditions(idx2)%hydraulic%values)
 

@@ -1,17 +1,20 @@
+!>
+!> Implements the procedures for the first-order triangular (3-node) finite element.
+!>
 submodule(domain_fe_element) domain_fe_element_triangle_first
     implicit none
 contains
 
-    !----------------------------------------------------------------------
-    ! CONSTRUCTOR for a first-order triangle element calculator.
-    !----------------------------------------------------------------------
-    ! This function constructs a generic computational object for a 3-node
-    ! linear triangle element. It creates the object based on global
-    ! settings found in the 'input' object.
-    !----------------------------------------------------------------------
+    !>
+    !> Creates and initializes a first-order triangular (3-node) element object.
+    !> This function sets up the element properties, including the number of nodes,
+    !> dimension, order, and a 1-point Gauss integration rule at the centroid.
+    !>
     module function construct_triangle_first(input) result(fe)
         implicit none
+        !> The main input data structure (unused, for API consistency).
         type(type_input), intent(in) :: input
+        !> The newly created and allocated first-order triangular element object.
         class(abst_fe), allocatable :: fe
 
         character(len=32), parameter :: cell_name = "Triangle"
@@ -27,13 +30,12 @@ contains
 
         call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
 
-        ! For linear triangles, full, reduced, and free integration
-        ! typically use the same single-point rule at the centroid.
+        ! For linear triangles, a single-point rule at the centroid is sufficient.
         num_gauss = 1
         allocate (weight(num_gauss))
         allocate (gauss(3, num_gauss))
-        weight(1) = 0.5d0
-        gauss(1:2, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0]
+        weight(1) = 0.5d0 ! Weight for area calculation in barycentric coordinates
+        gauss(1:2, 1) = [1.0d0 / 3.0d0, 1.0d0 / 3.0d0] ! Centroid
         gauss(3, 1) = 0.0d0
 
         call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
@@ -43,14 +45,20 @@ contains
 
     end function construct_triangle_first
 
-    !----------------------------------------------------------------------
-    ! get_area: Computes the area of a specific element instance.
-    !----------------------------------------------------------------------
+    !>
+    !> Computes the area of a specific element instance using Gauss quadrature.
+    !> For a linear triangle, the Jacobian is constant, so a single-point rule is exact.
+    !> The area is \( A = \int_A dA = \int_V |J| d\xi d\eta \).
+    !>
     module function get_area_triangle_first(self, node_coords, connectivity) result(area)
         implicit none
+        !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> The computed area of the element.
         real(real64) :: area
 
         integer(int32) :: i
@@ -67,14 +75,20 @@ contains
 
     end function get_area_triangle_first
 
-    !----------------------------------------------------------------------
-    ! psi: Shape function N_i at local coordinate r = (xi, eta)
-    !----------------------------------------------------------------------
+    !>
+    !> Evaluates the shape function \( \psi_i \) for a 3-node linear triangle.
+    !> These are the barycentric coordinates: \( \psi_1 = \xi \), \( \psi_2 = \eta \),
+    !> and \( \psi_3 = 1 - \xi - \eta \).
+    !>
     pure elemental module function psi_triangle_first(self, i, r) result(psi)
         implicit none
+        !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
+        !> The index of the shape function (1, 2, or 3).
         integer(int32), intent(in) :: i
+        !> The local coordinate vector, where \( \xi = r\%x \) and \( \eta = r\%y \).
         type(type_dp_vector_3d), intent(in) :: r
+        !> The value of the shape function \( \psi_i(\xi, \eta) \).
         real(real64) :: psi
 
         select case (i)
@@ -89,15 +103,21 @@ contains
         end select
     end function psi_triangle_first
 
-    !----------------------------------------------------------------------
-    ! dpsi: Derivative of shape function w.r.t. local coordinates
-    !----------------------------------------------------------------------
+    !>
+    !> Evaluates the derivative of the shape function with respect to the local
+    !> coordinates, \( \frac{\partial\psi_i}{\partial r_j} \).
+    !>
     pure elemental module function dpsi_triangle_first(self, i, j, r) result(dpsi)
         implicit none
+        !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
+        !> The index of the shape function (1, 2, or 3).
         integer(int32), intent(in) :: i
+        !> The index of the local coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
         integer(int32), intent(in) :: j
+        !> The local coordinate vector (unused, as derivatives are constant).
         type(type_dp_vector_3d), intent(in) :: r
+        !> The value of the derivative, which is a constant (0, 1, or -1).
         real(real64) :: dpsi
 
         dpsi = 0.0d0
@@ -119,15 +139,21 @@ contains
         end select
     end function dpsi_triangle_first
 
-    !----------------------------------------------------------------------
-    ! jacobian: Computes the Jacobian matrix J.
-    !----------------------------------------------------------------------
+    !>
+    !> Computes the Jacobian matrix \( J \), which maps derivatives from local
+    !> to global coordinates. For a linear triangle, this matrix is constant.
+    !>
     pure module function jacobian_triangle_first(self, r, node_coords, connectivity) result(jac)
         implicit none
+        !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
+        !> The local coordinate vector (unused, as Jacobian is constant).
         type(type_dp_vector_3d), intent(in) :: r
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> The computed 2x2 Jacobian matrix.
         real(real64) :: jac(self%get_dimension(), self%get_dimension())
 
         integer(int32) :: i, node_id
@@ -142,15 +168,21 @@ contains
         end do
     end function jacobian_triangle_first
 
-    !----------------------------------------------------------------------
-    ! jacobian_det: Computes the determinant of the Jacobian matrix |J|.
-    !----------------------------------------------------------------------
+    !>
+    !> Computes the determinant of the Jacobian matrix, \( |J| \).
+    !> For a linear triangle, \( |J| \) is constant and equal to twice the element's area.
+    !>
     pure module function jacobian_det_triangle_first(self, r, node_coords, connectivity) result(det_j)
         implicit none
+        !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
+        !> The local coordinate vector (unused).
         type(type_dp_vector_3d), intent(in) :: r
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> The Jacobian determinant.
         real(real64) :: det_j
 
         real(real64) :: jac(self%get_dimension(), self%get_dimension())
@@ -159,16 +191,24 @@ contains
         det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
     end function jacobian_det_triangle_first
 
-    !----------------------------------------------------------------------
-    ! is_in: Checks if a point in global coordinates is inside the element.
-    !----------------------------------------------------------------------
+    !>
+    !> Determines if a point in global coordinates lies inside the element.
+    !> This is solved by using the Newton-Raphson method to find the local
+    !> (barycentric) coordinates corresponding to the given global point.
+    !>
     module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, connectivity, is_in)
         implicit none
+        !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
+        !> The point in global (Cartesian) coordinates to check.
         type(type_dp_vector_3d), intent(in) :: cartesian
+        !> The resulting local (normalized) coordinate if the point is inside.
         type(type_dp_vector_3d), intent(inout) :: normalized
+        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
+        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
+        !> A logical flag, set to true if the point is inside, false otherwise.
         logical, intent(inout) :: is_in
 
         type(type_dp_vector_3d) :: r
@@ -183,9 +223,11 @@ contains
         real(real64), parameter :: tol = 1.0e-9
         integer(int32), parameter :: max_iter = 10
 
+        ! Initial guess for local coordinate is the centroid of the element
         call r%set(1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0)
         converged = .false.
 
+        ! Newton-Raphson method to find local coordinate 'r' for the given 'cartesian' point
         do iter = 1, max_iter
             call interpolated_pos%set(0.0d0, 0.0d0, 0.0d0)
             do i = 1, self%get_num_nodes()
@@ -202,14 +244,16 @@ contains
 
             det_j = self%jacobian_det(r, node_coords, connectivity)
             if (abs(det_j) < epsilon(det_j)) then
-                exit
+                exit ! Jacobian is singular, cannot continue
             end if
 
             jac = self%jacobian(r, node_coords, connectivity)
+            ! Update local coordinates using the inverse of the Jacobian
             r%x = r%x + (jac(2, 2) * dx - jac(1, 2) * dy) / det_j
             r%y = r%y + (-jac(2, 1) * dx + jac(1, 1) * dy) / det_j
         end do
 
+        ! Check if the converged local coordinate is within the element bounds
         is_in = converged .and. (r%x >= -tol) .and. (r%y >= -tol) .and. (r%x + r%y <= 1.0d0 + tol)
         if (is_in) then
             normalized = r

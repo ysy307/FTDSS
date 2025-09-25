@@ -1,6 +1,4 @@
-!>
-!> @brief Module for handling multicoloring of domain elements
-!>
+!> Module for handling multicoloring of domain elements for parallel processing.
 module domain_multicoloring
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_sorting, only:sort_index
@@ -11,31 +9,19 @@ module domain_multicoloring
 
     public :: type_coloring
 
-    !>
-    !> @brief Information for a single color group
-    !>
+    !> Contains information for a single color group.
     type :: type_colored_info
-        !>
-        !> @brief Number of elements in this color
-        !>
+        !> Number of elements belonging to this color.
         integer(int32) :: num_elements = 0
-        !>
-        !> @brief List of element indices in this color
-        !>
+        !> List of 1-based domain element indices in this color group.
         integer(int32), allocatable :: elements(:)
     end type type_colored_info
 
-    !>
-    !> @brief Stores element grouping by colors
-    !>
+    !> Stores the grouping of all domain elements by color.
     type :: type_coloring
-        !>
-        !> @brief Total number of colors
-        !>
+        !> Total number of colors used in the domain.
         integer(int32) :: num_colors = 0
-        !>
-        !> @brief Array of colored info, one per color
-        !>
+        !> An array holding the data for each color group.
         type(type_colored_info), allocatable :: colored(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_coloring
@@ -44,13 +30,14 @@ module domain_multicoloring
 
 contains
 
-    !>
-    !> @brief Initialize the coloring object
-    !> @param[inout] self  Coloring object to initialize
-    !> @param[in] input    Input data containing domain geometry and coloring
+    !> Initializes the coloring structure from the input data.
+    !> This routine determines the number of colors, counts elements per color,
+    !> allocates memory, and populates the element lists for each color.
     subroutine initialize_type_coloring(self, input)
         implicit none
+        !> The coloring object to be initialized.
         class(type_coloring), intent(inout) :: self
+        !> The main input data structure containing geometry and coloring info.
         class(type_input), intent(in) :: input
 
         integer(int32) :: i, c
@@ -63,7 +50,9 @@ contains
 
         comp_dim = input%basic%simulation_settings%calculate_dimension
 
-        ! Pass 1: Determine number of colors and count elements
+        ! ==========================================================
+        ! Pass 1: Determine number of colors and count elements per color
+        ! ==========================================================
         self%num_colors = 0
         do i = 1, input%geometry%vtk%num_total_cells
             if (input%geometry%vtk%cells(i)%get_dimension() == comp_dim) then
@@ -72,7 +61,7 @@ contains
         end do
         if (self%num_colors == 0) return
 
-        allocate (counts_per_color(self%num_colors))
+        call allocate_array(counts_per_color, self%num_colors)
         counts_per_color = 0
         do i = 1, input%geometry%vtk%num_total_cells
             if (input%geometry%vtk%cells(i)%get_dimension() == comp_dim) then
@@ -83,7 +72,9 @@ contains
             end if
         end do
 
-        ! Allocation of arrays per color
+        ! ==========================================================
+        ! Allocation of arrays for each color group
+        ! ==========================================================
         allocate (self%colored(self%num_colors))
         do c = 1, self%num_colors
             self%colored(c)%num_elements = counts_per_color(c)
@@ -91,9 +82,11 @@ contains
                 allocate (self%colored(c)%elements(self%colored(c)%num_elements))
             end if
         end do
-        deallocate (counts_per_color)
+        call deallocate_array(counts_per_color)
 
-        ! Pass 2: Fill element indices for each color
+        ! ==========================================================
+        ! Pass 2: Fill element indices into their respective color groups
+        ! ==========================================================
         allocate (current_indices(self%num_colors))
         current_indices = 0
         domain_element_id = 0
@@ -107,15 +100,16 @@ contains
                 end if
             end if
         end do
-        deallocate (current_indices)
+        call deallocate_array(current_indices)
 
     end subroutine initialize_type_coloring
 
-    !>
-    !> @brief Destroy the coloring object and deallocate arrays
-    !> @param[inout] self  Coloring object to destroy
+    !> Deallocates all memory associated with the coloring object.
+    !> This routine safely releases the element arrays for each color and the
+    !> main array of color groups.
     subroutine destroy_type_coloring(self)
         implicit none
+        !> The coloring object to be destroyed.
         class(type_coloring), intent(inout) :: self
 
         integer(int32) :: i

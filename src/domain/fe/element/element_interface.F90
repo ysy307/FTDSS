@@ -1,5 +1,6 @@
 !>
-!> @brief Module for defining 2-dimensional finite element types.
+!> Defines 2D finite element types (triangles, quadrilaterals) and their
+!> associated operations, such as shape functions and Jacobians.
 !>
 module domain_fe_element
     use, intrinsic :: iso_fortran_env, only: int32, real64
@@ -26,7 +27,7 @@ module domain_fe_element
     ! ====================================================================================
 
     !>
-    !> @brief Type representing a first-order triangular element.
+    !> Represents a first-order triangular element (3 nodes).
     !>
     type, extends(abst_fe) :: type_triangle_first
     contains
@@ -39,7 +40,7 @@ module domain_fe_element
     end type type_triangle_first
 
     !>
-    !> @brief Type representing a first-order quadrilateral element.
+    !> Represents a first-order quadrilateral element (4 nodes).
     !>
     type, extends(abst_fe) :: type_square_first
     contains
@@ -52,7 +53,7 @@ module domain_fe_element
     end type type_square_first
 
     !>
-    !> @brief Type representing a second-order triangular element.
+    !> Represents a second-order triangular element (6 nodes).
     !>
     type, extends(abst_fe) :: type_triangle_second
     contains
@@ -65,7 +66,7 @@ module domain_fe_element
     end type type_triangle_second
 
     !>
-    !> @brief Type representing a second-order quadrilateral element.
+    !> Represents a second-order quadrilateral element (8 nodes).
     !>
     type, extends(abst_fe) :: type_square_second
     contains
@@ -82,508 +83,488 @@ module domain_fe_element
     ! ====================================================================================
 
     !--------------------------------------------------------------------------------------
-    !   Triangle First Order Element Type procedures interface
+    !  Triangle First Order Element Type procedures interface
     !--------------------------------------------------------------------------------------
     interface
         !>
-        !> @brief Constructs an instance of a first-order triangular element.
-        !> @param[in] input Input parameters.
-        !>
-        !> @return fe The created instance of the first-order triangular element.
+        !> Constructs an instance of a first-order triangular element.
         !>
         module function construct_triangle_first(input) result(fe)
             implicit none
+            !> The main input data structure.
             type(type_input), intent(in) :: input
+            !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_triangle_first
 
         !>
-        !> @brief Calculates the area of a first-order triangular element.
-        !> @param[in] self First-order triangular element object.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return area The area of the element.
+        !> Calculates the area of a first-order triangular element.
         !>
         module function get_area_triangle_first(self, node_coords, connectivity) result(area)
             implicit none
+            !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The computed area of the element.
             real(real64) :: area
         end function get_area_triangle_first
 
         !>
-        !> @brief Calculates the value of the shape function (psi_i) for a first-order triangular element.
-        !> @param[in] self First-order triangular element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return psi Value of the shape function.
+        !> Calculates the value of the shape function \( \psi_i \) for a first-order triangular element.
         !>
         pure elemental module function psi_triangle_first(self, i, r) result(psi)
             implicit none
+            !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function.
             real(real64) :: psi
         end function psi_triangle_first
 
         !>
-        !> @brief Calculates the derivative of the shape function w.r.t. normalized coordinates (d(psi_i)/dr_j).
-        !> @param[in] self First-order triangular element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] j Index of the coordinate to differentiate w.r.t. (1:xi, 2:eta).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return dpsi Value of the shape function's derivative.
+        !> Calculates the derivative of the shape function with respect to the
+        !> normalized coordinates, \( \frac{\partial\psi_i}{\partial r_j} \).
         !>
         pure elemental module function dpsi_triangle_first(self, i, j, r) result(dpsi)
             implicit none
+            !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_triangle_first
 
         !>
-        !> @brief Calculates the Jacobian matrix for a first-order triangular element.
-        !> @param[in] self First-order triangular element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian The Jacobian matrix.
+        !> Calculates the Jacobian matrix for a first-order triangular element.
         !>
         pure module function jacobian_triangle_first(self, r, node_coords, connectivity) result(jacobian)
             implicit none
+            !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The resulting Jacobian matrix.
             real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
         end function jacobian_triangle_first
 
         !>
-        !> @brief Calculates the Jacobian determinant for a first-order triangular element.
-        !> @param[in] self First-order triangular element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian_det The Jacobian determinant.
+        !> Calculates the Jacobian determinant for a first-order triangular element.
         !>
         pure module function jacobian_det_triangle_first(self, r, node_coords, connectivity) result(jacobian_det)
             implicit none
+            !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The Jacobian determinant.
             real(real64) :: jacobian_det
         end function jacobian_det_triangle_first
 
         !>
-        !> @brief Checks if a given Cartesian coordinate is inside the element.
-        !> @param[in] self First-order triangular element object.
-        !> @param[in] cartesian Cartesian coordinate to check.
-        !> @param[inout] normalized The corresponding normalized coordinate if inside.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !> @param[inout] is_in The result (true: is inside, false: is not).
+        !> Checks if a given Cartesian coordinate is inside the element.
         !>
         module subroutine is_in_triangle_first(self, cartesian, normalized, node_coords, connectivity, is_in)
             implicit none
+            !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
+            !> The Cartesian coordinate to check.
             type(type_dp_vector_3d), intent(in) :: cartesian
+            !> The corresponding normalized coordinate if the point is inside.
             type(type_dp_vector_3d), intent(inout) :: normalized
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The result (`.true.` if the point is inside, `.false.` otherwise).
             logical, intent(inout) :: is_in
         end subroutine is_in_triangle_first
     end interface
 
     !--------------------------------------------------------------------------------------
-    !   Square First Order Element Type procedures interface
+    !  Square First Order Element Type procedures interface
     !--------------------------------------------------------------------------------------
     interface
         !>
-        !> @brief Constructs an instance of a first-order quadrilateral element.
-        !> @param[in] input Input parameters.
-        !>
-        !> @return fe The created instance of the first-order quadrilateral element.
+        !> Constructs an instance of a first-order quadrilateral element.
         !>
         module function construct_square_first(input) result(fe)
             implicit none
+            !> The main input data structure.
             type(type_input), intent(in) :: input
+            !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_square_first
 
         !>
-        !> @brief Calculates the area of a first-order quadrilateral element.
-        !> @param[in] self First-order quadrilateral element object.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return area The area of the element.
+        !> Calculates the area of a first-order quadrilateral element using Gauss quadrature.
         !>
         module function get_area_square_first(self, node_coords, connectivity) result(area)
             implicit none
+            !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The computed area of the element.
             real(real64) :: area
         end function get_area_square_first
 
         !>
-        !> @brief Calculates the value of the shape function (psi_i) for a first-order quadrilateral element.
-        !> @param[in] self First-order quadrilateral element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return psi Value of the shape function.
+        !> Calculates the value of the shape function \( \psi_i \) for a first-order quadrilateral element.
         !>
         pure elemental module function psi_square_first(self, i, r) result(psi)
             implicit none
+            !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function.
             real(real64) :: psi
         end function psi_square_first
 
         !>
-        !> @brief Calculates the derivative of the shape function w.r.t. normalized coordinates (d(psi_i)/dr_j).
-        !> @param[in] self First-order quadrilateral element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] j Index of the coordinate to differentiate w.r.t. (1:xi, 2:eta).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return dpsi Value of the shape function's derivative.
+        !> Calculates the derivative of the shape function with respect to the
+        !> normalized coordinates, \( \frac{\partial\psi_i}{\partial r_j} \).
         !>
         pure elemental module function dpsi_square_first(self, i, j, r) result(dpsi)
             implicit none
+            !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_square_first
 
         !>
-        !> @brief Calculates the Jacobian matrix for a first-order quadrilateral element.
-        !> @param[in] self First-order quadrilateral element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian The Jacobian matrix.
+        !> Calculates the Jacobian matrix for a first-order quadrilateral element.
         !>
         pure module function jacobian_square_first(self, r, node_coords, connectivity) result(jacobian)
             implicit none
+            !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The resulting Jacobian matrix.
             real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
         end function jacobian_square_first
 
         !>
-        !> @brief Calculates the Jacobian determinant for a first-order quadrilateral element.
-        !> @param[in] self First-order quadrilateral element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian_det The Jacobian determinant.
+        !> Calculates the Jacobian determinant for a first-order quadrilateral element.
         !>
         pure module function jacobian_det_square_first(self, r, node_coords, connectivity) result(jacobian_det)
             implicit none
+            !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The Jacobian determinant.
             real(real64) :: jacobian_det
         end function jacobian_det_square_first
 
         !>
-        !> @brief Checks if a given Cartesian coordinate is inside the element.
-        !> @param[in] self First-order quadrilateral element object.
-        !> @param[in] cartesian Cartesian coordinate to check.
-        !> @param[inout] normalized The corresponding normalized coordinate if inside.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !> @param[inout] is_in The result (true: is inside, false: is not).
+        !> Checks if a given Cartesian coordinate is inside the element.
         !>
         module subroutine is_in_square_first(self, cartesian, normalized, node_coords, connectivity, is_in)
             implicit none
+            !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
+            !> The Cartesian coordinate to check.
             type(type_dp_vector_3d), intent(in) :: cartesian
+            !> The corresponding normalized coordinate if the point is inside.
             type(type_dp_vector_3d), intent(inout) :: normalized
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The result (`.true.` if the point is inside, `.false.` otherwise).
             logical, intent(inout) :: is_in
         end subroutine is_in_square_first
     end interface
 
     !--------------------------------------------------------------------------------------
-    !   Triangle Second Order Element Type procedures interface
+    !  Triangle Second Order Element Type procedures interface
     !--------------------------------------------------------------------------------------
     interface
         !>
-        !> @brief Constructs an instance of a second-order triangular element.
-        !> @param[in] input Input parameters.
-        !>
-        !> @return fe The created instance of the second-order triangular element.
+        !> Constructs an instance of a second-order triangular element.
         !>
         module function construct_triangle_second(input) result(fe)
             implicit none
+            !> The main input data structure.
             type(type_input), intent(in) :: input
+            !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_triangle_second
 
         !>
-        !> @brief Calculates the area of a second-order triangular element.
-        !> @param[in] self Second-order triangular element object.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return area The area of the element.
+        !> Calculates the area of a second-order triangular element using Gauss quadrature.
         !>
         module function get_area_triangle_second(self, node_coords, connectivity) result(area)
             implicit none
+            !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The computed area of the element.
             real(real64) :: area
         end function get_area_triangle_second
 
         !>
-        !> @brief Calculates the value of the shape function (psi_i) for a second-order triangular element.
-        !> @param[in] self Second-order triangular element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return psi Value of the shape function.
+        !> Calculates the value of the shape function \( \psi_i \) for a second-order triangular element.
         !>
         pure elemental module function psi_triangle_second(self, i, r) result(psi)
             implicit none
+            !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function.
             real(real64) :: psi
         end function psi_triangle_second
 
         !>
-        !> @brief Calculates the derivative of the shape function w.r.t. normalized coordinates (d(psi_i)/dr_j).
-        !> @param[in] self Second-order triangular element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] j Index of the coordinate to differentiate w.r.t. (1:xi, 2:eta).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return dpsi Value of the shape function's derivative.
+        !> Calculates the derivative of the shape function with respect to the
+        !> normalized coordinates, \( \frac{\partial\psi_i}{\partial r_j} \).
         !>
         pure elemental module function dpsi_triangle_second(self, i, j, r) result(dpsi)
             implicit none
+            !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_triangle_second
 
         !>
-        !> @brief Calculates the derivative of the shape function w.r.t. normalized coordinates (d(psi_i)/dr_j).
-        !> @param[in] self Second-order triangular element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] j Index of the coordinate to differentiate w.r.t. (1:xi, 2:eta).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return dpsi Value of the shape function's derivative.
+        !> Calculates the derivative of the shape function with respect to the
+        !> normalized coordinates, \( \frac{\partial\psi_i}{\partial r_j} \).
         !>
         pure elemental module function dpsi_deta_triangle_second(self, i, j, r) result(dpsi)
             implicit none
+            !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_deta_triangle_second
 
         !>
-        !> @brief Calculates the Jacobian matrix for a second-order triangular element.
-        !> @param[in] self Second-order triangular element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian The Jacobian matrix.
+        !> Calculates the Jacobian matrix for a second-order triangular element.
         !>
         pure module function jacobian_triangle_second(self, r, node_coords, connectivity) result(jacobian)
             implicit none
+            !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The resulting Jacobian matrix.
             real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
         end function jacobian_triangle_second
 
         !>
-        !> @brief Calculates the Jacobian determinant for a second-order triangular element.
-        !> @param[in] self Second-order triangular element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian_det The Jacobian determinant.
+        !> Calculates the Jacobian determinant for a second-order triangular element.
         !>
         pure module function jacobian_det_triangle_second(self, r, node_coords, connectivity) result(jacobian_det)
             implicit none
+            !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The Jacobian determinant.
             real(real64) :: jacobian_det
         end function jacobian_det_triangle_second
 
         !>
-        !> @brief Checks if a given Cartesian coordinate is inside the element.
-        !> @param[in] self Second-order triangular element object.
-        !> @param[in] cartesian Cartesian coordinate to check.
-        !> @param[inout] normalized The corresponding normalized coordinate if inside.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !> @param[inout] is_in The result (true: is inside, false: is not).
+        !> Checks if a given Cartesian coordinate is inside the element.
         !>
         module subroutine is_in_triangle_second(self, cartesian, normalized, node_coords, connectivity, is_in)
             implicit none
+            !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
+            !> The Cartesian coordinate to check.
             type(type_dp_vector_3d), intent(in) :: cartesian
+            !> The corresponding normalized coordinate if the point is inside.
             type(type_dp_vector_3d), intent(inout) :: normalized
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The result (`.true.` if the point is inside, `.false.` otherwise).
             logical, intent(inout) :: is_in
         end subroutine is_in_triangle_second
 
     end interface
 
     !--------------------------------------------------------------------------------------
-    !   Square Second Order Element Type procedures interface
+    !  Square Second Order Element Type procedures interface
     !--------------------------------------------------------------------------------------
     interface
         !>
-        !> @brief Constructs an instance of a second-order quadrilateral element.
-        !> @param[in] input Input parameters.
-        !>
-        !> @return fe The created instance of the second-order quadrilateral element.
+        !> Constructs an instance of a second-order quadrilateral element.
         !>
         module function construct_square_second(input) result(fe)
             implicit none
+            !> The main input data structure.
             type(type_input), intent(in) :: input
+            !> The newly created and allocated finite element object.
             class(abst_fe), allocatable :: fe
         end function construct_square_second
 
         !>
-        !> @brief Calculates the area of a second-order quadrilateral element.
-        !> @param[in] self Second-order quadrilateral element object.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return area The area of the element.
+        !> Calculates the area of a second-order quadrilateral element using Gauss quadrature.
         !>
         module function get_area_square_second(self, node_coords, connectivity) result(area)
             implicit none
+            !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The computed area of the element.
             real(real64) :: area
         end function get_area_square_second
 
         !>
-        !> @brief Calculates the value of the shape function (psi_i) for a second-order quadrilateral element.
-        !> @param[in] self Second-order quadrilateral element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return psi Value of the shape function.
+        !> Calculates the value of the shape function \( \psi_i \) for a second-order quadrilateral element.
         !>
         pure elemental module function psi_square_second(self, i, r) result(psi)
             implicit none
+            !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function.
             real(real64) :: psi
         end function psi_square_second
 
         !>
-        !> @brief Calculates the derivative of the shape function w.r.t. normalized coordinates (d(psi_i)/dr_j).
-        !> @param[in] self Second-order quadrilateral element object.
-        !> @param[in] i Index of the shape function (node number).
-        !> @param[in] j Index of the coordinate to differentiate w.r.t. (1:xi, 2:eta).
-        !> @param[in] r Normalized coordinates.
-        !>
-        !> @return dpsi Value of the shape function's derivative.
+        !> Calculates the derivative of the shape function with respect to the
+        !> normalized coordinates, \( \frac{\partial\psi_i}{\partial r_j} \).
         !>
         pure elemental module function dpsi_square_second(self, i, j, r) result(dpsi)
             implicit none
+            !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
+            !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
+            !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
+            !> The local coordinate vector \( r \).
             type(type_dp_vector_3d), intent(in) :: r
+            !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_square_second
 
         !>
-        !> @brief Calculates the Jacobian matrix for a second-order quadrilateral element.
-        !> @param[in] self Second-order quadrilateral element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian The Jacobian matrix.
+        !> Calculates the Jacobian matrix for a second-order quadrilateral element.
         !>
         pure module function jacobian_square_second(self, r, node_coords, connectivity) result(jacobian)
             implicit none
+            !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The resulting Jacobian matrix.
             real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
         end function jacobian_square_second
 
         !>
-        !> @brief Calculates the Jacobian determinant for a second-order quadrilateral element.
-        !> @param[in] self Second-order quadrilateral element object.
-        !> @param[in] r Normalized coordinates.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !>
-        !> @return jacobian_det The Jacobian determinant.
+        !> Calculates the Jacobian determinant for a second-order quadrilateral element.
         !>
         pure module function jacobian_det_square_second(self, r, node_coords, connectivity) result(jacobian_det)
             implicit none
+            !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
+            !> The local coordinate vector.
             type(type_dp_vector_3d), intent(in) :: r
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The Jacobian determinant.
             real(real64) :: jacobian_det
         end function jacobian_det_square_second
 
         !>
-        !> @brief Checks if a given Cartesian coordinate is inside the element.
-        !> @param[in] self Second-order quadrilateral element object.
-        !> @param[in] cartesian Cartesian coordinate to check.
-        !> @param[inout] normalized The corresponding normalized coordinate if inside.
-        !> @param[in] node_coords Nodal coordinate array.
-        !> @param[in] connectivity Node numbers that make up the element.
-        !> @param[inout] is_in The result (true: is inside, false: is not).
+        !> Checks if a given Cartesian coordinate is inside the element.
         !>
         module subroutine is_in_square_second(self, cartesian, normalized, node_coords, connectivity, is_in)
             implicit none
+            !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
+            !> The Cartesian coordinate to check.
             type(type_dp_vector_3d), intent(in) :: cartesian
+            !> The corresponding normalized coordinate if the point is inside.
             type(type_dp_vector_3d), intent(inout) :: normalized
+            !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
+            !> The connectivity array for the element.
             integer(int32), intent(in) :: connectivity(:)
+            !> The result (`.true.` if the point is inside, `.false.` otherwise).
             logical, intent(inout) :: is_in
         end subroutine is_in_square_second
     end interface
