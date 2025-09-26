@@ -14,10 +14,12 @@ program test_communicator
 
     call input%initialize()
 
+    call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
     if (my_rank == 0) then
         print *, "my_rank = ", my_rank
-        do i = 1, input%geometry%vtk%num_points
-            print '(8i6)', i, input%geometry%vtk%cells(i)%connectivity(:)
+        do i = 1, size(input%geometry%vtk%cells(:))
+            print '(a,i0)', "cell= ", i
+            print '(10(x,i0))', input%geometry%vtk%cells(i)%connectivity(:)
         end do
     end if
 

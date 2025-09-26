@@ -27,7 +27,7 @@ target_link_libraries(Input_Main PUBLIC
     Solver::Core
 )
 enable_build_flags(Input_Main)
-enable_thirdparty(Input_Main)
+enable_thirdparty (Input_Main)
 
 add_library(Input_Interface INTERFACE)
 target_link_libraries(Input_Interface INTERFACE Input_Main)

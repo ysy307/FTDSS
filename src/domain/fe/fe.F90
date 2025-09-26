@@ -5,8 +5,8 @@ module module_fe
     use, intrinsic :: iso_fortran_env, only: int32
     use :: module_input, only:type_input
     use :: domain_fe, only:abst_fe, holder_fes
-    use :: module_fe_side, only:type_side_first, type_side_second
-    use :: module_fe_element, only:type_triangle_first, type_triangle_second, &
+    use :: domain_fe_side, only:type_side_first, type_side_second
+    use :: domain_fe_element, only:type_triangle_first, type_triangle_second, &
         type_square_first, type_square_second
     use :: domain_fe_factory, only:create_fe
     implicit none
@@ -32,6 +32,7 @@ module module_fe
     ! manager for finite elements
     !-------------------------------------------------------------------------------------------------------------------------------
     public :: type_fe_manager
+
     !> Manager type for handling multiple FE objects
     type :: type_fe_manager
         private
@@ -65,7 +66,6 @@ contains
 
         do i = 1, num_fe
             self%fe_list(i)%fe = create_fe(target_ids(i), input)
-            call self%fe_list(i)%fe%display()
             self%fe_map(target_ids(i)) = i
         end do
 

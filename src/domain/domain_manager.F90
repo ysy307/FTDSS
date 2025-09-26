@@ -7,8 +7,9 @@ module domain_manager
     use :: stdlib_logger
     use :: module_core
     use :: module_input, only:type_input
-    use :: domain_multicoloring, only:type_coloring
     use :: module_fe, only:type_fe_manager
+    use :: domain_multicoloring, only:type_coloring
+    use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
     ! use :: conditions_boundary, only:abst_bc, construct_type_bc_thermal_dirichlet, &
     !     construct_type_bc_thermal_adiabatic ! Other construct_* would be USEd similarly
 
@@ -127,33 +128,19 @@ module domain_manager
     !> Manages all data related to volume elements in the domain.
     !>
     type :: type_element_manager
-        !>
         !> Pointer to the parent domain object.
-        !>
         type(type_domain), pointer, private :: parent => null()
-        !>
         !> Number of elements in this subdomain.
-        !>
         integer(int32) :: num_elements = 0
-        !>
         !> Finite element type ID for each element.
-        !>
         integer(int32), allocatable :: fe_types(:)
-        !>
         !> Material ID for each element.
-        !>
         integer(int32), allocatable :: fe_material_ids(:)
-        !>
         !> Manager for FE type-specific operations (shape functions, etc.).
-        !>
         type(type_fe_manager) :: fe_manager
-        !>
         !> Connectivity data for all elements.
-        !>
         type(type_fe_connectivity) :: connectivity
-        !>
         !> Coloring information for parallel element processing.
-        !>
         type(type_coloring) :: colors
     contains
         procedure, public, pass(self) :: initialize => initialize_element_manager
@@ -183,6 +170,10 @@ module domain_manager
         type(type_node_manager) :: nodes
         !> Manages all element data.
         type(type_element_manager) :: elements
+        !> Node adjacency information for all nodes in the domain.
+        type(type_node_adjacency) :: node_adjacency
+        !> Element-to-node adjacency information.
+        type(type_map_node_to_element) :: element_adjacency
         !> Manages all boundary condition data.
         type(type_boundary_manager) :: boundaries
 
@@ -207,11 +198,16 @@ contains
         !> The parsed input data from a file.
         type(type_input), intent(in) :: input
 
-        if (self%is_associated) call self%associate_parent(self%nodes, self%elements, self%boundaries)
+        if (.not. self%is_associated) call self%associate_parent(self%nodes, self%elements, self%boundaries)
         call self%set_basic_info_and_dof_map(input)
 
         call self%nodes%initialize(input)
         call self%elements%initialize(input)
+        ! Initialize the node adjacency information
+        call self%node_adjacency%initialize(self%nodes%num_nodes, self%elements%connectivity%ind, self%elements%connectivity%val)
+        ! Initialize the element-to-node adjacency information
+        call self%element_adjacency%initialize(self%nodes%num_nodes, self%elements%num_elements, &
+                                               self%elements%connectivity%ind, self%elements%connectivity%val)
         call self%boundaries%initialize(input)
     end subroutine initialize_type_domain
 
@@ -295,6 +291,7 @@ contains
 
         call allocate_array(self%node_global_ids, self%num_nodes)
         self%node_global_ids(:) = input%geometry%vtk%global_node_ids(1:self%num_nodes)
+
     end subroutine initialize_node_manager
 
     !> Initializes the element manager by reading and organizing element data.
@@ -325,10 +322,10 @@ contains
         end do
 
         if (self%num_elements > 0) then
-            allocate (self%fe_types(self%num_elements))
-            allocate (self%fe_material_ids(self%num_elements))
-            allocate (self%connectivity%ind(self%num_elements + 1))
-            allocate (self%connectivity%val(num_total_connectivity))
+            call allocate_array(self%fe_types, self%num_elements)
+            call allocate_array(self%fe_material_ids, self%num_elements)
+            call allocate_array(self%connectivity%ind, self%num_elements + 1)
+            call allocate_array(self%connectivity%val, num_total_connectivity)
         end if
 
         ! Pass 2: Store element data
@@ -349,7 +346,6 @@ contains
 
         ! Initialize the FE manager with the unique element types found
         call unique(self%fe_types, unique_fe_types)
-        print *, unique_fe_types
         call self%fe_manager%initialize(input, self%num_elements, self%fe_types)
 
         ! Initialize coloring information

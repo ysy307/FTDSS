@@ -52,11 +52,11 @@ include(Toolchain)
 # ====================================================================
 add_subdirectory(src/core)
 add_subdirectory(src/inout)
-# add_subdirectory(src/linalg)
-# add_subdirectory(src/control)
+add_subdirectory(src/linalg)
+add_subdirectory(src/control)
 # add_subdirectory(src/physics)
-# add_subdirectory(src/domain)
-add_subdirectory(src/parallel)
+add_subdirectory(src/domain)
+# add_subdirectory(src/parallel)
 # add_subdirectory(src/solver)
 # add_subdirectory(src/field)
 # add_subdirectory(src/conditions)
@@ -69,7 +69,7 @@ add_subdirectory(src/parallel)
 
 # 実行ファイルのソースを指定
 set(MAIN_APP_SOURCE "app/ysy_fc.F90")
-set(TEST_APP_SOURCE "test/test_communicator.F90")
+set(TEST_APP_SOURCE "test/test_domain.F90")
 
 # Build Targets
 if(BUILD_APP STREQUAL "ysy_fc")
@@ -94,8 +94,8 @@ if(TARGET ${APP_TARGET})
         # Solver::Control
         # Solver::Linalg
         # Solver::Physics
-        # Solver::Domain
-        Solver::Parallel
+        Solver::Domain
+        # Solver::Parallel
     )
 
     # MPIが有効な場合、MPIライブラリを追加でリンク
