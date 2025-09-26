@@ -38,8 +38,8 @@ enable_thirdparty(Domain_Mesh)
 # Computes connectivity information (e.g., node-to-element).
 set(DOMAIN_ADJACENCY_SOURCES
     # adjacency/adjacency_element.F90
-    adjacency/adjacency_node.F90
-    adjacency/adjacency_node_element.F90
+    adjacency/node.F90
+    adjacency/node_element.F90
     adjacency/adjacency.F90
 )
 add_library(Domain_Adjacency STATIC ${DOMAIN_ADJACENCY_SOURCES})

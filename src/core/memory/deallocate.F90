@@ -1,3 +1,6 @@
+!>
+!> Provides a generic interface and safe wrappers for deallocating allocatable arrays.
+!>
 module core_deallocate
     use, intrinsic :: iso_fortran_env
     use :: core_error, only:error_message
@@ -29,8 +32,13 @@ module core_deallocate
 
 contains
 
+    !>
+    !> Safely deallocates a rank-1 8-bit integer array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_int8(array)
         implicit none
+        !> The allocatable array to be deallocated.
         integer(int8), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -41,8 +49,13 @@ contains
 
     end subroutine deallocate_rank1_int8
 
+    !>
+    !> Safely deallocates a rank-1 32-bit integer array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_int32(array)
         implicit none
+        !> The allocatable array to be deallocated.
         integer(int32), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -53,8 +66,13 @@ contains
 
     end subroutine deallocate_rank1_int32
 
+    !>
+    !> Safely deallocates a rank-1 64-bit integer array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_int64(array)
         implicit none
+        !> The allocatable array to be deallocated.
         integer(int64), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -65,8 +83,13 @@ contains
 
     end subroutine deallocate_rank1_int64
 
+    !>
+    !> Safely deallocates a rank-1 single precision real array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_real32(array)
         implicit none
+        !> The allocatable array to be deallocated.
         real(real32), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -77,8 +100,13 @@ contains
 
     end subroutine deallocate_rank1_real32
 
+    !>
+    !> Safely deallocates a rank-1 double precision real array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_real64(array)
         implicit none
+        !> The allocatable array to be deallocated.
         real(real64), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -89,8 +117,13 @@ contains
 
     end subroutine deallocate_rank1_real64
 
+    !>
+    !> Safely deallocates a rank-1 quad precision real array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_real128(array)
         implicit none
+        !> The allocatable array to be deallocated.
         real(real128), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -101,8 +134,13 @@ contains
 
     end subroutine deallocate_rank1_real128
 
+    !>
+    !> Safely deallocates a rank-1 logical (kind=8) array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_logical1(array)
         implicit none
+        !> The allocatable array to be deallocated.
         logical(logical8), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -113,8 +151,13 @@ contains
 
     end subroutine deallocate_rank1_logical1
 
+    !>
+    !> Safely deallocates a rank-1 logical (kind=32) array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_logical4(array)
         implicit none
+        !> The allocatable array to be deallocated.
         logical(logical32), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -125,8 +168,13 @@ contains
 
     end subroutine deallocate_rank1_logical4
 
+    !>
+    !> Safely deallocates a rank-1 logical (kind=64) array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank1_logical8(array)
         implicit none
+        !> The allocatable array to be deallocated.
         logical(logical64), allocatable, intent(inout) :: array(:)
         integer(int32) :: stat
 
@@ -137,8 +185,13 @@ contains
 
     end subroutine deallocate_rank1_logical8
 
+    !>
+    !> Safely deallocates a rank-2 8-bit integer array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_int8(array)
         implicit none
+        !> The allocatable array to be deallocated.
         integer(int8), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -148,8 +201,13 @@ contains
         end if
     end subroutine deallocate_rank2_int8
 
+    !>
+    !> Safely deallocates a rank-2 32-bit integer array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_int32(array)
         implicit none
+        !> The allocatable array to be deallocated.
         integer(int32), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -159,8 +217,13 @@ contains
         end if
     end subroutine deallocate_rank2_int32
 
+    !>
+    !> Safely deallocates a rank-2 64-bit integer array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_int64(array)
         implicit none
+        !> The allocatable array to be deallocated.
         integer(int64), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -170,8 +233,13 @@ contains
         end if
     end subroutine deallocate_rank2_int64
 
+    !>
+    !> Safely deallocates a rank-2 single precision real array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_real32(array)
         implicit none
+        !> The allocatable array to be deallocated.
         real(real32), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -181,8 +249,13 @@ contains
         end if
     end subroutine deallocate_rank2_real32
 
+    !>
+    !> Safely deallocates a rank-2 double precision real array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_real64(array)
         implicit none
+        !> The allocatable array to be deallocated.
         real(real64), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -192,8 +265,13 @@ contains
         end if
     end subroutine deallocate_rank2_real64
 
+    !>
+    !> Safely deallocates a rank-2 quad precision real array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_real128(array)
         implicit none
+        !> The allocatable array to be deallocated.
         real(real128), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -203,8 +281,13 @@ contains
         end if
     end subroutine deallocate_rank2_real128
 
+    !>
+    !> Safely deallocates a rank-2 logical (kind=8) array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_logical1(array)
         implicit none
+        !> The allocatable array to be deallocated.
         logical(logical8), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -214,8 +297,13 @@ contains
         end if
     end subroutine deallocate_rank2_logical1
 
+    !>
+    !> Safely deallocates a rank-2 logical (kind=32) array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_logical4(array)
         implicit none
+        !> The allocatable array to be deallocated.
         logical(logical32), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 
@@ -225,8 +313,13 @@ contains
         end if
     end subroutine deallocate_rank2_logical4
 
+    !>
+    !> Safely deallocates a rank-2 logical (kind=64) array.
+    !> If the array is not allocated, the routine does nothing.
+    !>
     subroutine deallocate_rank2_logical8(array)
         implicit none
+        !> The allocatable array to be deallocated.
         logical(logical64), allocatable, intent(inout) :: array(:, :)
         integer(int32) :: stat
 

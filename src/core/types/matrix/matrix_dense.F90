@@ -6,15 +6,16 @@ contains
     !----------------------------------------------------------
     ! 初期化
     !----------------------------------------------------------
-    module subroutine initialize_dense(self, num_nodes, row, col)
+    module subroutine initialize_dense(self, num_nodes, num_dofs, row, col)
         implicit none
         class(type_dense), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
+        integer(int32), intent(in) :: num_dofs
         integer(int32), intent(in), optional :: row(:)
         integer(int32), intent(in), optional :: col(:)
 
-        self%num_row = num_nodes
-        self%num_col = num_nodes
+        self%num_row = num_nodes * num_dofs
+        self%num_col = num_nodes * num_dofs
         call allocate_array(self%val, self%num_row, self%num_col)
         self%val = 0.0d0
     end subroutine initialize_dense

@@ -1,3 +1,7 @@
+!>
+!> Defines derived types for handling arrays of 2D and 3D vectors,
+!> supporting both double precision real and integer components.
+!>
 module core_types_array
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: core_allocate, only:allocate_array
@@ -5,13 +9,13 @@ module core_types_array
     implicit none
     private
 
-    ! 2D and 3D arrays of double precision
+    ! Public types
     public :: type_dp_2d
     public :: type_dp_3d
-    ! 2D and 3D arrays of integers
     public :: type_int_2d
     public :: type_int_3d
 
+    ! Public generic assignment
     public :: assignment(=)
 
     interface assignment(=)
@@ -21,34 +25,56 @@ module core_types_array
         module procedure :: assignment_type_int_3d
     end interface
 
+    !>
+    !> Represents an array of 2D double precision vectors.
+    !>
     type :: type_dp_2d
+        !> Array of x-components.
         real(real64), allocatable :: x(:)
+        !> Array of y-components.
         real(real64), allocatable :: y(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_dp_2d
         procedure, pass(self) :: destroy => destroy_type_dp_2d
     end type type_dp_2d
 
+    !>
+    !> Represents an array of 3D double precision vectors.
+    !>
     type :: type_dp_3d
+        !> Array of x-components.
         real(real64), allocatable :: x(:)
+        !> Array of y-components.
         real(real64), allocatable :: y(:)
+        !> Array of z-components.
         real(real64), allocatable :: z(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_dp_3d
         procedure, pass(self) :: destroy => destroy_type_dp_3d
     end type type_dp_3d
 
+    !>
+    !> Represents an array of 2D integer vectors.
+    !>
     type :: type_int_2d
+        !> Array of x-components.
         integer(int32), allocatable :: x(:)
+        !> Array of y-components.
         integer(int32), allocatable :: y(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_int_2d
         procedure, pass(self) :: destroy => destroy_type_int_2d
     end type type_int_2d
 
+    !>
+    !> Represents an array of 3D integer vectors.
+    !>
     type :: type_int_3d
+        !> Array of x-components.
         integer(int32), allocatable :: x(:)
+        !> Array of y-components.
         integer(int32), allocatable :: y(:)
+        !> Array of z-components.
         integer(int32), allocatable :: z(:)
     contains
         procedure, pass(self) :: initialize => initialize_type_int_3d
@@ -57,10 +83,16 @@ module core_types_array
 
 contains
 
+    !>
+    !> Allocates and initializes the 2D double precision vector component arrays.
+    !>
     subroutine initialize_type_dp_2d(self, length, initialize_value)
         implicit none
+        !> The vector array object to initialize.
         class(type_dp_2d), intent(inout) :: self
+        !> The number of vectors to allocate.
         integer(int32), intent(in) :: length
+        !> An optional value to assign to all components. Defaults to zero.
         real(real64), intent(in), optional :: initialize_value
 
         call allocate_array(self%x, length)
@@ -76,9 +108,14 @@ contains
 
     end subroutine initialize_type_dp_2d
 
+    !>
+    !> Overloads the assignment operator (=) to perform a deep copy.
+    !>
     subroutine assignment_type_dp_2d(a, b)
         implicit none
+        !> The destination object (left-hand side).
         class(type_dp_2d), intent(inout) :: a
+        !> The source object (right-hand side).
         class(type_dp_2d), intent(in) :: b
 
         a%x(:) = b%x(:)
@@ -86,8 +123,12 @@ contains
 
     end subroutine assignment_type_dp_2d
 
+    !>
+    !> Deallocates the component arrays of the 2D double precision vector type.
+    !>
     subroutine destroy_type_dp_2d(self)
         implicit none
+        !> The vector array object to destroy.
         class(type_dp_2d), intent(inout) :: self
 
         call deallocate_array(self%x)
@@ -95,10 +136,16 @@ contains
 
     end subroutine destroy_type_dp_2d
 
+    !>
+    !> Allocates and initializes the 3D double precision vector component arrays.
+    !>
     subroutine initialize_type_dp_3d(self, length, initialize_value)
         implicit none
+        !> The vector array object to initialize.
         class(type_dp_3d), intent(inout) :: self
+        !> The number of vectors to allocate.
         integer(int32), intent(in) :: length
+        !> An optional value to assign to all components. Defaults to zero.
         real(real64), intent(in), optional :: initialize_value
 
         call allocate_array(self%x, length)
@@ -117,9 +164,14 @@ contains
 
     end subroutine initialize_type_dp_3d
 
+    !>
+    !> Overloads the assignment operator (=) to perform a deep copy.
+    !>
     subroutine assignment_type_dp_3d(a, b)
         implicit none
+        !> The destination object (left-hand side).
         class(type_dp_3d), intent(inout) :: a
+        !> The source object (right-hand side).
         class(type_dp_3d), intent(in) :: b
 
         a%x(:) = b%x(:)
@@ -128,8 +180,12 @@ contains
 
     end subroutine assignment_type_dp_3d
 
+    !>
+    !> Deallocates the component arrays of the 3D double precision vector type.
+    !>
     subroutine destroy_type_dp_3d(self)
         implicit none
+        !> The vector array object to destroy.
         class(type_dp_3d), intent(inout) :: self
 
         call deallocate_array(self%x)
@@ -138,10 +194,16 @@ contains
 
     end subroutine destroy_type_dp_3d
 
+    !>
+    !> Allocates and initializes the 2D integer vector component arrays.
+    !>
     subroutine initialize_type_int_2d(self, length, initialize_value)
         implicit none
+        !> The vector array object to initialize.
         class(type_int_2d), intent(inout) :: self
+        !> The number of vectors to allocate.
         integer(int32), intent(in) :: length
+        !> An optional value to assign to all components. Defaults to zero.
         integer(int32), intent(in), optional :: initialize_value
 
         call allocate_array(self%x, length)
@@ -157,9 +219,14 @@ contains
 
     end subroutine initialize_type_int_2d
 
+    !>
+    !> Overloads the assignment operator (=) to perform a deep copy.
+    !>
     subroutine assignment_type_int_2d(a, b)
         implicit none
+        !> The destination object (left-hand side).
         class(type_int_2d), intent(inout) :: a
+        !> The source object (right-hand side).
         class(type_int_2d), intent(in) :: b
 
         a%x(:) = b%x(:)
@@ -167,8 +234,12 @@ contains
 
     end subroutine assignment_type_int_2d
 
+    !>
+    !> Deallocates the component arrays of the 2D integer vector type.
+    !>
     subroutine destroy_type_int_2d(self)
         implicit none
+        !> The vector array object to destroy.
         class(type_int_2d), intent(inout) :: self
 
         call deallocate_array(self%x)
@@ -176,10 +247,16 @@ contains
 
     end subroutine destroy_type_int_2d
 
+    !>
+    !> Allocates and initializes the 3D integer vector component arrays.
+    !>
     subroutine initialize_type_int_3d(self, length, initialize_value)
         implicit none
+        !> The vector array object to initialize.
         class(type_int_3d), intent(inout) :: self
+        !> The number of vectors to allocate.
         integer(int32), intent(in) :: length
+        !> An optional value to assign to all components. Defaults to zero.
         integer(int32), intent(in), optional :: initialize_value
 
         call allocate_array(self%x, length)
@@ -198,9 +275,14 @@ contains
 
     end subroutine initialize_type_int_3d
 
+    !>
+    !> Overloads the assignment operator (=) to perform a deep copy.
+    !>
     subroutine assignment_type_int_3d(a, b)
         implicit none
+        !> The destination object (left-hand side).
         class(type_int_3d), intent(inout) :: a
+        !> The source object (right-hand side).
         class(type_int_3d), intent(in) :: b
 
         a%x(:) = b%x(:)
@@ -209,8 +291,12 @@ contains
 
     end subroutine assignment_type_int_3d
 
+    !>
+    !> Deallocates the component arrays of the 3D integer vector type.
+    !>
     subroutine destroy_type_int_3d(self)
         implicit none
+        !> The vector array object to destroy.
         class(type_int_3d), intent(inout) :: self
 
         call deallocate_array(self%x)

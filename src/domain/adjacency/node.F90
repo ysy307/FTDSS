@@ -5,7 +5,7 @@
 !> and j share an element. The adjacency is stored in both Coordinate (COO) and
 !> Compressed Sparse Row (CSR) formats.
 !>
-module domain_adjacency_adjacency_node
+module domain_adjacency_node
     use, intrinsic :: iso_fortran_env, only: int32, int64
     use :: stdlib_sorting, only:sort
     use :: module_core, only:allocate_array, deallocate_array, unique
@@ -33,14 +33,14 @@ module domain_adjacency_adjacency_node
         !> Column indices for CSR format.
         integer(int32), allocatable :: ind(:)
     contains
-        procedure, pass(self), public :: initialize => initialize_from_connectivity
+        procedure, pass(self), public :: initialize => initialize_type_node_adjacency
         procedure, pass(self), public :: get_num_nodes => get_num_nodes
         procedure, pass(self), public :: get_degree => get_degree_csr
         procedure, pass(self), public :: get_neighbors => get_neighbors_csr
         procedure, pass(self), public :: get_nnz => get_nnz
         procedure, pass(self), public :: get_coo => get_coo
         procedure, pass(self), public :: get_csr => get_csr
-        procedure, pass(self), public :: destroy => destroy_adjacency
+        procedure, pass(self), public :: destroy => destroy_type_node_adjacency
     end type type_node_adjacency
 
 contains
@@ -50,7 +50,7 @@ contains
     !> This is the main routine that orchestrates the creation of both the
     !> COO and CSR representations of the graph.
     !>
-    subroutine initialize_from_connectivity(self, num_all_nodes, conn_ind, conn_val)
+    subroutine initialize_type_node_adjacency(self, num_all_nodes, conn_ind, conn_val)
         implicit none
         !> The node adjacency object to initialize.
         class(type_node_adjacency), intent(inout) :: self
@@ -85,7 +85,7 @@ contains
 
         call deallocate_array(temp_row)
         call deallocate_array(temp_col)
-    end subroutine initialize_from_connectivity
+    end subroutine initialize_type_node_adjacency
 
     !>
     !> Estimates the maximum possible size of the temporary COO array.
@@ -409,7 +409,7 @@ contains
     !>
     !> Deallocates all internal arrays of the node adjacency object.
     !>
-    subroutine destroy_adjacency(self)
+    subroutine destroy_type_node_adjacency(self)
         implicit none
         !> The node adjacency object to destroy.
         class(type_node_adjacency), intent(inout) :: self
@@ -420,6 +420,6 @@ contains
         call deallocate_array(self%ind)
         self%num_nodes = 0
         self%nnz = 0
-    end subroutine destroy_adjacency
+    end subroutine destroy_type_node_adjacency
 
-end module domain_adjacency_adjacency_node
+end module domain_adjacency_node

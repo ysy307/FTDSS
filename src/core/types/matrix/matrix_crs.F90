@@ -3,29 +3,70 @@ submodule(core_types_matrix) core_types_matrix_crs
 
 contains
 
-    module subroutine initialize_type_crs(self, num_nodes, row, col)
+    module subroutine initialize_type_crs(self, num_nodes, num_dofs, row, col)
         implicit none
         class(type_crs), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
-        integer(int32), intent(in), optional :: row(:) ! CRSではptr配列に相当
-        integer(int32), intent(in), optional :: col(:) ! CRSではind配列に相当
+        integer(int32), intent(in) :: num_dofs
+        integer(int32), intent(in), optional :: row(:) ! 節点レベルのptr配列
+        integer(int32), intent(in), optional :: col(:) ! 節点レベルのind配列
+
+        integer(int32) :: final_num_row, final_nnz, ind_idx
+        integer(int32) :: r_node, c_node, k, k_start, k_end
+        integer(int32) :: idof, jdof
+        integer(int32) :: current_dof_row
 
         if (.not. present(row) .or. .not. present(col)) then
-            print *, "Error: row(ptr) and col(ind) must be provided for CRS initialization."
+            print *, "Error: row (node_ptr) and col (node_ind) must be provided."
             stop
         end if
 
-        self%num_row = num_nodes
-        self%num_ptr = num_nodes + 1
-        self%nnz = size(col)
+        ! ## クリティカルなチェック: ptr配列のサイズを検証
+        if (size(row) /= num_nodes + 1) then
+            print *, "Error: The size of row (node_ptr) array must be num_nodes + 1."
+            stop
+        end if
 
-        call allocate_array(self%ptr, self%num_ptr + 1)
-        self%ptr = row(:)
+        ! --- 行列サイズと nnz を計算 ---
+        final_num_row = num_nodes * num_dofs
+        final_nnz = size(col) * num_dofs * num_dofs
 
+        self%num_row = final_num_row
+        self%num_ptr = final_num_row + 1
+        self%nnz = final_nnz
+
+        ! --- 配列を確保 ---
+        call allocate_array(self%ptr, self%num_ptr)
         call allocate_array(self%ind, self%nnz)
-        self%ind = col(:)
-
         call allocate_array(self%val, self%nnz)
+
+        ! --- ptr と ind を作成 ---
+        ind_idx = 0
+        self%ptr(1) = 1
+
+        do r_node = 1, num_nodes
+            k_start = row(r_node)
+            k_end = row(r_node + 1) - 1
+
+            do idof = 1, num_dofs
+                current_dof_row = (r_node - 1) * num_dofs + idof
+
+                ! この行の開始位置を記録
+                self%ptr(current_dof_row) = ind_idx + 1
+
+                do k = k_start, k_end
+                    c_node = col(k)
+                    do jdof = 1, num_dofs
+                        ind_idx = ind_idx + 1
+                        self%ind(ind_idx) = (c_node - 1) * num_dofs + jdof
+                    end do
+                end do
+            end do
+        end do
+
+        ! 最後の要素を nnz+1 に設定
+        self%ptr(final_num_row + 1) = ind_idx + 1
+
         self%val = 0.0d0
     end subroutine initialize_type_crs
 

@@ -5,7 +5,7 @@ module core_types
     use :: core_types_pointer, only:type_dp_pointer
     use :: core_types_variable, only:type_variable
     use :: core_types_gauss, only:type_state
-    use :: module_type_matrix, only:abst_matrix, type_coo, type_crs, type_dense, matrix_dense, matrix_crs, matrix_coo
+    use :: module_type_matrix, only:abst_matrix, type_coo, type_crs, type_dense
     implicit none
 
 end module core_types

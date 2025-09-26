@@ -4,7 +4,7 @@
 !> elements that contain a specific node, built from a CSR-formatted element
 !> connectivity array.
 !>
-module domain_adjacency_adjacency_node_element
+module domain_adjacency_node_element
     use, intrinsic :: iso_fortran_env, only: int32
 
     implicit none
@@ -29,9 +29,9 @@ module domain_adjacency_adjacency_node_element
         !> node ID and holds a list of element IDs.
         type(type_element_list), allocatable :: map_data(:)
     contains
-        procedure, pass(self), public :: initialize
+        procedure, pass(self), public :: initialize => initialize_type_map_node_to_element
         procedure, pass(self), public :: get_list => get_element_list
-        procedure, pass(self), public :: destroy
+        procedure, pass(self), public :: destroy => destroy_type_map_node_to_element
     end type type_map_node_to_element
 
 contains
@@ -42,7 +42,7 @@ contains
     !> number of elements per node, then allocate memory, and finally populate
     !> the map.
     !>
-    subroutine initialize(self, num_nodes, num_elements, conn_ind, conn_val)
+    subroutine initialize_type_map_node_to_element(self, num_nodes, num_elements, conn_ind, conn_val)
         implicit none
         !> The map object to be initialized.
         class(type_map_node_to_element), intent(inout) :: self
@@ -107,7 +107,7 @@ contains
             end do
         end do
         deallocate (current_indices)
-    end subroutine initialize
+    end subroutine initialize_type_map_node_to_element
 
     !>
     !> Returns a pointer to the list of element IDs for a specific node.
@@ -133,7 +133,7 @@ contains
     !>
     !> Deallocates all memory associated with the map.
     !>
-    subroutine destroy(self)
+    subroutine destroy_type_map_node_to_element(self)
         implicit none
         !> The map object to destroy.
         class(type_map_node_to_element), intent(inout) :: self
@@ -145,6 +145,6 @@ contains
             end if
         end do
         deallocate (self%map_data)
-    end subroutine destroy
+    end subroutine destroy_type_map_node_to_element
 
-end module domain_adjacency_adjacency_node_element
+end module domain_adjacency_node_element

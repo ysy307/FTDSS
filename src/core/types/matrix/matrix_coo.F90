@@ -4,30 +4,81 @@ submodule(core_types_matrix) core_types_matrix_coo
 
 contains
 
-    module subroutine initialize_type_coo(self, num_nodes, row, col)
+    module subroutine initialize_type_coo(self, num_nodes, num_dofs, row, col)
         implicit none
         class(type_coo), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
-        integer(int32), intent(in), optional :: row(:)
-        integer(int32), intent(in), optional :: col(:)
+        integer(int32), intent(in) :: num_dofs
+        integer(int32), intent(in), optional :: row(:) ! ソート済みの節点レベル行インデックス
+        integer(int32), intent(in), optional :: col(:) ! 対応する節点レベル列インデックス
+
+        integer(int32) :: idx, nloc
+        integer(int32) :: k, k_end, j
+        integer(int32) :: idof, jdof
+        integer(int32) :: r_node, c_node
+        integer(int32) :: current_dof_row
 
         if (.not. present(row) .or. .not. present(col)) then
             print *, "Error: row and col must be provided for COO initialization."
             stop
         end if
 
-        self%num_row = num_nodes
-        self%num_col = num_nodes
-        self%nnz = size(row)
+        nloc = size(row)
 
+        ! --- 行列サイズとnnzの計算 (これは変わらない) ---
+        self%num_row = num_nodes * num_dofs
+        self%num_col = num_nodes * num_dofs
+        self%nnz = nloc * num_dofs * num_dofs
+
+        ! --- 配列のメモリ確保 ---
         if (self%nnz > 0) then
             call allocate_array(self%row, self%nnz)
-            self%row = row(:)
             call allocate_array(self%col, self%nnz)
-            self%col = col(:)
             call allocate_array(self%val, self%nnz)
-            self%val = 0.0d0
+        else
+            return
         end if
+
+        ! --- ソート済みインデックスの確定処理 ---
+        idx = 0
+        k = 1
+        ! 1. 節点パターンの先頭からブロックごとに処理
+        do while (k <= nloc)
+            ! 現在処理中の節点行番号を取得
+            r_node = row(k)
+
+            ! 2. 同じ節点行番号がどこまで続くかを探す (ブロックの終点k_endを特定)
+            k_end = k
+            do while (k_end + 1 <= nloc .and. row(k_end + 1) == r_node)
+                k_end = k_end + 1
+            end do
+            ! これで row(k) から row(k_end) までは全て同じ r_node となる
+
+            ! 3. このブロックに対して自由度展開を行う
+            ! 節点行r_nodeに属する自由度をループ
+            do idof = 1, num_dofs
+                current_dof_row = (r_node - 1) * num_dofs + idof
+
+                ! 4. ブロック内の全ての節点列に対してループ (ご要望のcolループ)
+                do j = k, k_end
+                    c_node = col(j)
+
+                    ! 節点列c_nodeに属する自由度をループ
+                    do jdof = 1, num_dofs
+                        idx = idx + 1
+                        self%row(idx) = current_dof_row
+                        self%col(idx) = (c_node - 1) * num_dofs + jdof
+                    end do
+                end do
+            end do
+
+            ! 5. 次のブロックの開始点へポインタを移動
+            k = k_end + 1
+        end do
+
+        ! 値をゼロで初期化
+        self%val = 0.0d0
+
     end subroutine initialize_type_coo
 
     module pure function get_nnz_coo(self) result(nnz)
