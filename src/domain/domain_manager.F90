@@ -185,6 +185,9 @@ module domain_manager
         type(type_element_manager) :: elements
         !> Manages all boundary condition data.
         type(type_boundary_manager) :: boundaries
+
+        !> Indicates whether the domain is associated with a parent.
+        logical, private :: is_associated = .false.
     contains
         procedure, public, pass(self) :: initialize => initialize_type_domain
         procedure, private, pass(self) :: associate_parent
@@ -204,7 +207,7 @@ contains
         !> The parsed input data from a file.
         type(type_input), intent(in) :: input
 
-        call self%associate_parent(self%nodes, self%elements, self%boundaries)
+        if (self%is_associated) call self%associate_parent(self%nodes, self%elements, self%boundaries)
         call self%set_basic_info_and_dof_map(input)
 
         call self%nodes%initialize(input)
@@ -227,6 +230,8 @@ contains
         node%parent => self
         element%parent => self
         boundary%parent => self
+
+        self%is_associated = .true.
     end subroutine associate_parent
 
     !> Sets basic simulation info and configures the DOF map based on input settings.
