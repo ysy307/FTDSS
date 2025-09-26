@@ -5,11 +5,11 @@ module core_constants
 
     ! --- Matrix Types ---
     !> Dense matrix storage format
-    integer(int32), parameter, public :: matrix_dense = 1 !&
+    integer(int32), parameter, public :: MATRIX_DENSE = 1 !&
     !> Compressed Row Storage format
-    integer(int32), parameter, public :: matrix_crs   = 2 !&
+    integer(int32), parameter, public :: MATRIX_CRS   = 2 !&
     !> Coordinate list format
-    integer(int32), parameter, public :: matrix_coo   = 3 !&
+    integer(int32), parameter, public :: MATRIX_COO   = 3 !&
 
     ! --- Physics Types ---
     !> Thermal analysis

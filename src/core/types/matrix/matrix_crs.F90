@@ -303,7 +303,7 @@ contains
     end subroutine add_crs
 
     !>
-    !> Performs the matrix operation C = alpha*A + B, where A is self.
+    !> Performs the matrix operation \( C = \alpha*A + B \), where A is self.
     !> This simplified version requires all matrices to have identical sparsity patterns.
     !>
     module subroutine add_matrix_crs(self, alpha, B, C)
