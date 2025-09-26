@@ -257,24 +257,6 @@ module core_types_matrix
         integer(int32), allocatable :: ptr(:) ! pointers to row starts (num_row + 1 entries)
         integer(int32), allocatable :: ind(:) ! column indices of non-zeros
         real(real64), allocatable :: val(:) ! non-zero values
-
-#ifdef _MPI
-        ! --- MPI通信パターンを格納するメンバ (初期化時に設定) ---
-        integer(int32) :: n_recv_procs = 0 ! データを受信するプロセスの数
-        integer(int32), allocatable :: recv_procs(:) ! 受信元プロセスのランク一覧
-        integer(int32), allocatable :: recv_counts(:) ! 各受信元から受け取る要素数
-        integer(int32), allocatable :: recv_ptr(:) ! 受信データのインデックスポインタ
-
-        integer(int32) :: n_send_procs = 0 ! データを送信するプロセスの数
-        integer(int32), allocatable :: send_procs(:) ! 送信先プロセスのランク一覧
-        integer(int32), allocatable :: send_counts(:) ! 各送信先に送る要素数
-        integer(int32), allocatable :: send_ptr(:) ! 送信データのインデックスポインタ
-
-        integer(int32), allocatable :: send_indices(:) ! 他プロセスに送信するxの(ローカル)インデックスリスト
-
-        ! リモート要素（Halo/Ghost）を格納するバッファ
-        real(real64), allocatable :: remote_x(:)
-#endif
     contains
         ! --- initialize/destroy ---
         procedure, pass(self) :: initialize => initialize_type_crs

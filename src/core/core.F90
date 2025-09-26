@@ -7,6 +7,7 @@ module module_core
     use :: core_deallocate, only:deallocate_array
     use :: core_string_utils, only:join, filter, modify_path_format, get_bc_type_from_string
     use :: core_system_env, only:get_env_string
+    use :: core_findings, only:binary_find
     use :: core_fortran_utils_signal_flag_wrapper
     use :: core_fortran_utils_memory_stats_wrapper
     use :: core_fortran_utils_system_info_wrapper
@@ -15,6 +16,7 @@ module module_core
     use :: core_vtk
     use :: core_vtk_vtk_constants
     use :: core_constants
+    use :: core_parallel_constants
     implicit none
     public
 

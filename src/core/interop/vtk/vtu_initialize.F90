@@ -180,9 +180,30 @@ contains
         end if
 
         !----------------------------------------------------------------!
-        ! 5. MPI: グローバルIDへの変換 (並列処理で正しく動かすために必須)
+        ! 5. 全体情報の集計 (MPI)
         !----------------------------------------------------------------!
+        ! ◆修正: コネクティビティをグローバルIDに変換する処理を削除
+        ! NOTE: このブロックは、効率的なローカルインデックスを意図的に非効率な
+        !       グローバルIDに変換していました。この変換を行わないことで、
+        !       アプリケーション全体で高速なローカルインデックスが維持されます。
+        !
+        ! if (allocated(self%global_node_ids)) then
+        !     if (size(self%global_node_ids) > 0) then
+        !         local_max_node_id = maxval(self%global_node_ids)
+        !     else
+        !         local_max_node_id = 0
+        !     end if
+        !     call MPI_Allreduce(local_max_node_id, global_max_node_id, 1, MPI_INTEGER4, MPI_MAX, MPI_COMM_WORLD, ierr)
+        !     self%global_num_points = global_max_node_id
+        !
+        !     if (self%num_total_cells > 0 .and. self%num_points > 0) then
+        !         do i = 1, self%num_total_cells
+        !             self%cells(i)%connectivity(:) = self%global_node_ids(self%cells(i)%connectivity(:))
+        !         end do
+        !     end if
+        ! end if
 
+        ! 全体の節点数と要素数の集計は、情報として有用なため残す
         if (allocated(self%global_node_ids)) then
             if (size(self%global_node_ids) > 0) then
                 local_max_node_id = maxval(self%global_node_ids)
@@ -191,19 +212,15 @@ contains
             end if
             call MPI_Allreduce(local_max_node_id, global_max_node_id, 1, MPI_INTEGER4, MPI_MAX, MPI_COMM_WORLD, ierr)
             self%global_num_points = global_max_node_id
-
-            if (self%num_total_cells > 0 .and. self%num_points > 0) then
-                do i = 1, self%num_total_cells
-                    self%cells(i)%connectivity(:) = self%global_node_ids(self%cells(i)%connectivity(:))
-                end do
-            end if
         end if
+
         call MPI_Allreduce(self%num_total_cells, self%global_num_total_cells, 1, MPI_INTEGER4, MPI_SUM, MPI_COMM_WORLD, ierr)
 
         !----------------------------------------------------------------!
         ! 6. 後処理: 一時配列を解放し、メモリリークを防止
         !----------------------------------------------------------------!
         call deallocate_array(raw_connectivity)
+        call deallocate_array(raw_offsets)
         call deallocate_array(raw_cell_types)
         call deallocate_array(raw_cell_entity_ids)
         call deallocate_array(raw_point_field_values)
@@ -218,4 +235,3 @@ contains
     end subroutine type_vtk_vtu_initialize
 
 end submodule core_vtk_vtu_initialize
-

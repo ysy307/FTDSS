@@ -3,11 +3,23 @@ module core_constants
     implicit none
     private
 
+    ! --- Matrix Types ---
+    !> Dense matrix storage format
+    integer(int32), parameter, public :: matrix_dense = 1 !&
+    !> Compressed Row Storage format
+    integer(int32), parameter, public :: matrix_crs   = 2 !&
+    !> Coordinate list format
+    integer(int32), parameter, public :: matrix_coo   = 3 !&
+
     ! --- Physics Types ---
+    !> Thermal analysis
     integer(int32), parameter, public :: PHYSICS_TYPE_THERMAL    = 1 !&
+    !> Hydraulic analysis
     integer(int32), parameter, public :: PHYSICS_TYPE_HYDRAULIC  = 2 !&
+    !> Mechanical analysis
     integer(int32), parameter, public :: PHYSICS_TYPE_MECHANICAL = 3 !&
 
+    !> Total number of supported physics types
     integer(int32), parameter, public :: NUM_PHYSICS_TYPES = 3
 
     ! --- DOF Types ---
