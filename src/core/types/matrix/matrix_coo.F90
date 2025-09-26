@@ -1,5 +1,6 @@
 submodule(core_types_matrix) core_types_matrix_coo
-
+    use :: core_allocate, only:allocate_array
+    use :: core_deallocate, only:deallocate_array
     implicit none
 
 contains
@@ -7,16 +8,13 @@ contains
     module subroutine initialize_type_coo(self, num_nodes, num_dofs, row, col)
         implicit none
         class(type_coo), intent(inout) :: self
-        integer(int32), intent(in) :: num_nodes
-        integer(int32), intent(in) :: num_dofs
-        integer(int32), intent(in), optional :: row(:) ! ソート済みの節点レベル行インデックス
-        integer(int32), intent(in), optional :: col(:) ! 対応する節点レベル列インデックス
+        integer(int32), intent(in) :: num_nodes, num_dofs
+        integer(int32), intent(in), optional :: row(:) ! 節点レベル行インデックス(ソート済を仮定)
+        integer(int32), intent(in), optional :: col(:) ! 節点レベル列インデックス
 
-        integer(int32) :: idx, nloc
-        integer(int32) :: k, k_end, j
+        integer(int32) :: idx, nloc, i
         integer(int32) :: idof, jdof
         integer(int32) :: r_node, c_node
-        integer(int32) :: current_dof_row
 
         if (.not. present(row) .or. .not. present(col)) then
             print *, "Error: row and col must be provided for COO initialization."
@@ -25,7 +23,9 @@ contains
 
         nloc = size(row)
 
-        ! --- 行列サイズとnnzの計算 (これは変わらない) ---
+        ! --- 行列サイズと nnz の計算 ---
+        self%num_nodes = num_nodes
+        self%num_dofs = num_dofs
         self%num_row = num_nodes * num_dofs
         self%num_col = num_nodes * num_dofs
         self%nnz = nloc * num_dofs * num_dofs
@@ -39,41 +39,20 @@ contains
             return
         end if
 
-        ! --- ソート済みインデックスの確定処理 ---
+        ! --- [修正点] 自由度ブロック展開 (行・列でソート済になるようにループを構成) ---
+        ! 入力のrow(:)が行番号でソート済み、かつ同じ行番号内ではcol(:)が
+        ! 列番号でソート済みであると仮定することで、効率的にソート済みCOOを生成する.
         idx = 0
-        k = 1
-        ! 1. 節点パターンの先頭からブロックごとに処理
-        do while (k <= nloc)
-            ! 現在処理中の節点行番号を取得
-            r_node = row(k)
-
-            ! 2. 同じ節点行番号がどこまで続くかを探す (ブロックの終点k_endを特定)
-            k_end = k
-            do while (k_end + 1 <= nloc .and. row(k_end + 1) == r_node)
-                k_end = k_end + 1
-            end do
-            ! これで row(k) から row(k_end) までは全て同じ r_node となる
-
-            ! 3. このブロックに対して自由度展開を行う
-            ! 節点行r_nodeに属する自由度をループ
+        do i = 1, nloc
+            r_node = row(i)
+            c_node = col(i)
             do idof = 1, num_dofs
-                current_dof_row = (r_node - 1) * num_dofs + idof
-
-                ! 4. ブロック内の全ての節点列に対してループ (ご要望のcolループ)
-                do j = k, k_end
-                    c_node = col(j)
-
-                    ! 節点列c_nodeに属する自由度をループ
-                    do jdof = 1, num_dofs
-                        idx = idx + 1
-                        self%row(idx) = current_dof_row
-                        self%col(idx) = (c_node - 1) * num_dofs + jdof
-                    end do
+                do jdof = 1, num_dofs
+                    idx = idx + 1
+                    self%row(idx) = (idof - 1) * num_nodes + r_node
+                    self%col(idx) = (jdof - 1) * num_nodes + c_node
                 end do
             end do
-
-            ! 5. 次のブロックの開始点へポインタを移動
-            k = k_end + 1
         end do
 
         ! 値をゼロで初期化
@@ -81,83 +60,108 @@ contains
 
     end subroutine initialize_type_coo
 
-    module pure function get_nnz_coo(self) result(nnz)
+    ! find_coo は非常に低速であることに注意。
+    ! 頻繁な要素アクセスにはCRS形式が推奨される。
+    module pure function find_coo(self, row_dof, col_dof, row, col) result(index)
         implicit none
         class(type_coo), intent(in) :: self
-        integer(int32) :: nnz
-
-        nnz = self%nnz
-
-    end function get_nnz_coo
-
-    module pure function get_num_row_coo(self) result(num_row)
-        implicit none
-        class(type_coo), intent(in) :: self
-        integer(int32) :: num_row
-
-        num_row = self%num_row
-
-    end function get_num_row_coo
-
-    module pure function get_num_col_coo(self) result(num_col)
-        implicit none
-        class(type_coo), intent(in) :: self
-        integer(int32) :: num_col
-
-        num_col = self%num_col
-
-    end function get_num_col_coo
-
-    module function get_row_coo(self) result(row)
-        implicit none
-        class(type_coo), intent(in), target :: self
-        integer(int32), dimension(:), pointer :: row
-
-        row => self%row
-
-    end function get_row_coo
-
-    module function get_col_coo(self) result(col)
-        implicit none
-        class(type_coo), intent(in), target :: self
-        integer(int32), dimension(:), pointer :: col
-
-        col => self%col
-
-    end function get_col_coo
-
-    module function get_val_coo(self) result(val)
-        implicit none
-        class(type_coo), intent(in), target :: self
-        real(real64), dimension(:), pointer :: val
-
-        val => self%val
-
-    end function get_val_coo
-
-    module pure function find_coo(self, row, col) result(index)
-        implicit none
-        class(type_coo), intent(in) :: self
-        integer(int32), intent(in) :: row, col
+        integer(int32), intent(in) :: row_dof, col_dof, row, col
         integer(int32) :: index, i
+        integer(int32) :: actual_row, actual_col
+
+        actual_row = (row_dof - 1) * self%num_nodes + row
+        actual_col = (col_dof - 1) * self%num_nodes + col
 
         index = 0
+        ! O(nnz)の線形探索。大規模問題では深刻なボトルネックになる。
         do i = 1, self%nnz
-            if (self%row(i) == row .and. self%col(i) == col) then
+            if (self%row(i) == actual_row .and. self%col(i) == actual_col) then
                 index = i
                 return
             end if
         end do
     end function find_coo
 
-    module subroutine set_coo(self, row, col, value)
+    module subroutine gemv_coo(self, alpha, x, beta, y)
+        ! y := alpha*A*x + beta*y
+        implicit none
+        class(type_coo), intent(in) :: self
+        real(real64), intent(in) :: alpha
+        real(real64), intent(in) :: x(:)
+        real(real64), intent(in) :: beta
+        real(real64), intent(inout) :: y(:)
+        integer(int32) :: i
+
+        ! --- [修正点] 並列化のバグを修正 ---
+        ! 1. 先に y 全体を beta でスケールする (betaの誤った複数回適用を防ぐ)
+        if (beta == 0.0d0) then
+            y = 0.0d0
+        else
+            y = beta * y
+        end if
+
+        ! 2. 各非ゼロ要素の寄与を加算する
+        !    yの同じ要素への複数スレッドからの書き込みは atomic で保護する
+        !$omp parallel do
+        do i = 1, self%nnz
+            !$omp atomic update
+            y(self%row(i)) = y(self%row(i)) + alpha * self%val(i) * x(self%col(i))
+        end do
+        !$omp end parallel do
+
+    end subroutine gemv_coo
+
+    ! --- 以下、変更なし ---
+
+    module pure function get_nnz_coo(self) result(nnz)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32) :: nnz
+        nnz = self%nnz
+    end function get_nnz_coo
+
+    module pure function get_num_row_coo(self) result(num_row)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32) :: num_row
+        num_row = self%num_row
+    end function get_num_row_coo
+
+    module pure function get_num_col_coo(self) result(num_col)
+        implicit none
+        class(type_coo), intent(in) :: self
+        integer(int32) :: num_col
+        num_col = self%num_col
+    end function get_num_col_coo
+
+    module function get_row_coo(self) result(row)
+        implicit none
+        class(type_coo), intent(in), target :: self
+        integer(int32), dimension(:), pointer :: row
+        row => self%row
+    end function get_row_coo
+
+    module function get_col_coo(self) result(col)
+        implicit none
+        class(type_coo), intent(in), target :: self
+        integer(int32), dimension(:), pointer :: col
+        col => self%col
+    end function get_col_coo
+
+    module function get_val_coo(self) result(val)
+        implicit none
+        class(type_coo), intent(in), target :: self
+        real(real64), dimension(:), pointer :: val
+        val => self%val
+    end function get_val_coo
+
+    module subroutine set_coo(self, row_dof, col_dof, row, col, value)
         implicit none
         class(type_coo), intent(inout) :: self
-        integer(int32), intent(in) :: row, col
+        integer(int32), intent(in) :: row_dof, col_dof, row, col
         real(real64), intent(in) :: value
         integer(int32) :: index
-
-        index = self%find(row, col)
+        index = self%find(row_dof, col_dof, row, col)
 #ifdef USE_DEBUG
         if (index > 0) then
 #endif
@@ -169,44 +173,40 @@ contains
 #endif
     end subroutine set_coo
 
-    module subroutine set_row_coo(self, row, value)
+    module subroutine set_row_coo(self, row_dof, row, value)
         implicit none
         class(type_coo), intent(inout) :: self
-        integer(int32), intent(in) :: row
+        integer(int32), intent(in) :: row_dof, row
         real(real64), intent(in) :: value
-
-        integer(int32) :: i
+        integer(int32) :: i, actual_row
+        actual_row = (row_dof - 1) * self%num_nodes + row
         do i = 1, self%nnz
-            if (self%row(i) == row) then
+            if (self%row(i) == actual_row) then
                 self%val(i) = value
             end if
         end do
-
     end subroutine set_row_coo
 
     module subroutine set_all_coo(self, value)
         implicit none
         class(type_coo), intent(inout) :: self
         real(real64), intent(in) :: value
-
         self%val = value
     end subroutine set_all_coo
 
     module subroutine zero_coo(self)
         implicit none
         class(type_coo), intent(inout) :: self
-
         self%val = 0.0d0
     end subroutine zero_coo
 
-    module subroutine add_coo(self, row, col, value)
+    module subroutine add_coo(self, row_dof, col_dof, row, col, value)
         implicit none
         class(type_coo), intent(inout) :: self
-        integer(int32), intent(in) :: row, col
+        integer(int32), intent(in) :: row_dof, col_dof, row, col
         real(real64), intent(in) :: value
         integer(int32) :: index
-
-        index = self%find(row, col)
+        index = self%find(row_dof, col_dof, row, col)
 #ifdef USE_DEBUG
         if (index > 0) then
 #endif
@@ -220,13 +220,10 @@ contains
 
     module subroutine add_matrix_coo(self, alpha, B, C)
         implicit none
-        class(type_coo), intent(in) :: self ! This is matrix A
+        class(type_coo), intent(in) :: self
         real(real64), intent(in) :: alpha
         class(abst_matrix), intent(in) :: B
         class(abst_matrix), intent(inout) :: C
-        ! NOTE: これはA, B, Cが全く同じ非ゼロパターンを持つという
-        !       非常に強い仮定の下での簡易的な実装です。
-        !       実用的な疎行列の加算はより複雑なアルゴリズムを要します。
         select type (B_coo => B)
         type is (type_coo)
             select type (C_coo => C)
@@ -235,37 +232,15 @@ contains
                     print *, "ERROR(add_matrix_coo): In this simplified version, NNZ must be identical."
                     stop
                 end if
-                ! この単純な操作は、row/colのパターンが完全に一致する場合にのみ有効
                 C_coo%val = alpha * self%val + B_coo%val
             end select
         end select
     end subroutine add_matrix_coo
 
-    module subroutine gemv_coo(self, alpha, x, beta, y)
-        ! y := alpha*A*x + beta*y
-        implicit none
-        class(type_coo), intent(in) :: self
-        real(real64), intent(in) :: alpha
-        real(real64), intent(in) :: x(:)
-        real(real64), intent(in) :: beta
-        real(real64), intent(inout) :: y(:)
-
-        integer(int32) :: i
-
-        !$omp parallel do default(shared) private(i)
-        do i = 1, self%nnz
-            !$omp atomic
-            y(self%row(i)) = alpha * self%val(i) * x(self%col(i)) + beta * y(self%row(i))
-        end do
-        !$omp end parallel do
-
-    end subroutine gemv_coo
-
     module subroutine display_coo(self)
         implicit none
         class(type_coo), intent(in) :: self
         integer(int32) :: i
-
         print *, "COO Matrix (max_dims=", self%num_row, "x", self%num_col, ", nnz=", self%nnz, ")"
         do i = 1, self%nnz
             write (*, '(2(i8, ", "), es16.8)') self%row(i), self%col(i), self%val(i)

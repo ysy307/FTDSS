@@ -14,6 +14,9 @@ contains
         integer(int32), intent(in), optional :: row(:)
         integer(int32), intent(in), optional :: col(:)
 
+        self%num_nodes = num_nodes
+        self%num_dofs = num_dofs
+
         self%num_row = num_nodes * num_dofs
         self%num_col = num_nodes * num_dofs
         call allocate_array(self%val, self%num_row, self%num_col)
@@ -61,22 +64,29 @@ contains
     !----------------------------------------------------------
     ! 要素を設定
     !----------------------------------------------------------
-    module subroutine set_value_dense(self, row, col, value)
+    module subroutine set_value_dense(self, row_dof, col_dof, row, col, value)
         implicit none
         class(type_dense), intent(inout) :: self
-        integer(int32), intent(in) :: row, col
+        integer(int32), intent(in) :: row_dof, col_dof, row, col
         real(real64), intent(in) :: value
 
-        self%val(row, col) = value
+        integer(int32) :: actual_row, actual_col
+        actual_row = (row - 1) * row_dof + 1
+        actual_col = (col - 1) * col_dof + 1
+
+        self%val(actual_row, actual_col) = value
     end subroutine set_value_dense
 
-    module subroutine set_row_dense(self, row, value)
+    module subroutine set_row_dense(self, row_dof, row, value)
         implicit none
         class(type_dense), intent(inout) :: self
-        integer(int32), intent(in) :: row
+        integer(int32), intent(in) :: row_dof, row
         real(real64), intent(in) :: value
+        integer(int32) :: actual_row
 
-        self%val(row, :) = value
+        actual_row = (row_dof - 1) * self%num_nodes + row
+
+        self%val(actual_row, :) = value
 
     end subroutine set_row_dense
     !----------------------------------------------------------
@@ -102,13 +112,18 @@ contains
     !----------------------------------------------------------
     ! 要素に値を加算
     !----------------------------------------------------------
-    module subroutine add_value_dense(self, row, col, value)
+    module subroutine add_value_dense(self, row_dof, col_dof, row, col, value)
         implicit none
         class(type_dense), intent(inout) :: self
-        integer(int32), intent(in) :: row, col
+        integer(int32), intent(in) :: row_dof, col_dof, row, col
         real(real64), intent(in) :: value
 
-        self%val(row, col) = self%val(row, col) + value
+        integer(int32) :: actual_row, actual_col
+
+        actual_row = (row_dof - 1) * self%num_nodes + row
+        actual_col = (col_dof - 1) * self%num_nodes + col
+
+        self%val(actual_row, actual_col) = self%val(actual_row, actual_col) + value
     end subroutine add_value_dense
 
     !----------------------------------------------------------

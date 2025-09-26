@@ -2,6 +2,7 @@ module core_types_matrix
     use, intrinsic :: iso_fortran_env
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
+    use :: core_findings, only:binary_find
     implicit none
     private
 
@@ -13,6 +14,8 @@ module core_types_matrix
     ! Abstract base type for matrices.
     type, abstract :: abst_matrix
         private
+        integer(int32) :: num_nodes = 0
+        integer(int32) :: num_dofs = 0
     contains
         procedure(abst_initialize), public, pass(self), deferred :: initialize
         procedure(abst_destroy), public, pass(self), deferred :: destroy
@@ -44,20 +47,20 @@ module core_types_matrix
 
         end subroutine abst_initialize
 
-        subroutine abst_set_value(self, dof, row, col, value)
+        subroutine abst_set_value(self, row_dof, col_dof, row, col, value)
             import :: abst_matrix, int32, real64
             implicit none
             class(abst_matrix), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine abst_set_value
 
-        subroutine abst_set_row(self, dof, row, value)
+        subroutine abst_set_row(self, row_dof, row, value)
             import :: abst_matrix, real64, int32
             implicit none
             class(abst_matrix), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row
+            integer(int32), intent(in) :: row_dof, row
             real(real64), intent(in) :: value
 
         end subroutine abst_set_row
@@ -77,11 +80,11 @@ module core_types_matrix
 
         end subroutine abst_zero
 
-        subroutine abst_add_value(self, dof, row, col, value)
+        subroutine abst_add_value(self, row_dof, col_dof, row, col, value)
             import :: abst_matrix, int32, real64
             implicit none
             class(abst_matrix), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine abst_add_value
@@ -190,18 +193,18 @@ module core_types_matrix
 
         end function get_val_dense
 
-        module subroutine set_value_dense(self, dof, row, col, value)
+        module subroutine set_value_dense(self, row_dof, col_dof, row, col, value)
             implicit none
             class(type_dense), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine set_value_dense
 
-        module subroutine set_row_dense(self, dof, row, value)
+        module subroutine set_row_dense(self, row_dof, row, value)
             implicit none
             class(type_dense), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row
+            integer(int32), intent(in) :: row_dof, row
             real(real64), intent(in) :: value
 
         end subroutine set_row_dense
@@ -218,10 +221,10 @@ module core_types_matrix
 
         end subroutine zero_dense
 
-        module subroutine add_value_dense(self, dof, row, col, value)
+        module subroutine add_value_dense(self, row_dof, col_dof, row, col, value)
             implicit none
             class(type_dense), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine add_value_dense
@@ -256,6 +259,7 @@ module core_types_matrix
         integer(int32) :: nnz = 0 ! number of non-zero elements
         integer(int32) :: num_row = 0 ! number of rows
         integer(int32) :: num_ptr = 0 ! number of pointers
+
         integer(int32), allocatable :: ptr(:) ! pointers to row starts (num_row + 1 entries)
         integer(int32), allocatable :: ind(:) ! column indices of non-zeros
         real(real64), allocatable :: val(:) ! non-zero values
@@ -351,26 +355,26 @@ module core_types_matrix
 
         end function get_val_crs
 
-        module pure function find_crs(self, dof, row, col) result(index)
+        module pure function find_crs(self, row_dof, col_dof, row, col) result(index)
             implicit none
             class(type_crs), intent(in) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             integer(int32) :: index
 
         end function find_crs
 
-        module subroutine set_crs(self, dof, row, col, value)
+        module subroutine set_crs(self, row_dof, col_dof, row, col, value)
             implicit none
             class(type_crs), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine set_crs
 
-        module subroutine set_row_crs(self, dof, row, value)
+        module subroutine set_row_crs(self, row_dof, row, value)
             implicit none
             class(type_crs), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row
+            integer(int32), intent(in) :: row_dof, row
             real(real64), intent(in) :: value
 
         end subroutine set_row_crs
@@ -388,10 +392,10 @@ module core_types_matrix
 
         end subroutine zero_crs
 
-        module subroutine add_crs(self, dof, row, col, value)
+        module subroutine add_crs(self, row_dof, col_dof, row, col, value)
             implicit none
             class(type_crs), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine add_crs
@@ -516,26 +520,26 @@ module core_types_matrix
 
         end function get_val_coo
 
-        module pure function find_coo(self, dof, row, col) result(index)
+        module pure function find_coo(self, row_dof, col_dof, row, col) result(index)
             implicit none
             class(type_coo), intent(in) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             integer(int32) :: index
 
         end function find_coo
 
-        module subroutine set_coo(self, dof, row, col, value)
+        module subroutine set_coo(self, row_dof, col_dof, row, col, value)
             implicit none
             class(type_coo), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine set_coo
 
-        module subroutine set_row_coo(self, dof, row, value)
+        module subroutine set_row_coo(self, row_dof, row, value)
             implicit none
             class(type_coo), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row
+            integer(int32), intent(in) :: row_dof, row
             real(real64), intent(in) :: value
 
         end subroutine set_row_coo
@@ -553,10 +557,10 @@ module core_types_matrix
 
         end subroutine zero_coo
 
-        module subroutine add_coo(self, dof, row, col, value)
+        module subroutine add_coo(self, row_dof, col_dof, row, col, value)
             implicit none
             class(type_coo), intent(inout) :: self
-            integer(int32), intent(in) :: dof, row, col
+            integer(int32), intent(in) :: row_dof, col_dof, row, col
             real(real64), intent(in) :: value
 
         end subroutine add_coo
