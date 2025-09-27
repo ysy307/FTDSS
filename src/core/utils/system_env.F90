@@ -30,6 +30,8 @@ contains
 
         call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
 
+        if (allocated(value)) deallocate (value)
+
         ! Rank 0 reads the environment variable
         if (my_rank == 0) then
             call get_environment_variable(env_var_name, buffer, status=status)

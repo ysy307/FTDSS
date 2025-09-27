@@ -57,7 +57,6 @@ contains
         integer(int32) :: num_row
 
         num_row = self%num_row
-
     end function get_num_row_dense
 
     !>
@@ -71,7 +70,6 @@ contains
         integer(int32) :: num_col
 
         num_col = self%num_col
-
     end function get_num_col_dense
 
     !>
@@ -102,6 +100,7 @@ contains
         real(real64), intent(in) :: value
 
         integer(int32) :: actual_row, actual_col
+
         actual_row = (row - 1) * self%num_dofs + row_dof
         actual_col = (col - 1) * self%num_dofs + col_dof
 
@@ -121,6 +120,7 @@ contains
         integer(int32), intent(in) :: row
         !> The scalar value to assign.
         real(real64), intent(in) :: value
+
         integer(int32) :: actual_row
 
         actual_row = (row_dof - 1) * self%num_nodes + row

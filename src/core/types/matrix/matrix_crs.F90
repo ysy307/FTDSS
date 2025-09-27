@@ -134,6 +134,7 @@ contains
         class(type_crs), intent(in) :: self
         !> The number of non-zero entries.
         integer(int32) :: nnz
+
         nnz = self%nnz
     end function get_nnz_crs
 
@@ -146,6 +147,7 @@ contains
         class(type_crs), intent(in) :: self
         !> The size of the pointer array.
         integer(int32) :: num_ptr
+
         num_ptr = self%num_ptr
     end function get_num_ptr_crs
 
@@ -158,6 +160,7 @@ contains
         class(type_crs), intent(in) :: self
         !> The number of rows.
         integer(int32) :: num_row
+
         num_row = self%num_row
     end function get_num_row_crs
 
@@ -170,6 +173,7 @@ contains
         class(type_crs), intent(in), target :: self
         !> A pointer to the CSR `ptr` array.
         integer(int32), dimension(:), pointer :: ptr
+
         ptr => self%ptr
     end function get_ptr_crs
 
@@ -182,6 +186,7 @@ contains
         class(type_crs), intent(in), target :: self
         !> A pointer to the CSR `ind` array.
         integer(int32), dimension(:), pointer :: ind
+
         ind => self%ind
     end function get_ind_crs
 
@@ -194,6 +199,7 @@ contains
         class(type_crs), intent(in), target :: self
         !> A pointer to the CSR `val` array.
         real(real64), dimension(:), pointer :: val
+
         val => self%val
     end function get_val_crs
 
@@ -214,6 +220,7 @@ contains
         integer(int32), intent(in) :: col
         !> The value to set at the specified entry.
         real(real64), intent(in) :: value
+
         integer(int32) :: index
 
         index = self%find(row_dof, col_dof, row, col)
@@ -237,6 +244,7 @@ contains
         class(type_crs), intent(inout) :: self
         !> The scalar value to assign to all non-zero entries.
         real(real64), intent(in) :: value
+
         self%val = value
     end subroutine set_all_crs
 
@@ -253,6 +261,7 @@ contains
         integer(int32), intent(in) :: row
         !> The scalar value to assign.
         real(real64), intent(in) :: value
+
         integer(int32) :: actual_row, is, ie
 
         actual_row = (row_dof - 1) * self%num_nodes + row
@@ -268,6 +277,7 @@ contains
         implicit none
         !> The CRS matrix object.
         class(type_crs), intent(inout) :: self
+
         self%val = 0.0d0
     end subroutine zero_crs
 
@@ -288,6 +298,7 @@ contains
         integer(int32), intent(in) :: col
         !> The value to add to the specified entry.
         real(real64), intent(in) :: value
+
         integer(int32) :: index
 
         index = self%find(row_dof, col_dof, row, col)
@@ -316,6 +327,7 @@ contains
         class(abst_matrix), intent(in) :: B
         !> The abstract matrix C to store the result (must be of type_crs).
         class(abst_matrix), intent(inout) :: C
+
         select type (B_crs => B)
         type is (type_crs)
             select type (C_crs => C)
@@ -344,6 +356,7 @@ contains
         real(real64), intent(in) :: beta
         !> The input/output vector y.
         real(real64), intent(inout) :: y(:)
+
         integer(int32) :: i, j, is, ie
         real(real64) :: sum
 
