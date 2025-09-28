@@ -1,7 +1,7 @@
 module main_thermal_assemble
     use, intrinsic :: iso_fortran_env, only: int32, real64
 !$  use omp_lib
-    use :: module_core, only:type_state, type_dp_vector_3d, assignment(=), type_variable, allocate_array, deallocate_array, type_crs, type_dense
+    use :: module_core, only:type_state, type_coordinate_dp, assignment(=), type_variable, allocate_array, deallocate_array, type_crs, type_dense
     use :: module_domain, only:type_domain, abst_mesh
     use :: module_field, only:type_jacobian_matrix, type_residual_vector
     use :: module_properties, only:type_properties_manager

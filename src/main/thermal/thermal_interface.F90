@@ -47,7 +47,7 @@ module main_thermal
             implicit none
             class(type_thermal), intent(inout) :: self
             type(type_input), intent(inout) :: input
-            type(type_dp_3d), intent(inout), pointer :: coordinate
+            type(type_coordinate_array_dp), intent(inout), pointer :: coordinate
             type(type_domain), intent(inout) :: domain
 
         end subroutine initialize_type_thermal

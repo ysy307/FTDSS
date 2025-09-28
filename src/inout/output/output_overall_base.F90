@@ -6,7 +6,7 @@ contains
         implicit none
         class(type_output_overall), intent(inout) :: self
         type(Type_input), intent(in) :: input
-        type(type_dp_3d), intent(in) :: coordinate
+        type(type_coordinate_array_dp), intent(in) :: coordinate
         type(type_domain), intent(inout) :: domain
         character(*), intent(in) :: dir_output
 

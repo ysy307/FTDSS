@@ -19,7 +19,7 @@ contains
         implicit none
         class(type_output_overall), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_dp_3d), intent(in) :: coordinate
+        type(type_coordinate_array_dp), intent(in) :: coordinate
         type(type_domain), intent(inout) :: domain
 
         integer(int32) :: i, j, idx, total
@@ -64,7 +64,7 @@ contains
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: si(:)
         real(real64), intent(in), optional :: pressure(:)
-        type(type_dp_3d), intent(in), optional :: water_flux
+        type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
         integer(int32) :: status
         integer(int32) :: unit_num

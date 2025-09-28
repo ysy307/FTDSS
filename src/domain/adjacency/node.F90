@@ -38,8 +38,10 @@ module domain_adjacency_node
         procedure, pass(self), public :: get_degree => get_degree_csr
         procedure, pass(self), public :: get_neighbors => get_neighbors_csr
         procedure, pass(self), public :: get_nnz => get_nnz
-        procedure, pass(self), public :: get_coo => get_coo
-        procedure, pass(self), public :: get_csr => get_csr
+        procedure, pass(self), public :: get_coo
+        procedure, pass(self), public :: get_coo_ptr
+        procedure, pass(self), public :: get_csr
+        procedure, pass(self), public :: get_csr_ptr
         procedure, pass(self), public :: destroy => destroy_type_node_adjacency
     end type type_node_adjacency
 
@@ -368,15 +370,29 @@ contains
         integer(int32), allocatable, intent(inout) :: col_out(:)
 
         if (self%nnz > 0) then
-            call allocate_array(row_out, self%nnz)
-            call allocate_array(col_out, self%nnz)
-            row_out = self%row
-            col_out = self%col
+            call allocate_array(row_out, source=self%row)
+            call allocate_array(col_out, source=self%col)
         else
             call allocate_array(row_out, 0)
             call allocate_array(col_out, 0)
         end if
     end subroutine get_coo
+
+    !>
+    !> Retrieves the COO representation of the adjacency graph.
+    !>
+    subroutine get_coo_ptr(self, row_out, col_out)
+        implicit none
+        !> The node adjacency object.
+        class(type_node_adjacency), intent(in), target :: self
+        !> An allocatable array that will contain the row indices.
+        integer(int32), dimension(:), intent(inout), pointer :: row_out(:)
+        !> An allocatable array that will contain the column indices.
+        integer(int32), dimension(:), intent(inout), pointer :: col_out(:)
+
+        row_out => self%row
+        col_out => self%col
+    end subroutine get_coo_ptr
 
     !>
     !> Retrieves the CSR representation of the adjacency graph.
@@ -391,10 +407,8 @@ contains
         integer(int32), allocatable, intent(inout) :: ind_out(:)
 
         if (self%num_nodes > 0 .and. self%nnz > 0) then
-            call allocate_array(ptr_out, self%num_nodes + 1)
-            call allocate_array(ind_out, self%nnz)
-            ptr_out = self%ptr
-            ind_out = self%ind
+            call allocate_array(ptr_out, source=self%ptr)
+            call allocate_array(ind_out, source=self%ind)
         else
             if (self%num_nodes > 0) then
                 call allocate_array(ptr_out, self%num_nodes + 1)
@@ -405,6 +419,22 @@ contains
             call allocate_array(ind_out, 0)
         end if
     end subroutine get_csr
+
+    !>
+    !> Retrieves the CSR representation of the adjacency graph.
+    !>
+    subroutine get_csr_ptr(self, ptr_out, ind_out)
+        implicit none
+        !> The node adjacency object.
+        class(type_node_adjacency), intent(in), target :: self
+        !> An allocatable array that will contain the row pointers.
+        integer(int32), dimension(:), intent(inout), pointer :: ptr_out
+        !> An allocatable array that will contain the column indices.
+        integer(int32), dimension(:), intent(inout), pointer :: ind_out
+
+        ptr_out => self%ptr
+        ind_out => self%ind
+    end subroutine get_csr_ptr
 
     !>
     !> Deallocates all internal arrays of the node adjacency object.

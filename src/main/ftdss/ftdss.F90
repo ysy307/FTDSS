@@ -18,7 +18,7 @@ module Main_FTDSS
 
     type :: type_ftdss
         type(tDM) :: dm
-        type(type_dp_3d), pointer :: coordinate
+        type(type_coordinate_array_dp), pointer :: coordinate
         type(type_domain) :: domain
 
         type(type_variable) :: phi

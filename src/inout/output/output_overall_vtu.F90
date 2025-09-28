@@ -6,7 +6,7 @@ contains
         implicit none
         class(type_output_overall), intent(inout) :: self
         type(Type_Input), intent(in) :: Input
-        type(type_dp_3d), intent(in) :: Coordinate
+        type(type_coordinate_array_dp), intent(in) :: Coordinate
         type(type_domain), intent(inout) :: Domain
 
         integer(int32) :: i, j
@@ -69,7 +69,7 @@ contains
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: si(:)
         real(real64), intent(in), optional :: pressure(:)
-        type(type_dp_3d), intent(in), optional :: water_flux
+        type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
         type(vtk_file) :: vtu
         integer(int32) :: status

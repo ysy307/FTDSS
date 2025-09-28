@@ -4,10 +4,10 @@ module input_output
 !$  use :: omp_lib
     use :: stdlib_strings, only:to_string
     use :: vtk_fortran, only:vtk_file
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, & !&
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_coordinate_array_dp, type_state, & !&
                              get_username, get_hostname, get_compiler_name, get_compiler_version, & !&
                              get_cpu_architecture, get_os, get_openmp_version, get_memory_usage, & !&
-                             filter, type_dp_vector_3d, assignment(=), type_crs
+                             filter, type_coordinate_dp, assignment(=), type_crs
 
     use :: module_input
     use :: inout_project_settings, only:get_project_path
@@ -29,10 +29,10 @@ module input_output
         character(:), allocatable :: type
         logical :: do_output
         integer(int32) :: num_observations
-        type(type_dp_3d) :: coordinate
+        type(type_coordinate_array_dp) :: coordinate
         !!
         type(holder_elements), allocatable :: elements(:)
-        type(type_dp_vector_3d), allocatable :: coordinate_normalized(:)
+        type(type_coordinate_dp), allocatable :: coordinate_normalized(:)
         !!
         integer(int32), allocatable :: node_ids(:)
         procedure(abst_write_line), pointer, pass(self) :: write_line => null()
@@ -80,7 +80,7 @@ module input_output
             implicit none
             class(type_output_observation), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_dp_3d), intent(inout), pointer :: coordinate
+            type(type_coordinate_array_dp), intent(inout), pointer :: coordinate
             type(type_domain), intent(inout) :: domain
             character(*), intent(in) :: dir_output
             character(*), intent(in) :: variable_name
@@ -91,7 +91,7 @@ module input_output
     type :: type_output_vtk
         integer(int32) :: num_points
         integer(int32) :: num_cells
-        type(type_dp_3d) :: coordinate
+        type(type_coordinate_array_dp) :: coordinate
         integer(int32), allocatable :: connectivities(:)
         integer(int32), allocatable :: offsets(:)
         integer(int8), allocatable :: cell_types(:)
@@ -117,7 +117,7 @@ module input_output
 
     abstract interface
         subroutine abst_output_overall_fields(self, file_counts, domain, porosity, temperature, si, pressure, water_flux)
-            import :: type_output_overall, type_domain, type_dp_3d, real64, int32
+            import :: type_output_overall, type_domain, type_coordinate_array_dp, real64, int32
             implicit none
             class(type_output_overall), intent(inout) :: self
             integer(int32), intent(in) :: file_counts
@@ -126,7 +126,7 @@ module input_output
             real(real64), intent(in), optional :: temperature(:)
             real(real64), intent(in), optional :: si(:)
             real(real64), intent(in), optional :: pressure(:)
-            type(type_dp_3d), intent(in), optional :: water_flux
+            type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
         end subroutine abst_output_overall_fields
 
@@ -146,7 +146,7 @@ module input_output
             implicit none
             class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_dp_3d), intent(in) :: coordinate
+            type(type_coordinate_array_dp), intent(in) :: coordinate
             type(type_domain), intent(inout) :: domain
             character(*), intent(in) :: dir_output
 
@@ -156,7 +156,7 @@ module input_output
             implicit none
             class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_dp_3d), intent(in) :: coordinate
+            type(type_coordinate_array_dp), intent(in) :: coordinate
             type(type_domain), intent(inout) :: domain
 
         end subroutine initialize_output_overall_vtk
@@ -165,7 +165,7 @@ module input_output
             implicit none
             class(type_output_overall), intent(inout) :: self
             type(type_input), intent(in) :: input
-            type(type_dp_3d), intent(in) :: coordinate
+            type(type_coordinate_array_dp), intent(in) :: coordinate
             type(type_domain), intent(inout) :: domain
 
         end subroutine initialize_output_overall_vtu
@@ -224,7 +224,7 @@ contains
         class(type_output), intent(inout) :: self
         type(type_input), intent(in) :: input
         class(type_domain), intent(inout), optional :: domain
-        type(type_dp_3d), intent(inout), pointer :: coordinate
+        type(type_coordinate_array_dp), intent(inout), pointer :: coordinate
 
         character(256) :: dir_path
         logical :: exists
@@ -277,7 +277,7 @@ contains
         real(real64), intent(in), optional :: temperature(:)
         real(real64), intent(in), optional :: si(:)
         real(real64), intent(in), optional :: pressure(:)
-        type(type_dp_3d), intent(in), optional :: water_flux
+        type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
         if (.not. self%overall%do_output) return
 

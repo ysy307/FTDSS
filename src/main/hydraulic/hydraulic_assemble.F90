@@ -1,7 +1,7 @@
 module hydraulic_hydraulic_assemble
 !$  use omp_lib
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_state, type_dp_vector_3d, assignment(=), type_variable, allocate_array, &
+    use :: module_core, only:type_state, type_coordinate_dp, assignment(=), type_variable, allocate_array, &
         deallocate_array, type_crs, type_dense
     use :: module_domain, only:type_domain, abst_mesh
     use :: module_properties, only:type_properties_manager
@@ -65,7 +65,7 @@ contains
         ! --- Physical quantities at Gauss points ---
         type(type_state), allocatable :: state(:)
         real(real64), dimension(:), pointer :: p_weight => null()
-        type(type_dp_vector_3d), dimension(:), pointer :: p_gauss => null()
+        type(type_coordinate_dp), dimension(:), pointer :: p_gauss => null()
         real(real64), allocatable :: kflh(:)
         real(real64), allocatable :: dot_ice(:)
         integer(int32), dimension(:), pointer :: p_conn => null()

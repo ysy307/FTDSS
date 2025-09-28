@@ -1,6 +1,6 @@
 module main_thermal_workspace
     use, intrinsic :: iso_fortran_env
-    use :: module_core, only:type_state, type_dp_vector_3d, type_variable, allocate_array, deallocate_array, type_dense
+    use :: module_core, only:type_state, type_coordinate_dp, type_variable, allocate_array, deallocate_array, type_dense
     use :: module_domain, only:abst_mesh
     use :: module_control
     implicit none
@@ -40,7 +40,7 @@ module main_thermal_workspace
         ! メッシュ情報ポインタ
         integer(int32),          dimension(:), pointer :: p_conn   => null() !&
         real(real64),            dimension(:), pointer :: p_weight => null() !&
-        type(type_dp_vector_3d), dimension(:), pointer :: p_gauss  => null() !&
+        type(type_coordinate_dp), dimension(:), pointer :: p_gauss  => null() !&
 
         integer(int32), allocatable :: connectivity(:)
     contains

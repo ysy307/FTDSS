@@ -9,7 +9,7 @@ module inout_input
     use :: inout_input_conditions, only:type_conditions
     use :: inout_input_output_conditions, only:type_output_settings
     use :: inout_input_geometry, only:type_input_geometry
-    use :: module_core, only:type_vtk, type_dp_3d, type_dp_vector_3d, allocate_array, deallocate_array, & !&
+    use :: module_core, only:type_vtk, type_coordinate_array_dp, type_coordinate_dp, allocate_array, deallocate_array, & !&
                              error_message, join, value_in_range, filter, modify_path_format, get_env_string
     implicit none
     private

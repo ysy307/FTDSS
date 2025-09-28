@@ -67,7 +67,7 @@ set(CORE_TYPES_SOURCES
 )
 add_library(Core_Types STATIC ${CORE_TYPES_SOURCES})
 target_include_directories(Core_Types PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Core_Types PUBLIC Core_Memory Core_Utils)
+target_link_libraries(Core_Types PUBLIC Core_Memory Core_Utils Core_Constants)
 enable_build_flags(Core_Types)
 
 

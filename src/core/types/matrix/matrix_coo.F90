@@ -2,8 +2,6 @@
 !> Implements the procedures for the Coordinate (COO) sparse matrix type.
 !>
 submodule(core_types_matrix) core_types_matrix_coo
-    use :: core_allocate, only:allocate_array
-    use :: core_deallocate, only:deallocate_array
     implicit none
 
 contains

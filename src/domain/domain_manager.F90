@@ -5,6 +5,7 @@ module domain_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
     use :: stdlib_logger
+    use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_input, only:type_input
     use :: module_fe, only:type_fe_manager
@@ -164,6 +165,8 @@ module domain_manager
         integer(int32) :: computation_dimension
         !> The type of computation (e.g., 1 for XY-plane, 2 for XZ-plane, 3 for 3D).
         integer(int32), private :: computation_type
+        !> The type of coupling (e.g., staggered or monolithic).
+        integer(int32) :: coupling_mode
         !> Manages the degree of freedom layout.
         type(type_dof_map) :: dof_map
         !> Manages all nodal data.
@@ -263,6 +266,13 @@ contains
             current_dof_index = current_dof_index + self%computation_dimension
         end if
         self%dof_map%num_dof_per_node = current_dof_index - 1
+
+        select case (strip(input%basic%analysis_controls%coupling_mode))
+        case ("weak")
+            self%coupling_mode = COUPLING_MODE_STAGGERED
+        case ("strong")
+            self%coupling_mode = COUPLING_MODE_MONOLITHIC
+        end select
     end subroutine set_basic_info_and_dof_map
 
     !> Initializes the node manager by reading data from the input object.

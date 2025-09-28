@@ -5,7 +5,7 @@ module inout_input_output_conditions
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
-    use :: module_core, only:join, error_message, allocate_array, type_dp_vector_3d
+    use :: module_core, only:join, error_message, allocate_array, type_coordinate_dp
     use :: inout_input_base, only:get_json_value
     implicit none
     private
@@ -51,7 +51,7 @@ module inout_input_output_conditions
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)
         integer(int32) :: num_observations
-        type(type_dp_vector_3d), allocatable :: coordinates(:)
+        type(type_coordinate_dp), allocatable :: coordinates(:)
         integer(int32), allocatable :: node_ids(:)
     contains
         procedure, pass(self) :: display => display_output_settings_history

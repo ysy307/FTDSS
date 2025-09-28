@@ -62,7 +62,7 @@ contains
         real(real64) :: area
 
         integer(int32) :: i
-        type(type_dp_vector_3d), allocatable :: gauss_pts(:)
+        type(type_coordinate_dp), allocatable :: gauss_pts(:)
         real(real64), allocatable :: weights(:)
 
         area = 0.0d0
@@ -87,7 +87,7 @@ contains
         !> The index of the shape function (1, 2, or 3).
         integer(int32), intent(in) :: i
         !> The local coordinate vector, where \( \xi = r\%x \) and \( \eta = r\%y \).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The value of the shape function \( \psi_i(\xi, \eta) \).
         real(real64) :: psi
 
@@ -116,7 +116,7 @@ contains
         !> The index of the local coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
         integer(int32), intent(in) :: j
         !> The local coordinate vector (unused, as derivatives are constant).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The value of the derivative, which is a constant (0, 1, or -1).
         real(real64) :: dpsi
 
@@ -148,7 +148,7 @@ contains
         !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
         !> The local coordinate vector (unused, as Jacobian is constant).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
         !> The connectivity array for the element.
@@ -177,7 +177,7 @@ contains
         !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
         !> The local coordinate vector (unused).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
         !> The connectivity array for the element.
@@ -201,9 +201,9 @@ contains
         !> The first-order triangular element object.
         class(type_triangle_first), intent(in) :: self
         !> The point in global (Cartesian) coordinates to check.
-        type(type_dp_vector_3d), intent(in) :: cartesian
+        type(type_coordinate_dp), intent(in) :: cartesian
         !> The resulting local (normalized) coordinate if the point is inside.
-        type(type_dp_vector_3d), intent(inout) :: normalized
+        type(type_coordinate_dp), intent(inout) :: normalized
         !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
         !> The connectivity array for the element.
@@ -211,8 +211,8 @@ contains
         !> A logical flag, set to true if the point is inside, false otherwise.
         logical, intent(inout) :: is_in
 
-        type(type_dp_vector_3d) :: r
-        type(type_dp_vector_3d) :: interpolated_pos
+        type(type_coordinate_dp) :: r
+        type(type_coordinate_dp) :: interpolated_pos
         real(real64) :: det_j
         real(real64) :: dx
         real(real64) :: dy

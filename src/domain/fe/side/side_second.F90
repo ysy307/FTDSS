@@ -72,7 +72,7 @@ contains
         !> The second-order side element object.
         class(type_side_second), intent(in) :: self
         !> The local coordinate vector \( r \).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
         !> The connectivity array for the element.
@@ -106,7 +106,7 @@ contains
         !> The computed length of the element.
         real(real64) :: length
         integer(int32) :: i
-        type(type_dp_vector_3d), allocatable :: gauss_pts(:)
+        type(type_coordinate_dp), allocatable :: gauss_pts(:)
         real(real64), allocatable :: weights(:)
 
         length = 0.0d0
@@ -128,7 +128,7 @@ contains
         !> The index of the shape function (1, 2, or 3).
         integer(int32), intent(in) :: i
         !> The local coordinate vector, where \( \xi = r\%x \).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The value of the shape function \( \psi_i(\xi) \).
         real(real64) :: psi
         real(real64) :: xi
@@ -159,7 +159,7 @@ contains
         !> The index of the local coordinate to differentiate with respect to (must be 1 for \( \xi \)).
         integer(int32), intent(in) :: j
         !> The local coordinate vector, where \( \xi = r\%x \).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The value of the derivative \( \frac{d\psi_i}{d\xi} \).
         real(real64) :: dpsi
         real(real64) :: xi
@@ -188,7 +188,7 @@ contains
         !> The second-order side element object.
         class(type_side_second), intent(in) :: self
         !> The local coordinate vector \( r \).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
         !> The connectivity array for the element.
@@ -212,7 +212,7 @@ contains
         !> The second-order side element object.
         class(type_side_second), intent(in) :: self
         !> The local coordinate vector \( r \).
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
         !> The connectivity array for the element.
@@ -236,9 +236,9 @@ contains
         !> The second-order side element object.
         class(type_side_second), intent(in) :: self
         !> The point in global (Cartesian) coordinates to check.
-        type(type_dp_vector_3d), intent(in) :: cartesian
+        type(type_coordinate_dp), intent(in) :: cartesian
         !> The resulting local (normalized) coordinate if the point is on the element.
-        type(type_dp_vector_3d), intent(inout) :: normalized
+        type(type_coordinate_dp), intent(inout) :: normalized
         !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
         !> The connectivity array for the element.
@@ -246,9 +246,9 @@ contains
         !> A logical flag, set to true if the point is on the element, false otherwise.
         logical, intent(inout) :: is_in
 
-        type(type_dp_vector_3d) :: r_local
-        type(type_dp_vector_3d) :: pos_guess
-        type(type_dp_vector_3d) :: residual_vec
+        type(type_coordinate_dp) :: r_local
+        type(type_coordinate_dp) :: pos_guess
+        type(type_coordinate_dp) :: residual_vec
         real(real64) :: tangent_vec(3)
         real(real64) :: tangent_dot_tangent
         real(real64) :: residual_norm

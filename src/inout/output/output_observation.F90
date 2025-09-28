@@ -5,7 +5,7 @@ contains
         implicit none
         class(type_output_observation), intent(inout) :: self
         type(type_input), intent(in) :: input
-        type(type_dp_3d), intent(inout), pointer :: coordinate
+        type(type_coordinate_array_dp), intent(inout), pointer :: coordinate
         type(type_domain), intent(inout) :: domain
         character(*), intent(in) :: dir_output
         character(*), intent(in) :: variable_name
@@ -13,7 +13,7 @@ contains
         integer(int32) :: iObs, iElem, num_elements
         integer(int32) :: local_id, local_type, ierr
         real(real64) :: tmp_xi, tmp_eta
-        type(type_dp_vector_3d) :: cartesian, normalized
+        type(type_coordinate_dp) :: cartesian, normalized
 
         integer(int32) :: num_target_variables
 

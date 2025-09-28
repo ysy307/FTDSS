@@ -5,7 +5,7 @@ module core_vtk
     use :: stdlib_strings, only:to_string, replace_all, strip
     use :: stdlib_sorting, only:sort
     use :: stdlib_logger
-    use :: core_types, only:type_dp_3d
+    use :: core_types, only:type_coordinate_array_dp
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
     use :: core_unique, only:unique
@@ -43,7 +43,7 @@ module core_vtk
         character(:), allocatable :: dataset
         ! VTK points data
         integer(int32) :: num_points = 0 ! Local number of points
-        type(type_dp_3d) :: points
+        type(type_coordinate_array_dp) :: points
         ! VTK Cells data
         integer(int32) :: num_total_cells = 0 ! Local number of cells
         type(type_vtk_cell), allocatable :: cells(:)

@@ -11,6 +11,12 @@ module core_constants
     !> Coordinate list format
     integer(int32), parameter, public :: MATRIX_COO   = 3 !&
 
+    ! --- Coupling modes ---
+    !> staggered coupling
+    integer(int32), parameter, public :: COUPLING_MODE_STAGGERED = 1 !&
+    !> monolithic coupling
+    integer(int32), parameter, public :: COUPLING_MODE_MONOLITHIC = 2 !&
+
     ! --- Physics Types ---
     !> Thermal analysis
     integer(int32), parameter, public :: PHYSICS_TYPE_THERMAL    = 1 !&
@@ -23,11 +29,16 @@ module core_constants
     integer(int32), parameter, public :: NUM_PHYSICS_TYPES = 3
 
     ! --- DOF Types ---
-    integer(int32), parameter, public :: DOF_TYPE_T = 1 ! Temperature
-    integer(int32), parameter, public :: DOF_TYPE_P = 2 ! Pressure
-    integer(int32), parameter, public :: DOF_TYPE_DX = 3 ! Disp X
-    integer(int32), parameter, public :: DOF_TYPE_DY = 4 ! Disp Y
-    integer(int32), parameter, public :: DOF_TYPE_DZ = 5 ! Disp Z
+    !> Temperature DOF
+    integer(int32), parameter, public :: DOF_TYPE_T = 1
+    !> Pressure DOF
+    integer(int32), parameter, public :: DOF_TYPE_P = 2
+    !> Displacement X-DOF
+    integer(int32), parameter, public :: DOF_TYPE_DX = 3
+    !> Displacement Y-DOF
+    integer(int32), parameter, public :: DOF_TYPE_DY = 4
+    !> Displacement Z-DOF
+    integer(int32), parameter, public :: DOF_TYPE_DZ = 5
 
     ! Definition of boundary condition type IDs for thermal analysis
     integer(int32), parameter, public :: THERMAL_BC_DIRICHLET  = 101 !&

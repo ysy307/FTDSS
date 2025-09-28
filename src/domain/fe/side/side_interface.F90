@@ -95,7 +95,7 @@ module domain_fe_side
             !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
             !> The local coordinate vector \( r \). Only \( r\%x \) is used as \( \xi \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function.
             real(real64) :: psi
         end function psi_side_first
@@ -113,7 +113,7 @@ module domain_fe_side
             !> The index of the coordinate to differentiate with respect to (should be 1 for \( \xi \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_side_first
@@ -126,7 +126,7 @@ module domain_fe_side
             !> The first-order side element object.
             class(type_side_first), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -144,7 +144,7 @@ module domain_fe_side
             !> The first-order side element object.
             class(type_side_first), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -161,9 +161,9 @@ module domain_fe_side
             !> The first-order side element object.
             class(type_side_first), intent(in) :: self
             !> The Cartesian coordinate to check.
-            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(in) :: cartesian
             !> The corresponding normalized coordinate if the point is on the element.
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            type(type_coordinate_dp), intent(inout) :: normalized
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -180,7 +180,7 @@ module domain_fe_side
             !> The first-order side element object.
             class(type_side_first), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -231,7 +231,7 @@ module domain_fe_side
             !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
             !> The local coordinate vector \( r \). Only \( r\%x \) is used as \( \xi \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function.
             real(real64) :: psi
         end function psi_side_second
@@ -249,7 +249,7 @@ module domain_fe_side
             !> The index of the coordinate to differentiate with respect to (should be 1 for \( \xi \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_side_second
@@ -262,7 +262,7 @@ module domain_fe_side
             !> The second-order side element object.
             class(type_side_second), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -280,7 +280,7 @@ module domain_fe_side
             !> The second-order side element object.
             class(type_side_second), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -297,9 +297,9 @@ module domain_fe_side
             !> The second-order side element object.
             class(type_side_second), intent(in) :: self
             !> The Cartesian coordinate to check.
-            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(in) :: cartesian
             !> The corresponding normalized coordinate if the point is on the element.
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            type(type_coordinate_dp), intent(inout) :: normalized
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -316,7 +316,7 @@ module domain_fe_side
             !> The second-order side element object.
             class(type_side_second), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.

@@ -122,7 +122,7 @@ module domain_fe_element
             !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function.
             real(real64) :: psi
         end function psi_triangle_first
@@ -140,7 +140,7 @@ module domain_fe_element
             !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_triangle_first
@@ -153,7 +153,7 @@ module domain_fe_element
             !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -170,7 +170,7 @@ module domain_fe_element
             !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -187,9 +187,9 @@ module domain_fe_element
             !> The first-order triangular element object.
             class(type_triangle_first), intent(in) :: self
             !> The Cartesian coordinate to check.
-            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(in) :: cartesian
             !> The corresponding normalized coordinate if the point is inside.
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            type(type_coordinate_dp), intent(inout) :: normalized
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -239,7 +239,7 @@ module domain_fe_element
             !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function.
             real(real64) :: psi
         end function psi_square_first
@@ -257,7 +257,7 @@ module domain_fe_element
             !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_square_first
@@ -270,7 +270,7 @@ module domain_fe_element
             !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -287,7 +287,7 @@ module domain_fe_element
             !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -304,9 +304,9 @@ module domain_fe_element
             !> The first-order quadrilateral element object.
             class(type_square_first), intent(in) :: self
             !> The Cartesian coordinate to check.
-            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(in) :: cartesian
             !> The corresponding normalized coordinate if the point is inside.
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            type(type_coordinate_dp), intent(inout) :: normalized
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -356,7 +356,7 @@ module domain_fe_element
             !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function.
             real(real64) :: psi
         end function psi_triangle_second
@@ -374,7 +374,7 @@ module domain_fe_element
             !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_triangle_second
@@ -392,7 +392,7 @@ module domain_fe_element
             !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_deta_triangle_second
@@ -405,7 +405,7 @@ module domain_fe_element
             !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -422,7 +422,7 @@ module domain_fe_element
             !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -439,9 +439,9 @@ module domain_fe_element
             !> The second-order triangular element object.
             class(type_triangle_second), intent(in) :: self
             !> The Cartesian coordinate to check.
-            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(in) :: cartesian
             !> The corresponding normalized coordinate if the point is inside.
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            type(type_coordinate_dp), intent(inout) :: normalized
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -492,7 +492,7 @@ module domain_fe_element
             !> The index of the shape function (local node number).
             integer(int32), intent(in) :: i
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function.
             real(real64) :: psi
         end function psi_square_second
@@ -510,7 +510,7 @@ module domain_fe_element
             !> The index of the coordinate to differentiate with respect to (1 for \( \xi \), 2 for \( \eta \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function's derivative.
             real(real64) :: dpsi
         end function dpsi_square_second
@@ -523,7 +523,7 @@ module domain_fe_element
             !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -540,7 +540,7 @@ module domain_fe_element
             !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
             !> The local coordinate vector.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -557,9 +557,9 @@ module domain_fe_element
             !> The second-order quadrilateral element object.
             class(type_square_second), intent(in) :: self
             !> The Cartesian coordinate to check.
-            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(in) :: cartesian
             !> The corresponding normalized coordinate if the point is inside.
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            type(type_coordinate_dp), intent(inout) :: normalized
             !> The global coordinates of the mesh nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.

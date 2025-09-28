@@ -36,7 +36,7 @@ module domain_fe
         !> An array of weights for Gauss integration points.
         real(real64), allocatable :: weight(:)
         !> An array containing the local coordinates of the Gauss integration points.
-        type(type_dp_vector_3d), allocatable :: gauss(:)
+        type(type_coordinate_dp), allocatable :: gauss(:)
 
     contains
         !---------------------------------------------------------------------------------------------------------------------------
@@ -88,14 +88,14 @@ module domain_fe
         !> \( r = (\xi, \eta, \zeta) \).
         !>
         pure elemental function abst_psi(self, i, r) result(psi_val)
-            import :: abst_fe, type_dp_vector_3d, int32, real64
+            import :: abst_fe, type_coordinate_dp, int32, real64
             implicit none
             !> The finite element object.
             class(abst_fe), intent(in) :: self
             !> The index of the shape function (corresponding to a local node).
             integer(int32), intent(in) :: i
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the shape function, \( \psi_i (r) \).
             real(real64) :: psi_val
         end function abst_psi
@@ -105,7 +105,7 @@ module domain_fe
         !> with respect to the j-th local coordinate, \( \frac{\partial \psi_i}{\partial r_j} \).
         !>
         pure elemental function abst_dpsi(self, i, j, r) result(dpsi_val)
-            import :: abst_fe, type_dp_vector_3d, int32, real64
+            import :: abst_fe, type_coordinate_dp, int32, real64
             implicit none
             !> The finite element object.
             class(abst_fe), intent(in) :: self
@@ -114,7 +114,7 @@ module domain_fe
             !> The index of the local coordinate (1=\( \xi \), 2=\( \eta \), 3=\( \zeta \)).
             integer(int32), intent(in) :: j
             !> The local coordinate vector \( r \).
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The value of the derivative, \( \frac{\partial \psi_i}{\partial r_j} \).
             real(real64) :: dpsi_val
         end function abst_dpsi
@@ -124,12 +124,12 @@ module domain_fe
         !> coordinates to global coordinates, where \( J_{ij} = \frac{\partial x_i}{\partial \xi_j} \).
         !>
         pure function abst_jacobian(self, r, node_coords, connectivity) result(jac)
-            import :: abst_fe, type_dp_vector_3d, int32, real64
+            import :: abst_fe, type_coordinate_dp, int32, real64
             implicit none
             !> The finite element object.
             class(abst_fe), intent(in) :: self
             !> The local coordinate vector where the Jacobian is evaluated.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -144,12 +144,12 @@ module domain_fe
         !> from global to local coordinate systems.
         !>
         pure function abst_jacobian_det(self, r, node_coords, connectivity) result(det_j)
-            import :: abst_fe, type_dp_vector_3d, int32, real64
+            import :: abst_fe, type_coordinate_dp, int32, real64
             implicit none
             !> The finite element object.
             class(abst_fe), intent(in) :: self
             !> The local coordinate vector where the determinant is evaluated.
-            type(type_dp_vector_3d), intent(in) :: r
+            type(type_coordinate_dp), intent(in) :: r
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -164,14 +164,14 @@ module domain_fe
         !> local coordinates.
         !>
         subroutine abst_is_inside(self, cartesian, normalized, node_coords, connectivity, is_in)
-            import abst_fe, type_dp_vector_3d, int32, real64
+            import abst_fe, type_coordinate_dp, int32, real64
             implicit none
             !> The finite element object.
             class(abst_fe), intent(in) :: self
             !> The point in global (Cartesian) coordinates to check.
-            type(type_dp_vector_3d), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(in) :: cartesian
             !> The resulting local (normalized) coordinates if the point is inside.
-            type(type_dp_vector_3d), intent(inout) :: normalized
+            type(type_coordinate_dp), intent(inout) :: normalized
             !> The global coordinates of the element's nodes.
             real(real64), intent(in) :: node_coords(:, :)
             !> The connectivity array for the element.
@@ -302,7 +302,7 @@ contains
         !> The finite element object.
         class(abst_fe), intent(in) :: self
         !> An allocatable array that will contain the Gauss points.
-        type(type_dp_vector_3d), allocatable :: val(:)
+        type(type_coordinate_dp), allocatable :: val(:)
         val = self%gauss
     end function get_gauss
 
@@ -315,7 +315,7 @@ contains
         !> The finite element object.
         class(abst_fe), intent(in) :: self
         !> The local coordinate vector \( r \) where the interpolation is evaluated.
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The array of values at all nodes in the mesh.
         real(real64), intent(in) :: global_values(:)
         !> The connectivity array for the element.
@@ -339,13 +339,13 @@ contains
         !> The finite element object.
         class(abst_fe), intent(in) :: self
         !> The local coordinate vector \( r \) where the derivative is evaluated.
-        type(type_dp_vector_3d), intent(in) :: r
+        type(type_coordinate_dp), intent(in) :: r
         !> The array of values at all nodes in the mesh.
         real(real64), intent(in) :: global_values(:)
         !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
         !> The gradient of the interpolated value at the local coordinate \( r \).
-        type(type_dp_vector_3d) :: val
+        type(type_coordinate_dp) :: val
         integer(int32) :: i
 
         val%x = 0.0d0

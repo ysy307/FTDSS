@@ -2,7 +2,7 @@ module main_hydraulic
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: stdlib_logger
     use :: stdlib_strings
-    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_dp_3d, type_state, type_crs
+    use :: module_core, only:allocate_array, deallocate_array, type_variable, type_coordinate_array_dp, type_state, type_crs
     use :: module_domain, only:type_domain
     use :: module_properties, only:type_properties_manager
     use :: module_input, only:type_input
@@ -17,7 +17,7 @@ module main_hydraulic
     public :: type_hydraulic_crs
 
     type, abstract :: abst_hydraulic
-        type(type_dp_3d) :: water_flux
+        type(type_coordinate_array_dp) :: water_flux
 
         type(type_crs) :: KH_star
         real(real64), allocatable :: FH(:)
@@ -95,7 +95,7 @@ module main_hydraulic
             implicit none
             class(abst_hydraulic), allocatable :: structure
             type(type_input), intent(inout) :: input
-            type(type_dp_3d), intent(inout), pointer :: coordinate
+            type(type_coordinate_array_dp), intent(inout), pointer :: coordinate
             type(type_domain), intent(inout) :: domain
 
         end function construct_type_hydraulic_crs
