@@ -54,8 +54,8 @@ enable_build_flags(Core_Utils)
 # --- Types Library (Memoryに依存) ---
 set(CORE_TYPES_SOURCES
     types/types.F90
-    types/array.F90
-    types/vector.F90
+    types/coordinate_array.F90
+    types/coordinate.F90
     types/pointer.F90
     types/variable.F90
     types/gauss.F90

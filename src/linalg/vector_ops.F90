@@ -1,221 +1,1593 @@
-module linalg_vector_ops
+!>
+!> Provides advanced vector operations and operator overloads.
+!> This module offers a hybrid approach to arithmetic:
+!> * **Operator Overloads**: For fixed-size, lightweight `coordinate` and
+!>     `coordinate_array` types, it provides convenient function-based
+!>     operators (+, -, *, /).
+!> * **Subroutines**: For variable-size, potentially large `vector` types, it
+!>     provides performance-oriented subroutines.
+!> It also features a backend-switching capability for norm and dot-product
+!> calculations, utilizing MKL when available.
+!>
+module linalg_vector_operations
     use, intrinsic :: iso_fortran_env, only: int32, real64
-#ifdef _MPI
-    use :: mpi
+    use :: mpi_f08
+    use :: module_core
+    use :: linalg_vector
+#ifdef _MKL
+    use :: linalg_mkl_interfaces
 #endif
+    use :: linalg_mkl_backends
+
     implicit none
     private
 
     ! =========================================================================
-    ! 1. 公開インターフェース (API)
+    ! 1. Public Interface (API)
     ! =========================================================================
-    public :: norm_1, norm_2, norm_inf, dot
+    public :: initialize_linalg
+    public :: norm_1
+    public :: norm_2
+    public :: norm_inf
+    public :: dot
+
+    public :: operator( + ) !&
+    public :: operator( - ) !&
+    public :: operator( * ) !&
+    public :: operator( / ) !&
+    public :: add
+    public :: subtract
+    public :: multiply
+    public :: divide
+    public :: assignment(=)
+
+    interface operator(+)
+        module procedure :: add_coordinate_dp
+        module procedure :: add_scalar_1_coordinate_dp
+        module procedure :: add_scalar_2_coordinate_dp
+        module procedure :: add_coordinate_int
+        module procedure :: add_scalar_1_coordinate_int
+        module procedure :: add_scalar_2_coordinate_int
+        module procedure :: add_coordinate_array_dp
+        module procedure :: add_scalar_1_coordinate_array_dp
+        module procedure :: add_scalar_2_coordinate_array_dp
+        module procedure :: add_coordinate_array_int
+        module procedure :: add_scalar_1_coordinate_array_int
+        module procedure :: add_scalar_2_coordinate_array_int
+    end interface
+
+    interface operator(-)
+        module procedure :: subtract_coordinate_dp
+        module procedure :: subtract_scalar_1_coordinate_dp
+        module procedure :: subtract_scalar_2_coordinate_dp
+        module procedure :: subtract_coordinate_int
+        module procedure :: subtract_scalar_1_coordinate_int
+        module procedure :: subtract_scalar_2_coordinate_int
+        module procedure :: subtract_coordinate_array_dp
+        module procedure :: subtract_scalar_1_coordinate_array_dp
+        module procedure :: subtract_scalar_2_coordinate_array_dp
+        module procedure :: subtract_coordinate_array_int
+        module procedure :: subtract_scalar_1_coordinate_array_int
+        module procedure :: subtract_scalar_2_coordinate_array_int
+    end interface
+
+    interface operator(*)
+        module procedure :: multiply_coordinate_dp
+        module procedure :: multiply_scalar_1_coordinate_dp
+        module procedure :: multiply_scalar_2_coordinate_dp
+        module procedure :: multiply_coordinate_int
+        module procedure :: multiply_scalar_1_coordinate_int
+        module procedure :: multiply_scalar_2_coordinate_int
+        module procedure :: multiply_coordinate_array_dp
+        module procedure :: multiply_scalar_1_coordinate_array_dp
+        module procedure :: multiply_scalar_2_coordinate_array_dp
+        module procedure :: multiply_coordinate_array_int
+        module procedure :: multiply_scalar_1_coordinate_array_int
+        module procedure :: multiply_scalar_2_coordinate_array_int
+    end interface
+
+    interface operator(/)
+        module procedure :: divide_coordinate_dp
+        module procedure :: divide_scalar_1_coordinate_dp
+        module procedure :: divide_scalar_2_coordinate_dp
+        module procedure :: divide_coordinate_array_dp
+        module procedure :: divide_scalar_1_coordinate_array_dp
+        module procedure :: divide_scalar_2_coordinate_array_dp
+    end interface
+
+    interface add
+        module procedure :: add_vector_dp
+        module procedure :: add_vector_int
+    end interface
+
+    interface subtract
+        module procedure :: subtract_vector_dp
+        module procedure :: subtract_vector_int
+    end interface
+
+    interface multiply
+        module procedure :: multiply_vector_dp
+        module procedure :: multiply_vector_int
+    end interface
+
+    interface divide
+        module procedure :: divide_vector_dp
+    end interface
+
+    interface assignment(=)
+        module procedure :: assign_coordinate_dp
+        module procedure :: assign_coordinate_int
+        module procedure :: assign_coordinate_array_dp
+        module procedure :: assign_coordinate_array_int
+        module procedure :: assign_vector_dp
+        module procedure :: assign_vector_int
+    end interface
 
     ! =========================================================================
-    ! 2. 手続きポインタと、そのための抽象インターフェース
+    ! 2. Private Helper Interfaces and Pointers
     ! =========================================================================
+
+    interface check_sizes_match
+        module procedure :: check_sizes_match_dp
+        module procedure :: check_sizes_match_int
+    end interface
+
     abstract interface
-        function real64_from_vec_t(x)
+        function abst_real_from_one_vector_function(vector)
             import :: real64
-            real(real64), intent(in) :: x(:)
-            real(real64) :: real64_from_vec_t
+            implicit none
+            real(real64), intent(in) :: vector(:)
+            real(real64) :: abst_real_from_one_vector_function
         end function
-        function real64_from_2vec_t(x, y)
+
+        function abst_real_from_two_vectors_function(vector_a, vector_b)
             import :: real64
-            real(real64), intent(in) :: x(:), y(:)
-            real(real64) :: real64_from_2vec_t
+            implicit none
+            real(real64), intent(in) :: vector_a(:)
+            real(real64), intent(in) :: vector_b(:)
+            real(real64) :: abst_real_from_two_vectors_function
         end function
-        function real64_from_vec_inf_t(x)
+
+        function abst_real_from_vector_for_inf_norm_function(vector)
             import :: real64
-            real(real64), intent(in) :: x(:)
-            real(real64) :: real64_from_vec_inf_t
+            implicit none
+            real(real64), intent(in) :: vector(:)
+            real(real64) :: abst_real_from_vector_for_inf_norm_function
         end function
     end interface
 
-    procedure(real64_from_vec_t), pointer, private :: norm_1_impl => null()
-    procedure(real64_from_vec_t), pointer, private :: norm_2_impl => null()
-    procedure(real64_from_vec_inf_t), pointer, private :: norm_inf_impl => null()
-    procedure(real64_from_2vec_t), pointer, private :: dot_impl => null()
+    !> Procedure pointer for the backend implementation of the 1-norm.
+    procedure(abst_real_from_one_vector_function), pointer, private :: compute_norm_1_backend => null()
+    !> Procedure pointer for the backend implementation of the 2-norm.
+    procedure(abst_real_from_one_vector_function), pointer, private :: compute_norm_2_backend => null()
+    !> Procedure pointer for the backend implementation of the infinity-norm.
+    procedure(abst_real_from_vector_for_inf_norm_function), pointer, private :: compute_norm_inf_backend => null()
+    !> Procedure pointer for the backend implementation of the dot product.
+    procedure(abst_real_from_two_vectors_function), pointer, private :: compute_dot_product_backend => null()
 
-    logical, private :: is_initialized = .false.
-
-    ! =========================================================================
-    ! 3. 外部関数(MKL)のインターフェース定義
-    !    エラー修正のため、CONTAINS の前に移動しました。
-    ! =========================================================================
-#ifdef _MKL
-    interface
-#ifdef _MPI
-        function pdasum(n, x, incx)
-            import :: int32, real64
-            integer(int32), intent(in) :: n, incx
-            real(real64), intent(in) :: x(*)
-            real(real64) :: pdasum
-        end function
-        function pdnrm2(n, x, incx)
-            import :: int32, real64
-            integer(int32), intent(in) :: n, incx
-            real(real64), intent(in) :: x(*)
-            real(real64) :: pdnrm2
-        end function
-        function pddot(n, x, incx, y, incy)
-            import :: int32, real64
-            integer(int32), intent(in) :: n, incx, incy
-            real(real64), intent(in) :: x(*), y(*)
-            real(real64) :: pddot
-        end function
-#else
-        function dasum(n, x, incx)
-            import :: int32, real64
-            integer(int32), intent(in) :: n, incx
-            real(real64), intent(in) :: x(*)
-            real(real64) :: dasum
-        end function
-        function dnrm2(n, x, incx)
-            import :: int32, real64
-            integer(int32), intent(in) :: n, incx
-            real(real64), intent(in) :: x(*)
-            real(real64) :: dnrm2
-        end function
-        function ddot(n, x, incx, y, incy)
-            import :: int32, real64
-            integer(int32), intent(in) :: n, incx, incy
-            real(real64), intent(in) :: x(*), y(*)
-            real(real64) :: ddot
-        end function
-#endif
-        function idamax(n, x, incx)
-            import :: int32, real64
-            integer(int32), intent(in) :: n, incx
-            real(real64), intent(in) :: x(*)
-            integer(int32) :: idamax
-        end function
-    end interface
-#endif
+    !> Flag to ensure the backend pointers are initialized only once.
+    logical, private :: is_mkl_initialized = .false.
 
 contains
 
     ! =========================================================================
-    ! 4. 公開関数 (ラッパー)
+    ! 3. Private Helper Subroutines
     ! =========================================================================
-    function norm_1(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-        if (.not. is_initialized) call initialize_backend()
-        norm = norm_1_impl(x)
+
+    !>
+    !> Checks if two double precision arrays have the same size.
+    !>
+    subroutine check_sizes_match_dp(a, b, routine_name)
+        implicit none
+        !> The first array.
+        real(real64), intent(in) :: a(:)
+        !> The second array.
+        real(real64), intent(in) :: b(:)
+        !> The name of the calling routine for error messages.
+        character(len=*), intent(in) :: routine_name
+
+        if (size(a) /= size(b)) then
+            write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
+            error stop 1
+        end if
+    end subroutine check_sizes_match_dp
+
+    !>
+    !> Checks if two integer arrays have the same size.
+    !>
+    subroutine check_sizes_match_int(a, b, routine_name)
+        implicit none
+        !> The first array.
+        integer(int32), intent(in) :: a(:)
+        !> The second array.
+        integer(int32), intent(in) :: b(:)
+        !> The name of the calling routine for error messages.
+        character(len=*), intent(in) :: routine_name
+
+        if (size(a) /= size(b)) then
+            write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
+            error stop 1
+        end if
+    end subroutine check_sizes_match_int
+
+    !>
+    !> Initializes the linear algebra backend.
+    !> This should be called once before using norm or dot product functions.
+    !>
+    subroutine initialize_linalg()
+        implicit none
+
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+    end subroutine initialize_linalg
+
+    !>
+    !> Points the backend procedure pointers to the appropriate implementation (MKL or native).
+    !> This selection is controlled by the `_MKL` preprocessor macro.
+    !>
+    subroutine initialize_mkl_backend()
+        implicit none
+
+        if (is_mkl_initialized) return
+
+#ifdef _MKL
+        compute_norm_1_backend => norm_1_mkl
+        compute_norm_2_backend => norm_2_mkl
+        compute_norm_inf_backend => norm_inf_mkl
+        compute_dot_product_backend => dot_mkl
+#else
+        compute_norm_1_backend => norm_1_native
+        compute_norm_2_backend => norm_2_native
+        compute_norm_inf_backend => norm_inf_native
+        compute_dot_product_backend => dot_native
+#endif
+        is_mkl_initialized = .true.
+    end subroutine initialize_mkl_backend
+
+    ! =========================================================================
+    ! 4. Public Norms and Dot Product
+    ! =========================================================================
+
+    !>
+    !> Computes the 1-norm of a vector, \( \sum |x_i| \), using the initialized backend.
+    !>
+    function norm_1(x) result(norm_value)
+        implicit none
+        !> The input vector.
+        real(real64), intent(in) :: x(:)
+        !> The computed 1-norm.
+        real(real64) :: norm_value
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        norm_value = compute_norm_1_backend(x)
     end function norm_1
 
-    function norm_2(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-        if (.not. is_initialized) call initialize_backend()
-        norm = norm_2_impl(x)
+    !>
+    !> Computes the 2-norm (Euclidean norm) of a vector, \( \sqrt{\sum x_i^2} \), using the initialized backend.
+    !>
+    function norm_2(x) result(norm_value)
+        implicit none
+        !> The input vector.
+        real(real64), intent(in) :: x(:)
+        !> The computed 2-norm.
+        real(real64) :: norm_value
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        norm_value = compute_norm_2_backend(x)
     end function norm_2
 
-    function norm_inf(x) result(norm)
+    !>
+    !> Computes the infinity-norm (maximum absolute value), \( \max(|x_i|) \), using the initialized backend.
+    !>
+    function norm_inf(x) result(norm_value)
         implicit none
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-        if (.not. is_initialized) call initialize_backend()
-        norm = norm_inf_impl(x)
+        !> The input vector.
+        real(real64), intent(in) :: x(:)
+        !> The computed infinity-norm.
+        real(real64) :: norm_value
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        norm_value = compute_norm_inf_backend(x)
     end function norm_inf
 
-    function dot(x, y) result(prod)
-        real(real64), intent(in) :: x(:), y(:); real(real64) :: prod
-        if (.not. is_initialized) call initialize_backend()
-        prod = dot_impl(x, y)
+    !>
+    !> Computes the dot product of two vectors, \( \sum x_i y_i \), using the initialized backend.
+    !>
+    function dot(x, y) result(product)
+        implicit none
+        !> The first input vector.
+        real(real64), intent(in) :: x(:)
+        !> The second input vector.
+        real(real64), intent(in) :: y(:)
+        !> The computed dot product.
+        real(real64) :: product
+
+        call check_sizes_match(x, y, 'dot')
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        product = compute_dot_product_backend(x, y)
     end function dot
 
     ! =========================================================================
-    ! 5. バックエンドの初期化処理
-    ! =========================================================================
-    subroutine initialize_backend()
-        if (is_initialized) return
-#ifdef _MKL
-        norm_1_impl => norm_1_mkl
-        norm_2_impl => norm_2_mkl
-        norm_inf_impl => norm_inf_mkl
-        dot_impl => dot_mkl
-        write (*, '(A)') "INFO: linalg_vector_ops initialized with MKL backend."
-#else
-        norm_1_impl => norm_1_native
-        norm_2_impl => norm_2_native
-        norm_inf_impl => norm_inf_native
-        dot_impl => dot_native
-        write (*, '(A)') "INFO: linalg_vector_ops initialized with native Fortran backend."
-#endif
-        is_initialized = .true.
-    end subroutine initialize_backend
-
-    ! =========================================================================
-    ! 6. 実際の計算処理 (実装)
+    ! 5. Operator Overload Implementations for Coordinate Types
     ! =========================================================================
 
     ! -------------------------------------------------------------------------
-    ! 6a. MKLバックエンドの実装
+    ! 5a. Double Precision Coordinate Operators
     ! -------------------------------------------------------------------------
-#ifdef _MKL
-    function norm_1_mkl(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-#ifdef _MPI
-        norm = pdasum(int(size(x), int32), x, 1)
-#else
-        norm = dasum(int(size(x), int32), x, 1)
-#endif
-    end function norm_1_mkl
+    !>
+    !> Performs component-wise addition of two double precision coordinates.
+    !>
+    function add_coordinate_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate.
+        type(type_coordinate_dp), intent(in) :: a
+        !> The second coordinate.
+        type(type_coordinate_dp), intent(in) :: b
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = a%x + b%x
+        c%y = a%y + b%y
+        c%z = a%z + b%z
+    end function add_coordinate_dp
+    !>
+    !> Performs component-wise addition of a scalar and a coordinate.
+    !>
+    function add_scalar_1_coordinate_dp(scalar, coord) result(c)
+        implicit none
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The coordinate.
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = scalar + coord%x
+        c%y = scalar + coord%y
+        c%z = scalar + coord%z
+    end function add_scalar_1_coordinate_dp
+    !>
+    !> Performs component-wise addition of a coordinate and a scalar.
+    !>
+    function add_scalar_2_coordinate_dp(coord, scalar) result(c)
+        implicit none
+        !> The coordinate.
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = coord%x + scalar
+        c%y = coord%y + scalar
+        c%z = coord%z + scalar
+    end function add_scalar_2_coordinate_dp
+    !>
+    !> Performs component-wise subtraction of two double precision coordinates.
+    !>
+    function subtract_coordinate_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate (minuend).
+        type(type_coordinate_dp), intent(in) :: a
+        !> The second coordinate (subtrahend).
+        type(type_coordinate_dp), intent(in) :: b
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = a%x - b%x
+        c%y = a%y - b%y
+        c%z = a%z - b%z
+    end function subtract_coordinate_dp
+    !>
+    !> Performs component-wise subtraction of a coordinate from a scalar.
+    !>
+    function subtract_scalar_1_coordinate_dp(scalar, coord) result(c)
+        implicit none
+        !> The scalar value (minuend).
+        real(real64), intent(in) :: scalar
+        !> The coordinate (subtrahend).
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = scalar - coord%x
+        c%y = scalar - coord%y
+        c%z = scalar - coord%z
+    end function subtract_scalar_1_coordinate_dp
+    !>
+    !> Performs component-wise subtraction of a scalar from a coordinate.
+    !>
+    function subtract_scalar_2_coordinate_dp(coord, scalar) result(c)
+        implicit none
+        !> The coordinate (minuend).
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The scalar value (subtrahend).
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = coord%x - scalar
+        c%y = coord%y - scalar
+        c%z = coord%z - scalar
+    end function subtract_scalar_2_coordinate_dp
+    !>
+    !> Performs component-wise multiplication of two double precision coordinates.
+    !>
+    function multiply_coordinate_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate.
+        type(type_coordinate_dp), intent(in) :: a
+        !> The second coordinate.
+        type(type_coordinate_dp), intent(in) :: b
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = a%x * b%x
+        c%y = a%y * b%y
+        c%z = a%z * b%z
+    end function multiply_coordinate_dp
+    !>
+    !> Performs component-wise multiplication of a scalar and a coordinate.
+    !>
+    function multiply_scalar_1_coordinate_dp(scalar, coord) result(c)
+        implicit none
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The coordinate.
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = scalar * coord%x
+        c%y = scalar * coord%y
+        c%z = scalar * coord%z
+    end function multiply_scalar_1_coordinate_dp
+    !>
+    !> Performs component-wise multiplication of a coordinate and a scalar.
+    !>
+    function multiply_scalar_2_coordinate_dp(coord, scalar) result(c)
+        implicit none
+        !> The coordinate.
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
+        c%x = coord%x * scalar
+        c%y = coord%y * scalar
+        c%z = coord%z * scalar
+    end function multiply_scalar_2_coordinate_dp
+    !>
+    !> Performs component-wise division of two double precision coordinates.
+    !>
+    function divide_coordinate_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate (numerator).
+        type(type_coordinate_dp), intent(in) :: a
+        !> The second coordinate (denominator).
+        type(type_coordinate_dp), intent(in) :: b
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
 
-    function norm_2_mkl(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-#ifdef _MPI
-        norm = pdnrm2(int(size(x), int32), x, 1)
-#else
-        norm = dnrm2(int(size(x), int32), x, 1)
-#endif
-    end function norm_2_mkl
-
-    function norm_inf_mkl(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-        if (size(x) > 0) then
-            norm = abs(x(idamax(int(size(x), int32), x, 1)))
-        else
-            norm = 0.0_real64
+#ifdef USE_DEBUG
+        if (b%x == 0.0d0 .or. b%y == 0.0d0 .or. b%z == 0.0d0) then
+            write (*, '(A)') "ERROR in divide_coordinate_dp: Division by zero."
+            error stop 1
         end if
-    end function norm_inf_mkl
-
-    function dot_mkl(x, y) result(prod)
-        real(real64), intent(in) :: x(:), y(:); real(real64) :: prod
-        if (size(x) /= size(y)) error stop "Error: dot_mkl - array sizes do not match."
-#ifdef _MPI
-        prod = pddot(int(size(x), int32), x, 1, y, 1)
-#else
-        prod = ddot(int(size(x), int32), x, 1, y, 1)
 #endif
-    end function dot_mkl
-#endif
+        c%x = a%x / b%x
+        c%y = a%y / b%y
+        c%z = a%z / b%z
+    end function divide_coordinate_dp
+    !>
+    !> Performs component-wise division of a scalar by a coordinate.
+    !>
+    function divide_scalar_1_coordinate_dp(scalar, coord) result(c)
+        implicit none
+        !> The scalar value (numerator).
+        real(real64), intent(in) :: scalar
+        !> The coordinate (denominator).
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
 
-    ! -------------------------------------------------------------------------
-    ! 6b. 標準Fortranバックエンドの実装
-    ! -------------------------------------------------------------------------
-    function norm_1_native(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-        norm = sum(abs(x))
-    end function norm_1_native
-
-    function norm_2_native(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-        norm = norm2(x)
-    end function norm_2_native
-
-    function norm_inf_native(x) result(norm)
-        real(real64), intent(in) :: x(:); real(real64) :: norm
-        if (size(x) > 0) then
-            norm = maxval(abs(x))
-        else
-            norm = 0.0_real64
+#ifdef USE_DEBUG
+        if (coord%x == 0.0d0 .or. coord%y == 0.0d0 .or. coord%z == 0.0d0) then
+            write (*, '(A)') "ERROR in divide_scalar_1_coordinate_dp: Division by zero."
+            error stop 1
         end if
-    end function norm_inf_native
+#endif
+        c%x = scalar / coord%x
+        c%y = scalar / coord%y
+        c%z = scalar / coord%z
+    end function divide_scalar_1_coordinate_dp
+    !>
+    !> Performs component-wise division of a coordinate by a scalar.
+    !>
+    function divide_scalar_2_coordinate_dp(coord, scalar) result(c)
+        implicit none
+        !> The coordinate (numerator).
+        type(type_coordinate_dp), intent(in) :: coord
+        !> The scalar value (denominator).
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate.
+        type(type_coordinate_dp) :: c
 
-    function dot_native(x, y) result(prod)
-        real(real64), intent(in) :: x(:), y(:); real(real64) :: prod
-        if (size(x) /= size(y)) error stop "Error: dot_native - array sizes do not match."
-        prod = dot_product(x, y)
-    end function dot_native
+#ifdef USE_DEBUG
+        if (scalar == 0.0d0) then
+            write (*, '(A)') "ERROR in divide_scalar_2_coordinate_dp: Division by zero."
+            error stop 1
+        end if
+#endif
+        c%x = coord%x / scalar
+        c%y = coord%y / scalar
+        c%z = coord%z / scalar
+    end function divide_scalar_2_coordinate_dp
 
-end module linalg_vector_ops
+    ! -------------------------------------------------------------------------
+    ! 5b. Integer Coordinate Operators
+    ! -------------------------------------------------------------------------
+    !>
+    !> Performs component-wise addition of two integer coordinates.
+    !>
+    function add_coordinate_int(a, b) result(c)
+        implicit none
+        !> The first coordinate.
+        type(type_coordinate_int), intent(in) :: a
+        !> The second coordinate.
+        type(type_coordinate_int), intent(in) :: b
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = a%x + b%x
+        c%y = a%y + b%y
+        c%z = a%z + b%z
+    end function add_coordinate_int
+    !>
+    !> Performs component-wise addition of a scalar and a coordinate.
+    !>
+    function add_scalar_1_coordinate_int(scalar, coord) result(c)
+        implicit none
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The coordinate.
+        type(type_coordinate_int), intent(in) :: coord
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = scalar + coord%x
+        c%y = scalar + coord%y
+        c%z = scalar + coord%z
+    end function add_scalar_1_coordinate_int
+    !>
+    !> Performs component-wise addition of a coordinate and a scalar.
+    !>
+    function add_scalar_2_coordinate_int(coord, scalar) result(c)
+        implicit none
+        !> The coordinate.
+        type(type_coordinate_int), intent(in) :: coord
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = coord%x + scalar
+        c%y = coord%y + scalar
+        c%z = coord%z + scalar
+    end function add_scalar_2_coordinate_int
+    !>
+    !> Performs component-wise subtraction of two integer coordinates.
+    !>
+    function subtract_coordinate_int(a, b) result(c)
+        implicit none
+        !> The first coordinate (minuend).
+        type(type_coordinate_int), intent(in) :: a
+        !> The second coordinate (subtrahend).
+        type(type_coordinate_int), intent(in) :: b
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = a%x - b%x
+        c%y = a%y - b%y
+        c%z = a%z - b%z
+    end function subtract_coordinate_int
+    !>
+    !> Performs component-wise subtraction of a coordinate from a scalar.
+    !>
+    function subtract_scalar_1_coordinate_int(scalar, coord) result(c)
+        implicit none
+        !> The scalar value (minuend).
+        integer(int32), intent(in) :: scalar
+        !> The coordinate (subtrahend).
+        type(type_coordinate_int), intent(in) :: coord
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = scalar - coord%x
+        c%y = scalar - coord%y
+        c%z = scalar - coord%z
+    end function subtract_scalar_1_coordinate_int
+    !>
+    !> Performs component-wise subtraction of a scalar from a coordinate.
+    !>
+    function subtract_scalar_2_coordinate_int(coord, scalar) result(c)
+        implicit none
+        !> The coordinate (minuend).
+        type(type_coordinate_int), intent(in) :: coord
+        !> The scalar value (subtrahend).
+        integer(int32), intent(in) :: scalar
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = coord%x - scalar
+        c%y = coord%y - scalar
+        c%z = coord%z - scalar
+    end function subtract_scalar_2_coordinate_int
+    !>
+    !> Performs component-wise multiplication of two integer coordinates.
+    !>
+    function multiply_coordinate_int(a, b) result(c)
+        implicit none
+        !> The first coordinate.
+        type(type_coordinate_int), intent(in) :: a
+        !> The second coordinate.
+        type(type_coordinate_int), intent(in) :: b
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = a%x * b%x
+        c%y = a%y * b%y
+        c%z = a%z * b%z
+    end function multiply_coordinate_int
+    !>
+    !> Performs component-wise multiplication of a scalar and a coordinate.
+    !>
+    function multiply_scalar_1_coordinate_int(scalar, coord) result(c)
+        implicit none
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The coordinate.
+        type(type_coordinate_int), intent(in) :: coord
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = scalar * coord%x
+        c%y = scalar * coord%y
+        c%z = scalar * coord%z
+    end function multiply_scalar_1_coordinate_int
+    !>
+    !> Performs component-wise multiplication of a coordinate and a scalar.
+    !>
+    function multiply_scalar_2_coordinate_int(coord, scalar) result(c)
+        implicit none
+        !> The coordinate.
+        type(type_coordinate_int), intent(in) :: coord
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The resulting coordinate.
+        type(type_coordinate_int) :: c
+
+        c%x = coord%x * scalar
+        c%y = coord%y * scalar
+        c%z = coord%z * scalar
+    end function multiply_scalar_2_coordinate_int
+
+    ! -------------------------------------------------------------------------
+    ! 5c. Double Precision Coordinate Array Operators
+    ! -------------------------------------------------------------------------
+    !>
+    !> Performs element-wise addition of two coordinate arrays.
+    !>
+    function add_coordinate_array_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: a
+        !> The second coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: b
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = a%x + b%x
+        c%y = a%y + b%y
+        c%z = a%z + b%z
+    end function add_coordinate_array_dp
+    !>
+    !> Adds a scalar to each component of each coordinate in an array.
+    !>
+    function add_scalar_1_coordinate_array_dp(scalar, array_coord) result(c)
+        implicit none
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = scalar + array_coord%x
+        c%y = scalar + array_coord%y
+        c%z = scalar + array_coord%z
+    end function add_scalar_1_coordinate_array_dp
+    !>
+    !> Adds a scalar to each component of each coordinate in an array.
+    !>
+    function add_scalar_2_coordinate_array_dp(array_coord, scalar) result(c)
+        implicit none
+        !> The coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = array_coord%x + scalar
+        c%y = array_coord%y + scalar
+        c%z = array_coord%z + scalar
+    end function add_scalar_2_coordinate_array_dp
+    !>
+    !> Performs element-wise subtraction of two coordinate arrays.
+    !>
+    function subtract_coordinate_array_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate array (minuend).
+        type(type_coordinate_array_dp), intent(in) :: a
+        !> The second coordinate array (subtrahend).
+        type(type_coordinate_array_dp), intent(in) :: b
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = a%x - b%x
+        c%y = a%y - b%y
+        c%z = a%z - b%z
+    end function subtract_coordinate_array_dp
+    !>
+    !> Subtracts each coordinate component in an array from a scalar.
+    !>
+    function subtract_scalar_1_coordinate_array_dp(scalar, array_coord) result(c)
+        implicit none
+        !> The scalar value (minuend).
+        real(real64), intent(in) :: scalar
+        !> The coordinate array (subtrahend).
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = scalar - array_coord%x
+        c%y = scalar - array_coord%y
+        c%z = scalar - array_coord%z
+    end function subtract_scalar_1_coordinate_array_dp
+    !>
+    !> Subtracts a scalar from each coordinate component in an array.
+    !>
+    function subtract_scalar_2_coordinate_array_dp(array_coord, scalar) result(c)
+        implicit none
+        !> The coordinate array (minuend).
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The scalar value (subtrahend).
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = array_coord%x - scalar
+        c%y = array_coord%y - scalar
+        c%z = array_coord%z - scalar
+    end function subtract_scalar_2_coordinate_array_dp
+    !>
+    !> Performs element-wise multiplication of two coordinate arrays.
+    !>
+    function multiply_coordinate_array_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: a
+        !> The second coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: b
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = a%x * b%x
+        c%y = a%y * b%y
+        c%z = a%z * b%z
+    end function multiply_coordinate_array_dp
+    !>
+    !> Multiplies each coordinate component in an array by a scalar.
+    !>
+    function multiply_scalar_1_coordinate_array_dp(scalar, array_coord) result(c)
+        implicit none
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = scalar * array_coord%x
+        c%y = scalar * array_coord%y
+        c%z = scalar * array_coord%z
+    end function multiply_scalar_1_coordinate_array_dp
+    !>
+    !> Multiplies each coordinate component in an array by a scalar.
+    !>
+    function multiply_scalar_2_coordinate_array_dp(array_coord, scalar) result(c)
+        implicit none
+        !> The coordinate array.
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The scalar value.
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+        c%x = array_coord%x * scalar
+        c%y = array_coord%y * scalar
+        c%z = array_coord%z * scalar
+    end function multiply_scalar_2_coordinate_array_dp
+    !>
+    !> Performs element-wise division of two coordinate arrays.
+    !>
+    function divide_coordinate_array_dp(a, b) result(c)
+        implicit none
+        !> The first coordinate array (numerator).
+        type(type_coordinate_array_dp), intent(in) :: a
+        !> The second coordinate array (denominator).
+        type(type_coordinate_array_dp), intent(in) :: b
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+#ifdef USE_DEBUG
+        if (any(b%x == 0.0d0) .or. any(b%y == 0.0d0) .or. any(b%z == 0.0d0)) then
+            write (*, '(A)') "ERROR in divide_coordinate_array_dp: Division by zero."
+            error stop 1
+        end if
+#endif
+        c%x = a%x / b%x
+        c%y = a%y / b%y
+        c%z = a%z / b%z
+    end function divide_coordinate_array_dp
+    !>
+    !> Divides a scalar by each coordinate component in an array.
+    !>
+    function divide_scalar_1_coordinate_array_dp(scalar, array_coord) result(c)
+        implicit none
+        !> The scalar value (numerator).
+        real(real64), intent(in) :: scalar
+        !> The coordinate array (denominator).
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+#ifdef USE_DEBUG
+        if (any(array_coord%x == 0.0d0) .or. any(array_coord%y == 0.0d0) .or. any(array_coord%z == 0.0d0)) then
+            write (*, '(A)') "ERROR in divide_scalar_1_coordinate_array_dp: Division by zero."
+            error stop 1
+        end if
+#endif
+        c%x = scalar / array_coord%x
+        c%y = scalar / array_coord%y
+        c%z = scalar / array_coord%z
+    end function divide_scalar_1_coordinate_array_dp
+    !>
+    !> Divides each coordinate component in an array by a scalar.
+    !>
+    function divide_scalar_2_coordinate_array_dp(array_coord, scalar) result(c)
+        implicit none
+        !> The coordinate array (numerator).
+        type(type_coordinate_array_dp), intent(in) :: array_coord
+        !> The scalar value (denominator).
+        real(real64), intent(in) :: scalar
+        !> The resulting coordinate array.
+        type(type_coordinate_array_dp) :: c
+
+#ifdef USE_DEBUG
+        if (scalar == 0.0d0) then
+            write (*, '(A)') "ERROR in divide_scalar_2_coordinate_array_dp: Division by zero."
+            error stop 1
+        end if
+#endif
+        c%x = array_coord%x / scalar
+        c%y = array_coord%y / scalar
+        c%z = array_coord%z / scalar
+    end function divide_scalar_2_coordinate_array_dp
+
+    ! -------------------------------------------------------------------------
+    ! 5d. Integer Coordinate Array Operators
+    ! -------------------------------------------------------------------------
+    !>
+    !> Performs element-wise addition of two integer coordinate arrays.
+    !>
+    function add_coordinate_array_int(a, b) result(c)
+        implicit none
+        !> The first coordinate array.
+        type(type_coordinate_array_int), intent(in) :: a
+        !> The second coordinate array.
+        type(type_coordinate_array_int), intent(in) :: b
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = a%x + b%x
+        c%y = a%y + b%y
+        c%z = a%z + b%z
+    end function add_coordinate_array_int
+    !>
+    !> Adds a scalar to each component of each coordinate in an array.
+    !>
+    function add_scalar_1_coordinate_array_int(scalar, array_coord) result(c)
+        implicit none
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The coordinate array.
+        type(type_coordinate_array_int), intent(in) :: array_coord
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = scalar + array_coord%x
+        c%y = scalar + array_coord%y
+        c%z = scalar + array_coord%z
+    end function add_scalar_1_coordinate_array_int
+    !>
+    !> Adds a scalar to each component of each coordinate in an array.
+    !>
+    function add_scalar_2_coordinate_array_int(array_coord, scalar) result(c)
+        implicit none
+        !> The coordinate array.
+        type(type_coordinate_array_int), intent(in) :: array_coord
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = array_coord%x + scalar
+        c%y = array_coord%y + scalar
+        c%z = array_coord%z + scalar
+    end function add_scalar_2_coordinate_array_int
+    !>
+    !> Performs element-wise subtraction of two integer coordinate arrays.
+    !>
+    function subtract_coordinate_array_int(a, b) result(c)
+        implicit none
+        !> The first coordinate array (minuend).
+        type(type_coordinate_array_int), intent(in) :: a
+        !> The second coordinate array (subtrahend).
+        type(type_coordinate_array_int), intent(in) :: b
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = a%x - b%x
+        c%y = a%y - b%y
+        c%z = a%z - b%z
+    end function subtract_coordinate_array_int
+    !>
+    !> Subtracts each coordinate component in an array from a scalar.
+    !>
+    function subtract_scalar_1_coordinate_array_int(scalar, array_coord) result(c)
+        implicit none
+        !> The scalar value (minuend).
+        integer(int32), intent(in) :: scalar
+        !> The coordinate array (subtrahend).
+        type(type_coordinate_array_int), intent(in) :: array_coord
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = scalar - array_coord%x
+        c%y = scalar - array_coord%y
+        c%z = scalar - array_coord%z
+    end function subtract_scalar_1_coordinate_array_int
+    !>
+    !> Subtracts a scalar from each coordinate component in an array.
+    !>
+    function subtract_scalar_2_coordinate_array_int(array_coord, scalar) result(c)
+        implicit none
+        !> The coordinate array (minuend).
+        type(type_coordinate_array_int), intent(in) :: array_coord
+        !> The scalar value (subtrahend).
+        integer(int32), intent(in) :: scalar
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = array_coord%x - scalar
+        c%y = array_coord%y - scalar
+        c%z = array_coord%z - scalar
+    end function subtract_scalar_2_coordinate_array_int
+    !>
+    !> Performs element-wise multiplication of two integer coordinate arrays.
+    !>
+    function multiply_coordinate_array_int(a, b) result(c)
+        implicit none
+        !> The first coordinate array.
+        type(type_coordinate_array_int), intent(in) :: a
+        !> The second coordinate array.
+        type(type_coordinate_array_int), intent(in) :: b
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = a%x * b%x
+        c%y = a%y * b%y
+        c%z = a%z * b%z
+    end function multiply_coordinate_array_int
+    !>
+    !> Multiplies each coordinate component in an array by a scalar.
+    !>
+    function multiply_scalar_1_coordinate_array_int(scalar, array_coord) result(c)
+        implicit none
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The coordinate array.
+        type(type_coordinate_array_int), intent(in) :: array_coord
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = scalar * array_coord%x
+        c%y = scalar * array_coord%y
+        c%z = scalar * array_coord%z
+    end function multiply_scalar_1_coordinate_array_int
+    !>
+    !> Multiplies each coordinate component in an array by a scalar.
+    !>
+    function multiply_scalar_2_coordinate_array_int(array_coord, scalar) result(c)
+        implicit none
+        !> The coordinate array.
+        type(type_coordinate_array_int), intent(in) :: array_coord
+        !> The scalar value.
+        integer(int32), intent(in) :: scalar
+        !> The resulting coordinate array.
+        type(type_coordinate_array_int) :: c
+
+        c%x = array_coord%x * scalar
+        c%y = array_coord%y * scalar
+        c%z = array_coord%z * scalar
+    end function multiply_scalar_2_coordinate_array_int
+
+    ! =========================================================================
+    ! 6. Public Subroutines for Vector Arithmetic
+    ! =========================================================================
+
+    ! -------------------------------------------------------------------------
+    ! 6a. Double Precision Vector Arithmetic Subroutines
+    ! -------------------------------------------------------------------------
+    !>
+    !> Performs element-wise addition of two vectors: c = a + b.
+    !>
+    subroutine add_vector_dp(a, b, c)
+        implicit none
+        !> The first input vector.
+        class(type_vector_dp), intent(in) :: a
+        !> The second input vector.
+        class(type_vector_dp), intent(in) :: b
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: c
+        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+
+        ptr_a => a%get_data()
+        ptr_b => b%get_data()
+        ptr_c => c%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_a, ptr_b, 'add_vector_dp')
+        call check_sizes_match(ptr_a, ptr_c, 'add_vector_dp')
+#endif
+        ptr_c = ptr_a + ptr_b
+    end subroutine add_vector_dp
+    !>
+    !> Adds a scalar to each element of a vector: result = scalar + vector.
+    !>
+    subroutine add_scalar_1_vector_dp(scalar, vector, result_vec)
+        implicit none
+        !> The scalar value to add.
+        real(real64), intent(in) :: scalar
+        !> The input vector.
+        class(type_vector_dp), intent(in) :: vector
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_1_vector_dp')
+#endif
+        ptr_r = scalar + ptr_v
+    end subroutine add_scalar_1_vector_dp
+    !>
+    !> Adds a scalar to each element of a vector: result = vector + scalar.
+    !>
+    subroutine add_scalar_2_vector_dp(vector, scalar, result_vec)
+        implicit none
+        !> The input vector.
+        class(type_vector_dp), intent(in) :: vector
+        !> The scalar value to add.
+        real(real64), intent(in) :: scalar
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_2_vector_dp')
+#endif
+        ptr_r = ptr_v + scalar
+    end subroutine add_scalar_2_vector_dp
+    !>
+    !> Performs element-wise subtraction of two vectors: c = a - b.
+    !>
+    subroutine subtract_vector_dp(a, b, c)
+        implicit none
+        !> The first input vector (minuend).
+        class(type_vector_dp), intent(in) :: a
+        !> The second input vector (subtrahend).
+        class(type_vector_dp), intent(in) :: b
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: c
+        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+
+        ptr_a => a%get_data()
+        ptr_b => b%get_data()
+        ptr_c => c%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_a, ptr_b, 'subtract_vector_dp')
+        call check_sizes_match(ptr_a, ptr_c, 'subtract_vector_dp')
+#endif
+        ptr_c = ptr_a - ptr_b
+    end subroutine subtract_vector_dp
+    !>
+    !> Subtracts each element of a vector from a scalar: result = scalar - vector.
+    !>
+    subroutine subtract_scalar_1_vector_dp(scalar, vector, result_vec)
+        implicit none
+        !> The scalar value (minuend).
+        real(real64), intent(in) :: scalar
+        !> The input vector (subtrahend).
+        class(type_vector_dp), intent(in) :: vector
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_1_vector_dp')
+#endif
+        ptr_r = scalar - ptr_v
+    end subroutine subtract_scalar_1_vector_dp
+    !>
+    !> Subtracts a scalar from each element of a vector: result = vector - scalar.
+    !>
+    subroutine subtract_scalar_2_vector_dp(vector, scalar, result_vec)
+        implicit none
+        !> The input vector (minuend).
+        class(type_vector_dp), intent(in) :: vector
+        !> The scalar value (subtrahend).
+        real(real64), intent(in) :: scalar
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_2_vector_dp')
+#endif
+        ptr_r = ptr_v - scalar
+    end subroutine subtract_scalar_2_vector_dp
+    !>
+    !> Performs element-wise multiplication of two vectors: c = a * b.
+    !>
+    subroutine multiply_vector_dp(a, b, c)
+        implicit none
+        !> The first input vector.
+        class(type_vector_dp), intent(in) :: a
+        !> The second input vector.
+        class(type_vector_dp), intent(in) :: b
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: c
+        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+
+        ptr_a => a%get_data()
+        ptr_b => b%get_data()
+        ptr_c => c%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_a, ptr_b, 'multiply_vector_dp')
+        call check_sizes_match(ptr_a, ptr_c, 'multiply_vector_dp')
+#endif
+        ptr_c = ptr_a * ptr_b
+    end subroutine multiply_vector_dp
+    !>
+    !> Multiplies each element of a vector by a scalar: result = scalar * vector.
+    !>
+    subroutine multiply_scalar_1_vector_dp(scalar, vector, result_vec)
+        implicit none
+        !> The scalar value to multiply by.
+        real(real64), intent(in) :: scalar
+        !> The input vector.
+        class(type_vector_dp), intent(in) :: vector
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_1_vector_dp')
+#endif
+        ptr_r = scalar * ptr_v
+    end subroutine multiply_scalar_1_vector_dp
+    !>
+    !> Multiplies each element of a vector by a scalar: result = vector * scalar.
+    !>
+    subroutine multiply_scalar_2_vector_dp(vector, scalar, result_vec)
+        implicit none
+        !> The input vector.
+        class(type_vector_dp), intent(in) :: vector
+        !> The scalar value to multiply by.
+        real(real64), intent(in) :: scalar
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_2_vector_dp')
+#endif
+        ptr_r = ptr_v * scalar
+    end subroutine multiply_scalar_2_vector_dp
+    !>
+    !> Performs element-wise division of two vectors: c = a / b.
+    !>
+    subroutine divide_vector_dp(a, b, c)
+        implicit none
+        !> The first input vector (numerator).
+        class(type_vector_dp), intent(in) :: a
+        !> The second input vector (denominator).
+        class(type_vector_dp), intent(in) :: b
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: c
+        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+
+        ptr_a => a%get_data()
+        ptr_b => b%get_data()
+        ptr_c => c%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_a, ptr_b, 'divide_vector_dp')
+        call check_sizes_match(ptr_a, ptr_c, 'divide_vector_dp')
+        if (any(ptr_b == 0.0d0)) error stop "ERROR in divide_vector_dp: Division by zero."
+#endif
+        ptr_c = ptr_a / ptr_b
+    end subroutine divide_vector_dp
+    !>
+    !> Divides a scalar by each element of a vector: result = scalar / vector.
+    !>
+    subroutine divide_scalar_1_vector_dp(scalar, vector, result_vec)
+        implicit none
+        !> The scalar value (numerator).
+        real(real64), intent(in) :: scalar
+        !> The input vector (denominator).
+        class(type_vector_dp), intent(in) :: vector
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'divide_scalar_1_vector_dp')
+        if (any(ptr_v == 0.0d0)) error stop "ERROR in divide_scalar_1_vector_dp: Division by zero."
+#endif
+        ptr_r = scalar / ptr_v
+    end subroutine divide_scalar_1_vector_dp
+    !>
+    !> Divides each element of a vector by a scalar: result = vector / scalar.
+    !>
+    subroutine divide_scalar_2_vector_dp(vector, scalar, result_vec)
+        implicit none
+        !> The input vector (numerator).
+        class(type_vector_dp), intent(in) :: vector
+        !> The scalar value (denominator).
+        real(real64), intent(in) :: scalar
+        !> The output vector to store the result.
+        class(type_vector_dp), intent(inout) :: result_vec
+        real(real64), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'divide_scalar_2_vector_dp')
+        if (scalar == 0.0d0) error stop "ERROR in divide_scalar_2_vector_dp: Division by zero."
+#endif
+        ptr_r = ptr_v / scalar
+    end subroutine divide_scalar_2_vector_dp
+
+    ! -------------------------------------------------------------------------
+    ! 6b. Integer Vector Arithmetic Subroutines
+    ! -------------------------------------------------------------------------
+    !>
+    !> Performs element-wise addition of two integer vectors: c = a + b.
+    !>
+    subroutine add_vector_int(a, b, c)
+        implicit none
+        !> The first input vector.
+        class(type_vector_int), intent(in) :: a
+        !> The second input vector.
+        class(type_vector_int), intent(in) :: b
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: c
+
+        integer(int32), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+
+        ptr_a => a%get_data()
+        ptr_b => b%get_data()
+        ptr_c => c%get_data()
+
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_a, ptr_b, 'add_vector_int')
+        call check_sizes_match(ptr_a, ptr_c, 'add_vector_int')
+#endif
+
+        ptr_c = ptr_a + ptr_b
+    end subroutine add_vector_int
+    !>
+    !> Adds a scalar to each element of a vector: result = scalar + vector.
+    !>
+    subroutine add_scalar_1_vector_int(scalar, vector, result_vec)
+        implicit none
+        !> The scalar value to add.
+        integer(int32), intent(in) :: scalar
+        !> The input vector.
+        class(type_vector_int), intent(in) :: vector
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: result_vec
+
+        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_1_vector_int')
+#endif
+        ptr_r = scalar + ptr_v
+    end subroutine add_scalar_1_vector_int
+    !>
+    !> Adds a scalar to each element of a vector: result = vector + scalar.
+    !>
+    subroutine add_scalar_2_vector_int(vector, scalar, result_vec)
+        implicit none
+        !> The input vector.
+        class(type_vector_int), intent(in) :: vector
+        !> The scalar value to add.
+        integer(int32), intent(in) :: scalar
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: result_vec
+        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_2_vector_int')
+#endif
+        ptr_r = ptr_v + scalar
+    end subroutine add_scalar_2_vector_int
+    !>
+    !> Performs element-wise subtraction of two integer vectors: c = a - b.
+    !>
+    subroutine subtract_vector_int(a, b, c)
+        implicit none
+        !> The first input vector (minuend).
+        class(type_vector_int), intent(in) :: a
+        !> The second input vector (subtrahend).
+        class(type_vector_int), intent(in) :: b
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: c
+        integer(int32), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+
+        ptr_a => a%get_data()
+        ptr_b => b%get_data()
+        ptr_c => c%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_a, ptr_b, 'subtract_vector_int')
+        call check_sizes_match(ptr_a, ptr_c, 'subtract_vector_int')
+#endif
+        ptr_c = ptr_a - ptr_b
+    end subroutine subtract_vector_int
+    !>
+    !> Subtracts each element of a vector from a scalar: result = scalar - vector.
+    !>
+    subroutine subtract_scalar_1_vector_int(scalar, vector, result_vec)
+        implicit none
+        !> The scalar value (minuend).
+        integer(int32), intent(in) :: scalar
+        !> The input vector (subtrahend).
+        class(type_vector_int), intent(in) :: vector
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: result_vec
+        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_1_vector_int')
+#endif
+        ptr_r = scalar - ptr_v
+    end subroutine subtract_scalar_1_vector_int
+    !>
+    !> Subtracts a scalar from each element of a vector: result = vector - scalar.
+    !>
+    subroutine subtract_scalar_2_vector_int(vector, scalar, result_vec)
+        implicit none
+        !> The input vector (minuend).
+        class(type_vector_int), intent(in) :: vector
+        !> The scalar value (subtrahend).
+        integer(int32), intent(in) :: scalar
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: result_vec
+        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_2_vector_int')
+#endif
+        ptr_r = ptr_v - scalar
+    end subroutine subtract_scalar_2_vector_int
+    !>
+    !> Performs element-wise multiplication of two integer vectors: c = a * b.
+    !>
+    subroutine multiply_vector_int(a, b, c)
+        implicit none
+        !> The first input vector.
+        class(type_vector_int), intent(in) :: a
+        !> The second input vector.
+        class(type_vector_int), intent(in) :: b
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: c
+        integer(int32), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+
+        ptr_a => a%get_data()
+        ptr_b => b%get_data()
+        ptr_c => c%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_a, ptr_b, 'multiply_vector_int')
+        call check_sizes_match(ptr_a, ptr_c, 'multiply_vector_int')
+#endif
+        ptr_c = ptr_a * ptr_b
+    end subroutine multiply_vector_int
+    !>
+    !> Multiplies each element of a vector by a scalar: result = scalar * vector.
+    !>
+    subroutine multiply_scalar_1_vector_int(scalar, vector, result_vec)
+        implicit none
+        !> The scalar value to multiply by.
+        integer(int32), intent(in) :: scalar
+        !> The input vector.
+        class(type_vector_int), intent(in) :: vector
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: result_vec
+        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_1_vector_int')
+#endif
+        ptr_r = scalar * ptr_v
+    end subroutine multiply_scalar_1_vector_int
+    !>
+    !> Multiplies each element of a vector by a scalar: result = vector * scalar.
+    !>
+    subroutine multiply_scalar_2_vector_int(vector, scalar, result_vec)
+        implicit none
+        !> The input vector.
+        class(type_vector_int), intent(in) :: vector
+        !> The scalar value to multiply by.
+        integer(int32), intent(in) :: scalar
+        !> The output vector to store the result.
+        class(type_vector_int), intent(inout) :: result_vec
+        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+
+        ptr_v => vector%get_data()
+        ptr_r => result_vec%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_2_vector_int')
+#endif
+        ptr_r = ptr_v * scalar
+    end subroutine multiply_scalar_2_vector_int
+
+    ! =========================================================================
+    ! 7. Public Assignment Subroutines
+    ! =========================================================================
+    !>
+    !> Overloads the assignment operator (=) for the double precision coordinate type.
+    !>
+    subroutine assign_coordinate_dp(lhs, rhs)
+        implicit none
+        !> The destination object (left-hand side).
+        type(type_coordinate_dp), intent(inout) :: lhs
+        !> The source object (right-hand side).
+        type(type_coordinate_dp), intent(in) :: rhs
+
+        lhs%x = rhs%x
+        lhs%y = rhs%y
+        lhs%z = rhs%z
+    end subroutine assign_coordinate_dp
+
+    !>
+    !> Overloads the assignment operator (=) for the integer coordinate type.
+    !>
+    subroutine assign_coordinate_int(lhs, rhs)
+        implicit none
+        !> The destination object (left-hand side).
+        type(type_coordinate_int), intent(inout) :: lhs
+        !> The source object (right-hand side).
+        type(type_coordinate_int), intent(in) :: rhs
+
+        lhs%x = rhs%x
+        lhs%y = rhs%y
+        lhs%z = rhs%z
+    end subroutine assign_coordinate_int
+
+    !>
+    !> Overloads the assignment operator (=) for the double precision coordinate array type.
+    !>
+    subroutine assign_coordinate_array_dp(lhs, rhs)
+        implicit none
+        !> The destination object (left-hand side).
+        type(type_coordinate_array_dp), intent(inout) :: lhs
+        !> The source object (right-hand side).
+        type(type_coordinate_array_dp), intent(in) :: rhs
+
+        lhs%x = rhs%x
+        lhs%y = rhs%y
+        lhs%z = rhs%z
+    end subroutine assign_coordinate_array_dp
+
+    !>
+    !> Overloads the assignment operator (=) for the integer coordinate array type.
+    !>
+    subroutine assign_coordinate_array_int(lhs, rhs)
+        implicit none
+        !> The destination object (left-hand side).
+        type(type_coordinate_array_int), intent(inout) :: lhs
+        !> The source object (right-hand side).
+        type(type_coordinate_array_int), intent(in) :: rhs
+
+        lhs%x = rhs%x
+        lhs%y = rhs%y
+        lhs%z = rhs%z
+    end subroutine assign_coordinate_array_int
+
+    !>
+    !> Overloads the assignment operator (=) for the double precision vector type.
+    !>
+    subroutine assign_vector_dp(lhs, rhs)
+        implicit none
+        !> The destination vector (left-hand side).
+        class(type_vector_dp), intent(inout) :: lhs
+        !> The source vector (right-hand side).
+        class(type_vector_dp), intent(in) :: rhs
+
+        real(real64), pointer :: ptr_rhs(:)
+
+        if (.not. rhs%is_initialized()) then
+            error stop "ERROR in assign_vector_dp: RHS vector is not initialized."
+        end if
+
+        ptr_rhs => rhs%get_data()
+        call lhs%set(ptr_rhs)
+    end subroutine assign_vector_dp
+
+    !>
+    !> Overloads the assignment operator (=) for the integer vector type.
+    !>
+    subroutine assign_vector_int(lhs, rhs)
+        implicit none
+        !> The destination vector (left-hand side).
+        class(type_vector_int), intent(inout) :: lhs
+        !> The source vector (right-hand side).
+        class(type_vector_int), intent(in) :: rhs
+
+        integer(int32), pointer :: ptr_rhs(:)
+
+        if (.not. rhs%is_initialized()) then
+            error stop "ERROR in assign_vector_int: RHS vector is not initialized."
+        end if
+        ptr_rhs => rhs%get_data()
+
+        call lhs%set(ptr_rhs)
+    end subroutine assign_vector_int
+
+end module linalg_vector_operations
