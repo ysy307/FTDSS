@@ -11,24 +11,21 @@ contains
     !> The dimensions are determined by the total number of degrees of freedom
     !> (num_nodes * num_dofs). The sparsity pattern arguments are ignored.
     !>
-    module subroutine initialize_dense(self, num_nodes, num_dofs, row, col)
+    module subroutine initialize_dense(self, num_nodes, row, col)
         implicit none
         !> The dense matrix object to initialize.
         class(type_dense), intent(inout) :: self
         !> The number of nodes.
         integer(int32), intent(in) :: num_nodes
-        !> The number of DOFs per node.
-        integer(int32), intent(in) :: num_dofs
         !> Ignored for dense matrices, present for API compatibility.
         integer(int32), intent(in), optional :: row(:)
         !> Ignored for dense matrices, present for API compatibility.
         integer(int32), intent(in), optional :: col(:)
 
         self%num_nodes = num_nodes
-        self%num_dofs = num_dofs
+        self%num_row = num_nodes
+        self%num_col = num_nodes
 
-        self%num_row = num_nodes * num_dofs
-        self%num_col = num_nodes * num_dofs
         call allocate_array(self%val, self%num_row, self%num_col)
         self%val = 0.0d0
     end subroutine initialize_dense
@@ -88,44 +85,33 @@ contains
     !>
     !> Sets the value of a single entry in the matrix.
     !>
-    module subroutine set_value_dense(self, row_dof, col_dof, row, col, value)
+    module subroutine set_value_dense(self, row, col, value)
         implicit none
         !> The dense matrix object.
         class(type_dense), intent(inout) :: self
-        !> The 1-based DOF index within the row/column node.
-        integer(int32), intent(in) :: row_dof, col_dof
-        !> The 1-based node index for the row/column.
-        integer(int32), intent(in) :: row, col
+        !> The 1-based node index for the row.
+        integer(int32), intent(in) :: row
+        !> The 1-based node index for the column.
+        integer(int32), intent(in) :: col
         !> The value to set at the specified entry.
         real(real64), intent(in) :: value
 
-        integer(int32) :: actual_row, actual_col
-
-        actual_row = (row - 1) * self%num_dofs + row_dof
-        actual_col = (col - 1) * self%num_dofs + col_dof
-
-        self%val(actual_row, actual_col) = value
+        self%val(row, col) = value
     end subroutine set_value_dense
 
     !>
     !> Sets all entries in a specified row to a single scalar value.
     !>
-    module subroutine set_row_dense(self, row_dof, row, value)
+    module subroutine set_row_dense(self, row, value)
         implicit none
         !> The dense matrix object.
         class(type_dense), intent(inout) :: self
-        !> The 1-based DOF index within the row node.
-        integer(int32), intent(in) :: row_dof
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The scalar value to assign.
         real(real64), intent(in) :: value
 
-        integer(int32) :: actual_row
-
-        actual_row = (row_dof - 1) * self%num_nodes + row
-
-        self%val(actual_row, :) = value
+        self%val(row, :) = value
 
     end subroutine set_row_dense
 
@@ -155,23 +141,18 @@ contains
     !>
     !> Adds a value to a single entry in the matrix.
     !>
-    module subroutine add_value_dense(self, row_dof, col_dof, row, col, value)
+    module subroutine add_value_dense(self, row, col, value)
         implicit none
         !> The dense matrix object.
         class(type_dense), intent(inout) :: self
-        !> The 1-based DOF index within the row/column node.
-        integer(int32), intent(in) :: row_dof, col_dof
-        !> The 1-based node index for the row/column.
-        integer(int32), intent(in) :: row, col
+        !> The 1-based node index for the row.
+        integer(int32), intent(in) :: row
+        !> The 1-based node index for the column.
+        integer(int32), intent(in) :: col
         !> The value to add to the specified entry.
         real(real64), intent(in) :: value
 
-        integer(int32) :: actual_row, actual_col
-
-        actual_row = (row_dof - 1) * self%num_nodes + row
-        actual_col = (col_dof - 1) * self%num_nodes + col
-
-        self%val(actual_row, actual_col) = self%val(actual_row, actual_col) + value
+        self%val(row, col) = self%val(row, col) + value
     end subroutine add_value_dense
 
     !>

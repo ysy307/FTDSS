@@ -1052,7 +1052,7 @@ contains
         class(type_vector_dp), intent(in) :: b
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: c
-        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+        real(real64), dimension(:), pointer :: ptr_a, ptr_b, ptr_c
 
         ptr_a => a%get_data()
         ptr_b => b%get_data()
@@ -1074,7 +1074,7 @@ contains
         class(type_vector_dp), intent(in) :: vector
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1094,7 +1094,7 @@ contains
         real(real64), intent(in) :: scalar
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1114,7 +1114,7 @@ contains
         class(type_vector_dp), intent(in) :: b
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: c
-        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+        real(real64), dimension(:), pointer :: ptr_a, ptr_b, ptr_c
 
         ptr_a => a%get_data()
         ptr_b => b%get_data()
@@ -1136,7 +1136,7 @@ contains
         class(type_vector_dp), intent(in) :: vector
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1156,7 +1156,7 @@ contains
         real(real64), intent(in) :: scalar
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1176,7 +1176,7 @@ contains
         class(type_vector_dp), intent(in) :: b
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: c
-        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+        real(real64), dimension(:), pointer :: ptr_a, ptr_b, ptr_c
 
         ptr_a => a%get_data()
         ptr_b => b%get_data()
@@ -1198,7 +1198,7 @@ contains
         class(type_vector_dp), intent(in) :: vector
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1218,7 +1218,7 @@ contains
         real(real64), intent(in) :: scalar
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1238,7 +1238,7 @@ contains
         class(type_vector_dp), intent(in) :: b
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: c
-        real(real64), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+        real(real64), dimension(:), pointer :: ptr_a, ptr_b, ptr_c
 
         ptr_a => a%get_data()
         ptr_b => b%get_data()
@@ -1261,7 +1261,7 @@ contains
         class(type_vector_dp), intent(in) :: vector
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1282,7 +1282,7 @@ contains
         real(real64), intent(in) :: scalar
         !> The output vector to store the result.
         class(type_vector_dp), intent(inout) :: result_vec
-        real(real64), pointer :: ptr_v(:), ptr_r(:)
+        real(real64), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1308,7 +1308,7 @@ contains
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: c
 
-        integer(int32), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+        integer(int32), dimension(:), pointer :: ptr_a, ptr_b, ptr_c
 
         ptr_a => a%get_data()
         ptr_b => b%get_data()
@@ -1333,7 +1333,7 @@ contains
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: result_vec
 
-        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+        integer(int32), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1353,7 +1353,7 @@ contains
         integer(int32), intent(in) :: scalar
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: result_vec
-        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+        integer(int32), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1373,7 +1373,7 @@ contains
         class(type_vector_int), intent(in) :: b
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: c
-        integer(int32), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+        integer(int32), dimension(:), pointer :: ptr_a, ptr_b, ptr_c
 
         ptr_a => a%get_data()
         ptr_b => b%get_data()
@@ -1395,7 +1395,7 @@ contains
         class(type_vector_int), intent(in) :: vector
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: result_vec
-        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+        integer(int32), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1415,7 +1415,7 @@ contains
         integer(int32), intent(in) :: scalar
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: result_vec
-        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+        integer(int32), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1435,7 +1435,7 @@ contains
         class(type_vector_int), intent(in) :: b
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: c
-        integer(int32), pointer :: ptr_a(:), ptr_b(:), ptr_c(:)
+        integer(int32), dimension(:), pointer :: ptr_a, ptr_b, ptr_c
 
         ptr_a => a%get_data()
         ptr_b => b%get_data()
@@ -1457,7 +1457,7 @@ contains
         class(type_vector_int), intent(in) :: vector
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: result_vec
-        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+        integer(int32), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1477,7 +1477,7 @@ contains
         integer(int32), intent(in) :: scalar
         !> The output vector to store the result.
         class(type_vector_int), intent(inout) :: result_vec
-        integer(int32), pointer :: ptr_v(:), ptr_r(:)
+        integer(int32), dimension(:), pointer :: ptr_v, ptr_r
 
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
@@ -1560,7 +1560,7 @@ contains
         !> The source vector (right-hand side).
         class(type_vector_dp), intent(in) :: rhs
 
-        real(real64), pointer :: ptr_rhs(:)
+        real(real64), dimension(:), pointer :: ptr_rhs
 
         if (.not. rhs%is_initialized()) then
             error stop "ERROR in assign_vector_dp: RHS vector is not initialized."
@@ -1580,7 +1580,7 @@ contains
         !> The source vector (right-hand side).
         class(type_vector_int), intent(in) :: rhs
 
-        integer(int32), pointer :: ptr_rhs(:)
+        integer(int32), dimension(:), pointer :: ptr_rhs
 
         if (.not. rhs%is_initialized()) then
             error stop "ERROR in assign_vector_int: RHS vector is not initialized."

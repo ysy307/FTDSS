@@ -30,14 +30,12 @@ contains
         ! Do something with range if needed
     end subroutine allocate_matrix
 
-    function create_matrix(matrix_type, num_nodes, num_dofs, row, col) result(matrix)
+    function create_matrix(matrix_type, num_nodes, row, col) result(matrix)
         implicit none
         !> The type of matrix to create: "dense", "crs", or "coo".
         integer(int32), intent(in) :: matrix_type
         !> The number of nodes.
         integer(int32), intent(in) :: num_nodes
-        !> The number of DOFs per node.
-        integer(int32), intent(in) :: num_dofs
         !> Optional node-level CSR `ptr` array to define sparsity.
         integer(int32), intent(in), optional :: row(:)
         !> Optional node-level CSR `ind` array to define sparsity.
@@ -48,16 +46,16 @@ contains
         select case (matrix_type)
         case (MATRIX_DENSE)
             allocate (type_dense :: matrix)
-            call matrix%initialize(num_nodes, num_dofs)
+            call matrix%initialize(num_nodes)
         case (MATRIX_CRS)
             allocate (type_crs :: matrix)
-            call matrix%initialize(num_nodes, num_dofs, row, col)
+            call matrix%initialize(num_nodes, row, col)
         case (MATRIX_COO)
             allocate (type_coo :: matrix)
-            call matrix%initialize(num_nodes, num_dofs, row, col)
+            call matrix%initialize(num_nodes, row, col)
         case default
             allocate (type_dense :: matrix)
-            call matrix%initialize(num_nodes, num_dofs)
+            call matrix%initialize(num_nodes)
             write (*, *) "Warning: Unknown matrix type. Defaulting to dense matrix."
         end select
 

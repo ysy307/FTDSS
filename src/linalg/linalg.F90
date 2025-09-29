@@ -1,11 +1,8 @@
 module module_linalg
-    use :: linalg_vector_ops, only:norm_1, norm_2, norm_inf, dot
+    use :: linalg_vector
+    use :: linalg_vector_ops
+    use :: linalg_matrix_factory
     implicit none
-    private
-
-    public :: norm_1
-    public :: norm_2
-    public :: norm_inf
-    public :: dot
+    public
 
 end module module_linalg

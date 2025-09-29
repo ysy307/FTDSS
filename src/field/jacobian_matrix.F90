@@ -5,10 +5,9 @@
 !>
 module field_jacobian_matrix
     use, intrinsic :: iso_fortran_env
-    use :: core_constants, only:MATRIX_CRS, MATRIX_COO, MATRIX_DENSE, COUPLING_MODE_MONOLITHIC, COUPLING_MODE_STAGGERED
-    use :: core_types_matrix, only:abst_matrix, type_dense, type_crs, type_coo, holder_matrices
-    use :: core_types_matrix_factory, only:create_matrix
+    use :: module_core
     use :: module_domain, only:type_domain
+    use :: module_linalg
     implicit none
     private
 

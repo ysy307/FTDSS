@@ -13,7 +13,7 @@ set(LINALG_SOURCES
     vector.F90
     vector_ops.F90
     matrix_factory.F90
-    matrix_ops.F90
+    # matrix_ops.F90
     linalg.F90
 )
 add_library(Linalg_Main STATIC ${LINALG_SOURCES})

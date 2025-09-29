@@ -186,6 +186,13 @@ module domain_manager
         procedure, public, pass(self) :: initialize => initialize_type_domain
         procedure, private, pass(self) :: associate_parent
         procedure, private, pass(self) :: set_basic_info_and_dof_map
+        procedure, public, pass(self) :: get_num_nodes => get_num_nodes_domain
+        procedure, public, pass(self) :: get_num_elements => get_num_elements_domain
+        procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node_domain
+        procedure, public, pass(self) :: get_total_dofs => get_total_dofs_domain
+        procedure, public, pass(self) :: get_computation_dimension => get_computation_dimension_domain
+        procedure, public, pass(self) :: get_computation_type => get_computation_type_domain
+        procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_domain
     end type type_domain
 
 contains
@@ -676,4 +683,61 @@ contains
         end select
 
     end function are_bcs_identical
+
+    pure function get_num_nodes_domain(self) result(num_nodes)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: num_nodes
+
+        num_nodes = self%nodes%num_nodes
+    end function get_num_nodes_domain
+
+    pure function get_num_elements_domain(self) result(num_elements)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: num_elements
+
+        num_elements = self%elements%num_elements
+    end function get_num_elements_domain
+
+    pure function get_num_dofs_per_node_domain(self) result(num_dofs_per_node)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: num_dofs_per_node
+
+        num_dofs_per_node = self%dof_map%num_dof_per_node
+    end function get_num_dofs_per_node_domain
+
+    pure function get_total_dofs_domain(self) result(total_dofs)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: total_dofs
+
+        total_dofs = self%nodes%num_nodes * self%dof_map%num_dof_per_node
+    end function get_total_dofs_domain
+
+    pure function get_computation_dimension_domain(self) result(comp_dim)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: comp_dim
+
+        comp_dim = self%computation_dimension
+    end function get_computation_dimension_domain
+
+    pure function get_computation_type_domain(self) result(comp_type)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: comp_type
+
+        comp_type = self%computation_type
+    end function get_computation_type_domain
+
+    pure function get_coupling_mode_domain(self) result(coupling_mode)
+        implicit none
+        class(type_domain), intent(in) :: self
+        integer(int32) :: coupling_mode
+
+        coupling_mode = self%coupling_mode
+    end function get_coupling_mode_domain
+
 end module domain_manager

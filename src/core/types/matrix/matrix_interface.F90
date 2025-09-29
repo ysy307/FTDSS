@@ -28,8 +28,6 @@ module core_types_matrix
         private
         !> The number of nodes associated with the matrix dimensions.
         integer(int32) :: num_nodes = 0
-        !> The number of degrees of freedom (DOFs) per node.
-        integer(int32) :: num_dofs = 0
     contains
         procedure(abst_initialize), public, pass(self), deferred :: initialize
         procedure(abst_destroy), public, pass(self), deferred :: destroy
@@ -56,15 +54,13 @@ module core_types_matrix
         !> Initializes the matrix structure based on the number of nodes and DOFs.
         !> For sparse matrices, a sparsity pattern can be provided.
         !>
-        subroutine abst_initialize(self, num_nodes, num_dofs, row, col)
+        subroutine abst_initialize(self, num_nodes, row, col)
             import :: abst_matrix, int32
             implicit none
             !> The matrix object to initialize.
             class(abst_matrix), intent(inout) :: self
             !> The number of nodes.
             integer(int32), intent(in) :: num_nodes
-            !> The number of DOFs per node.
-            integer(int32), intent(in) :: num_dofs
             !> Optional node-level CSR `ptr` array to define sparsity.
             integer(int32), intent(in), optional :: row(:)
             !> Optional node-level CSR `ind` array to define sparsity.
@@ -74,15 +70,15 @@ module core_types_matrix
         !>
         !> Sets the value of a single entry in the matrix.
         !>
-        subroutine abst_set_value(self, row_dof, col_dof, row, col, value)
+        subroutine abst_set_value(self, row, col, value)
             import :: abst_matrix, int32, real64
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
-            !> The 1-based DOF index within the row/column node.
-            integer(int32), intent(in) :: row_dof, col_dof
-            !> The 1-based node index for the row/column.
-            integer(int32), intent(in) :: row, col
+            !> The 1-based node index for the row.
+            integer(int32), intent(in) :: row
+            !> The 1-based node index for the column.
+            integer(int32), intent(in) :: col
             !> The value to set.
             real(real64), intent(in) :: value
         end subroutine abst_set_value
@@ -90,13 +86,11 @@ module core_types_matrix
         !>
         !> Sets all entries in a specified row to a single value.
         !>
-        subroutine abst_set_row(self, row_dof, row, value)
+        subroutine abst_set_row(self, row, value)
             import :: abst_matrix, real64, int32
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
-            !> The 1-based DOF index within the row node.
-            integer(int32), intent(in) :: row_dof
             !> The 1-based node index for the row.
             integer(int32), intent(in) :: row
             !> The scalar value to assign.
@@ -128,15 +122,15 @@ module core_types_matrix
         !>
         !> Adds a value to a single entry in the matrix.
         !>
-        subroutine abst_add_value(self, row_dof, col_dof, row, col, value)
+        subroutine abst_add_value(self, row, col, value)
             import :: abst_matrix, int32, real64
             implicit none
             !> The matrix object.
             class(abst_matrix), intent(inout) :: self
-            !> The 1-based DOF index within the row/column node.
-            integer(int32), intent(in) :: row_dof, col_dof
-            !> The 1-based node index for the row/column.
-            integer(int32), intent(in) :: row, col
+            !> The 1-based node index for the row.
+            integer(int32), intent(in) :: row
+            !> The 1-based node index for the column.
+            integer(int32), intent(in) :: col
             !> The value to add.
             real(real64), intent(in) :: value
         end subroutine abst_add_value
@@ -228,11 +222,10 @@ module core_types_matrix
 
     interface
         !> Initializes a dense matrix.
-        module subroutine initialize_dense(self, num_nodes, num_dofs, row, col)
+        module subroutine initialize_dense(self, num_nodes, row, col)
             implicit none
             class(type_dense), intent(inout) :: self
             integer(int32), intent(in) :: num_nodes
-            integer(int32), intent(in) :: num_dofs
             integer(int32), intent(in), optional :: row(:)
             integer(int32), intent(in), optional :: col(:)
         end subroutine initialize_dense
@@ -265,18 +258,18 @@ module core_types_matrix
         end function get_val_dense
 
         !> Sets a single value in the dense matrix.
-        module subroutine set_value_dense(self, row_dof, col_dof, row, col, value)
+        module subroutine set_value_dense(self, row, col, value)
             implicit none
             class(type_dense), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine set_value_dense
 
         !> Sets all values in a specified row of the dense matrix.
-        module subroutine set_row_dense(self, row_dof, row, value)
+        module subroutine set_row_dense(self, row, value)
             implicit none
             class(type_dense), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, row
+            integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
         end subroutine set_row_dense
 
@@ -293,10 +286,10 @@ module core_types_matrix
         end subroutine zero_dense
 
         !> Adds a value to a single entry in the dense matrix.
-        module subroutine add_value_dense(self, row_dof, col_dof, row, col, value)
+        module subroutine add_value_dense(self, row, col, value)
             implicit none
             class(type_dense), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine add_value_dense
 
@@ -355,24 +348,23 @@ module core_types_matrix
         procedure, pass(self) :: get_ptr => get_ptr_crs
         procedure, pass(self) :: get_ind => get_ind_crs
         procedure, pass(self) :: get_val => get_val_crs
-        procedure, pass(self) :: set_value => set_crs
+        procedure, pass(self) :: set_value => set_value_crs
         procedure, pass(self) :: set_row => set_row_crs
         procedure, pass(self) :: set_all => set_all_crs
         procedure, pass(self) :: zero => zero_crs
-        procedure, private, pass(self) :: find => find_crs
-        procedure, pass(self) :: add_value => add_crs
+        procedure, pass(self) :: add_value => add_value_crs
         procedure, pass(self) :: add_matrix => add_matrix_crs
         procedure, pass(self) :: gemv => gemv_crs
+        procedure, pass(self), private :: find => find_crs
         procedure, pass(self) :: display => display_crs
     end type type_crs
 
     interface
         !> Initializes a CRS matrix from a node-level sparsity pattern.
-        module subroutine initialize_type_crs(self, num_nodes, num_dofs, row, col)
+        module subroutine initialize_type_crs(self, num_nodes, row, col)
             implicit none
             class(type_crs), intent(inout) :: self
             integer(int32), intent(in) :: num_nodes
-            integer(int32), intent(in) :: num_dofs
             integer(int32), intent(in), optional :: row(:)
             integer(int32), intent(in), optional :: col(:)
         end subroutine initialize_type_crs
@@ -426,26 +418,26 @@ module core_types_matrix
         end function get_val_crs
 
         !> Finds the storage index of a matrix entry.
-        module pure function find_crs(self, row_dof, col_dof, row, col) result(index)
+        module pure function find_crs(self, row, col) result(index)
             implicit none
             class(type_crs), intent(in) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             integer(int32) :: index
         end function find_crs
 
         !> Sets a single value in the matrix.
-        module subroutine set_crs(self, row_dof, col_dof, row, col, value)
+        module subroutine set_value_crs(self, row, col, value)
             implicit none
             class(type_crs), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
-        end subroutine set_crs
+        end subroutine set_value_crs
 
         !> Sets all values in a row.
-        module subroutine set_row_crs(self, row_dof, row, value)
+        module subroutine set_row_crs(self, row, value)
             implicit none
             class(type_crs), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, row
+            integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
         end subroutine set_row_crs
 
@@ -463,12 +455,12 @@ module core_types_matrix
         end subroutine zero_crs
 
         !> Adds a value to a single matrix entry.
-        module subroutine add_crs(self, row_dof, col_dof, row, col, value)
+        module subroutine add_value_crs(self, row, col, value)
             implicit none
             class(type_crs), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
-        end subroutine add_crs
+        end subroutine add_value_crs
 
         !> Performs C = alpha*A + B for CRS matrices.
         module subroutine add_matrix_crs(self, alpha, B, C)
@@ -525,24 +517,23 @@ module core_types_matrix
         procedure, pass(self) :: get_row => get_row_coo
         procedure, pass(self) :: get_col => get_col_coo
         procedure, pass(self) :: get_val => get_val_coo
-        procedure, pass(self) :: set_value => set_coo
-        procedure, pass(self) :: set_all => set_all_coo
+        procedure, pass(self) :: set_value => set_value_coo
         procedure, pass(self) :: set_row => set_row_coo
-        procedure, private, pass(self) :: find => find_coo
+        procedure, pass(self) :: set_all => set_all_coo
         procedure, pass(self) :: zero => zero_coo
-        procedure, pass(self) :: add_value => add_coo
+        procedure, pass(self) :: add_value => add_value_coo
         procedure, pass(self) :: add_matrix => add_matrix_coo
         procedure, pass(self) :: gemv => gemv_coo
+        procedure, private, pass(self) :: find => find_coo
         procedure, pass(self) :: display => display_coo
     end type type_coo
 
     interface
         !> Initializes a COO matrix from a node-level sparsity pattern.
-        module subroutine initialize_type_coo(self, num_nodes, num_dofs, row, col)
+        module subroutine initialize_type_coo(self, num_nodes, row, col)
             implicit none
             class(type_coo), intent(inout) :: self
             integer(int32), intent(in) :: num_nodes
-            integer(int32), intent(in) :: num_dofs
             integer(int32), intent(in), optional :: row(:)
             integer(int32), intent(in), optional :: col(:)
         end subroutine initialize_type_coo
@@ -590,26 +581,26 @@ module core_types_matrix
         end function get_val_coo
 
         !> Finds the storage index of a matrix entry.
-        module pure function find_coo(self, row_dof, col_dof, row, col) result(index)
+        module pure function find_coo(self, row, col) result(index)
             implicit none
             class(type_coo), intent(in) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             integer(int32) :: index
         end function find_coo
 
         !> Sets a single value in the matrix.
-        module subroutine set_coo(self, row_dof, col_dof, row, col, value)
+        module subroutine set_value_coo(self, row, col, value)
             implicit none
             class(type_coo), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
-        end subroutine set_coo
+        end subroutine set_value_coo
 
         !> Sets all values in a row.
-        module subroutine set_row_coo(self, row_dof, row, value)
+        module subroutine set_row_coo(self, row, value)
             implicit none
             class(type_coo), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, row
+            integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
         end subroutine set_row_coo
 
@@ -627,12 +618,12 @@ module core_types_matrix
         end subroutine zero_coo
 
         !> Adds a value to a single matrix entry.
-        module subroutine add_coo(self, row_dof, col_dof, row, col, value)
+        module subroutine add_value_coo(self, row, col, value)
             implicit none
             class(type_coo), intent(inout) :: self
-            integer(int32), intent(in) :: row_dof, col_dof, row, col
+            integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
-        end subroutine add_coo
+        end subroutine add_value_coo
 
         !> Performs C = alpha*A + B for COO matrices.
         module subroutine add_matrix_coo(self, alpha, B, C)

@@ -12,23 +12,16 @@ contains
     !> It assumes the input node-level column indices (`col`) are sorted for each row segment.
     !> This routine expands the node-level graph into a full DOF-level matrix sparsity pattern.
     !>
-    module subroutine initialize_type_crs(self, num_nodes, num_dofs, row, col)
+    module subroutine initialize_type_crs(self, num_nodes, row, col)
         implicit none
         !> The CRS matrix object to initialize.
         class(type_crs), intent(inout) :: self
         !> The total number of nodes in the mesh.
         integer(int32), intent(in) :: num_nodes
-        !> The number of degrees of freedom per node.
-        integer(int32), intent(in) :: num_dofs
         !> The node-level CSR pointer array (`ptr`), of size num_nodes + 1.
         integer(int32), intent(in), optional :: row(:)
         !> The node-level CSR column index array (`ind`).
         integer(int32), intent(in), optional :: col(:)
-
-        integer(int32) :: final_num_row, final_nnz, ind_idx
-        integer(int32) :: r_node, c_node, k, k_start, k_end
-        integer(int32) :: idof, jdof
-        integer(int32) :: current_dof_row
 
         ! Argument validation
         if (.not. present(row) .or. .not. present(col)) then
@@ -41,89 +34,34 @@ contains
             stop
         end if
 
-        ! Calculate final matrix dimensions
-        final_num_row = num_nodes * num_dofs
-        final_nnz = size(col) * num_dofs * num_dofs
-
         self%num_nodes = num_nodes
-        self%num_dofs = num_dofs
-        self%num_row = final_num_row
-        self%num_ptr = final_num_row + 1
-        self%nnz = final_nnz
+        self%num_row = num_nodes
+        self%num_ptr = num_nodes + 1
+        self%nnz = size(col)
 
         ! Allocate arrays
-        call allocate_array(self%ptr, self%num_ptr)
-        call allocate_array(self%ind, self%nnz)
+        call allocate_array(self%ptr, source=row)
+        call allocate_array(self%ind, source=col)
         call allocate_array(self%val, self%nnz)
-
-        ! Create the DOF-level ptr and ind arrays. The loop ordering ensures
-        ! that column indices within each row are generated in ascending order,
-        ! avoiding the need for a separate sort.
-        ind_idx = 0
-        self%ptr(1) = 1
-
-        do idof = 1, num_dofs ! Loop over row DOFs
-            do r_node = 1, num_nodes ! Loop over row nodes
-                current_dof_row = (idof - 1) * num_nodes + r_node
-                self%ptr(current_dof_row) = ind_idx + 1
-
-                k_start = row(r_node)
-                k_end = row(r_node + 1) - 1
-
-                do jdof = 1, num_dofs ! Loop over column DOFs
-                    do k = k_start, k_end ! Loop over column nodes
-                        c_node = col(k)
-                        ind_idx = ind_idx + 1
-                        self%ind(ind_idx) = (jdof - 1) * num_nodes + c_node
-                    end do
-                end do
-            end do
-        end do
-        self%ptr(final_num_row + 1) = ind_idx + 1
 
         ! Initialize value array to zero
         self%val = 0.0d0
     end subroutine initialize_type_crs
 
     !>
-    !> Finds the 1-based index in the `val` and `ind` arrays corresponding to a specific matrix entry.
+    !> Deallocates all internal arrays of the CRS matrix object.
     !>
-    pure module function find_crs(self, row_dof, col_dof, row, col) result(index)
+    module subroutine destroy_crs(self)
         implicit none
-        !> The CRS matrix object.
-        class(type_crs), intent(in) :: self
-        !> The 1-based DOF index within the row node.
-        integer(int32), intent(in) :: row_dof
-        !> The 1-based DOF index within the column node.
-        integer(int32), intent(in) :: col_dof
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The 1-based index in the `val`/`ind` arrays, or 0 if not found.
-        integer(int32) :: index
-        integer(int32) :: actual_row, actual_col
-        integer(int32) :: ptr_start, ptr_end
+        !> The CRS matrix object to destroy.
+        class(type_crs), intent(inout) :: self
 
-        index = 0
-
-#ifdef USE_DEBUG
-        if (row < 1 .or. row > self%num_nodes) return
-        if (col < 1 .or. col > self%num_nodes) return
-        if (row_dof < 1 .or. row_dof > self%num_dofs) return
-        if (col_dof < 1 .or. col_dof > self%num_dofs) return
-#endif
-
-        actual_row = (row_dof - 1) * self%num_nodes + row
-        actual_col = (col_dof - 1) * self%num_nodes + col
-
-        ptr_start = self%ptr(actual_row)
-        ptr_end = self%ptr(actual_row + 1) - 1
-
-        ! Perform a binary search within the relevant segment of the index array.
-        index = binary_find(actual_col, self%ind, ptr_start, ptr_end)
-
-    end function find_crs
+        call deallocate_array(self%ptr)
+        call deallocate_array(self%ind)
+        call deallocate_array(self%val)
+        self%nnz = 0
+        self%num_row = 0
+    end subroutine destroy_crs
 
     !>
     !> Returns the number of non-zero entries in the matrix.
@@ -206,14 +144,10 @@ contains
     !>
     !> Sets the value of a specific entry in the sparse matrix.
     !>
-    module subroutine set_crs(self, row_dof, col_dof, row, col, value)
+    module subroutine set_value_crs(self, row, col, value)
         implicit none
         !> The CRS matrix object.
         class(type_crs), intent(inout) :: self
-        !> The 1-based DOF index within the row node.
-        integer(int32), intent(in) :: row_dof
-        !> The 1-based DOF index within the column node.
-        integer(int32), intent(in) :: col_dof
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The 1-based node index for the column.
@@ -223,17 +157,37 @@ contains
 
         integer(int32) :: index
 
-        index = self%find(row_dof, col_dof, row, col)
+        index = self%find(row, col)
 #ifdef USE_DEBUG
         if (index > 0) then
 #endif
             self%val(index) = value
 #ifdef USE_DEBUG
         else
-            print *, "Warning(set_crs): Element not in sparsity pattern.", row, col
+            print *, "Warning(set_value_crs): Element not in sparsity pattern.", row, col
         end if
 #endif
-    end subroutine set_crs
+    end subroutine set_value_crs
+
+    !>
+    !> Sets all non-zero entries in a specific row to a single scalar value.
+    !>
+    module subroutine set_row_crs(self, row, value)
+        implicit none
+        !> The CRS matrix object.
+        class(type_crs), intent(inout) :: self
+        !> The 1-based node index for the row.
+        integer(int32), intent(in) :: row
+        !> The scalar value to assign.
+        real(real64), intent(in) :: value
+
+        integer(int32) :: is, ie
+
+        is = self%ptr(row)
+        ie = self%ptr(row + 1) - 1
+
+        self%val(is:ie) = value
+    end subroutine set_row_crs
 
     !>
     !> Sets all stored non-zero values in the matrix to a single scalar value.
@@ -249,28 +203,6 @@ contains
     end subroutine set_all_crs
 
     !>
-    !> Sets all non-zero entries in a specific row to a single scalar value.
-    !>
-    module subroutine set_row_crs(self, row_dof, row, value)
-        implicit none
-        !> The CRS matrix object.
-        class(type_crs), intent(inout) :: self
-        !> The 1-based DOF index within the row node.
-        integer(int32), intent(in) :: row_dof
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The scalar value to assign.
-        real(real64), intent(in) :: value
-
-        integer(int32) :: actual_row, is, ie
-
-        actual_row = (row_dof - 1) * self%num_nodes + row
-        is = self%ptr(actual_row)
-        ie = self%ptr(actual_row + 1) - 1
-        self%val(is:ie) = value
-    end subroutine set_row_crs
-
-    !>
     !> Sets all stored values in the matrix to zero.
     !>
     module subroutine zero_crs(self)
@@ -284,14 +216,10 @@ contains
     !>
     !> Adds a value to a specific entry in the sparse matrix.
     !>
-    module subroutine add_crs(self, row_dof, col_dof, row, col, value)
+    module subroutine add_value_crs(self, row, col, value)
         implicit none
         !> The CRS matrix object.
         class(type_crs), intent(inout) :: self
-        !> The 1-based DOF index within the row node.
-        integer(int32), intent(in) :: row_dof
-        !> The 1-based DOF index within the column node.
-        integer(int32), intent(in) :: col_dof
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The 1-based node index for the column.
@@ -301,17 +229,17 @@ contains
 
         integer(int32) :: index
 
-        index = self%find(row_dof, col_dof, row, col)
+        index = self%find(row, col)
 #ifdef USE_DEBUG
         if (index > 0) then
 #endif
             self%val(index) = self%val(index) + value
 #ifdef USE_DEBUG
         else
-            print *, "Warning(add_crs): Element not in sparsity pattern.", row, col
+            print *, "Warning(add_value_crs): Element not in sparsity pattern.", row, col
         end if
 #endif
-    end subroutine add_crs
+    end subroutine add_value_crs
 
     !>
     !> Performs the matrix operation \( C = \alpha*A + B \), where A is self.
@@ -374,6 +302,37 @@ contains
     end subroutine gemv_crs
 
     !>
+    !> Finds the 1-based index in the `val` and `ind` arrays corresponding to a specific matrix entry.
+    !>
+    pure module function find_crs(self, row, col) result(index)
+        implicit none
+        !> The CRS matrix object.
+        class(type_crs), intent(in) :: self
+        !> The 1-based node index for the row.
+        integer(int32), intent(in) :: row
+        !> The 1-based node index for the column.
+        integer(int32), intent(in) :: col
+        !> The 1-based index in the `val`/`ind` arrays, or 0 if not found.
+
+        integer(int32) :: index
+        integer(int32) :: ptr_start, ptr_end
+
+        index = 0
+
+#ifdef USE_DEBUG
+        if (row < 1 .or. row > self%num_nodes) return
+        if (col < 1 .or. col > self%num_nodes) return
+#endif
+
+        ptr_start = self%ptr(row)
+        ptr_end = self%ptr(row + 1) - 1
+
+        ! Perform a binary search within the relevant segment of the index array.
+        index = binary_find(col, self%ind, ptr_start, ptr_end)
+
+    end function find_crs
+
+    !>
     !> Prints the non-zero contents of the sparse matrix to standard output.
     !>
     module subroutine display_crs(self)
@@ -391,20 +350,5 @@ contains
             end do
         end do
     end subroutine display_crs
-
-    !>
-    !> Deallocates all internal arrays of the CRS matrix object.
-    !>
-    module subroutine destroy_crs(self)
-        implicit none
-        !> The CRS matrix object to destroy.
-        class(type_crs), intent(inout) :: self
-
-        call deallocate_array(self%ptr)
-        call deallocate_array(self%ind)
-        call deallocate_array(self%val)
-        self%nnz = 0
-        self%num_row = 0
-    end subroutine destroy_crs
 
 end submodule core_types_matrix_crs
