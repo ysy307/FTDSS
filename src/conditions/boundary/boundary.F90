@@ -1,12 +1,10 @@
 module module_boundary
-    use :: conditions_boundary, only:abst_bc, mode_value, mode_nr, mode_ic
-    use :: conditions_boundary_manager, only:type_bc, holder_bcs
+    use :: conditions_boundary, only:abst_bc
+    use :: conditions_boundary_manager, only:create_boundary_conditions
     implicit none
     private
 
-    public :: type_bc
-    public :: holder_bcs
-
-    public :: mode_value, mode_nr, mode_ic
+    public :: abst_bc
+    public :: create_boundary_conditions
 
 end module module_boundary

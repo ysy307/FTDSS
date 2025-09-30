@@ -9,7 +9,7 @@
 !> It also features a backend-switching capability for norm and dot-product
 !> calculations, utilizing MKL when available.
 !>
-module linalg_vector_operations
+module linalg_vector_ops
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
     use :: module_core
@@ -1590,4 +1590,4 @@ contains
         call lhs%set(ptr_rhs)
     end subroutine assign_vector_int
 
-end module linalg_vector_operations
+end module linalg_vector_ops

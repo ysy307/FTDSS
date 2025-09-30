@@ -18,7 +18,8 @@ module field_jacobian_matrix
         integer(int32) :: matrix_type = -1
         integer(int32) :: coupling_mode = -1
         integer(int32) :: size = 0
-        type(holder_matrices), allocatable :: data(:)
+        integer(int32), allocatable :: dofs(:, :)
+        type(holder_matrices), allocatable :: data(:, :) ! coupling_modeに応じてサイズが変わる
     contains
         procedure, public, pass(self) :: initialize => initialize_jacobian_matrix
         procedure, public, pass(self) :: destroy => destroy_jacobian_matrix
@@ -48,7 +49,7 @@ contains
         class(type_jacobian_matrix), intent(inout) :: self
         class(type_domain), intent(in) :: domain
         integer(int32), intent(in) :: matrix_type
-        integer(int32) :: i, num_dofs, num_nodes
+        integer(int32) :: i, j, num_dofs, num_nodes
         integer(int32), pointer :: row_ptr(:) => null(), col_ptr(:) => null()
 
         self%matrix_type = matrix_type
@@ -60,19 +61,36 @@ contains
         if (allocated(self%data)) deallocate (self%data)
 
         if (matrix_type == MATRIX_CRS .or. matrix_type == MATRIX_COO) then
-            row_ptr => domain%get_node_adjacency_ptr_row()
-            col_ptr => domain%get_node_adjacency_ptr_col()
+            call domain%get_node_adjacency(matrix_type, row_ptr, col_ptr)
         end if
 
         select case (self%coupling_mode)
         case (COUPLING_MODE_STAGGERED)
-            allocate (self%data(num_dofs))
+            call allocate_array(self%dofs, 1, num_dofs)
             do i = 1, num_dofs
-                self%data(i)%m = create_matrix(matrix_type, num_nodes, 1, row_ptr, col_ptr)
+                self%dofs(1, i) = i
+            end do
+            allocate (self%data(1, num_dofs))
+            do i = 1, num_dofs
+                if (associated(row_ptr) .and. associated(col_ptr)) then
+                    self%data(1, i)%m = create_matrix(matrix_type, num_nodes, row_ptr, col_ptr)
+                else
+                    self%data(1, i)%m = create_matrix(matrix_type, num_nodes)
+                end if
             end do
         case (COUPLING_MODE_MONOLITHIC)
-            allocate (self%data(1))
-            self%data(1)%m = create_matrix(matrix_type, num_nodes, num_dofs, row_ptr, col_ptr)
+            call allocate_array(self%dofs, num_dofs, num_dofs)
+            allocate (self%data(num_dofs, num_dofs))
+            do i = 1, num_dofs
+                do j = 1, num_dofs
+                    self%dofs(i, j) = (i - 1) * num_dofs + j
+                    if (associated(row_ptr) .and. associated(col_ptr)) then
+                        self%data(i, j)%m = create_matrix(matrix_type, num_nodes, row_ptr, col_ptr)
+                    else
+                        self%data(i, j)%m = create_matrix(matrix_type, num_nodes)
+                    end if
+                end do
+            end do
         end select
 
         nullify (row_ptr, col_ptr)
@@ -90,11 +108,19 @@ contains
     ! -------------------------------------------------------------------
     !  Getters
     ! -------------------------------------------------------------------
-    pure function get_size_jacobian_matrix(self) result(sz)
-        class(type_jacobian_matrix), intent(in) :: self; integer(int32) :: sz; sz = self%size
+    pure function get_size_jacobian_matrix(self) result(size)
+        implicit none
+        class(type_jacobian_matrix), intent(in) :: self
+        integer(int32) :: size
+
+        size = self%size
     end function
-    pure function get_matrix_type_jacobian_matrix(self) result(mt)
-        class(type_jacobian_matrix), intent(in) :: self; integer(int32) :: mt; mt = self%matrix_type
+    pure function get_matrix_type_jacobian_matrix(self) result(matrix_type)
+        implicit none
+        class(type_jacobian_matrix), intent(in) :: self
+        integer(int32) :: matrix_type
+
+        matrix_type = self%matrix_type
     end function
 
     function get_matrix_jacobian_matrix(self, dof) result(matrix)

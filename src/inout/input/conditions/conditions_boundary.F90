@@ -14,7 +14,8 @@ submodule(inout_input_conditions) inout_input_conditions_boundry
     character(*), parameter :: is_uniform = "is_uniform"
     character(*), parameter :: values = "values"
     character(len=16), parameter :: valid_thermal_boundary_types(8) = [character(len=16) :: &
-                                                                       "dirichlet", "neumann", "flux", "robin", "adiabatic", "free", "convective", "head_radiation"]
+                                                                       "dirichlet", "neumann", "flux", "robin", "adiabatic", &
+                                                                       "free", "convective", "head_radiation"]
     character(len=16), parameter :: valid_hydraulic_boundary_types(5) = [character(len=16) :: &
                                                                          "dirichlet", "neumann", "flux", "impermeable", "seepage"]
 

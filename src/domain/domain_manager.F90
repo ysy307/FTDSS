@@ -8,9 +8,11 @@ module domain_manager
     use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_input, only:type_input
+    use :: module_control, only:type_controls
     use :: module_fe, only:type_fe_manager
     use :: domain_multicoloring, only:type_coloring
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
+    use :: module_boundary
     ! use :: conditions_boundary, only:abst_bc, construct_type_bc_thermal_dirichlet, &
     !     construct_type_bc_thermal_adiabatic ! Other construct_* would be USEd similarly
 
@@ -37,20 +39,20 @@ module domain_manager
     !>
     !> Represents a single, unique boundary condition applied to a set of geometric entities.
     !>
-    type :: type_single_bc
-        !>
+    type :: type_boundary_patch
+        !> The integer ID representing the type of boundary condition (e.g., Dirichlet, Neumann).
+        integer(int32) :: type_id = -1
         !> The number of elements (sides) this boundary condition applies to.
-        !>
         integer(int32) :: num_elements = 0
-        !>
         !> Array of finite element type IDs for each element in this BC set.
-        !>
         integer(int32), allocatable :: element_types(:)
-        !>
+        !> Manager for FE type-specific operations (shape functions, etc.).
+        type(type_fe_manager) :: fe_manager
         !> Connectivity data for the elements in this BC set.
-        !>
         type(type_fe_connectivity) :: connectivity
-    end type type_single_bc
+        !>
+        class(abst_bc), allocatable :: condition
+    end type type_boundary_patch
 
     !>
     !> Manages all boundary conditions for a single physics type (e.g., thermal).
@@ -63,20 +65,19 @@ module domain_manager
         !>
         !> Array of unique boundary condition sets.
         !>
-        type(type_single_bc), allocatable :: bcs(:)
+        type(type_boundary_patch), allocatable :: bcs(:)
+        !>
+        !>
+        !>
     end type type_physics_bc_manager
 
     !>
     !> Top-level manager for all boundary conditions across all physics types.
     !>
     type :: type_boundary_manager
-        !>
         !> Pointer to the parent domain object.
-        !>
         type(type_domain), pointer, private :: parent => null()
-        !>
         !> Array of BC managers, one for each physics type.
-        !>
         type(type_physics_bc_manager) :: physics(NUM_PHYSICS_TYPES)
     contains
         procedure, public, pass(self) :: initialize => initialize_boundary_manager
@@ -193,6 +194,7 @@ module domain_manager
         procedure, public, pass(self) :: get_computation_dimension => get_computation_dimension_domain
         procedure, public, pass(self) :: get_computation_type => get_computation_type_domain
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_domain
+        procedure, public, pass(self) :: get_node_adjacency => get_node_adjacency_domain
     end type type_domain
 
 contains
@@ -201,12 +203,14 @@ contains
     !>
     !>  This is the main entry point for setting up the domain. It orchestrates the
     !>          initialization of basic info, nodes, elements, and boundaries.
-    subroutine initialize_type_domain(self, input)
+    subroutine initialize_type_domain(self, input, controls)
         implicit none
         !> The domain object to be initialized.
         class(type_domain), intent(inout) :: self
         !> The parsed input data from a file.
         type(type_input), intent(in) :: input
+        !> The control parameters for the simulation.
+        type(type_controls), intent(in) :: controls
 
         if (.not. self%is_associated) call self%associate_parent(self%nodes, self%elements, self%boundaries)
         call self%set_basic_info_and_dof_map(input)
@@ -218,7 +222,7 @@ contains
         ! Initialize the element-to-node adjacency information
         call self%element_adjacency%initialize(self%nodes%num_nodes, self%elements%num_elements, &
                                                self%elements%connectivity%ind, self%elements%connectivity%val)
-        call self%boundaries%initialize(input)
+        call self%boundaries%initialize(input, controls)
     end subroutine initialize_type_domain
 
     !> Associates child manager components with this parent domain object.
@@ -370,20 +374,24 @@ contains
     end subroutine initialize_element_manager
 
     !> Initializes the boundary manager by processing BCs for all active physics.
-    subroutine initialize_boundary_manager(self, input)
+    subroutine initialize_boundary_manager(self, input, controls)
         !> The boundary manager object.
         class(type_boundary_manager), intent(inout) :: self
         !> The parsed input data.
         type(type_input), intent(in) :: input
+        !> The control parameters for the simulation.
+        type(type_controls), intent(in) :: controls
+
+        integer(int32) :: phys, ibc, ie
 
         if (input%basic%analysis_controls%calculate_thermal) then
-            call self%process_single_physics_bcs(PHYSICS_TYPE_THERMAL, input)
+            call self%process_single_physics_bcs(PHYSICS_TYPE_THERMAL, input, controls)
         end if
         if (input%basic%analysis_controls%calculate_hydraulic) then
-            call self%process_single_physics_bcs(PHYSICS_TYPE_HYDRAULIC, input)
+            call self%process_single_physics_bcs(PHYSICS_TYPE_HYDRAULIC, input, controls)
         end if
         if (input%basic%analysis_controls%calculate_mechanical) then
-            call self%process_single_physics_bcs(PHYSICS_TYPE_MECHANICAL, input)
+            call self%process_single_physics_bcs(PHYSICS_TYPE_MECHANICAL, input, controls)
         end if
 
     end subroutine initialize_boundary_manager
@@ -392,7 +400,7 @@ contains
     !>
     !> This routine identifies active boundary entities, groups them by identical condition
     !>          (type and values), and stores the geometric information in CSR format for each group.
-    subroutine process_single_physics_bcs(self, physics_type_id, input)
+    subroutine process_single_physics_bcs(self, physics_type_id, input, controls)
         implicit none
         !> The boundary manager object.
         class(type_boundary_manager), intent(inout) :: self
@@ -400,12 +408,14 @@ contains
         integer(int32), intent(in) :: physics_type_id
         !> The parsed input data.
         type(type_input), intent(in) :: input
+        !> The control parameters for the simulation.
+        type(type_controls), intent(in) :: controls
 
         ! --- Local variables ---
         integer(int32) :: i, bc_type, num_groups
         integer(int32) :: max_id, bc_id, group_idx
         integer(int32) :: target_dimension
-        integer(int32), allocatable :: bc_sequence(:), bc_idx_list(:), bc_key(:), active_region_id(:)
+        integer(int32), allocatable :: bc_sequence(:), bc_idx_list(:), bc_key(:), active_region_id(:), group_to_cell_id(:)
         integer(int32), allocatable :: input_idx_to_group_idx_map(:)
         integer(int32), allocatable :: entity_id_to_group_idx_map(:)
         integer(int32), allocatable :: total_conn_per_group(:), current_elem_indices(:)
@@ -486,7 +496,7 @@ contains
         allocate (self%physics(physics_type_id)%bcs(num_groups))
 
         ! --- Step B: Create a map from entity ID to group index ---
-        max_id = maxval(input%conditions%boundary_conditions%id)
+        max_id = maxval(input%conditions%boundary_conditions(:)%id)
         call allocate_array(entity_id_to_group_idx_map, max_id)
         entity_id_to_group_idx_map = 0
 
@@ -533,6 +543,10 @@ contains
 
         call allocate_array(current_elem_indices, num_groups)
         current_elem_indices = 0
+
+        call allocate_array(group_to_cell_id, num_groups)
+        group_to_cell_id = -1
+
         do i = 1, num_total_cells
             if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
                 cell_id = input%geometry%vtk%cells(i)%cell_entity_id
@@ -552,14 +566,34 @@ contains
                     self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%ind(current_elem_indices(current_group_idx)): &
                     self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%ind(current_elem_indices(current_group_idx) + 1) - 1) = &
                     input%geometry%vtk%cells(i)%connectivity(1:num_nodes)
+
+                if (group_to_cell_id(current_group_idx) < 0) group_to_cell_id(current_group_idx) = cell_id
             end if
         end do
+
+        block
+            integer(int32) :: my_rank
+            call MPI_Comm_rank(MPI_COMM_WORLD, my_rank)
+            if (my_rank == 0) then
+                write (*, *) group_to_cell_id
+            end if
+        end block
+
+        ! do current_group_idx = 1, num_groups
+        !     if (group_to_cell_id(current_group_idx) > 0) then
+        !         call create_boundary_conditions( &
+        !             cell_id=group_to_cell_id(current_group_idx), &
+        !             input=input, &
+        !             controls=controls)
+        !     end if
+        ! end do
 
         call deallocate_array(current_elem_indices)
         call deallocate_array(entity_id_to_group_idx_map)
         call deallocate_array(bc_key)
         call deallocate_array(bc_sequence)
         call deallocate_array(active_region_id)
+        call deallocate_array(group_to_cell_id)
     end subroutine process_single_physics_bcs
 
     !> Finds the position of a BC ID within a predefined sequence array.
@@ -739,5 +773,20 @@ contains
 
         coupling_mode = self%coupling_mode
     end function get_coupling_mode_domain
+
+    subroutine get_node_adjacency_domain(self, matrix_type, row, col)
+        implicit none
+        class(type_domain), intent(in), target :: self
+        integer(int32), intent(in) :: matrix_type
+        integer(int32), dimension(:), pointer, intent(inout) :: row, col
+
+        ! Get the node adjacency information based on the matrix type
+        select case (matrix_type)
+        case (MATRIX_COO)
+            call self%node_adjacency%get_coo_ptr(row, col)
+        case (MATRIX_CRS)
+            call self%node_adjacency%get_csr_ptr(row, col)
+        end select
+    end subroutine get_node_adjacency_domain
 
 end module domain_manager

@@ -100,6 +100,8 @@ target_link_libraries(Domain_Main PUBLIC
     # Domain_Reordering
     Solver::Core
     Solver::Input
+    Solver::Control
+    Solver::Conditions
 )
 enable_build_flags(Domain_Main)
 enable_thirdparty(Domain_Main)
