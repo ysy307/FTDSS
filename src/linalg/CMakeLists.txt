@@ -36,6 +36,7 @@ add_library(Linalg_Interface INTERFACE)
 target_link_libraries(Linalg_Interface INTERFACE
     Linalg_Main
 )
+enable_build_flags(Linalg_Interface)
 
 # Create a clean, namespaced ALIAS for other directories to use.
 add_library(Solver::Linalg ALIAS Linalg_Interface)

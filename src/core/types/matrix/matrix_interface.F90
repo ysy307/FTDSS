@@ -40,9 +40,10 @@ module core_types_matrix
 
         procedure(abst_zero), public, pass(self), deferred :: zero
         procedure(abst_add_value), private, pass(self), deferred :: add_value
+        procedure(abst_add_values), private, pass(self), deferred :: add_values
         procedure(abst_add_matrix), private, pass(self), deferred :: add_matrix
         !> Generic interface for adding values to the matrix.
-        generic, public :: add => add_value, add_matrix
+        generic, public :: add => add_value, add_values, add_matrix
 
         procedure(abst_gemv), public, pass(self), deferred :: gemv
 
@@ -136,6 +137,20 @@ module core_types_matrix
         end subroutine abst_add_value
 
         !>
+        !> Adds a value to a single entry in the matrix.
+        !>
+        subroutine abst_add_values(self, indices, values)
+            import :: abst_matrix, int32
+            implicit none
+            !> The matrix object.
+            class(abst_matrix), intent(inout) :: self
+            !> The 1-based node index for the row.
+            integer(int32), intent(in) :: indices(:)
+            !> The value to add.
+            class(abst_matrix), intent(in) :: values
+        end subroutine abst_add_values
+
+        !>
         !> Performs the matrix operation C = alpha*A + B, where A is `self`.
         !>
         subroutine abst_add_matrix(self, alpha, B, C)
@@ -215,6 +230,7 @@ module core_types_matrix
         procedure, pass(self) :: set_all => set_all_dense
         procedure, pass(self) :: zero => zero_dense
         procedure, pass(self) :: add_value => add_value_dense
+        procedure, pass(self) :: add_values => add_values_dense
         procedure, pass(self) :: add_matrix => add_matrix_dense
         procedure, pass(self) :: gemv => gemv_dense
         procedure, pass(self) :: display => display_dense
@@ -293,6 +309,14 @@ module core_types_matrix
             real(real64), intent(in) :: value
         end subroutine add_value_dense
 
+        !> Adds a value to multiple entries in the dense matrix specified by indices.
+        module subroutine add_values_dense(self, indices, values)
+            implicit none
+            class(type_dense), intent(inout) :: self
+            integer(int32), intent(in) :: indices(:)
+            class(abst_matrix), intent(in) :: values
+        end subroutine add_values_dense
+
         !> Performs the matrix operation C = alpha*A + B for dense matrices.
         module subroutine add_matrix_dense(self, alpha, B, C)
             implicit none
@@ -353,6 +377,7 @@ module core_types_matrix
         procedure, pass(self) :: set_all => set_all_crs
         procedure, pass(self) :: zero => zero_crs
         procedure, pass(self) :: add_value => add_value_crs
+        procedure, pass(self) :: add_values => add_values_crs
         procedure, pass(self) :: add_matrix => add_matrix_crs
         procedure, pass(self) :: gemv => gemv_crs
         procedure, pass(self), private :: find => find_crs
@@ -462,6 +487,14 @@ module core_types_matrix
             real(real64), intent(in) :: value
         end subroutine add_value_crs
 
+        !> Adds values to multiple matrix entries specified by indices.
+        module subroutine add_values_crs(self, indices, values)
+            implicit none
+            class(type_crs), intent(inout) :: self
+            integer(int32), intent(in) :: indices(:)
+            class(abst_matrix), intent(in) :: values
+        end subroutine add_values_crs
+
         !> Performs C = alpha*A + B for CRS matrices.
         module subroutine add_matrix_crs(self, alpha, B, C)
             implicit none
@@ -522,6 +555,7 @@ module core_types_matrix
         procedure, pass(self) :: set_all => set_all_coo
         procedure, pass(self) :: zero => zero_coo
         procedure, pass(self) :: add_value => add_value_coo
+        procedure, pass(self) :: add_values => add_values_coo
         procedure, pass(self) :: add_matrix => add_matrix_coo
         procedure, pass(self) :: gemv => gemv_coo
         procedure, private, pass(self) :: find => find_coo
@@ -624,6 +658,14 @@ module core_types_matrix
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine add_value_coo
+
+        !> Adds values to multiple matrix entries specified by indices.
+        module subroutine add_values_coo(self, indices, values)
+            implicit none
+            class(type_coo), intent(inout) :: self
+            integer(int32), intent(in) :: indices(:)
+            class(abst_matrix), intent(in) :: values
+        end subroutine add_values_coo
 
         !> Performs C = alpha*A + B for COO matrices.
         module subroutine add_matrix_coo(self, alpha, B, C)

@@ -4,7 +4,7 @@
 !> It includes interfaces for both standard and MPI-parallel BLAS routines.
 !>
 #ifdef _MKL
-module linalg_mkl_interfaces
+module linalg_mkl_interface
     use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
     private
@@ -144,5 +144,5 @@ module linalg_mkl_interfaces
         end function
     end interface
 
-end module linalg_mkl_interfaces
+end module linalg_mkl_interface
 #endif

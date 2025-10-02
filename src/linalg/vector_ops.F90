@@ -14,10 +14,7 @@ module linalg_vector_ops
     use :: mpi_f08
     use :: module_core
     use :: linalg_vector
-#ifdef _MKL
-    use :: linalg_mkl_interfaces
-#endif
-    use :: linalg_mkl_backends
+    use :: linalg_mkl_backend
 
     implicit none
     private

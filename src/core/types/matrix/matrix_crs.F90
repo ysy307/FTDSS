@@ -242,6 +242,30 @@ contains
     end subroutine add_value_crs
 
     !>
+    !> Adds the values from another CRS matrix to this matrix.
+    !> This simplified version requires both matrices to have identical sparsity patterns.
+    module subroutine add_values_crs(self, indices, values)
+        implicit none
+        !> The CRS matrix object to modify (self).
+        class(type_crs), intent(inout) :: self
+        !> The 1-based node indices specifying which rows and columns to update.
+        integer(int32), intent(in) :: indices(:)
+        !> The abstract matrix containing values to add (must be of type_crs).
+        class(abst_matrix), intent(in) :: values
+
+        integer(int32) :: i, j, n
+
+        select type (matrix => values)
+        type is (type_dense)
+            n = size(indices)
+            do i = 1, n
+                do j = 1, n
+                    call self%add(indices(i), indices(j), matrix%val(i, j))
+                end do
+            end do
+        end select
+    end subroutine add_values_crs
+    !>
     !> Performs the matrix operation \( C = \alpha*A + B \), where A is self.
     !> This simplified version requires all matrices to have identical sparsity patterns.
     !>

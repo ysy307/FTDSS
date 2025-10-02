@@ -246,6 +246,26 @@ contains
 #endif
     end subroutine add_value_coo
 
+    module subroutine add_values_coo(self, indices, values)
+        implicit none
+        class(type_coo), intent(inout) :: self
+        integer(int32), intent(in) :: indices(:)
+        class(abst_matrix), intent(in) :: values
+
+        integer(int32) :: n, i, j
+        class(type_dense), pointer :: matrix
+
+        n = size(indices)
+        select type (matrix => values)
+        type is (type_dense)
+            do i = 1, n
+                do j = 1, n
+                    call self%add(indices(i), indices(j), matrix%val(i, j))
+                end do
+            end do
+        end select
+    end subroutine add_values_coo
+
     !>
     !> Performs the matrix operation C = alpha*A + B, where A is `self`.
     !> This simplified version requires all matrices to have identical sparsity patterns.

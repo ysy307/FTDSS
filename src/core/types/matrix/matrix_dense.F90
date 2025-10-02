@@ -155,6 +155,25 @@ contains
         self%val(row, col) = self%val(row, col) + value
     end subroutine add_value_dense
 
+    module subroutine add_values_dense(self, indices, values)
+        implicit none
+        class(type_dense), intent(inout) :: self
+        integer(int32), intent(in) :: indices(:)
+        class(abst_matrix), intent(in) :: values
+
+        integer(int32) :: i, j, n
+
+        select type (matrix => values)
+        type is (type_dense)
+            n = size(indices)
+            do i = 1, n
+                do j = 1, n
+                    call self%add(indices(i), indices(j), matrix%val(i, j))
+                end do
+            end do
+        end select
+    end subroutine add_values_dense
+
     !>
     !> Performs the matrix operation C = alpha*A + B, where A is `self`.
     !>

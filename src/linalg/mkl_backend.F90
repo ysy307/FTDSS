@@ -4,11 +4,11 @@
 !> is defined) and a native Fortran version. Both versions support MPI parallelism.
 !> This module is intended to be used by `linalg_vector_operations`.
 !>
-module linalg_mkl_backends
+module linalg_mkl_backend
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
 #ifdef _MKL
-    use :: linalg_mkl_interfaces
+    use :: linalg_mkl_interface
 #endif
 
     implicit none
@@ -19,11 +19,12 @@ module linalg_mkl_backends
     public :: norm_2_mkl
     public :: norm_inf_mkl
     public :: dot_mkl
-#endif
+#else
     public :: norm_1_native
     public :: norm_2_native
     public :: norm_inf_native
     public :: dot_native
+#endif
 
 contains
 
@@ -213,4 +214,4 @@ contains
 #endif
     end function dot_native
 
-end module linalg_mkl_backends
+end module linalg_mkl_backend

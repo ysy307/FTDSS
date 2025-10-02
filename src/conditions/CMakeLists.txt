@@ -21,7 +21,6 @@ target_include_directories(Conditions_Boundary PUBLIC ${CMAKE_CURRENT_BINARY_DIR
 # Boundary conditions need info from Core, Domain, InOut, and Field.
 target_link_libraries(Conditions_Boundary PUBLIC
     Solver::Core
-    Solver::Domain
     Solver::Input
     Solver::Control
     # Solver::Field
