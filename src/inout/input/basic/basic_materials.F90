@@ -12,7 +12,7 @@ submodule(inout_input_basic) inout_input_basic_materials
     character(*), parameter :: phase = "phase"
     character(*), parameter :: is_frozen = "is_frozen"
     character(*), parameter :: is_dispersed = "is_dispersed"
-    character(*), parameter :: thermal = "thermal"
+
     character(*), parameter :: density = "density"
     character(*), parameter :: specific_heat = "specific_heat"
     character(*), parameter :: thermal_conductivity = "thermal_conductivity"
@@ -35,14 +35,12 @@ submodule(inout_input_basic) inout_input_basic_materials
     character(*), parameter :: segregation = "segregation"
     character(*), parameter :: unit = "unit"
     character(*), parameter :: valid_gcc_units(2) = [character(len=4) :: "m", "pa"]
-    character(*), parameter :: hydraulic = "hydraulic"
     character(*), parameter :: hydraulic_conductivity_model = "hydraulic_conductivity_model"
     character(*), parameter :: saturated_conductivity = "saturated_conductivity"
     character(*), parameter :: l = "l"
     character(*), parameter :: impedance_factor = "impedance_factor"
     character(*), parameter :: water_viscosity_model = "water_viscosity_model"
     character(*), parameter :: water_retention_model = "water_retention_model"
-    character(*), parameter :: mechanical = "mechanical"
 contains
     module subroutine read_parameters_materials(self, json)
         implicit none

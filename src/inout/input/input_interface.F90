@@ -5,6 +5,7 @@ module inout_input
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
+    use :: inout_input_base, only:abst_input
     use :: inout_input_basic, only:type_input_basic
     use :: inout_input_conditions, only:type_conditions
     use :: inout_input_output_conditions, only:type_output_settings
@@ -16,16 +17,8 @@ module inout_input
 
     public :: type_input
 
-    !!------------------------------------------------------------------------------------------------------------------------------
-
-    !!------------------------------------------------------------------------------------------------------------------------------
-
-    type :: type_input
-        character(:), allocatable, private :: project_path
-        character(:), allocatable, private :: basic_file_name
-        character(:), allocatable, private :: conditions_file_name
-        character(:), allocatable, private :: geometry_file_name
-        character(:), allocatable, private :: output_file_name
+    type, extends(abst_input) :: type_input
+        character(:), allocatable :: input_path
 
         type(type_input_basic) :: basic
         type(type_conditions) :: conditions
@@ -39,30 +32,27 @@ contains
 
     subroutine initialize_type_input(self)
         implicit none
-        class(type_input), intent(inout) :: self
+        class(type_input), intent(inout), target :: self
 
-        character(len=:), allocatable :: fullpath
-        character(len=:), allocatable :: local_input_path
-        character(len=:), allocatable :: project_path_env
+        character(:), allocatable :: project_path_env
 
         character(*), parameter :: PROJECT_ENV = "FTDSS_PROJECT_PATH"
 
         integer(int32) :: ierr, myrank
         integer(int32) :: error_flag = 0
+        integer(int32) :: input_path_length
 
         call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 
         call get_env_string(PROJECT_ENV, project_path_env)
         call modify_path_format(project_path_env)
-        self%project_path = project_path_env
 
         if (myrank == 0) then
-
-            fullpath = strip(self%project_path)//"Input/"
-
-            if (.not. file_exists(fullpath//"Basic.json")) error_flag = 2
-            if (.not. file_exists(fullpath//"Conditions.json")) error_flag = 3
-            if (.not. file_exists(fullpath//"Output.json")) error_flag = 4
+            self%input_path = strip(project_path_env)//"Input/"
+            input_path_length = len_trim(self%input_path)
+            if (.not. file_exists(self%input_path//"Basic.json")) error_flag = 2
+            if (.not. file_exists(self%input_path//"Conditions.json")) error_flag = 3
+            if (.not. file_exists(self%input_path//"Output.json")) error_flag = 4
         end if
 
         ! 2. ランク0のチェック結果(error_flag)を全員にブロードキャスト
@@ -72,7 +62,6 @@ contains
         if (error_flag /= 0) then
             if (myrank == 0) then
                 print *, "FATAL ERROR: A required input file was not found. Aborting."
-                ! ここでどのファイルがなかったかを示すメッセージを追加すると、さらに親切
                 select case (error_flag)
                 case (2); print *, "-> Basic.json is missing."
                 case (3); print *, "-> Conditions.json is missing."
@@ -82,39 +71,48 @@ contains
             call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
         end if
 
-        local_input_path = strip(self%project_path)//"Input/"
+        call MPI_Bcast(input_path_length, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+        if (myrank /= 0) then
+            allocate (character(len=input_path_length) :: self%input_path)
+        end if
+        call MPI_Bcast(self%input_path, input_path_length, MPI_CHARACTER, 0, MPI_COMM_WORLD, ierr)
 
-        self%basic%file_name = local_input_path//"Basic.json"
-        self%conditions%file_name = local_input_path//"Conditions.json"
-        self%output_settings%file_name = local_input_path//"Output.json"
+        self%basic%file_name = self%input_path//"Basic.json"
+        self%conditions%file_name = self%input_path//"Conditions.json"
+        self%output_settings%file_name = self%input_path//"Output.json"
+
+        self%basic%parent => self
+        self%conditions%parent => self
+        self%output_settings%parent => self
+        self%geometry%parent => self
 
         call self%basic%initialize()
         call self%conditions%initialize()
         call self%output_settings%initialize()
-        call self%geometry%initialize(local_input_path, self%basic, self%conditions)
+        call self%geometry%initialize()
 
     end subroutine initialize_type_input
 
-    !-----------------------------------------------------------------------
-    ! 機能: ファイルの存在を open/close を使って確実にチェックする
-    ! 引数: file_path - チェックしたいファイルのパス
-    ! 戻り値: .true. (ファイルが存在し、読み取り可能), .false. (それ以外)
-    !-----------------------------------------------------------------------
+    !>
+    !> Checks if a file exists by attempting to open it.
+    !> This method is more reliable than using INQUIRE(FILE=...) in some environments.
+    !>
     function file_exists(file_path) result(found)
         implicit none
-        character(len=*), intent(in) :: file_path
+        !> The path of the file to check.
+        character(*), intent(in) :: file_path
+        !> `.true.` if the file exists and is readable, `.false.` otherwise.
         logical :: found
         integer(int32) :: unit_num, io_status
 
-        ! status='old' でファイルを開こうと試みる
         open (newunit=unit_num, file=trim(file_path), status="old", action="read", iostat=io_status)
 
         if (io_status == 0) then
-            ! openに成功した場合: ファイルは存在する。すぐに閉じる。
+            ! If opened successfully, the file exists. Close it immediately.
             close (unit_num)
             found = .true.
         else
-            ! openに失敗した場合: ファイルは存在しないか、アクセスできない。
+            ! If opened failed, the file does not exist or is not accessible.
             found = .false.
         end if
 

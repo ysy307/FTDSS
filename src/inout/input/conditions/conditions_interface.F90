@@ -6,7 +6,7 @@ module inout_input_conditions
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: module_core, only:join, error_message, allocate_array
-    use :: inout_input_base, only:get_json_value
+    use :: inout_input_base, only:get_json_value, abst_input
     implicit none
     private
 
@@ -91,6 +91,7 @@ module inout_input_conditions
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_conditions
+        class(abst_input), pointer :: parent => null()
         character(:), allocatable :: file_name
         type(type_time_controls) :: time_control
         type(type_boundary_conditions), allocatable :: boundary_conditions(:)

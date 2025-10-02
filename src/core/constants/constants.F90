@@ -41,6 +41,7 @@ module core_constants
     integer(int32), parameter, public :: DOF_TYPE_DZ = 5
 
     ! Definition of boundary condition type IDs for thermal analysis
+    integer(int32), parameter, public :: NUM_THERMAL_BC_TYPES = 8 !&
     integer(int32), parameter, public :: THERMAL_BC_DIRICHLET  = 101 !&
     integer(int32), parameter, public :: THERMAL_BC_NEUMANN    = 102 !&
     integer(int32), parameter, public :: THERMAL_BC_FLUX       = 103 !&
@@ -53,7 +54,7 @@ module core_constants
     ! -----------------------------
     ! Thermal BC application sequence
     ! -----------------------------
-    integer(int32), parameter, public :: THERMAL_BC_SEQUENCE(8) = [ &
+    integer(int32), parameter, public :: THERMAL_BC_SEQUENCE(NUM_THERMAL_BC_TYPES) = [ &
                                          THERMAL_BC_ROBIN, &
                                          THERMAL_BC_CONVECTIVE, &
                                          THERMAL_BC_RADIATION, &
@@ -64,6 +65,7 @@ module core_constants
                                          THERMAL_BC_DIRICHLET]
 
     ! Definition of boundary condition type IDs for hydraulic analysis
+    integer(int32), parameter, public :: NUM_HYDRAULIC_BC_TYPES = 5 !&
     integer(int32), parameter, public :: HYDRAULIC_BC_DIRICHLET   = 201 !&
     integer(int32), parameter, public :: HYDRAULIC_BC_NEUMANN     = 202 !&
     integer(int32), parameter, public :: HYDRAULIC_BC_FLUX        = 203 !&
@@ -73,11 +75,23 @@ module core_constants
     ! -----------------------------
     ! Hydraulic BC application sequence
     ! -----------------------------
-    integer(int32), parameter, public :: HYDRAULIC_BC_SEQUENCE(5) = [ &
+    integer(int32), parameter, public :: HYDRAULIC_BC_SEQUENCE(NUM_HYDRAULIC_BC_TYPES) = [ &
                                          HYDRAULIC_BC_FLUX, &
                                          HYDRAULIC_BC_IMPERMEABLE, &
                                          HYDRAULIC_BC_SEEPAGE, &
                                          HYDRAULIC_BC_NEUMANN, &
                                          HYDRAULIC_BC_DIRICHLET]
 
+    !
+    ! For initial condition type IDs
+    !
+    integer(int32), parameter, public :: NUM_INITIAL_CONDITIONS = 4 !&
+    !> Thermal initial condition ID
+    integer(int32), parameter, public :: INITIAL_CONDITION_THERMAL    = 1 !&
+    !> Hydraulic initial condition ID
+    integer(int32), parameter, public :: INITIAL_CONDITION_HYDRAULIC  = 2 !&
+    !> Mechanical initial condition ID
+    integer(int32), parameter, public :: INITIAL_CONDITION_MECHANICAL = 3 !&
+    !> Porosity initial condition ID
+    integer(int32), parameter, public :: INITIAL_CONDITION_POROSITY   = 4 !&
 end module core_constants

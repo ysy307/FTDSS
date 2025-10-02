@@ -6,15 +6,19 @@ module inout_input_base
     implicit none
     private
 
+    public :: abst_input
     public :: get_json_value
 
+    type, abstract :: abst_input
+    end type abst_input
+
     interface get_json_value
-        module procedure :: get_json_integer
-        module procedure :: get_json_real
+        module procedure :: get_json_integer32
+        module procedure :: get_json_real64
         module procedure :: get_json_logical
         module procedure :: get_json_string
-        module procedure :: get_json_integer_array
-        module procedure :: get_json_real_array
+        module procedure :: get_json_integer32_array
+        module procedure :: get_json_real64_array
         module procedure :: get_json_string_array
     end interface
 
@@ -23,7 +27,7 @@ contains
     !----------------------------------------------------------------!
     ! INTEGER版
     !----------------------------------------------------------------!
-    subroutine get_json_integer(json, key, target_var, is_required, default_value, valid_range, valid_list)
+    subroutine get_json_integer32(json, key, target_var, is_required, default_value, valid_range, valid_list)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
@@ -62,12 +66,12 @@ contains
                 end if
             end if
         end if
-    end subroutine get_json_integer
+    end subroutine get_json_integer32
 
     !----------------------------------------------------------------!
     ! REAL版 (内容はINTEGER版とほぼ同じ)
     !----------------------------------------------------------------!
-    subroutine get_json_real(json, key, target_var, is_required, default_value, valid_range)
+    subroutine get_json_real64(json, key, target_var, is_required, default_value, valid_range)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
@@ -98,7 +102,7 @@ contains
                 end if
             end if
         end if
-    end subroutine get_json_real
+    end subroutine get_json_real64
 
     !----------------------------------------------------------------!
     ! LOGICAL版
@@ -173,7 +177,7 @@ contains
     !----------------------------------------------------------------!
     ! INTEGER ARRAY版
     !----------------------------------------------------------------!
-    subroutine get_json_integer_array(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)
+    subroutine get_json_integer32_array(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
@@ -222,12 +226,12 @@ contains
             end if
         end if
 
-    end subroutine get_json_integer_array
+    end subroutine get_json_integer32_array
 
     !----------------------------------------------------------------!
     ! REAL ARRAY版
     !----------------------------------------------------------------!
-    subroutine get_json_real_array(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)
+    subroutine get_json_real64_array(json, key, target_var, is_required, default_value, valid_range, valid_list, array_size)
         implicit none
         class(json_file), intent(inout) :: json
         character(len=*), intent(in) :: key
@@ -276,7 +280,7 @@ contains
             end if
         end if
 
-    end subroutine get_json_real_array
+    end subroutine get_json_real64_array
 
     subroutine get_json_string_array(json, key, target_var, is_required, default_value, valid_list, array_size)
         implicit none

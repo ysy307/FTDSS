@@ -5,12 +5,16 @@ module inout_input_basic
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
-    use :: module_core, only:join, error_message, allocate_array
-    use :: inout_input_base, only:get_json_value
+    use :: module_core
+    use :: inout_input_base, only:get_json_value, abst_input
     implicit none
     private
 
     public :: type_input_basic
+
+    character(*), parameter :: thermal = "thermal"
+    character(*), parameter :: hydraulic = "hydraulic"
+    character(*), parameter :: mechanical = "mechanical"
 
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_simulation_settings
@@ -29,10 +33,8 @@ module inout_input_basic
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_analysis_controls
-        logical :: calculate_thermal
-        logical :: calculate_hydraulic
-        logical :: calculate_mechanical
-        character(:), allocatable :: coupling_mode
+        logical :: is_active(NUM_INITIAL_CONDITIONS)
+        integer(int32) :: coupling_mode
         logical :: partitioning
     contains
         procedure, pass(self) :: display => display_analysis_controls
@@ -56,7 +58,7 @@ module inout_input_basic
         character(:), allocatable :: rank_key
         character(:), allocatable :: color_key
         character(:), allocatable :: integration_type
-        real(real64) :: integration_points
+        real(real64), allocatable :: integration_points(:)
     contains
         procedure, pass(self) :: display => display_geometry_settings
     end type type_geometry_settings
@@ -208,6 +210,7 @@ module inout_input_basic
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_input_basic
+        class(abst_input), pointer :: parent => null()
         character(:), allocatable :: file_name
         type(type_simulation_settings) :: simulation_settings
         type(type_analysis_controls) :: analysis_controls
@@ -257,9 +260,6 @@ contains
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file) :: json
-
-        ! integer(int32) :: ierr, myrank
-        ! integer(int32) :: i
 
         call json%initialize()
 

@@ -43,23 +43,20 @@ module field_residual_vector
 
 contains
 
-    subroutine initialize_residual_vector(self, domain, bounds)
+    subroutine initialize_residual_vector(self, domain)
         implicit none
         class(type_residual_vector), intent(inout) :: self
         type(type_domain), intent(in) :: domain
-        !> A 2-element array specifying the lower and upper index bounds.
-        integer(int32), intent(in) :: bounds(2)
 
         integer(int32) :: i, num_dofs
 
         self%coupling_mode = domain%get_coupling_mode()
-        self%size = bounds(2) - bounds(1) + 1
-        num_dofs = domain%get_num_dofs_per_node()
-        self%num_dofs_per_node = num_dofs
+        self%size = domain%get_num_nodes() * domain%get_num_dofs_per_node()
+        self%num_dofs_per_node = domain%get_num_dofs_per_node()
 
-        allocate (self%data(num_dofs))
-        do i = 1, num_dofs
-            call self%data(i)%initialize(bounds)
+        allocate (self%data(self%num_dofs_per_node))
+        do i = 1, self%num_dofs_per_node
+            call self%data(i)%initialize(domain%get_num_nodes())
         end do
 
     end subroutine initialize_residual_vector

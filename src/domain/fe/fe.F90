@@ -3,6 +3,7 @@
 !>
 module module_fe
     use, intrinsic :: iso_fortran_env, only: int32
+    use :: module_core, only:unique
     use :: module_input, only:type_input
     use :: domain_fe, only:abst_fe, holder_fes
     use :: domain_fe_side, only:type_side_first, type_side_second
@@ -58,15 +59,26 @@ contains
         !> Array of FE IDs to initialize
         integer(int32), intent(in) :: target_ids(:)
 
+        integer(int32), allocatable :: unique_ids(:)
         integer(int32) :: i
 
-        allocate (self%fe_list(num_fe))
-        allocate (self%fe_map(maxval(target_ids)))
+        if (allocated(self%fe_list)) then
+            deallocate (self%fe_list)
+        end if
+
+        call unique(target_ids, unique_ids)
+
+        allocate (self%fe_list(size(unique_ids)))
+        allocate (self%fe_map(num_fe))
         self%fe_map = 0
 
+        do i = 1, size(unique_ids)
+            self%fe_list(i)%fe = create_fe(unique_ids(i), input)
+        end do
+
+        ! Create mapping from target_ids to fe_list indices
         do i = 1, num_fe
-            self%fe_list(i)%fe = create_fe(target_ids(i), input)
-            self%fe_map(target_ids(i)) = i
+            self%fe_map(i) = findloc(unique_ids, target_ids(i), 1)
         end do
 
     end subroutine initialize_fe_manager

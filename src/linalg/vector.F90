@@ -24,14 +24,15 @@ module linalg_vector
         private
         !> The internal allocatable array holding the vector data.
         real(real64), allocatable :: val(:)
+        !> The number of nodes (size) of the vector.
+        integer(int32) :: num_nodes = 0
         !> A flag to track the allocation status.
         logical :: is_allocated = .false.
     contains
         procedure, public, pass(self) :: initialize => initialize_vector_dp
         procedure, public, pass(self) :: destroy => destroy_vector_dp
         procedure, public, pass(self) :: is_initialized => is_initialized_vector_dp
-        procedure, public, pass(self) :: get_lower_bound => get_lower_bound_vector_dp
-        procedure, public, pass(self) :: get_upper_bound => get_upper_bound_vector_dp
+        procedure, public, pass(self) :: get_size => get_size_vector_dp
         procedure, public, pass(self) :: get_data => get_data_vector_dp
 
         procedure, private, pass(self) :: set_scalar => set_scalar_vector_dp
@@ -61,14 +62,15 @@ module linalg_vector
         private
         !> The internal allocatable array holding the vector data.
         integer(int32), allocatable :: val(:)
+        !> The number of nodes (size) of the vector.
+        integer(int32) :: num_nodes = 0
         !> A flag to track the allocation status.
         logical :: is_allocated = .false.
     contains
         procedure, public, pass(self) :: initialize => initialize_vector_int
         procedure, public, pass(self) :: destroy => destroy_vector_int
         procedure, public, pass(self) :: is_initialized => is_initialized_vector_int
-        procedure, public, pass(self) :: get_lower_bound => get_lower_bound_vector_int
-        procedure, public, pass(self) :: get_upper_bound => get_upper_bound_vector_int
+        procedure, public, pass(self) :: get_size => get_size_vector_int
         procedure, public, pass(self) :: get_data => get_data_vector_int
 
         procedure, private, pass(self) :: set_scalar => set_scalar_vector_int
@@ -95,22 +97,19 @@ contains
     ! ==========================================================
 
     !>
-    !> Initializes the vector by allocating it with specified bounds.
+    !> Initializes the vector by allocating it with a specified size.
+    !> The indices will range from 1 to num_nodes.
     !>
-    subroutine initialize_vector_dp(self, bounds)
+    subroutine initialize_vector_dp(self, num_nodes)
         implicit none
         !> The vector object to initialize.
         class(type_vector_dp), intent(inout) :: self
-        !> A 2-element array specifying the lower and upper index bounds.
-        integer(int32), intent(in) :: bounds(2)
+        !> The number of nodes (size) for the vector.
+        integer(int32), intent(in) :: num_nodes
 
-        if (bounds(1) > bounds(2)) then
-            call allocate_array(self%val, bounds=[1, 0]) ! 0-size array
-        else
-            call allocate_array(self%val, bounds=bounds)
-        end if
+        call allocate_array(self%val, num_nodes)
         self%val(:) = 0.0d0
-
+        self%num_nodes = num_nodes
         self%is_allocated = .true.
     end subroutine initialize_vector_dp
 
@@ -123,6 +122,7 @@ contains
         class(type_vector_dp), intent(inout) :: self
 
         call deallocate_array(self%val)
+        self%num_nodes = 0
         self%is_allocated = .false.
     end subroutine destroy_vector_dp
 
@@ -140,38 +140,17 @@ contains
     end function is_initialized_vector_dp
 
     !>
-    !> Returns the lower bound of the vector's index range.
+    !> Returns the size (number of elements) of the vector.
     !>
-    pure function get_lower_bound_vector_dp(self) result(lower_bound)
+    pure function get_size_vector_dp(self) result(vector_size)
         implicit none
         !> The vector object.
         class(type_vector_dp), intent(in) :: self
-        !> The lower index bound.
-        integer(int32) :: lower_bound
+        !> The size of the vector.
+        integer(int32) :: vector_size
 
-        if (.not. allocated(self%val)) then
-            lower_bound = 1
-        else
-            lower_bound = lbound(self%val, 1)
-        end if
-    end function get_lower_bound_vector_dp
-
-    !>
-    !> Returns the upper bound of the vector's index range.
-    !>
-    pure function get_upper_bound_vector_dp(self) result(upper_bound)
-        implicit none
-        !> The vector object.
-        class(type_vector_dp), intent(in) :: self
-        !> The upper index bound.
-        integer(int32) :: upper_bound
-
-        if (.not. allocated(self%val)) then
-            upper_bound = 0
-        else
-            upper_bound = ubound(self%val, 1)
-        end if
-    end function get_upper_bound_vector_dp
+        vector_size = self%num_nodes
+    end function get_size_vector_dp
 
     !>
     !> Returns a pointer to the internal data array of the vector.
@@ -209,7 +188,7 @@ contains
         !> The source array containing the new values.
         real(real64), intent(in) :: array_value(:)
 
-        if (size(self%val) /= size(array_value)) stop "Error: size mismatch in set_array_vector_dp"
+        if (self%num_nodes /= size(array_value)) stop "Error: size mismatch in set_array_vector_dp"
         self%val(:) = array_value
     end subroutine set_array_vector_dp
 
@@ -225,7 +204,7 @@ contains
         !> The new value for the element.
         real(real64), intent(in) :: value
 
-        if (global_index >= lbound(self%val, 1) .and. global_index <= ubound(self%val, 1)) then
+        if (global_index >= 1 .and. global_index <= self%num_nodes) then
             self%val(global_index) = value
         end if
     end subroutine set_value_at_index_vector_dp
@@ -244,7 +223,7 @@ contains
         integer(int32) :: i
 
         do i = 1, size(global_indices)
-            if (global_indices(i) >= lbound(self%val, 1) .and. global_indices(i) <= ubound(self%val, 1)) then
+            if (global_indices(i) >= 1 .and. global_indices(i) <= self%num_nodes) then
                 self%val(global_indices(i)) = new_values(i)
             end if
         end do
@@ -273,7 +252,7 @@ contains
         !> The source array of values to add.
         real(real64), intent(in) :: array_value(:)
 
-        if (size(self%val) /= size(array_value)) stop "Error: size mismatch in add_array_vector_dp"
+        if (self%num_nodes /= size(array_value)) stop "Error: size mismatch in add_array_vector_dp"
         self%val(:) = self%val(:) + array_value
     end subroutine add_array_vector_dp
 
@@ -289,7 +268,7 @@ contains
         !> The value to add to the element.
         real(real64), intent(in) :: value
 
-        if (global_index >= lbound(self%val, 1) .and. global_index <= ubound(self%val, 1)) then
+        if (global_index >= 1 .and. global_index <= self%num_nodes) then
             self%val(global_index) = self%val(global_index) + value
         end if
     end subroutine add_value_at_index_vector_dp
@@ -308,7 +287,7 @@ contains
         integer(int32) :: i
 
         do i = 1, size(global_indices)
-            if (global_indices(i) >= lbound(self%val, 1) .and. global_indices(i) <= ubound(self%val, 1)) then
+            if (global_indices(i) >= 1 .and. global_indices(i) <= self%num_nodes) then
                 self%val(global_indices(i)) = self%val(global_indices(i)) + new_values(i)
             end if
         end do
@@ -330,22 +309,19 @@ contains
     ! ==========================================================
 
     !>
-    !> Initializes the vector by allocating it with specified bounds.
+    !> Initializes the vector by allocating it with a specified size.
+    !> The indices will range from 1 to num_nodes.
     !>
-    subroutine initialize_vector_int(self, bounds)
+    subroutine initialize_vector_int(self, num_nodes)
         implicit none
         !> The vector object to initialize.
         class(type_vector_int), intent(inout) :: self
-        !> A 2-element array specifying the lower and upper index bounds.
-        integer(int32), intent(in) :: bounds(2)
+        !> The number of nodes (size) for the vector.
+        integer(int32), intent(in) :: num_nodes
 
-        if (bounds(1) > bounds(2)) then
-            call allocate_array(self%val, bounds=[1, 0])
-        else
-            call allocate_array(self%val, bounds=bounds)
-        end if
+        call allocate_array(self%val, num_nodes)
         self%val(:) = 0
-
+        self%num_nodes = num_nodes
         self%is_allocated = .true.
     end subroutine initialize_vector_int
 
@@ -358,6 +334,7 @@ contains
         class(type_vector_int), intent(inout) :: self
 
         call deallocate_array(self%val)
+        self%num_nodes = 0
         self%is_allocated = .false.
     end subroutine destroy_vector_int
 
@@ -375,38 +352,17 @@ contains
     end function is_initialized_vector_int
 
     !>
-    !> Returns the lower bound of the vector's index range.
+    !> Returns the size (number of elements) of the vector.
     !>
-    pure function get_lower_bound_vector_int(self) result(lower_bound)
+    pure function get_size_vector_int(self) result(vector_size)
         implicit none
         !> The vector object.
         class(type_vector_int), intent(in) :: self
-        !> The lower index bound.
-        integer(int32) :: lower_bound
+        !> The size of the vector.
+        integer(int32) :: vector_size
 
-        if (.not. allocated(self%val)) then
-            lower_bound = 1
-        else
-            lower_bound = lbound(self%val, 1)
-        end if
-    end function get_lower_bound_vector_int
-
-    !>
-    !> Returns the upper bound of the vector's index range.
-    !>
-    pure function get_upper_bound_vector_int(self) result(upper_bound)
-        implicit none
-        !> The vector object.
-        class(type_vector_int), intent(in) :: self
-        !> The upper index bound.
-        integer(int32) :: upper_bound
-
-        if (.not. allocated(self%val)) then
-            upper_bound = 0
-        else
-            upper_bound = ubound(self%val, 1)
-        end if
-    end function get_upper_bound_vector_int
+        vector_size = self%num_nodes
+    end function get_size_vector_int
 
     !>
     !> Returns a pointer to the internal data array of the vector.
@@ -444,7 +400,7 @@ contains
         !> The source array containing the new values.
         integer(int32), intent(in) :: array_value(:)
 
-        if (size(self%val) /= size(array_value)) stop "Error: size mismatch in set_array_vector_int"
+        if (self%num_nodes /= size(array_value)) stop "Error: size mismatch in set_array_vector_int"
         self%val(:) = array_value
     end subroutine set_array_vector_int
 
@@ -460,7 +416,7 @@ contains
         !> The new value for the element.
         integer(int32), intent(in) :: value
 
-        if (global_index >= lbound(self%val, 1) .and. global_index <= ubound(self%val, 1)) then
+        if (global_index >= 1 .and. global_index <= self%num_nodes) then
             self%val(global_index) = value
         end if
     end subroutine set_value_at_index_vector_int
@@ -479,7 +435,7 @@ contains
         integer(int32) :: i
 
         do i = 1, size(global_indices)
-            if (global_indices(i) >= lbound(self%val, 1) .and. global_indices(i) <= ubound(self%val, 1)) then
+            if (global_indices(i) >= 1 .and. global_indices(i) <= self%num_nodes) then
                 self%val(global_indices(i)) = new_values(i)
             end if
         end do
@@ -508,7 +464,7 @@ contains
         !> The source array of values to add.
         integer(int32), intent(in) :: array_value(:)
 
-        if (size(self%val) /= size(array_value)) stop "Error: size mismatch in add_array_vector_int"
+        if (self%num_nodes /= size(array_value)) stop "Error: size mismatch in add_array_vector_int"
         self%val(:) = self%val(:) + array_value
     end subroutine add_array_vector_int
 
@@ -524,7 +480,7 @@ contains
         !> The value to add to the element.
         integer(int32), intent(in) :: value
 
-        if (global_index >= lbound(self%val, 1) .and. global_index <= ubound(self%val, 1)) then
+        if (global_index >= 1 .and. global_index <= self%num_nodes) then
             self%val(global_index) = self%val(global_index) + value
         end if
     end subroutine add_value_at_index_vector_int
@@ -543,7 +499,7 @@ contains
         integer(int32) :: i
 
         do i = 1, size(global_indices)
-            if (global_indices(i) >= lbound(self%val, 1) .and. global_indices(i) <= ubound(self%val, 1)) then
+            if (global_indices(i) >= 1 .and. global_indices(i) <= self%num_nodes) then
                 self%val(global_indices(i)) = self%val(global_indices(i)) + new_values(i)
             end if
         end do

@@ -18,6 +18,7 @@ enable_thirdparty(Core_Validation)
 set(CORE_CONSTANTS_SOURCES
     constants/constants.F90
     constants/parallel_constants.F90
+    constants/constants_utils.F90
 )
 add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES})
 target_include_directories(Core_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})

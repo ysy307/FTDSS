@@ -10,11 +10,9 @@ module domain_manager
     use :: module_input, only:type_input
     use :: module_control, only:type_controls
     use :: module_fe, only:type_fe_manager
+    use :: module_boundary
     use :: domain_multicoloring, only:type_coloring
     use :: domain_adjacency, only:type_node_adjacency, type_map_node_to_element
-    use :: module_boundary
-    ! use :: conditions_boundary, only:abst_bc, construct_type_bc_thermal_dirichlet, &
-    !     construct_type_bc_thermal_adiabatic ! Other construct_* would be USEd similarly
 
     implicit none
     private
@@ -366,7 +364,6 @@ contains
         end if
 
         ! Initialize the FE manager with the unique element types found
-        call unique(self%fe_types, unique_fe_types)
         call self%fe_manager%initialize(input, self%num_elements, self%fe_types)
 
         ! Initialize coloring information
@@ -415,11 +412,11 @@ contains
         integer(int32) :: i, bc_type, num_groups
         integer(int32) :: max_id, bc_id, group_idx
         integer(int32) :: target_dimension
-        integer(int32), allocatable :: bc_sequence(:), bc_idx_list(:), bc_key(:), active_region_id(:), group_to_cell_id(:)
+        integer(int32), allocatable :: bc_sequence(:), bc_idx_list(:), bc_key(:), active_region_id(:), group_to_cell_types(:), group_to_cell_entity_ids(:)
         integer(int32), allocatable :: input_idx_to_group_idx_map(:)
         integer(int32), allocatable :: entity_id_to_group_idx_map(:)
         integer(int32), allocatable :: total_conn_per_group(:), current_elem_indices(:)
-        integer(int32) :: num_total_cells, cell_id, current_group_idx, num_nodes
+        integer(int32) :: num_total_cells, cell_entity_id, cell_type, current_group_idx, num_nodes
 
         ! Check target dimension
         target_dimension = self%parent%computation_dimension - 1
@@ -516,10 +513,10 @@ contains
         num_total_cells = input%geometry%vtk%num_total_cells
         do i = 1, num_total_cells
             if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
-                cell_id = input%geometry%vtk%cells(i)%cell_entity_id
-                if (cell_id > size(entity_id_to_group_idx_map) .or. entity_id_to_group_idx_map(cell_id) == 0) cycle
+                cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
+                if (cell_entity_id > size(entity_id_to_group_idx_map) .or. entity_id_to_group_idx_map(cell_entity_id) == 0) cycle
 
-                current_group_idx = entity_id_to_group_idx_map(cell_id)
+                current_group_idx = entity_id_to_group_idx_map(cell_entity_id)
                 self%physics(physics_type_id)%bcs(current_group_idx)%num_elements = &
                     self%physics(physics_type_id)%bcs(current_group_idx)%num_elements + 1
                 total_conn_per_group(current_group_idx) = total_conn_per_group(current_group_idx) &
@@ -544,15 +541,18 @@ contains
         call allocate_array(current_elem_indices, num_groups)
         current_elem_indices = 0
 
-        call allocate_array(group_to_cell_id, num_groups)
-        group_to_cell_id = -1
+        call allocate_array(group_to_cell_types, num_groups)
+        group_to_cell_types = -1
+        call allocate_array(group_to_cell_entity_ids, num_groups)
+        group_to_cell_entity_ids = -1
 
         do i = 1, num_total_cells
             if (input%geometry%vtk%cells(i)%cell_dimension == target_dimension) then
-                cell_id = input%geometry%vtk%cells(i)%cell_entity_id
-                if (cell_id > size(entity_id_to_group_idx_map) .or. entity_id_to_group_idx_map(cell_id) == 0) cycle
+                cell_entity_id = input%geometry%vtk%cells(i)%cell_entity_id
+                cell_type = input%geometry%vtk%cells(i)%cell_type
+                if (cell_entity_id > size(entity_id_to_group_idx_map) .or. entity_id_to_group_idx_map(cell_entity_id) == 0) cycle
 
-                current_group_idx = entity_id_to_group_idx_map(cell_id)
+                current_group_idx = entity_id_to_group_idx_map(cell_entity_id)
                 current_elem_indices(current_group_idx) = current_elem_indices(current_group_idx) + 1
 
                 num_nodes = input%geometry%vtk%cells(i)%num_nodes_in_cell
@@ -567,33 +567,36 @@ contains
                     self%physics(physics_type_id)%bcs(current_group_idx)%connectivity%ind(current_elem_indices(current_group_idx) + 1) - 1) = &
                     input%geometry%vtk%cells(i)%connectivity(1:num_nodes)
 
-                if (group_to_cell_id(current_group_idx) < 0) group_to_cell_id(current_group_idx) = cell_id
+                if (group_to_cell_types(current_group_idx) < 0) group_to_cell_types(current_group_idx) = cell_type
+                if (group_to_cell_entity_ids(current_group_idx) < 0) group_to_cell_entity_ids(current_group_idx) = cell_entity_id
             end if
         end do
 
-        block
-            integer(int32) :: my_rank
-            call MPI_Comm_rank(MPI_COMM_WORLD, my_rank)
-            if (my_rank == 0) then
-                write (*, *) group_to_cell_id
-            end if
-        end block
+        write (*, *) group_to_cell_types
 
-        ! do current_group_idx = 1, num_groups
-        !     if (group_to_cell_id(current_group_idx) > 0) then
-        !         call create_boundary_conditions( &
-        !             cell_id=group_to_cell_id(current_group_idx), &
-        !             input=input, &
-        !             controls=controls)
-        !     end if
-        ! end do
+        ! Step D: Create boundary condition objects for each group
+        do i = 1, self%physics(physics_type_id)%num_bcs
+            current_group_idx = entity_id_to_group_idx_map(group_to_cell_entity_ids(i))
+            select case (physics_type_id)
+            case (PHYSICS_TYPE_THERMAL)
+                bc_type = get_bc_type_from_string( &
+                          input%conditions%boundary_conditions(current_group_idx)%thermal%type, &
+                          physics_type_id)
+            case (PHYSICS_TYPE_HYDRAULIC)
+                bc_type = get_bc_type_from_string( &
+                          input%conditions%boundary_conditions(current_group_idx)%hydraulic%type, &
+                          physics_type_id)
+            end select
+            self%physics(physics_type_id)%bcs(i)%condition = create_boundary_conditions( &
+                                                             bc_type, group_to_cell_types(i), input, controls)
+        end do
 
         call deallocate_array(current_elem_indices)
         call deallocate_array(entity_id_to_group_idx_map)
         call deallocate_array(bc_key)
         call deallocate_array(bc_sequence)
         call deallocate_array(active_region_id)
-        call deallocate_array(group_to_cell_id)
+        call deallocate_array(group_to_cell_types)
     end subroutine process_single_physics_bcs
 
     !> Finds the position of a BC ID within a predefined sequence array.

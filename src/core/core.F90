@@ -17,6 +17,7 @@ module module_core
     use :: core_vtk_vtk_constants
     use :: core_constants
     use :: core_parallel_constants
+    use :: core_constants_utils
     implicit none
     public
 

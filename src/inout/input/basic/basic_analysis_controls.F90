@@ -8,7 +8,7 @@ submodule(inout_input_basic) inout_input_basic_analysis_controls
     character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: calculate_mechanical = "calculate_mechanical"
     character(*), parameter :: coupling_mode = "coupling_mode"
-    character(*), parameter :: coupling_modes(3) = [character(len=16) :: "none", "weak", "strong"]
+    character(*), parameter :: coupling_modes(2) = [character(len=16) :: "weak", "strong"]
     character(*), parameter :: partitioning = "partitioning"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -16,30 +16,35 @@ contains
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
+        integer(int32) :: target_id
+
+        character(:), allocatable :: temp_string
 
         character(256) :: buffer(2) = [character(256) :: analysis_controls, ""]
 
         buffer(2) = calculate_thermal
-        call get_json_value(json, join(buffer), self%analysis_controls%calculate_thermal, &
+        target_id = get_physics_type(thermal)
+        call get_json_value(json, join(buffer), self%analysis_controls%is_active(target_id), &
                             is_required=.true., default_value=.false.)
 
         buffer(2) = calculate_hydraulic
-        call get_json_value(json, join(buffer), self%analysis_controls%calculate_hydraulic, &
+        target_id = get_physics_type(hydraulic)
+        call get_json_value(json, join(buffer), self%analysis_controls%is_active(target_id), &
                             is_required=.true., default_value=.false.)
 
         buffer(2) = calculate_mechanical
-        call get_json_value(json, join(buffer), self%analysis_controls%calculate_mechanical, &
+        target_id = get_physics_type(mechanical)
+        call get_json_value(json, join(buffer), self%analysis_controls%is_active(target_id), &
                             is_required=.true., default_value=.false.)
 
-        if (.not. self%analysis_controls%calculate_thermal .and. &
-            .not. self%analysis_controls%calculate_hydraulic .and. &
-            .not. self%analysis_controls%calculate_mechanical) then
+        if (.not. any(self%analysis_controls%is_active(:))) then
             call error_message(905, c_opt=analysis_controls)
         end if
 
         buffer(2) = coupling_mode
-        call get_json_value(json, join(buffer), self%analysis_controls%coupling_mode, &
+        call get_json_value(json, join(buffer), temp_string, &
                             is_required=.true., default_value="weak", valid_list=coupling_modes)
+        self%analysis_controls%coupling_mode = get_coupling_mode(temp_string)
 
         buffer(2) = partitioning
         call get_json_value(json, join(buffer), self%analysis_controls%partitioning, &
@@ -51,10 +56,10 @@ contains
         implicit none
         class(type_analysis_controls) :: self
 
-        write (*, '(a)') "Calculate Thermal: "//to_string(self%calculate_thermal)
-        write (*, '(a)') "Calculate Hydraulic: "//to_string(self%calculate_hydraulic)
-        write (*, '(a)') "Calculate Mechanical: "//to_string(self%calculate_mechanical)
-        write (*, '(a)') "Coupling Mode: "//strip(self%coupling_mode)
+        write (*, '(a)') "Calculate Thermal: "//to_string(self%is_active(get_physics_type(thermal)))
+        write (*, '(a)') "Calculate Hydraulic: "//to_string(self%is_active(get_physics_type(hydraulic)))
+        write (*, '(a)') "Calculate Mechanical: "//to_string(self%is_active(get_physics_type(mechanical)))
+        write (*, '(a)') "Coupling Mode: "//to_string(self%coupling_mode)
         write (*, '(a)') "Partitioning: "//to_string(self%partitioning)
 
     end subroutine display_analysis_controls
