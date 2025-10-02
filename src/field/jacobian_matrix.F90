@@ -169,12 +169,12 @@ contains
         end if
     end subroutine
 
-    subroutine add_value_jacobian_matrix(self, row_node, col_node, value, row_dof, col_dof)
+    subroutine add_value_jacobian_matrix(self, row_dof, col_dof, row_node, col_node, value)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
+        integer(int32), intent(in), optional :: row_dof, col_dof
         integer(int32), intent(in) :: row_node, col_node
         real(real64), intent(in) :: value
-        integer(int32), intent(in), optional :: row_dof, col_dof
         class(abst_matrix), pointer :: m
         integer(int32) :: rdof, cdof
 

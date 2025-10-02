@@ -22,8 +22,8 @@ target_include_directories(Field_Main PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # from Core, Domain, and Physics to assemble the system.
 target_link_libraries(Field_Main PUBLIC
     Solver::Core
+    Solver::Linalg
     Solver::Domain
-    Solver::Physics
 )
 enable_build_flags(Field_Main)
 enable_thirdparty (Field_Main)
