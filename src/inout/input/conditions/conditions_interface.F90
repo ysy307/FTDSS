@@ -12,6 +12,11 @@ module inout_input_conditions
 
     public :: type_conditions
 
+    character(*), parameter :: thermal = "thermal"
+    character(*), parameter :: hydraulic = "hydraulic"
+    character(*), parameter :: mechanical = "mechanical"
+    character(*), parameter :: porosity = "porosity"
+
     type :: type_time_controls_simulation_period
         integer(int32) :: unit
         real(real64) :: start
@@ -26,6 +31,7 @@ module inout_input_conditions
     end type type_time_controls_time_stepping
 
     type :: type_time_controls
+        class(type_conditions), pointer :: parent => null()
         type(type_time_controls_simulation_period) :: simulation_period
         type(type_time_controls_time_stepping) :: time_stepping
         real(real64), allocatable :: boundary_time_points(:)
@@ -48,6 +54,7 @@ module inout_input_conditions
     end type type_boundary_local
 
     type :: type_boundary_conditions
+        class(type_conditions), pointer :: parent => null()
         integer(int32) :: id
         type(type_boundary_local) :: physics(NUM_PHYSICS_TYPES)
     contains
@@ -73,6 +80,7 @@ module inout_input_conditions
     end type type_initial_local
 
     type :: type_initial_conditions
+        class(type_conditions), pointer :: parent => null()
         type(type_initial_local) :: physics(NUM_INITIAL_CONDITIONS)
     contains
         procedure, pass(self) :: display => display_initial_conditions
@@ -103,7 +111,7 @@ module inout_input_conditions
     interface
         module subroutine initialize_type_conditions(self)
             implicit none
-            class(type_conditions), intent(inout) :: self
+            class(type_conditions), intent(inout), target :: self
 
         end subroutine initialize_type_conditions
 

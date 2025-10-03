@@ -87,6 +87,7 @@ module inout_input_output_conditions
         type(type_standard_output) :: standard_output
     contains
         procedure, pass(self) :: initialize => initialize_type_output_settings
+        procedure, pass(self) :: display => display_output_settings
     end type type_output_settings
 
     interface
@@ -129,5 +130,23 @@ contains
         call json%print_error_message(output_unit)
 
     end subroutine initialize_type_output_settings
+
+    subroutine display_output_settings(self)
+        implicit none
+        class(type_output_settings), intent(in) :: self
+
+        integer(int32) :: ierr, myrank
+
+        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+        if (myrank == 0) then
+            write (*, '(A)') "=== Output Settings ==="
+            write (*, '(A)') "--- Field Output ---"
+            call self%field_output%display()
+            write (*, '(A)') "--- History Output ---"
+            call self%history_output%display()
+            write (*, '(A)') "--- Standard Output ---"
+            call self%standard_output%display()
+        end if
+    end subroutine display_output_settings
 
 end module inout_input_output_conditions

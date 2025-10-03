@@ -9,9 +9,6 @@ submodule(inout_input_conditions) inout_input_conditions_boundry
     character(*), parameter :: calculate_thermal = "calculate_thermal"
     character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: calculate_mechanical = "calculate_mechanical"
-    character(*), parameter :: thermal = "thermal"
-    character(*), parameter :: hydraulic = "hydraulic"
-    character(*), parameter :: mechanical = "mechanical"
     character(*), parameter :: type = "type"
     character(*), parameter :: is_uniform = "is_uniform"
     character(*), parameter :: values = "values"
@@ -133,9 +130,32 @@ contains
         class(type_boundary_conditions), intent(in) :: self
 
         write (*, '(a, i0, a)') "  ■ Boundary Condition (ID: ", self%id, ") -------------------"
+        if (associated(self%parent)) then
+            ! 次に、祖父母ポインタが有効かチェックする
+            if (associated(self%parent%parent)) then
+                select type (p => self%parent%parent)
+                type is (type_input)
+                    if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
+                        call display_boundary_local(self%physics, "Thermal", PHYSICS_TYPE_THERMAL)
+                    end if
+                    if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+                        call display_boundary_local(self%physics, "Hydraulic", PHYSICS_TYPE_HYDRAULIC)
+                    end if
+                    if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
+                        call display_boundary_local(self%physics, "Mechanical", PHYSICS_TYPE_MECHANICAL)
+                    end if
 
-        call display_boundary_local(self%physics, "Thermal", PHYSICS_TYPE_THERMAL)
-        call display_boundary_local(self%physics, "Hydraulic", PHYSICS_TYPE_HYDRAULIC)
+                end select
+
+            else
+                ! (任意) 祖父母ポインタが null の場合のエラー処理
+                write (*, *) "Grandparent pointer is not associated."
+            end if
+
+        else
+            ! (任意) 親ポインタが null の場合のエラー処理
+            write (*, *) "Parent pointer is not associated."
+        end if
 
     end subroutine display_boundary_conditions
 

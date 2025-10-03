@@ -13,10 +13,10 @@ module inout_input_basic
     public :: type_input_basic
 
     character(*), parameter :: thermal = "thermal"
-    character(*), parameter :: calculate_thermal = "calculate_thermal"
     character(*), parameter :: hydraulic = "hydraulic"
-    character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: mechanical = "mechanical"
+    character(*), parameter :: calculate_thermal = "calculate_thermal"
+    character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: calculate_mechanical = "calculate_mechanical"
 
     !!------------------------------------------------------------------------------------------------------------------------------
@@ -219,6 +219,7 @@ module inout_input_basic
         type(type_solver_settings) :: solver_settings
     contains
         procedure, pass(self) :: initialize => initialize_type_input_basic
+        procedure, pass(self) :: display => display_input_basic
     end type type_input_basic
 
     interface
@@ -258,6 +259,11 @@ module inout_input_basic
             implicit none
             class(type_input_basic), intent(inout) :: self
         end subroutine initialize_type_input_basic
+
+        module subroutine display_input_basic(self)
+            implicit none
+            class(type_input_basic), intent(in) :: self
+        end subroutine display_input_basic
     end interface
 
 end module inout_input_basic

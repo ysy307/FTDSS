@@ -39,6 +39,11 @@ module inout_input_geometry
             class(type_input_geometry), intent(inout) :: self
             character(:), allocatable :: field_list(:)
         end function collect_fields_from_conditions
+
+        ! module subroutine display_input_geometry(self)
+        !     implicit none
+        !     class(type_input_geometry), intent(in) :: self
+        ! end subroutine display_input_geometry
     end interface
 
 end module inout_input_geometry

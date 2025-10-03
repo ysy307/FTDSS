@@ -26,6 +26,7 @@ module inout_input
         type(type_input_geometry) :: geometry
     contains
         procedure, pass(self), public :: initialize => initialize_type_input
+        procedure, pass(self), public :: display => display_input
     end type type_input
 
 contains
@@ -92,6 +93,25 @@ contains
         call self%geometry%initialize()
 
     end subroutine initialize_type_input
+
+    subroutine display_input(self)
+        implicit none
+        class(type_input), intent(in) :: self
+
+        integer(int32) :: ierr, myrank
+        integer(int32) :: i
+
+        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+        if (myrank == 0) then
+            write (*, '(A)') "=== Simulation Settings ==="
+            call self%basic%display()
+            write (*, '(A)') "=== Conditions ==="
+            call self%conditions%display()
+            write (*, '(A)') "=== Output Settings ==="
+            call self%output_settings%display()
+        end if
+
+    end subroutine display_input
 
     !>
     !> Checks if a file exists by attempting to open it.

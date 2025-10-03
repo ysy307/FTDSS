@@ -15,6 +15,7 @@ module core_constants_utils
     public :: get_thermal_bc_type
     public :: get_hydraulic_bc_type
     public :: get_initial_condition_type
+    public :: get_initial_condition_physical_type
     public :: get_norm_type
     public :: get_nonlinear_solver_type
     public :: get_nonlinear_norm_criteria
@@ -31,6 +32,7 @@ module core_constants_utils
     public :: get_thermal_bc_type_string
     public :: get_hydraulic_bc_type_string
     public :: get_initial_condition_type_string
+    public :: get_initial_condition_physical_type_string
     public :: get_norm_type_string
     public :: get_nonlinear_solver_type_string
     public :: get_nonlinear_norm_criteria_string
@@ -287,7 +289,7 @@ contains
     end function get_hydraulic_bc_type_string
 
     !> 文字列から初期条件タイプIDを取得する
-    pure function get_initial_condition_type(key) result(val)
+    pure function get_initial_condition_physical_type(key) result(val)
         implicit none
         character(len=*), intent(in) :: key
         integer(int32) :: val
@@ -302,9 +304,9 @@ contains
         case ("porosity")
             val = INITIAL_CONDITION_POROSITY
         end select
-    end function get_initial_condition_type
+    end function get_initial_condition_physical_type
 
-    pure function get_initial_condition_type_string(val) result(key)
+    pure function get_initial_condition_physical_type_string(val) result(key)
         implicit none
         integer(int32), intent(in) :: val
         character(:), allocatable :: key
@@ -318,6 +320,39 @@ contains
             key = "Mechanical"
         case (INITIAL_CONDITION_POROSITY)
             key = "Porosity"
+        case default
+            key = "Unknown"
+        end select
+    end function get_initial_condition_physical_type_string
+
+    !> 文字列から初期条件タイプIDを取得する
+    pure function get_initial_condition_type(key) result(val)
+        implicit none
+        character(len=*), intent(in) :: key
+        integer(int32) :: val
+
+        select case (strip(to_lower(key)))
+        case ("uniform")
+            val = INITIAL_CONDITION_UNIFORM
+        case ("laplace")
+            val = INITIAL_CONDITION_LAPLACE
+        case ("file")
+            val = INITIAL_CONDITION_FILE
+        end select
+    end function get_initial_condition_type
+
+    pure function get_initial_condition_type_string(val) result(key)
+        implicit none
+        integer(int32), intent(in) :: val
+        character(:), allocatable :: key
+
+        select case (val)
+        case (INITIAL_CONDITION_UNIFORM)
+            key = "Uniform"
+        case (INITIAL_CONDITION_LAPLACE)
+            key = "Laplace"
+        case (INITIAL_CONDITION_FILE)
+            key = "File"
         case default
             key = "Unknown"
         end select

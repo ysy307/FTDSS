@@ -16,6 +16,7 @@ program test_input
 #endif
 
     call input%initialize()
+    call input%display()
 
 #ifdef _MPI
     call MPI_Finalize(ierr)

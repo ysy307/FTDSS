@@ -1,12 +1,10 @@
 submodule(inout_input_conditions) inout_input_conditions_initial
+    use :: inout_input
     implicit none
     !------------------------------------------------------------------------------------------------------------------------------
     ! JSON key names for initial conditions
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: initial_conditions = "initial_conditions"
-    character(*), parameter :: calculate_thermal = "calculate_thermal"
-    character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
-    character(*), parameter :: calculate_mechanical = "calculate_mechanical"
     character(*), parameter :: type = "type"
     character(*), parameter :: value = "value"
     character(*), parameter :: valid_initial_condition_types(3) = [character(8) :: "uniform", "laplace", "file"]
@@ -17,68 +15,91 @@ contains
         implicit none
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json
-
+        integer(int32) :: i
+        character(:), allocatable :: tmp_string
         character(256) :: buffer(3) = [character(256) :: initial_conditions, "", ""]
-        logical :: has_thermal, has_hydraulic, has_mechanical
 
-        buffer(2) = calculate_thermal
-        call get_json_value(json, join(buffer), has_thermal, default_value=.false.)
-        if (has_thermal) then
-            buffer(2) = "thermal"
-            buffer(3) = type
-            call get_json_value(json, join(buffer), self%initial_conditions%thermal%type, &
-                                is_required=.true., valid_list=valid_initial_condition_types)
-            select case (self%initial_conditions%thermal%type)
-            case ("uniform")
-                buffer(3) = value
-                call get_json_value(json, join(buffer), self%initial_conditions%thermal%value, &
-                                    is_required=.true.)
-            case ("laplace")
-                ! No additional parameters needed for laplace
-            case ("file")
-                buffer(3) = field_name
-                call get_json_value(json, join(buffer), self%initial_conditions%thermal%field_name, &
-                                    is_required=.true.)
-            end select
-        end if
+        select type (p => self%parent)
+        type is (type_input)
+            do i = 1, NUM_INITIAL_CONDITIONS
+
+                select case (i)
+                case (INITIAL_CONDITION_THERMAL)
+                    if (.not. p%basic%analysis_controls%is_active(i)) cycle
+                    buffer(2) = thermal
+                case (INITIAL_CONDITION_HYDRAULIC)
+                    if (.not. p%basic%analysis_controls%is_active(i)) cycle
+                    buffer(2) = hydraulic
+                case (INITIAL_CONDITION_MECHANICAL)
+                    if (.not. p%basic%analysis_controls%is_active(i)) cycle
+                    buffer(2) = mechanical
+                case (INITIAL_CONDITION_POROSITY)
+                    buffer(2) = porosity
+                end select
+                buffer(3) = type
+
+                call get_json_value(json, join(buffer), tmp_string, &
+                                    is_required=.true., valid_list=valid_initial_condition_types)
+                self%initial_conditions%physics(i)%type = get_initial_condition_type(tmp_string)
+
+                select case (self%initial_conditions%physics(i)%type)
+                case (INITIAL_CONDITION_UNIFORM)
+                    buffer(3) = value
+                    call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%value, &
+                                        is_required=.true.)
+                case (INITIAL_CONDITION_LAPLACE)
+                    ! No additional parameters needed for laplace
+                case (INITIAL_CONDITION_FILE)
+                    buffer(3) = field_name
+                    call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%field_name, &
+                                        is_required=.true.)
+                end select
+            end do
+        end select
+
     end subroutine read_conditions_initial_conditions
 
     module subroutine display_initial_conditions(self)
         implicit none
         class(type_initial_conditions), intent(in) :: self
 
-        write (output_unit, '(A)') "  Initial Conditions:"
-        write (output_unit, '(A)') "    Thermal:"
-        write (output_unit, '(A, A)') "      Type: ", trim(self%thermal%type)
-        select case (self%thermal%type)
-        case ("uniform")
-            write (output_unit, '(A, F8.3)') "      Value: ", self%thermal%value
-        case ("laplace")
-            write (output_unit, '(A)') "      Value: Laplace equation will be solved"
-        case ("file")
-            write (output_unit, '(A, A)') "      Field Name: ", trim(self%thermal%field_name)
-        end select
-        write (output_unit, '(A)') "    Hydraulic:"
-        write (output_unit, '(A, A)') "      Type: ", trim(self%hydraulic%type)
-        select case (self%hydraulic%type)
-        case ("uniform")
-            write (output_unit, '(A, F8.3)') "      Value: ", self%hydraulic%value
-        case ("laplace")
-            write (output_unit, '(A)') "      Value: Laplace equation will be solved"
-        case ("file")
-            write (output_unit, '(A, A)') "      Field Name: ", trim(self%hydraulic%field_name)
-        end select
-        write (output_unit, '(A)') "    Porosity:"
-        write (output_unit, '(A, A)') "      Type: ", trim(self%porosity%type)
-        select case (self%porosity%type)
-        case ("uniform")
-            write (output_unit, '(A, F8.3)') "      Value: ", self%porosity%value
-        case ("laplace")
-            write (output_unit, '(A)') "      Value: Laplace equation will be solved"
-        case ("file")
-            write (output_unit, '(A, A)') "      Field Name: ", trim(self%porosity%field_name)
+        write (*, '(A)') "  Initial Conditions:"
+
+        select type (p => self%parent%parent)
+        type is (type_input)
+
+            if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
+                call display_initial_local(self%physics, "Thermal", INITIAL_CONDITION_THERMAL)
+            end if
+            if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
+                call display_initial_local(self%physics, "Hydraulic", INITIAL_CONDITION_HYDRAULIC)
+            end if
+
+            call display_initial_local(self%physics, "Porosity", INITIAL_CONDITION_POROSITY)
+
         end select
 
     end subroutine display_initial_conditions
+
+    subroutine display_initial_local(fields, title, target_ic_id)
+        implicit none
+        type(type_initial_local), intent(in) :: fields(:)
+        character(*), intent(in) :: title
+        integer(int32), intent(in), optional :: target_ic_id
+
+        write (*, '(A, A)') "    ", trim(title), ":"
+        write (*, '(A, A)') "      Type: ", get_initial_condition_type_string(fields(target_ic_id)%type)
+
+        select case (fields(target_ic_id)%type)
+        case (INITIAL_CONDITION_UNIFORM)
+            write (*, '(A, F8.3)') "      Value: ", fields(target_ic_id)%value
+        case (INITIAL_CONDITION_LAPLACE)
+            write (*, '(A)') "      Value: Laplace equation will be solved"
+        case (INITIAL_CONDITION_FILE)
+            write (*, '(A, A)') "      Field Name: ", trim(fields(target_ic_id)%field_name)
+        case default
+            write (*, '(A)') "      Unknown type"
+        end select
+    end subroutine display_initial_local
 
 end submodule inout_input_conditions_initial

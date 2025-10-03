@@ -24,4 +24,28 @@ contains
 
     end subroutine initialize_type_input_basic
 
+    module subroutine display_input_basic(self)
+        implicit none
+        class(type_input_basic), intent(in) :: self
+
+        integer(int32) :: ierr, myrank
+        integer(int32) :: i
+
+        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+        if (myrank == 0) then
+            write (*, '(A)') "=== Simulation Settings ==="
+            call self%simulation_settings%display()
+            write (*, '(A)') "=== Analysis Controls ==="
+            call self%analysis_controls%display()
+            write (*, '(A)') "=== Geometry Settings ==="
+            call self%geometry_settings%display()
+            write (*, '(A)') "=== Material Settings ==="
+            do i = 1, self%num_materials
+                call self%materials(i)%display()
+            end do
+            write (*, '(A)') "=== Solver Settings ==="
+            call self%solver_settings%display()
+        end if
+    end subroutine display_input_basic
+
 end submodule inout_input_basic_base
