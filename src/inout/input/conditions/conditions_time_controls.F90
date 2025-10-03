@@ -32,13 +32,17 @@ contains
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
         character(256) :: buffer(3)
+        character(:), allocatable :: tmp_string
 
         buffer(1) = time_controls
         buffer(2) = simulation_period
 
         buffer(3) = unit
-        call get_json_value(json, join(buffer), self%time_control%simulation_period%unit, &
+        call get_json_value(json, join(buffer), tmp_string, &
                             is_required=.true., valid_list=valid_units)
+
+        self%time_control%simulation_period%unit = get_time_unit(tmp_string)
+        if (allocated(tmp_string)) deallocate (tmp_string)
 
         buffer(3) = start
         call get_json_value(json, join(buffer), self%time_control%simulation_period%start, &
@@ -60,13 +64,17 @@ contains
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
         character(256) :: buffer(3)
+        character(:), allocatable :: tmp_string
 
         buffer(1) = time_controls
         buffer(2) = time_stepping
 
         buffer(3) = unit
-        call get_json_value(json, join(buffer), self%time_control%time_stepping%unit, &
+        call get_json_value(json, join(buffer), tmp_string, &
                             is_required=.true., valid_list=valid_units)
+
+        self%time_control%time_stepping%unit = get_time_unit(tmp_string)
+        if (allocated(tmp_string)) deallocate (tmp_string)
 
         buffer(3) = initial_step
         call get_json_value(json, join(buffer), self%time_control%time_stepping%initial_step, &
@@ -142,13 +150,13 @@ contains
 
         ! --- Simulation Period ---
         write (*, '(/a)') "  --- Simulation Period ---"
-        write (*, '(a, a)') "    Unit                : ", trim(self%simulation_period%unit)
+        write (*, '(a, a)') "    Unit                : ", strip(get_time_unit_string(self%simulation_period%unit))
         write (*, '(a, es12.4e2)') "    Start Time          : ", self%simulation_period%start
         write (*, '(a, es12.4e2)') "    End Time            : ", self%simulation_period%end
 
         ! --- Time Stepping ---
         write (*, '(/a)') "  --- Time Stepping ---"
-        write (*, '(a, a)') "    Unit                : ", trim(self%time_stepping%unit)
+        write (*, '(a, a)') "    Unit                : ", strip(get_time_unit_string(self%time_stepping%unit))
         write (*, '(a, es12.4e2)') "    Initial Step        : ", self%time_stepping%initial_step
         write (*, '(a, es12.4e2)') "    Min Step            : ", self%time_stepping%min_step
         write (*, '(a, es12.4e2)') "    Max Step            : ", self%time_stepping%max_step

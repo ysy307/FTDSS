@@ -68,7 +68,7 @@ contains
         if (strip(self%geometry_settings%integration_type) == "free") then
             buffer(3) = integration_points
             call get_json_value(json, join(buffer), self%geometry_settings%integration_points, &
-                                is_required=.true., default_value=0.5d0, valid_range=[0.0d0, 1.0d0])
+                                is_required=.true., valid_range=[0.0d0, 1.0d0])
         end if
 
     end subroutine read_parameters_geometry_settings
@@ -76,6 +76,8 @@ contains
     module subroutine display_geometry_settings(self)
         implicit none
         class(type_geometry_settings) :: self
+
+        integer(int32) :: i
 
         write (*, '(a)') "Mesh File Name: "//strip(self%file_name)
         write (*, '(a)') "Global Node ID Key: "//strip(self%global_node_id_key)
@@ -87,7 +89,9 @@ contains
         write (*, '(a)') "Color Key: "//strip(self%color_key)
         write (*, '(a)') "Integration Type: "//strip(self%integration_type)
         if (strip(self%integration_type) == "free") then
-            write (*, '(a)') "Integration Points: "//to_string(self%integration_points)
+            do i = 1, size(self%integration_points)
+                write (*, '(a)') "Integration Points: "//to_string(self%integration_points(i))
+            end do
         end if
 
     end subroutine display_geometry_settings

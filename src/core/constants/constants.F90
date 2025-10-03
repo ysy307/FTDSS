@@ -41,7 +41,7 @@ module core_constants
     integer(int32), parameter, public :: DOF_TYPE_DZ = 5
 
     ! Definition of boundary condition type IDs for thermal analysis
-    integer(int32), parameter, public :: NUM_THERMAL_BC_TYPES = 8 !&
+    integer(int32), parameter, public :: NUM_THERMAL_BC_TYPES  = 8 !&
     integer(int32), parameter, public :: THERMAL_BC_DIRICHLET  = 101 !&
     integer(int32), parameter, public :: THERMAL_BC_NEUMANN    = 102 !&
     integer(int32), parameter, public :: THERMAL_BC_FLUX       = 103 !&
@@ -94,4 +94,36 @@ module core_constants
     integer(int32), parameter, public :: INITIAL_CONDITION_MECHANICAL = 3 !&
     !> Porosity initial condition ID
     integer(int32), parameter, public :: INITIAL_CONDITION_POROSITY   = 4 !&
+
+    integer(int32), parameter, public ::  INITIAL_CONDITION_UNIFORM  = 1 !&
+    integer(int32), parameter, public ::  INITIAL_CONDITION_LAPLACE  = 2 !&
+    integer(int32), parameter, public ::  INITIAL_CONDITION_FILE     = 3 !&
+
+    integer(int32), parameter, public :: NORM_TYPE_L2      = 1 !&
+    integer(int32), parameter, public :: NORM_TYPE_LINF    = 2 !&
+
+    integer(int32), parameter, public :: NONLINEAR_SOLVER_NONE = 0
+    integer(int32), parameter, public :: NONLINEAR_SOLVER_NEWTON = 1
+    integer(int32), parameter, public :: NONLINEAR_SOLVER_MODIFIED_NEWTON = 2
+    integer(int32), parameter, public :: NONLINEAR_SOLVER_PICARD = 3
+
+    integer(int32), parameter, public :: NONLINEAR_NORM_CRITERIA_NONE = 0
+    integer(int32), parameter, public :: NONLINEAR_NORM_CRITERIA_RESIDUAL = 1
+    integer(int32), parameter, public :: NONLINEAR_NORM_CRITERIA_UPDATE = 2
+    integer(int32), parameter, public :: NONLINEAR_NORM_CRITERIA_BOTH = 3
+
+    integer(int32), parameter, public :: NONLINEAR_CRITERIA_NONE = 0
+    integer(int32), parameter, public :: NONLINEAR_CRITERIA_RELATIVE = 1
+    integer(int32), parameter, public :: NONLINEAR_CRITERIA_ABSOLUTE = 2
+    integer(int32), parameter, public :: NONLINEAR_CRITERIA_BOTH = 3
+
+    integer(int32), parameter, public :: NONLINEAR_LOGIC_OR = 1
+    integer(int32), parameter, public :: NONLINEAR_LOGIC_AND = 2
+
+    integer(int32), parameter, public :: TIME_UNIT_SECONDS = 1
+    integer(int32), parameter, public :: TIME_UNIT_MINUTES = 2
+    integer(int32), parameter, public :: TIME_UNIT_HOURS = 3
+    integer(int32), parameter, public :: TIME_UNIT_DAYS = 4
+    integer(int32), parameter, public :: TIME_UNIT_YEARS = 5
+
 end module core_constants

@@ -89,54 +89,60 @@ contains
     !================================================================!
     ! 初期条件オブジェクトを解析し、ユニークなフィールド名のリストを返すプライベート関数
     !================================================================!
+!================================================================!
+! 初期条件オブジェクトを解析し、ユニークなフィールド名のリストを返すプライベート関数
+!================================================================!
     module function collect_fields_from_conditions(self) result(field_list)
         implicit none
         class(type_input_geometry), intent(inout) :: self
         character(:), allocatable :: field_list(:)
 
-        character(len=256) :: temp_list(2) ! 熱と水理の最大2つを仮定
+        character(len=256) :: temp_list(NUM_INITIAL_CONDITIONS)
         integer :: num_fields, i
         logical :: is_duplicate
 
         num_fields = 0
 
-        ! 熱解析が有効な場合のみ、熱の初期条件をチェック
-        if (basic%analysis_controls%calculate_thermal) then
-            if (conditions%initial_conditions%thermal%type == "file") then
-                if (allocated(conditions%initial_conditions%thermal%field_name)) then
-                    num_fields = 1
-                    temp_list(1) = conditions%initial_conditions%thermal%field_name
-                end if
-            end if
-        end if
-
-        ! 水理解析が有効な場合のみ、水理の初期条件をチェック
-        if (basic%analysis_controls%calculate_hydraulic) then
-            if (conditions%initial_conditions%hydraulic%type == "file") then
-                if (allocated(conditions%initial_conditions%hydraulic%field_name)) then
-                    ! 重複をチェック
-                    is_duplicate = .false.
-                    do i = 1, num_fields
-                        if (trim(temp_list(i)) == trim(conditions%initial_conditions%hydraulic%field_name)) then
-                            is_duplicate = .true.
-                            exit
-                        end if
-                    end do
-
-                    if (.not. is_duplicate) then
-                        num_fields = num_fields + 1
-                        temp_list(num_fields) = conditions%initial_conditions%hydraulic%field_name
+        select type (p => self%parent)
+        type is (type_input)
+            ! 熱解析が有効な場合のみ、熱の初期条件をチェック
+            if (p%basic%analysis_controls%is_active(get_initial_condition_type(thermal))) then
+                if (p%conditions%initial_conditions%thermal%type == "file") then
+                    if (allocated(p%conditions%initial_conditions%thermal%field_name)) then
+                        num_fields = 1
+                        temp_list(1) = p%conditions%initial_conditions%thermal%field_name
                     end if
                 end if
             end if
-        end if
 
-        ! 収集したフィールド名で戻り値の配列を確保
-        if (num_fields > 0) then
-            allocate (character(len=256) :: field_list(num_fields))
-            field_list = temp_list(1:num_fields)
-        end if
+            ! 水理解析が有効な場合のみ、水理の初期条件をチェック
+            if (p%basic%analysis_controls%is_active(get_initial_condition_type(hydraulic))) then
+                if (p%conditions%initial_conditions%hydraulic%type == "file") then
+                    if (allocated(p%conditions%initial_conditions%hydraulic%field_name)) then
+                        ! 重複をチェック
+                        is_duplicate = .false.
+                        do i = 1, num_fields
+                            if (trim(temp_list(i)) == trim(p%conditions%initial_conditions%hydraulic%field_name)) then
+                                is_duplicate = .true.
+                                exit
+                            end if
+                        end do
+
+                        if (.not. is_duplicate) then
+                            num_fields = num_fields + 1
+                            temp_list(num_fields) = p%conditions%initial_conditions%hydraulic%field_name
+                        end if
+                    end if
+                end if
+            end if
+
+            ! 収集したフィールド名で戻り値の配列を確保
+            if (num_fields > 0) then
+                allocate (character(len=256) :: field_list(num_fields))
+                field_list = temp_list(1:num_fields)
+            end if
+
+        end select
 
     end function collect_fields_from_conditions
-
 end submodule inout_input_geometry_base

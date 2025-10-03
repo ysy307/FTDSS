@@ -6,9 +6,7 @@ submodule(inout_input_basic) inout_input_basic_materials
     character(*), parameter :: materials = "materials"
     character(*), parameter :: id = "id"
     character(*), parameter :: name = "name"
-    character(*), parameter :: calculate_thermal = "calculate_thermal"
-    character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
-    character(*), parameter :: calculate_mechanical = "calculate_mechanical"
+
     character(*), parameter :: phase = "phase"
     character(*), parameter :: is_frozen = "is_frozen"
     character(*), parameter :: is_dispersed = "is_dispersed"
@@ -49,6 +47,7 @@ contains
 
         logical :: found
         integer(int32) :: i
+        integer(int32) :: target_id
 
         call json%info(materials, found=found, n_children=self%num_materials)
         call json%print_error_message(output_unit)
@@ -61,13 +60,14 @@ contains
 
         do i = 1, self%num_materials
             call read_parameters_materials_basic(self, json, i)
-            if (self%analysis_controls%calculate_thermal) then
+
+            if (self%analysis_controls%is_active(get_physics_type(thermal))) then
                 call read_parameters_materials_thermal(self, json, i)
             end if
-            if (self%analysis_controls%calculate_hydraulic) then
+            if (self%analysis_controls%is_active(get_physics_type(hydraulic))) then
                 call read_parameters_materials_hydraulic(self, json, i)
             end if
-            if (self%analysis_controls%calculate_mechanical) then
+            if (self%analysis_controls%is_active(get_physics_type(mechanical))) then
                 ! Mechanical parameters can be added here in the future
             end if
         end do
@@ -92,21 +92,21 @@ contains
         call get_json_value(json, join(buffer), self%materials(i_material)%name, &
                             is_required=.false., default_value="Material_"//to_string(i_material))
 
-        if (self%analysis_controls%calculate_thermal) then
+        if (self%analysis_controls%is_active(get_physics_type(thermal))) then
             buffer(2) = calculate_thermal
-            call get_json_value(json, join(buffer), self%materials(i_material)%calculate_thermal, &
+            call get_json_value(json, join(buffer), self%materials(i_material)%is_active(get_physics_type(thermal)), &
                                 is_required=.false., default_value=.false.)
         end if
 
-        if (self%analysis_controls%calculate_hydraulic) then
+        if (self%analysis_controls%is_active(get_physics_type(hydraulic))) then
             buffer(2) = calculate_hydraulic
-            call get_json_value(json, join(buffer), self%materials(i_material)%calculate_hydraulic, &
+            call get_json_value(json, join(buffer), self%materials(i_material)%is_active(get_physics_type(hydraulic)), &
                                 is_required=.false., default_value=.false.)
         end if
 
-        if (self%analysis_controls%calculate_mechanical) then
+        if (self%analysis_controls%is_active(get_physics_type(mechanical))) then
             buffer(2) = calculate_mechanical
-            call get_json_value(json, join(buffer), self%materials(i_material)%calculate_mechanical, &
+            call get_json_value(json, join(buffer), self%materials(i_material)%is_active(get_physics_type(mechanical)), &
                                 is_required=.false., default_value=.false.)
         end if
 
@@ -344,17 +344,17 @@ contains
         call display_material_basic(self)
 
         ! --- 2. Thermal Properties ---
-        if (self%calculate_thermal) then
+        if (self%is_active(get_physics_type(thermal))) then
             call display_material_thermal(self)
         end if
 
         ! --- 3. Hydraulic Properties ---
-        if (self%calculate_hydraulic) then
+        if (self%is_active(get_physics_type(hydraulic))) then
             call display_material_hydraulic(self)
         end if
 
         ! --- 4. Mechanical Properties (for future implementation) ---
-        if (self%calculate_mechanical) then
+        if (self%is_active(get_physics_type(mechanical))) then
             write (*, '(a)') "  Mechanical Properties: (Not implemented)"
         end if
 
@@ -369,9 +369,9 @@ contains
         write (*, '(a, i0)') "  Phase Count         : ", material%phase
         write (*, '(a, g0)') "  Is Frozen           : ", material%is_frozen
         write (*, '(a, g0)') "  Is Dispersed        : ", material%is_dispersed
-        write (*, '(a, g0)') "  Calculate Thermal   : ", material%calculate_thermal
-        write (*, '(a, g0)') "  Calculate Hydraulic : ", material%calculate_hydraulic
-        write (*, '(a, g0)') "  Calculate Mechanical: ", material%calculate_mechanical
+        write (*, '(a, g0)') "  Calculate Thermal   : ", material%is_active(get_physics_type(thermal))
+        write (*, '(a, g0)') "  Calculate Hydraulic : ", material%is_active(get_physics_type(hydraulic))
+        write (*, '(a, g0)') "  Calculate Mechanical: ", material%is_active(get_physics_type(mechanical))
     end subroutine display_material_basic
 
     subroutine display_material_thermal(material)

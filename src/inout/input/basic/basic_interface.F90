@@ -13,8 +13,11 @@ module inout_input_basic
     public :: type_input_basic
 
     character(*), parameter :: thermal = "thermal"
+    character(*), parameter :: calculate_thermal = "calculate_thermal"
     character(*), parameter :: hydraulic = "hydraulic"
+    character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: mechanical = "mechanical"
+    character(*), parameter :: calculate_mechanical = "calculate_mechanical"
 
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_simulation_settings
@@ -124,9 +127,7 @@ module inout_input_basic
         integer(int32) :: phase
         logical :: is_frozen
         logical :: is_dispersed
-        logical :: calculate_thermal
-        logical :: calculate_hydraulic
-        logical :: calculate_mechanical
+        logical :: is_active(NUM_PHYSICS_TYPES)
         type(type_materials_thermal) :: thermal
         type(type_materials_hydraulic) :: hydraulic
     contains
@@ -141,22 +142,22 @@ module inout_input_basic
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_convergence_criteria
-        character(:), allocatable :: criteria
-        character(:), allocatable :: logic
+        integer(int32) :: criteria
+        integer(int32) :: logic
         real(real64) :: absolute_tolerance
         real(real64) :: relative_tolerance
     end type type_convergence_criteria
 
     type :: type_convergence
-        character(:), allocatable :: use_criteria
-        character(:), allocatable :: norm_type
-        character(:), allocatable :: use_logic
+        integer(int32) :: use_criteria
+        integer(int32) :: norm_type
+        integer(int32) :: use_logic
         type(type_convergence_criteria) :: residual
         type(type_convergence_criteria) :: update
     end type type_convergence
 
     type :: type_nonlinear_solver
-        character(:), allocatable :: method
+        integer(int32) :: method
         integer(int32) :: update_frequency
         integer(int32) :: max_iterations
         type(type_convergence) :: convergence
@@ -175,9 +176,7 @@ module inout_input_basic
     end type type_linear_solver_settings
 
     type :: type_linear_solver
-        type(type_linear_solver_settings) :: thermal
-        type(type_linear_solver_settings) :: hydraulic
-        type(type_linear_solver_settings) :: mechanical
+        type(type_linear_solver_settings) :: physics(NUM_PHYSICS_TYPES)
     end type type_linear_solver
 
     type :: type_parallel_threads
@@ -254,43 +253,11 @@ module inout_input_basic
         end subroutine read_parameters_solver_settings
     end interface
 
-contains
-    subroutine initialize_type_input_basic(self)
-        !< Load the input parameters from the JSON file
-        implicit none
-        class(type_input_basic), intent(inout) :: self
-        type(json_file) :: json
-
-        call json%initialize()
-
-        call json%load(filename=self%file_name)
-        call json%print_error_message(output_unit)
-
-        call read_parameters_simulation_settings(self, json)
-        call read_parameters_analysis_controls(self, json)
-        call read_parameters_geometry_settings(self, json)
-        call read_parameters_materials(self, json)
-        call read_parameters_solver_settings(self, json)
-
-        ! call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
-        ! if (myrank == 0) then
-        !     write (*, '(A)') "=== Simulation Settings ==="
-        !     call self%simulation_settings%display()
-        !     write (*, '(A)') "=== Analysis Controls ==="
-        !     call self%analysis_controls%display()
-        !     write (*, '(A)') "=== Geometry Settings ==="
-        !     call self%geometry_settings%display()
-        !     write (*, '(A)') "=== Material Settings ==="
-        !     do i = 1, self%num_materials
-        !         call self%materials(i)%display()
-        !     end do
-        !     write (*, '(A)') "=== Solver Settings ==="
-        !     call self%solver_settings%display()
-        ! end if
-        call json%destroy()
-        call json%print_error_message(output_unit)
-
-    end subroutine initialize_type_input_basic
-    !!------------------------------------------------------------------------------------------------------------------------------
+    interface
+        module subroutine initialize_type_input_basic(self)
+            implicit none
+            class(type_input_basic), intent(inout) :: self
+        end subroutine initialize_type_input_basic
+    end interface
 
 end module inout_input_basic

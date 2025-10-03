@@ -5,12 +5,19 @@ module inout_input_geometry
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
-    use :: module_core, only:join, type_vtk
+    use :: module_core
     use :: inout_input_base, only:get_json_value, abst_input
     implicit none
     private
 
     public :: type_input_geometry
+
+    character(*), parameter :: thermal = "thermal"
+    character(*), parameter :: calculate_thermal = "calculate_thermal"
+    character(*), parameter :: hydraulic = "hydraulic"
+    character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
+    character(*), parameter :: mechanical = "mechanical"
+    character(*), parameter :: calculate_mechanical = "calculate_mechanical"
 
     type :: type_input_geometry
         class(abst_input), pointer :: parent => null()
