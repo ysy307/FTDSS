@@ -1,18 +1,54 @@
-# CMake Minimum Version
 cmake_minimum_required(VERSION 3.20)
 
 # ====================================================================
 # 1. Options and Toolchain Setup
 # ====================================================================
 
-# プロジェクトの挙動を決定するオプションを先に定義
+# --------------------------------------------------------------------
+# ★ ビルド目的を決定する変数
+# --------------------------------------------------------------------
+# 1. ビルドするアプリケーションを選択 ('ysy_fc' または 'test')
+set(BUILD_APP "ysy_fc" CACHE STRING "Select the application to build: ysy_fc or test")
+
+# 2. 'test' をビルドする場合、どのテストを実行するか指定
+set(TEST_NAME "input" CACHE STRING "Specify the test name (e.g., input, domain)")
+# --------------------------------------------------------------------
+
+# その他のオプション
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_MKL    "Enable MKL support"    ON)
 option(ENABLE_MPI    "Enable MPI support"    ON)
 option(ENABLE_DEBUG  "Enable debug flags"    OFF)
 
-# ENABLE_MPIオプションに応じてコンパイラを自動で設定
-# NOTE: project()コマンドの前にコンパイラを設定するのがベストプラクティスです
+# ビルドするモジュールのリストを準備
+set(REQUIRED_MODULES "")
+
+if(BUILD_APP STREQUAL "ysy_fc")
+    # --- アプリケーションビルドモード ---
+    message(STATUS "Build mode: Main application (ysy_fc)")
+    list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control" "conditions" "domain" "physics" "parallel" "solver" "field")
+
+elseif(BUILD_APP STREQUAL "test")
+    # --- テストビルドモード ---
+    message(STATUS "Build mode: Test (selected test: ${TEST_NAME})")
+
+    if(TEST_NAME STREQUAL "input")
+        list(APPEND REQUIRED_MODULES "core" "inout")
+    
+    # --- 他のテストを追加する場合は、ここに elseif を追記 ---
+    # elseif(TEST_NAME STREQUAL "domain")
+    #     list(APPEND REQUIRED_MODULES "core" "inout" "domain")
+    
+    else()
+        message(WARNING "Unknown TEST_NAME: ${TEST_NAME}. No specific modules required.")
+    endif()
+
+else()
+    message(FATAL_ERROR "Invalid BUILD_APP value: ${BUILD_APP}. Choose 'ysy_fc' or 'test'.")
+endif()
+
+
+# コンパイラ設定
 if(ENABLE_MPI)
     message(STATUS "MPI support is ON. Setting compiler to MPI wrappers.")
     set(CMAKE_Fortran_COMPILER mpiifx CACHE STRING "MPI Fortran Compiler" FORCE)
@@ -28,21 +64,21 @@ endif()
 # Project Name and Language
 project(YSY_FC LANGUAGES Fortran C CXX)
 
+# CTestを有効化
+enable_testing()
+
 # Build Type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build: Debug or Release" FORCE)
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# Select the application to build
-set(BUILD_APP "ysy_fc" CACHE STRING "Specify the application to build: ysy_fc or test")
-
 # Output Directories
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/.mod)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
-# Include custom CMake modules (Toolchain.cmakeがMPI/MKLを探す)
+# Include custom CMake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Toolchain)
 
@@ -50,81 +86,72 @@ include(Toolchain)
 # ====================================================================
 # 2. Source Tree Definition
 # ====================================================================
-add_subdirectory(src/core)
-add_subdirectory(src/inout)
-# add_subdirectory(src/linalg)
-# add_subdirectory(src/control)
-# add_subdirectory(src/conditions)
-# add_subdirectory(src/domain)
-# add_subdirectory(src/physics)
-# add_subdirectory(src/parallel)
-# add_subdirectory(src/solver)
-# add_subdirectory(src/field)
-# add_subdirectory(src/main)
+
+# REQUIRED_MODULESリストに含まれているモジュールだけをビルド対象にする関数
+function(add_required_subdirectory module_name)
+    list(FIND REQUIRED_MODULES "${module_name}" _index)
+    if(NOT _index EQUAL -1)
+        message(STATUS "Including module: ${module_name}")
+        add_subdirectory("src/${module_name}")
+    else()
+        message(STATUS "Skipping module: ${module_name}")
+    endif()
+endfunction()
+
+# この関数を使って各モジュールを追加
+add_required_subdirectory(core)
+add_required_subdirectory(inout)
+add_required_subdirectory(linalg)
+add_required_subdirectory(control)
+add_required_subdirectory(conditions)
+add_required_subdirectory(domain)
+add_required_subdirectory(physics)
+add_required_subdirectory(parallel)
+add_required_subdirectory(solver)
+add_required_subdirectory(field)
 
 
 # ====================================================================
 # 3. Build Targets
 # ====================================================================
 
-# 実行ファイルのソースを指定
-set(MAIN_APP_SOURCE "app/ysy_fc.F90")
-set(TEST_APP_SOURCE "test/test_input.F90")
-
-# Build Targets
 if(BUILD_APP STREQUAL "ysy_fc")
-    add_executable(ysy_fc ${MAIN_APP_SOURCE})
-    set(APP_TARGET ysy_fc)
-
-elseif(BUILD_APP STREQUAL "test")
-    enable_language(Fortran)
-    add_executable(test ${TEST_APP_SOURCE})
-    set_target_properties(test PROPERTIES LINKER_LANGUAGE Fortran)
-    set(APP_TARGET test)
-    enable_build_flags(test)
-    enable_thirdparty(test)
-endif()
-
-# ライブラリのリンク
-if(TARGET ${APP_TARGET})
-    # まず、アプリケーションのコアとなるライブラリをリンク
-    target_link_libraries(${APP_TARGET} PRIVATE
+    # アプリケーションをビルド
+    add_executable(ysy_fc app/ysy_fc.F90)
+    
+    target_link_libraries(ysy_fc PRIVATE
         Solver::Core
         Solver::Input
-        # Solver::Control
-        # Solver::Linalg
-        # Solver::Conditions
-        # Solver::Physics
-        # Solver::Domain
-        # Solver::Parallel
+        # ... アプリケーションに必要な全てのライブラリ ...
     )
 
-    # MPIが有効な場合、MPIライブラリを追加でリンク
     if(ENABLE_MPI AND TARGET MPI::MPI_Fortran)
-        message(STATUS "Linking ${APP_TARGET} with MPI libraries.")
-        target_link_libraries(${APP_TARGET} PRIVATE MPI::MPI_Fortran)
+        target_link_libraries(ysy_fc PRIVATE MPI::MPI_Fortran)
     endif()
+
+elseif(BUILD_APP STREQUAL "test")
+    # テストをビルド
+    add_subdirectory(test)
 endif()
 
-# カスタム実行ターゲット (MPIの有無で実行コマンドを切り替え)
-if(BUILD_APP STREQUAL "ysy_fc")
+
+# ====================================================================
+# 4. Custom Targets
+# ====================================================================
+
+# アプリケーションビルドの場合のみ 'run' ターゲットを定義
+if(BUILD_APP STREQUAL "ysy_fc" AND TARGET ysy_fc)
     if(ENABLE_MPI)
-        add_custom_target(run_ysy_fc
-            COMMAND mpirun -np 4 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ysy_fc
+        add_custom_target(run
+            COMMAND mpirun -np 4 $<TARGET_FILE:ysy_fc>
             DEPENDS ysy_fc
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         )
     else()
-        add_custom_target(run_ysy_fc
-            COMMAND OMP_NUM_THREADS=4 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ysy_fc
+        add_custom_target(run
+            COMMAND OMP_NUM_THREADS=4 $<TARGET_FILE:ysy_fc>
             DEPENDS ysy_fc
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         )
     endif()
-endif()
-
-
-# Final Messages
-if(BUILD_APP STREQUAL "")
-    message(WARNING "No application selected to build. Set BUILD_APP to 'ysy_fc' or 'test'.")
 endif()
