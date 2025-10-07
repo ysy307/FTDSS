@@ -22,6 +22,7 @@ module core_constants_utils
     public :: get_nonlinear_criteria
     public :: get_nonlinear_logic
     public :: get_time_unit
+    public :: get_time_record
 
     ! String getter functions
     public :: get_string
@@ -39,6 +40,7 @@ module core_constants_utils
     public :: get_nonlinear_criteria_string
     public :: get_nonlinear_logic_string
     public :: get_time_unit_string
+    public :: get_time_record_string
 
     interface
         pure function get_value(key) result(val)
@@ -564,5 +566,33 @@ contains
             key = "Unknown"
         end select
     end function get_time_unit_string
+
+    pure function get_time_record(key) result(val)
+        implicit none
+        character(len=*), intent(in) :: key
+        integer(int32) :: val
+
+        select case (strip(to_lower(key)))
+        case ("start")
+            val = TIME_RECORD_START
+        case ("end")
+            val = TIME_RECORD_END
+        end select
+    end function get_time_record
+
+    pure function get_time_record_string(val) result(key)
+        implicit none
+        integer(int32), intent(in) :: val
+        character(:), allocatable :: key
+
+        select case (val)
+        case (TIME_RECORD_START)
+            key = "Start"
+        case (TIME_RECORD_END)
+            key = "End"
+        case default
+            key = "Unknown"
+        end select
+    end function get_time_record_string
 
 end module core_constants_utils

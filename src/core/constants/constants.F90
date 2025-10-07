@@ -126,4 +126,7 @@ module core_constants
     integer(int32), parameter, public :: TIME_UNIT_DAYS = 4
     integer(int32), parameter, public :: TIME_UNIT_YEARS = 5
 
+    integer(int32), parameter, public :: TIME_RECORD_START = 1
+    integer(int32), parameter, public :: TIME_RECORD_END = 2
+
 end module core_constants

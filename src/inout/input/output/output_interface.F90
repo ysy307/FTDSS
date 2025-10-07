@@ -5,7 +5,7 @@ module inout_input_output_conditions
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file
-    use :: module_core, only:join, error_message, allocate_array, type_coordinate_dp
+    use :: module_core
     use :: inout_input_base, only:get_json_value, abst_input
     implicit none
     private
@@ -29,7 +29,7 @@ module inout_input_output_conditions
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_field_output
         character(:), allocatable :: file_format
-        character(:), allocatable :: output_interval_unit
+        integer(int32) :: output_interval_unit
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)
     contains

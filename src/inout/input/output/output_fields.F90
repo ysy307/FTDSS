@@ -12,6 +12,8 @@ contains
         class(type_output_settings), intent(inout) :: self
         type(json_file), intent(inout) :: json
 
+        character(:), allocatable :: tmp_string
+
         character(256) :: buffer(3) = [character(256) :: field_output, "", ""]
 
         buffer(2) = file_format
@@ -20,8 +22,9 @@ contains
 
         buffer(2) = output_interval
         buffer(3) = unit
-        call get_json_value(json, join(buffer), self%field_output%output_interval_unit, &
+        call get_json_value(json, join(buffer), tmp_string, &
                             is_required=.true., valid_list=valid_time_units)
+        self%field_output%output_interval_unit = get_time_unit(trim(tmp_string))
         buffer(3) = value
         call get_json_value(json, join(buffer), self%field_output%output_interval_step, is_required=.true., &
                             valid_range=[0.0d0, huge(0.0d0)])
@@ -39,7 +42,7 @@ contains
 
         write (output_unit, '(A)') "  Field Output Settings:"
         write (output_unit, '(A, A)') "    File Format: ", trim(self%file_format)
-        write (output_unit, '(A, A, F8.3)') "    Output Interval: ", trim(self%output_interval_unit), &
+        write (output_unit, '(A, A, F8.3)') "    Output Interval: ", get_time_unit_string(self%output_interval_unit), &
             self%output_interval_step
         write (output_unit, '(A)') "    Variables:"
         do i = 1, size(self%variable_names)

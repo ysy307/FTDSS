@@ -1,7 +1,7 @@
 module control_time
-    use, intrinsic :: iso_fortran_env, only: int32, real64, int64
-!$  use omp_lib
-    use :: module_core, only:allocate_array, error_message
+    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: omp_lib
+    use :: module_core
     use :: module_input, only:type_input
 
     implicit none
@@ -10,42 +10,47 @@ module control_time
     public :: type_time
 
     type :: type_time_record
-        character(20) :: label
-        character(10) :: date
-        character(10) :: time
-        character(10) :: zone
+        character(20) :: label = ''
+        character(10) :: date = ''
+        character(10) :: time = ''
+        character(10) :: zone = ''
     end type type_time_record
 
     type :: type_profiler_section
-        character(20) :: label
+        character(20) :: label = ''
         real(real64) :: total_time = 0.0d0
         real(real64) :: start_time = 0.0d0
     end type type_profiler_section
 
     type :: type_time
-        real(real64) :: start_time
-        real(real64) :: end_time
-        real(real64) :: time
-        real(real64) :: time_old
-        real(real64) :: dt
+        real(real64) :: start_time = 0.0d0
+        real(real64) :: end_time = 0.0d0
+        real(real64) :: time = 0.0d0
+        real(real64) :: time_old = 0.0d0
+        real(real64) :: dt = 0.0d0
         real(real64), allocatable :: dt_old(:)
-        real(real64) :: dt_min
-        real(real64) :: dt_max
+        real(real64) :: dt_min = 0.0d0
+        real(real64) :: dt_max = 0.0d0
         real(real64) :: time_conversion = 1.0d0
+        real(real64), allocatable :: alpha(:)
+        real(real64) :: beta = 0.0d0
+        integer(int32) :: bdf_order = 1
         type(type_time_record) :: start
         type(type_time_record) :: end
         type(type_profiler_section), allocatable :: sections(:)
     contains
-        procedure, public, pass(self) :: initialize    => initialize_type_time !&
-        procedure, public, pass(self) :: record        => record_timestamp !&
-        procedure, public, pass(self) :: profile_start => profile_start_timer !&
-        procedure, public, pass(self) :: profile_stop  => profile_stop_timer !&
+        procedure, public, pass(self) :: initialize => initialize_type_time
+        procedure, public, pass(self) :: record => record_timestamp
+        procedure, public, pass(self) :: profile_start => profile_start_timer
+        procedure, public, pass(self) :: profile_stop => profile_stop_timer
+        procedure, private, pass(self) :: compute_bdf_coefficients
+        procedure, public, pass(self) :: update_bdf_coefficients => update_bdf_coefficients_wrapper
         procedure, public, pass(self) :: get_record
         procedure, public, pass(self) :: get_time
         procedure, public, nopass :: convert_time_unit
         procedure, public, pass(self) :: shift => shift_time
-        procedure, public, pass(self) :: get_time_coefficients
         procedure, public, pass(self) :: get_dt
+        procedure, public, pass(self) :: display => display_status
     end type type_time
 
 contains
@@ -56,35 +61,62 @@ contains
         type(type_input), intent(in), optional :: input
         character(*), intent(in), optional :: profiler_sections(:)
 
+        integer(int32) :: i, istat
         real(real64) :: time_conv_coeff
 
-        integer(int32) :: i
-
         if (present(input)) then
-            time_conv_coeff = self%convert_time_unit(trim(input%conditions%time_control%time_stepping%unit), "second")
-            self%dt     = input%conditions%time_control%time_stepping%initial_step * time_conv_coeff !&
-            self%dt_max = input%conditions%time_control%time_stepping%max_step     * time_conv_coeff !&
-            self%dt_min = input%conditions%time_control%time_stepping%min_step     * time_conv_coeff !&
+            ! --- 最大BDFオーダーを取得 ---
+            self%bdf_order = input%basic%solver_settings%bdf_order
 
-            call allocate_array(self%dt_old, input%basic%solver_settings%bdf_order)
-            self%dt_old(:) = 0.0d0
+            ! --- dt 初期値/max/min ---
+            time_conv_coeff = convert_time_unit(input%conditions%time_control%time_stepping%unit, &
+                                                TIME_UNIT_SECONDS)
+            self%dt = input%conditions%time_control%time_stepping%initial_step * time_conv_coeff
+            self%dt_max = input%conditions%time_control%time_stepping%max_step * time_conv_coeff
+            self%dt_min = input%conditions%time_control%time_stepping%min_step * time_conv_coeff
 
-            if (allocated(input%output_settings%field_output%output_interval_unit)) then
-                time_conv_coeff = self%convert_time_unit(trim(input%conditions%time_control%simulation_period%unit), "second")
-                self%start_time = input%conditions%time_control%simulation_period%start * time_conv_coeff !&
-                self%end_time   = input%conditions%time_control%simulation_period%end   * time_conv_coeff !&
+            ! --- dt_old 配列確保（ゼロ初期化） ---
+            if (.not. allocated(self%dt_old)) then
+                allocate (self%dt_old(self%bdf_order), stat=istat)
+                if (istat /= 0) call error_message(981, c_opt="[initialize_type_time] failed allocating dt_old")
+            end if
+            self%dt_old = 0.0_real64
 
-                self%time_conversion = self%convert_time_unit(trim(input%output_settings%field_output%output_interval_unit), &
-                                                              trim(input%conditions%time_control%simulation_period%unit))
+            ! --- alpha 配列確保（ゼロ初期化） ---
+            if (.not. allocated(self%alpha)) then
+                allocate (self%alpha(0:self%bdf_order), stat=istat)
+                if (istat /= 0) call error_message(981, c_opt="[initialize_type_time] failed allocating alpha")
+            end if
+            self%alpha = 0.0_real64
+            self%beta = 0.0_real64
 
+            ! --- 初期 BDF 計算 (order=1) ---
+            ! 初期化時には dt_old の履歴が存在しないため，汎用計算ルーチンはエラーとなる．
+            ! そのため，安全な1次精度（後退オイラー法）の係数を直接計算・設定する．
+            call self%compute_bdf_coefficients(1)
+
+            ! --- シミュレーション開始/終了時間 ---
+            if (.not. input%output_settings%field_output%file_format == "none") then
+                time_conv_coeff = convert_time_unit(input%conditions%time_control%simulation_period%unit, &
+                                                    TIME_UNIT_SECONDS)
+                self%start_time = input%conditions%time_control%simulation_period%start * time_conv_coeff
+                self%end_time = input%conditions%time_control%simulation_period%end * time_conv_coeff
+
+                self%time_conversion = convert_time_unit(input%output_settings%field_output%output_interval_unit, &
+                                                         input%conditions%time_control%simulation_period%unit)
             end if
         end if
 
+        ! --- Profiler Sections ---
         if (present(profiler_sections)) then
             if (size(profiler_sections) > 0) then
-                allocate (self%sections(size(profiler_sections)))
+                if (allocated(self%sections)) deallocate (self%sections)
+                allocate (self%sections(size(profiler_sections)), stat=istat)
+                if (istat /= 0) call error_message(981, c_opt="[initialize_type_time] failed allocating sections")
                 do i = 1, size(profiler_sections)
                     self%sections(i)%label = trim(profiler_sections(i))
+                    self%sections(i)%total_time = 0.0_real64
+                    self%sections(i)%start_time = 0.0_real64
                 end do
             end if
         end if
@@ -94,17 +126,15 @@ contains
     subroutine record_timestamp(self, label)
         implicit none
         class(type_time), intent(inout) :: self
-        character(*), intent(in) :: label
+        integer(int32), intent(in) :: label
 
-        select case (trim(label))
-        case ("Start")
+        select case (label)
+        case (TIME_RECORD_START)
             call date_and_time(date=self%start%date, time=self%start%time, zone=self%start%zone)
-            self%start%label = label
-        case ("End")
+            self%start%label = get_time_record_string(label)
+        case (TIME_RECORD_END)
             call date_and_time(date=self%end%date, time=self%end%time, zone=self%end%zone)
-            self%end%label = label
-        case default
-            call error_message(982, c_opt=label)
+            self%end%label = get_time_record_string(label)
         end select
     end subroutine record_timestamp
 
@@ -113,35 +143,35 @@ contains
         class(type_time), intent(inout) :: self
         character(len=*), intent(in) :: label
         integer(int32) :: i
-
         do i = 1, size(self%sections)
             if (trim(self%sections(i)%label) == trim(label)) then
                 self%sections(i)%start_time = get_current_time()
                 return
             end if
         end do
-
-        call error_message(982, c_opt=label)
+        call error_message(982, c_opt="[profile_start_timer] unknown label: "//trim(label))
     end subroutine profile_start_timer
 
     subroutine profile_stop_timer(self, label)
         implicit none
         class(type_time), intent(inout) :: self
-        character(*), intent(in) :: label
+        character(len=*), intent(in) :: label
         integer(int32) :: i
         real(real64) :: end_time
 
-        end_time = get_current_time()
+        if (.not. allocated(self%sections)) then
+            call error_message(982, c_opt="[profile_stop_timer] no profiler sections allocated")
+        end if
 
+        end_time = get_current_time()
         do i = 1, size(self%sections)
             if (trim(self%sections(i)%label) == trim(label)) then
-                self%sections(i)%total_time = self%sections(i)%total_time + &
-                                              (end_time - self%sections(i)%start_time)
+                self%sections(i)%total_time = self%sections(i)%total_time + (end_time - self%sections(i)%start_time)
+                self%sections(i)%start_time = 0.0d0
                 return
             end if
         end do
-
-        call error_message(982, c_opt=label)
+        call error_message(982, c_opt="[profile_stop_timer] unknown label: "//trim(label))
     end subroutine profile_stop_timer
 
     function get_current_time() result(current_time)
@@ -150,41 +180,36 @@ contains
 #ifdef _OPENMP
         current_time = omp_get_wtime()
 #else
-        integer(int32) :: count
-        integer(int32) :: rate
+        integer(int32) :: count, rate
         call system_clock(count=count, count_rate=rate)
         current_time = real(count, kind=real64) / real(rate, kind=real64)
 #endif
     end function get_current_time
 
-    function get_record(self, label) result(record)
+    pure function get_record(self, label) result(record)
         implicit none
         class(type_time), intent(in) :: self
-        character(*), intent(in) :: label
+        integer(int32), intent(in) :: label
         character(:), allocatable :: record
 
-        select case (trim(label))
-        case ("Start")
+        select case (label)
+        case (TIME_RECORD_START)
             record = trim(self%start%label)//" Time : "// &
                      self%start%date(1:4)//"-"//self%start%date(5:6)//"-"//self%start%date(7:8)//"T"// &
                      self%start%time(1:2)//":"//self%start%time(3:4)//":"//self%start%time(5:6)//trim(self%start%zone)
-        case ("End")
-            record = trim(self%end%label)//" Time   : "// &
+        case (TIME_RECORD_END)
+            record = trim(self%end%label)//" Time : "// &
                      self%end%date(1:4)//"-"//self%end%date(5:6)//"-"//self%end%date(7:8)//"T"// &
                      self%end%time(1:2)//":"//self%end%time(3:4)//":"//self%end%time(5:6)//trim(self%end%zone)
-        case default
-            call error_message(982, c_opt=label)
         end select
-
     end function get_record
 
-    function get_time(self) result(time)
+    function get_time(self) result(t)
         implicit none
         class(type_time), intent(in) :: self
-        real(real64) :: time
+        real(real64) :: t
 
-        time = self%time * self%time_conversion
-
+        t = self%time * self%time_conversion
     end function get_time
 
     subroutine shift_time(self, reverse)
@@ -195,447 +220,250 @@ contains
         integer(int32) :: n
         logical :: do_reverse
 
-        ! reverse引数の有無と値を確認
         do_reverse = .false.
-        if (present(reverse)) then
-            do_reverse = reverse
-        end if
+        if (present(reverse)) do_reverse = reverse
+        if (.not. allocated(self%dt_old)) return
 
-        ! 配列サイズを取得
         n = size(self%dt_old)
 
         if (do_reverse) then
-            ! --- 逆方向の更新 ---
-            ! ★★★ 時間を1ステップ前に戻す処理を追加 ★★★
             self%time = self%time_old
-
-            ! dtを履歴の先頭の値に戻す
-            self%dt = self%dt_old(1)
-
-            ! dt_old配列を左に1つシフト（配列スライスを使用）
-            if (n > 1) then
-                self%dt_old(1:n - 1) = self%dt_old(2:n)
-            end if
-
-            ! 配列の末尾を0で埋める（元の仕様を踏襲）
-            if (n > 0) then
-                self%dt_old(n) = 0.0d0
-            end if
-
+            if (n > 0) self%dt = self%dt_old(1)
+            if (n > 1) self%dt_old(1:n - 1) = self%dt_old(2:n)
+            if (n > 0) self%dt_old(n) = 0.0d0
         else
-            ! --- 順方向の更新 ---
-            ! 時間を更新
             self%time_old = self%time
             self%time = self%time + self%dt
-
-            ! dt_old配列を右に1つシフト（配列スライスを使用）
-            if (n > 1) then
-                self%dt_old(2:n) = self%dt_old(1:n - 1)
-            end if
-
-            ! 配列の先頭に現在のdtを格納
-            if (n > 0) then
-                self%dt_old(1) = self%dt
-            end if
+            if (n > 1) self%dt_old(2:n) = self%dt_old(1:n - 1)
+            if (n > 0) self%dt_old(1) = self%dt
         end if
-
     end subroutine shift_time
 
-    subroutine get_time_coefficients(self, order, coefficients)
+    subroutine update_bdf_coefficients_wrapper(self, order)
         implicit none
-        class(type_time), intent(in) :: self
+        class(type_time), intent(inout) :: self
         integer(int32), intent(in) :: order
-        real(real64), intent(inout) :: coefficients(0:)
 
-        ! Local variables
-        real(real64) :: dt_n, dt_nm1, dt_nm2, dt_nm3, dt_nm4, dt_nm5
-        real(real64) :: rho1, rho2, rho3, rho4, rho5
+        integer(int32) :: i, effective_order, order_to_use
 
-        select case (order)
-        case (1) ! BDF1 (Backward Euler)
-            dt_n = self%dt
+        if (order < 1) then
+            call error_message(981, c_opt="[update_bdf_coefficients] invalid BDF order")
+        end if
+        if (.not. allocated(self%dt_old)) call error_message(981, c_opt="[update_bdf_coefficients] dt_old not allocated")
+        if (size(self%dt_old) < order) call error_message(981, c_opt="[update_bdf_coefficients] dt_old shorter than requested BDF order")
 
-            coefficients(0) = 1.0d0
-            coefficients(1) = -1.0d0
+        ! --- alpha 配列が要求される次数に対して適切か確認し，必要であれば再確保 ---
+        if (.not. allocated(self%alpha) .or. ubound(self%alpha, 1) < self%bdf_order) then
+            if (allocated(self%alpha)) deallocate (self%alpha)
+            allocate (self%alpha(0:self%bdf_order))
+        end if
 
-        case (2) ! BDF2
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            rho1 = dt_n / dt_nm1
+        ! --- 堅牢性の向上 ---
+        ! dt_old の履歴に基づいて，現在計算可能な最大のBDF次数を決定する．
+        ! BDF次数kには，k個の有効な（ゼロではない）過去のタイムステップが必要．
+        effective_order = 0
+        do i = 1, size(self%dt_old)
+            if (self%dt_old(i) <= 1.0d-15) then
+                ! 履歴がここで途切れている
+                exit
+            end if
+            effective_order = i
+        end do
 
-            coefficients(0) = (2.0d0 * rho1 + 1.0d0) / (rho1 + 1.0d0)
-            coefficients(1) = -(rho1 + 1.0d0)
-            coefficients(2) = rho1**2.0d0 / (rho1 + 1.0d0)
+        ! 要求された次数と，履歴から可能な次数のうち，小さい方を使用する．
+        order_to_use = min(order, effective_order)
+        ! 履歴がない場合(effective_order=0)でも，最低1次精度は保証する．
+        if (order_to_use < 1) order_to_use = 1
 
-        case (3)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
+        call self%compute_bdf_coefficients(order_to_use)
+    end subroutine update_bdf_coefficients_wrapper
 
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
+    subroutine compute_bdf_coefficients(self, order)
+        implicit none
+        class(type_time), intent(inout) :: self
+        integer(int32), intent(in) :: order
 
-            coefficients(0) = (3.0d0 * rho1**2.0d0 * rho2 + 4.0d0 * rho1 * rho2 + 2.0d0 * rho1 + rho2 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) / (rho2 + 1.0d0)
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) / ((rho2 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
+        integer :: j, m, n
+        real(real64), allocatable :: tau(:)
+        real(real64) :: num, denom, dLj, Lj
+        real(real64), parameter :: eps = 1.0d-15
 
-        case (4)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
-            dt_nm3 = self%dt_old(3)
+        if (abs(self%dt) <= 0.0d0) call error_message(981, c_opt="[compute_bdf_coefficients] current dt is nonpositive or zero")
 
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
-            rho3 = dt_nm2 / dt_nm3
-            coefficients(0) = (4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + 9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + 3.0d0 * rho1**2.0d0 * rho2 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + 8.0d0 * rho1 * rho2 * rho3 + &
-                               4.0d0 * rho1 * rho2 + 2.0d0 * rho1 * rho3 + 2.0d0 * rho1 + &
-                               rho2**2.0d0 * rho3 + 2.0d0 * rho2 * rho3 + rho2 + rho3 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho3 + 1.0d0))
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
-            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) &
-                              / ((rho3 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
+        ! --- BDF1（後退オイラー法）の場合 ---
+        ! BDF1はdtの履歴を必要としないため，係数は常に一定．
+        ! 履歴がない初期状態でも安全に計算できるよう，このケースを特別に処理する．
+        if (order == 1) then
+            self%alpha(0) = 1.0d0
+            self%alpha(1) = -1.0d0
+            if (ubound(self%alpha, 1) >= 2) self%alpha(2:) = 0.0d0 ! 高次の係数をクリア
+            self%beta = 1.0d0
+            self%bdf_order = 1
+            return
+        end if
 
-        case (5)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
-            dt_nm3 = self%dt_old(3)
-            dt_nm4 = self%dt_old(4)
+        ! --- BDF2以上（可変ステップサイズ）の場合 ---
+        if (order < 1) call error_message(981, c_opt="[compute_bdf_coefficients] invalid order")
+        if (.not. allocated(self%dt_old)) call error_message(981, c_opt="[compute_bdf_coefficients] dt_old not allocated")
+        if (size(self%dt_old) < order) call error_message(981, c_opt="[compute_bdf_coefficients] dt_old too short for order")
 
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
-            rho3 = dt_nm2 / dt_nm3
-            rho4 = dt_nm3 / dt_nm4
-            coefficients(0) = (5.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               16.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               8.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + &
-                               18.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
-                               9.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + &
-                               3.0d0 * rho1**2.00 * rho2 * rho4 + &
-                               3.0d0 * rho1**2.0d0 * rho2 + &
-                               8.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + &
-                               12.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4 + &
-                               16.0d0 * rho1 * rho2 * rho3 * rho4 + &
-                               8.0d0 * rho1 * rho2 * rho3 + &
-                               4.0d0 * rho1 * rho2 * rho4 + &
-                               4.0d0 * rho1 * rho2 + &
-                               2.0d0 * rho1 * rho3**2.0d0 * rho4 + &
-                               4.0d0 * rho1 * rho3 * rho4 + &
-                               2.0d0 * rho1 * rho3 + &
-                               2.0d0 * rho1 * rho4 + &
-                               2.0d0 * rho1 + &
-                               rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               rho2**2.0d0 * rho3 + &
-                               3.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               4.0d0 * rho2 * rho3 * rho4 + &
-                               2.0d0 * rho2 * rho3 + &
-                               rho2 * rho4 + &
-                               rho2 + &
-                               rho3**2.0d0 * rho4 + &
-                               2.0d0 * rho3 * rho4 + &
-                               rho3 + &
-                               rho4 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
-                                 (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho1 + 1.0d0) * (rho3 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho2 + 1.0d0) * (rho4 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0))
-            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) &
-                              / ((rho3 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(5) = -rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) &
-                              / ((rho4 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0) * &
-                                 (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                                 (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
+        ! `tau` は現在の時間 t_n を基準(0)とし，過去の時間点 t_{n-j} を現在のステップ幅 dt で正規化したもの．
+        ! tau_j = (t_{n-j} - t_n) / dt
+        allocate (tau(0:order))
+        tau(0) = 0.0d0
+        do j = 1, order
+            tau(j) = tau(j - 1) - (self%dt_old(j) / self%dt)
+        end do
 
-        case (6)
-            dt_n = self%dt
-            dt_nm1 = self%dt_old(1)
-            dt_nm2 = self%dt_old(2)
-            dt_nm3 = self%dt_old(3)
-            dt_nm4 = self%dt_old(4)
-            dt_nm5 = self%dt_old(5)
+        ! 念のためtauの重複をチェック
+        do j = 0, order
+            do m = j + 1, order
+                if (abs(tau(j) - tau(m)) < eps) then
+                    call error_message(981, c_opt="[compute_bdf_coefficients] duplicate tau values detected. Insufficient dt history.")
+                end if
+            end do
+        end do
 
-            rho1 = dt_n / dt_nm1
-            rho2 = dt_nm1 / dt_nm2
-            rho3 = dt_nm2 / dt_nm3
-            rho4 = dt_nm3 / dt_nm4
-            rho5 = dt_nm4 / dt_nm5
+        ! ラグランジュ補間多項式の微分からBDF係数（alpha）を計算する．
+        ! これは可変ステップサイズに対応した一般的な数値微分公式．
+        do j = 0, order
+            dLj = 0.0d0
+            do m = 0, order
+                if (m == j) cycle
+                num = 1.0d0
+                denom = 1.0d0
+                do n = 0, order
+                    if (n == j .or. n == m) cycle
+                    num = num * (-tau(n))
+                    denom = denom * (tau(j) - tau(n))
+                end do
+                if (abs(denom) < eps) call error_message(981, c_opt="[compute_bdf_coefficients] small denominator")
+                dLj = dLj + num / denom / (tau(j) - tau(m))
+            end do
+            self%alpha(j) = dLj
+        end do
 
-            coefficients(0) = (6.0d0 * rho1**5.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               25.0d0 * rho1**4.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               20.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               15.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               10.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               5.0d0 * rho1**4.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               40.0d0 * rho1**3.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               64.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               48.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.00 * rho4**2.00 * rho5 + &
-                               32.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               16.0d0 * rho1**3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               24.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               12.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               16.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               8.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 * rho5 + &
-                               4.0d0 * rho1**3.0d0 * rho2**2.0d0 * rho3 + &
-                               30.0d0 * rho1**2.0d0 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               72.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               54.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               18.0d0 * rho1**2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               54.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               81.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               54.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               27.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               18.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 * rho5 + &
-                               9.0d0 * rho1**2.0d0 * rho2**2.0d0 * rho3 + &
-                               12.0d0 * rho1**2.0d0 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               27.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               18.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 * rho5 + &
-                               9.0d0 * rho1**2.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 * rho5 + &
-                               12.0d0 * rho1**2.0d0 * rho2 * rho3 * rho4 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 * rho5 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho3 + &
-                               3.0d0 * rho1**2.0d0 * rho2 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho1**2.0d0 * rho2 * rho4 * rho5 + &
-                               3.0d0 * rho1**2.0d0 * rho2 * rho4 + &
-                               3.0d0 * rho1**2.0d0 * rho2 * rho5 + &
-                               3.0d0 * rho1**2.0d0 * rho2 + &
-                               10.0d0 * rho1 * rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               32.0d0 * rho1 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               16.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               8.0d0 * rho1 * rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               36.0d0 * rho1 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               54.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               18.0d0 * rho1 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               18.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               12.0d0 * rho1 * rho2**2.0d0 * rho3 * rho4 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 * rho5 + &
-                               6.0d0 * rho1 * rho2**2.0d0 * rho3 + &
-                               16.0d0 * rho1 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               36.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               24.0d0 * rho1 * rho2 * rho3**2.d0 * rho4 * rho5 + &
-                               12.0d0 * rho1 * rho2 * rho3**2.0d0 * rho4 + &
-                               24.0d0 * rho1 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
-                               32.0d0 * rho1 * rho2 * rho3 * rho4 * rho5 + &
-                               16.0d0 * rho1 * rho2 * rho3 * rho4 + &
-                               8.0d0 * rho1 * rho2 * rho3 * rho5 + &
-                               8.0d0 * rho1 * rho2 * rho3 + &
-                               4.0d0 * rho1 * rho2 * rho4**2.0d0 * rho5 + &
-                               8.0d0 * rho1 * rho2 * rho4 * rho5 + &
-                               4.0d0 * rho1 * rho2 * rho4 + &
-                               4.0d0 * rho1 * rho2 * rho5 + &
-                               4.0d0 * rho1 * rho2 + &
-                               2.0d0 * rho1 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho1 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho1 * rho3**2.0d0 * rho4 * rho5 + &
-                               2.0d0 * rho1 * rho3**2.0d0 * rho4 + &
-                               6.0d0 * rho1 * rho3 * rho4**2.0d0 * rho5 + &
-                               8.0d0 * rho1 * rho3 * rho4 * rho5 + &
-                               4.0d0 * rho1 * rho3 * rho4 + &
-                               2.0d0 * rho1 * rho3 * rho5 + &
-                               2.0d0 * rho1 * rho3 + &
-                               2.0d0 * rho1 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho1 * rho4 * rho5 + &
-                               2.0d0 * rho1 * rho4 + &
-                               2.0d0 * rho1 * rho5 + &
-                               2.0d0 * rho1 + &
-                               rho2**4.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho2**3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               3.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho2**3.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               rho2**3.0d0 * rho3**2.0d0 * rho4 + &
-                               6.0d0 * rho2**2.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               9.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 * rho5 + &
-                               3.0d0 * rho2**2.0d0 * rho3**2.0d0 * rho4 + &
-                               3.0d0 * rho2**2.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho2**2.0d0 * rho3 * rho4 * rho5 + &
-                               2.0d0 * rho2**2.0d0 * rho3 * rho4 + &
-                               rho2**2.0d0 * rho3 * rho5 + &
-                               rho2**2.0d0 * rho3 + &
-                               4.0d0 * rho2 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               9.0d0 * rho2 * rho3**2.0d0 * rho4**2.0d0 * rho5 + &
-                               6.0d0 * rho2 * rho3**2.0d0 * rho4 * rho5 + &
-                               3.0d0 * rho2 * rho3**2.0d0 * rho4 + &
-                               6.0d0 * rho2 * rho3 * rho4**2.0d0 * rho5 + &
-                               8.0d0 * rho2 * rho3 * rho4 * rho5 + &
-                               4.0d0 * rho2 * rho3 * rho4 + &
-                               2.0d0 * rho2 * rho3 * rho5 + &
-                               2.0d0 * rho2 * rho3 + &
-                               rho2 * rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho2 * rho4 * rho5 + &
-                               rho2 * rho4 + &
-                               rho2 * rho5 + &
-                               rho2 + &
-                               rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               3.0d0 * rho3**3.0d0 * rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho3**3.0d0 * rho4 * rho5 + &
-                               rho3**3.0d0 * rho4 + &
-                               3.0d0 * rho3 * rho4**2.0d0 * rho5 + &
-                               4.0d0 * rho3 * rho4 * rho5 + &
-                               2.0d0 * rho3 * rho4 + &
-                               rho3 * rho5 + &
-                               rho3 + &
-                               rho4**2.0d0 * rho5 + &
-                               2.0d0 * rho4 * rho5 + &
-                               rho4 + &
-                               rho5 + &
-                               1.0d0) / &
-                              ((rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                                rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
+        self%beta = 0.0d0
+        do j = 0, order
+            Lj = 1.0d0
+            do m = 0, order
+                if (m == j) cycle
+                Lj = Lj * (-tau(m)) / (tau(j) - tau(m))
+            end do
+            self%beta = self%beta + Lj
+        end do
 
-            coefficients(1) = -(rho1 + 1.0d0) * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho2 + 1.0d0) * (rho2 * rho3 + rho3 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 * rho5 + rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
-            coefficients(2) = rho1**2.0d0 * (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho1 + 1.0d0) * (rho3 + 1.0d0) * &
-                               (rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
-            coefficients(3) = -rho1**2.0d0 * rho2**3.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho2 + 1.0d0) * (rho4 + 1.0d0) * &
-                               (rho1 * rho2 + rho2 + 1.0d0) * &
-                               (rho4 * rho5 + rho5 + 1.0d0))
-            coefficients(4) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho3 + 1.0d0) * (rho5 + 1.0d0) * &
-                               (rho2 * rho3 + rho3 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0))
-            coefficients(5) = -rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                               rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) / &
-                              ((rho4 + 1.0d0) * (rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0))
-            coefficients(6) = rho1**2.0d0 * rho2**3.0d0 * rho3**4.0d0 * rho4**5.0d0 * rho5**6.0d0 * (rho1 + 1.0d0) * &
-                              (rho1 * rho2 + rho2 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 + rho2 * rho3 + rho3 + 1.0d0) * &
-                              (rho1 * rho2 * rho3 * rho4 + rho2 * rho3 * rho4 + rho3 * rho4 + rho4 + 1.0d0) / &
-                              ((rho5 + 1.0d0) * (rho4 * rho5 + rho5 + 1.0d0) * &
-                               (rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0) * &
-                               (rho2 * rho3 * rho4 * rho5 + rho3 * rho4 * rho5 + &
-                                rho4 * rho5 + rho5 + 1.0d0) * &
-                               (rho1 * rho2 * rho3 * rho4 * rho5 + rho2 * rho3 * rho4 * rho5 + &
-                                rho3 * rho4 * rho5 + rho4 * rho5 + rho5 + 1.0d0))
-        end select
-
-    end subroutine get_time_coefficients
+        deallocate (tau)
+        self%bdf_order = order
+    end subroutine compute_bdf_coefficients
 
     pure function get_dt(self) result(dt)
         class(type_time), intent(in) :: self
         real(real64) :: dt
-
         dt = self%dt
     end function get_dt
 
-    function convert_time_unit(source_unit, target_unit) result(coefficient)
+    pure function convert_time_unit(source_unit, target_unit) result(coefficient)
         implicit none
-        character(*), intent(in) :: source_unit
-        character(*), intent(in) :: target_unit
+        integer(int32), intent(in) :: source_unit
+        integer(int32), intent(in) :: target_unit
         real(real64) :: coefficient
         real(real64) :: source_factor, target_factor
 
-        select case (trim(source_unit))
-        case ("second")
+        select case (source_unit)
+        case (TIME_UNIT_SECONDS)
             source_factor = 1.0d0
-        case ("minute")
+        case (TIME_UNIT_MINUTES)
             source_factor = 60.0d0
-        case ("hour")
+        case (TIME_UNIT_HOURS)
             source_factor = 3600.0d0
-        case ("day")
+        case (TIME_UNIT_DAYS)
             source_factor = 86400.0d0
-        case ("year")
+        case (TIME_UNIT_YEARS)
             source_factor = 31557600.0d0
         case default
-            call error_message(981, c_opt="invalid source time unit")
+            source_factor = 1.0d0
+            ! Or error
         end select
 
-        select case (trim(target_unit))
-        case ("second")
+        select case (target_unit)
+        case (TIME_UNIT_SECONDS)
             target_factor = 1.0d0
-        case ("minute")
+        case (TIME_UNIT_MINUTES)
             target_factor = 60.0d0
-        case ("hour")
+        case (TIME_UNIT_HOURS)
             target_factor = 3600.0d0
-        case ("day")
+        case (TIME_UNIT_DAYS)
             target_factor = 86400.0d0
-        case ("year")
+        case (TIME_UNIT_YEARS)
             target_factor = 31557600.0d0
         case default
-            call error_message(981, c_opt="invalid target time unit")
+            target_factor = 1.0d0
+            ! Or error
         end select
 
         coefficient = source_factor / target_factor
-
     end function convert_time_unit
+
+    subroutine display_status(self)
+        implicit none
+        class(type_time), intent(in) :: self
+        integer :: i, lb, ub
+
+        ! --- Header ---
+        write (*, '(a)') "## Time Status"
+        write (*, '(a)') "---"
+        write (*, *)
+
+        ! --- Simulation Period ---
+        write (*, '(a)') "### Simulation Period (seconds)"
+        write (*, '(a)') "------------------------------------"
+        write (*, '(" - Start Time      : ", ES12.5)') self%start_time
+        write (*, '(" - End Time        : ", ES12.5)') self%end_time
+        if (trim(self%start%label) /= "") write (*, '(" - Start Timestamp : ", A)') self%get_record(TIME_RECORD_START)
+        if (trim(self%end%label) /= "") write (*, '(" - End Timestamp   : ", A)') self%get_record(TIME_RECORD_END)
+        write (*, *)
+
+        ! --- Current Time Step ---
+        write (*, '(a)') "### Current Time Step (seconds)"
+        write (*, '(a)') "------------------------------------"
+        write (*, '(" - Current Time    : ", ES12.5)') self%time
+        write (*, '(" - Current dt      : ", ES12.5)') self%dt
+        write (*, '(" - Min dt          : ", ES12.5)') self%dt_min
+        write (*, '(" - Max dt          : ", ES12.5)') self%dt_max
+
+        if (allocated(self%dt_old)) then
+            write (*, '(a)') "- dt History (newest first):"
+            lb = lbound(self%dt_old, 1)
+            ub = ubound(self%dt_old, 1)
+            write (*, '(100(ES12.5,1X))', advance='no') (self%dt_old(i), i=lb, ub)
+            write (*, *)
+        end if
+        write (*, *)
+
+        ! --- BDF Coefficients ---
+        if (allocated(self%alpha)) then
+            write (*, '(a)') "### BDF Coefficients"
+            write (*, '(" - Current Order   : ", I0)') self%bdf_order
+            do i = lbound(self%alpha, 1), ubound(self%alpha, 1)
+                write (*, '(" - alpha(",I0,") = ", ES12.5)') i, self%alpha(i)
+            end do
+            write (*, '(" - beta = ", ES12.5)') self%beta
+            write (*, *)
+        end if
+
+        ! --- Profiler Results ---
+        if (allocated(self%sections)) then
+            if (size(self%sections) > 0) then
+                write (*, '(a)') "### Profiler Results (seconds)"
+                write (*, '(a)') "| Section | Time        |"
+                write (*, '(a)') "|:-------:|:-----------:|"
+                do i = 1, size(self%sections)
+                    write (*, '("|", A20, "|", ES12.5, "|")') trim(self%sections(i)%label), self%sections(i)%total_time
+                end do
+                write (*, *)
+            end if
+        end if
+    end subroutine display_status
 
 end module control_time

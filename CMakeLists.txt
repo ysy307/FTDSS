@@ -34,10 +34,10 @@ elseif(BUILD_APP STREQUAL "test")
 
     if(TEST_NAME STREQUAL "input")
         list(APPEND REQUIRED_MODULES "core" "inout")
-    
-    # --- 他のテストを追加する場合は、ここに elseif を追記 ---
-    # elseif(TEST_NAME STREQUAL "domain")
-    #     list(APPEND REQUIRED_MODULES "core" "inout" "domain")
+    elseif(TEST_NAME STREQUAL "control")
+        list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control")
+    elseif(TEST_NAME STREQUAL "domain")
+        list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control" "conditions" "domain")
     
     else()
         message(WARNING "Unknown TEST_NAME: ${TEST_NAME}. No specific modules required.")
@@ -125,12 +125,7 @@ if(BUILD_APP STREQUAL "ysy_fc")
         # ... アプリケーションに必要な全てのライブラリ ...
     )
 
-    if(ENABLE_MPI AND TARGET MPI::MPI_Fortran)
-        target_link_libraries(ysy_fc PRIVATE MPI::MPI_Fortran)
-    endif()
-
 elseif(BUILD_APP STREQUAL "test")
-    # テストをビルド
     add_subdirectory(test)
 endif()
 
@@ -138,9 +133,8 @@ endif()
 # ====================================================================
 # 4. Custom Targets
 # ====================================================================
-
-# アプリケーションビルドの場合のみ 'run' ターゲットを定義
 if(BUILD_APP STREQUAL "ysy_fc" AND TARGET ysy_fc)
+    # --- メインアプリ実行 ---
     if(ENABLE_MPI)
         add_custom_target(run
             COMMAND mpirun -np 4 $<TARGET_FILE:ysy_fc>
@@ -153,5 +147,25 @@ if(BUILD_APP STREQUAL "ysy_fc" AND TARGET ysy_fc)
             DEPENDS ysy_fc
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         )
+    endif()
+elseif(BUILD_APP STREQUAL "test")
+    # --- テスト実行 ---
+    set(TEST_EXE "test_${TEST_NAME}")
+    if(TARGET ${TEST_EXE})
+        if(ENABLE_MPI)
+            add_custom_target(run_${TEST_NAME}
+                COMMAND mpirun -np 4 $<TARGET_FILE:${TEST_EXE}> >| log/output_${TEST_NAME}.md
+                DEPENDS ${TEST_EXE}
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            )
+        else()
+            add_custom_target(run_${TEST_NAME}
+                COMMAND OMP_NUM_THREADS=4 $<TARGET_FILE:${TEST_EXE}> >| log/output_${TEST_NAME}.md
+                DEPENDS ${TEST_EXE}
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            )
+        endif()
+    else()
+        message(WARNING "Test target '${TEST_EXE}' not found. No run target created.")
     endif()
 endif()
