@@ -262,24 +262,24 @@ contains
         self%dof_map%num_dof_of_physics(PHYSICS_TYPE_MECHANICAL) = self%computation_dimension
 
         current_dof_index = 1
-        if (input%basic%analysis_controls%calculate_thermal) then
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
             self%dof_map%start_dof_index(PHYSICS_TYPE_THERMAL) = current_dof_index
             current_dof_index = current_dof_index + 1
         end if
-        if (input%basic%analysis_controls%calculate_hydraulic) then
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
             self%dof_map%start_dof_index(PHYSICS_TYPE_HYDRAULIC) = current_dof_index
             current_dof_index = current_dof_index + 1
         end if
-        if (input%basic%analysis_controls%calculate_mechanical) then
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
             self%dof_map%start_dof_index(PHYSICS_TYPE_MECHANICAL) = current_dof_index
             current_dof_index = current_dof_index + self%computation_dimension
         end if
         self%dof_map%num_dof_per_node = current_dof_index - 1
 
-        select case (strip(input%basic%analysis_controls%coupling_mode))
-        case ("weak")
+        select case (input%basic%analysis_controls%coupling_mode)
+        case (COUPLING_MODE_STAGGERED)
             self%coupling_mode = COUPLING_MODE_STAGGERED
-        case ("strong")
+        case (COUPLING_MODE_MONOLITHIC)
             self%coupling_mode = COUPLING_MODE_MONOLITHIC
         end select
     end subroutine set_basic_info_and_dof_map
@@ -381,13 +381,13 @@ contains
 
         integer(int32) :: phys, ibc, ie
 
-        if (input%basic%analysis_controls%calculate_thermal) then
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
             call self%process_single_physics_bcs(PHYSICS_TYPE_THERMAL, input, controls)
         end if
-        if (input%basic%analysis_controls%calculate_hydraulic) then
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
             call self%process_single_physics_bcs(PHYSICS_TYPE_HYDRAULIC, input, controls)
         end if
-        if (input%basic%analysis_controls%calculate_mechanical) then
+        if (input%basic%analysis_controls%is_active(PHYSICS_TYPE_MECHANICAL)) then
             call self%process_single_physics_bcs(PHYSICS_TYPE_MECHANICAL, input, controls)
         end if
 
@@ -440,12 +440,12 @@ contains
         do i = 1, input%conditions%num_boundaries
             select case (physics_type_id)
             case (PHYSICS_TYPE_THERMAL)
-                if (input%conditions%boundary_conditions(i)%calculate_thermal .and. &
+                if (input%conditions%boundary_conditions(i)%physics(PHYSICS_TYPE_THERMAL)%is_active .and. &
                     any(active_region_id == input%conditions%boundary_conditions(i)%id)) then
                     bc_idx_list = [bc_idx_list, i]
                 end if
             case (PHYSICS_TYPE_HYDRAULIC)
-                if (input%conditions%boundary_conditions(i)%calculate_hydraulic .and. &
+                if (input%conditions%boundary_conditions(i)%physics(PHYSICS_TYPE_HYDRAULIC)%is_active .and. &
                     any(active_region_id == input%conditions%boundary_conditions(i)%id)) then
                     bc_idx_list = [bc_idx_list, i]
                 end if
@@ -457,15 +457,15 @@ contains
         do i = 1, size(bc_idx_list)
             select case (physics_type_id)
             case (PHYSICS_TYPE_THERMAL)
-                bc_type = get_bc_type_from_string( &
-                          input%conditions%boundary_conditions(bc_idx_list(i))%thermal%type, &
-                          physics_type_id)
+                bc_key(i) = get_bc_seq_pos( &
+                            input%conditions%boundary_conditions(bc_idx_list(i))%physics(PHYSICS_TYPE_THERMAL)%type, &
+                            bc_sequence)
             case (PHYSICS_TYPE_HYDRAULIC)
-                bc_type = get_bc_type_from_string( &
-                          input%conditions%boundary_conditions(bc_idx_list(i))%hydraulic%type, &
-                          physics_type_id)
+                bc_key(i) = get_bc_seq_pos( &
+                            input%conditions%boundary_conditions(bc_idx_list(i))%physics(PHYSICS_TYPE_HYDRAULIC)%type, &
+                            bc_sequence)
             end select
-            bc_key(i) = get_bc_seq_pos(bc_type, bc_sequence)
+
         end do
 
         ! --- Sort using the key array ---
@@ -579,13 +579,9 @@ contains
             current_group_idx = entity_id_to_group_idx_map(group_to_cell_entity_ids(i))
             select case (physics_type_id)
             case (PHYSICS_TYPE_THERMAL)
-                bc_type = get_bc_type_from_string( &
-                          input%conditions%boundary_conditions(current_group_idx)%thermal%type, &
-                          physics_type_id)
+                bc_type = input%conditions%boundary_conditions(current_group_idx)%physics(PHYSICS_TYPE_THERMAL)%type
             case (PHYSICS_TYPE_HYDRAULIC)
-                bc_type = get_bc_type_from_string( &
-                          input%conditions%boundary_conditions(current_group_idx)%hydraulic%type, &
-                          physics_type_id)
+                bc_type = input%conditions%boundary_conditions(current_group_idx)%physics(PHYSICS_TYPE_HYDRAULIC)%type
             end select
             self%physics(physics_type_id)%bcs(i)%condition = create_boundary_conditions( &
                                                              bc_type, group_to_cell_types(i), input, controls)
@@ -666,8 +662,8 @@ contains
         select case (physics_type_id)
         case (PHYSICS_TYPE_THERMAL)
             ! --- Convert type from string to integer ID using a helper function ---
-            bc_type1 = get_bc_type_from_string(input%conditions%boundary_conditions(idx1)%thermal%type, physics_type_id)
-            bc_type2 = get_bc_type_from_string(input%conditions%boundary_conditions(idx2)%thermal%type, physics_type_id)
+            bc_type1 = input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_THERMAL)%type
+            bc_type2 = input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_THERMAL)%type
 
             ! --- Compare by integer ID ---
             if (bc_type1 /= bc_type2) then
@@ -675,15 +671,15 @@ contains
             end if
 
             ! --- Safe value comparison using allocated() ---
-            alloc1 = allocated(input%conditions%boundary_conditions(idx1)%thermal%values)
-            alloc2 = allocated(input%conditions%boundary_conditions(idx2)%thermal%values)
+            alloc1 = allocated(input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_THERMAL)%values)
+            alloc2 = allocated(input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_THERMAL)%values)
 
             if (alloc1 .and. alloc2) then
-                if (size(input%conditions%boundary_conditions(idx1)%thermal%values) == &
-                    size(input%conditions%boundary_conditions(idx2)%thermal%values)) then
+                if (size(input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_THERMAL)%values) == &
+                    size(input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_THERMAL)%values)) then
 
-                    if (all(input%conditions%boundary_conditions(idx1)%thermal%values == &
-                            input%conditions%boundary_conditions(idx2)%thermal%values)) then
+                    if (all(input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_THERMAL)%values == &
+                            input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_THERMAL)%values)) then
                         is_identical = .true.
                     end if
                 end if
@@ -693,8 +689,8 @@ contains
 
         case (PHYSICS_TYPE_HYDRAULIC)
             ! --- Convert type from string to integer ID using a helper function ---
-            bc_type1 = get_bc_type_from_string(input%conditions%boundary_conditions(idx1)%hydraulic%type, physics_type_id)
-            bc_type2 = get_bc_type_from_string(input%conditions%boundary_conditions(idx2)%hydraulic%type, physics_type_id)
+            bc_type1 = input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_HYDRAULIC)%type
+            bc_type2 = input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_HYDRAULIC)%type
 
             ! --- Compare by integer ID ---
             if (bc_type1 /= bc_type2) then
@@ -702,15 +698,15 @@ contains
             end if
 
             ! --- Safe value comparison using allocated() ---
-            alloc1 = allocated(input%conditions%boundary_conditions(idx1)%hydraulic%values)
-            alloc2 = allocated(input%conditions%boundary_conditions(idx2)%hydraulic%values)
+            alloc1 = allocated(input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_HYDRAULIC)%values)
+            alloc2 = allocated(input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_HYDRAULIC)%values)
 
             if (alloc1 .and. alloc2) then
-                if (size(input%conditions%boundary_conditions(idx1)%hydraulic%values) == &
-                    size(input%conditions%boundary_conditions(idx2)%hydraulic%values)) then
+                if (size(input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_HYDRAULIC)%values) == &
+                    size(input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_HYDRAULIC)%values)) then
 
-                    if (all(input%conditions%boundary_conditions(idx1)%hydraulic%values == &
-                            input%conditions%boundary_conditions(idx2)%hydraulic%values)) then
+                    if (all(input%conditions%boundary_conditions(idx1)%physics(PHYSICS_TYPE_HYDRAULIC)%values == &
+                            input%conditions%boundary_conditions(idx2)%physics(PHYSICS_TYPE_HYDRAULIC)%values)) then
                         is_identical = .true.
                     end if
                 end if

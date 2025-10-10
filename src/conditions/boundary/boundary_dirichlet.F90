@@ -20,13 +20,14 @@ contains
 
             call deallocate_array(this%time_points)
             allocate (this%time_points, source=input%conditions%time_control%boundary_time_points)
-            time_conv = controls%time%convert_time_unit(strip(input%conditions%time_control%simulation_period%unit), "second")
+            time_conv = controls%time%convert_time_unit(input%conditions%time_control%simulation_period%unit, &
+                                                        TIME_UNIT_SECONDS)
             this%time_points = this%time_points * time_conv
 
             call deallocate_array(this%values)
             do i = 1, input%conditions%num_boundaries
                 if (input%conditions%boundary_conditions(i)%id == cell_id) then
-                    allocate (this%values, source=input%conditions%boundary_conditions(i)%thermal%values)
+                    allocate (this%values, source=input%conditions%boundary_conditions(i)%physics(PHYSICS_TYPE_THERMAL)%values)
                     exit
                 end if
             end do

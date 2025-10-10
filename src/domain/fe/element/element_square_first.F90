@@ -57,18 +57,6 @@ contains
             weight(1) = 4.0d0
             gauss(:, 1) = 0.0d0
 
-        case ("free")
-            num_gauss = 4
-            call allocate_array(weight, num_gauss)
-            call allocate_array(gauss, 3, num_gauss)
-
-            p = input%basic%geometry_settings%integration_points
-            weight(:) = 1.0d0
-            gauss(1:2, 1) = [-p, -p]
-            gauss(1:2, 2) = [p, -p]
-            gauss(1:2, 3) = [p, p]
-            gauss(1:2, 4) = [-p, p]
-            gauss(3, :) = 0.0d0
         end select
 
         ! Initialize the object with properties common to this fe type
