@@ -21,7 +21,7 @@ contains
 
         select type (p => self%parent)
         type is (type_input)
-            do i = 1, NUM_INITIAL_CONDITIONS
+            do i = 1, NUM_IC_TARGETS
 
                 select case (i)
                 case (IC_TARGET_THERMAL)

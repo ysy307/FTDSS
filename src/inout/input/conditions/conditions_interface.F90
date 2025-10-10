@@ -81,7 +81,7 @@ module inout_input_conditions
 
     type :: type_initial_conditions
         class(type_conditions), pointer :: parent => null()
-        type(type_initial_local) :: physics(NUM_INITIAL_CONDITIONS)
+        type(type_initial_local) :: physics(NUM_IC_TARGETS)
     contains
         procedure, pass(self) :: display => display_initial_conditions
     end type type_initial_conditions

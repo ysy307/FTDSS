@@ -91,7 +91,7 @@ contains
         class(type_input_geometry), intent(inout) :: self
         character(:), allocatable :: field_list(:)
 
-        character(len=256) :: temp_list(NUM_INITIAL_CONDITIONS)
+        character(len=256) :: temp_list(NUM_IC_TARGETS)
         character(len=256) :: current_field_name
 
         integer :: num_fields, i, k
@@ -102,7 +102,7 @@ contains
         select type (p => self%parent)
         type is (type_input)
             ! 全ての初期条件を整数インデックスでループ
-            do i = 1, NUM_INITIAL_CONDITIONS
+            do i = 1, NUM_IC_TARGETS
 
                 ! この解析タイプが有効でない場合はスキップ
                 if (.not. p%basic%analysis_controls%is_active(i)) cycle

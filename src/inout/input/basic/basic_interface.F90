@@ -36,7 +36,7 @@ module inout_input_basic
     end interface
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_analysis_controls
-        logical :: is_active(NUM_INITIAL_CONDITIONS)
+        logical :: is_active(NUM_IC_TARGETS)
         integer(int32) :: coupling_mode
         logical :: partitioning
     contains

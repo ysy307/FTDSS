@@ -1,4 +1,4 @@
-program test_communicator
+program test_parallel
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
     use :: module_core
@@ -14,17 +14,11 @@ program test_communicator
 
     call input%initialize()
 
-    call MPI_Comm_rank(MPI_COMM_WORLD, my_rank, ierr)
-    if (my_rank == 0) then
-        print *, "my_rank = ", my_rank
-        do i = 1, size(input%geometry%vtk%cells(:))
-            print '(a,i0)', "cell= ", i
-            print '(10(x,i0))', input%geometry%vtk%cells(i)%connectivity(:)
-        end do
-    end if
+    ! print *, input%geometry%vtk%communication_partners
 
     ! call domain%initialize(input)
     call communicator%initialize(input)
+    call communicator%display()
 
     call MPI_Finalize(ierr)
-end program
+end program test_parallel

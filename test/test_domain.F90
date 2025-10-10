@@ -22,5 +22,9 @@ program test_domain
 
     call domain%initialize(input, controls)
 
+    if (domain%my_rank == 0) then
+        call domain%display()
+    end if
+
     call MPI_Finalize(ierr)
 end program

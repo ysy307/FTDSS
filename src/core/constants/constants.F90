@@ -185,8 +185,8 @@ module core_constants
     integer(int32), parameter, public :: TIME_RECORD_END = 2
 
     ! --- Internal constants for spatial dimensions ---
-    integer(int32), parameter :: PLANE_XY = 1
-    integer(int32), parameter :: PLANE_XZ = 2
-    integer(int32), parameter :: THREE_DIM = 3
+    integer(int32), parameter, public :: COMP_TYPE_2D_XY = 1
+    integer(int32), parameter, public :: COMP_TYPE_2D_XZ = 2
+    integer(int32), parameter, public :: COMP_TYPE_3D = 3
 
 end module core_constants

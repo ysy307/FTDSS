@@ -38,6 +38,8 @@ elseif(BUILD_APP STREQUAL "test")
         list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control")
     elseif(TEST_NAME STREQUAL "domain")
         list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control" "conditions" "domain")
+    elseif(TEST_NAME STREQUAL "parallel")
+        list(APPEND REQUIRED_MODULES "core" "inout" "parallel")
     
     else()
         message(WARNING "Unknown TEST_NAME: ${TEST_NAME}. No specific modules required.")
