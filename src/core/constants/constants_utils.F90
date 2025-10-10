@@ -298,13 +298,13 @@ contains
 
         select case (strip(to_lower(key)))
         case ("thermal")
-            val = INITIAL_CONDITION_THERMAL
+            val = IC_TARGET_THERMAL
         case ("hydraulic")
-            val = INITIAL_CONDITION_HYDRAULIC
+            val = IC_TARGET_HYDRAULIC
         case ("mechanical")
-            val = INITIAL_CONDITION_MECHANICAL
+            val = IC_TARGET_MECHANICAL
         case ("porosity")
-            val = INITIAL_CONDITION_POROSITY
+            val = IC_TARGET_POROSITY
         end select
     end function get_initial_condition_physical_type
 
@@ -314,13 +314,13 @@ contains
         character(:), allocatable :: key
 
         select case (val)
-        case (INITIAL_CONDITION_THERMAL)
+        case (IC_TARGET_THERMAL)
             key = "Thermal"
-        case (INITIAL_CONDITION_HYDRAULIC)
+        case (IC_TARGET_HYDRAULIC)
             key = "Hydraulic"
-        case (INITIAL_CONDITION_MECHANICAL)
+        case (IC_TARGET_MECHANICAL)
             key = "Mechanical"
-        case (INITIAL_CONDITION_POROSITY)
+        case (IC_TARGET_POROSITY)
             key = "Porosity"
         case default
             key = "Unknown"
@@ -335,11 +335,11 @@ contains
 
         select case (strip(to_lower(key)))
         case ("uniform")
-            val = INITIAL_CONDITION_UNIFORM
+            val = IC_METHOD_UNIFORM
         case ("laplace")
-            val = INITIAL_CONDITION_LAPLACE
+            val = IC_METHOD_LAPLACE
         case ("file")
-            val = INITIAL_CONDITION_FILE
+            val = IC_METHOD_FROM_FILE
         end select
     end function get_initial_condition_type
 
@@ -349,11 +349,11 @@ contains
         character(:), allocatable :: key
 
         select case (val)
-        case (INITIAL_CONDITION_UNIFORM)
+        case (IC_METHOD_UNIFORM)
             key = "Uniform"
-        case (INITIAL_CONDITION_LAPLACE)
+        case (IC_METHOD_LAPLACE)
             key = "Laplace"
-        case (INITIAL_CONDITION_FILE)
+        case (IC_METHOD_FROM_FILE)
             key = "File"
         case default
             key = "Unknown"

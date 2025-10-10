@@ -108,7 +108,7 @@ contains
                 if (.not. p%basic%analysis_controls%is_active(i)) cycle
 
                 ! 初期条件がファイルから読み込む設定の場合のみ処理
-                if (p%conditions%initial_conditions%physics(i)%type == INITIAL_CONDITION_FILE) then
+                if (p%conditions%initial_conditions%physics(i)%type == IC_METHOD_FROM_FILE) then
 
                     ! フィールド名が割り当てられているか確認
                     if (allocated(p%conditions%initial_conditions%physics(i)%field_name)) then

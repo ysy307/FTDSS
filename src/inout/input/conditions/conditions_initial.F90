@@ -24,16 +24,16 @@ contains
             do i = 1, NUM_INITIAL_CONDITIONS
 
                 select case (i)
-                case (INITIAL_CONDITION_THERMAL)
+                case (IC_TARGET_THERMAL)
                     if (.not. p%basic%analysis_controls%is_active(i)) cycle
                     buffer(2) = thermal
-                case (INITIAL_CONDITION_HYDRAULIC)
+                case (IC_TARGET_HYDRAULIC)
                     if (.not. p%basic%analysis_controls%is_active(i)) cycle
                     buffer(2) = hydraulic
-                case (INITIAL_CONDITION_MECHANICAL)
+                case (IC_TARGET_MECHANICAL)
                     if (.not. p%basic%analysis_controls%is_active(i)) cycle
                     buffer(2) = mechanical
-                case (INITIAL_CONDITION_POROSITY)
+                case (IC_TARGET_POROSITY)
                     buffer(2) = porosity
                 end select
                 buffer(3) = type
@@ -43,13 +43,13 @@ contains
                 self%initial_conditions%physics(i)%type = get_initial_condition_type(tmp_string)
 
                 select case (self%initial_conditions%physics(i)%type)
-                case (INITIAL_CONDITION_UNIFORM)
+                case (IC_METHOD_UNIFORM)
                     buffer(3) = value
                     call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%value, &
                                         is_required=.true.)
-                case (INITIAL_CONDITION_LAPLACE)
+                case (IC_METHOD_LAPLACE)
                     ! No additional parameters needed for laplace
-                case (INITIAL_CONDITION_FILE)
+                case (IC_METHOD_FROM_FILE)
                     buffer(3) = field_name
                     call get_json_value(json, join(buffer), self%initial_conditions%physics(i)%field_name, &
                                         is_required=.true.)
@@ -69,13 +69,13 @@ contains
         type is (type_input)
 
             if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_THERMAL)) then
-                call display_initial_local(self%physics, "Thermal", INITIAL_CONDITION_THERMAL)
+                call display_initial_local(self%physics, "Thermal", IC_TARGET_THERMAL)
             end if
             if (p%basic%analysis_controls%is_active(PHYSICS_TYPE_HYDRAULIC)) then
-                call display_initial_local(self%physics, "Hydraulic", INITIAL_CONDITION_HYDRAULIC)
+                call display_initial_local(self%physics, "Hydraulic", IC_TARGET_HYDRAULIC)
             end if
 
-            call display_initial_local(self%physics, "Porosity", INITIAL_CONDITION_POROSITY)
+            call display_initial_local(self%physics, "Porosity", IC_TARGET_POROSITY)
 
         end select
 
@@ -91,11 +91,11 @@ contains
         write (*, '(A, A)') "      Type: ", get_initial_condition_type_string(fields(target_ic_id)%type)
 
         select case (fields(target_ic_id)%type)
-        case (INITIAL_CONDITION_UNIFORM)
+        case (IC_METHOD_UNIFORM)
             write (*, '(A, F8.3)') "      Value: ", fields(target_ic_id)%value
-        case (INITIAL_CONDITION_LAPLACE)
+        case (IC_METHOD_LAPLACE)
             write (*, '(A)') "      Value: Laplace equation will be solved"
-        case (INITIAL_CONDITION_FILE)
+        case (IC_METHOD_FROM_FILE)
             write (*, '(A, A)') "      Field Name: ", trim(fields(target_ic_id)%field_name)
         case default
             write (*, '(A)') "      Unknown type"

@@ -27,7 +27,8 @@ contains
             call deallocate_array(this%values)
             do i = 1, input%conditions%num_boundaries
                 if (input%conditions%boundary_conditions(i)%id == cell_id) then
-                    allocate (this%values, source=input%conditions%boundary_conditions(i)%physics(PHYSICS_TYPE_THERMAL)%values)
+                    call allocate_array(this%values, &
+                                        source=input%conditions%boundary_conditions(i)%physics(PHYSICS_TYPE_THERMAL)%values)
                     exit
                 end if
             end do
