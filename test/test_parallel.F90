@@ -17,7 +17,7 @@ program test_parallel
     ! print *, input%geometry%vtk%communication_partners
 
     ! call domain%initialize(input)
-    call communicator%initialize(input)
+    call communicator%initialize(input, MPI_COMM_WORLD)
     call communicator%display()
 
     call MPI_Finalize(ierr)

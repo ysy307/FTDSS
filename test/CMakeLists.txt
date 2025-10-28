@@ -37,6 +37,19 @@ elseif(TEST_NAME STREQUAL "domain")
         Solver::Domain
     )
     add_test(NAME test_domain COMMAND $<TARGET_FILE:test_domain>)
+elseif(TEST_NAME STREQUAL "field")
+    add_executable(test_field test_field.F90)
+    set_target_properties(test_field PROPERTIES LINKER_LANGUAGE Fortran)
+    target_link_libraries(test_field PRIVATE
+        Solver::Core
+        Solver::Input
+        Solver::Linalg
+        Solver::Control
+        Solver::Conditions
+        Solver::Domain
+        Solver::Field
+    )
+    add_test(NAME test_field COMMAND $<TARGET_FILE:test_field>)
 elseif(TEST_NAME STREQUAL "parallel")
     add_executable(test_parallel test_parallel.F90)
     set_target_properties(test_parallel PROPERTIES LINKER_LANGUAGE Fortran)

@@ -27,6 +27,8 @@ module field_jacobian_matrix
         procedure, public, pass(self) :: get_size => get_size_jacobian_matrix
         procedure, public, pass(self) :: get_matrix_type => get_matrix_type_jacobian_matrix
         procedure, public, pass(self) :: get_matrix => get_matrix_jacobian_matrix
+        procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_jacobian_matrix
+        procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node
 
         ! --- 修正: ローカルインデックスAPIに統一 ---
         procedure, private, pass(self) :: set_value_local => set_value_jacobian_matrix
@@ -34,6 +36,8 @@ module field_jacobian_matrix
         procedure, private, pass(self) :: add_local_matrix => add_local_jacobian_matrix
         generic, public :: set => set_value_local
         generic, public :: add => add_value_local, add_local_matrix
+
+        procedure, public, pass(self) :: display => display_jacobian_matrix
 
         procedure, public, pass(self) :: zero => zero_jacobian_matrix
         procedure, public, pass(self) :: get_matrix_block => get_matrix_jacobian_block_matrix
@@ -140,6 +144,20 @@ contains
 
         matrix => self%get_matrix_block(row_dof, col_dof)
     end function get_matrix_jacobian_matrix
+
+    pure function get_coupling_mode_jacobian_matrix(self) result(coupling_mode)
+        implicit none
+        class(type_jacobian_matrix), intent(in) :: self
+        integer(int32) :: coupling_mode
+        coupling_mode = self%coupling_mode
+    end function
+
+    pure function get_num_dofs_per_node(self) result(num_dofs)
+        implicit none
+        class(type_jacobian_matrix), intent(in) :: self
+        integer(int32) :: num_dofs
+        num_dofs = self%num_dofs_per_node
+    end function
     ! -------------------------------------------------------------------
     !  Setters / Adders (ローカルインデックスAPI)
     ! -------------------------------------------------------------------
@@ -258,5 +276,35 @@ contains
             end if
         end select
     end function get_matrix_jacobian_block_matrix
+
+    subroutine display_jacobian_matrix(self)
+        implicit none
+        class(type_jacobian_matrix), intent(in) :: self
+        integer(int32) :: i, j
+
+        if (.not. allocated(self%data)) then
+            write (*, '(A)') 'Jacobian Matrix is not allocated.'
+            return
+        end if
+
+        write (*, '(A)') '--- Jacobian Matrix ---'
+        write (*, '(A, I0)') 'Matrix Type: ', self%matrix_type
+        write (*, '(A, I0)') 'Coupling Mode: ', self%coupling_mode
+        write (*, '(A, I0)') 'Size (total DOFs): ', self%size
+        write (*, '(A, I0)') 'Number of DOFs per Node: ', self%num_dofs_per_node
+        write (*, '(A)') '-----------------------'
+
+        do i = 1, size(self%data, 1)
+            do j = 1, size(self%data, 2)
+                write (*, '(A, I0, A, I0)') 'Block (', i, ',', j, '):'
+                if (allocated(self%data(i, j)%m)) then
+                    call self%data(i, j)%m%display()
+                else
+                    write (*, '(A)') '  [Not allocated]'
+                end if
+            end do
+        end do
+        write (*, '(A)') '-----------------------'
+    end subroutine display_jacobian_matrix
 
 end module field_jacobian_matrix

@@ -23,4 +23,8 @@ module core_parallel_constants
     !> Ranks not involved for this node
     integer(int32), parameter, public :: ROLE_NONE = -1
 
+    ! Communication operations
+    integer(int32), parameter, public :: OP_UPDATE = 1
+    integer(int32), parameter, public :: OP_ASSEMBLE = 2
+
 end module core_parallel_constants

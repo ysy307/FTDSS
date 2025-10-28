@@ -39,6 +39,10 @@ module field_residual_vector
         generic, public :: add => add_value_residual_vector, add_array_residual_vector, &
             add_value_at_index_residual_vector, add_values_at_indices_residual_vector
         procedure, pass(self), public :: zero => zero_residual_vector
+
+        procedure, public, pass(self) :: scale => scale_residual_vector
+
+        procedure, public, pass(self) :: display => display_residual_vector
     end type type_residual_vector
 
 contains
@@ -158,6 +162,18 @@ contains
         call self%data(row_dof)%add(global_indices, values)
     end subroutine add_values_at_indices_residual_vector
 
+    subroutine scale_residual_vector(self, alpha)
+        implicit none
+        class(type_residual_vector), intent(inout) :: self
+        real(real64), intent(in) :: alpha
+
+        integer(int32) :: i
+
+        do i = 1, self%num_dofs_per_node
+            call self%data(i)%scale(alpha)
+        end do
+    end subroutine scale_residual_vector
+
     subroutine zero_residual_vector(self)
         implicit none
         class(type_residual_vector), intent(inout) :: self
@@ -187,5 +203,18 @@ contains
         self%coupling_mode = -1
 
     end subroutine destroy_residual_vector
+
+    subroutine display_residual_vector(self)
+        implicit none
+        class(type_residual_vector), intent(in) :: self
+
+        integer(int32) :: i
+
+        write (*, '(A)') 'Residual Vector:'
+        do i = 1, self%num_dofs_per_node
+            write (*, '(A,I0)') '  DOF ', i
+        end do
+
+    end subroutine display_residual_vector
 
 end module field_residual_vector

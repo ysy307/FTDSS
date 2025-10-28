@@ -1,428 +1,662 @@
-!>
-!> @brief Halo (ゴーストセル) 通信を管理するモジュール
+!> @brief 並列プロセス間のハロー領域データ通信を管理するモジュール．
 !> @details
-!> MPIを用いた並列計算において、領域境界に配置されたノード (ハロ) の
-!> データ交換を効率的に行うためのデータ構造と手続きを提供します.
-!>
-!> ---
-!> @usage
-!> 1. `type(type_halo_communicator)` の変数を宣言します.
-!>    `type(type_halo_communicator) :: halo_comm`
-!> 2. `initialize` を呼び出し、メッシュ情報から通信スケジュールを構築します.
-!>    `call halo_comm%initialize(input)`
-!> 3. `display` (任意) を呼び出して、構築されたスケジュールをデバッグします.
-!>    `call halo_comm%display()`
-!> 4. `update_halo` を呼び出して、スカラー場やベクトル場のハロデータを更新します.
-!>    `call update_halo(halo_comm, temperature_field)`
-!>    `call update_halo(halo_comm, velocity_field, num_components=3)`
-!> ---
-!> @note
-!> MPI通信には `MPI_Neighbor_alltoallv` を使用しています.
-!> 最高のパフォーマンスを得るには、事前に `MPI_Dist_graph_create_adjacent` などで
-!> トポロジ情報を持つコミュニケータを作成し、それを渡すことが推奨されます.
-!>
+!> このモジュールは，領域分割されたメッシュにおけるプロセス境界（ハロー）の
+!> データ交換（update）および集計（assemble）を行うためのコミュニケータを提供します．
+!> MPIを用いた非同期通信により，スカラー値およびベクトル値の効率的なデータ交換を実現します．
 module parallel_communicator
     use, intrinsic :: iso_fortran_env
     use :: mpi_f08
+    use :: module_core
     use :: module_input, only:type_input
-    use :: module_core, only:NODE_BORDER, NODE_HALO, ROLE_OWNER, ROLE_RECEIVER
+    use :: core_findings, only:binary_find
+
     implicit none
     private
 
+    ! 通信操作の種類を定義するパラメータ
+    integer(int32), private, parameter :: OP_UPDATE = 1 !< 値を上書きする操作
+    integer(int32), private, parameter :: OP_ASSEMBLE = 2 !< 値を加算する操作
+
     public :: type_halo_communicator
-    public :: update_halo
 
-    !>
-    !> @brief 異なるデータ型・ランクの配列に対応するハロ更新の汎用インターフェース
-    !>
-    interface update_halo
-        module procedure update_halo_scalar
-        module procedure update_halo_vector
-    end interface
-
-    !>
-    !> @brief ハロ交換に必要な全てのデータ構造と操作をカプセル化する型
-    !>
+    !> @brief ハロー通信を管理するデータ型
     type :: type_halo_communicator
         private
+        ! -- MPI関連情報 --
         integer(int32) :: my_rank = -1
         integer(int32) :: num_procs = -1
+        type(MPI_Comm) :: comm = MPI_COMM_NULL
+
+        ! -- 通信パートナー情報 --
         integer(int32) :: num_partners = 0
         integer(int32), allocatable :: partners(:)
 
-        ! Send-related data
-        integer(int32), allocatable :: send_counts(:), send_displs(:)
-        integer(int32), allocatable :: send_indices(:)
+        ! -- 通信スケジュール (スカラー用) --
+        integer(int32), allocatable :: send_counts(:)
+        integer(int32), allocatable :: send_displs(:)
+        integer(int32), allocatable :: recv_counts(:)
+        integer(int32), allocatable :: recv_displs(:)
 
-        ! Receive-related data
-        integer(int32), allocatable :: recv_counts(:), recv_displs(:)
-        integer(int32), allocatable :: recv_indices(:)
+        ! -- 通信スケジュール (ベクトル用) --
+        integer(int32), allocatable :: send_counts_vector(:)
+        integer(int32), allocatable :: send_displs_vector(:)
+        integer(int32), allocatable :: recv_counts_vector(:)
+        integer(int32), allocatable :: recv_displs_vector(:)
+
+        ! -- データインデックス --
+        integer(int32), allocatable :: send_indices(:) !< 送信するローカルノードのインデックス
+        integer(int32), allocatable :: recv_indices(:) !< 受信するハローノードのインデックス
+
+        ! -- 送受信バッファ --
+        real(real64), allocatable :: send_buf(:)
+        real(real64), allocatable :: recv_buf(:)
+
+        ! -- GID検索用データ --
+        integer(int64), allocatable :: sorted_local_gids(:) !< ソート済みの自領域境界ノードのGID
+        integer(int32), allocatable :: sorted_local_lids(:) !< 上記GIDに対応するLID
+
+        logical :: is_initialized = .false.
 
     contains
-        procedure, pass(self), public :: initialize => initialize_halo_communicator
-        procedure, pass(self), public :: display => display_communicator_state
-        procedure, pass(self), private :: build_communication_schedule
+        procedure, pass(self) :: initialize => initialize_halo_communicator
+        procedure, pass(self) :: display => display_communicator_state
+        final :: destroy_halo_communicator
+
+        procedure, pass(self) :: update_scalar
+        procedure, pass(self) :: update_vector
+        procedure, pass(self) :: assemble_scalar
+        procedure, pass(self) :: assemble_vector
+
+        generic, public :: update => update_scalar, update_vector
+        generic, public :: assemble => assemble_scalar, assemble_vector
+
+        ! -- private methods --
+        procedure, private, pass(self) :: build_communication_schedule
+        procedure, private, pass(self) :: setup_local_sorted_nodes
+        procedure, private, pass(self) :: exchange_communication_plan
+        procedure, private, pass(self) :: exchange_gids_and_build_indices
+
+        procedure, private, pass(self) :: exchange_and_operate_scalar_impl
+        procedure, private, pass(self) :: exchange_and_operate_vector_impl
+        procedure, private, pass(self) :: ensure_buffers_ready
     end type type_halo_communicator
 
-    !>
-    !> @brief 動的に拡張可能な整数リストを管理する型 (64-bit版も追加)
-    !>
-    type :: dynamic_int32_list
-        integer(int32), allocatable :: data(:)
-    end type dynamic_int32_list
-
-    type :: dynamic_int64_list
-        integer(int64), allocatable :: data(:)
-    end type dynamic_int64_list
+    interface swap
+        procedure swap_i32
+        procedure swap_i64
+    end interface
 
 contains
 
-    !>
-    !> @brief Halo communicatorを初期化し、通信スケジュールを構築する
-    !> @param[inout] self Halo communicatorオブジェクト
-    !> @param[in]    input メッシュ情報を含む入力データオブジェクト
-    !>
-    subroutine initialize_halo_communicator(self, input)
+    !> @brief コミュニケータを初期化する．
+    subroutine initialize_halo_communicator(self, input, comm_in)
         class(type_halo_communicator), intent(inout) :: self
         class(type_input), intent(in) :: input
-        integer(int32) :: rank_tmp, size_tmp
+        type(MPI_Comm), intent(in) :: comm_in
+        integer(int32) :: ierr
 
-        call MPI_Comm_rank(MPI_COMM_WORLD, rank_tmp)
-        call MPI_Comm_size(MPI_COMM_WORLD, size_tmp)
-        self%my_rank = rank_tmp
-        self%num_procs = size_tmp
+        if (self%is_initialized) return
 
-        ! ! メッシュに分散情報(communication_partners)がなければ何もしない
-        ! if (.not. associated(input%geometry%vtk%communication_partners)) then
-        !     self%num_partners = 0
-        !     return
-        ! end if
-        ! ! グローバルIDがなければエラー (Two-Pass方式に必須)
-        ! if (.not. associated(input%geometry%vtk%global_node_id)) then
-        !     call handle_error(99, "global_node_id is required for building communication schedule.")
-        ! end if
+        self%comm = comm_in
+        call MPI_Comm_rank(self%comm, self%my_rank, ierr)
+        call handle_mpi_error(ierr, "MPI_Comm_rank in initialize")
+        call MPI_Comm_size(self%comm, self%num_procs, ierr)
+        call handle_mpi_error(ierr, "MPI_Comm_size in initialize")
 
         call self%build_communication_schedule(input)
+
+        self%is_initialized = .true.
     end subroutine initialize_halo_communicator
 
-    !>
-    !> @brief スカラー場 (1次元配列) のハロデータを更新する
-    !>
-    subroutine update_halo_scalar(self, data_array)
-        class(type_halo_communicator), intent(in) :: self
+    !> @brief コミュニケータを破棄し，メモリを解放する．
+    subroutine destroy_halo_communicator(self)
+        type(type_halo_communicator), intent(inout) :: self
+
+        call deallocate_array(self%partners)
+        call deallocate_array(self%send_counts)
+        call deallocate_array(self%recv_counts)
+        call deallocate_array(self%send_displs)
+        call deallocate_array(self%recv_displs)
+        call deallocate_array(self%send_indices)
+        call deallocate_array(self%recv_indices)
+        call deallocate_array(self%send_buf)
+        call deallocate_array(self%recv_buf)
+        call deallocate_array(self%send_counts_vector)
+        call deallocate_array(self%send_displs_vector)
+        call deallocate_array(self%recv_counts_vector)
+        call deallocate_array(self%recv_displs_vector)
+        call deallocate_array(self%sorted_local_gids)
+        call deallocate_array(self%sorted_local_lids)
+
+        self%comm = MPI_COMM_NULL
+        self%is_initialized = .false.
+    end subroutine destroy_halo_communicator
+
+    !> @brief スカラーデータを更新（上書き）する．
+    subroutine update_scalar(self, data_array)
+        class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:)
-        real(real64), allocatable :: send_buffer(:), recv_buffer(:)
-        integer(int32) :: total_sends, total_recvs, stat
-        integer :: ierror
+        call self%exchange_and_operate_scalar_impl(data_array, OP_UPDATE)
+    end subroutine update_scalar
 
-        if (self%num_partners == 0) return
+    !> @brief スカラーデータを集計（加算）する．
+    subroutine assemble_scalar(self, data_array)
+        class(type_halo_communicator), intent(inout) :: self
+        real(real64), intent(inout) :: data_array(:)
+        call self%exchange_and_operate_scalar_impl(data_array, OP_ASSEMBLE)
+    end subroutine assemble_scalar
 
-        total_sends = sum(self%send_counts)
-        total_recvs = sum(self%recv_counts)
-        allocate (send_buffer(total_sends), stat=stat)
-        call handle_error(stat, "allocating send_buffer in scalar update")
-        allocate (recv_buffer(total_recvs), stat=stat)
-        call handle_error(stat, "allocating recv_buffer in scalar update")
-
-        send_buffer = data_array(self%send_indices)
-
-        call MPI_Neighbor_alltoallv(send_buffer, self%send_counts, self%send_displs, MPI_DOUBLE_PRECISION, &
-                                    recv_buffer, self%recv_counts, self%recv_displs, MPI_DOUBLE_PRECISION, &
-                                    MPI_COMM_WORLD, ierror)
-        call handle_error(ierror, "MPI_Neighbor_alltoallv in scalar update")
-
-        data_array(self%recv_indices) = recv_buffer
-
-        deallocate (send_buffer, recv_buffer)
-    end subroutine update_halo_scalar
-
-    !>
-    !> @brief ベクトル場 (2次元配列) のハロデータを更新する
-    !>
-    subroutine update_halo_vector(self, data_array, num_components)
-        class(type_halo_communicator), intent(in) :: self
+    !> @brief ベクトルデータを更新（上書き）する．
+    subroutine update_vector(self, data_array, num_components)
+        class(type_halo_communicator), intent(inout) :: self
         real(real64), intent(inout) :: data_array(:, :)
         integer(int32), intent(in) :: num_components
-        real(real64), allocatable :: send_buffer(:), recv_buffer(:)
-        integer(int32), allocatable :: send_counts_vec(:), send_displs_vec(:)
-        integer(int32), allocatable :: recv_counts_vec(:), recv_displs_vec(:)
-        integer(int32) :: total_sends, total_recvs, i, stat
-        integer :: ierror
+        call self%exchange_and_operate_vector_impl(data_array, num_components, OP_UPDATE)
+    end subroutine update_vector
 
-        if (self%num_partners == 0) return
+    !> @brief ベクトルデータを集計（加算）する．
+    subroutine assemble_vector(self, data_array, num_components)
+        class(type_halo_communicator), intent(inout) :: self
+        real(real64), intent(inout) :: data_array(:, :)
+        integer(int32), intent(in) :: num_components
+        call self%exchange_and_operate_vector_impl(data_array, num_components, OP_ASSEMBLE)
+    end subroutine assemble_vector
 
-        total_sends = sum(self%send_counts)
-        total_recvs = sum(self%recv_counts)
-        allocate (send_buffer(total_sends * num_components), stat=stat)
-        call handle_error(stat, "allocating send_buffer in vector update")
-        allocate (recv_buffer(total_recvs * num_components), stat=stat)
-        call handle_error(stat, "allocating recv_buffer in vector update")
+    !> @brief スカラーデータの送受信と操作を実行する内部実装．
+    subroutine exchange_and_operate_scalar_impl(self, data_array, operation)
+        class(type_halo_communicator), intent(inout) :: self
+        real(real64), intent(inout) :: data_array(:)
+        integer(int32), intent(in) :: operation
+        integer(int32) :: i, ierr, total_send_nodes, total_recv_nodes
+        type(MPI_Request), allocatable :: reqs(:)
+        type(MPI_Status), allocatable :: statuses(:)
 
-        do i = 1, total_sends
-            send_buffer((i - 1) * num_components + 1:i * num_components) = data_array(:, self%send_indices(i))
+        if (.not. self%is_initialized .or. self%comm == MPI_COMM_NULL .or. self%num_partners == 0) return
+
+        total_send_nodes = sum(self%send_counts)
+        total_recv_nodes = sum(self%recv_counts)
+        call self%ensure_buffers_ready(total_send_nodes, total_recv_nodes)
+
+        if (total_send_nodes > 0) then
+            self%send_buf(1:total_send_nodes) = data_array(self%send_indices(1:total_send_nodes))
+        end if
+
+        allocate (reqs(self%num_partners * 2), statuses(self%num_partners * 2))
+
+        do i = 1, self%num_partners
+            call MPI_Irecv(self%recv_buf(self%recv_displs(i) + 1), self%recv_counts(i), MPI_DOUBLE_PRECISION, &
+                           self%partners(i), 0, self%comm, reqs(i), ierr)
+            call handle_mpi_error(ierr, "MPI_Irecv loop")
         end do
 
-        allocate (send_counts_vec(self%num_partners), send_displs_vec(self%num_partners), &
-                  recv_counts_vec(self%num_partners), recv_displs_vec(self%num_partners), stat=stat)
-        call handle_error(stat, "allocating vector count/displ arrays")
-        send_counts_vec = self%send_counts * num_components
-        send_displs_vec = self%send_displs * num_components
-        recv_counts_vec = self%recv_counts * num_components
-        recv_displs_vec = self%recv_displs * num_components
-
-        call MPI_Neighbor_alltoallv(send_buffer, send_counts_vec, send_displs_vec, MPI_DOUBLE_PRECISION, &
-                                    recv_buffer, recv_counts_vec, recv_displs_vec, MPI_DOUBLE_PRECISION, &
-                                    MPI_COMM_WORLD, ierror)
-        call handle_error(ierror, "MPI_Neighbor_alltoallv in vector update")
-
-        do i = 1, total_recvs
-            data_array(:, self%recv_indices(i)) = recv_buffer((i - 1) * num_components + 1:i * num_components)
+        do i = 1, self%num_partners
+            call MPI_Isend(self%send_buf(self%send_displs(i) + 1), self%send_counts(i), MPI_DOUBLE_PRECISION, &
+                           self%partners(i), 0, self%comm, reqs(self%num_partners + i), ierr)
+            call handle_mpi_error(ierr, "MPI_Isend loop")
         end do
 
-        deallocate (send_buffer, recv_buffer)
-        deallocate (send_counts_vec, send_displs_vec, recv_counts_vec, recv_displs_vec)
-    end subroutine update_halo_vector
+        call MPI_Waitall(self%num_partners * 2, reqs, statuses, ierr)
+        call handle_mpi_error(ierr, "MPI_Waitall for scalar exchange")
 
-    !>
-    !> @brief Communicatorの内部状態をMarkdown形式でデバッグ出力する
-    !>
-    subroutine display_communicator_state(self)
-        class(type_halo_communicator), intent(in) :: self
-        integer :: i, p, rank_to_print, start_idx, end_idx
+        deallocate (reqs, statuses)
 
-        call MPI_Barrier(MPI_COMM_WORLD)
-        do rank_to_print = 0, self%num_procs - 1
-            if (self%my_rank == rank_to_print) then
-                write (*, '(A)') '---'
-                write (*, '("### Halo Communicator State [Rank ", I0, "/", I0, "]")') self%my_rank, self%num_procs
-                write (*, *)
-                if (self%num_partners == 0) then
-                    write (*, '(A)') 'This rank has no communication partners.'
-                else
-                    write (*, '("**Summary:** ", I0, " communication partner(s).")') self%num_partners
-                    write (*, '(A)') '| Partner Rank | Send Count | Recv Count | Send Displ | Recv Displ |'
-                    write (*, '(A)') '|--------------|------------|------------|------------|------------|'
-                    do i = 1, self%num_partners
-                        write (*, '("| ", I12, " | ", I10, " | ", I10, " | ", I10, " | ", I10, " |")') &
-                            self%partners(i), self%send_counts(i), self%recv_counts(i), &
-                            self%send_displs(i), self%recv_displs(i)
-                    end do
-                    write (*, *)
-                    write (*, '(A)') '#### Detailed Send/Receive Node Indices'
-                    do i = 1, self%num_partners
-                        p = self%partners(i)
-                        write (*, '(" - **To/From Rank `", I0, "`**:")') p
-                        start_idx = self%send_displs(i) + 1
-                        end_idx = self%send_displs(i) + self%send_counts(i)
-                        if (start_idx <= end_idx) then
-                            write (*, '("   - `send_indices`: ", 15(I0, ", "))') self%send_indices(start_idx:end_idx)
-                        end if
-                        start_idx = self%recv_displs(i) + 1
-                        end_idx = self%recv_displs(i) + self%recv_counts(i)
-                        if (start_idx <= end_idx) then
-                            write (*, '("   - `recv_indices`: ", 15(I0, ", "))') self%recv_indices(start_idx:end_idx)
-                        end if
-                    end do
-                end if
-            end if
-            call MPI_Barrier(MPI_COMM_WORLD)
+        if (total_recv_nodes > 0) then
+            select case (operation)
+            case (OP_UPDATE)
+                data_array(self%recv_indices(1:total_recv_nodes)) = self%recv_buf(1:total_recv_nodes)
+            case (OP_ASSEMBLE)
+                data_array(self%recv_indices(1:total_recv_nodes)) = data_array(self%recv_indices(1:total_recv_nodes)) + &
+                                                                    self%recv_buf(1:total_recv_nodes)
+            end select
+        end if
+    end subroutine exchange_and_operate_scalar_impl
+
+    !> @brief ベクトルデータの送受信と操作を実行する内部実装．
+    subroutine exchange_and_operate_vector_impl(self, data_array, num_components, operation)
+        class(type_halo_communicator), intent(inout) :: self
+        real(real64), intent(inout) :: data_array(:, :)
+        integer(int32), intent(in) :: num_components
+        integer(int32), intent(in) :: operation
+        integer(int32) :: i, total_send_nodes, total_recv_nodes, total_send_values, total_recv_values, ierr
+        type(MPI_Request), allocatable :: reqs(:)
+        type(MPI_Status), allocatable :: statuses(:)
+
+        if (.not. self%is_initialized .or. self%comm == MPI_COMM_NULL .or. self%num_partners == 0 .or. num_components <= 0) return
+
+        total_send_nodes = sum(self%send_counts)
+        total_recv_nodes = sum(self%recv_counts)
+        total_send_values = total_send_nodes * num_components
+        total_recv_values = total_recv_nodes * num_components
+
+        call self%ensure_buffers_ready(total_send_values, total_recv_values, num_components)
+
+        if (total_send_nodes > 0) then
+            do i = 1, total_send_nodes
+                self%send_buf((i - 1) * num_components + 1:i * num_components) = data_array(:, self%send_indices(i))
+            end do
+        end if
+
+        allocate (reqs(self%num_partners * 2), statuses(self%num_partners * 2))
+
+        do i = 1, self%num_partners
+            call MPI_Irecv(self%recv_buf(self%recv_displs_vector(i) + 1), self%recv_counts_vector(i), MPI_DOUBLE_PRECISION, &
+                           self%partners(i), 1, self%comm, reqs(i), ierr)
+            call handle_mpi_error(ierr, "MPI_Irecv loop for vector")
         end do
-    end subroutine display_communicator_state
 
-    ! ======================================================================
-    ! PRIVATE SUBROUTINES
-    ! ======================================================================
+        do i = 1, self%num_partners
+            call MPI_Isend(self%send_buf(self%send_displs_vector(i) + 1), self%send_counts_vector(i), MPI_DOUBLE_PRECISION, &
+                           self%partners(i), 1, self%comm, reqs(self%num_partners + i), ierr)
+            call handle_mpi_error(ierr, "MPI_Isend loop for vector")
+        end do
 
-    !>
-    !> @brief Two-Pass方式で堅牢な通信スケジュールを構築する
-    !> @details
-    !> Pass 1: 各プロセスが必要とするノードのグローバルIDをオーナープロセスに要求する.
-    !> Pass 2: 要求を受け取ったプロセスが、対応するローカルノードのインデックスを送信リストに加える.
-    !> これにより、送受信の数と順序の整合性を保証する.
-    !>
+        call MPI_Waitall(self%num_partners * 2, reqs, statuses, ierr)
+        call handle_mpi_error(ierr, "MPI_Waitall for vector exchange")
+
+        deallocate (reqs, statuses)
+
+        if (total_recv_nodes > 0) then
+            select case (operation)
+            case (OP_UPDATE)
+                do i = 1, total_recv_nodes
+                    data_array(:, self%recv_indices(i)) = self%recv_buf((i - 1) * num_components + 1:i * num_components)
+                end do
+            case (OP_ASSEMBLE)
+                do i = 1, total_recv_nodes
+                    data_array(:, self%recv_indices(i)) = data_array(:, self%recv_indices(i)) + &
+                                                          self%recv_buf((i - 1) * num_components + 1:i * num_components)
+                end do
+            end select
+        end if
+    end subroutine exchange_and_operate_vector_impl
+
+    !--------------------------------------------------------------------------
+    ! 通信スケジュール構築関連のサブルーチン群
+    !--------------------------------------------------------------------------
+
+    !> @brief 通信スケジュールを構築する．（メインルーチン）
     subroutine build_communication_schedule(self, input)
         class(type_halo_communicator), intent(inout) :: self
         class(type_input), intent(in) :: input
-
-        integer(int32) :: i, p, stat, ierror, total_send_reqs, total_recv_reqs
-        integer(int32), allocatable :: send_counts_req(:), recv_counts_req(:)
-        integer(int32), allocatable :: send_displs_req(:), recv_displs_req(:)
-        integer(int64), allocatable :: send_buffer_gid(:), recv_buffer_gid(:)
-        logical, allocatable :: is_partner_flag(:)
-
-        type(dynamic_int64_list), allocatable :: requests_to_send(:) !< [GID] to send to each proc
-        type(dynamic_int32_list), allocatable :: recv_indices_map(:) !< [LID] to map received data
-        type(dynamic_int32_list), allocatable :: temp_send_indices(:)
+        integer(int32) :: num_halo_nodes
+        integer(int64), allocatable :: halo_gids(:)
+        integer(int32), allocatable :: halo_owners(:), halo_lids(:)
+        integer(int32), allocatable :: send_counts_per_proc(:), recv_counts_per_proc(:)
 
         associate (vtk => input%geometry%vtk)
+            ! 1. 自プロセスが担当する境界ノードのGIDとLIDを抽出し，GIDでソートする．
+            call self%setup_local_sorted_nodes(vtk)
 
-            ! === Pass 1: 要求フェーズ (どのデータが欲しいかを通知) ===
-
-            ! 1-1. 要求リストの作成 (自プロセス視点)
-            !      requests_to_send(p): プロセスpに要求するGIDs
-            !      recv_indices_map(p): プロセスpから受信したデータを格納するLIDs
-            allocate (requests_to_send(0:self%num_procs - 1), stat=stat)
-            call handle_error(stat, "allocating requests_to_send")
-            allocate (recv_indices_map(0:self%num_procs - 1), stat=stat)
-            call handle_error(stat, "allocating recv_indices_map")
-
-            do i = 1, vtk%num_points
-                if (vtk%node_type(i) == NODE_HALO) then
-                    do p = 0, self%num_procs - 1
-                        if (vtk%communication_partners(p + 1, i) == ROLE_OWNER) then
-                            requests_to_send(p)%data = [requests_to_send(p)%data, int(vtk%global_node_ids(i), kind=int64)]
-                            recv_indices_map(p)%data = [recv_indices_map(p)%data, i]
-                            exit ! Owner is unique for a halo node
-                        end if
-                    end do
-                end if
-            end do
-
-            ! 1-2. 要求数を全プロセスで交換
-            allocate (send_counts_req(self%num_procs), recv_counts_req(self%num_procs), stat=stat)
-            call handle_error(stat, "allocating req count arrays")
-            do p = 1, self%num_procs
-                send_counts_req(p) = size(requests_to_send(p - 1)%data)
-            end do
-            call MPI_Alltoall(send_counts_req, 1, MPI_INTEGER, recv_counts_req, 1, MPI_INTEGER, MPI_COMM_WORLD, ierror)
-            call handle_error(ierror, "MPI_Alltoall for request counts")
-
-            ! 1-3. 要求内容 (GIDs) を全プロセスで交換
-            total_send_reqs = sum(send_counts_req)
-            total_recv_reqs = sum(recv_counts_req)
-            allocate (send_buffer_gid(total_send_reqs), recv_buffer_gid(total_recv_reqs), stat=stat)
-            call handle_error(stat, "allocating GID buffers")
-            allocate (send_displs_req(self%num_procs), recv_displs_req(self%num_procs), stat=stat)
-            call handle_error(stat, "allocating req displ arrays")
-
-            send_displs_req = 0; recv_displs_req = 0
-            if (self%num_procs > 1) then
-                do i = 2, self%num_procs
-                    send_displs_req(i) = send_displs_req(i - 1) + send_counts_req(i - 1)
-                    recv_displs_req(i) = recv_displs_req(i - 1) + recv_counts_req(i - 1)
-                end do
-            end if
-
-            do p = 0, self%num_procs - 1
-                if (send_counts_req(p + 1) > 0) then
-                    send_buffer_gid(send_displs_req(p + 1) + 1:send_displs_req(p + 1) + send_counts_req(p + 1)) = requests_to_send(p)%data
-                end if
-            end do
-
-            call MPI_Alltoallv(send_buffer_gid, send_counts_req, send_displs_req, MPI_INT64_T, &
-                               recv_buffer_gid, recv_counts_req, recv_displs_req, MPI_INT64_T, &
-                               MPI_COMM_WORLD, ierror)
-            call handle_error(ierror, "MPI_Alltoallv for request GIDs")
-
-            deallocate (requests_to_send)
-
-            ! === Pass 2: 応答フェーズ (要求されたデータを準備) ===
-
-            ! 2-1. GIDからLIDへの高速逆引きマップを作成 (Owned nodes only)
-            ! Note: For extreme performance, use a hash map or sorted list + binary search.
-            !       A simple linear search is used here for simplicity.
-            allocate (temp_send_indices(0:self%num_procs - 1), stat=stat)
-            call handle_error(stat, "allocating temp_send_indices")
-
-            do i = 1, total_recv_reqs
-                block
-                    integer(int64) :: target_gid
-                    integer :: owner_rank, lid, found_lid
-                    target_gid = recv_buffer_gid(i)
-                    found_lid = -1
-                    ! find which process requested this GID
-                    do owner_rank = self%num_procs - 1, 0, -1
-                        if (i > recv_displs_req(owner_rank + 1)) then
-                            exit
-                        end if
-                    end do
-                    ! find corresponding LID in my domain
-                    do lid = 1, vtk%num_points
-                        if (int(vtk%global_node_ids(lid), kind=int64) == target_gid) then
-                            if (vtk%node_type(lid) == NODE_BORDER .or. vtk%node_type(lid) == NODE_HALO) then
-                                found_lid = lid
-                                exit
-                            end if
-                        end if
-                    end do
-                    if (found_lid > 0) then
-                        temp_send_indices(owner_rank)%data = [temp_send_indices(owner_rank)%data, found_lid]
-                    else
-                        call handle_error(101, "Could not find requested GID in local domain.")
+            ! 2. ハローノードの情報を抽出する (owner, lid, gid)．
+            num_halo_nodes = count(vtk%node_type == NODE_HALO)
+            allocate (halo_owners(num_halo_nodes), halo_lids(num_halo_nodes), halo_gids(num_halo_nodes))
+            block
+                integer(int32) :: i, current_pos
+                current_pos = 0
+                do i = 1, vtk%num_points
+                    if (vtk%node_type(i) == NODE_HALO) then
+                        current_pos = current_pos + 1
+                        halo_owners(current_pos) = vtk%owner_rank(1, i)
+                        halo_lids(current_pos) = i
+                        halo_gids(current_pos) = vtk%global_node_ids(i)
                     end if
-                end block
-            end do
-            deallocate (recv_buffer_gid)
-
-            ! === 最終処理: Communicatorのデータ構造を構築 ===
-
-            allocate (is_partner_flag(0:self%num_procs - 1), stat=stat)
-            is_partner_flag = .false.
-            do p = 0, self%num_procs - 1
-                if (send_counts_req(p + 1) > 0 .or. recv_counts_req(p + 1) > 0) then
-                    is_partner_flag(p) = .true.
-                end if
-            end do
-
-            self%num_partners = count(is_partner_flag)
-            if (self%num_partners == 0) return
-
-            allocate (self%partners(self%num_partners), stat=stat)
-            self%partners = pack([(p, p=0, self%num_procs - 1)], is_partner_flag)
-
-            allocate (self%send_counts(self%num_partners), self%recv_counts(self%num_partners), &
-                      self%send_displs(self%num_partners), self%recv_displs(self%num_partners), stat=stat)
-            call handle_error(stat, "allocating final count/displ arrays")
-
-            do i = 1, self%num_partners
-                p = self%partners(i)
-                self%send_counts(i) = size(temp_send_indices(p)%data) ! What I will send to p
-                self%recv_counts(i) = size(recv_indices_map(p)%data) ! What I will receive from p
-            end do
-
-            self%send_displs = 0; self%recv_displs = 0
-            if (self%num_partners > 1) then
-                do i = 2, self%num_partners
-                    self%send_displs(i) = self%send_displs(i - 1) + self%send_counts(i - 1)
-                    self%recv_displs(i) = self%recv_displs(i - 1) + self%recv_counts(i - 1)
                 end do
+            end block
+            if (num_halo_nodes > 1) then
+                call quicksort_rank_lid_gid_triplets(halo_owners, halo_lids, halo_gids, 1, num_halo_nodes)
             end if
+            self%recv_indices = halo_lids
 
-            allocate (self%send_indices(sum(self%send_counts)), stat=stat)
-            call handle_error(stat, "allocating send_indices")
-            allocate (self%recv_indices(sum(self%recv_counts)), stat=stat)
-            call handle_error(stat, "allocating recv_indices")
+            ! 3. 各プロセスに要求するノード数を集計し，Alltoallで交換して通信計画を立てる．
+            call self%exchange_communication_plan(halo_owners, send_counts_per_proc, recv_counts_per_proc)
 
-            do i = 1, self%num_partners
-                p = self%partners(i)
-                if (self%send_counts(i) > 0) then
-                    self%send_indices(self%send_displs(i) + 1:self%send_displs(i) + self%send_counts(i)) = temp_send_indices(p)%data
-                end if
-                if (self%recv_counts(i) > 0) then
-                    self%recv_indices(self%recv_displs(i) + 1:self%recv_displs(i) + self%recv_counts(i)) = recv_indices_map(p)%data
-                end if
-            end do
+            ! 4. GIDを交換し，送信インデックスと受信インデックスを確定させる．
+            call self%exchange_gids_and_build_indices(halo_gids, send_counts_per_proc, recv_counts_per_proc)
 
+            deallocate (halo_gids, halo_owners, send_counts_per_proc, recv_counts_per_proc)
         end associate
     end subroutine build_communication_schedule
 
-    subroutine handle_error(error_code, message)
-        integer, intent(in) :: error_code
-        character(len=*), intent(in) :: message
-        integer :: my_rank
+    !> @brief 自領域の境界ノード(NODE_BORDER)を抽出し，GIDでソートして保持する．
+    subroutine setup_local_sorted_nodes(self, vtk)
+        class(type_halo_communicator), intent(inout) :: self
+        class(type_vtk), intent(in) :: vtk
+        integer(int32) :: num_border_nodes, i, current_pos
 
-        if (error_code == 0) return
+        num_border_nodes = count(vtk%node_type == NODE_BORDER)
+        allocate (self%sorted_local_gids(num_border_nodes), self%sorted_local_lids(num_border_nodes))
 
-        call MPI_Comm_rank(MPI_COMM_WORLD, my_rank)
-        if (my_rank == 0) then
-            print *, "================================================================================"
-            print *, "FATAL ERROR in parallel_communicator:"
-            print *, "  Message: ", trim(message)
-            print *, "  Error Code: ", error_code
-            print *, "Aborting execution."
-            print *, "================================================================================"
+        current_pos = 0
+        do i = 1, vtk%num_points
+            if (vtk%node_type(i) == NODE_BORDER) then
+                current_pos = current_pos + 1
+                self%sorted_local_gids(current_pos) = vtk%global_node_ids(i)
+                self%sorted_local_lids(current_pos) = i
+            end if
+        end do
+
+        if (num_border_nodes > 1) then
+            call quicksort_gid_lid_pairs(self%sorted_local_gids, self%sorted_local_lids, 1, num_border_nodes)
         end if
-        call MPI_Abort(MPI_COMM_WORLD, error_code)
-    end subroutine handle_error
+    end subroutine setup_local_sorted_nodes
+
+    !> @brief 各プロセスが要求する/されるノード数を交換し，通信パートナーを決定する．
+    subroutine exchange_communication_plan(self, halo_owners, send_counts_per_proc, recv_counts_per_proc)
+        class(type_halo_communicator), intent(inout) :: self
+        integer(int32), intent(in) :: halo_owners(:)
+        integer(int32), intent(out), allocatable :: send_counts_per_proc(:), recv_counts_per_proc(:)
+        integer(int32) :: i, ierr, current_pos, num_all_partners
+        integer(int32), allocatable :: all_partner_ranks(:)
+
+        allocate (send_counts_per_proc(0:self%num_procs - 1), recv_counts_per_proc(0:self%num_procs - 1))
+        send_counts_per_proc = 0
+        recv_counts_per_proc = 0
+
+        do i = 1, size(halo_owners)
+            send_counts_per_proc(halo_owners(i)) = send_counts_per_proc(halo_owners(i)) + 1
+        end do
+
+        call MPI_Alltoall(send_counts_per_proc, 1, MPI_INT32_T, recv_counts_per_proc, 1, MPI_INT32_T, self%comm, ierr)
+        call handle_mpi_error(ierr, "MPI_Alltoall for request counts")
+
+        num_all_partners = count(send_counts_per_proc > 0 .or. recv_counts_per_proc > 0)
+        allocate (all_partner_ranks(num_all_partners))
+        current_pos = 0
+        do i = 0, self%num_procs - 1
+            if (send_counts_per_proc(i) > 0 .or. recv_counts_per_proc(i) > 0) then
+                current_pos = current_pos + 1
+                all_partner_ranks(current_pos) = i
+            end if
+        end do
+
+        self%num_partners = num_all_partners
+        allocate (self%partners(self%num_partners))
+        self%partners = all_partner_ranks
+
+        if (self%num_partners > 0) then
+            allocate (self%send_counts(self%num_partners), self%recv_counts(self%num_partners))
+            allocate (self%send_displs(self%num_partners), self%recv_displs(self%num_partners))
+            do i = 1, self%num_partners
+                self%send_counts(i) = send_counts_per_proc(self%partners(i))
+                self%recv_counts(i) = recv_counts_per_proc(self%partners(i))
+            end do
+            self%send_displs(1) = 0
+            self%recv_displs(1) = 0
+            do i = 2, self%num_partners
+                self%send_displs(i) = self%send_displs(i - 1) + self%send_counts(i - 1)
+                self%recv_displs(i) = self%recv_displs(i - 1) + self%recv_counts(i - 1)
+            end do
+        end if
+        deallocate (all_partner_ranks)
+    end subroutine exchange_communication_plan
+
+    !> @brief 要求するGIDを送信し，要求されたGIDを受信して，送信インデックスを構築する．
+    subroutine exchange_gids_and_build_indices(self, halo_gids, send_counts_per_proc, recv_counts_per_proc)
+        class(type_halo_communicator), intent(inout) :: self
+        integer(int64), intent(in) :: halo_gids(:)
+        integer(int32), intent(in) :: send_counts_per_proc(:), recv_counts_per_proc(:)
+        integer(int32) :: i, ierr, found_idx
+        integer(int32), allocatable :: send_displs_per_proc(:), recv_displs_per_proc(:)
+        integer(int64), allocatable :: gids_others_need_from_me(:)
+
+        allocate (send_displs_per_proc(0:self%num_procs - 1), recv_displs_per_proc(0:self%num_procs - 1))
+        send_displs_per_proc(0) = 0
+        recv_displs_per_proc(0) = 0
+        do i = 1, self%num_procs - 1
+            send_displs_per_proc(i) = send_displs_per_proc(i - 1) + send_counts_per_proc(i - 1)
+            recv_displs_per_proc(i) = recv_displs_per_proc(i - 1) + recv_counts_per_proc(i - 1)
+        end do
+
+        allocate (gids_others_need_from_me(sum(recv_counts_per_proc)))
+        call MPI_Alltoallv(halo_gids, send_counts_per_proc, send_displs_per_proc, MPI_INT64_T, &
+                           gids_others_need_from_me, recv_counts_per_proc, recv_displs_per_proc, MPI_INT64_T, &
+                           self%comm, ierr)
+        call handle_mpi_error(ierr, "MPI_Alltoallv for GIDs")
+
+        deallocate (send_displs_per_proc, recv_displs_per_proc)
+
+        allocate (self%send_indices(size(gids_others_need_from_me)))
+        do i = 1, size(gids_others_need_from_me)
+            found_idx = binary_find(gids_others_need_from_me(i), self%sorted_local_gids)
+            if (found_idx > 0) then
+                self%send_indices(i) = self%sorted_local_lids(found_idx)
+            else
+                write (*, '(A, I0, A, I0)') 'FATAL: Could not find LID for a requested GID. Rank=', self%my_rank, &
+                    ', GID=', gids_others_need_from_me(i)
+                call MPI_Abort(MPI_COMM_WORLD, 1)
+            end if
+        end do
+        deallocate (gids_others_need_from_me)
+    end subroutine exchange_gids_and_build_indices
+
+    !> @brief 必要に応じて送受信バッファを確保・再確保する．
+    subroutine ensure_buffers_ready(self, required_send_size, required_recv_size, num_components)
+        class(type_halo_communicator), intent(inout) :: self
+        integer(int32), intent(in) :: required_send_size, required_recv_size
+        integer(int32), intent(in), optional :: num_components
+
+        if (.not. allocated(self%send_buf) .or. size(self%send_buf) < required_send_size) then
+            call deallocate_array(self%send_buf)
+            allocate (self%send_buf(max(0, required_send_size)))
+        end if
+
+        if (.not. allocated(self%recv_buf) .or. size(self%recv_buf) < required_recv_size) then
+            call deallocate_array(self%recv_buf)
+            allocate (self%recv_buf(max(0, required_recv_size)))
+        end if
+
+        if (present(num_components) .and. self%num_partners > 0) then
+            if (.not. allocated(self%send_counts_vector)) then
+                allocate (self%send_counts_vector(self%num_partners))
+                allocate (self%send_displs_vector(self%num_partners))
+                allocate (self%recv_counts_vector(self%num_partners))
+                allocate (self%recv_displs_vector(self%num_partners))
+            end if
+            self%send_counts_vector = self%send_counts * num_components
+            self%send_displs_vector = self%send_displs * num_components
+            self%recv_counts_vector = self%recv_counts * num_components
+            self%recv_displs_vector = self%recv_displs * num_components
+        end if
+    end subroutine ensure_buffers_ready
+
+    !> @brief コミュニケータの現在の状態を標準出力に表示する（デバッグ用）．
+    subroutine display_communicator_state(self)
+        class(type_halo_communicator), intent(in) :: self
+        integer(int32) :: i, j, ierr
+
+        call MPI_Barrier(self%comm, ierr)
+        if (self%my_rank == 0) then
+            write (*, '(A)') '--- Halo Communicator State ---'
+        end if
+
+        do i = 0, self%num_procs - 1
+            call MPI_Barrier(self%comm, ierr)
+            if (self%my_rank == i) then
+                write (*, '(A, I0, A)') "[Rank ", self%my_rank, "]"
+                write (*, '(4X, A, I0)') "Number of partners: ", self%num_partners
+                if (self%num_partners > 0) then
+                    write (*, '(4X, A)') "Partner | Send Count | Recv Count"
+                    write (*, '(4X, A)') "---------------------------------"
+                    do j = 1, self%num_partners
+                        write (*, '(4X, I7, " | ", I10, " | ", I10)') &
+                            self%partners(j), self%send_counts(j), self%recv_counts(j)
+                    end do
+                end if
+            end if
+        end do
+        call MPI_Barrier(self%comm, ierr)
+    end subroutine display_communicator_state
+
+    !> @brief MPIエラーをハンドルし，メッセージを表示してプログラムを終了する．
+    subroutine handle_mpi_error(ierr, msg)
+        integer(int32), intent(in) :: ierr
+        character(len=*), intent(in) :: msg
+        integer(int32) :: err_len, rank, mpi_ierr
+        character(len=MPI_MAX_ERROR_STRING) :: err_str
+        if (ierr == MPI_SUCCESS) return
+        call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpi_ierr)
+        call MPI_Error_string(ierr, err_str, err_len)
+        write (*, '(A,I0,A,A,A,A)') "MPI ERROR (rank ", rank, "): ", trim(msg), " - ", trim(err_str(1:err_len))
+        call MPI_Abort(MPI_COMM_WORLD, ierr)
+    end subroutine handle_mpi_error
+
+    !--------------------------------------------------------------------------
+    ! ソート関連のユーティリティ
+    !--------------------------------------------------------------------------
+
+    !> @brief GID-LIDペアの配列をGID基準でソートする（非再帰的クイックソート）．
+    subroutine quicksort_gid_lid_pairs(gids, lids, low, high)
+        integer(int64), intent(inout) :: gids(:)
+        integer(int32), intent(inout) :: lids(:)
+        integer(int32), intent(in) :: low, high
+        integer(int32), parameter :: MAX_DEPTH = 128
+        integer(int32) :: stack_low(MAX_DEPTH), stack_high(MAX_DEPTH)
+        integer(int32) :: sp, l, h, p_idx
+
+        if (low >= high) return
+        sp = 1
+        stack_low(sp) = low
+        stack_high(sp) = high
+
+        do while (sp > 0)
+            l = stack_low(sp)
+            h = stack_high(sp)
+            sp = sp - 1
+            if (l >= h) cycle
+            p_idx = partition_gid_lid(gids, lids, l, h)
+            ! より小さい方のパーティションを先にスタックに積むことで，スタック深度を抑える
+            if ((p_idx - l) > (h - p_idx)) then
+                if (l < p_idx - 1) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("gid_lid")
+                    stack_low(sp) = l; stack_high(sp) = p_idx - 1
+                end if
+                if (p_idx + 1 < h) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("gid_lid")
+                    stack_low(sp) = p_idx + 1; stack_high(sp) = h
+                end if
+            else
+                if (p_idx + 1 < h) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("gid_lid")
+                    stack_low(sp) = p_idx + 1; stack_high(sp) = h
+                end if
+                if (l < p_idx - 1) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("gid_lid")
+                    stack_low(sp) = l; stack_high(sp) = p_idx - 1
+                end if
+            end if
+        end do
+    end subroutine quicksort_gid_lid_pairs
+
+    !> @brief GID-LIDペアのクイックソート用パーティション分割関数．
+    function partition_gid_lid(gids, lids, low, high) result(p_idx)
+        integer(int64), intent(inout) :: gids(:)
+        integer(int32), intent(inout) :: lids(:)
+        integer(int32), intent(in) :: low, high
+        integer(int32) :: p_idx, i, j
+        integer(int64) :: pivot_gid
+
+        pivot_gid = gids(high)
+        i = low - 1
+        do j = low, high - 1
+            if (gids(j) <= pivot_gid) then
+                i = i + 1
+                call swap(gids(i), gids(j))
+                call swap(lids(i), lids(j))
+            end if
+        end do
+        call swap(gids(i + 1), gids(high))
+        call swap(lids(i + 1), lids(high))
+        p_idx = i + 1
+    end function partition_gid_lid
+
+    !> @brief Rank-LID-GIDの3つ組をRank基準でソートする（非再帰的クイックソート）．
+    subroutine quicksort_rank_lid_gid_triplets(ranks, lids, gids, low, high)
+        integer(int32), intent(inout) :: ranks(:), lids(:)
+        integer(int64), intent(inout) :: gids(:)
+        integer(int32), intent(in) :: low, high
+        integer(int32), parameter :: MAX_DEPTH = 128
+        integer(int32) :: stack_low(MAX_DEPTH), stack_high(MAX_DEPTH)
+        integer(int32) :: sp, l, h, p_idx
+
+        if (low >= high) return
+        sp = 1
+        stack_low(sp) = low
+        stack_high(sp) = high
+        do while (sp > 0)
+            l = stack_low(sp)
+            h = stack_high(sp)
+            sp = sp - 1
+            if (l >= h) cycle
+            p_idx = partition_rank_lid_gid(ranks, lids, gids, l, h)
+            if ((p_idx - l) > (h - p_idx)) then
+                if (l < p_idx - 1) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("rank_lid_gid")
+                    stack_low(sp) = l; stack_high(sp) = p_idx - 1
+                end if
+                if (p_idx + 1 < h) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("rank_lid_gid")
+                    stack_low(sp) = p_idx + 1; stack_high(sp) = h
+                end if
+            else
+                if (p_idx + 1 < h) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("rank_lid_gid")
+                    stack_low(sp) = p_idx + 1; stack_high(sp) = h
+                end if
+                if (l < p_idx - 1) then
+                    sp = sp + 1; if (sp > MAX_DEPTH) call handle_fatal_sort_error("rank_lid_gid")
+                    stack_low(sp) = l; stack_high(sp) = p_idx - 1
+                end if
+            end if
+        end do
+    end subroutine quicksort_rank_lid_gid_triplets
+
+    !> @brief Rank-LID-GIDのクイックソート用パーティション分割関数．
+    function partition_rank_lid_gid(ranks, lids, gids, low, high) result(p_idx)
+        integer(int32), intent(inout) :: ranks(:), lids(:)
+        integer(int64), intent(inout) :: gids(:)
+        integer(int32), intent(in) :: low, high
+        integer(int32) :: p_idx, i, j, pivot_rank
+
+        pivot_rank = ranks(high)
+        i = low - 1
+        do j = low, high - 1
+            if (ranks(j) <= pivot_rank) then
+                i = i + 1
+                call swap(ranks(i), ranks(j))
+                call swap(lids(i), lids(j))
+                call swap(gids(i), gids(j))
+            end if
+        end do
+        call swap(ranks(i + 1), ranks(high))
+        call swap(lids(i + 1), lids(high))
+        call swap(gids(i + 1), gids(high))
+        p_idx = i + 1
+    end function partition_rank_lid_gid
+
+    !> @brief ソートの内部スタックがオーバーフローした場合にエラー終了する．
+    subroutine handle_fatal_sort_error(msg)
+        character(len=*), intent(in) :: msg
+        write (*, '(A,A,A)') "FATAL: Quicksort internal stack for '", trim(msg), "' overflowed."
+        call MPI_Abort(MPI_COMM_WORLD, -1)
+    end subroutine handle_fatal_sort_error
+
+    !> @brief 32ビット整数を交換する．
+    subroutine swap_i32(a, b)
+        integer(int32), intent(inout) :: a, b
+        integer(int32) :: tmp
+        tmp = a
+        a = b
+        b = tmp
+    end subroutine swap_i32
+
+    !> @brief 64ビット整数を交換する．
+    subroutine swap_i64(a, b)
+        integer(int64), intent(inout) :: a, b
+        integer(int64) :: tmp
+        tmp = a
+        a = b
+        b = tmp
+    end subroutine swap_i64
 
 end module parallel_communicator
+

@@ -48,6 +48,7 @@ module linalg_vector
         procedure, private, pass(self) :: add_values_at_indices => add_values_at_indices_vector_dp
         !> Generic interface for adding values to the vector.
         generic, public :: add => add_scalar, add_array, add_value_at_index, add_values_at_indices
+        procedure, public, pass(self) :: scale => scale_vector_dp
 
         procedure, public, pass(self) :: zero => zero_vector_dp
     end type type_vector_dp
@@ -86,6 +87,7 @@ module linalg_vector
         procedure, private, pass(self) :: add_values_at_indices => add_values_at_indices_vector_int
         !> Generic interface for adding values to the vector.
         generic, public :: add => add_scalar, add_array, add_value_at_index, add_values_at_indices
+        procedure, public, pass(self) :: scale => scale_vector_int
 
         procedure, public, pass(self) :: zero => zero_vector_int
     end type type_vector_int
@@ -292,6 +294,19 @@ contains
             end if
         end do
     end subroutine add_values_at_indices_vector_dp
+
+    !>
+    !> Scales all elements of the vector by a given scalar factor.
+    !>
+    subroutine scale_vector_dp(self, factor)
+        implicit none
+        !> The vector object to modify.
+        class(type_vector_dp), intent(inout) :: self
+        !> The scalar factor to scale by.
+        real(real64), intent(in) :: factor
+
+        self%val(:) = self%val(:) * factor
+    end subroutine scale_vector_dp
 
     !>
     !> Sets all elements of the vector to zero.
@@ -504,6 +519,19 @@ contains
             end if
         end do
     end subroutine add_values_at_indices_vector_int
+
+    !>
+    !> Scales all elements of the vector by a given scalar factor.
+    !>
+    subroutine scale_vector_int(self, factor)
+        implicit none
+        !> The vector object to modify.
+        class(type_vector_int), intent(inout) :: self
+        !> The scalar factor to scale by.
+        integer(int32), intent(in) :: factor
+
+        self%val(:) = self%val(:) * factor
+    end subroutine scale_vector_int
 
     !>
     !> Sets all elements of the vector to zero.
