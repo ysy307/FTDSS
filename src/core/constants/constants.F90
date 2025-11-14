@@ -189,4 +189,42 @@ module core_constants
     integer(int32), parameter, public :: COMP_TYPE_2D_XZ = 2
     integer(int32), parameter, public :: COMP_TYPE_3D = 3
 
+    !
+    integer(int32), parameter, public :: SOLVER_CG           = 1 !&
+    integer(int32), parameter, public :: SOLVER_BICG         = 2 !&
+    integer(int32), parameter, public :: SOLVER_CGS          = 3 !&
+    integer(int32), parameter, public :: SOLVER_BICGSTAB     = 4 !&
+    integer(int32), parameter, public :: SOLVER_BICGSTAB_L   = 5 !&
+    integer(int32), parameter, public :: SOLVER_GPBICG       = 6 !&
+    integer(int32), parameter, public :: SOLVER_TFQMR        = 7 !&
+    integer(int32), parameter, public :: SOLVER_ORTHOMIN_M   = 8 !&
+    integer(int32), parameter, public :: SOLVER_GMRES_M      = 9 !&
+    integer(int32), parameter, public :: SOLVER_JACOBI       = 10 !&
+    integer(int32), parameter, public :: SOLVER_GAUSS_SEIDEL = 11 !&
+    integer(int32), parameter, public :: SOLVER_SOR          = 12 !&
+    integer(int32), parameter, public :: SOLVER_BICGSAFE     = 13 !&
+    integer(int32), parameter, public :: SOLVER_CR           = 14 !&
+    integer(int32), parameter, public :: SOLVER_BICR         = 15 !&
+    integer(int32), parameter, public :: SOLVER_CRS          = 16 !&
+    integer(int32), parameter, public :: SOLVER_BICRSTAB     = 17 !&
+    integer(int32), parameter, public :: SOLVER_GPBICR       = 18 !&
+    integer(int32), parameter, public :: SOLVER_BICRSAFE     = 19 !&
+    integer(int32), parameter, public :: SOLVER_FGMRES_M     = 20 !&
+    integer(int32), parameter, public :: SOLVER_IDR_S        = 21 !&
+    integer(int32), parameter, public :: SOLVER_IDR1         = 22 !&
+    integer(int32), parameter, public :: SOLVER_MINRES       = 23 !&
+    integer(int32), parameter, public :: SOLVER_COCG         = 24 !&
+    integer(int32), parameter, public :: SOLVER_COCR         = 25 !&
+
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_NONE   = 0 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_JACOBI = 1 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_ILU    = 2 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_SSOR   = 3 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_HYBRID = 4 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_IS     = 5 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_SAINV  = 6 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_SAAMG  = 7 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_ILUC   = 8 !&
+    integer(int32), parameter, public :: SOLVER_PRECONDITION_ILUT   = 9 !&
+
 end module core_constants

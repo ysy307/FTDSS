@@ -1,3 +1,7 @@
+!>
+!> 残差ベクトルを管理する高レベルなコンテナ．
+!> APIは(ノード, DOF)のローカルインデックスを基本とする．
+!>
 module field_residual_vector
     use, intrinsic :: iso_fortran_env
     use :: module_core
@@ -10,7 +14,7 @@ module field_residual_vector
 
     type :: type_residual_vector
         private
-        integer(int32) :: coupling_mode = -1
+        ! integer(int32) :: coupling_mode = -1 ! coupling_modeは使用されないため削除
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
         type(type_vector_dp), allocatable :: data(:)
@@ -54,7 +58,7 @@ contains
 
         integer(int32) :: i, num_dofs
 
-        self%coupling_mode = domain%get_coupling_mode()
+        ! self%coupling_mode = domain%get_coupling_mode() ! coupling_modeは使用されないため削除
         self%size = domain%get_num_nodes() * domain%get_num_dofs_per_node()
         self%num_dofs_per_node = domain%get_num_dofs_per_node()
 
@@ -80,7 +84,14 @@ contains
         integer(int32), intent(in) :: row_dof
         type(type_vector_dp), pointer :: data
 
-        data => self%data(row_dof)
+        ! 配列の境界チェックを追加 (念のため)
+        if (row_dof >= 1 .and. row_dof <= self%num_dofs_per_node) then
+            data => self%data(row_dof)
+        else
+            data => null()
+            ! エラー処理や警告をここに追加しても良い
+            ! print *, "Error: row_dof out of bounds in get_data_residual_vector"
+        end if
 
     end function get_data_residual_vector
 
@@ -90,6 +101,10 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: value
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in set_scalar_residual_vector'
+        end if
         call self%data(row_dof)%set(value)
     end subroutine set_scalar_residual_vector
 
@@ -99,6 +114,10 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: values(:)
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in set_array_residual_vector'
+        end if
         call self%data(row_dof)%set(values)
     end subroutine set_array_residual_vector
 
@@ -109,6 +128,10 @@ contains
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in set_value_at_index_residual_vector'
+        end if
         call self%data(row_dof)%set(global_index, value)
     end subroutine set_value_at_index_residual_vector
 
@@ -119,6 +142,10 @@ contains
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in set_values_at_indices_residual_vector'
+        end if
         call self%data(row_dof)%set(global_indices, values)
     end subroutine set_values_at_indices_residual_vector
 
@@ -128,6 +155,10 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: value
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in add_value_residual_vector'
+        end if
         call self%data(row_dof)%add(value)
 
     end subroutine add_value_residual_vector
@@ -138,6 +169,10 @@ contains
         integer(int32), intent(in) :: row_dof
         real(real64), intent(in) :: values(:)
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in add_array_residual_vector'
+        end if
         call self%data(row_dof)%add(values)
     end subroutine add_array_residual_vector
 
@@ -148,6 +183,10 @@ contains
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in add_value_at_index_residual_vector'
+        end if
         call self%data(row_dof)%add(global_index, value)
 
     end subroutine add_value_at_index_residual_vector
@@ -159,6 +198,10 @@ contains
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
 
+        ! row_dofの境界チェック
+        if (row_dof < 1 .or. row_dof > self%num_dofs_per_node) then
+            error stop 'Error: row_dof out of bounds in add_values_at_indices_residual_vector'
+        end if
         call self%data(row_dof)%add(global_indices, values)
     end subroutine add_values_at_indices_residual_vector
 
@@ -168,6 +211,9 @@ contains
         real(real64), intent(in) :: alpha
 
         integer(int32) :: i
+
+        ! allocateされていない場合のチェックを追加
+        if (.not. allocated(self%data)) return
 
         do i = 1, self%num_dofs_per_node
             call self%data(i)%scale(alpha)
@@ -179,6 +225,9 @@ contains
         class(type_residual_vector), intent(inout) :: self
 
         integer(int32) :: i
+
+        ! allocateされていない場合のチェックを追加
+        if (.not. allocated(self%data)) return
 
         do i = 1, self%num_dofs_per_node
             call self%data(i)%zero()
@@ -200,7 +249,6 @@ contains
 
         self%size = 0
         self%num_dofs_per_node = 0
-        self%coupling_mode = -1
 
     end subroutine destroy_residual_vector
 
@@ -210,11 +258,26 @@ contains
 
         integer(int32) :: i
 
-        write (*, '(A)') 'Residual Vector:'
-        do i = 1, self%num_dofs_per_node
-            write (*, '(A,I0)') '  DOF ', i
-        end do
+        write (*, '(A)') '--- Residual Vector ---'
+        write (*, '(A, I0)') 'Size (total DOFs): ', self%size
+        write (*, '(A, I0)') 'Number of DOFs per Node: ', self%num_dofs_per_node
+        write (*, '(A)') '-----------------------'
 
+        if (.not. allocated(self%data)) then
+            write (*, '(A)') '  [Not allocated]'
+            write (*, '(A)') '-----------------------'
+            return
+        end if
+
+        do i = 1, self%num_dofs_per_node
+            write (*, '(A, I0, A)') 'Block (DOF ', i, '):'
+            if (self%data(i)%is_initialized()) then
+                call self%data(i)%display()
+            else
+                write (*, '(A)') '  [Not allocated]'
+            end if
+        end do
+        write (*, '(A)') '-----------------------'
     end subroutine display_residual_vector
 
 end module field_residual_vector

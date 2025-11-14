@@ -12,6 +12,7 @@
 set(FIELD_SOURCES
     jacobian_matrix.F90
     residual_vector.F90
+    matrix_operations.F90
     field.F90
 )
 add_library(Field_Main STATIC ${FIELD_SOURCES})

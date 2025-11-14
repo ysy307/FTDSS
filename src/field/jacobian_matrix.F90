@@ -26,11 +26,9 @@ module field_jacobian_matrix
 
         procedure, public, pass(self) :: get_size => get_size_jacobian_matrix
         procedure, public, pass(self) :: get_matrix_type => get_matrix_type_jacobian_matrix
-        procedure, public, pass(self) :: get_matrix => get_matrix_jacobian_matrix
         procedure, public, pass(self) :: get_coupling_mode => get_coupling_mode_jacobian_matrix
         procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node
 
-        ! --- 修正: ローカルインデックスAPIに統一 ---
         procedure, private, pass(self) :: set_value_local => set_value_jacobian_matrix
         procedure, private, pass(self) :: add_value_local => add_value_jacobian_matrix
         procedure, private, pass(self) :: add_local_matrix => add_local_jacobian_matrix
@@ -127,28 +125,23 @@ contains
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
         integer(int32) :: size
+
         size = self%size
     end function
+
     pure function get_matrix_type_jacobian_matrix(self) result(matrix_type)
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
         integer(int32) :: matrix_type
+
         matrix_type = self%matrix_type
     end function
-
-    ! <<< 修正: 引数を2つにして、どのブロックを取得するかを明示
-    function get_matrix_jacobian_matrix(self, row_dof, col_dof) result(matrix)
-        class(type_jacobian_matrix), intent(in) :: self
-        integer(int32), intent(in), optional :: row_dof, col_dof
-        class(abst_matrix), pointer :: matrix
-
-        matrix => self%get_matrix_block(row_dof, col_dof)
-    end function get_matrix_jacobian_matrix
 
     pure function get_coupling_mode_jacobian_matrix(self) result(coupling_mode)
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
         integer(int32) :: coupling_mode
+
         coupling_mode = self%coupling_mode
     end function
 
@@ -156,78 +149,65 @@ contains
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
         integer(int32) :: num_dofs
+
         num_dofs = self%num_dofs_per_node
     end function
     ! -------------------------------------------------------------------
     !  Setters / Adders (ローカルインデックスAPI)
     ! -------------------------------------------------------------------
 
-    subroutine set_value_jacobian_matrix(self, row_node, col_node, value, row_dof, col_dof)
+    subroutine set_value_jacobian_matrix(self, row_dof, col_dof, row_node, col_node, value)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
-        integer(int32), intent(in) :: row_node, col_node
+        integer(int32), intent(in) :: row_dof
+        integer(int32), intent(in) :: col_dof
+        integer(int32), intent(in) :: row_node
+        integer(int32), intent(in) :: col_node
         real(real64), intent(in) :: value
-        integer(int32), intent(in), optional :: row_dof, col_dof
         class(abst_matrix), pointer :: m
-        integer(int32) :: rdof, cdof
 
-        rdof = 1
-        if (present(row_dof)) rdof = row_dof
-        cdof = 1
-        if (present(col_dof)) cdof = col_dof
-
-        if (self%coupling_mode == COUPLING_MODE_MONOLITHIC) then
-            m => self%get_matrix_block()
-            if (associated(m)) call m%set(row_node, col_node, value)
-        else ! COUPLING_MODE_STAGGERED
-            if (rdof /= cdof) return ! 対角ブロック外の操作は不可
-            m => self%get_matrix_block(rdof)
-            ! Staggeredの各行列はDOF=1なので，(1,1)を渡す
-            if (associated(m)) call m%set(row_node, col_node, value)
+        if (self%coupling_mode == COUPLING_MODE_STAGGERED) then
+            if (row_dof /= col_dof) error stop 'In Staggered mode, only diagonal blocks can be accessed.'
         end if
+
+        m => self%get_matrix_block(row_dof, col_dof)
+        if (associated(m)) call m%set(row_node, col_node, value)
     end subroutine
 
     subroutine add_value_jacobian_matrix(self, row_dof, col_dof, row_node, col_node, value)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
-        integer(int32), intent(in), optional :: row_dof, col_dof
-        integer(int32), intent(in) :: row_node, col_node
+        integer(int32), intent(in) :: row_dof
+        integer(int32), intent(in) :: col_dof
+        integer(int32), intent(in) :: row_node
+        integer(int32), intent(in) :: col_node
         real(real64), intent(in) :: value
         class(abst_matrix), pointer :: m
-        integer(int32) :: rdof, cdof
 
-        rdof = 1
-        if (present(row_dof)) rdof = row_dof
-        cdof = 1
-        if (present(col_dof)) cdof = col_dof
-
-        if (self%coupling_mode == COUPLING_MODE_MONOLITHIC) then
-            m => self%get_matrix_block()
-            if (associated(m)) call m%add(row_node, col_node, value)
-        else ! COUPLING_MODE_STAGGERED
-            if (rdof /= cdof) return ! 対角ブロック外の操作は不可
-            m => self%get_matrix_block(rdof)
-            ! Staggeredの各行列はDOF=1なので，(1,1)を渡す
-            if (associated(m)) call m%add(row_node, col_node, value)
+        if (self%coupling_mode == COUPLING_MODE_STAGGERED) then
+            if (row_dof /= col_dof) error stop 'In Staggered mode, only diagonal blocks can be accessed.'
         end if
-    end subroutine
+
+        m => self%get_matrix_block(row_dof, col_dof)
+        if (associated(m)) call m%add(row_node, col_node, value)
+    end subroutine add_value_jacobian_matrix
 
     subroutine add_local_jacobian_matrix(self, row_dof, col_dof, global_connectivity, local_data)
         implicit none
         class(type_jacobian_matrix), intent(inout), target :: self
+        integer(int32), intent(in) :: row_dof
+        integer(int32), intent(in) :: col_dof
         integer(int32), intent(in) :: global_connectivity(:)
-        integer(int32), intent(in) :: row_dof, col_dof
         type(type_dense), intent(in) :: local_data
-        class(abst_matrix), pointer :: target_block
+
+        class(abst_matrix), pointer :: m
         integer(int32) :: num_nodes_local, i, j
 
         num_nodes_local = size(global_connectivity)
 
-        ! (row_dof, col_dof)に対応する全体行列のブロックを取得
-        target_block => self%get_matrix_block(row_dof, col_dof)
-        if (.not. associated(target_block)) return
+        m => self%get_matrix_block(row_dof, col_dof)
 
-        call target_block%add(global_connectivity, local_data)
+        if (associated(m)) call m%add(global_connectivity, local_data)
     end subroutine add_local_jacobian_matrix
 
     ! -------------------------------------------------------------------
@@ -250,29 +230,23 @@ contains
     function get_matrix_jacobian_block_matrix(self, row_dof, col_dof) result(matrix)
         implicit none
         class(type_jacobian_matrix), intent(in), target :: self
-        integer(int32), intent(in), optional :: row_dof, col_dof
+        integer(int32), intent(in) :: row_dof
+        integer(int32), intent(in) :: col_dof
         class(abst_matrix), pointer :: matrix
-
-        integer(int32) :: rdof, cdof
 
         matrix => null()
         if (.not. allocated(self%data)) return
 
-        rdof = 1
-        if (present(row_dof)) rdof = row_dof
-        cdof = 1
-        if (present(col_dof)) cdof = col_dof
-
         select case (self%coupling_mode)
         case (COUPLING_MODE_MONOLITHIC)
-            if (rdof >= 1 .and. rdof <= size(self%data, 1) .and. &
-                cdof >= 1 .and. cdof <= size(self%data, 2)) then
-                matrix => self%data(rdof, cdof)%m
+            if (row_dof >= 1 .and. row_dof <= size(self%data, 1) .and. &
+                col_dof >= 1 .and. col_dof <= size(self%data, 2)) then
+                matrix => self%data(row_dof, col_dof)%m
             end if
         case (COUPLING_MODE_STAGGERED)
-            if (rdof /= cdof) return ! Staggeredは対角ブロックのみ
-            if (rdof >= 1 .and. rdof <= size(self%data, 2)) then
-                matrix => self%data(1, rdof)%m
+            if (row_dof /= col_dof) return ! Staggeredは対角ブロックのみ
+            if (row_dof >= 1 .and. row_dof <= size(self%data, 2)) then
+                matrix => self%data(1, row_dof)%m
             end if
         end select
     end function get_matrix_jacobian_block_matrix

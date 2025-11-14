@@ -51,6 +51,7 @@ module linalg_vector
         procedure, public, pass(self) :: scale => scale_vector_dp
 
         procedure, public, pass(self) :: zero => zero_vector_dp
+        procedure, public, pass(self) :: display => display_vector_dp
     end type type_vector_dp
 
     ! ==========================================================
@@ -90,6 +91,7 @@ module linalg_vector
         procedure, public, pass(self) :: scale => scale_vector_int
 
         procedure, public, pass(self) :: zero => zero_vector_int
+        procedure, public, pass(self) :: display => display_vector_int
     end type type_vector_int
 
 contains
@@ -319,6 +321,20 @@ contains
         self%val(:) = 0.0d0
     end subroutine zero_vector_dp
 
+    !>
+    !> Displays the contents of the vector to standard output.
+    !>
+    subroutine display_vector_dp(self)
+        implicit none
+        !> The vector object to display.
+        class(type_vector_dp), intent(in) :: self
+        integer(int32) :: i
+
+        do i = 1, self%num_nodes
+            write (*, '(A,I0,A,F12.6)') "Index ", i, ": ", self%val(i)
+        end do
+    end subroutine display_vector_dp
+
     ! ==========================================================
     ! Integer Vector Procedures
     ! ==========================================================
@@ -543,5 +559,19 @@ contains
 
         self%val(:) = 0
     end subroutine zero_vector_int
+
+    !>
+    !> Displays the contents of the vector to standard output.
+    !>
+    subroutine display_vector_int(self)
+        implicit none
+        !> The vector object to display.
+        class(type_vector_int), intent(in) :: self
+        integer(int32) :: i
+
+        do i = 1, self%num_nodes
+            write (*, '(A,I0,A,I0)') "Index ", i, ": ", self%val(i)
+        end do
+    end subroutine display_vector_int
 
 end module linalg_vector
