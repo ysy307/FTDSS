@@ -28,6 +28,26 @@ module linalg_vector_ops
     public :: norm_inf
     public :: dot
 
+    interface norm_1
+        module procedure :: norm_1_native
+        module procedure :: norm_1_vector_dp
+    end interface
+
+    interface norm_2
+        module procedure :: norm_2_native
+        module procedure :: norm_2_vector_dp
+    end interface
+
+    interface norm_inf
+        module procedure :: norm_inf_native
+        module procedure :: norm_inf_vector_dp
+    end interface
+
+    interface dot
+        module procedure :: dot_native
+        module procedure :: dot_vector_dp
+    end interface
+
     public :: operator( + ) !&
     public :: operator( - ) !&
     public :: operator( * ) !&
@@ -247,7 +267,7 @@ contains
     !>
     !> Computes the 1-norm of a vector, \( \sum |x_i| \), using the initialized backend.
     !>
-    function norm_1(x) result(norm_value)
+    function norm_1_native(x) result(norm_value)
         implicit none
         !> The input vector.
         real(real64), intent(in) :: x(:)
@@ -258,12 +278,30 @@ contains
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
 #endif
         norm_value = compute_norm_1_backend(x)
-    end function norm_1
+    end function norm_1_native
+
+    !>
+    !> Computes the 1-norm of a vector object, \( \sum |x_i| \), using the initialized backend.
+    function norm_1_vector_dp(x) result(norm_value)
+        implicit none
+        !> The input vector.
+        type(type_vector_dp), intent(in) :: x
+        !> The computed 1-norm.
+        real(real64) :: norm_value
+
+        real(real64), dimension(:), pointer :: vec_data
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        vec_data => x%get_data()
+        norm_value = norm_1_native(vec_data)
+    end function norm_1_vector_dp
 
     !>
     !> Computes the 2-norm (Euclidean norm) of a vector, \( \sqrt{\sum x_i^2} \), using the initialized backend.
     !>
-    function norm_2(x) result(norm_value)
+    function norm_2_native(x) result(norm_value)
         implicit none
         !> The input vector.
         real(real64), intent(in) :: x(:)
@@ -274,12 +312,30 @@ contains
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
 #endif
         norm_value = compute_norm_2_backend(x)
-    end function norm_2
+    end function norm_2_native
+
+    !>
+    !> Computes the 2-norm (Euclidean norm) of a vector object, \( \sqrt{\sum x_i^2} \), using the initialized backend.
+    function norm_2_vector_dp(x) result(norm_value)
+        implicit none
+        !> The input vector.
+        type(type_vector_dp), intent(in) :: x
+        !> The computed 2-norm.
+        real(real64) :: norm_value
+
+        real(real64), dimension(:), pointer :: vec_data
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        vec_data => x%get_data()
+        norm_value = norm_2_native(vec_data)
+    end function norm_2_vector_dp
 
     !>
     !> Computes the infinity-norm (maximum absolute value), \( \max(|x_i|) \), using the initialized backend.
     !>
-    function norm_inf(x) result(norm_value)
+    function norm_inf_native(x) result(norm_value)
         implicit none
         !> The input vector.
         real(real64), intent(in) :: x(:)
@@ -290,12 +346,30 @@ contains
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
 #endif
         norm_value = compute_norm_inf_backend(x)
-    end function norm_inf
+    end function norm_inf_native
+
+    !>
+    !> Computes the infinity-norm (maximum absolute value) of a vector object, \( \max(|x_i|) \), using the initialized backend.
+    function norm_inf_vector_dp(x) result(norm_value)
+        implicit none
+        !> The input vector.
+        type(type_vector_dp), intent(in) :: x
+        !> The computed infinity-norm.
+        real(real64) :: norm_value
+
+        real(real64), dimension(:), pointer :: vec_data
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        vec_data => x%get_data()
+        norm_value = norm_inf(vec_data)
+    end function norm_inf_vector_dp
 
     !>
     !> Computes the dot product of two vectors, \( \sum x_i y_i \), using the initialized backend.
     !>
-    function dot(x, y) result(product)
+    function dot_native(x, y) result(product)
         implicit none
         !> The first input vector.
         real(real64), intent(in) :: x(:)
@@ -310,7 +384,31 @@ contains
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
 #endif
         product = compute_dot_product_backend(x, y)
-    end function dot
+    end function dot_native
+
+    !> Computes the dot product of two vector objects, \( \sum x_i y_i \), using the initialized backend.
+    function dot_vector_dp(x, y) result(product)
+        implicit none
+        !> The first input vector.
+        type(type_vector_dp), intent(in) :: x
+        !> The second input vector.
+        type(type_vector_dp), intent(in) :: y
+        !> The computed dot product.
+        real(real64) :: product
+
+        real(real64), dimension(:), pointer :: vec_data_x
+        real(real64), dimension(:), pointer :: vec_data_y
+
+        vec_data_x => x%get_data()
+        vec_data_y => y%get_data()
+
+        call check_sizes_match(vec_data_x, vec_data_y, 'dot_vector_dp')
+
+#ifdef USE_DEBUG
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+#endif
+        product = dot_native(vec_data_x, vec_data_y)
+    end function dot_vector_dp
 
     ! =========================================================================
     ! 5. Operator Overload Implementations for Coordinate Types

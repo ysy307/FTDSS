@@ -35,6 +35,8 @@ module field_jacobian_matrix
         generic, public :: set => set_value_local
         generic, public :: add => add_value_local, add_local_matrix
 
+        procedure, public, pass(self) :: copy => copy_jacobian_matrix
+
         procedure, public, pass(self) :: display => display_jacobian_matrix
 
         procedure, public, pass(self) :: zero => zero_jacobian_matrix

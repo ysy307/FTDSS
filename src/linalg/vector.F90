@@ -50,6 +50,8 @@ module linalg_vector
         generic, public :: add => add_scalar, add_array, add_value_at_index, add_values_at_indices
         procedure, public, pass(self) :: scale => scale_vector_dp
 
+        procedure, public, pass(self) :: copy => copy_vector_dp
+
         procedure, public, pass(self) :: zero => zero_vector_dp
         procedure, public, pass(self) :: display => display_vector_dp
     end type type_vector_dp
@@ -89,6 +91,8 @@ module linalg_vector
         !> Generic interface for adding values to the vector.
         generic, public :: add => add_scalar, add_array, add_value_at_index, add_values_at_indices
         procedure, public, pass(self) :: scale => scale_vector_int
+
+        procedure, public, pass(self) :: copy => copy_vector_int
 
         procedure, public, pass(self) :: zero => zero_vector_int
         procedure, public, pass(self) :: display => display_vector_int
@@ -309,6 +313,23 @@ contains
 
         self%val(:) = self%val(:) * factor
     end subroutine scale_vector_dp
+
+    !>
+    !> Copies the contents from another vector into this vector.
+    subroutine copy_vector_dp(self, source_vector)
+        implicit none
+        !> The vector object to modify.
+        class(type_vector_dp), intent(inout) :: self
+        !> The source vector to copy from.
+        class(type_vector_dp), intent(in) :: source_vector
+
+        if (self%num_nodes /= source_vector%num_nodes) stop "Error: size mismatch in copy_vector_dp"
+
+        if (self%is_allocated) then
+            call deallocate_array(self%val)
+        end if
+        call allocate_array(self%val, source=source_vector%val)
+    end subroutine copy_vector_dp
 
     !>
     !> Sets all elements of the vector to zero.
@@ -548,6 +569,23 @@ contains
 
         self%val(:) = self%val(:) * factor
     end subroutine scale_vector_int
+
+    !>
+    !> Copies the contents from another vector into this vector.
+    subroutine copy_vector_int(self, source_vector)
+        implicit none
+        !> The vector object to modify.
+        class(type_vector_int), intent(inout) :: self
+        !> The source vector to copy from.
+        class(type_vector_int), intent(in) :: source_vector
+
+        if (self%num_nodes /= source_vector%num_nodes) stop "Error: size mismatch in copy_vector_int"
+
+        if (self%is_allocated) then
+            call deallocate_array(self%val)
+        end if
+        call allocate_array(self%val, source=source_vector%val)
+    end subroutine copy_vector_int
 
     !>
     !> Sets all elements of the vector to zero.

@@ -185,46 +185,104 @@ module core_constants
     integer(int32), parameter, public :: TIME_RECORD_END = 2
 
     ! --- Internal constants for spatial dimensions ---
+    !> 2D XY dimension
     integer(int32), parameter, public :: COMP_TYPE_2D_XY = 1
+    !> 2D XZ dimension
     integer(int32), parameter, public :: COMP_TYPE_2D_XZ = 2
+    !> 3D XYZ dimension
     integer(int32), parameter, public :: COMP_TYPE_3D = 3
 
-    !
+    ! ==========================================================
+    ! Linear Solver Types
+    ! ==========================================================
+    !> Conjugate Gradient
     integer(int32), parameter, public :: SOLVER_CG           = 1 !&
+    !> Bi-Conjugate Gradient
     integer(int32), parameter, public :: SOLVER_BICG         = 2 !&
+    !> Conjugate Gradient Squared
     integer(int32), parameter, public :: SOLVER_CGS          = 3 !&
+    !> Bi-Conjugate Gradient Stabilized
     integer(int32), parameter, public :: SOLVER_BICGSTAB     = 4 !&
+    !> Bi-Conjugate Gradient Stabilized (l)
     integer(int32), parameter, public :: SOLVER_BICGSTAB_L   = 5 !&
+    !> Generalized Product-type Bi-Conjugate Gradient
     integer(int32), parameter, public :: SOLVER_GPBICG       = 6 !&
+    !> Transpose-Free Quasi-Minimal Residual
     integer(int32), parameter, public :: SOLVER_TFQMR        = 7 !&
+    !> Orthomin(m)
     integer(int32), parameter, public :: SOLVER_ORTHOMIN_M   = 8 !&
+    !> Generalized Minimal Residual (m)
     integer(int32), parameter, public :: SOLVER_GMRES_M      = 9 !&
+    !> Jacobi
     integer(int32), parameter, public :: SOLVER_JACOBI       = 10 !&
+    !> Gauss-Seidel
     integer(int32), parameter, public :: SOLVER_GAUSS_SEIDEL = 11 !&
+    !> Successive Over-Relaxation
     integer(int32), parameter, public :: SOLVER_SOR          = 12 !&
+    !> BiCGSafe
     integer(int32), parameter, public :: SOLVER_BICGSAFE     = 13 !&
+    !> Conjugate Residual
     integer(int32), parameter, public :: SOLVER_CR           = 14 !&
+    !> Bi-Conjugate Residual
     integer(int32), parameter, public :: SOLVER_BICR         = 15 !&
+    !> Conjugate Residual Squared
     integer(int32), parameter, public :: SOLVER_CRS          = 16 !&
+    !> Bi-Conjugate Residual Stabilized
     integer(int32), parameter, public :: SOLVER_BICRSTAB     = 17 !&
+    !> Generalized Product-type Bi-Conjugate Residual
     integer(int32), parameter, public :: SOLVER_GPBICR       = 18 !&
+    !> BiCRSafe
     integer(int32), parameter, public :: SOLVER_BICRSAFE     = 19 !&
+    !> Flexible GMRES (m)
     integer(int32), parameter, public :: SOLVER_FGMRES_M     = 20 !&
+    !> Induced Dimension Reduction (s)
     integer(int32), parameter, public :: SOLVER_IDR_S        = 21 !&
+    !> IDR(1)
     integer(int32), parameter, public :: SOLVER_IDR1         = 22 !&
+    !> Minimal Residual
     integer(int32), parameter, public :: SOLVER_MINRES       = 23 !&
+    !> Conjugate Orthogonal Conjugate Gradient
     integer(int32), parameter, public :: SOLVER_COCG         = 24 !&
+    !> Conjugate Orthogonal Conjugate Residual
     integer(int32), parameter, public :: SOLVER_COCR         = 25 !&
 
+    ! ==========================================================
+    ! Preconditioner Types
+    ! ==========================================================
+    !> No preconditioner
     integer(int32), parameter, public :: SOLVER_PRECONDITION_NONE   = 0 !&
+    !> Jacobi preconditioner
     integer(int32), parameter, public :: SOLVER_PRECONDITION_JACOBI = 1 !&
+    !> ILU(k) (Incomplete LU)
     integer(int32), parameter, public :: SOLVER_PRECONDITION_ILU    = 2 !&
+    !> SSOR (Symmetric Successive Over-Relaxation)
     integer(int32), parameter, public :: SOLVER_PRECONDITION_SSOR   = 3 !&
+    !> Hybrid preconditioner
     integer(int32), parameter, public :: SOLVER_PRECONDITION_HYBRID = 4 !&
+    !> I+S preconditioner
     integer(int32), parameter, public :: SOLVER_PRECONDITION_IS     = 5 !&
+    !> SAINV (Sparse Approximate Inverse)
     integer(int32), parameter, public :: SOLVER_PRECONDITION_SAINV  = 6 !&
+    !> SA-AMG (Sparse Approximate Algebraic Multigrid)
     integer(int32), parameter, public :: SOLVER_PRECONDITION_SAAMG  = 7 !&
+    !> Crout ILU
     integer(int32), parameter, public :: SOLVER_PRECONDITION_ILUC   = 8 !&
+    !> ILUT (Incomplete LU with threshold)
     integer(int32), parameter, public :: SOLVER_PRECONDITION_ILUT   = 9 !&
 
+    ! ==========================================================
+    ! Solver Status Codes
+    ! ==========================================================
+    !> Solver completed successfully
+    integer(int32), parameter, public :: SOLVER_STATUS_SUCCESS = 0
+    !> Solver encountered ill-conditioned options
+    integer(int32), parameter, public :: SOLVER_STATUS_ILL_OPTIONS = -1
+    !> Solver encountered a breakdown
+    integer(int32), parameter, public :: SOLVER_STATUS_BREAKDOWN = -2
+    !> Solver ran out of memory
+    integer(int32), parameter, public :: SOLVER_STATUS_OUT_OF_MEMORY = -3
+    !> Solver reached maximum iterations without convergence
+    integer(int32), parameter, public :: SOLVER_STATUS_MAXITER = -4
+    !> Solver method not implemented
+    integer(int32), parameter, public :: SOLVER_STATUS_NOT_IMPLEMENTED = -5
 end module core_constants

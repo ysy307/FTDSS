@@ -14,17 +14,20 @@ module field_residual_vector
 
     type :: type_residual_vector
         private
-        ! integer(int32) :: coupling_mode = -1 ! coupling_modeは使用されないため削除
         integer(int32) :: num_dofs_per_node = 0
         integer(int32) :: size = 0
         type(type_vector_dp), allocatable :: data(:)
     contains
         ! --- initialize/destroy ---
-        procedure, pass(self), public :: initialize => initialize_residual_vector
+        procedure, pass(self), private :: initialize_residual_vector_from_domain
+        procedure, pass(self), private :: initialize_residual_vector_from_values
+        generic, public :: initialize => initialize_residual_vector_from_domain, &
+            initialize_residual_vector_from_values
         procedure, pass(self), public :: destroy => destroy_residual_vector
 
         ! --- getter ---
         procedure, pass(self), public :: get_size => get_size_residual_vector
+        procedure, pass(self), public :: get_num_dofs_per_node => get_num_dofs_per_node_residual_vector
         procedure, pass(self), public :: get_data => get_data_residual_vector
 
         ! --- setter ---
@@ -44,6 +47,8 @@ module field_residual_vector
             add_value_at_index_residual_vector, add_values_at_indices_residual_vector
         procedure, pass(self), public :: zero => zero_residual_vector
 
+        procedure, public, pass(self) :: copy => copy_residual_vector
+
         procedure, public, pass(self) :: scale => scale_residual_vector
 
         procedure, public, pass(self) :: display => display_residual_vector
@@ -51,7 +56,7 @@ module field_residual_vector
 
 contains
 
-    subroutine initialize_residual_vector(self, domain)
+    subroutine initialize_residual_vector_from_domain(self, domain)
         implicit none
         class(type_residual_vector), intent(inout) :: self
         type(type_domain), intent(in) :: domain
@@ -67,7 +72,26 @@ contains
             call self%data(i)%initialize(domain%get_num_nodes())
         end do
 
-    end subroutine initialize_residual_vector
+    end subroutine initialize_residual_vector_from_domain
+
+    subroutine initialize_residual_vector_from_values(self, num_nodes, num_dofs_per_node)
+        implicit none
+        class(type_residual_vector), intent(inout) :: self
+        integer(int32), intent(in) :: num_nodes
+        integer(int32), intent(in) :: num_dofs_per_node
+
+        integer(int32) :: i, num_dofs
+
+        ! self%coupling_mode = domain%get_coupling_mode() ! coupling_modeは使用されないため削除
+        self%size = num_nodes * num_dofs_per_node
+        self%num_dofs_per_node = num_dofs_per_node
+
+        allocate (self%data(self%num_dofs_per_node))
+        do i = 1, self%num_dofs_per_node
+            call self%data(i)%initialize(num_nodes)
+        end do
+
+    end subroutine initialize_residual_vector_from_values
 
     pure function get_size_residual_vector(self) result(size)
         implicit none
@@ -77,6 +101,15 @@ contains
         size = self%size
 
     end function get_size_residual_vector
+
+    pure function get_num_dofs_per_node_residual_vector(self) result(num_dofs_per_node)
+        implicit none
+        class(type_residual_vector), intent(in) :: self
+        integer(int32) :: num_dofs_per_node
+
+        num_dofs_per_node = self%num_dofs_per_node
+
+    end function get_num_dofs_per_node_residual_vector
 
     function get_data_residual_vector(self, row_dof) result(data)
         implicit none
@@ -219,6 +252,22 @@ contains
             call self%data(i)%scale(alpha)
         end do
     end subroutine scale_residual_vector
+
+    subroutine copy_residual_vector(self, source_vector)
+        implicit none
+        class(type_residual_vector), intent(inout) :: self
+        class(type_residual_vector), intent(in) :: source_vector
+
+        integer(int32) :: i
+
+        ! allocateされていない場合のチェックを追加
+        if (.not. allocated(self%data)) return
+        if (.not. allocated(source_vector%data)) return
+
+        do i = 1, self%num_dofs_per_node
+            call self%data(i)%copy(source_vector%data(i))
+        end do
+    end subroutine copy_residual_vector
 
     subroutine zero_residual_vector(self)
         implicit none
