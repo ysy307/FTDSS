@@ -209,7 +209,7 @@ contains
     !> Sets all non-zero entries in a specified row to a single scalar value.
     !> Note: This is an inefficient O(nnz) operation for the COO format.
     !>
-    module subroutine set_row_coo(self, op, row, value)
+    module subroutine set_row_coo(self, op, row, value, row_block)
         implicit none
         !> The COO matrix object.
         class(type_coo), intent(inout) :: self
@@ -219,6 +219,8 @@ contains
         integer(int32), intent(in) :: row
         !> The scalar value to assign.
         real(real64), intent(in) :: value
+        !> The block row index.
+        integer(int32), intent(in), optional :: row_block
 
         integer(int32) :: i
 

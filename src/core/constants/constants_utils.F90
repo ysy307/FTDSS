@@ -69,10 +69,12 @@ contains
         select case (strip(to_lower(key)))
         case ("dense")
             val = MATRIX_DENSE
-        case ("crs")
-            val = MATRIX_CRS
+        case ("csr")
+            val = MATRIX_CSR
         case ("coo")
             val = MATRIX_COO
+        case ("bsr")
+            val = MATRIX_BSR
         end select
     end function get_matrix_type
 
@@ -84,10 +86,12 @@ contains
         select case (val)
         case (MATRIX_DENSE)
             key = "Dense Matrix"
-        case (MATRIX_CRS)
-            key = "CRS Matrix"
+        case (MATRIX_CSR)
+            key = "CSR Matrix"
         case (MATRIX_COO)
             key = "COO Matrix"
+        case (MATRIX_BSR)
+            key = "BSR Matrix"
         case default
             key = "Unknown"
         end select

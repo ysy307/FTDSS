@@ -48,7 +48,7 @@ contains
         ! Allocate arrays
         call allocate_array(self%ptr, source=row)
         call allocate_array(self%ind, source=col)
-        call allocate_array(self%val, row_blocks, col_blocks, self%nnz)
+        call allocate_array(self%val, self%num_blocks, self%num_block_rows, self%num_block_cols)
         call allocate_array(self%diagonal, self%num_block_rows * self%num_nodes)
         ! Initialize value array to zero
         call self%zero()
@@ -105,22 +105,27 @@ contains
 
         ! Extract diagonal elements
         self%diagonal(:) = 0.0d0
+
+        !$omp parallel do private(i, row_start, row_end, j, k, m)
         do i = 1, self%num_ptrs - 1
             row_start = self%ptr(i)
             row_end = self%ptr(i + 1) - 1
             do j = row_start, row_end
+                ! Check if the block corresponds to the diagonal node (block row == block col)
                 if (self%ind(j) == i) then
                     do k = 1, self%num_block_rows
                         do m = 1, self%num_block_cols
                             if (k == m) then
-                                diagonal((i - 1) * self%num_block_rows + k) = self%val(j, k, m)
+                                ! Calculate strict diagonal index
+                                self%diagonal((i - 1) * self%num_block_rows + k) = self%val(j, k, m)
                             end if
                         end do
-                        exit
                     end do
+                    exit ! Found the diagonal block, move to next row
                 end if
             end do
         end do
+        !$omp end parallel do
 
         diagonal => self%diagonal
     end function get_diagonal_bsr
@@ -159,7 +164,7 @@ contains
         !> The bsr matrix object.
         class(type_bsr), intent(in), target :: self
         !> A pointer to the bsr `val` array.
-        real(real64), dimension(:), pointer :: val
+        real(real64), dimension(:, :, :), pointer :: val
 
         val => self%val
     end function get_val_bsr
@@ -180,74 +185,119 @@ contains
         !> The value to set at the specified entry.
         real(real64), intent(in) :: value
 
-        integer(int32) :: index
+        ! integer(int32) :: index
+        self%status = MATRIX_STATUS_NOT_IMPLEMENTED
 
+!         index = self%find(row, col)
+! #ifdef USE_DEBUG
+!         if (index > 0) then
+! #endif
+!             select case (op)
+!             case (MATRIX_OP_INS)
+!                 self%val(index) = value
+!             case (MATRIX_OP_ADD)
+!                 self%val(index) = self%val(index) + value
+!             case default
+!                 self%status = MATRIX_STATUS_ILL_OPERATIONS
+!             end select
+! #ifdef USE_DEBUG
+!         else
+!             print *, "Warning(set_value_bsr): Element not in sparsity pattern.", row, col
+!         end if
+! #endif
+    end subroutine set_value_bsr
+
+    !>
+    !> Sets the value of a specific entry in the sparse matrix (Block level).
+    module subroutine set_value_block_bsr(self, op, row, col, row_block, col_block, value)
+        implicit none
+        class(type_bsr), intent(inout) :: self
+        integer(int32), intent(in) :: op
+        integer(int32), intent(in) :: row ! Block row index (Node index)
+        integer(int32), intent(in) :: col ! Block col index (Node index)
+        integer(int32), intent(in) :: row_block ! Local row index within block
+        integer(int32), intent(in) :: col_block ! Local col index within block
+        real(real64), intent(in) :: value
+
+        integer(int32) :: index
         index = self%find(row, col)
+
 #ifdef USE_DEBUG
         if (index > 0) then
 #endif
             select case (op)
             case (MATRIX_OP_INS)
-                self%val(index) = value
+                self%val(index, row_block, col_block) = value
             case (MATRIX_OP_ADD)
-                self%val(index) = self%val(index) + value
+                self%val(index, row_block, col_block) = self%val(index, row_block, col_block) + value
             case default
                 self%status = MATRIX_STATUS_ILL_OPERATIONS
             end select
 #ifdef USE_DEBUG
         else
-            print *, "Warning(set_value_bsr): Element not in sparsity pattern.", row, col
+            print *, "Warning(set_value_block_bsr): Element not in sparsity pattern.", row, col
         end if
 #endif
-    end subroutine set_value_bsr
-
-    !>
-    !> Sets the value of a specific entry in the sparse matrix.
-    !>
-    module subroutine set_value_block_bsr(self, op, row, col, row_block, col_block, value)
-        implicit none
-        !> The bsr matrix object.
-        class(type_bsr), intent(inout) :: self
-        !> The operation to perform.
-        integer(int32), intent(in) :: op
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The block row index within the block.
-        integer(int32), intent(in) :: row_block
-        !> The block column index within the block.
-        integer(int32), intent(in) :: col_block
-        !> The value to set at the specified entry.
-        real(real64), intent(in) :: value
-
-        self%status = MATRIX_STATUS_NOT_IMPLEMENTED
     end subroutine set_value_block_bsr
 
     !>
     !> Sets all non-zero entries in a specific row to a single scalar value.
     !>
-    module subroutine set_row_bsr(self, op, row, value)
+    module subroutine set_row_bsr(self, op, row, value, row_block)
         implicit none
-        !> The bsr matrix object.
         class(type_bsr), intent(inout) :: self
-        !> The operation to perform.
         integer(int32), intent(in) :: op
-        !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
-        !> The scalar value to assign.
         real(real64), intent(in) :: value
+        integer(int32), intent(in), optional :: row_block
 
-        integer(int32) :: is, ie
+        integer(int32) :: is, ie, k, col_node
+        integer(int32) :: r_start, r_end, r
 
         is = self%ptr(row)
         ie = self%ptr(row + 1) - 1
 
+        ! Determine which local rows (row_blocks) to process
+        if (present(row_block)) then
+            r_start = row_block
+            r_end = row_block
+        else
+            r_start = 1
+            r_end = self%num_block_rows
+        end if
+
         select case (op)
         case (MATRIX_OP_INS)
-            self%val(is:ie) = value
+            ! Direct substitution: Zero row, set diagonal = value
+            do k = is, ie
+                col_node = self%ind(k)
+
+                ! Zero out the specified rows in this block (for all columns in the block)
+                self%val(k, r_start:r_end, :) = 0.0d0
+
+                ! If this is the diagonal block, set the diagonal element
+                if (col_node == row) then
+                    do r = r_start, r_end
+                        if (r <= self%num_block_cols) then
+                            self%val(k, r, r) = value
+                        end if
+                    end do
+                end if
+            end do
+
         case (MATRIX_OP_ADD)
-            self%val(is:ie) = self%val(is:ie) + value
+            ! Penalty method: Add value to diagonal only, do NOT zero the row
+            do k = is, ie
+                if (self%ind(k) == row) then ! Found diagonal block
+                    do r = r_start, r_end
+                        if (r <= self%num_block_cols) then
+                            self%val(k, r, r) = self%val(k, r, r) + value
+                        end if
+                    end do
+                    exit ! Optimization: Diagonal block is unique in a row
+                end if
+            end do
+
         case default
             self%status = MATRIX_STATUS_ILL_OPERATIONS
         end select
@@ -267,9 +317,9 @@ contains
 
         select case (op)
         case (MATRIX_OP_INS)
-            self%val = value
+            self%val(:, :, :) = value
         case (MATRIX_OP_ADD)
-            self%val = self%val + value
+            self%val(:, :, :) = self%val(:, :, :) + value
         case default
             self%status = MATRIX_STATUS_ILL_OPERATIONS
         end select
@@ -434,18 +484,23 @@ contains
     !>
     module subroutine display_bsr(self)
         implicit none
-        !> The bsr matrix object to display.
         class(type_bsr), intent(in) :: self
-        integer(int32) :: i, r, row_start, row_end
+        integer(int32) :: i, r, row_start, row_end, rb, cb
 
-        write (*, '(a,i0,2x,a,i0,a)') "bsr Matrix (dims= ", self%num_rows, ", nnz= ", self%nnz, ")"
-        do r = 1, self%num_rows
+        write (*, '(a,i0,2x,a,i0,a)') "bsr Matrix (Nodes= ", self%num_nodes, ", nnz= ", self%nnz, ")"
+        do r = 1, self%num_nodes
             row_start = self%ptr(r)
             row_end = self%ptr(r + 1) - 1
             do i = row_start, row_end
-                write (*, '(2(i0, ", "), es16.8)') r, self%ind(i), self%val(i)
+                ! [Fix]: Iterate over the block dimensions to print values
+                do rb = 1, self%num_block_rows
+                    do cb = 1, self%num_block_cols
+                        write (*, '(a,i0,a,i0,a, i0,a,i0,a, es16.8)') &
+                            "Node(", r, ",", self%ind(i), ") Block(", rb, ",", cb, "): ", &
+                            self%val(i, rb, cb)
+                    end do
+                end do
             end do
         end do
     end subroutine display_bsr
-
 end submodule core_types_matrix_bsr

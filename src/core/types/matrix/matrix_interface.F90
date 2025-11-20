@@ -4,6 +4,7 @@
 !>
 module core_types_matrix
     use, intrinsic :: iso_fortran_env
+!$  use :: omp_lib
     use :: core_constants
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
@@ -152,7 +153,7 @@ module core_types_matrix
 
         !>
         !> Sets all entries in a specified row to a single value.
-        subroutine abst_set_row(self, op, row, value)
+        subroutine abst_set_row(self, op, row, value, row_block)
             import :: abst_matrix, real64, int32
             implicit none
             !> The matrix object.
@@ -163,6 +164,8 @@ module core_types_matrix
             integer(int32), intent(in) :: row
             !> The scalar value to assign.
             real(real64), intent(in) :: value
+            !> The block row index.
+            integer(int32), intent(in), optional :: row_block
         end subroutine abst_set_row
 
         !>
@@ -303,12 +306,13 @@ module core_types_matrix
         end subroutine set_value_block_dense
 
         !> Sets all values in a specified row of the dense matrix.
-        module subroutine set_row_dense(self, op, row, value)
+        module subroutine set_row_dense(self, op, row, value, row_block)
             implicit none
             class(type_dense), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
+            integer(int32), intent(in), optional :: row_block
         end subroutine set_row_dense
 
         !> Sets all values in the dense matrix to a single scalar value.
@@ -457,12 +461,13 @@ module core_types_matrix
         end subroutine set_value_block_csr
 
         !> Sets all values in a row.
-        module subroutine set_row_csr(self, op, row, value)
+        module subroutine set_row_csr(self, op, row, value, row_block)
             implicit none
             class(type_csr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
+            integer(int32), intent(in), optional :: row_block
         end subroutine set_row_csr
 
         !> Sets all stored values in the matrix.
@@ -604,12 +609,13 @@ module core_types_matrix
         end subroutine set_value_block_coo
 
         !> Sets all values in a row.
-        module subroutine set_row_coo(self, op, row, value)
+        module subroutine set_row_coo(self, op, row, value, row_block)
             implicit none
             class(type_coo), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
+            integer(int32), intent(in), optional :: row_block
         end subroutine set_row_coo
 
         !> Sets all stored values in the matrix.
@@ -741,12 +747,13 @@ module core_types_matrix
             real(real64), intent(in) :: value
         end subroutine set_value_block_bsr
 
-        module subroutine set_row_bsr(self, op, row, value)
+        module subroutine set_row_bsr(self, op, row, value, row_block)
             implicit none
             class(type_bsr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
+            integer(int32), intent(in), optional :: row_block
         end subroutine set_row_bsr
 
         module subroutine set_all_bsr(self, op, value)

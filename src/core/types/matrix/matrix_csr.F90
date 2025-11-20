@@ -210,7 +210,7 @@ contains
     !>
     !> Sets all non-zero entries in a specific row to a single scalar value.
     !>
-    module subroutine set_row_csr(self, op, row, value)
+    module subroutine set_row_csr(self, op, row, value, row_block)
         implicit none
         !> The csr matrix object.
         class(type_csr), intent(inout) :: self
@@ -220,6 +220,8 @@ contains
         integer(int32), intent(in) :: row
         !> The scalar value to assign.
         real(real64), intent(in) :: value
+        !> The block row index.
+        integer(int32), intent(in), optional :: row_block
 
         integer(int32) :: is, ie
 

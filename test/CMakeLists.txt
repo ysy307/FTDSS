@@ -2,7 +2,18 @@
 
 # 現在選択されているテスト名(${TEST_NAME})に応じて、ビルドするテストを決定する
 
-if(TEST_NAME STREQUAL "input")
+if(TEST_NAME STREQUAL "core")
+    # test_core実行ファイルを作成
+    add_executable(test_core test_core.F90)
+    set_target_properties(test_core PROPERTIES LINKER_LANGUAGE Fortran)
+    # 必要なライブラリをリンク
+    target_link_libraries(test_core PRIVATE
+        Solver::Core
+    )
+
+    # CTestにテストとして登録
+    add_test(NAME test_core COMMAND $<TARGET_FILE:test_core>)
+elseif(TEST_NAME STREQUAL "input")
     # test_input実行ファイルを作成
     add_executable(test_input test_input.F90)
     set_target_properties(test_input PROPERTIES LINKER_LANGUAGE Fortran)

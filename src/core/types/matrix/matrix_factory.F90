@@ -1,7 +1,7 @@
 module core_types_matrix_factory
     use, intrinsic :: iso_fortran_env, only: int32
     use :: core_constants
-    use :: core_types_matrix, only:abst_matrix, type_dense, type_csr, type_coo, type_bsr
+    use :: core_types_matrix
     implicit none
     private
 

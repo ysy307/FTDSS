@@ -149,7 +149,7 @@ contains
     !>
     !> Sets all entries in a specified row to a single scalar value.
     !>
-    module subroutine set_row_dense(self, op, row, value)
+    module subroutine set_row_dense(self, op, row, value, row_block)
         implicit none
         !> The dense matrix object.
         class(type_dense), intent(inout) :: self
@@ -159,6 +159,8 @@ contains
         integer(int32), intent(in) :: row
         !> The scalar value to assign.
         real(real64), intent(in) :: value
+        !> The block row index.
+        integer(int32), intent(in), optional :: row_block
 
         select case (op)
         case (MATRIX_OP_INS)
