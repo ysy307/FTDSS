@@ -32,7 +32,9 @@ elseif(BUILD_APP STREQUAL "test")
     # --- テストビルドモード ---
     message(STATUS "Build mode: Test (selected test: ${TEST_NAME})")
 
-    if(TEST_NAME STREQUAL "input")
+    if(TEST_NAME STREQUAL "core")
+        list(APPEND REQUIRED_MODULES "core")
+    elseif(TEST_NAME STREQUAL "input")
         list(APPEND REQUIRED_MODULES "core" "inout")
     elseif(TEST_NAME STREQUAL "control")
         list(APPEND REQUIRED_MODULES "core" "inout" "linalg" "control")

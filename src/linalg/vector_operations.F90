@@ -150,26 +150,26 @@ module linalg_vector_ops
     end interface
 
     abstract interface
-        function abst_real_from_one_vector_function(vector)
+        function abst_real_from_one_vector_function(vector) result(res)
             import :: real64
             implicit none
             real(real64), intent(in) :: vector(:)
-            real(real64) :: abst_real_from_one_vector_function
+            real(real64) :: res
         end function
 
-        function abst_real_from_two_vectors_function(vector_a, vector_b)
+        function abst_real_from_two_vectors_function(vector_a, vector_b) result(res)
             import :: real64
             implicit none
             real(real64), intent(in) :: vector_a(:)
             real(real64), intent(in) :: vector_b(:)
-            real(real64) :: abst_real_from_two_vectors_function
+            real(real64) :: res
         end function
 
-        function abst_real_from_vector_for_inf_norm_function(vector)
+        function abst_real_from_vector_for_inf_norm_function(vector) result(res)
             import :: real64
             implicit none
             real(real64), intent(in) :: vector(:)
-            real(real64) :: abst_real_from_vector_for_inf_norm_function
+            real(real64) :: res
         end function
     end interface
 
@@ -190,42 +190,6 @@ contains
     ! =========================================================================
     ! 3. Private Helper Subroutines
     ! =========================================================================
-
-    !>
-    !> Checks if two double precision arrays have the same size.
-    !>
-    subroutine check_sizes_match_dp(a, b, routine_name)
-        implicit none
-        !> The first array.
-        real(real64), intent(in) :: a(:)
-        !> The second array.
-        real(real64), intent(in) :: b(:)
-        !> The name of the calling routine for error messages.
-        character(len=*), intent(in) :: routine_name
-
-        if (size(a) /= size(b)) then
-            write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
-            error stop 1
-        end if
-    end subroutine check_sizes_match_dp
-
-    !>
-    !> Checks if two integer arrays have the same size.
-    !>
-    subroutine check_sizes_match_int(a, b, routine_name)
-        implicit none
-        !> The first array.
-        integer(int32), intent(in) :: a(:)
-        !> The second array.
-        integer(int32), intent(in) :: b(:)
-        !> The name of the calling routine for error messages.
-        character(len=*), intent(in) :: routine_name
-
-        if (size(a) /= size(b)) then
-            write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
-            error stop 1
-        end if
-    end subroutine check_sizes_match_int
 
     !>
     !> Initializes the linear algebra backend.

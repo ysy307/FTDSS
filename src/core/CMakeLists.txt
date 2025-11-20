@@ -9,6 +9,7 @@ set(CORE_VALIDATION_SOURCES
     validation/error.F90
     validation/check_nan.F90
     validation/check_range.F90
+    validation/check_length.F90
 )
 add_library(Core_Validation STATIC ${CORE_VALIDATION_SOURCES})
 target_include_directories(Core_Validation PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
@@ -16,9 +17,10 @@ enable_build_flags(Core_Validation)
 enable_thirdparty(Core_Validation)
 
 set(CORE_CONSTANTS_SOURCES
-    constants/constants.F90
-    constants/parallel_constants.F90
+    constants/constants_solver.F90
+    constants/constants_parallel.F90
     constants/constants_utils.F90
+    constants/constants.F90
 )
 add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES})
 target_include_directories(Core_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
@@ -63,7 +65,9 @@ set(CORE_TYPES_SOURCES
     types/matrix/matrix_interface.F90
     types/matrix/matrix_dense.F90
     types/matrix/matrix_coo.F90
-    types/matrix/matrix_crs.F90
+    types/matrix/matrix_csr.F90
+    types/matrix/matrix_bsr.F90
+    types/matrix/matrix_factory.F90
     types/matrix/matrix.F90
 )
 add_library(Core_Types STATIC ${CORE_TYPES_SOURCES})

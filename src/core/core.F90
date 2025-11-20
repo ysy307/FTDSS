@@ -2,6 +2,7 @@ module module_core
     use :: core_error, only:error_message
     use :: core_check_nan, only:has_nan
     use :: core_check_range, only:value_in_range
+    use :: core_check_length, only:check_match_length
     use :: core_unique, only:unique
     use :: core_allocate, only:allocate_array, allocate_pointer
     use :: core_deallocate, only:deallocate_array
@@ -16,8 +17,6 @@ module module_core
     use :: core_vtk
     use :: core_vtk_vtk_constants
     use :: core_constants
-    use :: core_parallel_constants
-    use :: core_constants_utils
     implicit none
     public
 

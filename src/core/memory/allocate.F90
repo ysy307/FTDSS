@@ -34,6 +34,17 @@ module core_allocate
         module procedure :: allocate_rank2_logical1
         module procedure :: allocate_rank2_logical4
         module procedure :: allocate_rank2_logical8
+        ! Rank-3 arrays
+        module procedure :: allocate_rank3_int8
+        module procedure :: allocate_rank3_int16
+        module procedure :: allocate_rank3_int32
+        module procedure :: allocate_rank3_int64
+        module procedure :: allocate_rank3_real32
+        module procedure :: allocate_rank3_real64
+        module procedure :: allocate_rank3_real128
+        module procedure :: allocate_rank3_logical1
+        module procedure :: allocate_rank3_logical4
+        module procedure :: allocate_rank3_logical8
     end interface
 
     interface allocate_pointer
@@ -1090,6 +1101,447 @@ contains
         if (stat /= 0) call error_message(955)
 #endif
     end subroutine allocate_rank2_logical8
+
+    ! ==========================================================
+    ! Rank-3 Allocatable Arrays
+    ! ==========================================================
+    !>
+    !> Safely allocates a rank-3 allocatable 8-bit integer array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_int8(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        integer(int8), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int8), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int8), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int8), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        integer(int8), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        integer(int64) :: total_size
+        logical :: shape_present, source_present
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+            total_size = int(dim1, kind=int64) * int(dim2, kind=int64) * int(dim3, kind=int64)
+            if (total_size > huge(0_int64) / 4) call error_message(953)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_int8
+
+    !>
+    !> Safely allocates a rank-3 allocatable 16-bit integer array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_int16(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        integer(int16), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int16), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int16), intent(in), optional :: dim2
+        !> The third dimension size.
+
+        integer(int16), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        integer(int16), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        integer(int64) :: total_size
+        logical :: shape_present, source_present
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+            total_size = int(dim1, kind=int64) * int(dim2, kind=int64) * int(dim3, kind=int64)
+            if (total_size > huge(0_int64) / 2) call error_message(953)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_int16
+
+    !>
+    !> Safely allocates a rank-3 allocatable 32-bit integer array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_int32(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        integer(int32), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        integer(int32), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        integer(int64) :: total_size
+        logical :: shape_present, source_present
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+            total_size = int(dim1, kind=int64) * int(dim2, kind=int64) * int(dim3, kind=int64)
+            if (total_size > huge(0_int64) / 4) call error_message(953)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_int32
+
+    !>
+    !> Safely allocates a rank-3 allocatable 64-bit integer array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_int64(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        integer(int64), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        integer(int64), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        integer(int64) :: total_size
+        logical :: shape_present, source_present
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+            total_size = int(dim1, kind=int64) * int(dim2, kind=int64) * int(dim3, kind=int64)
+            if (total_size > huge(0_int64) / 8) call error_message(953)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_int64
+
+    !>
+    !> Safely allocates a rank-3 allocatable single precision real array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_real32(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        real(real32), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        real(real32), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        integer(int64) :: total_size
+        logical :: shape_present, source_present
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+            total_size = int(dim1, kind=int64) * int(dim2, kind=int64) * int(dim3, kind=int64)
+            if (total_size > huge(0_int64) / 4) call error_message(953)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_real32
+
+    !>
+    !> Safely allocates a rank-3 allocatable double precision real array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_real64(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        real(real64), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        real(real64), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        integer(int64) :: total_size
+        logical :: shape_present, source_present
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+            total_size = int(dim1, kind=int64) * int(dim2, kind=int64) * int(dim3, kind=int64)
+            if (total_size > huge(0_int64) / 8) call error_message(953)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_real64
+    !>
+    !> Safely allocates a rank-3 allocatable quad precision real array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_real128(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        real(real128), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        real(real128), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        integer(int64) :: total_size
+        logical :: shape_present, source_present
+
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+            total_size = int(dim1, kind=int64) * int(dim2, kind=int64) * int(dim3, kind=int64)
+            if (total_size > huge(0_int64) / 16) call error_message(953)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_real128
+
+    !>
+    !> Safely allocates a rank-3 allocatable logical (kind=8) array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_logical1(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        logical(logical8), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        logical(logical8), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        logical :: shape_present, source_present
+
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_logical1
+
+    !>
+    !> Safely allocates a rank-3 allocatable logical (kind=32) array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_logical4(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        logical(logical32), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        logical(logical32), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        logical :: shape_present, source_present
+
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_logical4
+
+    !>
+    !> Safely allocates a rank-3 allocatable logical (kind=64) array.
+    !> Either the shape (dim1, dim2, dim3) or a source array must be provided.
+    !>
+    subroutine allocate_rank3_logical8(array, dim1, dim2, dim3, source)
+        implicit none
+        !> The allocatable array to be allocated.
+        logical(logical64), intent(inout), allocatable :: array(:, :, :)
+        !> The first dimension size.
+        integer(int32), intent(in), optional :: dim1
+        !> The second dimension size.
+        integer(int32), intent(in), optional :: dim2
+        !> The third dimension size.
+        integer(int32), intent(in), optional :: dim3
+        !> An existing array to use as a source for allocation and value copy.
+        logical(logical64), intent(in), optional :: source(:, :, :)
+        integer(int32) :: stat
+        logical :: shape_present, source_present
+
+        shape_present = present(dim1) .and. present(dim2) .and. present(dim3)
+        source_present = present(source)
+#ifdef USE_DEBUG
+        if (shape_present .and. source_present) call error_message(956)
+        if (.not. shape_present .and. .not. source_present) call error_message(957)
+        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+#endif
+
+        if (allocated(array)) call error_message(951)
+
+        if (shape_present) then
+#ifdef USE_DEBUG
+            if (dim1 <= 0 .or. dim2 <= 0 .or. dim3 <= 0) call error_message(952)
+#endif
+            allocate (array(dim1, dim2, dim3), stat=stat)
+        else if (source_present) then
+            allocate (array, source=source, stat=stat)
+        end if
+#ifdef USE_DEBUG
+        if (stat /= 0) call error_message(955)
+#endif
+    end subroutine allocate_rank3_logical8
 
     ! ==========================================================
     ! Pointer Allocations

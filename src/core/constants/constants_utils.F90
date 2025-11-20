@@ -2,8 +2,8 @@ module core_constants_utils
     use :: iso_fortran_env, only:int32
     use :: stdlib_strings, only:strip
     use :: stdlib_ascii, only:to_lower
-    use :: core_constants
-    use :: core_parallel_constants
+    use :: core_constants_solver
+    use :: core_constants_parallel
     implicit none
     private
 

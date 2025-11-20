@@ -1,4 +1,4 @@
-module core_parallel_constants
+module core_constants_parallel
     use, intrinsic :: iso_fortran_env, only: int32
     implicit none
     private
@@ -27,4 +27,4 @@ module core_parallel_constants
     integer(int32), parameter, public :: OP_UPDATE = 1
     integer(int32), parameter, public :: OP_ASSEMBLE = 2
 
-end module core_parallel_constants
+end module core_constants_parallel
