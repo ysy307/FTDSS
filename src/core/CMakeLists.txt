@@ -69,6 +69,10 @@ set(CORE_TYPES_SOURCES
     types/matrix/matrix_bsr.F90
     types/matrix/matrix_factory.F90
     types/matrix/matrix.F90
+    types/vector/vector_interface.F90
+    types/vector/vector_dp.F90
+    types/vector/vector_int.F90
+    types/vector/vector.F90
 )
 add_library(Core_Types STATIC ${CORE_TYPES_SOURCES})
 target_include_directories(Core_Types PUBLIC ${CMAKE_CURRENT_BINARY_DIR})

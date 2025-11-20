@@ -292,9 +292,9 @@ module core_constants_solver
     ! Matrix Operations
     ! ==========================================================
     !> Insert operation
-    integer(int32), parameter, public :: MATRIX_OP_INS = 1
+    integer(int32), parameter, public :: OP_INS = 1
     !> Add operation
-    integer(int32), parameter, public :: MATRIX_OP_ADD = 2
+    integer(int32), parameter, public :: OP_ADD = 2
 
     !=========================================================
     ! Matrix Check Status Codes
@@ -303,7 +303,13 @@ module core_constants_solver
     integer(int32), parameter, public :: MATRIX_STATUS_SUCCESS = 0
     !> Matrix has an error
     integer(int32), parameter, public :: MATRIX_STATUS_ILL_OPERATIONS = -1
+    integer(int32), parameter, public :: MATRIX_STATUS_OUT_OF_MEMORY = -2
 
     !> Matrix method not implemented
     integer(int32), parameter, public :: MATRIX_STATUS_NOT_IMPLEMENTED = -5
+
+    integer(int32), parameter, public :: VECTOR_STATUS_SUCCESS = 0
+    integer(int32), parameter, public :: VECTOR_STATUS_ILL_OPERATIONS = -1
+    integer(int32), parameter, public :: VECTOR_STATUS_OUT_OF_MEMORY = -3
+    integer(int32), parameter, public :: VECTOR_STATUS_NOT_IMPLEMENTED = -5
 end module core_constants_solver

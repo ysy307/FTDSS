@@ -27,7 +27,7 @@ contains
     !>
     !> Checks if an 8-bit integer value is within the inclusive range [min, max].
     !>
-    function value_in_range_int8(value, min, max) result(in_range)
+    pure function value_in_range_int8(value, min, max) result(in_range)
         implicit none
         !> The value to check.
         integer(int8), intent(in) :: value
@@ -44,7 +44,7 @@ contains
     !>
     !> Checks if a 16-bit integer value is within the inclusive range [min, max].
     !>
-    function value_in_range_int16(value, min, max) result(in_range)
+    pure function value_in_range_int16(value, min, max) result(in_range)
         implicit none
         !> The value to check.
         integer(int16), intent(in) :: value
@@ -61,7 +61,7 @@ contains
     !>
     !> Checks if a 32-bit integer value is within the inclusive range [min, max].
     !>
-    function value_in_range_int32(value, min, max) result(in_range)
+    pure function value_in_range_int32(value, min, max) result(in_range)
         implicit none
         !> The value to check.
         integer(int32), intent(in) :: value
@@ -78,7 +78,7 @@ contains
     !>
     !> Checks if a 64-bit integer value is within the inclusive range [min, max].
     !>
-    function value_in_range_int64(value, min, max) result(in_range)
+    pure function value_in_range_int64(value, min, max) result(in_range)
         implicit none
         !> The value to check.
         integer(int64), intent(in) :: value
@@ -95,7 +95,7 @@ contains
     !>
     !> Checks if a single precision real value is within the inclusive range [min, max].
     !>
-    function value_in_range_real32(value, min, max) result(in_range)
+    pure function value_in_range_real32(value, min, max) result(in_range)
         implicit none
         !> The value to check.
         real(real32), intent(in) :: value
@@ -112,7 +112,7 @@ contains
     !>
     !> Checks if a double precision real value is within the inclusive range [min, max].
     !>
-    function value_in_range_real64(value, min, max) result(in_range)
+    pure function value_in_range_real64(value, min, max) result(in_range)
         implicit none
         !> The value to check.
         real(real64), intent(in) :: value
@@ -129,7 +129,7 @@ contains
     !>
     !> Checks if a quad precision real value is within the inclusive range [min, max].
     !>
-    function value_in_range_real128(value, min, max) result(in_range)
+    pure function value_in_range_real128(value, min, max) result(in_range)
         implicit none
         !> The value to check.
         real(real128), intent(in) :: value

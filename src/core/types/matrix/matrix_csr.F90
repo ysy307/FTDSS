@@ -92,19 +92,20 @@ contains
 
         integer(int32) :: i, row_start, row_end, j
 
-        ! Extract diagonal elements
+        ! Extract diagonal elements into internal storage first
         self%diagonal(:) = 0.0d0
         do i = 1, self%num_ptrs - 1
             row_start = self%ptr(i)
             row_end = self%ptr(i + 1) - 1
             do j = row_start, row_end
                 if (self%ind(j) == i) then
-                    diagonal(i) = self%val(j)
+                    self%diagonal(i) = self%val(j)
                     exit
                 end if
             end do
         end do
 
+        ! Finally, associate the pointer
         diagonal => self%diagonal
     end function get_diagonal_csr
 
@@ -170,16 +171,16 @@ contains
         if (index > 0) then
 #endif
             select case (op)
-            case (MATRIX_OP_INS)
+            case (OP_INS)
                 self%val(index) = value
-            case (MATRIX_OP_ADD)
+            case (OP_ADD)
                 self%val(index) = self%val(index) + value
             case default
                 self%status = MATRIX_STATUS_ILL_OPERATIONS
             end select
 #ifdef USE_DEBUG
         else
-            print *, "Warning(set_value_csr): Element not in sparsity pattern.", row, col
+            self%status = MATRIX_STATUS_OUT_OF_MEMORY
         end if
 #endif
     end subroutine set_value_csr
@@ -229,9 +230,9 @@ contains
         ie = self%ptr(row + 1) - 1
 
         select case (op)
-        case (MATRIX_OP_INS)
+        case (OP_INS)
             self%val(is:ie) = value
-        case (MATRIX_OP_ADD)
+        case (OP_ADD)
             self%val(is:ie) = self%val(is:ie) + value
         case default
             self%status = MATRIX_STATUS_ILL_OPERATIONS
@@ -251,9 +252,9 @@ contains
         real(real64), intent(in) :: value
 
         select case (op)
-        case (MATRIX_OP_INS)
+        case (OP_INS)
             self%val = value
-        case (MATRIX_OP_ADD)
+        case (OP_ADD)
             self%val = self%val + value
         case default
             self%status = MATRIX_STATUS_ILL_OPERATIONS

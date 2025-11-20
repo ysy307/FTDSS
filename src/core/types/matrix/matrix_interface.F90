@@ -9,6 +9,7 @@ module core_types_matrix
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
     use :: core_findings, only:binary_find
+    use :: core_check_range, only:value_in_range
     implicit none
     private
 

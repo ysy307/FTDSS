@@ -18,7 +18,7 @@ set(TEST_NAME "input" CACHE STRING "Specify the test name (e.g., input, domain)"
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_MKL    "Enable MKL support"    ON)
 option(ENABLE_MPI    "Enable MPI support"    ON)
-option(ENABLE_DEBUG  "Enable debug flags"    OFF)
+option(ENABLE_DEBUG  "Enable debug flags"    ON)
 
 # ビルドするモジュールのリストを準備
 set(REQUIRED_MODULES "")

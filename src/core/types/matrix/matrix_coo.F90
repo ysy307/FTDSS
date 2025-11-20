@@ -171,16 +171,16 @@ contains
         if (index > 0) then
 #endif
             select case (op)
-            case (MATRIX_OP_INS)
+            case (OP_INS)
                 self%val(index) = value
-            case (MATRIX_OP_ADD)
+            case (OP_ADD)
                 self%val(index) = self%val(index) + value
             case default
                 self%status = MATRIX_STATUS_ILL_OPERATIONS
             end select
 #ifdef USE_DEBUG
         else
-            print *, "Warning(set_value_coo): Element not in sparsity pattern.", row, col
+            self%status = MATRIX_STATUS_OUT_OF_MEMORY
         end if
 #endif
     end subroutine set_value_coo
@@ -227,9 +227,9 @@ contains
         do i = 1, self%nnz
             if (self%row(i) == row) then
                 select case (op)
-                case (MATRIX_OP_INS)
+                case (OP_INS)
                     self%val(i) = value
-                case (MATRIX_OP_ADD)
+                case (OP_ADD)
                     self%val(i) = self%val(i) + value
                 case default
                     self%status = MATRIX_STATUS_ILL_OPERATIONS
@@ -251,9 +251,9 @@ contains
         real(real64), intent(in) :: value
 
         select case (op)
-        case (MATRIX_OP_INS)
+        case (OP_INS)
             self%val = value
-        case (MATRIX_OP_ADD)
+        case (OP_ADD)
             self%val = self%val + value
         case default
             self%status = MATRIX_STATUS_ILL_OPERATIONS

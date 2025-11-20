@@ -1,5 +1,4 @@
 module module_type_matrix
-    use, intrinsic :: iso_fortran_env
     use :: core_types_matrix
     use :: core_types_matrix_factory
     implicit none

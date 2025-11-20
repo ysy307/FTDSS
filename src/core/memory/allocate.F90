@@ -1130,7 +1130,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1176,7 +1176,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1221,7 +1221,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1265,7 +1265,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1309,7 +1309,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1353,7 +1353,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1397,7 +1397,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1441,7 +1441,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1483,7 +1483,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
@@ -1525,7 +1525,7 @@ contains
 #ifdef USE_DEBUG
         if (shape_present .and. source_present) call error_message(956)
         if (.not. shape_present .and. .not. source_present) call error_message(957)
-        if (present(dim1) .neqv. present(dim2) .or. present(dim1) .neqv. present(dim3)) call error_message(958)
+        if ((present(dim1) .neqv. present(dim2)) .or. (present(dim1) .neqv. present(dim3))) call error_message(958)
 #endif
 
         if (allocated(array)) call error_message(951)
