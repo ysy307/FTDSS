@@ -64,19 +64,26 @@ contains
         info%num_cols = self%num_cols
     end subroutine get_info_dense
 
-    module function get_diagonal_dense(self) result(diagonal)
+    module subroutine get_diagonal_dense(self, diagonal)
         implicit none
-        class(type_dense), intent(inout), target :: self
-        real(real64), dimension(:), pointer :: diagonal
+        class(type_dense), intent(inout) :: self
+        type(type_vector_dp), intent(inout) :: diagonal
         integer(int32) :: i
+
+#ifdef USE_DEBUG
+        if (.not. self%is_initialized()) then
+            self%status = MATRIX_STATUS_NOT_INITIALIZED
+            return
+        end if
+#endif
 
         if (allocated(self%val)) then
             do i = 1, self%num_rows
                 self%diagonal(i) = self%val(i, i)
             end do
         end if
-        diagonal => self%diagonal
-    end function get_diagonal_dense
+        call diagonal%set(OP_INS, self%diagonal)
+    end subroutine get_diagonal_dense
 
     !>
     !> Returns a pointer to the internal 2D array holding the matrix values.
@@ -175,6 +182,75 @@ contains
             self%status = MATRIX_STATUS_ILL_OPERATIONS
         end select
     end subroutine set_all_dense
+
+!>
+    !> Scales all stored values in the Dense matrix (2D array).
+    !>
+    module subroutine scale_dense(self, op, alpha)
+        implicit none
+        class(type_dense), intent(inout) :: self
+        integer(int32), intent(in) :: op
+        type(type_vector_dp), intent(in) :: alpha
+
+        real(real64), dimension(:), pointer :: alpha_data
+        integer(int32) :: i, j
+        integer(int32) :: nrows, ncols
+
+        nrows = self%num_rows
+        ncols = self%num_cols
+
+        alpha_data => alpha%get_data()
+
+        ! alphaのサイズチェック (行数分必要)
+        if (size(alpha_data) < nrows) then
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            return
+        end if
+
+        select case (op)
+
+            !-------------------------------------------------
+            ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
+            !-------------------------------------------------
+        case (OP_SCALE_SYMM_DIAG)
+
+            ! Fortranは列優先(Column-Major)なので、j(列)を外側、i(行)を内側にするのが
+            ! メモリアクセス的には最速ですが、alpha(j)へのアクセス頻度等を考慮し
+            ! コンパイラの最適化に任せつつ、OpenMPは列(j)で切ります。
+
+            !$omp parallel do default(shared) private(i, j)
+            do j = 1, ncols
+                do i = 1, nrows
+                    self%val(i, j) = self%val(i, j) * alpha_data(i) * alpha_data(j)
+                end do
+            end do
+            !$omp end parallel do
+
+            self%status = MATRIX_STATUS_SUCCESS
+
+            !-------------------------------------------------
+            ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
+            ! (左からのスケーリング: 行 i に alpha(i) を掛ける)
+            !-------------------------------------------------
+        case (OP_SCALE_JACOBI)
+
+            !$omp parallel do default(shared) private(i, j)
+            do j = 1, ncols
+                do i = 1, nrows
+                    ! ここで val(i, j) はメモリ連続アクセス
+                    ! alpha(i) は各ステップで値が変わるがキャッシュに載りやすい
+                    self%val(i, j) = self%val(i, j) * alpha_data(i)
+                end do
+            end do
+            !$omp end parallel do
+
+            self%status = MATRIX_STATUS_SUCCESS
+
+        case default
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+        end select
+
+    end subroutine scale_dense
 
     !>
     !> Sets all entries in the matrix to zero.

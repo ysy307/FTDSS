@@ -9,7 +9,7 @@
 !> It also features a backend-switching capability for norm and dot-product
 !> calculations, utilizing MKL when available.
 !>
-module linalg_vector_ops
+module linalg_vector_operations
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
     use :: module_core
@@ -379,9 +379,8 @@ contains
         !> The computed dot product.
         real(real64) :: product
 
-        call check_sizes_match(x, y, 'dot')
-
 #ifdef USE_DEBUG
+        call check_match_length(x, y, 'dot')
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
 #endif
         product = compute_dot_product_backend(x, y)
@@ -403,7 +402,7 @@ contains
         vec_data_x => x%get_data()
         vec_data_y => y%get_data()
 
-        call check_sizes_match(vec_data_x, vec_data_y, 'dot_vector_dp')
+        call check_match_length(vec_data_x, vec_data_y, 'dot_vector_dp')
 
 #ifdef USE_DEBUG
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
@@ -1154,8 +1153,8 @@ contains
         ptr_b => b%get_data()
         ptr_c => c%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_a, ptr_b, 'add_vector_dp')
-        call check_sizes_match(ptr_a, ptr_c, 'add_vector_dp')
+        call check_match_length(ptr_a, ptr_b, 'add_vector_dp')
+        call check_match_length(ptr_a, ptr_c, 'add_vector_dp')
 #endif
         ptr_c = ptr_a + ptr_b
     end subroutine add_vector_dp
@@ -1175,7 +1174,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_1_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'add_scalar_1_vector_dp')
 #endif
         ptr_r = scalar + ptr_v
     end subroutine add_scalar_1_vector_dp
@@ -1195,7 +1194,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_2_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'add_scalar_2_vector_dp')
 #endif
         ptr_r = ptr_v + scalar
     end subroutine add_scalar_2_vector_dp
@@ -1216,8 +1215,8 @@ contains
         ptr_b => b%get_data()
         ptr_c => c%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_a, ptr_b, 'subtract_vector_dp')
-        call check_sizes_match(ptr_a, ptr_c, 'subtract_vector_dp')
+        call check_match_length(ptr_a, ptr_b, 'subtract_vector_dp')
+        call check_match_length(ptr_a, ptr_c, 'subtract_vector_dp')
 #endif
         ptr_c = ptr_a - ptr_b
     end subroutine subtract_vector_dp
@@ -1237,7 +1236,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_1_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'subtract_scalar_1_vector_dp')
 #endif
         ptr_r = scalar - ptr_v
     end subroutine subtract_scalar_1_vector_dp
@@ -1257,7 +1256,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_2_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'subtract_scalar_2_vector_dp')
 #endif
         ptr_r = ptr_v - scalar
     end subroutine subtract_scalar_2_vector_dp
@@ -1278,8 +1277,8 @@ contains
         ptr_b => b%get_data()
         ptr_c => c%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_a, ptr_b, 'multiply_vector_dp')
-        call check_sizes_match(ptr_a, ptr_c, 'multiply_vector_dp')
+        call check_match_length(ptr_a, ptr_b, 'multiply_vector_dp')
+        call check_match_length(ptr_a, ptr_c, 'multiply_vector_dp')
 #endif
         ptr_c = ptr_a * ptr_b
     end subroutine multiply_vector_dp
@@ -1299,7 +1298,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_1_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'multiply_scalar_1_vector_dp')
 #endif
         ptr_r = scalar * ptr_v
     end subroutine multiply_scalar_1_vector_dp
@@ -1319,7 +1318,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_2_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'multiply_scalar_2_vector_dp')
 #endif
         ptr_r = ptr_v * scalar
     end subroutine multiply_scalar_2_vector_dp
@@ -1340,8 +1339,8 @@ contains
         ptr_b => b%get_data()
         ptr_c => c%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_a, ptr_b, 'divide_vector_dp')
-        call check_sizes_match(ptr_a, ptr_c, 'divide_vector_dp')
+        call check_match_length(ptr_a, ptr_b, 'divide_vector_dp')
+        call check_match_length(ptr_a, ptr_c, 'divide_vector_dp')
         if (any(ptr_b == 0.0d0)) error stop "ERROR in divide_vector_dp: Division by zero."
 #endif
         ptr_c = ptr_a / ptr_b
@@ -1362,7 +1361,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'divide_scalar_1_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'divide_scalar_1_vector_dp')
         if (any(ptr_v == 0.0d0)) error stop "ERROR in divide_scalar_1_vector_dp: Division by zero."
 #endif
         ptr_r = scalar / ptr_v
@@ -1383,7 +1382,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'divide_scalar_2_vector_dp')
+        call check_match_length(ptr_v, ptr_r, 'divide_scalar_2_vector_dp')
         if (scalar == 0.0d0) error stop "ERROR in divide_scalar_2_vector_dp: Division by zero."
 #endif
         ptr_r = ptr_v / scalar
@@ -1411,8 +1410,8 @@ contains
         ptr_c => c%get_data()
 
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_a, ptr_b, 'add_vector_int')
-        call check_sizes_match(ptr_a, ptr_c, 'add_vector_int')
+        call check_match_length(ptr_a, ptr_b, 'add_vector_int')
+        call check_match_length(ptr_a, ptr_c, 'add_vector_int')
 #endif
 
         ptr_c = ptr_a + ptr_b
@@ -1434,7 +1433,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_1_vector_int')
+        call check_match_length(ptr_v, ptr_r, 'add_scalar_1_vector_int')
 #endif
         ptr_r = scalar + ptr_v
     end subroutine add_scalar_1_vector_int
@@ -1454,7 +1453,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'add_scalar_2_vector_int')
+        call check_match_length(ptr_v, ptr_r, 'add_scalar_2_vector_int')
 #endif
         ptr_r = ptr_v + scalar
     end subroutine add_scalar_2_vector_int
@@ -1475,8 +1474,8 @@ contains
         ptr_b => b%get_data()
         ptr_c => c%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_a, ptr_b, 'subtract_vector_int')
-        call check_sizes_match(ptr_a, ptr_c, 'subtract_vector_int')
+        call check_match_length(ptr_a, ptr_b, 'subtract_vector_int')
+        call check_match_length(ptr_a, ptr_c, 'subtract_vector_int')
 #endif
         ptr_c = ptr_a - ptr_b
     end subroutine subtract_vector_int
@@ -1496,7 +1495,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_1_vector_int')
+        call check_match_length(ptr_v, ptr_r, 'subtract_scalar_1_vector_int')
 #endif
         ptr_r = scalar - ptr_v
     end subroutine subtract_scalar_1_vector_int
@@ -1516,7 +1515,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'subtract_scalar_2_vector_int')
+        call check_match_length(ptr_v, ptr_r, 'subtract_scalar_2_vector_int')
 #endif
         ptr_r = ptr_v - scalar
     end subroutine subtract_scalar_2_vector_int
@@ -1537,8 +1536,8 @@ contains
         ptr_b => b%get_data()
         ptr_c => c%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_a, ptr_b, 'multiply_vector_int')
-        call check_sizes_match(ptr_a, ptr_c, 'multiply_vector_int')
+        call check_match_length(ptr_a, ptr_b, 'multiply_vector_int')
+        call check_match_length(ptr_a, ptr_c, 'multiply_vector_int')
 #endif
         ptr_c = ptr_a * ptr_b
     end subroutine multiply_vector_int
@@ -1558,7 +1557,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_1_vector_int')
+        call check_match_length(ptr_v, ptr_r, 'multiply_scalar_1_vector_int')
 #endif
         ptr_r = scalar * ptr_v
     end subroutine multiply_scalar_1_vector_int
@@ -1578,7 +1577,7 @@ contains
         ptr_v => vector%get_data()
         ptr_r => result_vec%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_v, ptr_r, 'multiply_scalar_2_vector_int')
+        call check_match_length(ptr_v, ptr_r, 'multiply_scalar_2_vector_int')
 #endif
         ptr_r = ptr_v * scalar
     end subroutine multiply_scalar_2_vector_int
@@ -1686,10 +1685,10 @@ contains
         call lhs%set(OP_INS, ptr_rhs)
     end subroutine assign_vector_int
 
-    subroutine axpy_vector_dp(a, x, y)
+    subroutine axpy_vector_dp(alpha, x, y)
         implicit none
         !> The scalar multiplier.
-        real(real64), intent(in) :: a
+        real(real64), intent(in) :: alpha
         !> The input vector x.
         class(type_vector_dp), intent(in) :: x
         !> The output vector y to store the result.
@@ -1700,15 +1699,15 @@ contains
         ptr_x => x%get_data()
         ptr_y => y%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_x, ptr_y, 'axpy_vector_dp')
+        call check_match_length(ptr_x, ptr_y, 'axpy_vector_dp')
 #endif
-        ptr_y = ptr_y + a * ptr_x
+        ptr_y = ptr_y + alpha * ptr_x
     end subroutine axpy_vector_dp
 
-    subroutine axpy_vector_int(a, x, y)
+    subroutine axpy_vector_int(alpha, x, y)
         implicit none
         !> The scalar multiplier.
-        integer(int32), intent(in) :: a
+        integer(int32), intent(in) :: alpha
         !> The input vector x.
         class(type_vector_int), intent(in) :: x
         !> The output vector y to store the result.
@@ -1719,15 +1718,15 @@ contains
         ptr_x => x%get_data()
         ptr_y => y%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_x, ptr_y, 'axpy_vector_int')
+        call check_match_length(ptr_x, ptr_y, 'axpy_vector_int')
 #endif
-        ptr_y = ptr_y + a * ptr_x
+        ptr_y = ptr_y + alpha * ptr_x
     end subroutine axpy_vector_int
 
-    subroutine xpay_vector_dp(a, x, y)
+    subroutine xpay_vector_dp(alpha, x, y)
         implicit none
         !> The scalar multiplier.
-        real(real64), intent(in) :: a
+        real(real64), intent(in) :: alpha
         !> The input vector x.
         class(type_vector_dp), intent(in) :: x
         !> The output vector y to store the result.
@@ -1738,15 +1737,15 @@ contains
         ptr_x => x%get_data()
         ptr_y => y%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_x, ptr_y, 'xpay_vector_dp')
+        call check_match_length(ptr_x, ptr_y, 'xpay_vector_dp')
 #endif
-        ptr_y = a * ptr_x + ptr_y
+        ptr_y = alpha * ptr_x + ptr_y
     end subroutine xpay_vector_dp
 
-    subroutine xpay_vector_int(a, x, y)
+    subroutine xpay_vector_int(alpha, x, y)
         implicit none
         !> The scalar multiplier.
-        integer(int32), intent(in) :: a
+        integer(int32), intent(in) :: alpha
         !> The input vector x.
         class(type_vector_int), intent(in) :: x
         !> The output vector y to store the result.
@@ -1757,15 +1756,15 @@ contains
         ptr_x => x%get_data()
         ptr_y => y%get_data()
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_x, ptr_y, 'xpay_vector_int')
+        call check_match_length(ptr_x, ptr_y, 'xpay_vector_int')
 #endif
-        ptr_y = a * ptr_x + ptr_y
+        ptr_y = alpha * ptr_x + ptr_y
     end subroutine xpay_vector_int
 
-    subroutine axpyz_vector_dp(a, x, y, z)
+    subroutine axpyz_vector_dp(alpha, x, y, z)
         implicit none
         !> The scalar multiplier.
-        real(real64), intent(in) :: a
+        real(real64), intent(in) :: alpha
         !> The input vector x.
         class(type_vector_dp), intent(in) :: x
         !> The input vector y.
@@ -1780,16 +1779,16 @@ contains
         ptr_z => z%get_data()
 
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_x, ptr_y, 'axpyz_vector_dp')
-        call check_sizes_match(ptr_x, ptr_z, 'axpyz_vector_dp')
+        call check_match_length(ptr_x, ptr_y, 'axpyz_vector_dp')
+        call check_match_length(ptr_x, ptr_z, 'axpyz_vector_dp')
 #endif
-        ptr_z = ptr_y + a * ptr_x
+        ptr_z = ptr_y + alpha * ptr_x
     end subroutine axpyz_vector_dp
 
-    subroutine axpyz_vector_int(a, x, y, z)
+    subroutine axpyz_vector_int(alpha, x, y, z)
         implicit none
         !> The scalar multiplier.
-        integer(int32), intent(in) :: a
+        integer(int32), intent(in) :: alpha
         !> The input vector x.
         class(type_vector_int), intent(in) :: x
         !> The input vector y.
@@ -1804,16 +1803,16 @@ contains
         ptr_z => z%get_data()
 
 #ifdef USE_DEBUG
-        call check_sizes_match(ptr_x, ptr_y, 'axpyz_vector_int')
-        call check_sizes_match(ptr_x, ptr_z, 'axpyz_vector_int')
+        call check_match_length(ptr_x, ptr_y, 'axpyz_vector_int')
+        call check_match_length(ptr_x, ptr_z, 'axpyz_vector_int')
 #endif
-        ptr_z = ptr_y + a * ptr_x
+        ptr_z = ptr_y + alpha * ptr_x
     end subroutine axpyz_vector_int
 
-    subroutine scale_vector_dp(a, x)
+    subroutine scale_vector_dp(alpha, x)
         implicit none
         !> The scalar multiplier.
-        real(real64), intent(in) :: a
+        real(real64), intent(in) :: alpha
         !> The input/output vector x to be scaled.
         class(type_vector_dp), intent(inout) :: x
 
@@ -1821,8 +1820,7 @@ contains
 
         ptr_x => x%get_data()
 
-        ptr_x = a * ptr_x
-
+        ptr_x = alpha * ptr_x
     end subroutine scale_vector_dp
 
     subroutine scale_vector_int(a, x)
@@ -1927,4 +1925,4 @@ contains
 
     end subroutine shift_vector_int
 
-end module linalg_vector_ops
+end module linalg_vector_operations

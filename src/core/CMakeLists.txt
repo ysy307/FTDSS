@@ -20,6 +20,7 @@ set(CORE_CONSTANTS_SOURCES
     constants/constants_solver.F90
     constants/constants_parallel.F90
     constants/constants_utils.F90
+    constants/constants_physical.F90
     constants/constants.F90
 )
 add_library(Core_Constants STATIC ${CORE_CONSTANTS_SOURCES})

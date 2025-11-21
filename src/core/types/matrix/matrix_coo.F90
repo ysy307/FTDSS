@@ -91,10 +91,10 @@ contains
         info%nnz = self%nnz
     end subroutine get_info_coo
 
-    module function get_diagonal_coo(self) result(diagonal)
+    module subroutine get_diagonal_coo(self, diagonal)
         implicit none
-        class(type_coo), intent(inout), target :: self
-        real(real64), dimension(:), pointer :: diagonal
+        class(type_coo), intent(inout) :: self
+        type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i
 
@@ -106,8 +106,8 @@ contains
             end if
         end do
 
-        diagonal => self%diagonal
-    end function get_diagonal_coo
+        call diagonal%set(OP_INS, self%diagonal)
+    end subroutine get_diagonal_coo
 
     !>
     !> Returns a pointer to the internal `row` index array.
@@ -259,6 +259,66 @@ contains
             self%status = MATRIX_STATUS_ILL_OPERATIONS
         end select
     end subroutine set_all_coo
+
+!>
+    !> Scales all stored values in the matrix by a scalar factor vector.
+    module subroutine scale_coo(self, op, alpha)
+        implicit none
+        !> The COO matrix object.
+        class(type_coo), intent(inout) :: self
+        !> The operation to perform
+        integer(int32), intent(in) :: op
+        !> The scaling vector (derived from diagonal).
+        type(type_vector_dp), intent(in) :: alpha
+
+        integer(int32) :: i, r, c
+
+        real(real64), dimension(:), pointer :: alpha_data
+        alpha_data => alpha%get_data()
+
+        ! alphaは行列の次元数(n)と同じであるべき
+        if (size(alpha_data) /= self%num_nodes) then
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            return
+        end if
+
+        select case (op)
+            !-------------------------------------------------
+            ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
+            ! (alpha には 1/sqrt(|D|) が入っている)
+            !-------------------------------------------------
+        case (OP_SCALE_SYMM_DIAG)
+            !$omp parallel do default(shared) private(i, r, c)
+            do i = 1, self%nnz
+                r = self%row(i) ! 行インデックス (1-based)
+                c = self%col(i) ! 列インデックス (1-based)
+
+                self%val(i) = self%val(i) * alpha_data(r) * alpha_data(c)
+            end do
+            !$omp end parallel do
+
+            self%status = MATRIX_STATUS_SUCCESS
+
+            !-------------------------------------------------
+            ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
+            ! (alpha には 1/D が入っている)
+            !-------------------------------------------------
+        case (OP_SCALE_JACOBI)
+            !$omp parallel do default(shared) private(i, r)
+            do i = 1, self%nnz
+                r = self%row(i)
+                ! Jacobiは左から掛けるだけなので列インデックスは不要
+
+                self%val(i) = self%val(i) * alpha_data(r)
+            end do
+            !$omp end parallel do
+
+            self%status = MATRIX_STATUS_SUCCESS
+
+        case default
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+        end select
+    end subroutine scale_coo
 
     !>
     !> Sets all stored values in the matrix to zero.

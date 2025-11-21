@@ -10,6 +10,7 @@ module core_types_matrix
     use :: core_deallocate, only:deallocate_array
     use :: core_findings, only:binary_find
     use :: core_check_range, only:value_in_range
+    use :: module_type_vector, only:type_vector_dp
     implicit none
     private
 
@@ -69,6 +70,7 @@ module core_types_matrix
                                   set_row, & !&
                                   set_all !&
 
+        procedure(abst_scale),           public,  pass(self), deferred :: scale !&
         procedure(abst_zero),            public,  pass(self), deferred :: zero !&
         procedure(abst_find),            private, pass(self), deferred :: find !&
         procedure, public, pass(self) :: check => check_matrix_status
@@ -105,14 +107,14 @@ module core_types_matrix
             type(type_matrix_info), intent(inout) :: info
         end subroutine abst_get_info
 
-        function abst_get_diagonal(self) result(diagonal)
-            import :: abst_matrix, real64, int32
+        subroutine abst_get_diagonal(self, diagonal)
+            import :: abst_matrix, type_vector_dp
             implicit none
             !> The matrix object.
-            class(abst_matrix), intent(inout), target :: self
+            class(abst_matrix), intent(inout) :: self
             !> The diagonal entries of the matrix.
-            real(real64), dimension(:), pointer :: diagonal
-        end function abst_get_diagonal
+            type(type_vector_dp), intent(inout) :: diagonal
+        end subroutine abst_get_diagonal
 
         !>
         !> Sets the value of a single entry in the matrix.
@@ -183,6 +185,19 @@ module core_types_matrix
         end subroutine abst_set_all
 
         !>
+        !> Scales the matrix by a given scalar value.
+        subroutine abst_scale(self, op, alpha)
+            import :: abst_matrix, int32, type_vector_dp
+            implicit none
+            !> The matrix object.
+            class(abst_matrix), intent(inout) :: self
+            !> The operation to perform
+            integer(int32), intent(in) :: op
+            !> The scaling factor.
+            type(type_vector_dp), intent(in) :: alpha
+        end subroutine abst_scale
+
+        !>
         !> Sets all stored entries in the matrix to zero.
         subroutine abst_zero(self)
             import :: abst_matrix
@@ -243,6 +258,7 @@ module core_types_matrix
         procedure, pass(self) :: set_value_block => set_value_block_dense
         procedure, pass(self) :: set_row => set_row_dense
         procedure, pass(self) :: set_all => set_all_dense
+        procedure, pass(self) :: scale => scale_dense
         procedure, pass(self) :: find => find_dense
         procedure, pass(self) :: zero => zero_dense
         procedure, pass(self) :: display => display_dense
@@ -274,11 +290,12 @@ module core_types_matrix
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_dense
 
-        module function get_diagonal_dense(self) result(diagonal)
+        module subroutine get_diagonal_dense(self, diagonal)
             implicit none
-            class(type_dense), intent(inout), target :: self
-            real(real64), dimension(:), pointer :: diagonal
-        end function get_diagonal_dense
+            class(type_dense), intent(inout) :: self
+            !> The diagonal entries of the matrix.
+            type(type_vector_dp), intent(inout) :: diagonal
+        end subroutine get_diagonal_dense
 
         !> Returns a pointer to the dense matrix's value array.
         module function get_val_dense(self) result(val)
@@ -322,6 +339,14 @@ module core_types_matrix
             integer(int32), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_dense
+
+        !> Scales all values in the dense matrix by a scalar factor.
+        module subroutine scale_dense(self, op, alpha)
+            implicit none
+            class(type_dense), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            type(type_vector_dp), intent(in) :: alpha
+        end subroutine scale_dense
 
         !> Sets all values in the dense matrix to zero.
         module subroutine zero_dense(self)
@@ -376,6 +401,7 @@ module core_types_matrix
         procedure, pass(self) :: set_value_block => set_value_block_csr
         procedure, pass(self) :: set_row => set_row_csr
         procedure, pass(self) :: set_all => set_all_csr
+        procedure, pass(self) :: scale => scale_csr
         procedure, pass(self) :: zero => zero_csr
         procedure, pass(self), private :: find => find_csr
         procedure, pass(self) :: display => display_csr
@@ -407,11 +433,11 @@ module core_types_matrix
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_csr
 
-        module function get_diagonal_csr(self) result(diagonal)
+        module subroutine get_diagonal_csr(self, diagonal)
             implicit none
-            class(type_csr), intent(inout), target :: self
-            real(real64), dimension(:), pointer :: diagonal
-        end function get_diagonal_csr
+            class(type_csr), intent(inout) :: self
+            type(type_vector_dp), intent(inout) :: diagonal
+        end subroutine get_diagonal_csr
 
         !> Returns a pointer to the `ptr` array.
         module function get_ptr_csr(self) result(ptr)
@@ -479,6 +505,14 @@ module core_types_matrix
             real(real64), intent(in) :: value
         end subroutine set_all_csr
 
+        !> Scales all stored matrix values by a scalar factor.
+        module subroutine scale_csr(self, op, alpha)
+            implicit none
+            class(type_csr), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            type(type_vector_dp), intent(in) :: alpha
+        end subroutine scale_csr
+
         !> Sets all stored matrix values to zero.
         module subroutine zero_csr(self)
             implicit none
@@ -524,6 +558,7 @@ module core_types_matrix
         procedure, pass(self) :: set_value_block => set_value_block_coo
         procedure, pass(self) :: set_row => set_row_coo
         procedure, pass(self) :: set_all => set_all_coo
+        procedure, pass(self) :: scale => scale_coo
         procedure, pass(self) :: zero => zero_coo
         procedure, private, pass(self) :: find => find_coo
         procedure, pass(self) :: display => display_coo
@@ -555,11 +590,11 @@ module core_types_matrix
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_coo
 
-        module function get_diagonal_coo(self) result(diagonal)
+        module subroutine get_diagonal_coo(self, diagonal)
             implicit none
-            class(type_coo), intent(inout), target :: self
-            real(real64), dimension(:), pointer :: diagonal
-        end function get_diagonal_coo
+            class(type_coo), intent(inout) :: self
+            type(type_vector_dp), intent(inout) :: diagonal
+        end subroutine get_diagonal_coo
 
         !> Returns a pointer to the `row` index array.
         module function get_row_coo(self) result(row)
@@ -627,6 +662,14 @@ module core_types_matrix
             real(real64), intent(in) :: value
         end subroutine set_all_coo
 
+        !> Scales all stored matrix values by a scalar factor.
+        module subroutine scale_coo(self, op, alpha)
+            implicit none
+            class(type_coo), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            type(type_vector_dp), intent(in) :: alpha
+        end subroutine scale_coo
+
         !> Sets all stored matrix values to zero.
         module subroutine zero_coo(self)
             implicit none
@@ -671,6 +714,7 @@ module core_types_matrix
         procedure, pass(self) :: set_value_block => set_value_block_bsr
         procedure, pass(self) :: set_row => set_row_bsr
         procedure, pass(self) :: set_all => set_all_bsr
+        procedure, pass(self) :: scale => scale_bsr
         procedure, pass(self) :: zero => zero_bsr
         procedure, pass(self), private :: find => find_bsr
         procedure, pass(self) :: display => display_bsr
@@ -700,11 +744,11 @@ module core_types_matrix
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_bsr
 
-        module function get_diagonal_bsr(self) result(diagonal)
+        module subroutine get_diagonal_bsr(self, diagonal)
             implicit none
-            class(type_bsr), intent(inout), target :: self
-            real(real64), dimension(:), pointer :: diagonal
-        end function get_diagonal_bsr
+            class(type_bsr), intent(inout) :: self
+            type(type_vector_dp), intent(inout) :: diagonal
+        end subroutine get_diagonal_bsr
 
         module function get_ptr_bsr(self) result(ptr)
             implicit none
@@ -763,6 +807,13 @@ module core_types_matrix
             integer(int32), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_bsr
+
+        module subroutine scale_bsr(self, op, alpha)
+            implicit none
+            class(type_bsr), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            type(type_vector_dp), intent(in) :: alpha
+        end subroutine scale_bsr
 
         module subroutine zero_bsr(self)
             implicit none

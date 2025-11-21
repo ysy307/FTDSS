@@ -99,10 +99,10 @@ contains
         info%nnz = self%nnz
     end subroutine get_info_bsr
 
-    module function get_diagonal_bsr(self) result(diagonal)
+    module subroutine get_diagonal_bsr(self, diagonal)
         implicit none
-        class(type_bsr), intent(inout), target :: self
-        real(real64), dimension(:), pointer :: diagonal
+        class(type_bsr), intent(inout) :: self
+        type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i, row_start, row_end, j, k, m
 
@@ -127,8 +127,8 @@ contains
         end do
         !$omp end parallel do
 
-        diagonal => self%diagonal
-    end function get_diagonal_bsr
+        call diagonal%set(OP_INS, self%diagonal)
+    end subroutine get_diagonal_bsr
 
     !> Getters for internal arrays
     module function get_ptr_bsr(self) result(ptr)
@@ -298,6 +298,87 @@ contains
 
         self%status = MATRIX_STATUS_SUCCESS
     end subroutine set_all_bsr
+
+    module subroutine scale_bsr(self, op, alpha)
+        implicit none
+        class(type_bsr), intent(inout) :: self
+        integer(int32), intent(in) :: op
+        type(type_vector_dp), intent(in) :: alpha
+
+        real(real64), dimension(:), pointer :: alpha_data
+
+        integer(int32) :: i, j, rb, cb, col
+        integer(int32) :: row_start, row_end
+        integer(int32) :: row_dof, col_dof
+        integer(int32) :: nrequired
+        alpha_data => alpha%get_data()
+
+        ! 想定されるベクトルサイズチェック
+        nrequired = self%num_block_rows * self%num_nodes
+
+        if (size(alpha_data) /= nrequired) then
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            return
+        end if
+
+        select case (op)
+            !-------------------------------------------
+            ! Symmetric Scaling: A <- D^{-1/2} A D^{-1/2}
+            ! alpha には 1/sqrt(|D|) が入っている前提
+            !-------------------------------------------
+        case (OP_SCALE_SYMM_DIAG)
+
+            !$omp parallel do default(shared) private(i,j,rb,cb,col,row_start,row_end,row_dof,col_dof)
+            do i = 1, self%num_ptrs - 1
+                row_start = self%ptr(i)
+                row_end = self%ptr(i + 1) - 1
+
+                do j = row_start, row_end
+                    col = self%ind(j)
+                    ! ブロックごとの処理
+                    do rb = 1, self%num_block_rows
+                        row_dof = (i - 1) * self%num_block_rows + rb
+                        do cb = 1, self%num_block_cols
+                            col_dof = (col - 1) * self%num_block_rows + cb ! 正方ブロック前提
+
+                            self%val(rb, cb, j) = self%val(rb, cb, j) * &
+                                                  alpha_data(row_dof) * alpha_data(col_dof)
+                        end do
+                    end do
+                end do
+            end do
+            !$omp end parallel do
+            self%status = MATRIX_STATUS_SUCCESS
+
+            !-------------------------------------------
+            ! Jacobi Scaling: A <- D^{-1} A
+            ! alpha には 1/D が入っている前提 -> 掛け算で適用
+            !-------------------------------------------
+        case (OP_SCALE_JACOBI)
+
+            !$omp parallel do default(shared) private(i,j,rb,cb,row_start,row_end,row_dof)
+            do i = 1, self%num_ptrs - 1
+                row_start = self%ptr(i)
+                row_end = self%ptr(i + 1) - 1
+
+                do j = row_start, row_end
+                    do rb = 1, self%num_block_rows
+                        row_dof = (i - 1) * self%num_block_rows + rb
+                        do cb = 1, self%num_block_cols
+                            ! 【修正】割り算ではなく掛け算
+                            self%val(rb, cb, j) = self%val(rb, cb, j) * alpha_data(row_dof)
+                        end do
+                    end do
+                end do
+            end do
+            !$omp end parallel do
+            self%status = MATRIX_STATUS_SUCCESS
+
+        case default
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+        end select
+
+    end subroutine scale_bsr
 
     !>
     !> Zero out the matrix.

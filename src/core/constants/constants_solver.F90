@@ -296,6 +296,9 @@ module core_constants_solver
     !> Add operation
     integer(int32), parameter, public :: OP_ADD = 2
 
+    integer(int32), parameter, public :: OP_SCALE_SYMM_DIAG = 3
+    integer(int32), parameter, public :: OP_SCALE_JACOBI = 4
+
     !=========================================================
     ! Matrix Check Status Codes
     !=========================================================
@@ -304,6 +307,7 @@ module core_constants_solver
     !> Matrix has an error
     integer(int32), parameter, public :: MATRIX_STATUS_ILL_OPERATIONS = -1
     integer(int32), parameter, public :: MATRIX_STATUS_OUT_OF_MEMORY = -2
+    integer(int32), parameter, public :: MATRIX_STATUS_NOT_INITIALIZED = -3
 
     !> Matrix method not implemented
     integer(int32), parameter, public :: MATRIX_STATUS_NOT_IMPLEMENTED = -5

@@ -85,10 +85,10 @@ contains
         info%nnz = self%nnz
     end subroutine get_info_csr
 
-    module function get_diagonal_csr(self) result(diagonal)
+    module subroutine get_diagonal_csr(self, diagonal)
         implicit none
-        class(type_csr), intent(inout), target :: self
-        real(real64), dimension(:), pointer :: diagonal
+        class(type_csr), intent(inout) :: self
+        type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i, row_start, row_end, j
 
@@ -106,8 +106,8 @@ contains
         end do
 
         ! Finally, associate the pointer
-        diagonal => self%diagonal
-    end function get_diagonal_csr
+        call diagonal%set(OP_INS, self%diagonal)
+    end subroutine get_diagonal_csr
 
     !>
     !> Returns a pointer to the internal CSR pointer array (`ptr`).
@@ -260,6 +260,74 @@ contains
             self%status = MATRIX_STATUS_ILL_OPERATIONS
         end select
     end subroutine set_all_csr
+
+    !>
+    !> Scales all stored values in the CSR matrix.
+    module subroutine scale_csr(self, op, alpha)
+        implicit none
+        !> The CSR matrix object.
+        class(type_csr), intent(inout) :: self
+        !> The operation to perform
+        integer(int32), intent(in) :: op
+        !> The scaling vector.
+        type(type_vector_dp), intent(in) :: alpha
+
+        integer(int32) :: i, k, col
+        real(real64), dimension(:), pointer :: alpha_data
+
+        alpha_data => alpha%get_data()
+
+        ! alphaのサイズチェック
+        if (size(alpha_data) /= self%num_nodes) then
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            return
+        end if
+
+        select case (op)
+
+            !-------------------------------------------------
+            ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
+            ! (alpha には 1/sqrt(|D|) が入っている)
+            !-------------------------------------------------
+        case (OP_SCALE_SYMM_DIAG)
+
+            !$omp parallel do default(shared) private(i, k, col) schedule(static)
+            do i = 1, self%num_nodes
+                ! i行目の非ゼロ要素を走査
+                do k = self%ptr(i), self%ptr(i + 1) - 1
+                    col = self%ind(k) ! 列番号を取得
+
+                    ! A_ij = A_ij * D_i * D_j
+                    self%val(k) = self%val(k) * alpha_data(i) * alpha_data(col)
+                end do
+            end do
+            !$omp end parallel do
+
+            self%status = MATRIX_STATUS_SUCCESS
+
+            !-------------------------------------------------
+            ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
+            ! (alpha には 1/D が入っている)
+            !-------------------------------------------------
+        case (OP_SCALE_JACOBI)
+
+            !$omp parallel do default(shared) private(i, k) schedule(static)
+            do i = 1, self%num_nodes
+                ! i行目の全要素に対して、一律に alpha(i) を掛ける
+                ! 行単位でアクセスするため、CSR形式では非常にキャッシュ効率が良い
+                do k = self%ptr(i), self%ptr(i + 1) - 1
+                    self%val(k) = self%val(k) * alpha_data(i)
+                end do
+            end do
+            !$omp end parallel do
+
+            self%status = MATRIX_STATUS_SUCCESS
+
+        case default
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+        end select
+
+    end subroutine scale_csr
 
     !>
     !> Sets all stored values in the matrix to zero.

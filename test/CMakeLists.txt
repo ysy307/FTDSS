@@ -25,6 +25,14 @@ elseif(TEST_NAME STREQUAL "input")
 
     # CTestにテストとして登録
     add_test(NAME test_input COMMAND $<TARGET_FILE:test_input>)
+elseif(TEST_NAME STREQUAL "linalg")
+    add_executable(test_linalg test_linalg.F90)
+    set_target_properties(test_linalg PROPERTIES LINKER_LANGUAGE Fortran)
+    target_link_libraries(test_linalg PRIVATE
+        Solver::Core
+        Solver::Linalg
+    )
+    add_test(NAME test_linalg COMMAND $<TARGET_FILE:test_linalg>)
 
 elseif(TEST_NAME STREQUAL "control")
     add_executable(test_control test_control.F90)
