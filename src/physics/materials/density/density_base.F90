@@ -33,4 +33,18 @@ contains
                   + density_ice * phi_ice
 
     end function calc_den_3
+
+    !>
+    !> Calculate the density of saturated water vapor
+    module pure elemental function calc_den_saturated_vapor(temperature) result(density_vapor)
+        implicit none
+        !> Temperature [°C]
+        real(real64), intent(in) :: temperature
+        !> Density of saturated water vapor [kg/m^3]
+        real(real64) :: density_vapor
+
+        density_vapor = 1.0d-3 * exp(31.3716 - 6014.79 / (temperature + TtoK) - 7.92495d-3 * (temperature + TtoK)) &
+                        / (temperature + TtoK)
+
+    end function calc_den_saturated_vapor
 end submodule density_base

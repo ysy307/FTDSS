@@ -418,40 +418,42 @@ contains
         integer(int32), intent(in) :: material_id
         class(abst_hcf_base), allocatable :: property
 
-        select case (input%basic%materials(material_id)%hydraulic%hcf%model_number)
-        case (1)
-            property = construct_type_hcf_base_bc(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
-                                                  n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
-                                                  l=input%basic%materials(material_id)%hydraulic%hcf%l)
-        case (2)
-            property = construct_type_hcf_base_vg(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
-                                                  n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
-                                                  l=input%basic%materials(material_id)%hydraulic%hcf%l)
-        case (3)
-            property = construct_type_hcf_base_ko(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
-                                                  n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
-                                                  l=input%basic%materials(material_id)%hydraulic%hcf%l)
-        case (4)
-            property = construct_type_hcf_base_mvg(theta_s=input%basic%materials(material_id)%hydraulic%hcf%theta_s, &
-                                                   theta_r=input%basic%materials(material_id)%hydraulic%hcf%theta_r, &
-                                                   alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
-                                                   n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
-                                                   l=input%basic%materials(material_id)%hydraulic%hcf%l, &
-                                                   h_crit=input%basic%materials(material_id)%hydraulic%hcf%h_crit)
-        case (5)
-            property = construct_type_hcf_base_durner(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
-                                                      n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
-                                                      w1=input%basic%materials(material_id)%hydraulic%hcf%w1, &
-                                                      alpha2=input%basic%materials(material_id)%hydraulic%hcf%alpha2, &
-                                                      n2=input%basic%materials(material_id)%hydraulic%hcf%n2, &
-                                                      l=input%basic%materials(material_id)%hydraulic%hcf%l)
-        case (6)
-            property = construct_type_hcf_base_dvgch(alpha1=input%basic%materials(material_id)%hydraulic%hcf%alpha1, &
-                                                     n1=input%basic%materials(material_id)%hydraulic%hcf%n1, &
-                                                     w1=input%basic%materials(material_id)%hydraulic%hcf%w1, &
-                                                     n2=input%basic%materials(material_id)%hydraulic%hcf%n2, &
-                                                     l=input%basic%materials(material_id)%hydraulic%hcf%l)
-        end select
+        associate (hcf => input%basic%materials(material_id)%hydraulic%hcf)
+            select case (hcf%model_number)
+            case (1)
+                property = construct_type_hcf_base_bc(alpha1=hcf%alpha1, &
+                                                      n1=hcf%n1, &
+                                                      l=hcf%l)
+            case (2)
+                property = construct_type_hcf_base_vg(alpha1=hcf%alpha1, &
+                                                      n1=hcf%n1, &
+                                                      l=hcf%l)
+            case (3)
+                property = construct_type_hcf_base_ko(alpha1=hcf%alpha1, &
+                                                      n1=hcf%n1, &
+                                                      l=hcf%l)
+            case (4)
+                property = construct_type_hcf_base_mvg(theta_s=hcf%theta_s, &
+                                                       theta_r=hcf%theta_r, &
+                                                       alpha1=hcf%alpha1, &
+                                                       n1=hcf%n1, &
+                                                       l=hcf%l, &
+                                                       h_crit=hcf%h_crit)
+            case (5)
+                property = construct_type_hcf_base_durner(alpha1=hcf%alpha1, &
+                                                          n1=hcf%n1, &
+                                                          w1=hcf%w1, &
+                                                          alpha2=hcf%alpha2, &
+                                                          n2=hcf%n2, &
+                                                          l=hcf%l)
+            case (6)
+                property = construct_type_hcf_base_dvgch(alpha1=hcf%alpha1, &
+                                                         n1=hcf%n1, &
+                                                         w1=hcf%w1, &
+                                                         n2=hcf%n2, &
+                                                         l=hcf%l)
+            end select
+        end associate
 
     end function construct_hcf_base
 

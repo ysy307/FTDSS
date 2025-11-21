@@ -35,7 +35,8 @@ contains
 
         logical, intent(in), optional :: is_required
         integer(int32), intent(in), optional :: default_value
-        integer(int32), intent(in), optional :: valid_range(2)
+        ! [Fix] (2) -> (:) に変更して一時配列作成を回避
+        integer(int32), intent(in), optional :: valid_range(:)
         integer(int32), intent(in), optional :: valid_list(:)
 
         logical :: found
@@ -69,7 +70,7 @@ contains
     end subroutine get_json_integer32
 
     !----------------------------------------------------------------!
-    ! REAL版 (内容はINTEGER版とほぼ同じ)
+    ! REAL版
     !----------------------------------------------------------------!
     subroutine get_json_real64(json, key, target_var, is_required, default_value, valid_range)
         implicit none
@@ -79,7 +80,8 @@ contains
 
         logical, intent(in), optional :: is_required
         real(real64), intent(in), optional :: default_value
-        real(real64), intent(in), optional :: valid_range(2)
+        ! [Fix] (2) -> (:) に変更
+        real(real64), intent(in), optional :: valid_range(:)
 
         logical :: found
         logical :: required = .false.
@@ -185,13 +187,14 @@ contains
 
         logical, intent(in), optional :: is_required
         integer(int32), intent(in), optional :: default_value(:)
-        integer(int32), intent(in), optional :: valid_range(2)
+        ! [Fix] (2) -> (:) に変更
+        integer(int32), intent(in), optional :: valid_range(:)
         integer(int32), intent(in), optional :: valid_list(:)
         integer(int32), intent(in), optional :: array_size
 
         logical :: found
         logical :: required = .false.
-        integer :: i ! ## 修正点1: ループ変数iを宣言
+        integer :: i
 
         if (present(is_required)) required = is_required
 
@@ -204,7 +207,6 @@ contains
             else if (required) then
                 call error_message(904, c_opt="Required key not found: "//trim(key))
             else
-                ! 見つからず、必須でもなく、デフォルト値もない場合は空配列にする
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (target_var(0))
             end if
@@ -239,13 +241,14 @@ contains
 
         logical, intent(in), optional :: is_required
         real(real64), intent(in), optional :: default_value(:)
-        real(real64), intent(in), optional :: valid_range(2)
+        ! [Fix] (2) -> (:) に変更
+        real(real64), intent(in), optional :: valid_range(:)
         real(real64), intent(in), optional :: valid_list(:)
         integer(int32), intent(in), optional :: array_size
 
         logical :: found
         logical :: required = .false.
-        integer :: i ! ## 修正点1: ループ変数iを宣言
+        integer :: i
 
         if (present(is_required)) required = is_required
 
@@ -258,7 +261,6 @@ contains
             else if (required) then
                 call error_message(904, c_opt="Required key not found: "//trim(key))
             else
-                ! 見つからず、必須でもなく、デフォルト値もない場合は空配列にする
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (target_var(0))
             end if
@@ -282,6 +284,9 @@ contains
 
     end subroutine get_json_real64_array
 
+    !----------------------------------------------------------------!
+    ! STRING ARRAY版
+    !----------------------------------------------------------------!
     subroutine get_json_string_array(json, key, target_var, is_required, default_value, valid_list, array_size)
         implicit none
         class(json_file), intent(inout) :: json
@@ -293,7 +298,6 @@ contains
         character(len=*), intent(in), optional :: valid_list(:)
         integer(int32), intent(in), optional :: array_size
 
-        ! 一時領域：json%get は固定長要求なので 256 で受ける
         character(len=256), allocatable :: tmp(:)
 
         logical :: found
@@ -307,37 +311,32 @@ contains
 
         if (.not. found) then
             if (present(default_value)) then
-                ! デフォルト値を設定
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (character(len=len(default_value(1))) :: target_var(size(default_value)))
                 target_var = default_value
             else if (required) then
                 call error_message(904, c_opt="Required key not found: "//trim(key))
             else
-                ! 見つからず、必須でもなく、デフォルト値もない場合は空配列
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (character(len=0) :: target_var(0))
             end if
         else
-            ! json%get で得た tmp を target_var にコピー（長さを揃える）
             if (allocated(target_var)) deallocate (target_var)
             if (size(tmp) > 0) then
                 allocate (character(len=len(tmp(1))) :: target_var(size(tmp)))
                 do i = 1, size(tmp)
-                    target_var(i) = trim(tmp(i)) ! ★ 要素ごとに trim
+                    target_var(i) = trim(tmp(i))
                 end do
             else
                 allocate (character(len=0) :: target_var(0))
             end if
 
-            ! 配列サイズチェック
             if (present(array_size)) then
                 if (size(target_var) /= array_size) then
                     call error_message(905, c_opt="Array size for key '"//trim(key)//"' does not match the expected size.")
                 end if
             end if
 
-            ! 値のバリデーション
             if (present(valid_list)) then
                 do i = 1, size(target_var)
                     if (.not. any(valid_list == trim(target_var(i)))) then

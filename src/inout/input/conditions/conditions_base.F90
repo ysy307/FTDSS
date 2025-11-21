@@ -20,7 +20,7 @@ contains
         call json%print_error_message(output_unit)
 
         self%time_control%parent => self
-        do i = 1, NUM_PHYSICS_TYPES
+        do i = 1, self%num_boundaries
             self%boundary_conditions(i)%parent => self
         end do
         self%initial_conditions%parent => self
@@ -39,7 +39,7 @@ contains
             write (*, '(A)') "=== Time Controls ==="
             call self%time_control%display()
             write (*, '(A)') "=== Boundary Conditions ==="
-            do i = 1, NUM_PHYSICS_TYPES
+            do i = 1, self%num_boundaries
                 call self%boundary_conditions(i)%display()
             end do
             write (*, '(A)') "=== Initial Conditions ==="

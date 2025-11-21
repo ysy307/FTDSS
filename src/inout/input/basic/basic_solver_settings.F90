@@ -415,14 +415,20 @@ contains
 
         write (*, '(/a)') "  --- Linear Solver ---"
 
-        if (len_trim(linear%physics(PHYSICS_TYPE_THERMAL)%method) > 0) then
-            call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_THERMAL), "    Thermal")
+        if (allocated(linear%physics(PHYSICS_TYPE_THERMAL)%method)) then
+            if (len_trim(linear%physics(PHYSICS_TYPE_THERMAL)%method) > 0) then
+                call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_THERMAL), "    Thermal")
+            end if
         end if
-        if (len_trim(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method) > 0) then
-            call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_HYDRAULIC), "    Hydraulic")
+        if (allocated(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method)) then
+            if (len_trim(linear%physics(PHYSICS_TYPE_HYDRAULIC)%method) > 0) then
+                call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_HYDRAULIC), "    Hydraulic")
+            end if
         end if
-        if (len_trim(linear%physics(PHYSICS_TYPE_MECHANICAL)%method) > 0) then
-            call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_MECHANICAL), "    Mechanical")
+        if (allocated(linear%physics(PHYSICS_TYPE_MECHANICAL)%method)) then
+            if (len_trim(linear%physics(PHYSICS_TYPE_MECHANICAL)%method) > 0) then
+                call display_solver_settings_linear_local(linear%physics(PHYSICS_TYPE_MECHANICAL), "    Mechanical")
+            end if
         end if
     end subroutine display_solver_settings_linear
 

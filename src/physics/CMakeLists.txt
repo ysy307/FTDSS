@@ -13,7 +13,10 @@ set(PHYSICS_MATERIAL_DENSITY_SOURCES
 )
 add_library(Physics_Material_Density STATIC ${PHYSICS_MATERIAL_DENSITY_SOURCES})
 target_include_directories(Physics_Material_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_Density PUBLIC Solver::Core Solver::Input)
+target_link_libraries(Physics_Material_Density PUBLIC 
+    Solver::Core 
+    Solver::Input
+)
 enable_build_flags(Physics_Material_Density)
 
 # --- Specific Heat ---
@@ -24,7 +27,10 @@ set(PHYSICS_MATERIAL_SPH_SOURCES
 )
 add_library(Physics_Material_SpecificHeat STATIC ${PHYSICS_MATERIAL_SPH_SOURCES})
 target_include_directories(Physics_Material_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_SpecificHeat PUBLIC Solver::Core Solver::Input)
+target_link_libraries(Physics_Material_SpecificHeat PUBLIC 
+    Solver::Core 
+    Solver::Input
+)
 enable_build_flags(Physics_Material_SpecificHeat)
 
 # --- Thermal Conductivity ---
@@ -35,7 +41,10 @@ set(PHYSICS_MATERIAL_THC_SOURCES
 )
 add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_SOURCES})
 target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_ThermalConductivity PUBLIC Solver::Core Solver::Input)
+target_link_libraries(Physics_Material_ThermalConductivity PUBLIC 
+    Solver::Core 
+    Solver::Input
+)
 enable_build_flags(Physics_Material_ThermalConductivity)
 
 # --- Heat Capacity (depends on Density) ---
@@ -50,7 +59,7 @@ target_include_directories(Physics_Material_HeatCapacity PUBLIC ${CMAKE_CURRENT_
 target_link_libraries(Physics_Material_HeatCapacity PUBLIC
     Solver::Core
     Solver::Input
-    Physics_Material_Density # 強依存
+    Physics_Material_Density
 )
 enable_build_flags(Physics_Material_HeatCapacity)
 
@@ -82,7 +91,10 @@ set(PHYSICS_MODEL_HCF_SOURCES
 )
 add_library(Physics_Model_HydraulicConductivity STATIC ${PHYSICS_MODEL_HCF_SOURCES})
 target_include_directories(Physics_Model_HydraulicConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC Solver::Core Solver::Input)
+target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC
+    Solver::Core
+    Solver::Input
+)
 enable_build_flags(Physics_Model_HydraulicConductivity)
 
 # Water Retention
@@ -98,7 +110,10 @@ set(PHYSICS_MODEL_WRF_SOURCES
 )
 add_library(Physics_Model_WaterRetention STATIC ${PHYSICS_MODEL_WRF_SOURCES})
 target_include_directories(Physics_Model_WaterRetention PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Model_WaterRetention PUBLIC Solver::Core Solver::Input)
+target_link_libraries(Physics_Model_WaterRetention PUBLIC
+    Solver::Core
+    Solver::Input
+)
 enable_build_flags(Physics_Model_WaterRetention)
 
 # Phase Change

@@ -1,6 +1,6 @@
 module physics_material_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_state
+    use :: module_core, only:type_state, TtoK => celsius_to_kelvin
     use :: module_input, only:type_input
     implicit none
     private
@@ -89,6 +89,12 @@ module physics_material_density
             real(real64), intent(in) :: phi_ice
             real(real64) :: density
         end function calc_den_3
+
+        module pure elemental function calc_den_saturated_vapor(temperature) result(density_vapor)
+            implicit none
+            real(real64), intent(in) :: temperature
+            real(real64) :: density_vapor
+        end function calc_den_saturated_vapor
     end interface
 
     interface type_den_3phase
