@@ -13,7 +13,6 @@ module linalg_vector_ops
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: mpi_f08
     use :: module_core
-    use :: linalg_vector
     use :: linalg_mkl_backend
 
     implicit none
@@ -23,27 +22,34 @@ module linalg_vector_ops
     ! 1. Public Interface (API)
     ! =========================================================================
     public :: initialize_linalg
-    public :: norm_1
-    public :: norm_2
-    public :: norm_inf
-    public :: dot
+    public :: vector_norm1
+    public :: vector_norm2
+    public :: vector_norminf
+    public :: vector_dot
+    public :: vector_axpy
+    public :: vector_xpay
+    public :: vector_axpyz
+    public :: vector_scale
+    public :: vector_abs
+    public :: vector_reciprocal
+    public :: vector_shift
 
-    interface norm_1
+    interface vector_norm1
         module procedure :: norm_1_native
         module procedure :: norm_1_vector_dp
     end interface
 
-    interface norm_2
+    interface vector_norm2
         module procedure :: norm_2_native
         module procedure :: norm_2_vector_dp
     end interface
 
-    interface norm_inf
+    interface vector_norminf
         module procedure :: norm_inf_native
         module procedure :: norm_inf_vector_dp
     end interface
 
-    interface dot
+    interface vector_dot
         module procedure :: dot_native
         module procedure :: dot_vector_dp
     end interface
@@ -140,14 +146,44 @@ module linalg_vector_ops
         module procedure :: assign_vector_int
     end interface
 
+    interface vector_axpy
+        module procedure :: axpy_vector_dp
+        module procedure :: axpy_vector_int
+    end interface
+
+    interface vector_xpay
+        module procedure :: xpay_vector_dp
+        module procedure :: xpay_vector_int
+    end interface
+
+    interface vector_axpyz
+        module procedure :: axpyz_vector_dp
+        module procedure :: axpyz_vector_int
+    end interface
+
+    interface vector_scale
+        module procedure :: scale_vector_dp
+        module procedure :: scale_vector_int
+    end interface
+
+    interface vector_abs
+        module procedure :: abs_vector_dp
+        module procedure :: abs_vector_int
+    end interface
+
+    interface vector_reciprocal
+        module procedure :: reciprocal_vector_dp
+        module procedure :: reciprocal_vector_int
+    end interface
+
+    interface vector_shift
+        module procedure :: shift_vector_dp
+        module procedure :: shift_vector_int
+    end interface
+
     ! =========================================================================
     ! 2. Private Helper Interfaces and Pointers
     ! =========================================================================
-
-    interface check_sizes_match
-        module procedure :: check_sizes_match_dp
-        module procedure :: check_sizes_match_int
-    end interface
 
     abstract interface
         function abst_real_from_one_vector_function(vector) result(res)
@@ -211,6 +247,7 @@ contains
         if (is_mkl_initialized) return
 
 #ifdef _MKL
+
         compute_norm_1_backend => norm_1_mkl
         compute_norm_2_backend => norm_2_mkl
         compute_norm_inf_backend => norm_inf_mkl
@@ -327,7 +364,7 @@ contains
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
 #endif
         vec_data => x%get_data()
-        norm_value = norm_inf(vec_data)
+        norm_value = norm_inf_native(vec_data)
     end function norm_inf_vector_dp
 
     !>
@@ -1626,7 +1663,7 @@ contains
         end if
 
         ptr_rhs => rhs%get_data()
-        call lhs%set(ptr_rhs)
+        call lhs%set(OP_INS, ptr_rhs)
     end subroutine assign_vector_dp
 
     !>
@@ -1646,7 +1683,248 @@ contains
         end if
         ptr_rhs => rhs%get_data()
 
-        call lhs%set(ptr_rhs)
+        call lhs%set(OP_INS, ptr_rhs)
     end subroutine assign_vector_int
+
+    subroutine axpy_vector_dp(a, x, y)
+        implicit none
+        !> The scalar multiplier.
+        real(real64), intent(in) :: a
+        !> The input vector x.
+        class(type_vector_dp), intent(in) :: x
+        !> The output vector y to store the result.
+        class(type_vector_dp), intent(inout) :: y
+
+        real(real64), dimension(:), pointer :: ptr_x, ptr_y
+
+        ptr_x => x%get_data()
+        ptr_y => y%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_x, ptr_y, 'axpy_vector_dp')
+#endif
+        ptr_y = ptr_y + a * ptr_x
+    end subroutine axpy_vector_dp
+
+    subroutine axpy_vector_int(a, x, y)
+        implicit none
+        !> The scalar multiplier.
+        integer(int32), intent(in) :: a
+        !> The input vector x.
+        class(type_vector_int), intent(in) :: x
+        !> The output vector y to store the result.
+        class(type_vector_int), intent(inout) :: y
+
+        integer(int32), dimension(:), pointer :: ptr_x, ptr_y
+
+        ptr_x => x%get_data()
+        ptr_y => y%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_x, ptr_y, 'axpy_vector_int')
+#endif
+        ptr_y = ptr_y + a * ptr_x
+    end subroutine axpy_vector_int
+
+    subroutine xpay_vector_dp(a, x, y)
+        implicit none
+        !> The scalar multiplier.
+        real(real64), intent(in) :: a
+        !> The input vector x.
+        class(type_vector_dp), intent(in) :: x
+        !> The output vector y to store the result.
+        class(type_vector_dp), intent(inout) :: y
+
+        real(real64), dimension(:), pointer :: ptr_x, ptr_y
+
+        ptr_x => x%get_data()
+        ptr_y => y%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_x, ptr_y, 'xpay_vector_dp')
+#endif
+        ptr_y = a * ptr_x + ptr_y
+    end subroutine xpay_vector_dp
+
+    subroutine xpay_vector_int(a, x, y)
+        implicit none
+        !> The scalar multiplier.
+        integer(int32), intent(in) :: a
+        !> The input vector x.
+        class(type_vector_int), intent(in) :: x
+        !> The output vector y to store the result.
+        class(type_vector_int), intent(inout) :: y
+
+        integer(int32), dimension(:), pointer :: ptr_x, ptr_y
+
+        ptr_x => x%get_data()
+        ptr_y => y%get_data()
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_x, ptr_y, 'xpay_vector_int')
+#endif
+        ptr_y = a * ptr_x + ptr_y
+    end subroutine xpay_vector_int
+
+    subroutine axpyz_vector_dp(a, x, y, z)
+        implicit none
+        !> The scalar multiplier.
+        real(real64), intent(in) :: a
+        !> The input vector x.
+        class(type_vector_dp), intent(in) :: x
+        !> The input vector y.
+        class(type_vector_dp), intent(in) :: y
+        !> The output vector z to store the result.
+        class(type_vector_dp), intent(inout) :: z
+
+        real(real64), dimension(:), pointer :: ptr_x, ptr_y, ptr_z
+
+        ptr_x => x%get_data()
+        ptr_y => y%get_data()
+        ptr_z => z%get_data()
+
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_x, ptr_y, 'axpyz_vector_dp')
+        call check_sizes_match(ptr_x, ptr_z, 'axpyz_vector_dp')
+#endif
+        ptr_z = ptr_y + a * ptr_x
+    end subroutine axpyz_vector_dp
+
+    subroutine axpyz_vector_int(a, x, y, z)
+        implicit none
+        !> The scalar multiplier.
+        integer(int32), intent(in) :: a
+        !> The input vector x.
+        class(type_vector_int), intent(in) :: x
+        !> The input vector y.
+        class(type_vector_int), intent(in) :: y
+        !> The output vector z to store the result.
+        class(type_vector_int), intent(inout) :: z
+
+        integer(int32), dimension(:), pointer :: ptr_x, ptr_y, ptr_z
+
+        ptr_x => x%get_data()
+        ptr_y => y%get_data()
+        ptr_z => z%get_data()
+
+#ifdef USE_DEBUG
+        call check_sizes_match(ptr_x, ptr_y, 'axpyz_vector_int')
+        call check_sizes_match(ptr_x, ptr_z, 'axpyz_vector_int')
+#endif
+        ptr_z = ptr_y + a * ptr_x
+    end subroutine axpyz_vector_int
+
+    subroutine scale_vector_dp(a, x)
+        implicit none
+        !> The scalar multiplier.
+        real(real64), intent(in) :: a
+        !> The input/output vector x to be scaled.
+        class(type_vector_dp), intent(inout) :: x
+
+        real(real64), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+
+        ptr_x = a * ptr_x
+
+    end subroutine scale_vector_dp
+
+    subroutine scale_vector_int(a, x)
+        implicit none
+        !> The scalar multiplier.
+        integer(int32), intent(in) :: a
+        !> The input/output vector x to be scaled.
+        class(type_vector_int), intent(inout) :: x
+
+        integer(int32), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+
+        ptr_x = a * ptr_x
+
+    end subroutine scale_vector_int
+
+    subroutine abs_vector_dp(x)
+        implicit none
+        !> The input/output vector x to be modified.
+        class(type_vector_dp), intent(inout) :: x
+
+        real(real64), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+
+        ptr_x = abs(ptr_x)
+
+    end subroutine abs_vector_dp
+
+    subroutine abs_vector_int(x)
+        implicit none
+        !> The input/output vector x to be modified.
+        class(type_vector_int), intent(inout) :: x
+
+        integer(int32), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+
+        ptr_x = abs(ptr_x)
+
+    end subroutine abs_vector_int
+
+    subroutine reciprocal_vector_dp(x)
+        implicit none
+        !> The input/output vector x to be modified.
+        class(type_vector_dp), intent(inout) :: x
+
+        real(real64), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+
+#ifdef USE_DEBUG
+        if (any(ptr_x == 0.0d0)) error stop "ERROR in reciprocal_vector_dp: Division by zero."
+#endif
+        ptr_x = 1.0d0 / ptr_x
+
+    end subroutine reciprocal_vector_dp
+
+    subroutine reciprocal_vector_int(x)
+        implicit none
+        !> The input/output vector x to be modified.
+        class(type_vector_int), intent(inout) :: x
+
+        integer(int32), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+#ifdef USE_DEBUG
+        if (any(ptr_x == 0)) error stop "ERROR in reciprocal_vector_int: Division by zero."
+#endif
+        ptr_x = 1 / ptr_x
+
+    end subroutine reciprocal_vector_int
+
+    subroutine shift_vector_dp(shift_amount, x)
+        implicit none
+        !> The amount to shift by.
+        integer(int32), intent(in) :: shift_amount
+        !> The input/output vector x to be shifted.
+        class(type_vector_dp), intent(inout) :: x
+
+        real(real64), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+
+        ptr_x = ptr_x - shift_amount
+
+    end subroutine shift_vector_dp
+
+    subroutine shift_vector_int(shift_amount, x)
+        implicit none
+        !> The amount to shift by.
+        integer(int32), intent(in) :: shift_amount
+        !> The input/output vector x to be shifted.
+        class(type_vector_int), intent(inout) :: x
+
+        integer(int32), dimension(:), pointer :: ptr_x
+
+        ptr_x => x%get_data()
+
+        ptr_x = ptr_x - shift_amount
+
+    end subroutine shift_vector_int
 
 end module linalg_vector_ops
