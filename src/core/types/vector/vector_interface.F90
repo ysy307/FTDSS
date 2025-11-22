@@ -35,6 +35,7 @@ module core_types_vector
         procedure, private, pass(self) :: set_values_at_indices => set_values_at_indices_vector_dp
         generic, public :: set => set_scalar, set_array, set_value_at_index, set_values_at_indices
 
+        procedure, public, pass(self) :: scale => scale_vector_dp
         procedure, public, pass(self) :: copy => copy_vector_dp
         procedure, public, pass(self) :: zero => zero_vector_dp
         procedure, public, pass(self) :: display => display_vector_dp
@@ -64,6 +65,7 @@ module core_types_vector
         procedure, private, pass(self) :: set_values_at_indices => set_values_at_indices_vector_int
         generic, public :: set => set_array, set_value_at_index, set_values_at_indices
 
+        procedure, public, pass(self) :: scale => scale_vector_int
         procedure, public, pass(self) :: copy => copy_vector_int
         procedure, public, pass(self) :: zero => zero_vector_int
         procedure, public, pass(self) :: display => display_vector_int
@@ -144,6 +146,13 @@ module core_types_vector
             real(real64), intent(in) :: new_values(:)
             integer(int32), intent(in), optional :: row_block
         end subroutine set_values_at_indices_vector_dp
+
+        module subroutine scale_vector_dp(self, op, alpha)
+            implicit none
+            class(type_vector_dp), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            class(type_vector_dp), intent(in) :: alpha
+        end subroutine scale_vector_dp
 
         module subroutine copy_vector_dp(self, source_vector)
             implicit none
@@ -228,6 +237,13 @@ module core_types_vector
             integer(int32), intent(in) :: new_values(:)
             integer(int32), intent(in), optional :: row_block
         end subroutine set_values_at_indices_vector_int
+
+        module subroutine scale_vector_int(self, op, alpha)
+            implicit none
+            class(type_vector_int), intent(inout) :: self
+            integer(int32), intent(in) :: op
+            class(type_vector_int), intent(in) :: alpha
+        end subroutine scale_vector_int
 
         module subroutine copy_vector_int(self, source_vector)
             implicit none

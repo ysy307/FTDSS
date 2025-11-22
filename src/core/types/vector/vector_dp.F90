@@ -241,6 +241,27 @@ contains
 
     end subroutine set_values_at_indices_vector_dp
 
+    module subroutine scale_vector_dp(self, op, alpha)
+        implicit none
+        class(type_vector_dp), intent(inout) :: self
+        integer(int32), intent(in) :: op
+        class(type_vector_dp), intent(in) :: alpha
+
+        integer(int32) :: i
+        real(real64), dimension(:), pointer :: alpha_data
+
+        alpha_data => alpha%get_data()
+
+        select case (op)
+
+        case (OP_SCALE_SYMM_DIAG, OP_SCALE_JACOBI)
+            self%val = self%val * alpha_data
+        case default
+            self%status = VECTOR_STATUS_ILL_OPERATIONS
+        end select
+
+    end subroutine scale_vector_dp
+
     !>
     !> Optimized Copy.
     !>

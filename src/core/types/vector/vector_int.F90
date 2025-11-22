@@ -201,6 +201,30 @@ contains
     end subroutine set_values_at_indices_vector_int
 
     !>
+    !> Scales the vector by a scalar alpha.
+    !>
+    module subroutine scale_vector_int(self, op, alpha)
+        implicit none
+        class(type_vector_int), intent(inout) :: self
+        integer(int32), intent(in) :: op
+        class(type_vector_int), intent(in) :: alpha
+
+        integer(int32) :: i
+        integer(int32), dimension(:), pointer :: alpha_data
+
+        alpha_data => alpha%get_data()
+
+        select case (op)
+
+        case (OP_SCALE_SYMM_DIAG, OP_SCALE_JACOBI)
+            self%val = self%val * alpha_data
+        case default
+            self%status = VECTOR_STATUS_ILL_OPERATIONS
+        end select
+
+    end subroutine scale_vector_int
+
+    !>
     !> Optimized Copy.
     !>
     module subroutine copy_vector_int(self, source_vector)

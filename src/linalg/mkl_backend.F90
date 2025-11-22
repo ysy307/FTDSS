@@ -6,7 +6,9 @@
 !>
 module linalg_mkl_backend
     use, intrinsic :: iso_fortran_env, only: int32, real64
+#ifdef _MPI
     use :: mpi_f08
+#endif
 #ifdef _MKL
     use :: linalg_mkl_interface
 #endif
@@ -43,7 +45,14 @@ contains
         real(real64) :: norm_value
 
 #ifdef _MPI
-        norm_value = pdasum(int(size(x), int32), x, 1)
+        integer(int32) :: nprocs
+        call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
+
+        if (nprocs == 1) then
+            norm_value = dasum(int(size(x), int32), x, 1)
+        else
+            norm_value = pdasum(int(size(x), int32), x, 1)
+        end if
 #else
         norm_value = dasum(int(size(x), int32), x, 1)
 #endif
@@ -60,7 +69,13 @@ contains
         real(real64) :: norm_value
 
 #ifdef _MPI
-        norm_value = pdnrm2(int(size(x), int32), x, 1)
+        integer(int32) :: nprocs
+        call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
+        if (nprocs == 1) then
+            norm_value = dnrm2(int(size(x), int32), x, 1)
+        else
+            norm_value = pdnrm2(int(size(x), int32), x, 1)
+        end if
 #else
         norm_value = dnrm2(int(size(x), int32), x, 1)
 #endif
@@ -106,7 +121,13 @@ contains
         real(real64) :: product
 
 #ifdef _MPI
-        product = pddot(int(size(x), int32), x, 1, y, 1)
+        integer(int32) :: nprocs
+        call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
+        if (nprocs == 1) then
+            product = ddot(int(size(x), int32), x, 1, y, 1)
+        else
+            product = pddot(int(size(x), int32), x, 1, y, 1)
+        end if
 #else
         product = ddot(int(size(x), int32), x, 1, y, 1)
 #endif

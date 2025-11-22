@@ -122,7 +122,7 @@ contains
 
         select case (op)
         case (OP_SCALE_SYMM_DIAG)
-            diag = 1.0d0 / sqrt(diag)
+            diag = 1.0d0 / sqrt(abs(diag))
         case (OP_SCALE_JACOBI)
             diag = 1.0d0 / diag
         case default
@@ -131,6 +131,7 @@ contains
         end select
 
         call A%scale(op, d)
+        call b%scale(op, d)
 
     end subroutine matrix_scale
 
