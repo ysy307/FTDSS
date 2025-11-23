@@ -10,6 +10,7 @@ module module_type_matrix
     public :: type_coo
     public :: type_bsr
 
+    public :: type_matrix_info
     public :: create_matrix
 
 end module module_type_matrix

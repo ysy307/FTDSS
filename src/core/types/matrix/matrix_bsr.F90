@@ -52,7 +52,8 @@ contains
         ! Allocate arrays
         call allocate_array(self%ptr, source=row)
         call allocate_array(self%ind, source=col)
-        call allocate_array(self%val, self%num_blocks, self%num_block_rows, self%num_block_cols)
+        ! Allocate val as (rows, cols, blocks) to improve memory access patterns in block operations
+        call allocate_array(self%val, self%num_block_rows, self%num_block_cols, self%num_blocks)
         call allocate_array(self%diagonal, self%num_block_rows * self%num_nodes)
 
         call self%zero()
@@ -117,7 +118,8 @@ contains
                     do k = 1, self%num_block_rows
                         do m = 1, self%num_block_cols
                             if (k == m) then
-                                self%diagonal((i - 1) * self%num_block_rows + k) = self%val(j, k, m)
+                                ! Access val(row_in_block, col_in_block, block_index)
+                                self%diagonal((i - 1) * self%num_block_rows + k) = self%val(k, m, j)
                             end if
                         end do
                     end do
@@ -187,7 +189,6 @@ contains
             self%status = MATRIX_STATUS_OUT_OF_MEMORY
             return
         end if
-
 #endif
 
         index = self%find(row, col)
@@ -201,9 +202,10 @@ contains
 
         select case (op)
         case (OP_INS)
-            self%val(index, row_block, col_block) = value
+            ! Access val(row_in_block, col_in_block, block_index)
+            self%val(row_block, col_block, index) = value
         case (OP_ADD)
-            self%val(index, row_block, col_block) = self%val(index, row_block, col_block) + value
+            self%val(row_block, col_block, index) = self%val(row_block, col_block, index) + value
         case default
             self%status = MATRIX_STATUS_ILL_OPERATIONS
         end select
@@ -249,11 +251,12 @@ contains
         case (OP_INS)
             do k = is, ie
                 col_node = self%ind(k)
-                self%val(k, r_start:r_end, :) = 0.0d0
+                ! Access val(row_in_block, col_in_block, block_index)
+                self%val(r_start:r_end, :, k) = 0.0d0
                 if (col_node == row) then
                     do r = r_start, r_end
                         if (r <= self%num_block_cols) then
-                            self%val(k, r, r) = value
+                            self%val(r, r, k) = value
                         end if
                     end do
                 end if
@@ -264,7 +267,7 @@ contains
                 if (self%ind(k) == row) then
                     do r = r_start, r_end
                         if (r <= self%num_block_cols) then
-                            self%val(k, r, r) = self%val(k, r, r) + value
+                            self%val(r, r, k) = self%val(r, r, k) + value
                         end if
                     end do
                     exit
@@ -311,10 +314,27 @@ contains
         integer(int32) :: row_start, row_end
         integer(int32) :: row_dof, col_dof
         integer(int32) :: nrequired
+        integer(int32) :: bnr, bnc ! ブロックサイズを保持する一時変数
+
+        ! ポインタの関連付け
         alpha_data => alpha%get_data()
 
-        ! 想定されるベクトルサイズチェック
-        nrequired = self%num_block_rows * self%num_nodes
+        !--------------------------------------------------------
+        ! 変数名の可読性と安全性のためのエイリアス
+        ! self%num_block_rows が「ブロックサイズ(bnr)」であることを前提としています
+        !--------------------------------------------------------
+        bnr = self%num_block_rows
+        bnc = self%num_block_cols
+
+        ! 正方ブロックチェック (Symmetric Scalingの場合に必須)
+        if (op == OP_SCALE_SYMM_DIAG .and. bnr /= bnc) then
+            self%status = MATRIX_STATUS_ILL_OPERATIONS
+            return
+        end if
+
+        ! ベクトルサイズチェック
+        ! num_nodes が「全ブロック数」あるいは「全ノード数」を指すと仮定
+        nrequired = bnr * self%num_nodes
 
         if (size(alpha_data) /= nrequired) then
             self%status = MATRIX_STATUS_ILL_OPERATIONS
@@ -324,10 +344,10 @@ contains
         select case (op)
             !-------------------------------------------
             ! Symmetric Scaling: A <- D^{-1/2} A D^{-1/2}
-            ! alpha には 1/sqrt(|D|) が入っている前提
             !-------------------------------------------
         case (OP_SCALE_SYMM_DIAG)
 
+            ! private変数に bnr, bnc は不要(read only sharedで良い)
             !$omp parallel do default(shared) private(i,j,rb,cb,col,row_start,row_end,row_dof,col_dof)
             do i = 1, self%num_ptrs - 1
                 row_start = self%ptr(i)
@@ -335,14 +355,21 @@ contains
 
                 do j = row_start, row_end
                     col = self%ind(j)
-                    ! ブロックごとの処理
-                    do rb = 1, self%num_block_rows
-                        row_dof = (i - 1) * self%num_block_rows + rb
-                        do cb = 1, self%num_block_cols
-                            col_dof = (col - 1) * self%num_block_rows + cb ! 正方ブロック前提
 
+                    ! ブロック内の計算
+                    ! ループ順序: rb(行)を一番内側にするとメモリアクセスが連続になる
+                    ! ただし，alpha_dataのアクセス回数を減らす最適化も考えられる
+                    do cb = 1, bnc
+                        ! 列側のスケーリング係数はこのcbループ内で不変
+                        ! col_dof は (ブロックColID - 1)*BlockSize + LocalColID
+                        col_dof = (col - 1) * bnr + cb
+
+                        do rb = 1, bnr
+                            row_dof = (i - 1) * bnr + rb
+
+                            ! val(rb, cb, j) -> Fortranは第1次元(rb)が連続
                             self%val(rb, cb, j) = self%val(rb, cb, j) * &
-                                                  alpha_data(row_dof) * alpha_data(col_dof)
+                                                  (alpha_data(row_dof) * alpha_data(col_dof))
                         end do
                     end do
                 end do
@@ -352,7 +379,6 @@ contains
 
             !-------------------------------------------
             ! Jacobi Scaling: A <- D^{-1} A
-            ! alpha には 1/D が入っている前提 -> 掛け算で適用
             !-------------------------------------------
         case (OP_SCALE_JACOBI)
 
@@ -362,10 +388,12 @@ contains
                 row_end = self%ptr(i + 1) - 1
 
                 do j = row_start, row_end
-                    do rb = 1, self%num_block_rows
-                        row_dof = (i - 1) * self%num_block_rows + rb
-                        do cb = 1, self%num_block_cols
-                            ! 【修正】割り算ではなく掛け算
+                    ! Jacobiの場合，列(cb)方向には同じ行スケーリング係数がかかるため
+                    ! cbを外側，rbを内側にして連続アクセスを最大化
+                    do cb = 1, bnc
+                        do rb = 1, bnr
+                            row_dof = (i - 1) * bnr + rb
+
                             self%val(rb, cb, j) = self%val(rb, cb, j) * alpha_data(row_dof)
                         end do
                     end do
@@ -379,7 +407,6 @@ contains
         end select
 
     end subroutine scale_bsr
-
     !>
     !> Zero out the matrix.
     !>
@@ -435,9 +462,10 @@ contains
             do i = row_start, row_end
                 do rb = 1, self%num_block_rows
                     do cb = 1, self%num_block_cols
+                        ! Access val(row_in_block, col_in_block, block_index)
                         write (*, '(a,i0,a,i0,a, i0,a,i0,a, es16.8)') &
                             "Node(", r, ",", self%ind(i), ") Block(", rb, ",", cb, "): ", &
-                            self%val(i, rb, cb)
+                            self%val(rb, cb, i)
                     end do
                 end do
             end do
