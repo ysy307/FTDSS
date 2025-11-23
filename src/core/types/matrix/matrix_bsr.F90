@@ -13,9 +13,9 @@ contains
     !>
     !> Initializes the DOF-level bsr matrix structure.
     !>
-    module subroutine initialize_type_bsr(self, num_nodes, row, col, row_blocks, col_blocks)
+    module subroutine initialize_type_matrix_bsr(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
         integer(int32), intent(in), optional :: row(:)
         integer(int32), intent(in), optional :: col(:)
@@ -60,14 +60,14 @@ contains
 
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS_SUCCESS
-    end subroutine initialize_type_bsr
+    end subroutine initialize_type_matrix_bsr
 
     !>
     !> Deallocates all internal arrays.
     !>
     module subroutine destroy_bsr(self)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
 
         call deallocate_array(self%ptr)
         call deallocate_array(self%ind)
@@ -88,7 +88,7 @@ contains
     !>
     module subroutine get_info_bsr(self, info)
         implicit none
-        class(type_bsr), intent(in) :: self
+        class(type_matrix_bsr), intent(in) :: self
         type(type_matrix_info), intent(inout) :: info
 
         info%num_nodes = self%num_nodes
@@ -102,7 +102,7 @@ contains
 
     module subroutine get_diagonal_bsr(self, diagonal)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
         type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i, row_start, row_end, j, k, m
@@ -135,21 +135,21 @@ contains
     !> Getters for internal arrays
     module function get_ptr_bsr(self) result(ptr)
         implicit none
-        class(type_bsr), intent(in), target :: self
+        class(type_matrix_bsr), intent(in), target :: self
         integer(int32), dimension(:), pointer :: ptr
         ptr => self%ptr
     end function get_ptr_bsr
 
     module function get_ind_bsr(self) result(ind)
         implicit none
-        class(type_bsr), intent(in), target :: self
+        class(type_matrix_bsr), intent(in), target :: self
         integer(int32), dimension(:), pointer :: ind
         ind => self%ind
     end function get_ind_bsr
 
     module function get_val_bsr(self) result(val)
         implicit none
-        class(type_bsr), intent(in), target :: self
+        class(type_matrix_bsr), intent(in), target :: self
         real(real64), dimension(:, :, :), pointer :: val
         val => self%val
     end function get_val_bsr
@@ -159,7 +159,7 @@ contains
     !>
     module subroutine set_value_bsr(self, op, row, col, value)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
         integer(int32), intent(in) :: op
         integer(int32), intent(in) :: row
         integer(int32), intent(in) :: col
@@ -173,7 +173,7 @@ contains
     !>
     module subroutine set_value_block_bsr(self, op, row, col, row_block, col_block, value)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
         integer(int32), intent(in) :: op
         integer(int32), intent(in) :: row ! Block row index (Node index)
         integer(int32), intent(in) :: col ! Block col index (Node index)
@@ -217,7 +217,7 @@ contains
     !>
     module subroutine set_row_bsr(self, op, row, value, row_block)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
         integer(int32), intent(in) :: op
         integer(int32), intent(in) :: row
         real(real64), intent(in) :: value
@@ -286,7 +286,7 @@ contains
     !>
     module subroutine set_all_bsr(self, op, value)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
         integer(int32), intent(in) :: op
         real(real64), intent(in) :: value
 
@@ -304,7 +304,7 @@ contains
 
     module subroutine scale_bsr(self, op, alpha)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
         integer(int32), intent(in) :: op
         type(type_vector_dp), intent(in) :: alpha
 
@@ -412,7 +412,7 @@ contains
     !>
     module subroutine zero_bsr(self)
         implicit none
-        class(type_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(inout) :: self
 
         self%val = 0.0d0
         self%status = MATRIX_STATUS_SUCCESS
@@ -423,7 +423,7 @@ contains
     !>
     pure module function find_bsr(self, row, col) result(index)
         implicit none
-        class(type_bsr), intent(in) :: self
+        class(type_matrix_bsr), intent(in) :: self
         integer(int32), intent(in) :: row, col
         integer(int32) :: index
         integer(int32) :: ptr_start, ptr_end
@@ -447,7 +447,7 @@ contains
     !>
     module subroutine display_bsr(self)
         implicit none
-        class(type_bsr), intent(in) :: self
+        class(type_matrix_bsr), intent(in) :: self
         integer(int32) :: i, r, row_start, row_end, rb, cb
 
         if (.not. self%is_initialized()) then

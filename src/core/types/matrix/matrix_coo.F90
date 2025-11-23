@@ -11,10 +11,10 @@ contains
     !> It assumes the input node-level `row` and `col` arrays are sorted appropriately
     !> to produce a sorted DOF-level COO matrix without requiring an explicit sort.
     !>
-    module subroutine initialize_type_coo(self, num_nodes, row, col, row_blocks, col_blocks)
+    module subroutine initialize_type_matrix_coo(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
         !> The COO matrix object to initialize.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
         !> The total number of nodes in the mesh.
         integer(int32), intent(in) :: num_nodes
         !> The node-level row indices defining the sparsity pattern.
@@ -53,7 +53,7 @@ contains
 
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS_SUCCESS
-    end subroutine initialize_type_coo
+    end subroutine initialize_type_matrix_coo
 
     !>
     !> Deallocates all internal arrays of the COO matrix object.
@@ -61,7 +61,7 @@ contains
     module subroutine destroy_coo(self)
         implicit none
         !> The COO matrix object to destroy.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
 
         call deallocate_array(self%row)
         call deallocate_array(self%col)
@@ -81,7 +81,7 @@ contains
     module subroutine get_info_coo(self, info)
         implicit none
         !> The matrix object.
-        class(type_coo), intent(in) :: self
+        class(type_matrix_coo), intent(in) :: self
         !> The matrix information structure to populate.
         type(type_matrix_info), intent(inout) :: info
 
@@ -93,7 +93,7 @@ contains
 
     module subroutine get_diagonal_coo(self, diagonal)
         implicit none
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
         type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i
@@ -115,7 +115,7 @@ contains
     module function get_row_coo(self) result(row)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(in), target :: self
+        class(type_matrix_coo), intent(in), target :: self
         !> A pointer to the `row` index array.
         integer(int32), dimension(:), pointer :: row
 
@@ -128,7 +128,7 @@ contains
     module function get_col_coo(self) result(col)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(in), target :: self
+        class(type_matrix_coo), intent(in), target :: self
         !> A pointer to the `col` index array.
         integer(int32), dimension(:), pointer :: col
 
@@ -141,7 +141,7 @@ contains
     module function get_val_coo(self) result(val)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(in), target :: self
+        class(type_matrix_coo), intent(in), target :: self
         !> A pointer to the `val` array.
         real(real64), dimension(:), pointer :: val
 
@@ -154,7 +154,7 @@ contains
     module subroutine set_value_coo(self, op, row, col, value)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
         !> The operation to perform
         integer(int32), intent(in) :: op
         !> The 1-based node index for the row.
@@ -188,7 +188,7 @@ contains
     module subroutine set_value_block_coo(self, op, row, col, row_block, col_block, value)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
         !> The operation to perform
         integer(int32), intent(in) :: op
         !> The 1-based node index for the row.
@@ -212,7 +212,7 @@ contains
     module subroutine set_row_coo(self, op, row, value, row_block)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
         !> The operation to perform
         integer(int32), intent(in) :: op
         !> The 1-based node index for the row.
@@ -244,7 +244,7 @@ contains
     module subroutine set_all_coo(self, op, value)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
         !> The operation to perform
         integer(int32), intent(in) :: op
         !> The scalar value to assign to all non-zero entries.
@@ -265,7 +265,7 @@ contains
     module subroutine scale_coo(self, op, alpha)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
         !> The operation to perform
         integer(int32), intent(in) :: op
         !> The scaling vector (derived from diagonal).
@@ -326,7 +326,7 @@ contains
     module subroutine zero_coo(self)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(inout) :: self
 
         self%val = 0.0d0
     end subroutine zero_coo
@@ -337,7 +337,7 @@ contains
 !     module subroutine add_value_coo(self, row, col, value)
 !         implicit none
 !         !> The COO matrix object.
-!         class(type_coo), intent(inout) :: self
+!         class(type_matrix_coo), intent(inout) :: self
 !         !> The 1-based node index for the row.
 !         integer(int32), intent(in) :: row
 !         !> The 1-based node index for the column.
@@ -362,7 +362,7 @@ contains
 
 !     module subroutine add_values_coo(self, indices, values)
 !         implicit none
-!         class(type_coo), intent(inout) :: self
+!         class(type_matrix_coo), intent(inout) :: self
 !         integer(int32), intent(in) :: indices(:)
 !         class(abst_matrix), intent(in) :: values
 
@@ -387,18 +387,18 @@ contains
 !     module subroutine add_matrix_coo(self, alpha, B, C)
 !         implicit none
 !         !> The COO matrix object (A).
-!         class(type_coo), intent(in) :: self
+!         class(type_matrix_coo), intent(in) :: self
 !         !> The scalar multiplier alpha.
 !         real(real64), intent(in) :: alpha
-!         !> The abstract matrix B (must be of type_coo).
+!         !> The abstract matrix B (must be of type_matrix_coo).
 !         class(abst_matrix), intent(in) :: B
-!         !> The abstract matrix C to store the result (must be of type_coo).
+!         !> The abstract matrix C to store the result (must be of type_matrix_coo).
 !         class(abst_matrix), intent(inout) :: C
 
 !         select type (B_coo => B)
-!         type is (type_coo)
+!         type is (type_matrix_coo)
 !             select type (C_coo => C)
-!             type is (type_coo)
+!             type is (type_matrix_coo)
 !                 if (self%nnz /= B_coo%nnz .or. self%nnz /= C_coo%nnz) then
 !                     print *, "ERROR(add_matrix_coo): In this simplified version, NNZ must be identical."
 !                     stop
@@ -416,7 +416,7 @@ contains
 !     module subroutine gemv_coo(self, alpha, x, beta, y)
 !         implicit none
 !         !> The COO matrix object (A).
-!         class(type_coo), intent(in) :: self
+!         class(type_matrix_coo), intent(in) :: self
 !         !> The scalar multiplier alpha.
 !         real(real64), intent(in) :: alpha
 !         !> The input vector x.
@@ -453,7 +453,7 @@ contains
     module pure function find_coo(self, row, col) result(index)
         implicit none
         !> The COO matrix object.
-        class(type_coo), intent(in) :: self
+        class(type_matrix_coo), intent(in) :: self
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The 1-based node index for the column.
@@ -479,7 +479,7 @@ contains
     module subroutine display_coo(self)
         implicit none
         !> The COO matrix object to display.
-        class(type_coo), intent(in) :: self
+        class(type_matrix_coo), intent(in) :: self
 
         integer(int32) :: i
 

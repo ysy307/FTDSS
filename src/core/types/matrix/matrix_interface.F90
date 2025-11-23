@@ -15,10 +15,10 @@ module core_types_matrix
     private
 
     public :: abst_matrix
-    public :: type_dense
-    public :: type_coo
-    public :: type_csr
-    public :: type_bsr
+    public :: type_matrix_dense
+    public :: type_matrix_coo
+    public :: type_matrix_csr
+    public :: type_matrix_bsr
 
     public :: type_matrix_info
 
@@ -241,7 +241,7 @@ module core_types_matrix
     !>
     !> Represents a dense matrix stored as a 2D array.
     !>
-    type, extends(abst_matrix) :: type_dense
+    type, extends(abst_matrix) :: type_matrix_dense
         !> The number of rows in the matrix.
         integer(int32) :: num_rows = 0
         !> The number of columns in the matrix.
@@ -262,13 +262,13 @@ module core_types_matrix
         procedure, pass(self) :: find => find_dense
         procedure, pass(self) :: zero => zero_dense
         procedure, pass(self) :: display => display_dense
-    end type type_dense
+    end type type_matrix_dense
 
     interface
         !> Initializes a dense matrix.
         module subroutine initialize_dense(self, num_nodes, row, col, row_blocks, col_blocks)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
             integer(int32), intent(in) :: num_nodes
             integer(int32), intent(in), optional :: row(:)
             integer(int32), intent(in), optional :: col(:)
@@ -279,20 +279,20 @@ module core_types_matrix
         !> Deallocates the dense matrix.
         module subroutine destroy_dense(self)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
         end subroutine destroy_dense
 
         module subroutine get_info_dense(self, info)
             implicit none
             !> The matrix object.
-            class(type_dense), intent(in) :: self
+            class(type_matrix_dense), intent(in) :: self
             !> The matrix information structure to populate.
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_dense
 
         module subroutine get_diagonal_dense(self, diagonal)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
             !> The diagonal entries of the matrix.
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_dense
@@ -300,14 +300,14 @@ module core_types_matrix
         !> Returns a pointer to the dense matrix's value array.
         module function get_val_dense(self) result(val)
             implicit none
-            class(type_dense), intent(in), target :: self
+            class(type_matrix_dense), intent(in), target :: self
             real(real64), dimension(:, :), pointer :: val
         end function get_val_dense
 
         !> Sets a single value in the dense matrix.
         module subroutine set_value_dense(self, op, row, col, value)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
@@ -316,7 +316,7 @@ module core_types_matrix
         !> Sets a single value in the dense matrix.
         module subroutine set_value_block_dense(self, op, row, col, row_block, col_block, value)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
@@ -326,7 +326,7 @@ module core_types_matrix
         !> Sets all values in a specified row of the dense matrix.
         module subroutine set_row_dense(self, op, row, value, row_block)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
@@ -335,7 +335,7 @@ module core_types_matrix
 
         !> Sets all values in the dense matrix to a single scalar value.
         module subroutine set_all_dense(self, op, value)
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
             integer(int32), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_dense
@@ -343,7 +343,7 @@ module core_types_matrix
         !> Scales all values in the dense matrix by a scalar factor.
         module subroutine scale_dense(self, op, alpha)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
             integer(int32), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_dense
@@ -351,13 +351,13 @@ module core_types_matrix
         !> Sets all values in the dense matrix to zero.
         module subroutine zero_dense(self)
             implicit none
-            class(type_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(inout) :: self
         end subroutine zero_dense
 
         !> Finds the storage index of a matrix entry.
         module pure function find_dense(self, row, col) result(index)
             implicit none
-            class(type_dense), intent(in) :: self
+            class(type_matrix_dense), intent(in) :: self
             integer(int32), intent(in) :: row, col
             integer(int32) :: index
         end function find_dense
@@ -365,7 +365,7 @@ module core_types_matrix
         !> Displays the contents of the dense matrix.
         module subroutine display_dense(self)
             implicit none
-            class(type_dense), intent(in) :: self
+            class(type_matrix_dense), intent(in) :: self
         end subroutine display_dense
     end interface
 
@@ -376,7 +376,7 @@ module core_types_matrix
     !>
     !> Represents a sparse matrix in Compressed Row Storage (CRS) format.
     !>
-    type, extends(abst_matrix) :: type_csr
+    type, extends(abst_matrix) :: type_matrix_csr
         !> Number of non-zero elements.
         integer(int32) :: nnz = 0
         !> Number of rows.
@@ -390,7 +390,7 @@ module core_types_matrix
         !> Values of the non-zero elements.
         real(real64), allocatable :: val(:)
     contains
-        procedure, pass(self) :: initialize => initialize_type_csr
+        procedure, pass(self) :: initialize => initialize_type_matrix_csr
         procedure, pass(self) :: destroy => destroy_csr
         procedure, pass(self) :: get_info => get_info_csr
         procedure, pass(self) :: get_diagonal => get_diagonal_csr
@@ -405,65 +405,65 @@ module core_types_matrix
         procedure, pass(self) :: zero => zero_csr
         procedure, pass(self), private :: find => find_csr
         procedure, pass(self) :: display => display_csr
-    end type type_csr
+    end type type_matrix_csr
 
     interface
         !> Initializes a CRS matrix from a node-level sparsity pattern.
-        module subroutine initialize_type_csr(self, num_nodes, row, col, row_blocks, col_blocks)
+        module subroutine initialize_type_matrix_csr(self, num_nodes, row, col, row_blocks, col_blocks)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
             integer(int32), intent(in) :: num_nodes
             integer(int32), intent(in), optional :: row(:)
             integer(int32), intent(in), optional :: col(:)
             integer(int32), intent(in), optional :: row_blocks
             integer(int32), intent(in), optional :: col_blocks
-        end subroutine initialize_type_csr
+        end subroutine initialize_type_matrix_csr
 
         !> Deallocates the CRS matrix.
         module subroutine destroy_csr(self)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
         end subroutine destroy_csr
 
         module subroutine get_info_csr(self, info)
             implicit none
             !> The matrix object.
-            class(type_csr), intent(in) :: self
+            class(type_matrix_csr), intent(in) :: self
             !> The matrix information structure to populate.
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_csr
 
         module subroutine get_diagonal_csr(self, diagonal)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_csr
 
         !> Returns a pointer to the `ptr` array.
         module function get_ptr_csr(self) result(ptr)
             implicit none
-            class(type_csr), intent(in), target :: self
+            class(type_matrix_csr), intent(in), target :: self
             integer(int32), dimension(:), pointer :: ptr
         end function get_ptr_csr
 
         !> Returns a pointer to the `ind` array.
         module function get_ind_csr(self) result(ind)
             implicit none
-            class(type_csr), intent(in), target :: self
+            class(type_matrix_csr), intent(in), target :: self
             integer(int32), dimension(:), pointer :: ind
         end function get_ind_csr
 
         !> Returns a pointer to the `val` array.
         module function get_val_csr(self) result(val)
             implicit none
-            class(type_csr), intent(in), target :: self
+            class(type_matrix_csr), intent(in), target :: self
             real(real64), dimension(:), pointer :: val
         end function get_val_csr
 
         !> Finds the storage index of a matrix entry.
         module pure function find_csr(self, row, col) result(index)
             implicit none
-            class(type_csr), intent(in) :: self
+            class(type_matrix_csr), intent(in) :: self
             integer(int32), intent(in) :: row, col
             integer(int32) :: index
         end function find_csr
@@ -471,7 +471,7 @@ module core_types_matrix
         !> Sets a single value in the matrix.
         module subroutine set_value_csr(self, op, row, col, value)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
@@ -480,7 +480,7 @@ module core_types_matrix
         !> Sets a single value in the matrix.
         module subroutine set_value_block_csr(self, op, row, col, row_block, col_block, value)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
@@ -490,7 +490,7 @@ module core_types_matrix
         !> Sets all values in a row.
         module subroutine set_row_csr(self, op, row, value, row_block)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
@@ -500,7 +500,7 @@ module core_types_matrix
         !> Sets all stored values in the matrix.
         module subroutine set_all_csr(self, op, value)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
             integer(int32), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_csr
@@ -508,7 +508,7 @@ module core_types_matrix
         !> Scales all stored matrix values by a scalar factor.
         module subroutine scale_csr(self, op, alpha)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
             integer(int32), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_csr
@@ -516,13 +516,13 @@ module core_types_matrix
         !> Sets all stored matrix values to zero.
         module subroutine zero_csr(self)
             implicit none
-            class(type_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(inout) :: self
         end subroutine zero_csr
 
         !> Displays the matrix contents.
         module subroutine display_csr(self)
             implicit none
-            class(type_csr), intent(in) :: self
+            class(type_matrix_csr), intent(in) :: self
         end subroutine display_csr
     end interface
 
@@ -533,7 +533,7 @@ module core_types_matrix
     !>
     !> Represents a sparse matrix in Coordinate (COO) list format.
     !>
-    type, extends(abst_matrix) :: type_coo
+    type, extends(abst_matrix) :: type_matrix_coo
         !> Number of non-zero elements.
         integer(int32) :: nnz = 0
         !> Number of rows.
@@ -547,7 +547,7 @@ module core_types_matrix
         !> Values of the non-zero elements.
         real(real64), allocatable :: val(:)
     contains
-        procedure, pass(self) :: initialize => initialize_type_coo
+        procedure, pass(self) :: initialize => initialize_type_matrix_coo
         procedure, pass(self) :: destroy => destroy_coo
         procedure, pass(self) :: get_info => get_info_coo
         procedure, pass(self) :: get_diagonal => get_diagonal_coo
@@ -562,65 +562,65 @@ module core_types_matrix
         procedure, pass(self) :: zero => zero_coo
         procedure, private, pass(self) :: find => find_coo
         procedure, pass(self) :: display => display_coo
-    end type type_coo
+    end type type_matrix_coo
 
     interface
         !> Initializes a COO matrix from a node-level sparsity pattern.
-        module subroutine initialize_type_coo(self, num_nodes, row, col, row_blocks, col_blocks)
+        module subroutine initialize_type_matrix_coo(self, num_nodes, row, col, row_blocks, col_blocks)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
             integer(int32), intent(in) :: num_nodes
             integer(int32), intent(in), optional :: row(:)
             integer(int32), intent(in), optional :: col(:)
             integer(int32), intent(in), optional :: row_blocks
             integer(int32), intent(in), optional :: col_blocks
-        end subroutine initialize_type_coo
+        end subroutine initialize_type_matrix_coo
 
         !> Deallocates the COO matrix.
         module subroutine destroy_coo(self)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
         end subroutine destroy_coo
 
         module subroutine get_info_coo(self, info)
             implicit none
             !> The matrix object.
-            class(type_coo), intent(in) :: self
+            class(type_matrix_coo), intent(in) :: self
             !> The matrix information structure to populate.
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_coo
 
         module subroutine get_diagonal_coo(self, diagonal)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_coo
 
         !> Returns a pointer to the `row` index array.
         module function get_row_coo(self) result(row)
             implicit none
-            class(type_coo), intent(in), target :: self
+            class(type_matrix_coo), intent(in), target :: self
             integer(int32), dimension(:), pointer :: row
         end function get_row_coo
 
         !> Returns a pointer to the `col` index array.
         module function get_col_coo(self) result(col)
             implicit none
-            class(type_coo), intent(in), target :: self
+            class(type_matrix_coo), intent(in), target :: self
             integer(int32), dimension(:), pointer :: col
         end function get_col_coo
 
         !> Returns a pointer to the `val` array.
         module function get_val_coo(self) result(val)
             implicit none
-            class(type_coo), intent(in), target :: self
+            class(type_matrix_coo), intent(in), target :: self
             real(real64), dimension(:), pointer :: val
         end function get_val_coo
 
         !> Finds the storage index of a matrix entry.
         module pure function find_coo(self, row, col) result(index)
             implicit none
-            class(type_coo), intent(in) :: self
+            class(type_matrix_coo), intent(in) :: self
             integer(int32), intent(in) :: row, col
             integer(int32) :: index
         end function find_coo
@@ -628,7 +628,7 @@ module core_types_matrix
         !> Sets a single value in the matrix.
         module subroutine set_value_coo(self, op, row, col, value)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
@@ -637,7 +637,7 @@ module core_types_matrix
         !> Sets a single value in the matrix.
         module subroutine set_value_block_coo(self, op, row, col, row_block, col_block, value)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
@@ -647,7 +647,7 @@ module core_types_matrix
         !> Sets all values in a row.
         module subroutine set_row_coo(self, op, row, value, row_block)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
@@ -657,7 +657,7 @@ module core_types_matrix
         !> Sets all stored values in the matrix.
         module subroutine set_all_coo(self, op, value)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
             integer(int32), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_coo
@@ -665,7 +665,7 @@ module core_types_matrix
         !> Scales all stored matrix values by a scalar factor.
         module subroutine scale_coo(self, op, alpha)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
             integer(int32), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_coo
@@ -673,17 +673,17 @@ module core_types_matrix
         !> Sets all stored matrix values to zero.
         module subroutine zero_coo(self)
             implicit none
-            class(type_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(inout) :: self
         end subroutine zero_coo
 
         !> Displays the matrix contents.
         module subroutine display_coo(self)
             implicit none
-            class(type_coo), intent(in) :: self
+            class(type_matrix_coo), intent(in) :: self
         end subroutine display_coo
     end interface
 
-    type, extends(abst_matrix) :: type_bsr
+    type, extends(abst_matrix) :: type_matrix_bsr
         !> Number of non-zero elements.
         integer(int32) :: nnz = 0
         !> Number of rows.
@@ -703,7 +703,7 @@ module core_types_matrix
         !> Values of the non-zero elements stored in blocks. (row_blocks, col_blocks, index)
         real(real64), allocatable :: val(:, :, :)
     contains
-        procedure, pass(self) :: initialize => initialize_type_bsr
+        procedure, pass(self) :: initialize => initialize_type_matrix_bsr
         procedure, pass(self) :: destroy => destroy_bsr
         procedure, pass(self) :: get_info => get_info_bsr
         procedure, pass(self) :: get_diagonal => get_diagonal_bsr
@@ -718,66 +718,66 @@ module core_types_matrix
         procedure, pass(self) :: zero => zero_bsr
         procedure, pass(self), private :: find => find_bsr
         procedure, pass(self) :: display => display_bsr
-    end type type_bsr
+    end type type_matrix_bsr
 
     interface
-        module subroutine initialize_type_bsr(self, num_nodes, row, col, row_blocks, col_blocks)
+        module subroutine initialize_type_matrix_bsr(self, num_nodes, row, col, row_blocks, col_blocks)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
             integer(int32), intent(in) :: num_nodes
             integer(int32), intent(in), optional :: row(:)
             integer(int32), intent(in), optional :: col(:)
             integer(int32), intent(in), optional :: row_blocks
             integer(int32), intent(in), optional :: col_blocks
-        end subroutine initialize_type_bsr
+        end subroutine initialize_type_matrix_bsr
 
         module subroutine destroy_bsr(self)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
         end subroutine destroy_bsr
 
         module subroutine get_info_bsr(self, info)
             implicit none
             !> The matrix object.
-            class(type_bsr), intent(in) :: self
+            class(type_matrix_bsr), intent(in) :: self
             !> The matrix information structure to populate.
             type(type_matrix_info), intent(inout) :: info
         end subroutine get_info_bsr
 
         module subroutine get_diagonal_bsr(self, diagonal)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_bsr
 
         module function get_ptr_bsr(self) result(ptr)
             implicit none
-            class(type_bsr), intent(in), target :: self
+            class(type_matrix_bsr), intent(in), target :: self
             integer(int32), dimension(:), pointer :: ptr
         end function get_ptr_bsr
 
         module function get_ind_bsr(self) result(ind)
             implicit none
-            class(type_bsr), intent(in), target :: self
+            class(type_matrix_bsr), intent(in), target :: self
             integer(int32), dimension(:), pointer :: ind
         end function get_ind_bsr
 
         module function get_val_bsr(self) result(val)
             implicit none
-            class(type_bsr), intent(in), target :: self
+            class(type_matrix_bsr), intent(in), target :: self
             real(real64), dimension(:, :, :), pointer :: val
         end function get_val_bsr
 
         module pure function find_bsr(self, row, col) result(index)
             implicit none
-            class(type_bsr), intent(in) :: self
+            class(type_matrix_bsr), intent(in) :: self
             integer(int32), intent(in) :: row, col
             integer(int32) :: index
         end function find_bsr
 
         module subroutine set_value_bsr(self, op, row, col, value)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
@@ -785,7 +785,7 @@ module core_types_matrix
 
         module subroutine set_value_block_bsr(self, op, row, col, row_block, col_block, value)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row, col
             integer(int32), intent(in) :: row_block, col_block
@@ -794,7 +794,7 @@ module core_types_matrix
 
         module subroutine set_row_bsr(self, op, row, value, row_block)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
             integer(int32), intent(in) :: op
             integer(int32), intent(in) :: row
             real(real64), intent(in) :: value
@@ -803,26 +803,26 @@ module core_types_matrix
 
         module subroutine set_all_bsr(self, op, value)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
             integer(int32), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_bsr
 
         module subroutine scale_bsr(self, op, alpha)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
             integer(int32), intent(in) :: op
             type(type_vector_dp), intent(in) :: alpha
         end subroutine scale_bsr
 
         module subroutine zero_bsr(self)
             implicit none
-            class(type_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(inout) :: self
         end subroutine zero_bsr
 
         module subroutine display_bsr(self)
             implicit none
-            class(type_bsr), intent(in) :: self
+            class(type_matrix_bsr), intent(in) :: self
         end subroutine display_bsr
     end interface
 

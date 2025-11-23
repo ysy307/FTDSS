@@ -248,9 +248,9 @@ contains
         ! A= [1 2 3; 2 3 4; 3 4 5], B=3.0
         call matrix_axpy(2.0d0, A, B, ierr)
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             select type (B)
-            type is (type_dense)
+            type is (type_matrix_dense)
                 A_data => A%get_val()
                 B_data => B%get_val()
                 if (all(B_data == 2.0d0 * A_data + 3.0d0)) then
@@ -265,9 +265,9 @@ contains
         ! A= [1 2 3; 2 3 4; 3 4 5], C=0.0
         call matrix_xpay(4.0d0, A, C, ierr)
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             select type (C)
-            type is (type_dense)
+            type is (type_matrix_dense)
                 A_data => A%get_val()
                 C_data => C%get_val()
                 if (all(C_data == A_data + 4.0d0 * 0.0d0)) then
@@ -282,11 +282,11 @@ contains
         ! A= [1 2 3; 2 3 4; 3 4 5], B=3.0, C from previous step
         call matrix_axpyz(3.0d0, A, B, C, ierr)
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             select type (B)
-            type is (type_dense)
+            type is (type_matrix_dense)
                 select type (C)
-                type is (type_dense)
+                type is (type_matrix_dense)
                     A_data => A%get_val()
                     B_data => B%get_val()
                     C_data => C%get_val()
@@ -310,7 +310,7 @@ contains
         call vb%set(OP_INS, [0.5d0, 2.0d0, 1.0d0]) ! vb = [0.5, 2.0, 1.0]
         call matrix_scale(A, vb, diag, OP_SCALE_JACOBI, ierr)
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             A_data => A%get_val()
             vb_data => vb%get_data()
             block
@@ -339,7 +339,7 @@ contains
         call vb%set(OP_INS, [0.5d0, 2.0d0, 1.0d0]) ! vb = [0.5, 2.0, 1.0]
         call matrix_scale(A, vb, diag, OP_SCALE_SYMM_DIAG, ierr)
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             A_data => A%get_val()
             vb_data => vb%get_data()
             block
@@ -476,7 +476,7 @@ contains
         call matrix_scale(A, vb, diag, OP_SCALE_JACOBI, ierr)
 
         select type (A)
-        type is (type_coo)
+        type is (type_matrix_coo)
             val => A%get_val()
             vb_data => vb%get_data()
 
@@ -503,7 +503,7 @@ contains
         end do
         call matrix_scale(A, vb, diag, OP_SCALE_SYMM_DIAG, ierr)
         select type (A)
-        type is (type_coo)
+        type is (type_matrix_coo)
             val => A%get_val()
             vb_data => vb%get_data()
 
@@ -668,7 +668,7 @@ contains
         call matrix_scale(A, vb, diag, OP_SCALE_JACOBI, ierr)
 
         select type (A)
-        type is (type_csr)
+        type is (type_matrix_csr)
             val => A%get_val()
             vb_data => vb%get_data()
 
@@ -697,7 +697,7 @@ contains
         end do
         call matrix_scale(A, vb, diag, OP_SCALE_SYMM_DIAG, ierr)
         select type (A)
-        type is (type_csr)
+        type is (type_matrix_csr)
             val => A%get_val()
             vb_data => vb%get_data()
 
@@ -878,7 +878,7 @@ contains
 
         ! 値を定数(2.0)にリセット
         select type (A)
-        type is (type_bsr)
+        type is (type_matrix_bsr)
             call A%set_all(OP_INS, 2.0d0)
         end select
 
@@ -888,7 +888,7 @@ contains
         call matrix_scale(A, vb, diag, OP_SCALE_JACOBI, ierr)
 
         select type (A)
-        type is (type_bsr)
+        type is (type_matrix_bsr)
             A_data => A%get_val()
 
             diff = maxval(abs(A_data - 1.0d0))
@@ -907,7 +907,7 @@ contains
 
         ! 値を定数(4.0)にリセット
         select type (A)
-        type is (type_bsr)
+        type is (type_matrix_bsr)
             call A%set_all(OP_INS, 4.0d0)
         end select
 
@@ -917,7 +917,7 @@ contains
         call matrix_scale(A, vb, diag, OP_SCALE_SYMM_DIAG, ierr)
 
         select type (A)
-        type is (type_bsr)
+        type is (type_matrix_bsr)
             A_data => A%get_val()
 
             diff = maxval(abs(A_data - 1.0d0))
@@ -932,7 +932,7 @@ contains
         ! 5. MatVec Test (変更なし)
         !----------------------------------------
         select type (A)
-        type is (type_bsr)
+        type is (type_matrix_bsr)
             call A%set_all(OP_INS, 1.0d0)
         end select
 

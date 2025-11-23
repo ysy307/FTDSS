@@ -12,10 +12,10 @@ module linalg_matrix_operations
     public :: matvec
 
     interface matrix_gemv
-        module procedure :: gemv_dense
-        module procedure :: gemv_coo
-        module procedure :: gemv_csr
-        module procedure :: gemv_bsr
+        module procedure :: gemv_matrix_dense
+        module procedure :: gemv_matrix_coo
+        module procedure :: gemv_matrix_csr
+        module procedure :: gemv_matrix_bsr
     end interface
 
 contains
@@ -33,9 +33,9 @@ contains
         real(real64), dimension(:, :), pointer :: B_data
 
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             select type (B)
-            type is (type_dense)
+            type is (type_matrix_dense)
                 A_data => A%get_val()
                 B_data => B%get_val()
                 B_data = alpha * A_data + B_data
@@ -62,9 +62,9 @@ contains
         real(real64), dimension(:, :), pointer :: B_data
 
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             select type (B)
-            type is (type_dense)
+            type is (type_matrix_dense)
                 A_data => A%get_val()
                 B_data => B%get_val()
                 B_data = A_data + alpha * B_data
@@ -93,11 +93,11 @@ contains
         real(real64), dimension(:, :), pointer :: C_data
 
         select type (A)
-        type is (type_dense)
+        type is (type_matrix_dense)
             select type (B)
-            type is (type_dense)
+            type is (type_matrix_dense)
                 select type (C)
-                type is (type_dense)
+                type is (type_matrix_dense)
                     A_data => A%get_val()
                     B_data => B%get_val()
                     C_data => C%get_val()
@@ -147,12 +147,12 @@ contains
     !>
     !> Performs a general matrix-vector multiplication: y = alpha*A*x + beta*y.
     !> This implementation may use MKL's dgemv if available.
-    subroutine gemv_dense(alpha, A, x, beta, y, ierr)
+    subroutine gemv_matrix_dense(alpha, A, x, beta, y, ierr)
         implicit none
         !> The scalar multiplier alpha.
         real(real64), intent(in) :: alpha
         !> The dense matrix object (A).
-        class(type_dense), intent(in) :: A
+        class(type_matrix_dense), intent(in) :: A
         !> The input vector x.
         real(real64), intent(in) :: x(:)
         !> The scalar multiplier beta.
@@ -195,17 +195,17 @@ contains
 #endif
         ierr = MATRIX_STATUS_SUCCESS
 
-    end subroutine gemv_dense
+    end subroutine gemv_matrix_dense
 
     !>
     !> Performs a sparse matrix-vector multiplication (GEMV): y = alpha*A*x + beta*y.
     !>
-    subroutine gemv_csr(alpha, A, x, beta, y, ierr)
+    subroutine gemv_matrix_csr(alpha, A, x, beta, y, ierr)
         implicit none
         !> The scalar multiplier alpha.
         real(real64), intent(in) :: alpha
         !> The CRS matrix object (A).
-        class(type_csr), intent(in) :: A
+        class(type_matrix_csr), intent(in) :: A
         !> The input vector x.
         real(real64), intent(in) :: x(:)
         !> The scalar multiplier beta.
@@ -244,19 +244,19 @@ contains
         !$omp end parallel do
 
         ierr = MATRIX_STATUS_SUCCESS
-    end subroutine gemv_csr
+    end subroutine gemv_matrix_csr
 
     !>
     !> Performs a general matrix-vector multiplication: y = alpha*A*x + beta*y.
     !> This implementation is parallelized with OpenMP atomics to handle potential
     !> race conditions when multiple threads write to the same element of `y`.
     !>
-    subroutine gemv_coo(alpha, A, x, beta, y, ierr)
+    subroutine gemv_matrix_coo(alpha, A, x, beta, y, ierr)
         implicit none
         !> The scalar multiplier alpha.
         real(real64), intent(in) :: alpha
         !> The COO matrix object (A).
-        class(type_coo), intent(in) :: A
+        class(type_matrix_coo), intent(in) :: A
         !> The input vector x.
         real(real64), intent(in) :: x(:)
         !> The scalar multiplier beta.
@@ -299,17 +299,17 @@ contains
 
         ierr = MATRIX_STATUS_SUCCESS
 
-    end subroutine gemv_coo
+    end subroutine gemv_matrix_coo
 
     !>
     !> Performs a BSR matrix-vector multiplication (GEMV): y = alpha*A*x + beta*y.
     !>
-    subroutine gemv_bsr(alpha, A, x, beta, y, ierr)
+    subroutine gemv_matrix_bsr(alpha, A, x, beta, y, ierr)
         implicit none
         !> The scalar multiplier alpha.
         real(real64), intent(in) :: alpha
         !> The BSR matrix object (A).
-        class(type_bsr), intent(in) :: A
+        class(type_matrix_bsr), intent(in) :: A
         !> The input vector x.
         real(real64), intent(in) :: x(:)
         !> The scalar multiplier beta.
@@ -373,7 +373,7 @@ contains
 
         ierr = MATRIX_STATUS_SUCCESS
 
-    end subroutine gemv_bsr
+    end subroutine gemv_matrix_bsr
 
     subroutine matvec(A, x, y, ierr)
         implicit none
@@ -388,14 +388,14 @@ contains
         x_data => x%get_data()
         y_data => y%get_data()
         select type (A)
-        type is (type_dense)
-            call gemv_dense(1.0d0, A, x_data, 0.0d0, y_data, ierr)
-        type is (type_csr)
-            call gemv_csr(1.0d0, A, x_data, 0.0d0, y_data, ierr)
-        type is (type_coo)
-            call gemv_coo(1.0d0, A, x_data, 0.0d0, y_data, ierr)
-        type is (type_bsr)
-            call gemv_bsr(1.0d0, A, x_data, 0.0d0, y_data, ierr)
+        type is (type_matrix_dense)
+            call gemv_matrix_dense(1.0d0, A, x_data, 0.0d0, y_data, ierr)
+        type is (type_matrix_csr)
+            call gemv_matrix_csr(1.0d0, A, x_data, 0.0d0, y_data, ierr)
+        type is (type_matrix_coo)
+            call gemv_matrix_coo(1.0d0, A, x_data, 0.0d0, y_data, ierr)
+        type is (type_matrix_bsr)
+            call gemv_matrix_bsr(1.0d0, A, x_data, 0.0d0, y_data, ierr)
         class default
             ierr = MATRIX_STATUS_ILL_OPERATIONS
         end select

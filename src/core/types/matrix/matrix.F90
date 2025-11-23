@@ -5,10 +5,10 @@ module module_type_matrix
     private
 
     public :: abst_matrix
-    public :: type_dense
-    public :: type_csr
-    public :: type_coo
-    public :: type_bsr
+    public :: type_matrix_dense
+    public :: type_matrix_csr
+    public :: type_matrix_coo
+    public :: type_matrix_bsr
 
     public :: type_matrix_info
     public :: create_matrix

@@ -11,7 +11,7 @@ contains
     !>
     module subroutine initialize_dense(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
         integer(int32), intent(in), optional :: row(:)
         integer(int32), intent(in), optional :: col(:)
@@ -39,7 +39,7 @@ contains
     !>
     module subroutine destroy_dense(self)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
 
         call deallocate_array(self%val)
         call deallocate_array(self%diagonal)
@@ -56,7 +56,7 @@ contains
     !>
     module subroutine get_info_dense(self, info)
         implicit none
-        class(type_dense), intent(in) :: self
+        class(type_matrix_dense), intent(in) :: self
         type(type_matrix_info), intent(inout) :: info
 
         info%num_nodes = self%num_nodes
@@ -66,7 +66,7 @@ contains
 
     module subroutine get_diagonal_dense(self, diagonal)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         type(type_vector_dp), intent(inout) :: diagonal
         integer(int32) :: i
 
@@ -90,7 +90,7 @@ contains
     !>
     module function get_val_dense(self) result(val)
         implicit none
-        class(type_dense), intent(in), target :: self
+        class(type_matrix_dense), intent(in), target :: self
         real(real64), dimension(:, :), pointer :: val
         val => self%val
     end function get_val_dense
@@ -100,7 +100,7 @@ contains
     !>
     module subroutine set_value_dense(self, op, row, col, value)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         integer(int32), intent(in) :: op
         integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
@@ -127,7 +127,7 @@ contains
     !>
     module subroutine set_value_block_dense(self, op, row, col, row_block, col_block, value)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         integer(int32), intent(in) :: op
         integer(int32), intent(in) :: row, col
         integer(int32), intent(in) :: row_block, col_block
@@ -141,7 +141,7 @@ contains
     !>
     module subroutine set_row_dense(self, op, row, value, row_block)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         integer(int32), intent(in) :: op
         integer(int32), intent(in) :: row
         real(real64), intent(in) :: value
@@ -167,7 +167,7 @@ contains
     !>
     module subroutine set_all_dense(self, op, value)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         integer(int32), intent(in) :: op
         real(real64), intent(in) :: value
 
@@ -188,7 +188,7 @@ contains
     !>
     module subroutine scale_dense(self, op, alpha)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         integer(int32), intent(in) :: op
         type(type_vector_dp), intent(in) :: alpha
 
@@ -257,7 +257,7 @@ contains
     !>
     module subroutine zero_dense(self)
         implicit none
-        class(type_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(inout) :: self
         if (allocated(self%val)) self%val = 0.0d0
         self%status = MATRIX_STATUS_SUCCESS
     end subroutine zero_dense
@@ -267,7 +267,7 @@ contains
     !>
     module pure function find_dense(self, row, col) result(index)
         implicit none
-        class(type_dense), intent(in) :: self
+        class(type_matrix_dense), intent(in) :: self
         integer(int32), intent(in) :: row, col
         integer(int32) :: index
 
@@ -286,7 +286,7 @@ contains
     !>
     module subroutine display_dense(self)
         implicit none
-        class(type_dense), intent(in) :: self
+        class(type_matrix_dense), intent(in) :: self
         integer(int32) :: i, j
 
         if (.not. self%is_initialized()) then

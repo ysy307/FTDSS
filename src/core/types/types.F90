@@ -4,7 +4,8 @@ module core_types
     use :: core_types_pointer, only:type_dp_pointer, type_int_pointer, type_logical_pointer
     use :: core_types_variable, only:type_variable
     use :: core_types_gauss, only:type_state
-    use :: module_type_matrix, only:abst_matrix, type_coo, type_csr, type_dense, type_bsr, create_matrix, type_matrix_info
+    use :: module_type_matrix, only:abst_matrix, type_matrix_coo, type_matrix_csr, type_matrix_dense, type_matrix_bsr, &
+        create_matrix, type_matrix_info
     use :: module_type_vector, only:type_vector_dp, type_vector_int
     implicit none
 

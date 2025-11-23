@@ -7,7 +7,7 @@ trap '/usr/bin/python3 /workspaces/FTDSS/scripts/check.py' EXIT
 
 cmake -S . -B CMakeBuild \
     -DBUILD_APP=test \
-    -DTEST_NAME=linalg \
+    -DTEST_NAME=solver \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_Fortran_COMPILER=mpiifx \
     -DCMAKE_C_COMPILER=mpiicx \

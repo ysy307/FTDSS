@@ -1,49 +1,52 @@
-submodule(solver_solve) solve_bicgstab
+submodule(solver_solve) solve_type_solver_bicgstab
     implicit none
 contains
-    module function construct_type_solver_bicgstab(settings) result(structure)
-        implicit none
-        type(type_solver_settings), intent(in) :: settings
-        class(abst_solver), allocatable :: structure
-
-        allocate (type_solver_bicgstab :: structure)
-        select type (this => structure)
-        type is (type_solver_bicgstab)
-
-            this%num_nodes = settings%num_nodes
-            this%num_dofs_per_node = settings%num_dofs_per_node
-            this%tolerance = settings%tolerance
-            this%max_iterations = settings%max_iterations
-
-            ! 配列の確保
-            call this%p%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%phat%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%s%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%shat%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%r%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%r0%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%t%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%v%initialize(settings%num_nodes, settings%num_dofs_per_node)
-            call this%x%initialize(settings%num_nodes, settings%num_dofs_per_node)
-
-            ! 前処理の設定
-            this%pc = create_preconditioner(settings%preconditioner_id)
-
-        end select
-
-    end function construct_type_solver_bicgstab
-
-    module subroutine solve_bicgstab(self, A, b, x)
+    module subroutine initialize_type_solver_bicgstab(self, solver_settings, preconditioner_settings)
         implicit none
         class(type_solver_bicgstab), intent(inout) :: self
-        type(type_jacobian_matrix), intent(in) :: A
-        type(type_residual_vector), intent(in) :: b
-        type(type_residual_vector), intent(inout) :: x
+        type(type_solver_settings), intent(in) :: solver_settings
+        type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        integer(int32) :: ierr
+
+        self%id = solver_settings%id
+        self%name = "BiCGSTAB"
+
+        self%num_nodes = solver_settings%num_nodes
+        self%tolerance = solver_settings%tolerance
+        self%max_iterations = solver_settings%max_iterations
+
+        call self%p%initialize(self%num_nodes)
+        call self%phat%initialize(self%num_nodes)
+        call self%s%initialize(self%num_nodes)
+        call self%shat%initialize(self%num_nodes)
+        call self%r%initialize(self%num_nodes)
+        call self%r0%initialize(self%num_nodes)
+        call self%t%initialize(self%num_nodes)
+        call self%v%initialize(self%num_nodes)
+        call self%x%initialize(self%num_nodes)
+
+        self%status = SOLVER_STATUS_SUCCESS
+
+        ! 前処理の設定
+        call create_preconditioner(self%pc, preconditioner_settings, ierr)
+        self%status = ierr
+
+    end subroutine initialize_type_solver_bicgstab
+
+    module subroutine solve_type_solver_bicgstab(self, A, b, x)
+        implicit none
+        class(type_solver_bicgstab), intent(inout) :: self
+        class(abst_matrix), intent(in) :: A
+        type(type_vector_dp), intent(in) :: b
+        type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: rho, rho_old, alpha, beta, omega
         real(real64) :: resid
         integer(int32) :: iter, iN, vector_size
         integer(int32) :: idof
+
+        real(real64), dimension(:), pointer :: x_ptr
+        integer(int32) :: ierr
 
         ! select type (matrix => self%A)
         ! type is (type_crs)
@@ -55,35 +58,32 @@ contains
         beta = 1.0d0
         omega = 1.0d0
 
-        do idof = 1, self%num_dofs_per_node
-            call self%p%zero()
-            call self%s%zero()
-            call self%phat%zero()
-            call self%shat%zero()
+        call self%p%zero()
+        call self%s%zero()
+        call self%phat%zero()
+        call self%shat%zero()
 
-            ! 2: Set an initial value x0
-            call self%x%zero()
-        end do
+        ! 2: Set an initial value x0
+        call self%x%zero()
 
         ! 3: r0 = b-Ax0
-        call ftdss_gemv(A, 1.0d0, self%x, 0.0d0, self%r)
-        call ftdss_sub(b, self%r, self%r)
+        call self%r%zero()
+        call matvec(A, self%x, self%r, ierr)
+        call subtract(b, self%r, self%r)
 
         ! 4: Create preconditioned matrix
-        ! call self%Create_Preconditioner(matrix)
+        call self%pc%setup(A)
 
-        ! 5: ^r0 = r0, (r*0, r0)!=0
+        ! ! 5: ^r0 = r0, (r*0, r0)!=0
         call self%r0%copy(self%r)
 
         do iter = 1, self%max_iterations
             ! 7: (^r0, rk)
-            rho = ftdss_dot(self%r, self%r0)
+            rho = vector_dot(self%r0, self%r)
             ! 8: rho check
             if (rho == 0.0d0) then
-                self%solver_status = SOLVER_STATUS_SUCCESS
-                do iN = 1, self%num_dofs
-                    call x%set(iN, self%x(self%size * (iN - 1) + 1:self%size * iN))
-                end do
+                self%status = SOLVER_STATUS_SUCCESS
+                call x%copy(self%x)
                 return
             end if
 
@@ -94,50 +94,44 @@ contains
                 ! 12: beta = (rho / rho_old) * (alpha_k / omega_k)
                 beta = (rho / rho_old) * (alpha / omega)
                 ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
-                do iN = 1, self%size
-                    self%p(iN) = self%r(iN) + beta * (self%p(iN) - omega * self%v(iN))
-                end do
+                call vector_axpy(-omega, self%v, self%p)
+                call vector_scale(beta, self%p)
+                call vector_axpy(1.0d0, self%r, self%p)
             end if
             ! 15: phat = M^-1 * p
             call self%pc%apply(self%p, self%phat)
             ! 16: v = A * phat
-            call matrix%gemv(1.0d0, self%phat(:), 0.0d0, self%v(:))
-            ! call SpMV(self%CRS_A, self%phat, self%v)
+            call matvec(A, self%phat, self%v, ierr)
             ! 17: alpha_k = rho / (^r0, v)
-            alpha = rho / dot(self%r0(:), self%v(:))
+            alpha = rho / vector_dot(self%r0, self%v)
             ! 18: s = r_k - alpha_k * v
-            do iN = 1, self%size
-                self%s(iN) = self%r(iN) - alpha * self%v(iN)
-            end do
+            call vector_axpyz(-alpha, self%v, self%r, self%s)
 
             ! 19: shat = M^-1 * s
             call self%pc%apply(self%s, self%shat)
             ! 20: t = A * shat
-            call matrix%gemv(1.0d0, self%shat(:), 0.0d0, self%t(:))
+            call matvec(A, self%shat, self%t, ierr)
 
             ! 21: omega_k = (t,s)/(t,t)
-            omega = dot(self%t(:), self%s(:)) / dot(self%t(:), self%t(:))
+            omega = vector_dot(self%t, self%s) / vector_dot(self%t, self%t)
 
             ! 22: omega breakdown check
             if (omega == 0.0d0) then
-                self%solver_status = SOLVER_STATUS_BREAKDOWN
+                self%status = SOLVER_STATUS_BREAKDOWN
                 return
             end if
 
             ! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i)
             ! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)
-            do iN = 1, self%size
-                self%x(iN) = self%x(iN) + alpha * self%phat(iN) + omega * self%shat(iN)
-                self%r(iN) = self%s(iN) - omega * self%t(iN)
-            end do
+            call vector_axpy(alpha, self%phat, self%x)
+            call vector_axpy(omega, self%shat, self%x)
+            call vector_axpyz(-omega, self%t, self%s, self%r)
 
             ! 25: ||r_k+1||_2
-            resid = norm_2(self%r(:))
+            resid = vector_norm2(self%r)
             if (resid < self%tolerance) then
-                self%solver_status = SOLVER_STATUS_SUCCESS
-                do iN = 1, self%num_dofs
-                    call x%set(iN, self%x(self%size * (iN - 1) + 1:self%size * iN))
-                end do
+                self%status = SOLVER_STATUS_SUCCESS
+                call x%copy(self%x)
                 return
             end if
 
@@ -145,25 +139,36 @@ contains
 
             if (was_interrupted()) stop
         end do
-        self%solver_status = SOLVER_STATUS_MAXITER
+        self%status = SOLVER_STATUS_MAXITER
+        call x%copy(self%x)
 
-        ! end select
-    end subroutine solve_bicgstab
+    end subroutine solve_type_solver_bicgstab
 
-    module subroutine destruct_type_solver_bicgstab(self)
+    module subroutine destroy_type_solver_bicgstab(self)
         implicit none
-        type(type_solver_bicgstab), intent(inout) :: self
+        class(type_solver_bicgstab), intent(inout) :: self
 
-        call deallocate_array(self%m)
-        call deallocate_array(self%p)
-        call deallocate_array(self%phat)
-        call deallocate_array(self%s)
-        call deallocate_array(self%shat)
-        call deallocate_array(self%r)
-        call deallocate_array(self%r0)
-        call deallocate_array(self%t)
-        call deallocate_array(self%v)
-        call deallocate_array(self%x)
+        self%id = -1
+        if (allocated(self%name)) deallocate (self%name)
+        self%num_nodes = -1
+        self%tolerance = 0.0d0
+        self%max_iterations = 0
 
-    end subroutine destruct_type_solver_bicgstab
-end submodule solve_bicgstab
+        call self%p%destroy()
+        call self%phat%destroy()
+        call self%s%destroy()
+        call self%shat%destroy()
+        call self%r%destroy()
+        call self%r0%destroy()
+        call self%t%destroy()
+        call self%v%destroy()
+        call self%x%destroy()
+
+        if (allocated(self%pc)) then
+            call self%pc%destroy()
+            deallocate (self%pc)
+        end if
+
+        self%status = SOLVER_STATUS_SUCCESS
+    end subroutine destroy_type_solver_bicgstab
+end submodule solve_type_solver_bicgstab

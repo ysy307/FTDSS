@@ -1,29 +1,20 @@
-# test/CMakeLists.txt
-
-# 現在選択されているテスト名(${TEST_NAME})に応じて、ビルドするテストを決定する
-
+# CMakeLists.txt for test
+# Defines test executables for various modules in the Solver library.
+#
 if(TEST_NAME STREQUAL "core")
-    # test_core実行ファイルを作成
     add_executable(test_core test_core.F90)
     set_target_properties(test_core PROPERTIES LINKER_LANGUAGE Fortran)
-    # 必要なライブラリをリンク
     target_link_libraries(test_core PRIVATE
         Solver::Core
     )
-
-    # CTestにテストとして登録
     add_test(NAME test_core COMMAND $<TARGET_FILE:test_core>)
 elseif(TEST_NAME STREQUAL "input")
-    # test_input実行ファイルを作成
     add_executable(test_input test_input.F90)
     set_target_properties(test_input PROPERTIES LINKER_LANGUAGE Fortran)
-    # 必要なライブラリをリンク
     target_link_libraries(test_input PRIVATE
         Solver::Core
         Solver::Input
     )
-
-    # CTestにテストとして登録
     add_test(NAME test_input COMMAND $<TARGET_FILE:test_input>)
 elseif(TEST_NAME STREQUAL "linalg")
     add_executable(test_linalg test_linalg.F90)
@@ -33,6 +24,15 @@ elseif(TEST_NAME STREQUAL "linalg")
         Solver::Linalg
     )
     add_test(NAME test_linalg COMMAND $<TARGET_FILE:test_linalg>)
+elseif(TEST_NAME STREQUAL "solver")
+    add_executable(test_solver test_solver.F90)
+    set_target_properties(test_solver PROPERTIES LINKER_LANGUAGE Fortran)
+    target_link_libraries(test_solver PRIVATE
+        Solver::Core
+        Solver::Linalg
+        Solver::Solver
+    )
+    add_test(NAME test_solver COMMAND $<TARGET_FILE:test_solver>)
 
 elseif(TEST_NAME STREQUAL "control")
     add_executable(test_control test_control.F90)

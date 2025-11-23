@@ -25,16 +25,16 @@ contains
 
         select case (matrix_type)
         case (MATRIX_DENSE)
-            allocate (type_dense :: matrix)
+            allocate (type_matrix_dense :: matrix)
             call matrix%initialize(num_nodes)
         case (MATRIX_CSR)
-            allocate (type_csr :: matrix)
+            allocate (type_matrix_csr :: matrix)
             call matrix%initialize(num_nodes, row, col)
         case (MATRIX_COO)
-            allocate (type_coo :: matrix)
+            allocate (type_matrix_coo :: matrix)
             call matrix%initialize(num_nodes, row, col)
         case (MATRIX_BSR)
-            allocate (type_bsr :: matrix)
+            allocate (type_matrix_bsr :: matrix)
             call matrix%initialize(num_nodes, row, col, block_size, block_size)
         case default
             error stop "Error: Unsupported matrix type in create_matrix."

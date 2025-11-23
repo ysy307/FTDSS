@@ -12,9 +12,9 @@ contains
     !> It assumes the input node-level column indices (`col`) are sorted for each row segment.
     !> This routine expands the node-level graph into a full DOF-level matrix sparsity pattern.
     !>
-    module subroutine initialize_type_csr(self, num_nodes, row, col, row_blocks, col_blocks)
+    module subroutine initialize_type_matrix_csr(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
         integer(int32), intent(in), optional :: row(:)
         integer(int32), intent(in), optional :: col(:)
@@ -47,14 +47,14 @@ contains
 
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS_SUCCESS
-    end subroutine initialize_type_csr
+    end subroutine initialize_type_matrix_csr
 
     !>
     !> Deallocates all internal arrays of the csr matrix object.
     !>
     module subroutine destroy_csr(self)
         implicit none
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
 
         call deallocate_array(self%ptr)
         call deallocate_array(self%ind)
@@ -75,7 +75,7 @@ contains
     module subroutine get_info_csr(self, info)
         implicit none
         !> The matrix object.
-        class(type_csr), intent(in) :: self
+        class(type_matrix_csr), intent(in) :: self
         !> The matrix information structure to populate.
         type(type_matrix_info), intent(inout) :: info
 
@@ -87,7 +87,7 @@ contains
 
     module subroutine get_diagonal_csr(self, diagonal)
         implicit none
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
         type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i, row_start, row_end, j
@@ -115,7 +115,7 @@ contains
     module function get_ptr_csr(self) result(ptr)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(in), target :: self
+        class(type_matrix_csr), intent(in), target :: self
         !> A pointer to the CSR `ptr` array.
         integer(int32), dimension(:), pointer :: ptr
 
@@ -128,7 +128,7 @@ contains
     module function get_ind_csr(self) result(ind)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(in), target :: self
+        class(type_matrix_csr), intent(in), target :: self
         !> A pointer to the CSR `ind` array.
         integer(int32), dimension(:), pointer :: ind
 
@@ -141,7 +141,7 @@ contains
     module function get_val_csr(self) result(val)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(in), target :: self
+        class(type_matrix_csr), intent(in), target :: self
         !> A pointer to the CSR `val` array.
         real(real64), dimension(:), pointer :: val
 
@@ -154,7 +154,7 @@ contains
     module subroutine set_value_csr(self, op, row, col, value)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
         integer(int32), intent(in) :: op
         !> The 1-based node index for the row.
@@ -191,7 +191,7 @@ contains
     module subroutine set_value_block_csr(self, op, row, col, row_block, col_block, value)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
         integer(int32), intent(in) :: op
         !> The 1-based node index for the row.
@@ -214,7 +214,7 @@ contains
     module subroutine set_row_csr(self, op, row, value, row_block)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
         integer(int32), intent(in) :: op
         !> The 1-based node index for the row.
@@ -245,7 +245,7 @@ contains
     module subroutine set_all_csr(self, op, value)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform.
         integer(int32), intent(in) :: op
         !> The scalar value to assign to all non-zero entries.
@@ -266,7 +266,7 @@ contains
     module subroutine scale_csr(self, op, alpha)
         implicit none
         !> The CSR matrix object.
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
         !> The operation to perform
         integer(int32), intent(in) :: op
         !> The scaling vector.
@@ -335,7 +335,7 @@ contains
     module subroutine zero_csr(self)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(inout) :: self
 
         self%val = 0.0d0
     end subroutine zero_csr
@@ -346,7 +346,7 @@ contains
 !     module subroutine add_value_csr(self, row, col, value)
 !         implicit none
 !         !> The csr matrix object.
-!         class(type_csr), intent(inout) :: self
+!         class(type_matrix_csr), intent(inout) :: self
 !         !> The 1-based node index for the row.
 !         integer(int32), intent(in) :: row
 !         !> The 1-based node index for the column.
@@ -374,10 +374,10 @@ contains
 !     module subroutine add_values_csr(self, indices, values)
 !         implicit none
 !         !> The csr matrix object to modify (self).
-!         class(type_csr), intent(inout) :: self
+!         class(type_matrix_csr), intent(inout) :: self
 !         !> The 1-based node indices specifying which rows and columns to update.
 !         integer(int32), intent(in) :: indices(:)
-!         !> The abstract matrix containing values to add (must be of type_csr).
+!         !> The abstract matrix containing values to add (must be of type_matrix_csr).
 !         class(abst_matrix), intent(in) :: values
 
 !         integer(int32) :: i, j, n
@@ -399,18 +399,18 @@ contains
 !     module subroutine add_matrix_csr(self, alpha, B, C)
 !         implicit none
 !         !> The csr matrix object (A).
-!         class(type_csr), intent(in) :: self
+!         class(type_matrix_csr), intent(in) :: self
 !         !> The scalar multiplier alpha.
 !         real(real64), intent(in) :: alpha
-!         !> The abstract matrix B (must be of type_csr).
+!         !> The abstract matrix B (must be of type_matrix_csr).
 !         class(abst_matrix), intent(in) :: B
-!         !> The abstract matrix C to store the result (must be of type_csr).
+!         !> The abstract matrix C to store the result (must be of type_matrix_csr).
 !         class(abst_matrix), intent(inout) :: C
 
 !         select type (B_csr => B)
-!         type is (type_csr)
+!         type is (type_matrix_csr)
 !             select type (C_csr => C)
-!             type is (type_csr)
+!             type is (type_matrix_csr)
 !                 if (self%nnz /= B_csr%nnz .or. self%nnz /= C_csr%nnz) then
 !                     print *, "ERROR(add_matrix_csr): In this simplified version, NNZ must be identical."
 !                     stop
@@ -426,7 +426,7 @@ contains
 !     module subroutine gemv_csr(self, alpha, x, beta, y)
 !         implicit none
 !         !> The csr matrix object (A).
-!         class(type_csr), intent(in) :: self
+!         class(type_matrix_csr), intent(in) :: self
 !         !> The scalar multiplier alpha.
 !         real(real64), intent(in) :: alpha
 !         !> The input vector x.
@@ -458,7 +458,7 @@ contains
     pure module function find_csr(self, row, col) result(index)
         implicit none
         !> The csr matrix object.
-        class(type_csr), intent(in) :: self
+        class(type_matrix_csr), intent(in) :: self
         !> The 1-based node index for the row.
         integer(int32), intent(in) :: row
         !> The 1-based node index for the column.
@@ -489,7 +489,7 @@ contains
     module subroutine display_csr(self)
         implicit none
         !> The csr matrix object to display.
-        class(type_csr), intent(in) :: self
+        class(type_matrix_csr), intent(in) :: self
         integer(int32) :: i, r, row_start, row_end
 
         write (*, '(a,i0,2x,a,i0,a)') "csr Matrix (dims= ", self%num_rows, ", nnz= ", self%nnz, ")"
