@@ -8,9 +8,9 @@ program test_solver
     use :: module_solver
     implicit none
     integer(int32) :: unit
-    integer(int32), parameter :: num_solvers = 1
-    integer(int32), parameter :: solver_id_lists(num_solvers) = [SOLVER_BICGSTAB]
-    character(len=32), parameter :: solver_name_lists(num_solvers) = ["BiCGSTAB"]
+    integer(int32), parameter :: num_solvers = 2
+    integer(int32), parameter :: solver_id_lists(num_solvers) = [SOLVER_BICGSTAB, SOLVER_GMRES_M]
+    character(len=32), parameter :: solver_name_lists(num_solvers) = ["BiCGSTAB", "GMRES"]
     integer(int32), parameter :: num_preconditioners = 2
     integer(int32), parameter :: pc_id_lists(num_preconditioners) = [SOLVER_PRECONDITION_NONE, SOLVER_PRECONDITION_JACOBI]
     character(len=32), parameter :: pc_name_lists(num_preconditioners) = ["None", "Jacobi"]
@@ -45,7 +45,7 @@ contains
         class(abst_solver), allocatable :: solver
         integer(int32) :: ierr
 
-        integer(int32), parameter :: n = 10
+        integer(int32), parameter :: n = 1000
         real(real64), parameter :: h = 1.0d0 / dble(n + 1)
         real(real64) :: x_exact(n)
         integer(int32) :: i, is, ip
@@ -57,11 +57,13 @@ contains
 
         do is = 1, num_solvers
             do ip = 1, num_preconditioners
-                write (unit, '(4a)') " Testing solver: ", trim(solver_name_lists(is)), &
+                write (unit, '(4a)') " - Testing solver: ", trim(solver_name_lists(is)), &
                     " with preconditioner: ", trim(pc_name_lists(ip))
                 select case (solver_id_lists(is))
                 case (SOLVER_BICGSTAB)
-                    call matrix_info%set(solver_id_lists(is), n, 1.0d-12, 10000)
+                    call matrix_info%set(solver_id_lists(is), n, 1.0d-14, 10000)
+                case (SOLVER_GMRES_M)
+                    call matrix_info%set(solver_id_lists(is), n, 1.0d-14, 10000, 300)
                 end select
                 select case (pc_id_lists(ip))
                 case (SOLVER_PRECONDITION_NONE)
@@ -96,14 +98,14 @@ contains
                 ! Solve Ax = b
                 call solver%solve(A, b, x)
                 call solver%check()
-                call solver%display_rhistory(unit)
+                ! call solver%display_rhistory(unit)
 
                 ! Output the results
                 x_ptr => x%get_data()
                 if (any(abs(x_ptr - x_exact) > 1.0d-10)) then
-                    write (unit, '(3a)') "[FAIL]: ", trim(solver_name_lists(is)), " methods failed in dense matrix."
+                    write (unit, '(3a)') "  [FAIL]: ", trim(solver_name_lists(is)), " methods failed in dense matrix."
                 else
-                    write (unit, '(3a)') "[PASS]: ", trim(solver_name_lists(is)), " methods succeeded in dense matrix."
+                    write (unit, '(3a)') "  [PASS]: ", trim(solver_name_lists(is)), " methods succeeded in dense matrix."
                 end if
 
                 call A%destroy()

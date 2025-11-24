@@ -20,13 +20,17 @@ module linalg_matrix_operations
 
 contains
 
-    !>
-    !> Matrix AXPY operation: Y := a*X + Y
+    !> Compute \( B = \alpha A + B \) for matrices.
+    !> Performs the update on matrix B.
     subroutine matrix_axpy(alpha, A, B, ierr)
         implicit none
+        !> Scaling factor \( \alpha \)
         real(real64), intent(in) :: alpha
+        !> Input matrix A
         class(abst_matrix), intent(in) :: A
+        !> Input/Output matrix B
         class(abst_matrix), intent(inout) :: B
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         real(real64), dimension(:, :), pointer :: A_data
@@ -49,13 +53,17 @@ contains
 
     end subroutine matrix_axpy
 
-    !>
-    !> Matrix XAPY
+    !> Compute \( B = A + \alpha B \) for matrices.
+    !> Performs the update on matrix B.
     subroutine matrix_xpay(alpha, A, B, ierr)
         implicit none
+        !> Scaling factor \( \alpha \)
         real(real64), intent(in) :: alpha
+        !> Input matrix A
         class(abst_matrix), intent(in) :: A
+        !> Input/Output matrix B
         class(abst_matrix), intent(inout) :: B
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         real(real64), dimension(:, :), pointer :: A_data
@@ -78,14 +86,19 @@ contains
 
     end subroutine matrix_xpay
 
-    !>
-    !> Matrix AXPYZ
+    !> Compute \( C = \alpha A + B \) for matrices.
+    !> Stores the result in matrix C.
     subroutine matrix_axpyz(alpha, A, B, C, ierr)
         implicit none
+        !> Scaling factor \( \alpha \)
         real(real64), intent(in) :: alpha
+        !> Input matrix A
         class(abst_matrix), intent(in) :: A
+        !> Input matrix B
         class(abst_matrix), intent(in) :: B
+        !> Output matrix C
         class(abst_matrix), intent(inout) :: C
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         real(real64), dimension(:, :), pointer :: A_data
@@ -115,12 +128,19 @@ contains
 
     end subroutine matrix_axpyz
 
+    !> Scale the matrix and the right-hand side vector.
+    !> Used for symmetric diagonal scaling or Jacobi scaling.
     subroutine matrix_scale(A, b, d, op, ierr)
         implicit none
+        !> Matrix to be scaled
         class(abst_matrix), intent(inout) :: A
+        !> RHS vector to be scaled
         type(type_vector_dp), intent(inout) :: b
+        !> Vector to store the scaling factors (diagonal elements)
         type(type_vector_dp), intent(inout) :: d
+        !> Scaling operation identifier
         integer(int32), intent(in) :: op
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         real(real64), dimension(:), pointer :: diag
@@ -144,22 +164,21 @@ contains
 
     end subroutine matrix_scale
 
-    !>
-    !> Performs a general matrix-vector multiplication: y = alpha*A*x + beta*y.
-    !> This implementation may use MKL's dgemv if available.
+    !> Perform general matrix-vector multiplication for dense matrices.
+    !> Computes \( y = \alpha A x + \beta y \).
     subroutine gemv_matrix_dense(alpha, A, x, beta, y, ierr)
         implicit none
-        !> The scalar multiplier alpha.
+        !> Scalar \( \alpha \)
         real(real64), intent(in) :: alpha
-        !> The dense matrix object (A).
+        !> Dense matrix A
         class(type_matrix_dense), intent(in) :: A
-        !> The input vector x.
+        !> Input vector x
         real(real64), intent(in) :: x(:)
-        !> The scalar multiplier beta.
+        !> Scalar \( \beta \)
         real(real64), intent(in) :: beta
-        !> The input/output vector y.
+        !> Input/Output vector y
         real(real64), intent(inout) :: y(:)
-        !> Error code returned by the subroutine.
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         integer(int32) :: i
@@ -185,7 +204,6 @@ contains
         end if
         call dgemv('N', info%num_rows, info%num_cols, alpha, A%val, info%num_rows, x, 1, beta, y, 1)
 #else
-
         call A%get_info(info)
         !$omp parallel do private(i)
         do i = 1, info%num_rows
@@ -197,22 +215,21 @@ contains
 
     end subroutine gemv_matrix_dense
 
-    !>
-    !> Performs a sparse matrix-vector multiplication (GEMV): y = alpha*A*x + beta*y.
-    !>
+    !> Perform general matrix-vector multiplication for CSR matrices.
+    !> Computes \( y = \alpha A x + \beta y \).
     subroutine gemv_matrix_csr(alpha, A, x, beta, y, ierr)
         implicit none
-        !> The scalar multiplier alpha.
+        !> Scalar \( \alpha \)
         real(real64), intent(in) :: alpha
-        !> The CRS matrix object (A).
+        !> CSR matrix A
         class(type_matrix_csr), intent(in) :: A
-        !> The input vector x.
+        !> Input vector x
         real(real64), intent(in) :: x(:)
-        !> The scalar multiplier beta.
+        !> Scalar \( \beta \)
         real(real64), intent(in) :: beta
-        !> The input/output vector y.
+        !> Input/Output vector y
         real(real64), intent(inout) :: y(:)
-        !> Error code returned by the subroutine.
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         type(type_matrix_info) :: info
@@ -246,24 +263,22 @@ contains
         ierr = MATRIX_STATUS_SUCCESS
     end subroutine gemv_matrix_csr
 
-    !>
-    !> Performs a general matrix-vector multiplication: y = alpha*A*x + beta*y.
-    !> This implementation is parallelized with OpenMP atomics to handle potential
-    !> race conditions when multiple threads write to the same element of `y`.
-    !>
+    !> Perform general matrix-vector multiplication for COO matrices.
+    !> Computes \( y = \alpha A x + \beta y \).
+    !> Uses atomic updates for parallel execution.
     subroutine gemv_matrix_coo(alpha, A, x, beta, y, ierr)
         implicit none
-        !> The scalar multiplier alpha.
+        !> Scalar \( \alpha \)
         real(real64), intent(in) :: alpha
-        !> The COO matrix object (A).
+        !> COO matrix A
         class(type_matrix_coo), intent(in) :: A
-        !> The input vector x.
+        !> Input vector x
         real(real64), intent(in) :: x(:)
-        !> The scalar multiplier beta.
+        !> Scalar \( \beta \)
         real(real64), intent(in) :: beta
-        !> The input/output vector y.
+        !> Input/Output vector y
         real(real64), intent(inout) :: y(:)
-        !> Error code returned by the subroutine.
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         integer(int32) :: i
@@ -281,15 +296,14 @@ contains
         row => A%get_row()
         val => A%get_val()
 
-        ! First, scale the entire y vector by beta to avoid repeated multiplications inside the loop.
+        ! First, scale the entire y vector by beta
         if (beta == 0.0d0) then
             y = 0.0d0
         else
             y = beta * y
         end if
 
-        ! Add the contribution of each non-zero element.
-        ! Atomic updates are required as multiple non-zero entries may share the same row.
+        ! Add the contribution of each non-zero element
         !$omp parallel do
         do i = 1, info%nnz
             !$omp atomic update
@@ -301,22 +315,21 @@ contains
 
     end subroutine gemv_matrix_coo
 
-    !>
-    !> Performs a BSR matrix-vector multiplication (GEMV): y = alpha*A*x + beta*y.
-    !>
+    !> Perform general matrix-vector multiplication for BSR matrices.
+    !> Computes \( y = \alpha A x + \beta y \).
     subroutine gemv_matrix_bsr(alpha, A, x, beta, y, ierr)
         implicit none
-        !> The scalar multiplier alpha.
+        !> Scalar \( \alpha \)
         real(real64), intent(in) :: alpha
-        !> The BSR matrix object (A).
+        !> BSR matrix A
         class(type_matrix_bsr), intent(in) :: A
-        !> The input vector x.
+        !> Input vector x
         real(real64), intent(in) :: x(:)
-        !> The scalar multiplier beta.
+        !> Scalar \( \beta \)
         real(real64), intent(in) :: beta
-        !> The input/output vector y.
+        !> Input/Output vector y
         real(real64), intent(inout) :: y(:)
-        !> Error code returned by the subroutine.
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         type(type_matrix_info) :: info
@@ -335,8 +348,6 @@ contains
         C = info%num_block_cols
 
         ! Validate dimensions
-        ! Note: info%num_nodes is the number of block rows/cols.
-        ! Total DOFs = num_nodes * block_size
         if (info%num_nodes * C /= size(x) .or. info%num_nodes * R /= size(y)) then
             ierr = MATRIX_STATUS_ILL_OPERATIONS
             return
@@ -348,23 +359,18 @@ contains
 
         !$omp parallel do private(i, k, col, rb, cb, x_idx, y_idx, sum)
         do i = 1, info%num_nodes ! Iterate over block rows
-
             ! Iterate over rows within the current block row (local DOF)
             do rb = 1, R
                 sum = 0.0d0
-
-                ! Iterate over blocks in the row (sparse structure)
+                ! Iterate over blocks in the row
                 do k = ptr(i), ptr(i + 1) - 1
-                    col = ind(k) ! Column block index (node index)
-
-                    ! Perform block multiplication for the current local row 'rb'
+                    col = ind(k)
+                    ! Perform block multiplication for the current local row
                     do cb = 1, C
                         x_idx = (col - 1) * C + cb
-                        ! Access val(row_in_block, col_in_block, block_index)
                         sum = sum + val(rb, cb, k) * x(x_idx)
                     end do
                 end do
-
                 y_idx = (i - 1) * R + rb
                 y(y_idx) = alpha * sum + beta * y(y_idx)
             end do
@@ -375,11 +381,17 @@ contains
 
     end subroutine gemv_matrix_bsr
 
+    !> Compute matrix-vector multiplication \( y = A x \).
+    !> Wrapper for GEMV with \( \alpha = 1, \beta = 0 \).
     subroutine matvec(A, x, y, ierr)
         implicit none
+        !> System matrix A
         class(abst_matrix), intent(in) :: A
+        !> Input vector x
         class(type_vector_dp), intent(in) :: x
+        !> Output vector y
         class(type_vector_dp), intent(inout) :: y
+        !> Error status
         integer(int32), intent(inout) :: ierr
 
         real(real64), dimension(:), pointer :: x_data

@@ -87,7 +87,7 @@ contains
         ! ==========================================================
         call self%r%zero()
         call matvec(A, self%x, self%r, ierr)
-        call subtract(b, self%r, self%r)
+        call vector_axpyz(-1.0d0, self%r, b, self%r)
 
         ! ==========================================================
         ! 4: Create preconditioned matrix

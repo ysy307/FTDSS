@@ -130,22 +130,26 @@ module solver_solve
     end interface
 
     type, extends(abst_solver) :: type_solver_gmres
-        integer(int32) :: m_restart = 100 ! GMRESのリスタート回数 (m)
+        integer(int32) :: m_restart = 30
 
-        ! --- GMRES のための作業配列 ---
-        ! type(type_vector_dp) :: r(:) ! 残差 / 作業用 (n)
-        ! type(type_vector_dp) :: z(:) ! 前処理済みベクトル (n)
-        ! type(type_vector_dp) :: v(:, :) ! 基底ベクトル V (n, m+1)
-        ! type(type_vector_dp) :: h(:, :) ! ヘッセンベルグ行列 H (m+1, m)
-        ! type(type_vector_dp) :: g(:) ! ギブンス回転後の残差 g (m+1)
-        ! type(type_vector_dp) :: c(:) ! ギブンス回転係数 c (m)
-        ! type(type_vector_dp) :: s(:) ! ギブンス回転係数 s (m)
-        ! type(type_vector_dp) :: y(:) ! 最小二乗問題の解 y (m)
-        ! type(type_vector_dp) :: x_local(:) ! ローカルの解ベクトル (n)
+        ! --- ベクトルオブジェクト（システムサイズ N） ---
+        type(type_vector_dp), allocatable :: v(:) ! 基底ベクトル V (m+1)
+        type(type_vector_dp) :: r ! 残差ベクトル
+        type(type_vector_dp) :: z ! 作業用（前処理適用後など）
+        type(type_vector_dp) :: x_update ! 解の更新用
+
+        ! --- スカラー/小規模配列（サイズ m） ---
+        ! これらはサイズが小さい(m x m)ため，計算効率と記述の簡潔さからFortran標準配列を使用
+        real(real64), allocatable :: h(:, :) ! ヘッセンベルグ行列 (m+1, m)
+        real(real64), allocatable :: g(:) ! 右辺ベクトル g (m+1)
+        real(real64), allocatable :: cs(:) ! ギブンス回転 Cos (m)
+        real(real64), allocatable :: sn(:) ! ギブンス回転 Sin (m)
+        real(real64), allocatable :: y(:) ! 最小二乗解 (m)
+
     contains
-        procedure :: initialize => initialize_type_solver_gmres !&
-        procedure :: solve      => solve_type_solver_gmres !&
-        procedure :: destroy    => destroy_type_solver_gmres !&
+        procedure :: initialize => initialize_type_solver_gmres
+        procedure :: solve => solve_type_solver_gmres
+        procedure :: destroy => destroy_type_solver_gmres
     end type type_solver_gmres
 
     interface
