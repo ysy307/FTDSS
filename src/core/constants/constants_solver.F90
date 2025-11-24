@@ -285,8 +285,10 @@ module core_constants_solver
     integer(int32), parameter, public :: SOLVER_STATUS_OUT_OF_MEMORY = -3
     !> Solver reached maximum iterations without convergence
     integer(int32), parameter, public :: SOLVER_STATUS_MAXITER = -4
+    !> Preconditioner setup failure
+    integer(int32), parameter, public :: SOLVER_STATUS_DECOMPOSITION_FAILURE = -5
     !> Solver method not implemented
-    integer(int32), parameter, public :: SOLVER_STATUS_NOT_IMPLEMENTED = -5
+    integer(int32), parameter, public :: SOLVER_STATUS_NOT_IMPLEMENTED = -6
 
     ! =========================================================
     ! Matrix Operations

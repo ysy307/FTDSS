@@ -17,6 +17,9 @@ contains
 
         ! Initialize vectors and matrices specific to GMRES here
 
+        call self%residual_history%initialize(self%max_iterations)
+        self%current_iteration = 0
+
         call create_preconditioner(self%pc, preconditioner_settings, self%status)
 
         self%status = SOLVER_STATUS_SUCCESS

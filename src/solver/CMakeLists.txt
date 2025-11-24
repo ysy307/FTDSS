@@ -15,6 +15,7 @@ set(LINEAR_SOLVER_SOURCES
     iterative/solve_bicgstab.F90
     iterative/solve_gmres.F90
     preconditioner/preconditioner_none.F90
+    preconditioner/preconditioner_jacobi.F90
 )
 add_library(Solver_Iterative STATIC ${LINEAR_SOLVER_SOURCES})
 target_include_directories(Solver_Iterative PUBLIC ${CMAKE_CURRENT_BINARY_DIR})

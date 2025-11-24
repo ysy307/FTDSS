@@ -54,7 +54,6 @@ contains
         call allocate_array(self%ind, source=col)
         ! Allocate val as (rows, cols, blocks) to improve memory access patterns in block operations
         call allocate_array(self%val, self%num_block_rows, self%num_block_cols, self%num_blocks)
-        call allocate_array(self%diagonal, self%num_block_rows * self%num_nodes)
 
         call self%zero()
 
@@ -72,7 +71,6 @@ contains
         call deallocate_array(self%ptr)
         call deallocate_array(self%ind)
         call deallocate_array(self%val)
-        call deallocate_array(self%diagonal)
 
         self%num_nodes = 0
         self%num_rows = 0
@@ -102,12 +100,10 @@ contains
 
     module subroutine get_diagonal_bsr(self, diagonal)
         implicit none
-        class(type_matrix_bsr), intent(inout) :: self
+        class(type_matrix_bsr), intent(in) :: self
         type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i, row_start, row_end, j, k, m
-
-        self%diagonal(:) = 0.0d0
 
         !$omp parallel do private(i, row_start, row_end, j, k, m)
         do i = 1, self%num_ptrs - 1
@@ -119,7 +115,7 @@ contains
                         do m = 1, self%num_block_cols
                             if (k == m) then
                                 ! Access val(row_in_block, col_in_block, block_index)
-                                self%diagonal((i - 1) * self%num_block_rows + k) = self%val(k, m, j)
+                                call diagonal%set(OP_INS, (i - 1) * self%num_block_rows + k, self%val(k, m, j))
                             end if
                         end do
                     end do
@@ -129,8 +125,30 @@ contains
         end do
         !$omp end parallel do
 
-        call diagonal%set(OP_INS, self%diagonal)
     end subroutine get_diagonal_bsr
+
+    module subroutine get_diagonal_block_bsr(self, target_block, diagonal_block)
+        implicit none
+        class(type_matrix_bsr), intent(in) :: self
+        integer(int32), intent(in) :: target_block
+        real(real64), intent(inout) :: diagonal_block(:, :)
+
+        integer(int32) :: row_start, row_end, j, k, m
+        ! Initialize diagonal_block to zero
+        diagonal_block = 0.0d0
+        row_start = self%ptr(target_block)
+        row_end = self%ptr(target_block + 1) - 1
+        do j = row_start, row_end
+            if (self%ind(j) == target_block) then
+                do k = 1, self%num_block_rows
+                    do m = 1, self%num_block_cols
+                        diagonal_block(k, m) = self%val(k, m, j)
+                    end do
+                end do
+                exit
+            end if
+        end do
+    end subroutine get_diagonal_block_bsr
 
     !> Getters for internal arrays
     module function get_ptr_bsr(self) result(ptr)

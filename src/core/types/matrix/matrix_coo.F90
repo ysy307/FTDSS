@@ -46,7 +46,6 @@ contains
         call allocate_array(self%row, source=row)
         call allocate_array(self%col, source=col)
         call allocate_array(self%val, self%nnz)
-        call allocate_array(self%diagonal, self%num_nodes)
 
         ! Initialize values to zero
         call self%zero()
@@ -66,7 +65,6 @@ contains
         call deallocate_array(self%row)
         call deallocate_array(self%col)
         call deallocate_array(self%val)
-        call deallocate_array(self%diagonal)
         self%num_nodes = 0
         self%num_rows = 0
         self%num_cols = 0
@@ -87,26 +85,23 @@ contains
 
         info%num_nodes = self%num_nodes
         info%num_rows = self%num_rows
-        info%num_cols = self%num_cols
         info%nnz = self%nnz
     end subroutine get_info_coo
 
     module subroutine get_diagonal_coo(self, diagonal)
         implicit none
-        class(type_matrix_coo), intent(inout) :: self
+        class(type_matrix_coo), intent(in) :: self
         type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i
 
         ! Compute the diagonal entries
-        self%diagonal(:) = 0.0d0
         do i = 1, self%nnz
             if (self%row(i) == self%col(i)) then
-                self%diagonal(self%row(i)) = self%val(i)
+                call diagonal%set(OP_INS, self%row(i), self%val(i))
             end if
         end do
 
-        call diagonal%set(OP_INS, self%diagonal)
     end subroutine get_diagonal_coo
 
     !>

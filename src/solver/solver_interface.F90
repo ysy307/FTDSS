@@ -1,5 +1,5 @@
 module solver_solve
-    use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
 !$  use omp_lib
     use :: stdlib_strings, only:strip
     ! use :: module_input, only:type_input
@@ -18,6 +18,7 @@ module solver_solve
     public :: create_solver
 
     type :: type_solver_settings
+        private
         integer(int32) :: id
         integer(int32) :: preconditioner_id
         real(real64) :: tolerance
@@ -26,7 +27,8 @@ module solver_solve
 
         integer(int32) :: num_nodes
         integer(int32) :: num_dofs_per_node
-
+    contains
+        procedure :: set => set_solver_settings
     end type type_solver_settings
 
     type, abstract :: abst_solver
@@ -44,12 +46,16 @@ module solver_solve
         real(real64) :: tolerance = 0.0d0
         integer(int32) :: max_iterations = 0
 
+        type(type_vector_dp) :: residual_history
+        integer(int32) :: current_iteration = 0
+
         !> Preconditioner associated with the solver.
         class(abst_preconditioner), allocatable :: pc
     contains
         procedure(abst_solver_initialize), pass(self), public, deferred :: initialize !&
         procedure(abst_solver_solve),      pass(self), public, deferred :: solve !&
         procedure,                         pass(self), public           :: check => check_solver !&
+        procedure,                         pass(self), public           :: display_rhistory => display_residual_history_solver !&
         procedure(abst_solver_destroy),    pass(self), public, deferred :: destroy !&
     end type abst_solver
 
@@ -167,42 +173,98 @@ module solver_solve
     end interface
 
 contains
+    subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart)
+        implicit none
+        class(type_solver_settings), intent(inout) :: self
+        integer(int32), intent(in) :: id
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(in) :: tolerance
+        integer(int32), intent(in) :: max_iterations
+        integer(int32), intent(in), optional :: m_restart
 
-    subroutine check_solver(self, time)
+        self%id = id
+        self%num_nodes = num_nodes
+        self%tolerance = tolerance
+        self%max_iterations = max_iterations
+
+        select case (self%id)
+        case (SOLVER_GMRES_M)
+            if (present(m_restart)) then
+                self%m_restart = m_restart
+            else
+                self%m_restart = 100
+            end if
+        case default
+        end select
+    end subroutine set_solver_settings
+
+    subroutine check_solver(self, time, unit_display)
         implicit none
         class(abst_solver), intent(inout) :: self
         real(real64), intent(in), optional :: time
+        integer(int32), intent(in), optional :: unit_display
+        integer(int32) :: unit
 
         if (self%status == SOLVER_STATUS_SUCCESS) return
+
+        if (present(unit_display)) then
+            unit = unit_display
+        else
+            unit = output_unit
+        end if
 
         if (present(time)) then
             select case (self%status)
             case (SOLVER_STATUS_ILL_OPTIONS)
-                write (*, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures ILL_OPTIONS."
+                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures ILL_OPTIONS."
             case (SOLVER_STATUS_BREAKDOWN)
-                write (*, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures BREAKDOWN."
+                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures BREAKDOWN."
             case (SOLVER_STATUS_OUT_OF_MEMORY)
-                write (*, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures OUT_OF_MEMORY."
+                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures OUT_OF_MEMORY."
             case (SOLVER_STATUS_MAXITER)
-                write (*, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures MAXITER."
+                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures MAXITER."
             case (SOLVER_STATUS_NOT_IMPLEMENTED)
-                write (*, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures NOT_IMPLEMENTED."
+                write (unit, '(a,es13.4,a)'), strip(self%name), ": ", time, " Day: Solver occures NOT_IMPLEMENTED."
             end select
         else
             select case (self%status)
             case (SOLVER_STATUS_ILL_OPTIONS)
-                write (*, '(a,a)'), strip(self%name), ": Solver occures ILL_OPTIONS."
+                write (unit, '(a,a)'), strip(self%name), ": Solver occures ILL_OPTIONS."
             case (SOLVER_STATUS_BREAKDOWN)
-                write (*, '(a,a)'), strip(self%name), ": Solver occures BREAKDOWN."
+                write (unit, '(a,a)'), strip(self%name), ": Solver occures BREAKDOWN."
             case (SOLVER_STATUS_OUT_OF_MEMORY)
-                write (*, '(a,a)'), strip(self%name), ": Solver occures OUT_OF_MEMORY."
+                write (unit, '(a,a)'), strip(self%name), ": Solver occures OUT_OF_MEMORY."
             case (SOLVER_STATUS_MAXITER)
-                write (*, '(a,a)'), strip(self%name), ": Solver occures MAXITER."
+                write (unit, '(a,a)'), strip(self%name), ": Solver occures MAXITER."
             case (SOLVER_STATUS_NOT_IMPLEMENTED)
-                write (*, '(a,a)'), strip(self%name), ": Solver occures NOT_IMPLEMENTED."
+                write (unit, '(a,a)'), strip(self%name), ": Solver occures NOT_IMPLEMENTED."
             end select
         end if
     end subroutine check_solver
+
+    subroutine display_residual_history_solver(self, unit_display)
+        implicit none
+        class(abst_solver), intent(inout) :: self
+        integer(int32), intent(in), optional :: unit_display
+
+        integer(int32) :: unit
+        integer(int32) :: i
+        real(real64), pointer :: residual_history_ptr(:)
+
+        if (present(unit_display)) then
+            unit = unit_display
+        else
+            unit = output_unit
+        end if
+
+        residual_history_ptr => self%residual_history%get_data()
+
+        write (unit, '(a)') "Residual history:"
+        do i = 1, self%current_iteration
+            write (unit, '(i6,2x,es13.6)') i, residual_history_ptr(i)
+        end do
+
+    end subroutine display_residual_history_solver
 
     subroutine create_solver(solver, solver_settings, preconditioner_settings, ierr)
         implicit none

@@ -51,8 +51,6 @@ module core_types_matrix
         integer(int32) :: status = 0
         !> flag of the matrix initialized or not.
         logical :: is_initialized_matrix = .false.
-
-        real(real64), allocatable :: diagonal(:)
     contains
         procedure(abst_initialize),      public,  pass(self), deferred :: initialize !&
         procedure(abst_destroy),         public,  pass(self), deferred :: destroy !&
@@ -111,7 +109,7 @@ module core_types_matrix
             import :: abst_matrix, type_vector_dp
             implicit none
             !> The matrix object.
-            class(abst_matrix), intent(inout) :: self
+            class(abst_matrix), intent(in) :: self
             !> The diagonal entries of the matrix.
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine abst_get_diagonal
@@ -292,7 +290,7 @@ module core_types_matrix
 
         module subroutine get_diagonal_dense(self, diagonal)
             implicit none
-            class(type_matrix_dense), intent(inout) :: self
+            class(type_matrix_dense), intent(in) :: self
             !> The diagonal entries of the matrix.
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_dense
@@ -435,7 +433,7 @@ module core_types_matrix
 
         module subroutine get_diagonal_csr(self, diagonal)
             implicit none
-            class(type_matrix_csr), intent(inout) :: self
+            class(type_matrix_csr), intent(in) :: self
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_csr
 
@@ -592,7 +590,7 @@ module core_types_matrix
 
         module subroutine get_diagonal_coo(self, diagonal)
             implicit none
-            class(type_matrix_coo), intent(inout) :: self
+            class(type_matrix_coo), intent(in) :: self
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_coo
 
@@ -707,6 +705,7 @@ module core_types_matrix
         procedure, pass(self) :: destroy => destroy_bsr
         procedure, pass(self) :: get_info => get_info_bsr
         procedure, pass(self) :: get_diagonal => get_diagonal_bsr
+        procedure, pass(self), public :: get_diagonal_block => get_diagonal_block_bsr
         procedure, pass(self) :: get_ptr => get_ptr_bsr
         procedure, pass(self) :: get_ind => get_ind_bsr
         procedure, pass(self) :: get_val => get_val_bsr
@@ -746,7 +745,7 @@ module core_types_matrix
 
         module subroutine get_diagonal_bsr(self, diagonal)
             implicit none
-            class(type_matrix_bsr), intent(inout) :: self
+            class(type_matrix_bsr), intent(in) :: self
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_bsr
 
@@ -767,6 +766,13 @@ module core_types_matrix
             class(type_matrix_bsr), intent(in), target :: self
             real(real64), dimension(:, :, :), pointer :: val
         end function get_val_bsr
+
+        module subroutine get_diagonal_block_bsr(self, target_block, diagonal_block)
+            implicit none
+            class(type_matrix_bsr), intent(in) :: self
+            integer(int32), intent(in) :: target_block
+            real(real64), intent(inout) :: diagonal_block(:, :)
+        end subroutine get_diagonal_block_bsr
 
         module pure function find_bsr(self, row, col) result(index)
             implicit none

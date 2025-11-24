@@ -41,7 +41,6 @@ contains
         call allocate_array(self%ptr, source=row)
         call allocate_array(self%ind, source=col)
         call allocate_array(self%val, self%nnz)
-        call allocate_array(self%diagonal, self%num_nodes)
         ! Initialize value array to zero
         call self%zero()
 
@@ -59,7 +58,6 @@ contains
         call deallocate_array(self%ptr)
         call deallocate_array(self%ind)
         call deallocate_array(self%val)
-        call deallocate_array(self%diagonal)
 
         self%num_nodes = 0
         self%num_rows = 0
@@ -87,26 +85,23 @@ contains
 
     module subroutine get_diagonal_csr(self, diagonal)
         implicit none
-        class(type_matrix_csr), intent(inout) :: self
+        class(type_matrix_csr), intent(in) :: self
         type(type_vector_dp), intent(inout) :: diagonal
 
         integer(int32) :: i, row_start, row_end, j
 
         ! Extract diagonal elements into internal storage first
-        self%diagonal(:) = 0.0d0
         do i = 1, self%num_ptrs - 1
             row_start = self%ptr(i)
             row_end = self%ptr(i + 1) - 1
             do j = row_start, row_end
                 if (self%ind(j) == i) then
-                    self%diagonal(i) = self%val(j)
+                    call diagonal%set(OP_INS, i, self%val(j))
                     exit
                 end if
             end do
         end do
 
-        ! Finally, associate the pointer
-        call diagonal%set(OP_INS, self%diagonal)
     end subroutine get_diagonal_csr
 
     !>

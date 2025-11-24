@@ -20,14 +20,12 @@ contains
 
         ! 既存割り当ての解除
         if (allocated(self%val)) call deallocate_array(self%val)
-        if (allocated(self%diagonal)) call deallocate_array(self%diagonal)
 
         self%num_nodes = num_nodes
         self%num_rows = num_nodes
         self%num_cols = num_nodes
 
         call allocate_array(self%val, self%num_rows, self%num_cols)
-        call allocate_array(self%diagonal, self%num_rows)
         call self%zero()
 
         self%is_initialized_matrix = .true.
@@ -42,7 +40,6 @@ contains
         class(type_matrix_dense), intent(inout) :: self
 
         call deallocate_array(self%val)
-        call deallocate_array(self%diagonal)
         self%num_nodes = 0
         self%num_rows = 0
         self%num_cols = 0
@@ -66,23 +63,16 @@ contains
 
     module subroutine get_diagonal_dense(self, diagonal)
         implicit none
-        class(type_matrix_dense), intent(inout) :: self
+        class(type_matrix_dense), intent(in) :: self
         type(type_vector_dp), intent(inout) :: diagonal
         integer(int32) :: i
 
-#ifdef USE_DEBUG
-        if (.not. self%is_initialized()) then
-            self%status = MATRIX_STATUS_NOT_INITIALIZED
-            return
-        end if
-#endif
-
         if (allocated(self%val)) then
             do i = 1, self%num_rows
-                self%diagonal(i) = self%val(i, i)
+                call diagonal%set(OP_INS, i, self%val(i, i))
             end do
         end if
-        call diagonal%set(OP_INS, self%diagonal)
+
     end subroutine get_diagonal_dense
 
     !>

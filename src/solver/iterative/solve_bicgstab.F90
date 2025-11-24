@@ -1,11 +1,18 @@
 submodule(solver_solve) solve_type_solver_bicgstab
     implicit none
 contains
+
+    !> Initialize the BiCGSTAB solver instance.
+    !> It sets up internal vectors, parameters, and the preconditioner.
     module subroutine initialize_type_solver_bicgstab(self, solver_settings, preconditioner_settings)
         implicit none
+        !> Solver instance to be initialized
         class(type_solver_bicgstab), intent(inout) :: self
+        !> Configuration settings for the solver
         type(type_solver_settings), intent(in) :: solver_settings
+        !> Configuration settings for the preconditioner
         type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+
         integer(int32) :: ierr
 
         self%id = solver_settings%id
@@ -24,34 +31,39 @@ contains
         call self%t%initialize(self%num_nodes)
         call self%v%initialize(self%num_nodes)
         call self%x%initialize(self%num_nodes)
+        call self%residual_history%initialize(self%max_iterations)
+        self%current_iteration = 0
 
         self%status = SOLVER_STATUS_SUCCESS
 
-        ! 前処理の設定
+        ! Setup preconditioner
         call create_preconditioner(self%pc, preconditioner_settings, ierr)
         self%status = ierr
 
     end subroutine initialize_type_solver_bicgstab
 
+    !> Solve the linear system \( Ax = b \) using the BiCGSTAB method.
     module subroutine solve_type_solver_bicgstab(self, A, b, x)
         implicit none
+        !> Solver instance
         class(type_solver_bicgstab), intent(inout) :: self
+        !> System matrix
         class(abst_matrix), intent(in) :: A
+        !> Right-hand side vector
         type(type_vector_dp), intent(in) :: b
+        !> Solution vector (initial guess on input, result on output)
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: rho, rho_old, alpha, beta, omega
         real(real64) :: resid
-        integer(int32) :: iter, iN, vector_size
-        integer(int32) :: idof
+        integer(int32) :: iter
 
         real(real64), dimension(:), pointer :: x_ptr
         integer(int32) :: ierr
 
-        ! select type (matrix => self%A)
-        ! type is (type_crs)
-
-        ! 1:Initialize
+        ! ==========================================================
+        ! 1: Initialize
+        ! ==========================================================
         rho = 1.0d0
         rho_old = 1.0d0
         alpha = 1.0d0
@@ -63,18 +75,28 @@ contains
         call self%phat%zero()
         call self%shat%zero()
 
+        call self%residual_history%zero()
+
+        ! ==========================================================
         ! 2: Set an initial value x0
+        ! ==========================================================
         call self%x%zero()
 
-        ! 3: r0 = b-Ax0
+        ! ==========================================================
+        ! 3: r0 = b - Ax0
+        ! ==========================================================
         call self%r%zero()
         call matvec(A, self%x, self%r, ierr)
         call subtract(b, self%r, self%r)
 
+        ! ==========================================================
         ! 4: Create preconditioned matrix
+        ! ==========================================================
         call self%pc%setup(A)
 
-        ! ! 5: ^r0 = r0, (r*0, r0)!=0
+        ! ==========================================================
+        ! 5: ^r0 = r0 such that (r*0, r0) != 0
+        ! ==========================================================
         call self%r0%copy(self%r)
 
         do iter = 1, self%max_iterations
@@ -82,6 +104,8 @@ contains
             rho = vector_dot(self%r0, self%r)
             ! 8: rho check
             if (rho == 0.0d0) then
+                self%current_iteration = iter
+                call self%residual_history%set(OP_INS, iter, vector_norm2(self%r))
                 self%status = SOLVER_STATUS_SUCCESS
                 call x%copy(self%x)
                 return
@@ -129,7 +153,9 @@ contains
 
             ! 25: ||r_k+1||_2
             resid = vector_norm2(self%r)
+            call self%residual_history%set(OP_INS, iter, resid)
             if (resid < self%tolerance) then
+                self%current_iteration = iter
                 self%status = SOLVER_STATUS_SUCCESS
                 call x%copy(self%x)
                 return
@@ -139,13 +165,16 @@ contains
 
             if (was_interrupted()) stop
         end do
+        self%current_iteration = iter
         self%status = SOLVER_STATUS_MAXITER
         call x%copy(self%x)
 
     end subroutine solve_type_solver_bicgstab
 
+    !> Finalize the solver instance and release memory.
     module subroutine destroy_type_solver_bicgstab(self)
         implicit none
+        !> Solver instance to be destroyed
         class(type_solver_bicgstab), intent(inout) :: self
 
         self%id = -1

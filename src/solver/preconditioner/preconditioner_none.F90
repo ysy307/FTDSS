@@ -6,8 +6,8 @@ contains
         class(type_preconditioner_none), intent(inout) :: self
         type(type_preconditioner_settings), intent(in) :: info
 
-        self%name = "None"
         self%id = SOLVER_PRECONDITION_NONE
+        self%name = "None"
         self%status = SOLVER_STATUS_SUCCESS
     end subroutine initialize_preconditioner_none
 
@@ -25,12 +25,8 @@ contains
         type(type_vector_dp), intent(in) :: r
         type(type_vector_dp), intent(inout) :: z
 
-        real(real64), dimension(:), pointer :: r_data, z_data
-
-        r_data => r%get_data()
-        z_data => z%get_data()
         ! z = I * r
-        z_data = r_data
+        call z%copy(r)
 
         self%status = SOLVER_STATUS_SUCCESS
     end subroutine apply_preconditioner_none
@@ -39,6 +35,8 @@ contains
         implicit none
         class(type_preconditioner_none), intent(inout) :: self
 
+        self%id = -1
+        if (allocated(self%name)) deallocate (self%name)
         self%status = SOLVER_STATUS_SUCCESS
     end subroutine destroy_preconditioner_none
 
