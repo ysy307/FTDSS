@@ -2,6 +2,7 @@
 # src/cmake/BuildSettings.cmake
 # 完全修正版: 言語別フラグ分離 (Fortran/CXX) + MKL/VTK設定統合
 # =========================================================================
+
 # -------------------------------------------------------------------------
 # 必須パッケージの探索
 # -------------------------------------------------------------------------
@@ -15,6 +16,9 @@ find_package(OpenMP REQUIRED)
 set(MKL_LINK static)
 set(MKL_INTERFACE lp64)
 set(MKL_MPI "intelmpi")
+
+# SYCL (DPC++) リンクを無効化
+set(MKL_SYCL_LINK OFF)
 
 # コンパイラに応じたスレッド層の選択
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
@@ -36,21 +40,8 @@ if(ENABLE_MPI)
     message(STATUS "MKL: ScaLAPACK enabled.")
 endif()
 
-# --- [Hack] MKLのSYCL誤検知回避 (CXXコンパイラの一時隠蔽) ---
-set(CMAKE_CXX_COMPILER_BACKUP "${CMAKE_CXX_COMPILER}" CACHE INTERNAL "Backup CXX")
-set(CMAKE_CXX_LANG_INFO_BACKUP "${CMAKE_CXX_COMPILER_ID}" CACHE INTERNAL "Backup CXX ID")
-set(CMAKE_CXX_COMPILER "" CACHE STRING "Unset CXX for MKL" FORCE)
-set(CMAKE_CXX_COMPILER_ID "" CACHE STRING "Unset CXX ID for MKL" FORCE)
-message(STATUS "Temporarily unsetting CXX compiler for MKL find.")
-
 # MKL探索実行
 find_package(MKL CONFIG REQUIRED COMPONENTS ${MKL_COMPONENTS_LIST})
-
-# CXXコンパイラの復元
-set(CMAKE_CXX_COMPILER "${CMAKE_CXX_COMPILER_BACKUP}" CACHE STRING "Restore CXX" FORCE)
-set(CMAKE_CXX_COMPILER_ID "${CMAKE_CXX_LANG_INFO_BACKUP}" CACHE STRING "Restore CXX ID" FORCE)
-message(STATUS "Restored CXX compiler.")
-# -------------------------------------------------------------
 
 # BLAS/LAPACK エイリアス作成
 if(NOT TARGET BLAS::BLAS)

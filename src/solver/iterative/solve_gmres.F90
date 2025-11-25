@@ -2,11 +2,15 @@ submodule(solver_solve) solve_type_solver_gmres
     implicit none
 contains
 
-    !> GMRESソルバの初期化
+    !> Initialize the GMRES solver instance.
+    !> It allocates memory for the Krylov subspace basis (V) and the Hessenberg matrix (H).
     module subroutine initialize_type_solver_gmres(self, solver_settings, preconditioner_settings)
         implicit none
+        !> Solver instance to be initialized
         class(type_solver_gmres), intent(inout) :: self
+        !> Configuration settings for the solver
         type(type_solver_settings), intent(in) :: solver_settings
+        !> Configuration settings for the preconditioner
         type(type_preconditioner_settings), intent(in) :: preconditioner_settings
 
         integer(int32) :: i, ierr
@@ -19,150 +23,193 @@ contains
         self%max_iterations = solver_settings%max_iterations
         self%m_restart = solver_settings%m_restart
 
-        ! リスタート回数のデフォルト値チェック
+        ! Check default restart value
         if (self%m_restart <= 0) self%m_restart = 30
 
-        ! --- メモリ確保 ---
+        ! ==========================================================
+        ! Memory Allocation
+        ! ==========================================================
 
-        ! 基底ベクトル V の確保 (配列の各要素を初期化)
+        ! Allocate basis vectors V
         if (allocated(self%v)) deallocate (self%v)
         allocate (self%v(self%m_restart + 1))
         do i = 1, self%m_restart + 1
             call self%v(i)%initialize(self%num_nodes)
         end do
 
-        ! 作業用ベクトルの初期化
+        ! Initialize workspace vectors
         call self%r%initialize(self%num_nodes)
+        call self%w%initialize(self%num_nodes)
         call self%z%initialize(self%num_nodes)
         call self%x_update%initialize(self%num_nodes)
         call self%r%zero()
+        call self%w%zero()
         call self%z%zero()
         call self%x_update%zero()
 
-        ! ヘッセンベルグ行列等の確保 (m に依存する小さな配列)
+        ! Allocate Hessenberg matrix and auxiliary arrays (small arrays dependent on m)
         call allocate_array(self%h, self%m_restart + 1, self%m_restart)
         call allocate_array(self%g, self%m_restart + 1)
         call allocate_array(self%cs, self%m_restart)
         call allocate_array(self%sn, self%m_restart)
         call allocate_array(self%y, self%m_restart)
 
-        ! 行列・配列のゼロクリア
+        ! Zero clear
         self%h = 0.0d0
         self%g = 0.0d0
         self%cs = 0.0d0
         self%sn = 0.0d0
         self%y = 0.0d0
 
-        ! 履歴の初期化
+        ! Initialize history
         call self%residual_history%initialize(self%max_iterations)
         self%current_iteration = 0
 
-        ! 前処理の作成
+        ! Create preconditioner
         call create_preconditioner(self%pc, preconditioner_settings, ierr)
         self%status = ierr
 
     end subroutine initialize_type_solver_gmres
 
-!> GMRES(m) ソルバ本体 (lis実装ベースの右前処理)
+    !> Solve the linear system \( Ax = b \) using the GMRES(m) method.
+    !> Implements Right Preconditioning and Restarting.
     module subroutine solve_type_solver_gmres(self, A, b, x)
         implicit none
+        !> Solver instance
         class(type_solver_gmres), intent(inout) :: self
+        !> System matrix \( A \)
         class(abst_matrix), intent(in) :: A
+        !> Right-hand side vector \( b \)
         type(type_vector_dp), intent(in) :: b
+        !> Solution vector (initial guess on input, result on output)
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: beta, w_norm, temp_val, resid
-        integer(int32) :: i, j, k, ierr, iter_global
+        integer(int32) :: i, j, k, ierr, iter_global, iter
         logical :: converged
 
-        call self%residual_history%zero()
-        self%current_iteration = 0
+        ! Initialize
         iter_global = 0
+        self%current_iteration = 0
         converged = .false.
 
-        ! 前処理セットアップ
+        ! Clear history
+        call self%residual_history%zero()
+
+        ! Setup Preconditioner
         call self%pc%setup(A)
 
         ! ==========================================================
-        ! Restart Loop
+        ! Restart Loop (Outer Loop)
         ! ==========================================================
         restart_loop: do
 
-            ! 1. 初期残差 r = b - Ax
+            ! ------------------------------------------------------
+            ! 1. Compute initial residual: r0 = b - Ax
+            ! ------------------------------------------------------
+            ! Note: Recompute true residual from current x at every restart
             call self%r%zero()
             call matvec(A, x, self%r, ierr)
-            call subtract(b, self%r, self%r)
+            call vector_axpyz(-1.0d0, self%r, b, self%r)
 
-            ! 2. beta = ||r||
+            ! beta = ||r0||_2
             beta = vector_norm2(self%r)
 
+            ! Save history (first iteration or every restart)
             if (iter_global == 0) call self%residual_history%set(OP_INS, 1, beta)
 
+            ! Convergence check (Initial)
             if (beta < self%tolerance) then
                 self%status = SOLVER_STATUS_SUCCESS
-                self%current_iteration = iter_global
                 exit restart_loop
             end if
 
-            ! 3. v1 = r / beta
+            ! ------------------------------------------------------
+            ! 2. Initialize basis: v1 = r0 / beta
+            ! ------------------------------------------------------
+            ! Reset arrays
+            self%h(:, :) = 0.0d0
+            self%g(:) = 0.0d0
+            self%cs(:) = 0.0d0
+            self%sn(:) = 0.0d0
+            self%y(:) = 0.0d0
+
+            ! Initialize RHS vector g: g = [beta, 0, ..., 0]^T
+            self%g(1) = beta
+
+            ! Set v1
             call self%v(1)%copy(self%r)
             call vector_scale(1.0d0 / beta, self%v(1))
 
-            ! 4. g = [beta, 0, ...]^T
-            self%g = 0.0d0
-            self%g(1) = beta
-
-            ! ==========================================================
+            ! ======================================================
             ! Arnoldi Loop (Inner Loop)
-            ! ==========================================================
-            arnoldi_loop: do j = 1, self%m_restart
-
+            ! ======================================================
+            arnoldi_loop: do iter = 1, self%m_restart
                 iter_global = iter_global + 1
                 self%current_iteration = iter_global
+                k = iter
 
-                ! --- 右前処理 GMRES (Right Preconditioning) ---
-                ! lis: z = M^-1 * v
-                call self%pc%apply(self%v(j), self%z)
+                ! --------------------------------------------------
+                ! Step 5: w = A * M^-1 * v_i (Right Preconditioning)
+                ! --------------------------------------------------
+                ! 1. Preconditioning: z = M^-1 * v(iter)
+                call self%pc%apply(self%v(iter), self%z)
 
-                ! lis: w = A * z
-                call matvec(A, self%z, self%v(j + 1), ierr)
+                ! 2. Matrix-Vector Product: w = A * z
+                call matvec(A, self%z, self%w, ierr)
 
-                ! --- 修正グラム・シュミット (MGS) ---
-                do i = 1, j
-                    self%h(i, j) = vector_dot(self%v(j + 1), self%v(i))
-                    call vector_axpy(-self%h(i, j), self%v(i), self%v(j + 1))
+                ! --------------------------------------------------
+                ! Step 6-9: Modified Gram-Schmidt (MGS)
+                ! --------------------------------------------------
+                do i = 1, iter
+                    ! Dot product h(i, iter) = (w, v(i))
+                    self%h(i, iter) = vector_dot(self%w, self%v(i))
+                    ! Orthogonalization w = w - h(i, iter) * v(i)
+                    call vector_axpy(-self%h(i, iter), self%v(i), self%w)
                 end do
 
-                w_norm = vector_norm2(self%v(j + 1))
-                self%h(j + 1, j) = w_norm
+                ! --------------------------------------------------
+                ! Step 10-11: Normalize & Breakdown Check
+                ! --------------------------------------------------
+                w_norm = vector_norm2(self%w)
 
-                ! Breakdown check
-                if (w_norm < 1.0d-20) w_norm = 1.0d-20
+                ! Happy Breakdown check
+                if (w_norm < 1.0d-20) then
+                    self%h(iter + 1, iter) = 0.0d0
+                    ! Cannot extend basis further; break loop (residual should be small)
+                    exit arnoldi_loop
+                else
+                    self%h(iter + 1, iter) = w_norm
+                    ! v(iter+1) = w / w_norm
+                    call self%v(iter + 1)%copy(self%w)
+                    call vector_scale(1.0d0 / w_norm, self%v(iter + 1))
+                end if
 
-                call vector_scale(1.0d0 / w_norm, self%v(j + 1))
-
-                ! --- ギブンス回転 (Givens Rotation) ---
-                ! 過去の回転を適用
-                do i = 1, j - 1
-                    temp_val = self%cs(i) * self%h(i, j) + self%sn(i) * self%h(i + 1, j)
-                    self%h(i + 1, j) = -self%sn(i) * self%h(i, j) + self%cs(i) * self%h(i + 1, j)
-                    self%h(i, j) = temp_val
+                ! --------------------------------------------------
+                ! Givens Rotations
+                ! --------------------------------------------------
+                ! Apply previous rotations
+                do i = 1, iter - 1
+                    temp_val = self%cs(i) * self%h(i, iter) + self%sn(i) * self%h(i + 1, iter)
+                    self%h(i + 1, iter) = -self%sn(i) * self%h(i, iter) + self%cs(i) * self%h(i + 1, iter)
+                    self%h(i, iter) = temp_val
                 end do
 
-                ! 新しい回転の生成と適用
-                call generate_givens_rotation(self%h(j, j), self%h(j + 1, j), self%cs(j), self%sn(j))
+                ! Generate new rotation
+                call generate_givens_rotation(self%h(iter, iter), self%h(iter + 1, iter), self%cs(iter), self%sn(iter))
 
-                ! 対角成分の更新
-                self%h(j, j) = self%cs(j) * self%h(j, j) + self%sn(j) * self%h(j + 1, j)
-                self%h(j + 1, j) = 0.0d0
+                ! Apply rotation to current column (Diagonalize)
+                self%h(iter, iter) = self%cs(iter) * self%h(iter, iter) + self%sn(iter) * self%h(iter + 1, iter)
+                self%h(iter + 1, iter) = 0.0d0
 
-                ! 右辺ベクトル g の更新
-                ! lis: s[i1] = -sn * s[ii]; s[ii] = cs * s[ii];
-                self%g(j + 1) = -self%sn(j) * self%g(j)
-                self%g(j) = self%cs(j) * self%g(j)
+                ! Apply rotation to RHS vector g
+                self%g(iter + 1) = -self%sn(iter) * self%g(iter)
+                self%g(iter) = self%cs(iter) * self%g(iter)
 
-                ! --- 収束判定 ---
-                resid = abs(self%g(j + 1))
+                ! --------------------------------------------------
+                ! Convergence Check
+                ! --------------------------------------------------
+                resid = abs(self%g(iter + 1))
                 call self%residual_history%set(OP_INS, iter_global, resid)
 
                 if (resid < self%tolerance) then
@@ -175,47 +222,54 @@ contains
                     exit arnoldi_loop
                 end if
 
-                if (was_interrupted()) stop
-
             end do arnoldi_loop
 
-            ! ==========================================================
-            ! 解の更新 (Update Solution)
-            ! ==========================================================
-            k = j
-            if (k > self%m_restart) k = self%m_restart
+            ! ======================================================
+            ! Update Solution
+            ! ======================================================
 
-            ! 上三角行列の方程式 Hy = g を解く
+            ! 1. Calculate Least Squares solution y (Solve upper triangular Hy = g)
             call backward_substitution(k, self%h, self%g, self%y)
 
-            ! x = x + M^-1 * (V * y)
-            ! 1. w = V * y (x_update に蓄積)
+            ! 2. x_update = V * y (Update vector in non-preconditioned space)
             call self%x_update%zero()
             do i = 1, k
                 call vector_axpy(self%y(i), self%v(i), self%x_update)
             end do
 
-            ! 2. z = M^-1 * w
+            ! 3. Map to preconditioned space: z = M^-1 * x_update
             call self%pc%apply(self%x_update, self%z)
 
-            ! 3. x = x + z
+            ! 4. Update true solution: x = x + z
             call vector_axpy(1.0d0, self%z, x)
 
-            if (converged .or. self%status == SOLVER_STATUS_MAXITER) exit restart_loop
+            ! ======================================================
+            ! Restart Check
+            ! ======================================================
+            if (converged) then
+                self%status = SOLVER_STATUS_SUCCESS
+                exit restart_loop
+            end if
+
+            if (self%status == SOLVER_STATUS_MAXITER) then
+                exit restart_loop
+            end if
 
         end do restart_loop
 
     end subroutine solve_type_solver_gmres
-    !> メモリ解放
+
+    !> Finalize the GMRES solver instance and release memory.
     module subroutine destroy_type_solver_gmres(self)
         implicit none
+        !> Solver instance to be destroyed
         class(type_solver_gmres), intent(inout) :: self
         integer(int32) :: i
 
         self%id = -1
         if (allocated(self%name)) deallocate (self%name)
 
-        ! ベクトル配列の解放
+        ! Release vector arrays
         if (allocated(self%v)) then
             do i = 1, size(self%v)
                 call self%v(i)%destroy()
@@ -227,14 +281,13 @@ contains
         call self%z%destroy()
         call self%x_update%destroy()
 
-        ! スカラー配列の解放
+        ! Release scalar arrays
         call deallocate_array(self%h)
         call deallocate_array(self%g)
         call deallocate_array(self%cs)
         call deallocate_array(self%sn)
         call deallocate_array(self%y)
         if (allocated(self%pc)) then
-
             call self%pc%destroy()
             deallocate (self%pc)
         end if
@@ -242,15 +295,17 @@ contains
         self%status = SOLVER_STATUS_SUCCESS
     end subroutine destroy_type_solver_gmres
 
-    ! ------------------------------------------------------------------
-    ! ヘルパーサブルーチン (内部利用)
-    ! ------------------------------------------------------------------
-
-!> ギブンス回転係数生成 (lis/BLAS drotg相当)
+    !> Generate Givens rotation coefficients \( c \) (cosine) and \( s \) (sine).
     pure subroutine generate_givens_rotation(dx, dy, c, s)
         implicit none
-        real(real64), intent(in) :: dx, dy
-        real(real64), intent(inout) :: c, s
+        !> Value on the diagonal
+        real(real64), intent(in) :: dx
+        !> Value below the diagonal
+        real(real64), intent(in) :: dy
+        !> Cosine component of rotation
+        real(real64), intent(inout) :: c
+        !> Sine component of rotation
+        real(real64), intent(inout) :: s
         real(real64) :: temp
 
         if (dy == 0.0d0) then
@@ -267,12 +322,16 @@ contains
         end if
     end subroutine generate_givens_rotation
 
-    !> 後退代入 (H y = g)
+    !> Perform backward substitution to solve the upper triangular system \( Hy = g \).
     pure subroutine backward_substitution(n, H, g, y)
         implicit none
+        !> Dimension of the system
         integer(int32), intent(in) :: n
+        !> Upper triangular (Hessenberg) matrix H (size (n+1) x n)
         real(real64), intent(in) :: H(:, :)
+        !> Right-hand side vector g (size n+1)
         real(real64), intent(in) :: g(:)
+        !> Solution vector y (size n)
         real(real64), intent(inout) :: y(:)
 
         integer(int32) :: i, j

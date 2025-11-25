@@ -12,6 +12,7 @@ cmake -S . -B CMakeBuild \
     -DCMAKE_Fortran_COMPILER=mpiifx \
     -DCMAKE_C_COMPILER=mpiicx \
     -DCMAKE_CXX_COMPILER=mpiicpx \
+    -DMKL_SYCL_LINK=OFF \
     -G "Ninja"
 
 cmake --build CMakeBuild --parallel --verbose

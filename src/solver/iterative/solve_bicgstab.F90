@@ -106,8 +106,8 @@ contains
             if (rho == 0.0d0) then
                 self%current_iteration = iter
                 call self%residual_history%set(OP_INS, iter, vector_norm2(self%r))
-                self%status = SOLVER_STATUS_SUCCESS
                 call x%copy(self%x)
+                self%status = SOLVER_STATUS_SUCCESS
                 return
             end if
 

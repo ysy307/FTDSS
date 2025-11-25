@@ -136,6 +136,7 @@ module solver_solve
         type(type_vector_dp), allocatable :: v(:) ! 基底ベクトル V (m+1)
         type(type_vector_dp) :: r ! 残差ベクトル
         type(type_vector_dp) :: z ! 作業用（前処理適用後など）
+        type(type_vector_dp) :: w ! 作業用（前処理適用後など）
         type(type_vector_dp) :: x_update ! 解の更新用
 
         ! --- スカラー/小規模配列（サイズ m） ---
