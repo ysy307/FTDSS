@@ -1870,13 +1870,15 @@ contains
         class(type_vector_dp), intent(inout) :: x
 
         real(real64), dimension(:), pointer :: ptr_x
+        real(real64), parameter :: epsilon = 1.0d-20
 
         ptr_x => x%get_data()
 
-#ifdef USE_DEBUG
-        if (any(ptr_x == 0.0d0)) error stop "ERROR in reciprocal_vector_dp: Division by zero."
-#endif
-        ptr_x = 1.0d0 / ptr_x
+        where (abs(ptr_x) < epsilon)
+            ptr_x = 0.0d0
+        else where
+            ptr_x = 1.0d0 / ptr_x
+        end where
 
     end subroutine reciprocal_vector_dp
 
@@ -1888,10 +1890,12 @@ contains
         integer(int32), dimension(:), pointer :: ptr_x
 
         ptr_x => x%get_data()
-#ifdef USE_DEBUG
-        if (any(ptr_x == 0)) error stop "ERROR in reciprocal_vector_int: Division by zero."
-#endif
-        ptr_x = 1 / ptr_x
+
+        where (ptr_x == 0)
+            ptr_x = 0
+        else where
+            ptr_x = 1 / ptr_x
+        end where
 
     end subroutine reciprocal_vector_int
 
