@@ -456,7 +456,7 @@ contains
                     case (SOLVER_PRECONDITION_NONE)
                         call pc_info%set(pc_id_lists(ip))
                     case (SOLVER_PRECONDITION_JACOBI)
-                        call pc_info%set(pc_id_lists(ip), n)
+                        call pc_info%set(pc_id_lists(ip), n_dof)
                     case (SOLVER_PRECONDITION_ILU)
                         call pc_info%set(pc_id_lists(ip))
                     end select

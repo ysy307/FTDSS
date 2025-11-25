@@ -3,15 +3,16 @@ submodule(physics_material_density) density_base
 
 contains
 
-    module subroutine initialize_holder_dens(self, input, material_id)
+    module subroutine initialize_holder_dens(self, material_id, phase_info)
         implicit none
         class(holder_dens), intent(inout) :: self
-        type(type_input), intent(in) :: input
         integer(int32), intent(in) :: material_id
+        type(type_physics_phase), intent(in) :: phase_info
 
-        select case (input%basic%materials(material_id)%phase)
+        select case (phase_info%num_phases)
         case (3)
-            self%p = type_den_3phase(input, material_id)
+            allocate (type_den_3phase :: self%p)
+            call self%p%initialize(material_id, phase_info)
         end select
 
     end subroutine initialize_holder_dens

@@ -1,9 +1,10 @@
-module core_types_gauss
-    use, intrinsic :: iso_fortran_env, only: real64
+module core_types_physics
+    use, intrinsic :: iso_fortran_env, only: int32, real64
     implicit none
     private
 
     public :: type_state
+    public :: type_physics_phase
 
     type :: type_state
         real(real64) :: temperature !! T
@@ -19,4 +20,13 @@ module core_types_gauss
         real(real64) :: vhc_water !! C_w
     end type type_state
 
-end module core_types_gauss
+    type :: type_physics_phase
+        integer(int32) :: num_phases = 0
+        real(real64) :: solid = 0.0d0
+        real(real64) :: water = 0.0d0
+        real(real64) :: ice = 0.0d0
+        real(real64) :: vapor = 0.0d0
+        real(real64) :: air = 0.0d0
+    end type type_physics_phase
+
+end module core_types_physics

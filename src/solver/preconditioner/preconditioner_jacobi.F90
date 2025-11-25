@@ -11,8 +11,11 @@ contains
 
         self%name = "Jacobi"
         self%id = SOLVER_PRECONDITION_JACOBI
+        self%status = SOLVER_STATUS_SUCCESS
 
-        self%num_nodes = info%num_nodes ! 初期値
+        ! 初期化時に設定されたノード数（自由度数）を正とする
+        ! setupルーチンではこの値を変更しない
+        self%num_nodes = info%num_nodes
 
         if (info%block_size > 1) then
             self%is_block = .true.
@@ -22,7 +25,6 @@ contains
             self%block_size = 1
         end if
 
-        self%status = SOLVER_STATUS_SUCCESS
     end subroutine initialize_preconditioner_jacobi
 
     !> 行列 A に合わせて前処理をセットアップする
@@ -31,14 +33,8 @@ contains
         class(type_preconditioner_jacobi), intent(inout) :: self
         class(abst_matrix), intent(in) :: A
 
-        type(type_matrix_info) :: info
-
-        call A%get_info(info)
-
-        ! 行列の実際のサイズ情報で更新
-        if (self%num_nodes /= info%num_rows) then
-            self%num_nodes = info%num_rows
-        end if
+        ! サイズ変更ロジックを削除
+        ! Initializeで設定された self%num_nodes を信頼する
 
         self%status = SOLVER_STATUS_NOT_IMPLEMENTED
 
@@ -71,30 +67,28 @@ contains
     end subroutine setup_preconditioner_jacobi
 
     !> Point Jacobi のセットアップ
-    !> 引数は abst_matrix のまま、対角成分の逆数を計算する
     module subroutine setup_preconditioner_jacobi_point(self, A)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
         class(abst_matrix), intent(in) :: A
 
-        ! メモリ確保：サイズは num_rows (総自由度)
+        ! 初期化時のサイズでメモリを確保
         if (self%M_inv%get_size() /= self%num_nodes) then
             call self%M_inv%initialize(self%num_nodes)
         end if
 
         call self%M_inv%zero()
 
-        ! 対角成分を取得 (abst_matrix のインターフェース経由)
+        ! 対角成分を取得
         call A%get_diagonal(self%M_inv)
 
-        ! 逆数を計算 ( 1 / A_ii )
+        ! 逆数を計算 (linalg側でゼロ除算回避処理が行われる)
         call vector_reciprocal(self%M_inv)
 
         self%status = SOLVER_STATUS_SUCCESS
     end subroutine setup_preconditioner_jacobi_point
 
     !> Block Jacobi のセットアップ
-    !> 引数は abst_matrix のまま、内部で BSR にキャストして処理する
     module subroutine setup_preconditioner_jacobi_block(self, A)
         implicit none
         class(type_preconditioner_jacobi), intent(inout) :: self
@@ -103,11 +97,11 @@ contains
         integer(int32) :: i, ierr, bs, num_blocks
 
         bs = self%block_size
+        ! ブロック数は num_rows (全自由度) / block_size で計算
         num_blocks = self%num_nodes / bs
 
         select type (A)
         type is (type_matrix_bsr)
-            ! メモリ再確保
             if (allocated(self%M_inv_blocks)) deallocate (self%M_inv_blocks)
             if (allocated(self%ipiv_blocks)) deallocate (self%ipiv_blocks)
 
@@ -116,25 +110,16 @@ contains
 
             !$omp parallel do private(i, ierr)
             do i = 1, num_blocks
-                ! A は type_matrix_bsr なので get_diagonal_block を呼べる
                 call A%get_diagonal_block(i, self%M_inv_blocks(:, :, i))
-
-                ! LU分解 (dgetrf)
                 call dgetrf(bs, bs, self%M_inv_blocks(:, :, i), bs, &
                             self%ipiv_blocks(:, i), ierr)
-
-                if (ierr /= 0) then
-                    ! エラー処理用のマーカー（必要に応じて実装）
-                    self%M_inv_blocks(1, 1, i) = 0.0d0
-                end if
             end do
             !$omp end parallel do
 
             self%status = SOLVER_STATUS_SUCCESS
 
         class default
-            ! BSR以外がここに来ることは論理上ないが、安全のため
-            self%status = -1
+            self%status = SOLVER_STATUS_NOT_IMPLEMENTED
         end select
 
     end subroutine setup_preconditioner_jacobi_block
@@ -180,7 +165,6 @@ contains
             ! ==========================================================
             ! Point Jacobi (Scalar scaling)
             ! ==========================================================
-            ! type_vector_dp 内の multiply 手続きを使用
             call multiply(self%M_inv, r, z)
 
         end if
