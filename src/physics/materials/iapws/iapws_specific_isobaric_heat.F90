@@ -15,9 +15,7 @@ contains
         real(real64) :: cp
 
         real(real64) :: pi, tau
-        real(real64) :: g_pi, g_tau, g_tautau, g_pitau
-        real(real64) :: cp_dim
-
+        real(real64) :: gamma_tautau
         ! ==========================================================
         ! Dimensionless variables
         ! ==========================================================
@@ -27,22 +25,13 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        g_pi = get_gamma_pi_region1(pi, tau)
-        g_tau = get_gamma_tau_region1(pi, tau)
-        g_tautau = get_gamma_tautau_region1(pi, tau)
-        g_pitau = get_gamma_pitau_region1(pi, tau)
-
-        ! ==========================================================
-        ! Calculate dimensionless Cp/R
-        ! ==========================================================
-        cp_dim = (-tau**2 * g_tautau) + &
-                 ((g_tau - tau * g_pitau)**2 / g_pi)
+        gamma_tautau = get_gamma_tautau_region1(pi, tau)
 
         ! ==========================================================
         ! Convert to physical units [J/(kg K)]
         ! ==========================================================
         ! specific_gas_constant_water is in [kJ/(kg K)], so multiply by 1000
-        cp = cp_dim * specific_gas_constant_water * 1000.0d0
+        cp = -tau**2.0d0 * gamma_tautau * specific_gas_constant_water * 1000.0d0
 
     end function get_cp_iapws_region1
 
@@ -176,5 +165,34 @@ contains
                  (1.0d0 / (p_star1 * 1.0d6))
 
     end function get_dcp_dp_iapws_region1
+
+    module pure elemental function get_cp_iapws_region2(T_in, P_in) result(cp)
+        implicit none
+        !> Temperature [K]
+        real(real64), intent(in) :: T_in
+        !> Pressure [Pa]
+        real(real64), intent(in) :: P_in
+        !> Specific heat capacity at constant pressure [J/(kg K)]
+        real(real64) :: cp
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma_tautau
+        real(real64) :: cp_dim
+
+        ! ==========================================================
+        ! Dimensionless variables
+        ! ==========================================================
+        pi = (P_in * 1.0d-6) / p_star2
+        tau = T_star2 / T_in
+
+        ! ==========================================================
+        ! Get derivatives from parent module
+        ! ==========================================================
+        gamma_tautau = get_gammar_tautau_region2(pi, tau) + get_gammao_tautau_region2(pi, tau)
+
+        ! specific_gas_constant_water is in [kJ/(kg K)], so multiply by 1000
+        cp = -tau**2.0d0 * gamma_tautau * specific_gas_constant_water * 1000.0d0
+
+    end function get_cp_iapws_region2
 
 end submodule iapws_specific_isobaric_heat

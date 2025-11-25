@@ -4,6 +4,22 @@
 # ====================================================================
 # 1. Material Property Libraries (materials/*)
 # ====================================================================
+# --- IAPWS-IF97/IAPWS-06 Properties ---
+set(PHYSICS_MATERIAL_IAPWS_SOURCES
+    materials/iapws/iapws_interface.F90
+    materials/iapws/iapws_base1.F90
+    materials/iapws/iapws_base2.F90
+    materials/iapws/iapws_density.F90
+    materials/iapws/iapws_enthalpy.F90
+    materials/iapws/iapws_specific_isobaric_heat.F90
+    materials/iapws/iapws.F90
+)
+add_library(Physics_Material_IAPWS STATIC ${PHYSICS_MATERIAL_IAPWS_SOURCES})
+target_include_directories(Physics_Material_IAPWS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Material_IAPWS PUBLIC 
+    Solver::Core
+)
+enable_build_flags(Physics_Material_IAPWS)
 
 # --- Density ---
 set(PHYSICS_MATERIAL_DENSITY_SOURCES
@@ -14,8 +30,8 @@ set(PHYSICS_MATERIAL_DENSITY_SOURCES
 add_library(Physics_Material_Density STATIC ${PHYSICS_MATERIAL_DENSITY_SOURCES})
 target_include_directories(Physics_Material_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_Density PUBLIC 
-    Solver::Core 
-    Solver::Input
+    Solver::Core
+    Physics_Material_IAPWS
 )
 enable_build_flags(Physics_Material_Density)
 
@@ -28,8 +44,8 @@ set(PHYSICS_MATERIAL_SPH_SOURCES
 add_library(Physics_Material_SpecificHeat STATIC ${PHYSICS_MATERIAL_SPH_SOURCES})
 target_include_directories(Physics_Material_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_SpecificHeat PUBLIC 
-    Solver::Core 
-    Solver::Input
+    Solver::Core
+    Physics_Material_IAPWS
 )
 enable_build_flags(Physics_Material_SpecificHeat)
 
@@ -43,7 +59,6 @@ add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_S
 target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_ThermalConductivity PUBLIC 
     Solver::Core 
-    Solver::Input
 )
 enable_build_flags(Physics_Material_ThermalConductivity)
 
@@ -58,7 +73,6 @@ add_library(Physics_Material_HeatCapacity STATIC ${PHYSICS_MATERIAL_VHC_SOURCES}
 target_include_directories(Physics_Material_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_HeatCapacity PUBLIC
     Solver::Core
-    Solver::Input
     Physics_Material_Density
 )
 enable_build_flags(Physics_Material_HeatCapacity)
@@ -66,6 +80,7 @@ enable_build_flags(Physics_Material_HeatCapacity)
 # --- Materials aggregator ---
 add_library(Physics_Materials INTERFACE)
 target_link_libraries(Physics_Materials INTERFACE
+    Physics_Material_IAPWS
     Physics_Material_Density
     Physics_Material_SpecificHeat
     Physics_Material_ThermalConductivity

@@ -87,4 +87,29 @@ contains
         drho_dp = -rho * gamma_pipi / (gamma_pi * p_star1 * 1.0d6)
     end function get_drho_dp_iapws_region1
 
+    module pure elemental function get_density_iapws_region2(T_in, P_in) result(rho)
+        implicit none
+        !> Temperature [K]
+        real(real64), intent(in) :: T_in
+        !> Pressure [Pa]
+        real(real64), intent(in) :: P_in
+        !> Density [kg/m^3]
+        real(real64) :: rho
+
+        real(real64) :: pi, tau, gamma_pi
+
+        ! ==========================================================
+        ! Dimensionless variables
+        ! ==========================================================
+        pi = P_in * 1.0d-6 / p_star2 ! Pa -> MPa
+        tau = T_star2 / T_in
+
+        ! ==========================================================
+        ! Calculate Density
+        ! ==========================================================
+        gamma_pi = get_gammao_pi_region2(pi, tau) + get_gammar_pi_region2(pi, tau)
+        rho = p_star2 * 1.0d6 / (specific_gas_constant_water * 1000.0d0 * T_in * gamma_pi)
+
+    end function get_density_iapws_region2
+
 end submodule iapws_density
