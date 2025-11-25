@@ -8,6 +8,8 @@ module solver_preconditioner
 
     public :: abst_preconditioner
     public :: type_preconditioner_none
+    public :: type_preconditioner_jacobi
+    public :: type_preconditioner_iluk
 
     public :: type_preconditioner_settings
 
@@ -23,6 +25,8 @@ module solver_preconditioner
         integer(int32) :: num_nodes = -1
         !> Block size for block-based preconditioners (default is 1)
         integer(int32) :: block_size = -1
+        !> ILU fill-in level (for ILU preconditioners)
+        integer(int32) :: ilu_fill_level = 0
     contains
         !> Set configuration parameters.
         procedure :: set => set_preconditioner_settings
@@ -204,10 +208,108 @@ module solver_preconditioner
         end subroutine destroy_preconditioner_jacobi
     end interface
 
+!
+    ! ==========================================================
+    ! ILU(k) Preconditioner (Currently ILU(0))
+    ! ==========================================================
+    !
+    !> ILU(0) / Block ILU(0) preconditioner.
+    !> Stores the Incomplete LU factorization of the matrix A.
+    type, extends(abst_preconditioner) :: type_preconditioner_iluk
+        !> Number of nodes (rows)
+        integer(int32) :: num_rows = -1
+        !> Block size for BSR (1 for CSR)
+        integer(int32) :: block_size = 1
+        !> Level of fill-in (0 is implemented)
+        integer(int32) :: fill_level = 0
+        !> Flag for block matrix support
+        logical :: is_block = .false.
+
+        ! --- Storage for Sparse Structure (CSR/BSR common logic) ---
+        !> Row pointers (size num_rows + 1)
+        integer(int32), allocatable :: ptr(:)
+        !> Column indices (size nnz)
+        integer(int32), allocatable :: ind(:)
+        !> Pointers to diagonal elements within val/ind arrays (size num_rows)
+        integer(int32), allocatable :: diag_ptr(:)
+
+        ! --- Storage for Values ---
+        !> Non-zero values for scalar CSR (size nnz)
+        real(real64), allocatable :: val(:)
+        !> Non-zero blocks for BSR (size block_size, block_size, nnz)
+        real(real64), allocatable :: val_blocks(:, :, :)
+
+        ! --- Workspace for Block LU ---
+        !> Pivot indices for diagonal block LU factorization (size block_size, num_rows)
+        integer(int32), allocatable :: diag_pivots(:, :)
+
+    contains
+        procedure :: initialize => initialize_preconditioner_iluk
+        procedure :: setup => setup_preconditioner_iluk
+        procedure, pass(self), private :: setup_csr_ilu0
+        procedure, pass(self), private :: setup_bsr_ilu0
+        procedure :: apply => apply_preconditioner_iluk
+        procedure, pass(self), private :: apply_csr_ilu0
+        procedure, pass(self), private :: apply_bsr_ilu0
+        procedure :: destroy => destroy_preconditioner_iluk
+    end type type_preconditioner_iluk
+
+    interface
+        module subroutine initialize_preconditioner_iluk(self, info)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_iluk
+
+        module subroutine setup_preconditioner_iluk(self, A)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_iluk
+
+        module subroutine setup_csr_ilu0(self, A)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            class(type_matrix_csr), intent(in) :: A
+        end subroutine setup_csr_ilu0
+
+        module subroutine setup_bsr_ilu0(self, A)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            class(type_matrix_bsr), intent(in) :: A
+        end subroutine setup_bsr_ilu0
+
+        module subroutine apply_preconditioner_iluk(self, r, z)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_iluk
+
+        module subroutine apply_csr_ilu0(self, r, z)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_csr_ilu0
+
+        module subroutine apply_bsr_ilu0(self, r, z)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_bsr_ilu0
+
+        module subroutine destroy_preconditioner_iluk(self)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+        end subroutine destroy_preconditioner_iluk
+    end interface
+
 contains
 
     !> Sets the preconditioner configuration settings.
-    subroutine set_preconditioner_settings(self, id, num_nodes, block_size)
+    subroutine set_preconditioner_settings(self, id, num_nodes, block_size, ilu_fillin_level)
         implicit none
         !> Settings instance to be configured
         class(type_preconditioner_settings), intent(inout) :: self
@@ -217,6 +319,8 @@ contains
         integer(int32), intent(in), optional :: num_nodes
         !> Block size (optional, default 1)
         integer(int32), intent(in), optional :: block_size
+        !> ILU fill-in level (optional, default 0)
+        integer(int32), intent(in), optional :: ilu_fillin_level
 
         self%id = id
         select case (self%id)
@@ -231,7 +335,22 @@ contains
             else
                 self%block_size = 1
             end if
-        case default
+        case (SOLVER_PRECONDITION_ILU)
+            if (present(num_nodes)) then
+                self%num_nodes = num_nodes
+            else
+                self%num_nodes = -1
+            end if
+            if (present(block_size)) then
+                self%block_size = block_size
+            else
+                self%block_size = 1
+            end if
+            if (present(ilu_fillin_level)) then
+                self%ilu_fill_level = ilu_fillin_level
+            else
+                self%ilu_fill_level = 0
+            end if
         end select
     end subroutine set_preconditioner_settings
 
@@ -260,7 +379,9 @@ contains
             call pc%initialize(info)
             ierr = pc%status
         case (SOLVER_PRECONDITION_ILU)
-            ierr = SOLVER_STATUS_NOT_IMPLEMENTED
+            allocate (type_preconditioner_iluk :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         case (SOLVER_PRECONDITION_SSOR)
             ierr = SOLVER_STATUS_NOT_IMPLEMENTED
         case (SOLVER_PRECONDITION_HYBRID)

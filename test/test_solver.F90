@@ -13,9 +13,10 @@ program test_solver
     integer(int32), parameter :: num_solvers = 2
     integer(int32), parameter :: solver_id_lists(num_solvers) = [SOLVER_BICGSTAB, SOLVER_GMRES_M]
     character(len=32), parameter :: solver_name_lists(num_solvers) = ["BiCGSTAB", "GMRES"]
-    integer(int32), parameter :: num_preconditioners = 2
-    integer(int32), parameter :: pc_id_lists(num_preconditioners) = [SOLVER_PRECONDITION_NONE, SOLVER_PRECONDITION_JACOBI]
-    character(len=32), parameter :: pc_name_lists(num_preconditioners) = ["None", "Jacobi"]
+    integer(int32), parameter :: num_preconditioners = 3
+    integer(int32), parameter :: pc_id_lists(num_preconditioners) = [ &
+                                 SOLVER_PRECONDITION_NONE, SOLVER_PRECONDITION_JACOBI, SOLVER_PRECONDITION_ILU]
+    character(len=32), parameter :: pc_name_lists(num_preconditioners) = ["None", "Jacobi", "ILU(k)"]
 
     integer(int32), parameter :: max_iterations = 1000000
     real(real64), parameter :: tolerance = 1.0d-14
@@ -87,6 +88,8 @@ contains
                         call pc_info%set(pc_id_lists(ip))
                     case (SOLVER_PRECONDITION_JACOBI)
                         call pc_info%set(pc_id_lists(ip), n)
+                    case (SOLVER_PRECONDITION_ILU)
+                        call pc_info%set(pc_id_lists(ip))
                     end select
                     call create_solver(solver, matrix_info, pc_info, ierr)
                     if (ierr /= SOLVER_STATUS_SUCCESS) then
@@ -179,6 +182,8 @@ contains
                         call pc_info%set(pc_id_lists(ip))
                     case (SOLVER_PRECONDITION_JACOBI)
                         call pc_info%set(pc_id_lists(ip), n)
+                    case (SOLVER_PRECONDITION_ILU)
+                        call pc_info%set(pc_id_lists(ip))
                     end select
                     call create_solver(solver, matrix_info, pc_info, ierr)
                     if (ierr /= SOLVER_STATUS_SUCCESS) then
@@ -308,6 +313,8 @@ contains
                         call pc_info%set(pc_id_lists(ip))
                     case (SOLVER_PRECONDITION_JACOBI)
                         call pc_info%set(pc_id_lists(ip), n)
+                    case (SOLVER_PRECONDITION_ILU)
+                        call pc_info%set(pc_id_lists(ip))
                     end select
                     call create_solver(solver, matrix_info, pc_info, ierr)
                     if (ierr /= SOLVER_STATUS_SUCCESS) then
@@ -449,9 +456,10 @@ contains
                     case (SOLVER_PRECONDITION_NONE)
                         call pc_info%set(pc_id_lists(ip))
                     case (SOLVER_PRECONDITION_JACOBI)
-                        call pc_info%set(pc_id_lists(ip), n_dof)
+                        call pc_info%set(pc_id_lists(ip), n)
+                    case (SOLVER_PRECONDITION_ILU)
+                        call pc_info%set(pc_id_lists(ip))
                     end select
-
                     call create_solver(solver, matrix_info, pc_info, ierr)
                     if (ierr /= SOLVER_STATUS_SUCCESS) return
 
