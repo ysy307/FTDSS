@@ -1,54 +1,60 @@
 submodule(physics_material_iapws) iapws_specific_isobaric_heat
     implicit none
 contains
-    !-----------------------------------------------------------------------------
-    ! Region 1 (Liquid Water)
-    ! Valid: 273.15 K <= T <= 623.15 K (Extrapolates well to < 273.15 K)
-    !        p_s(T) <= P <= 100 MPa
-    ! Input:
-    !   T_in : Temperature [K]
-    !   P_in : Pressure [Pa]
-    ! Output:
-    !   cp     : Specific isobaric heat capacity [kJ/kg/K]
-    !-----------------------------------------------------------------------------
-    !> Specific heat capacity at constant pressure Cp [J/(kg K)]
-    !!
-    !! Formula: Cp = R * [ -tau^2 * g_tautau + (g_tau - tau * g_pitau)^2 / g_pi ]
+
+    !> Calculate the specific isobaric heat capacity (Cp) for liquid water (Region 1).
+    !> Valid range: \( 273.15 \text{ K} \le T \le 623.15 \text{ K} \), \( P_s(T) \le P \le 100 \text{ MPa} \).
+    !> Formula: \( C_p = R \left[ -\tau^2 \gamma_{\tau\tau} + \frac{(\gamma_{\tau} - \tau \gamma_{\pi\tau})^2}{\gamma_{\pi}} \right] \)
     module pure elemental function get_cp_iapws_region1(T_in, P_in) result(cp)
         implicit none
-        real(real64), intent(in) :: T_in !! Temperature [K]
-        real(real64), intent(in) :: P_in !! Pressure [Pa]
-        real(real64) :: cp !! Specific heat [J/(kg K)]
+        !> Temperature [K]
+        real(real64), intent(in) :: T_in
+        !> Pressure [Pa]
+        real(real64), intent(in) :: P_in
+        !> Specific heat capacity at constant pressure [J/(kg K)]
+        real(real64) :: cp
 
         real(real64) :: pi, tau
         real(real64) :: g_pi, g_tau, g_tautau, g_pitau
-        real(real64) :: cp_dim ! dimensionless Cp/R
+        real(real64) :: cp_dim
 
+        ! ==========================================================
         ! Dimensionless variables
+        ! ==========================================================
         pi = (P_in * 1.0d-6) / p_star1
         tau = T_star1 / T_in
 
+        ! ==========================================================
         ! Get derivatives from parent module
+        ! ==========================================================
         g_pi = get_gamma_pi_region1(pi, tau)
         g_tau = get_gamma_tau_region1(pi, tau)
         g_tautau = get_gamma_tautau_region1(pi, tau)
         g_pitau = get_gamma_pitau_region1(pi, tau)
 
+        ! ==========================================================
         ! Calculate dimensionless Cp/R
-        ! Note: Using parenthesis strictly to ensure correct order of operations
+        ! ==========================================================
         cp_dim = (-tau**2 * g_tautau) + &
                  ((g_tau - tau * g_pitau)**2 / g_pi)
 
+        ! ==========================================================
         ! Convert to physical units [J/(kg K)]
+        ! ==========================================================
         ! specific_gas_constant_water is in [kJ/(kg K)], so multiply by 1000
         cp = cp_dim * specific_gas_constant_water * 1000.0d0
 
     end function get_cp_iapws_region1
 
-    !> Derivative of Cp w.r.t Temperature (dCp/dT)_P [J/(kg K^2)]
+    !> Calculate the derivative of Cp with respect to temperature at constant pressure.
+    !> Computes \( \left(\frac{\partial C_p}{\partial T}\right)_P \).
     module pure elemental function get_dcp_dt_iapws_region1(T_in, P_in) result(dcp_dt)
         implicit none
-        real(real64), intent(in) :: T_in, P_in
+        !> Temperature [K]
+        real(real64), intent(in) :: T_in
+        !> Pressure [Pa]
+        real(real64), intent(in) :: P_in
+        !> Derivative of Cp w.r.t Temperature [J/(kg K^2)]
         real(real64) :: dcp_dt
 
         real(real64) :: pi, tau
@@ -60,7 +66,9 @@ contains
         pi = (P_in * 1.0d-6) / p_star1
         tau = T_star1 / T_in
 
-        ! Need derivatives up to 3rd order
+        ! ==========================================================
+        ! Get derivatives up to 3rd order
+        ! ==========================================================
         g_pi = get_gamma_pi_region1(pi, tau)
         g_tau = get_gamma_tau_region1(pi, tau)
         g_tautau = get_gamma_tautau_region1(pi, tau)
@@ -68,7 +76,9 @@ contains
         g_pitautau = get_gamma_pi_tautau_region1(pi, tau)
         g_tautautau = get_gamma_tautau_tau_region1(pi, tau)
 
+        ! ==========================================================
         ! Differentiate dimensionless Cp/R w.r.t tau
+        ! ==========================================================
         ! Cp/R = term1 + term2
         ! term1 = -tau^2 * g_tautau
         ! term2 = (g_tau - tau * g_pitau)^2 / g_pi
@@ -93,16 +103,24 @@ contains
 
         dcp_dim_dtau = term1 + term2
 
-        ! Convert to physical derivative: dCp/dT = R * d(Cp/R)/dtau * dtau/dT
+        ! ==========================================================
+        ! Convert to physical derivative
+        ! ==========================================================
+        ! dCp/dT = R * d(Cp/R)/dtau * dtau/dT
         ! dtau/dT = -tau/T
         dcp_dt = (specific_gas_constant_water * 1000.0d0) * dcp_dim_dtau * (-tau / T_in)
 
     end function get_dcp_dt_iapws_region1
 
-    !> Derivative of Cp w.r.t Pressure (dCp/dP)_T [J/(kg K Pa)]
+    !> Calculate the derivative of Cp with respect to pressure at constant temperature.
+    !> Computes \( \left(\frac{\partial C_p}{\partial P}\right)_T \).
     module pure elemental function get_dcp_dp_iapws_region1(T_in, P_in) result(dcp_dp)
         implicit none
-        real(real64), intent(in) :: T_in, P_in
+        !> Temperature [K]
+        real(real64), intent(in) :: T_in
+        !> Pressure [Pa]
+        real(real64), intent(in) :: P_in
+        !> Derivative of Cp w.r.t Pressure [J/(kg K Pa)]
         real(real64) :: dcp_dp
 
         real(real64) :: pi, tau
@@ -114,7 +132,9 @@ contains
         pi = (P_in * 1.0d-6) / p_star1
         tau = T_star1 / T_in
 
-        ! Need derivatives
+        ! ==========================================================
+        ! Get derivatives
+        ! ==========================================================
         g_pi = get_gamma_pi_region1(pi, tau)
         g_pipi = get_gamma_pipi_region1(pi, tau)
         g_tau = get_gamma_tau_region1(pi, tau)
@@ -123,7 +143,9 @@ contains
         g_pitautau = get_gamma_pi_tautau_region1(pi, tau)
         g_pipitau = get_gamma_pipi_tau_region1(pi, tau)
 
+        ! ==========================================================
         ! Differentiate dimensionless Cp/R w.r.t pi
+        ! ==========================================================
 
         ! d(term1)/dpi
         ! term1 = -tau^2 * g_tautau
@@ -145,10 +167,14 @@ contains
 
         dcp_dim_dpi = term1 + term2
 
-        ! Convert to physical derivative: dCp/dP = R * d(Cp/R)/dpi * dpi/dP
+        ! ==========================================================
+        ! Convert to physical derivative
+        ! ==========================================================
+        ! dCp/dP = R * d(Cp/R)/dpi * dpi/dP
         ! dpi/dP = 1 / (P_star [Pa]) = 1 / (p_star1 * 1.0d6)
         dcp_dp = (specific_gas_constant_water * 1000.0d0) * dcp_dim_dpi * &
                  (1.0d0 / (p_star1 * 1.0d6))
 
     end function get_dcp_dp_iapws_region1
+
 end submodule iapws_specific_isobaric_heat

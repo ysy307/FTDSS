@@ -79,10 +79,15 @@ module physics_material_iapws
 
 contains
 
+!> Calculate the dimensionless Gibbs free energy \(\gamma\) for Region 1.
+    !> Formula: \(\gamma = \sum n_i (7.1 - \pi)^{I_i} (\tau - 1.222)^{J_i}\)
     pure elemental function get_gamma_region1(pi, tau) result(gamma)
         implicit none
+        !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
+        !> Resulting \(\gamma\) value
         real(real64) :: gamma
 
         integer(int32) :: i
@@ -97,10 +102,15 @@ contains
 
     end function get_gamma_region1
 
+    !> Calculate the first derivative of \(\gamma\) with respect to \(\pi\).
+    !> Computes \(\gamma_{\pi} = \left(\frac{\partial \gamma}{\partial \pi}\right)_{\tau}\).
     pure elemental function get_gamma_pi_region1(pi, tau) result(gamma_pi)
         implicit none
+        !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\pi}\)
         real(real64) :: gamma_pi
 
         integer(int32) :: i
@@ -115,10 +125,15 @@ contains
 
     end function get_gamma_pi_region1
 
+    !> Calculate the first derivative of \(\gamma\) with respect to \(\tau\).
+    !> Computes \(\gamma_{\tau} = \left(\frac{\partial \gamma}{\partial \tau}\right)_{\pi}\).
     pure elemental function get_gamma_tau_region1(pi, tau) result(gamma_tau)
         implicit none
+        !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\tau}\)
         real(real64) :: gamma_tau
 
         integer(int32) :: i
@@ -133,10 +148,15 @@ contains
 
     end function get_gamma_tau_region1
 
+    !> Calculate the second derivative of \(\gamma\) with respect to \(\pi\).
+    !> Computes \(\gamma_{\pi\pi} = \left(\frac{\partial^2 \gamma}{\partial \pi^2}\right)_{\tau}\).
     pure elemental function get_gamma_pipi_region1(pi, tau) result(gamma_pipi)
         implicit none
+        !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\pi\pi}\)
         real(real64) :: gamma_pipi
 
         integer(int32) :: i
@@ -151,10 +171,15 @@ contains
 
     end function get_gamma_pipi_region1
 
+    !> Calculate the second derivative of \(\gamma\) with respect to \(\tau\).
+    !> Computes \(\gamma_{\tau\tau} = \left(\frac{\partial^2 \gamma}{\partial \tau^2}\right)_{\pi}\).
     pure elemental function get_gamma_tautau_region1(pi, tau) result(gamma_tautau)
         implicit none
+        !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\tau\tau}\)
         real(real64) :: gamma_tautau
 
         integer(int32) :: i
@@ -169,10 +194,15 @@ contains
 
     end function get_gamma_tautau_region1
 
+    !> Calculate the mixed second derivative of \(\gamma\).
+    !> Computes \(\gamma_{\pi\tau} = \frac{\partial^2 \gamma}{\partial \pi \partial \tau}\).
     pure elemental function get_gamma_pitau_region1(pi, tau) result(gamma_pitau)
         implicit none
+        !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\pi\tau}\)
         real(real64) :: gamma_pitau
 
         integer(int32) :: i
@@ -187,12 +217,19 @@ contains
 
     end function get_gamma_pitau_region1
 
-    ! d3g / dpi^2 dtau
+    !> Calculate the third derivative \(\gamma_{\pi\pi\tau}\).
+    !> Computes \(\frac{\partial^3 \gamma}{\partial \pi^2 \partial \tau}\).
     pure elemental function get_gamma_pipi_tau_region1(pi, tau) result(val)
         implicit none
-        real(real64), intent(in) :: pi, tau
+        !> Dimensionless pressure \(\pi\)
+        real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
+        real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\pi\pi\tau}\)
         real(real64) :: val
+
         integer(int32) :: i
+
         val = 0.0d0
         do i = 1, N1_terms
             val = val + n1(i) * dble(I1(i)) * (dble(I1(i)) - 1.0d0) * (7.1d0 - pi)**(I1(i) - 2) &
@@ -200,12 +237,19 @@ contains
         end do
     end function get_gamma_pipi_tau_region1
 
-    ! d3g / dpi dtau^2
+    !> Calculate the third derivative \(\gamma_{\pi\tau\tau}\).
+    !> Computes \(\frac{\partial^3 \gamma}{\partial \pi \partial \tau^2}\).
     pure elemental function get_gamma_pi_tautau_region1(pi, tau) result(val)
         implicit none
-        real(real64), intent(in) :: pi, tau
+        !> Dimensionless pressure \(\pi\)
+        real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
+        real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\pi\tau\tau}\)
         real(real64) :: val
+
         integer(int32) :: i
+
         val = 0.0d0
         do i = 1, N1_terms
             val = val - n1(i) * dble(I1(i)) * (7.1d0 - pi)**(I1(i) - 1) &
@@ -213,12 +257,19 @@ contains
         end do
     end function get_gamma_pi_tautau_region1
 
-    ! d3g / dtau^3
+    !> Calculate the third derivative \(\gamma_{\tau\tau\tau}\).
+    !> Computes \(\frac{\partial^3 \gamma}{\partial \tau^3}\).
     pure elemental function get_gamma_tautau_tau_region1(pi, tau) result(val)
         implicit none
-        real(real64), intent(in) :: pi, tau
+        !> Dimensionless pressure \(\pi\)
+        real(real64), intent(in) :: pi
+        !> Dimensionless temperature \(\tau\)
+        real(real64), intent(in) :: tau
+        !> Derivative \(\gamma_{\tau\tau\tau}\)
         real(real64) :: val
+
         integer(int32) :: i
+
         val = 0.0d0
         do i = 1, N1_terms
             val = val + n1(i) * (7.1d0 - pi)**I1(i) &
