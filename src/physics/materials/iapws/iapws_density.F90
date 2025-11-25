@@ -1,4 +1,4 @@
-submodule(physics_material_ipaws) iapws_density
+submodule(physics_material_iapws) iapws_density
     implicit none
 contains
     !-----------------------------------------------------------------------------
