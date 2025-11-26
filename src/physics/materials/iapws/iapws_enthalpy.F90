@@ -48,7 +48,7 @@ contains
         pi = P_in * 1.0d-6 / p_star2 ! Pa -> MPa
         tau = T_star2 / T_in
 
-        gamma_tau = get_gammao_tau_region2(pi, tau) + get_gammar_tau_region2(pi, tau)
+        gamma_tau = get_gamma0_tau_region2(pi, tau) + get_gammar_tau_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]

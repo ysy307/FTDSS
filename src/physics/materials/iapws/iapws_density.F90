@@ -107,7 +107,7 @@ contains
         ! ==========================================================
         ! Calculate Density
         ! ==========================================================
-        gamma_pi = get_gammao_pi_region2(pi, tau) + get_gammar_pi_region2(pi, tau)
+        gamma_pi = get_gamma0_pi_region2(pi, tau) + get_gammar_pi_region2(pi, tau)
         rho = p_star2 * 1.0d6 / (specific_gas_constant_water * 1000.0d0 * T_in * gamma_pi)
 
     end function get_density_iapws_region2

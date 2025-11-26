@@ -14,6 +14,22 @@ module physics_material_iapws
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star2 = 540.0d0 ! 基準温度 [K]
     real(real64), parameter :: p_star2 = 1.0d0 ! 基準圧力 [MPa]
+    !------------------------------------------------------------------------------------------
+    ! Reigon3: High Pressure Liquid Water and Steam (IAPWS-IF97)
+    !------------------------------------------------------------------------------------------
+    real(real64), parameter :: T_star3 = water_critical_point_temperature ! 基準温度 [K]
+    real(real64), parameter :: p_star3 = water_critical_point_pressure * 10d-6 ! 基準圧力 [MPa]
+    real(real64), parameter :: rho_star3 = water_critical_point_density ! 基準密度 [kg/m^3]
+    !------------------------------------------------------------------------------------------
+    ! Reigon4: Saturation curve between liquid and vapor (IAPWS-IF97)
+    !------------------------------------------------------------------------------------------
+    real(real64), parameter :: T_star4 = 1.0d0 ! 基準温度 [K]
+    real(real64), parameter :: p_star4 = 1.0d0 ! 基準圧力 [MPa]
+    !------------------------------------------------------------------------------------------
+    ! Reigon5: High Temperature Steam (IAPWS-IF97)
+    !------------------------------------------------------------------------------------------
+    real(real64), parameter :: T_star5 = 1000.0d0 ! 基準温度 [K]
+    real(real64), parameter :: p_star5 = 10.0d0 ! 基準圧力 [MPa]
 
     interface
         module pure elemental function get_boundary_pressure_region23(temperature) result(pressure)
@@ -200,74 +216,74 @@ module physics_material_iapws
     end interface
 
     interface
-        module pure elemental function get_gammao_region2(pi, tau) result(gammao)
+        module pure elemental function get_gamma0_region2(pi, tau) result(gamma0)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Resulting \(\gamma^o\) value
-            real(real64) :: gammao
+            real(real64) :: gamma0
 
             integer(int32) :: i
             real(real64) :: term
 
-        end function get_gammao_region2
+        end function get_gamma0_region2
 
-        module pure elemental function get_gammao_pi_region2(pi, tau) result(gammao_pi)
+        module pure elemental function get_gamma0_pi_region2(pi, tau) result(gamma0_p)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^o_{\pi}\)
-            real(real64) :: gammao_pi
+            real(real64) :: gamma0_p
 
-        end function get_gammao_pi_region2
+        end function get_gamma0_pi_region2
 
-        module pure elemental function get_gammao_pipi_region2(pi, tau) result(gammao_pipi)
+        module pure elemental function get_gamma0_pipi_region2(pi, tau) result(gamma0_pp)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^o_{\pi}\)
-            real(real64) :: gammao_pipi
+            real(real64) :: gamma0_pp
 
-        end function get_gammao_pipi_region2
+        end function get_gamma0_pipi_region2
 
-        module pure elemental function get_gammao_tau_region2(pi, tau) result(gammao_tau)
+        module pure elemental function get_gamma0_tau_region2(pi, tau) result(gamma0_t)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\pi}\)
-            real(real64) :: gammao_tau
+            real(real64) :: gamma0_t
 
-        end function get_gammao_tau_region2
+        end function get_gamma0_tau_region2
 
-        module pure elemental function get_gammao_tautau_region2(pi, tau) result(gammao_tautau)
+        module pure elemental function get_gamma0_tautau_region2(pi, tau) result(gamma0_tt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\pi}\)
-            real(real64) :: gammao_tautau
+            real(real64) :: gamma0_tt
 
-        end function get_gammao_tautau_region2
+        end function get_gamma0_tautau_region2
 
-        module pure elemental function get_gammao_pitau_region2(pi, tau) result(gammao_pitau)
+        module pure elemental function get_gamma0_pitau_region2(pi, tau) result(gamma0_pt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\pi}\)
-            real(real64) :: gammao_pitau
+            real(real64) :: gamma0_pt
 
-        end function get_gammao_pitau_region2
+        end function get_gamma0_pitau_region2
 
         module pure elemental function get_gammar_region2(pi, tau) result(gammar)
             implicit none
@@ -280,58 +296,58 @@ module physics_material_iapws
 
         end function get_gammar_region2
 
-        module pure elemental function get_gammar_pi_region2(pi, tau) result(gammar_pi)
+        module pure elemental function get_gammar_pi_region2(pi, tau) result(gammar_p)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\pi}\)
-            real(real64) :: gammar_pi
+            real(real64) :: gammar_p
 
         end function get_gammar_pi_region2
 
-        module pure elemental function get_gammar_pipi_region2(pi, tau) result(gammar_pipi)
+        module pure elemental function get_gammar_pipi_region2(pi, tau) result(gammar_pp)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\pi\pi}\)
-            real(real64) :: gammar_pipi
+            real(real64) :: gammar_pp
 
         end function get_gammar_pipi_region2
 
-        module pure elemental function get_gammar_tau_region2(pi, tau) result(gammar_tau)
+        module pure elemental function get_gammar_tau_region2(pi, tau) result(gammar_t)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\tau}\)
-            real(real64) :: gammar_tau
+            real(real64) :: gammar_t
 
         end function get_gammar_tau_region2
 
-        module pure elemental function get_gammar_tautau_region2(pi, tau) result(gammar_tautau)
+        module pure elemental function get_gammar_tautau_region2(pi, tau) result(gammar_tt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\tau\tau}\)
-            real(real64) :: gammar_tautau
+            real(real64) :: gammar_tt
 
         end function get_gammar_tautau_region2
 
-        module pure elemental function get_gammar_pitau_region2(pi, tau) result(gammar_pitau)
+        module pure elemental function get_gammar_pitau_region2(pi, tau) result(gammar_pt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
             !> Dimensionless temperature \(\tau\)
             real(real64), intent(in) :: tau
             !> Derivative \(\gamma^r_{\pi\tau}\)
-            real(real64) :: gammar_pitau
+            real(real64) :: gammar_pt
 
         end function get_gammar_pitau_region2
 
@@ -367,7 +383,6 @@ module physics_material_iapws
             real(real64) :: h
 
         end function get_enthalpy_iapws_region2
-
     end interface
 
     interface
@@ -422,6 +437,120 @@ module physics_material_iapws
             real(real64), intent(in) :: tau
             real(real64) :: phi_dt
         end function get_phi_deltatau_region3
+    end interface
+
+    interface
+        module pure elemental function get_sat_pressure_region4(temperature) result(P_sat)
+            implicit none
+            real(real64), intent(in) :: temperature
+            real(real64) :: P_sat
+
+        end function get_sat_pressure_region4
+
+        module pure elemental function get_sat_temperature_region4(pressure) result(T_sat)
+            implicit none
+            real(real64), intent(in) :: pressure
+            real(real64) :: T_sat
+
+        end function get_sat_temperature_region4
+
+    end interface
+
+    interface
+        module pure elemental function get_gamma0_region5(pi, tau) result(gamma0)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gamma0
+
+        end function get_gamma0_region5
+
+        module pure elemental function get_gamma0_pi_region5(pi, tau) result(gamma0_p)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gamma0_p
+        end function get_gamma0_pi_region5
+
+        module pure elemental function get_gamma0_pipi_region5(pi, tau) result(gamma0_pp)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gamma0_pp
+
+        end function get_gamma0_pipi_region5
+
+        module pure elemental function get_gamma0_tau_region5(pi, tau) result(gamma0_t)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gamma0_t
+
+        end function get_gamma0_tau_region5
+
+        module pure elemental function get_gamma0_tautau_region5(pi, tau) result(gamma0_tt)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gamma0_tt
+
+        end function get_gamma0_tautau_region5
+
+        module pure elemental function get_gamma0_pitau_region5(pi, tau) result(gamma0_pt)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gamma0_pt
+
+        end function get_gamma0_pitau_region5
+
+        module pure elemental function get_gammar_region5(pi, tau) result(gammar)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gammar
+
+        end function get_gammar_region5
+
+        module pure elemental function get_gammar_pi_region5(pi, tau) result(gammar_p)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gammar_p
+
+        end function get_gammar_pi_region5
+
+        module pure elemental function get_gammar_pipi_region5(pi, tau) result(gammar_pp)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gammar_pp
+
+        end function get_gammar_pipi_region5
+
+        module pure elemental function get_gammar_tau_region5(pi, tau) result(gammar_t)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gammar_t
+
+        end function get_gammar_tau_region5
+
+        module pure elemental function get_gammar_tautau_region5(pi, tau) result(gammar_tt)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gammar_tt
+
+        end function get_gammar_tautau_region5
+
+        module pure elemental function get_gammar_pitau_region5(pi, tau) result(gammar_pt)
+            implicit none
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
+            real(real64) :: gammar_pt
+
+        end function get_gammar_pitau_region5
     end interface
 
 contains

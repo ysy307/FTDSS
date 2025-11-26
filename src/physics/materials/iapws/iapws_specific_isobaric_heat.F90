@@ -188,7 +188,7 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_tautau = get_gammar_tautau_region2(pi, tau) + get_gammao_tautau_region2(pi, tau)
+        gamma_tautau = get_gamma0_tautau_region2(pi, tau) + get_gammar_tautau_region2(pi, tau)
 
         ! specific_gas_constant_water is in [kJ/(kg K)], so multiply by 1000
         cp = -tau**2.0d0 * gamma_tautau * specific_gas_constant_water * 1000.0d0

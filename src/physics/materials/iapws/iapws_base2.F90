@@ -3,9 +3,9 @@ submodule(physics_material_iapws) iapws_base2
     !------------------------------------------------------------------------------------------
     ! Region2: Superheated Steam (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
-    integer(int32), parameter :: No2_terms = 9
-    real(real64), parameter :: Jo_r2(No2_terms) = [0.0d0, 1.0d0, -5.0d0, -4.0d0, -3.0d0, -2.0d0, -1.0d0, 2.0d0, 3.0d0]
-    real(real64), parameter :: no_r2(No2_terms) = &
+    integer(int32), parameter :: N02_terms = 9
+    real(real64), parameter :: J0_r2(N02_terms) = [0.0d0, 1.0d0, -5.0d0, -4.0d0, -3.0d0, -2.0d0, -1.0d0, 2.0d0, 3.0d0]
+    real(real64), parameter :: n0_r2(N02_terms) = &
                                [-0.96927686500217d1,   0.10086655968018d2, -0.56087911283020d-2, & !&
                                  0.71452738081455d-1, -0.40710498223928d0,  0.14240819171444d1, & !&
                                 -0.43839511319450d1,  -0.28408632460772d0,  0.21268463753307d-1]
@@ -67,107 +67,107 @@ submodule(physics_material_iapws) iapws_base2
                                                    -0.94369707241210d-06] !& 43
 
 contains
-    module pure elemental function get_gammao_region2(pi, tau) result(gammao)
+    module pure elemental function get_gamma0_region2(pi, tau) result(gamma0)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Resulting \(\gamma^o\) value
-        real(real64) :: gammao
+        real(real64) :: gamma0
 
         integer(int32) :: i
         real(real64) :: term
 
-        gammao = log(pi)
+        gamma0 = log(pi)
 
-        do i = 1, No2_terms
-            term = no_r2(i) * tau**Jo_r2(i)
-            gammao = gammao + term
+        do i = 1, N02_terms
+            term = n0_r2(i) * tau**J0_r2(i)
+            gamma0 = gamma0 + term
         end do
 
-    end function get_gammao_region2
+    end function get_gamma0_region2
 
-    module pure elemental function get_gammao_pi_region2(pi, tau) result(gammao_pi)
+    module pure elemental function get_gamma0_pi_region2(pi, tau) result(gamma0_p)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^o_{\pi}\)
-        real(real64) :: gammao_pi
+        real(real64) :: gamma0_p
 
-        gammao_pi = 1.0d0 / pi
+        gamma0_p = 1.0d0 / pi
 
-    end function get_gammao_pi_region2
+    end function get_gamma0_pi_region2
 
-    module pure elemental function get_gammao_pipi_region2(pi, tau) result(gammao_pipi)
+    module pure elemental function get_gamma0_pipi_region2(pi, tau) result(gamma0_pp)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^o_{\pi}\)
-        real(real64) :: gammao_pipi
+        real(real64) :: gamma0_pp
 
-        gammao_pipi = -1.0d0 / pi**2.0d0
+        gamma0_pp = -1.0d0 / pi**2.0d0
 
-    end function get_gammao_pipi_region2
+    end function get_gamma0_pipi_region2
 
-    module pure elemental function get_gammao_tau_region2(pi, tau) result(gammao_tau)
+    module pure elemental function get_gamma0_tau_region2(pi, tau) result(gamma0_t)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\pi}\)
-        real(real64) :: gammao_tau
+        real(real64) :: gamma0_t
 
         integer(int32) :: i
-        real(real64) :: term_tau
+        real(real64) :: term_t
 
-        gammao_tau = 0.0d0
+        gamma0_t = 0.0d0
 
-        do i = 1, No2_terms
-            term_tau = no_r2(i) * Jo_r2(i) * tau**(Jo_r2(i) - 1.0d0)
-            gammao_tau = gammao_tau + term_tau
+        do i = 1, N02_terms
+            term_t = n0_r2(i) * J0_r2(i) * tau**(J0_r2(i) - 1.0d0)
+            gamma0_t = gamma0_t + term_t
         end do
 
-    end function get_gammao_tau_region2
+    end function get_gamma0_tau_region2
 
-    module pure elemental function get_gammao_tautau_region2(pi, tau) result(gammao_tautau)
+    module pure elemental function get_gamma0_tautau_region2(pi, tau) result(gamma0_tt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\pi}\)
-        real(real64) :: gammao_tautau
+        real(real64) :: gamma0_tt
 
         integer(int32) :: i
-        real(real64) :: term_tau
+        real(real64) :: term_tt
 
-        gammao_tautau = 0.0d0
+        gamma0_tt = 0.0d0
 
-        do i = 1, No2_terms
-            term_tau = no_r2(i) * Jo_r2(i) * (Jo_r2(i) - 1.0d0) * tau**(Jo_r2(i) - 2.0d0)
-            gammao_tautau = gammao_tautau + term_tau
+        do i = 1, N02_terms
+            term_tt = n0_r2(i) * J0_r2(i) * (J0_r2(i) - 1.0d0) * tau**(J0_r2(i) - 2.0d0)
+            gamma0_tt = gamma0_tt + term_tt
         end do
 
-    end function get_gammao_tautau_region2
+    end function get_gamma0_tautau_region2
 
-    module pure elemental function get_gammao_pitau_region2(pi, tau) result(gammao_pitau)
+    module pure elemental function get_gamma0_pitau_region2(pi, tau) result(gamma0_pt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\pi}\)
-        real(real64) :: gammao_pitau
+        real(real64) :: gamma0_pt
 
-        gammao_pitau = 0.0d0
+        gamma0_pt = 0.0d0
 
-    end function get_gammao_pitau_region2
+    end function get_gamma0_pitau_region2
 
     module pure elemental function get_gammar_region2(pi, tau) result(gammar)
         implicit none
@@ -190,107 +190,107 @@ contains
 
     end function get_gammar_region2
 
-    module pure elemental function get_gammar_pi_region2(pi, tau) result(gammar_pi)
+    module pure elemental function get_gammar_pi_region2(pi, tau) result(gammar_p)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\pi}\)
-        real(real64) :: gammar_pi
+        real(real64) :: gammar_p
 
         integer(int32) :: i
-        real(real64) :: term_pi
+        real(real64) :: term_p
 
-        gammar_pi = 0.0d0
+        gammar_p = 0.0d0
 
         do i = 1, Nr2_terms
-            term_pi = nr_r2(i) * Ir_r2(i) * pi**(Ir_r2(i) - 1.0d0) * (tau - 0.5d0)**Jr_r2(i)
-            gammar_pi = gammar_pi + term_pi
+            term_p = nr_r2(i) * Ir_r2(i) * pi**(Ir_r2(i) - 1.0d0) * (tau - 0.5d0)**Jr_r2(i)
+            gammar_p = gammar_p + term_p
         end do
 
     end function get_gammar_pi_region2
 
-    module pure elemental function get_gammar_pipi_region2(pi, tau) result(gammar_pipi)
+    module pure elemental function get_gammar_pipi_region2(pi, tau) result(gammar_pp)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\pi\pi}\)
-        real(real64) :: gammar_pipi
+        real(real64) :: gammar_pp
 
         integer(int32) :: i
-        real(real64) :: term_pipi
+        real(real64) :: term_pp
 
-        gammar_pipi = 0.0d0
+        gammar_pp = 0.0d0
 
         do i = 1, Nr2_terms
-            term_pipi = nr_r2(i) * dble(Ir_r2(i)) * (dble(Ir_r2(i)) - 1) * pi**(Ir_r2(i) - 2) * (tau - 0.5d0)**Jr_r2(i)
-            gammar_pipi = gammar_pipi + term_pipi
+            term_pp = nr_r2(i) * dble(Ir_r2(i)) * (dble(Ir_r2(i)) - 1) * pi**(Ir_r2(i) - 2) * (tau - 0.5d0)**Jr_r2(i)
+            gammar_pp = gammar_pp + term_pp
         end do
 
     end function get_gammar_pipi_region2
 
-    module pure elemental function get_gammar_tau_region2(pi, tau) result(gammar_tau)
+    module pure elemental function get_gammar_tau_region2(pi, tau) result(gammar_t)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\tau}\)
-        real(real64) :: gammar_tau
+        real(real64) :: gammar_t
 
         integer(int32) :: i
-        real(real64) :: term_tau
+        real(real64) :: term_t
 
-        gammar_tau = 0.0d0
+        gammar_t = 0.0d0
 
         do i = 1, Nr2_terms
-            term_tau = nr_r2(i) * pi**Ir_r2(i) * Jr_r2(i) * (tau - 0.5d0)**(Jr_r2(i) - 1.0d0)
-            gammar_tau = gammar_tau + term_tau
+            term_t = nr_r2(i) * pi**Ir_r2(i) * Jr_r2(i) * (tau - 0.5d0)**(Jr_r2(i) - 1.0d0)
+            gammar_t = gammar_t + term_t
         end do
 
     end function get_gammar_tau_region2
 
-    module pure elemental function get_gammar_tautau_region2(pi, tau) result(gammar_tautau)
+    module pure elemental function get_gammar_tautau_region2(pi, tau) result(gammar_tt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\tau\tau}\)
-        real(real64) :: gammar_tautau
+        real(real64) :: gammar_tt
 
         integer(int32) :: i
-        real(real64) :: term_tautau
+        real(real64) :: term_tt
 
-        gammar_tautau = 0.0d0
+        gammar_tt = 0.0d0
 
         do i = 1, Nr2_terms
-            term_tautau = nr_r2(i) * pi**Ir_r2(i) * Jr_r2(i) * (Jr_r2(i) - 1.0d0) * (tau - 0.5d0)**(Jr_r2(i) - 2.0d0)
-            gammar_tautau = gammar_tautau + term_tautau
+            term_tt = nr_r2(i) * pi**Ir_r2(i) * Jr_r2(i) * (Jr_r2(i) - 1.0d0) * (tau - 0.5d0)**(Jr_r2(i) - 2.0d0)
+            gammar_tt = gammar_tt + term_tt
         end do
 
     end function get_gammar_tautau_region2
 
-    module pure elemental function get_gammar_pitau_region2(pi, tau) result(gammar_pitau)
+    module pure elemental function get_gammar_pitau_region2(pi, tau) result(gammar_pt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma^r_{\pi\tau}\)
-        real(real64) :: gammar_pitau
+        real(real64) :: gammar_pt
 
         integer(int32) :: i
-        real(real64) :: term_pitau
+        real(real64) :: term_pt
 
-        gammar_pitau = 0.0d0
+        gammar_pt = 0.0d0
 
         do i = 1, Nr2_terms
-            term_pitau = nr_r2(i) * Ir_r2(i) * pi**(Ir_r2(i) - 1.0d0) * Jr_r2(i) * (tau - 0.5d0)**(Jr_r2(i) - 1.0d0)
-            gammar_pitau = gammar_pitau + term_pitau
+            term_pt = nr_r2(i) * Ir_r2(i) * pi**(Ir_r2(i) - 1.0d0) * Jr_r2(i) * (tau - 0.5d0)**(Jr_r2(i) - 1.0d0)
+            gammar_pt = gammar_pt + term_pt
         end do
 
     end function get_gammar_pitau_region2
