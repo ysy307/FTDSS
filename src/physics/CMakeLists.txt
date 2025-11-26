@@ -14,6 +14,7 @@ set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/bases/iapws97_base5.F90
     materials/iapws/bases/iapws97_auxiliary.F90
     materials/iapws/properties/specific_volume.F90
+    materials/iapws/properties/pressure.F90
     materials/iapws/properties/specific_internal_energy.F90
     materials/iapws/properties/specific_entropy.F90
     materials/iapws/properties/specific_enthalpy.F90

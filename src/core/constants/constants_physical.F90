@@ -19,8 +19,8 @@ module core_constants_physical
     !------------------------------------------------------------------------------------------
     ! For water properties
     !------------------------------------------------------------------------------------------
-    !> The specific gas constant of ordinary water [kJ/kg/K]
-    real(real64), parameter, public :: specific_gas_constant_water = 0.461526d0
+    !> The specific gas constant of ordinary water [J/kg/K]
+    real(real64), parameter, public :: specific_gas_constant_water = 461.526d0
     !> Water triple point temperature [K]
     real(real64), parameter, public :: water_triple_point_temperature = 273.16d0
     !> Water triple point pressure [Pa]

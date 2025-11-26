@@ -26,7 +26,7 @@ contains
 
         pi_val = nb23(1) + theta * (nb23(2) + theta * nb23(3))
 
-        pressure = pi_val * p_starb23
+        pressure = pi_val * p_starb23 * 1.0d6 ! MPa -> Pa
 
     end function get_boundary_pressure_region23
 
@@ -35,7 +35,7 @@ contains
     !! IAPWS-IF97 式(6)に基づき、与えられた圧力に対する境界温度を返す。
     !! Equation: theta = n4 + sqrt((pi - n5) / n3)
     !!
-    !! pressure : 圧力 [MPa]
+    !! pressure : 圧力 [Pa]
     module pure elemental function get_boundary_temperature_region23(pressure) result(temperature)
         implicit none
         real(real64), intent(in) :: pressure
@@ -43,7 +43,7 @@ contains
 
         real(real64) :: pi_val, theta
 
-        pi_val = pressure / p_starb23
+        pi_val = pressure * 1.0d-6 / p_starb23
 
         theta = nb23(4) + sqrt(max(0.0d0, (pi_val - nb23(5)) / nb23(3)))
 

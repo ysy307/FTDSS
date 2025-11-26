@@ -6,39 +6,55 @@ module physics_material_iapws
     public :: get_boundary_pressure_region23
     public :: get_boundary_temperature_region23
     public :: get_nu_iapws97_region1
+    public :: get_nu_iapws97_region2
+    public :: get_p_iapws97_region3
     public :: get_u_iapws97_region1
+    public :: get_u_iapws97_region2
+    public :: get_u_iapws97_region3
     public :: get_s_iapws97_region1
+    public :: get_s_iapws97_region2
+    public :: get_s_iapws97_region3
     public :: get_h_iapws97_region1
+    public :: get_h_iapws97_region2
+    public :: get_h_iapws97_region3
     public :: get_cp_iapws97_region1
+    public :: get_cp_iapws97_region2
+    public :: get_cp_iapws97_region3
     public :: get_cv_iapws97_region1
+    public :: get_cv_iapws97_region2
+    public :: get_cv_iapws97_region3
     public :: get_w_iapws97_region1
+    public :: get_w_iapws97_region2
+    public :: get_w_iapws97_region3
+    public :: get_sat_pressure_region4
+    public :: get_sat_temperature_region4
 
     !------------------------------------------------------------------------------------------
     ! Reigon1: Saturated liquid water (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star1 = 1386.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star1 = 16.53d0 ! 基準圧力 [MPa]
+    real(real64), parameter :: p_star1 = 16.53d6 ! 基準圧力 [Pa]
     !------------------------------------------------------------------------------------------
     ! Reigon2: Superheated Steam (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star2 = 540.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star2 = 1.0d0 ! 基準圧力 [MPa]
+    real(real64), parameter :: p_star2 = 1.0d6 ! 基準圧力 [Pa]
     !------------------------------------------------------------------------------------------
     ! Reigon3: High Pressure Liquid Water and Steam (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star3 = water_critical_point_temperature ! 基準温度 [K]
-    real(real64), parameter :: p_star3 = water_critical_point_pressure * 10d-6 ! 基準圧力 [MPa]
+    real(real64), parameter :: p_star3 = water_critical_point_pressure ! 基準圧力 [Pa]
     real(real64), parameter :: rho_star3 = water_critical_point_density ! 基準密度 [kg/m^3]
     !------------------------------------------------------------------------------------------
     ! Reigon4: Saturation curve between liquid and vapor (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star4 = 1.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star4 = 1.0d0 ! 基準圧力 [MPa]
+    real(real64), parameter :: p_star4 = 1.0d6 ! 基準圧力 [Pa]
     !------------------------------------------------------------------------------------------
     ! Reigon5: High Temperature Steam (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star5 = 1000.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star5 = 10.0d0 ! 基準圧力 [MPa]
+    real(real64), parameter :: p_star5 = 10.0d6 ! 基準圧力 [Pa]
 
     interface
         module pure elemental function get_boundary_pressure_region23(temperature) result(pressure)
@@ -326,29 +342,40 @@ module physics_material_iapws
 
         end function get_gammar_pitau_region2
 
-        module pure elemental function get_density_iapws_region2(T_in, P_in) result(rho)
+        module pure elemental function get_nu_iapws97_region2(T_in, P_in) result(nu)
             implicit none
             !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Density [kg/m^3]
-            real(real64) :: rho
+            !> Specific volume [m^3/kg]
+            real(real64) :: nu
 
-        end function get_density_iapws_region2
+        end function get_nu_iapws97_region2
 
-        module pure elemental function get_cp_iapws_region2(T_in, P_in) result(cp)
+        module pure elemental function get_u_iapws97_region2(T_in, P_in) result(u)
             implicit none
             !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific heat capacity at constant pressure [J/(kg K)]
-            real(real64) :: cp
+            !> Specific internal energy [J/kg]
+            real(real64) :: u
 
-        end function get_cp_iapws_region2
+        end function get_u_iapws97_region2
 
-        module pure elemental function get_enthalpy_iapws_region2(T_in, P_in) result(h)
+        module pure elemental function get_s_iapws97_region2(T_in, P_in) result(s)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific entropy [J/kg-K]
+            real(real64) :: s
+
+        end function get_s_iapws97_region2
+
+        module pure elemental function get_h_iapws97_region2(T_in, P_in) result(h)
             implicit none
             !> Temperature [K]
             real(real64), intent(in) :: T_in
@@ -357,7 +384,41 @@ module physics_material_iapws
             !> Specific enthalpy [J/kg]
             real(real64) :: h
 
-        end function get_enthalpy_iapws_region2
+        end function get_h_iapws97_region2
+
+        module pure elemental function get_cp_iapws97_region2(T_in, P_in) result(cp)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific heat capacity at constant pressure [J/(kg K)]
+            real(real64) :: cp
+
+        end function get_cp_iapws97_region2
+
+        module pure elemental function get_cv_iapws97_region2(T_in, P_in) result(cv)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific heat capacity at constant volume [J/(kg K)]
+            real(real64) :: cv
+
+        end function get_cv_iapws97_region2
+
+        module pure elemental function get_w_iapws97_region2(T_in, P_in) result(w)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Speed of sound [m/s]
+            real(real64) :: w
+
+        end function get_w_iapws97_region2
+
     end interface
 
     interface
@@ -412,6 +473,83 @@ module physics_material_iapws
             real(real64), intent(in) :: tau
             real(real64) :: phi_dt
         end function get_phi_deltatau_region3
+
+        module pure elemental function get_p_iapws97_region3(T_in, rho_in) result(p)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Density [kg/m^3]
+            real(real64), intent(in) :: rho_in
+            !> Pressure [Pa]
+            real(real64) :: p
+
+        end function get_p_iapws97_region3
+
+        module pure elemental function get_u_iapws97_region3(T_in, rho_in) result(u)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Density [kg/m^3]
+            real(real64), intent(in) :: rho_in
+            !> Specific internal energy [J/kg]
+            real(real64) :: u
+
+        end function get_u_iapws97_region3
+
+        module pure elemental function get_s_iapws97_region3(T_in, rho_in) result(s)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Density [kg/m^3]
+            real(real64), intent(in) :: rho_in
+            !> Specific entropy [J/kg-K]
+            real(real64) :: s
+
+        end function get_s_iapws97_region3
+
+        module pure elemental function get_h_iapws97_region3(T_in, rho_in) result(h)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Density [kg/m^3]
+            real(real64), intent(in) :: rho_in
+            !> Specific enthalpy [J/kg]
+            real(real64) :: h
+
+        end function get_h_iapws97_region3
+
+        module pure elemental function get_cp_iapws97_region3(T_in, rho_in) result(cp)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Density [kg/m^3]
+            real(real64), intent(in) :: rho_in
+            !> Specific heat capacity at constant pressure [J/kg-K]
+            real(real64) :: cp
+
+        end function get_cp_iapws97_region3
+
+        module pure elemental function get_cv_iapws97_region3(T_in, rho_in) result(cv)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Density [kg/m^3]
+            real(real64), intent(in) :: rho_in
+            !> Specific heat capacity at constant volume [J/kg-K]
+            real(real64) :: cv
+
+        end function get_cv_iapws97_region3
+
+        module pure elemental function get_w_iapws97_region3(T_in, rho_in) result(w)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Density [kg/m^3]
+            real(real64), intent(in) :: rho_in
+            !> Specific speed of sound [m/s]
+            real(real64) :: w
+
+        end function get_w_iapws97_region3
     end interface
 
     interface
@@ -428,7 +566,6 @@ module physics_material_iapws
             real(real64) :: T_sat
 
         end function get_sat_temperature_region4
-
     end interface
 
     interface
