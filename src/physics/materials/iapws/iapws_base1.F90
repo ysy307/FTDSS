@@ -1,20 +1,20 @@
 submodule(physics_material_iapws) iapws_base1
     implicit none
     !------------------------------------------------------------------------------------------
-    ! Reigon1: Saturated liquid water (IAPWS-IF97)
+    ! Region1: Saturated liquid water (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
     integer(int32), parameter :: N1_terms = 34
-    real(real64), parameter :: I1(N1_terms) = [ & !&
+    real(real64), parameter :: I_r1(N1_terms) = [ & !&
                                 0.0d0,  0.0d0,  0.0d0,  0.0d0, 0.0d0, 0.0d0, 0.0d0, 0.0d0,  1.0d0,  1.0d0, & !&
                                 1.0d0,  1.0d0,  1.0d0,  1.0d0, 2.0d0, 2.0d0, 2.0d0, 2.0d0,  2.0d0,  3.0d0, & !&
                                 3.0d0,  3.0d0,  4.0d0,  4.0d0, 4.0d0, 5.0d0, 8.0d0, 8.0d0, 21.0d0, 23.0d0, & !&
                                29.0d0, 30.0d0, 31.0d0, 32.0d0]
-    real(real64), parameter :: J1(N1_terms) = [ & !&
+    real(real64), parameter :: J_r1(N1_terms) = [ & !&
                                 -2.0d0,  -1.0d0,   0.0d0,   1.0d0,  2.0d0,  3.0d0,   4.0d0,  5.0d0,  -9.0d0,  -7.0d0, & !&
                                 -1.0d0,   0.0d0,   1.0d0,   3.0d0, -3.0d0,  0.0d0,   1.0d0,  3.0d0,  17.0d0,  -4.0d0, & !&
                                  0.0d0,   6.0d0,  -5.0d0,  -2.0d0, 10.0d0, -8.0d0, -11.0d0, -6.0d0, -29.0d0, -31.0d0, & !&
                                -38.0d0, -39.0d0, -40.0d0, -41.0d0]
-    real(real64), parameter :: n1(N1_terms) = [ & !&
+    real(real64), parameter :: n_r1(N1_terms) = [ & !&
                                  0.14632971213167d0,   -0.84548187169114d0,   -0.37563603672040d1, & !&
                                  0.33855169168385d1,   -0.95791963387872d0,    0.15772038513228d0, & !&
                                 -0.16616417199501d-1,   0.81214629983568d-3,   0.28319080123804d-3, & !&
@@ -46,7 +46,7 @@ contains
         gamma = 0.0d0
 
         do i = 1, N1_terms
-            term = n1(i) * (7.1d0 - pi)**I1(i) * (tau - 1.222d0)**J1(i)
+            term = n_r1(i) * (7.1d0 - pi)**I_r1(i) * (tau - 1.222d0)**J_r1(i)
             gamma = gamma + term
         end do
 
@@ -69,7 +69,7 @@ contains
         gamma_pi = 0.0d0
 
         do i = 1, N1_terms
-            term_pi = -n1(i) * I1(i) * (7.1d0 - pi)**(I1(i) - 1) * (tau - 1.222d0)**J1(i)
+            term_pi = -n_r1(i) * I_r1(i) * (7.1d0 - pi)**(I_r1(i) - 1) * (tau - 1.222d0)**J_r1(i)
             gamma_pi = gamma_pi + term_pi
         end do
 
@@ -92,7 +92,7 @@ contains
         gamma_tau = 0.0d0
 
         do i = 1, N1_terms
-            term_tau = n1(i) * (7.1d0 - pi)**I1(i) * J1(i) * (tau - 1.222d0)**(J1(i) - 1.0d0)
+            term_tau = n_r1(i) * (7.1d0 - pi)**I_r1(i) * J_r1(i) * (tau - 1.222d0)**(J_r1(i) - 1.0d0)
             gamma_tau = gamma_tau + term_tau
         end do
 
@@ -115,7 +115,7 @@ contains
         gamma_pipi = 0.0d0
 
         do i = 1, N1_terms
-            term_pipi = n1(i) * I1(i) * (I1(i) - 1.0d0) * (7.1d0 - pi)**(I1(i) - 2.0d0) * (tau - 1.222d0)**J1(i)
+            term_pipi = n_r1(i) * I_r1(i) * (I_r1(i) - 1.0d0) * (7.1d0 - pi)**(I_r1(i) - 2.0d0) * (tau - 1.222d0)**J_r1(i)
             gamma_pipi = gamma_pipi + term_pipi
         end do
 
@@ -138,7 +138,7 @@ contains
         gamma_tautau = 0.0d0
 
         do i = 1, N1_terms
-            term_tautau = n1(i) * (7.1d0 - pi)**I1(i) * J1(i) * (J1(i) - 1.0d0) * (tau - 1.222d0)**(J1(i) - 2.0d0)
+            term_tautau = n_r1(i) * (7.1d0 - pi)**I_r1(i) * J_r1(i) * (J_r1(i) - 1.0d0) * (tau - 1.222d0)**(J_r1(i) - 2.0d0)
             gamma_tautau = gamma_tautau + term_tautau
         end do
 
@@ -161,7 +161,7 @@ contains
         gamma_pitau = 0.0d0
 
         do i = 1, N1_terms
-            term_pitau = -n1(i) * I1(i) * (7.1d0 - pi)**(I1(i) - 1.0d0) * J1(i) * (tau - 1.222d0)**(J1(i) - 1.0d0)
+            term_pitau = -n_r1(i) * I_r1(i) * (7.1d0 - pi)**(I_r1(i) - 1.0d0) * J_r1(i) * (tau - 1.222d0)**(J_r1(i) - 1.0d0)
             gamma_pitau = gamma_pitau + term_pitau
         end do
 
@@ -182,8 +182,8 @@ contains
 
         val = 0.0d0
         do i = 1, N1_terms
-            val = val + n1(i) * I1(i) * (I1(i) - 1.0d0) * (7.1d0 - pi)**(I1(i) - 2.0d0) &
-                  * J1(i) * (tau - 1.222d0)**(J1(i) - 1.0d0)
+            val = val + n_r1(i) * I_r1(i) * (I_r1(i) - 1.0d0) * (7.1d0 - pi)**(I_r1(i) - 2.0d0) &
+                  * J_r1(i) * (tau - 1.222d0)**(J_r1(i) - 1.0d0)
         end do
     end function get_gamma_pipi_tau_region1
 
@@ -202,8 +202,8 @@ contains
 
         val = 0.0d0
         do i = 1, N1_terms
-            val = val - n1(i) * I1(i) * (7.1d0 - pi)**(I1(i) - 1.0d0) &
-                  * J1(i) * (J1(i) - 1.0d0) * (tau - 1.222d0)**(J1(i) - 2.0d0)
+            val = val - n_r1(i) * I_r1(i) * (7.1d0 - pi)**(I_r1(i) - 1.0d0) &
+                  * J_r1(i) * (J_r1(i) - 1.0d0) * (tau - 1.222d0)**(J_r1(i) - 2.0d0)
         end do
     end function get_gamma_pi_tautau_region1
 
@@ -222,8 +222,8 @@ contains
 
         val = 0.0d0
         do i = 1, N1_terms
-            val = val + n1(i) * (7.1d0 - pi)**I1(i) &
-                  * J1(i) * (J1(i) - 1.0d0) * (J1(i) - 2.0d0) * (tau - 1.222d0)**(J1(i) - 3.0d0)
+            val = val + n_r1(i) * (7.1d0 - pi)**I_r1(i) &
+                  * J_r1(i) * (J_r1(i) - 1.0d0) * (J_r1(i) - 2.0d0) * (tau - 1.222d0)**(J_r1(i) - 3.0d0)
         end do
     end function get_gamma_tautau_tau_region1
 end submodule iapws_base1

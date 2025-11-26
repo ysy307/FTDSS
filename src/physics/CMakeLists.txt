@@ -9,6 +9,8 @@ set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/iapws_interface.F90
     materials/iapws/iapws_base1.F90
     materials/iapws/iapws_base2.F90
+    materials/iapws/iapws_base3.F90
+    materials/iapws/iapws_auxiliary.F90
     materials/iapws/iapws_density.F90
     materials/iapws/iapws_enthalpy.F90
     materials/iapws/iapws_specific_isobaric_heat.F90

@@ -16,6 +16,22 @@ module physics_material_iapws
     real(real64), parameter :: p_star2 = 1.0d0 ! 基準圧力 [MPa]
 
     interface
+        module pure elemental function get_boundary_pressure_region23(temperature) result(pressure)
+            implicit none
+            real(real64), intent(in) :: temperature
+            real(real64) :: pressure
+
+        end function get_boundary_pressure_region23
+
+        module pure elemental function get_boundary_temperature_region23(pressure) result(temperature)
+            implicit none
+            real(real64), intent(in) :: pressure
+            real(real64) :: temperature
+
+        end function get_boundary_temperature_region23
+    end interface
+
+    interface
         !> Calculate the dimensionless Gibbs free energy \(\gamma\) for Region 1.
         !> Formula: \(\gamma = \sum n_i (7.1 - \pi)^{I_i} (\tau - 1.222)^{J_i}\)
         module pure elemental function get_gamma_region1(pi, tau) result(gamma)
@@ -352,6 +368,60 @@ module physics_material_iapws
 
         end function get_enthalpy_iapws_region2
 
+    end interface
+
+    interface
+        !> Calculate the dimensionless Helmholtz free energy \(\phi\) for Region 3.
+        !> Formula: \(\phi = n_1 \ln \delta + \sum n_i \delta^{I_i} \tau^{J_i}\)
+        module pure elemental function get_phi_region3(delta, tau) result(phi)
+            implicit none
+            !> Dimensionless density \(\delta = \rho / \rho^*\)
+            real(real64), intent(in) :: delta
+            !> Inverse dimensionless temperature \(\tau = T^* / T\)
+            real(real64), intent(in) :: tau
+            !> Resulting \(\phi\) value
+            real(real64) :: phi
+        end function get_phi_region3
+
+        !> First derivative w.r.t. \(\delta\): \(\phi_{\delta} = (\partial \phi / \partial \delta)_{\tau}\)
+        module pure elemental function get_phi_delta_region3(delta, tau) result(phi_d)
+            implicit none
+            real(real64), intent(in) :: delta
+            real(real64), intent(in) :: tau
+            real(real64) :: phi_d
+        end function get_phi_delta_region3
+
+        !> Second derivative w.r.t. \(\delta\): \(\phi_{\delta\delta} = (\partial^2 \phi / \partial \delta^2)_{\tau}\)
+        module pure elemental function get_phi_deltadelta_region3(delta, tau) result(phi_dd)
+            implicit none
+            real(real64), intent(in) :: delta
+            real(real64), intent(in) :: tau
+            real(real64) :: phi_dd
+        end function get_phi_deltadelta_region3
+
+        !> First derivative w.r.t. \(\tau\): \(\phi_{\tau} = (\partial \phi / \partial \tau)_{\delta}\)
+        module pure elemental function get_phi_tau_region3(delta, tau) result(phi_t)
+            implicit none
+            real(real64), intent(in) :: delta
+            real(real64), intent(in) :: tau
+            real(real64) :: phi_t
+        end function get_phi_tau_region3
+
+        !> Second derivative w.r.t. \(\tau\): \(\phi_{\tau\tau} = (\partial^2 \phi / \partial \tau^2)_{\delta}\)
+        module pure elemental function get_phi_tautau_region3(delta, tau) result(phi_tt)
+            implicit none
+            real(real64), intent(in) :: delta
+            real(real64), intent(in) :: tau
+            real(real64) :: phi_tt
+        end function get_phi_tautau_region3
+
+        !> Mixed derivative: \(\phi_{\delta\tau} = \partial^2 \phi / (\partial \delta \partial \tau)\)
+        module pure elemental function get_phi_deltatau_region3(delta, tau) result(phi_dt)
+            implicit none
+            real(real64), intent(in) :: delta
+            real(real64), intent(in) :: tau
+            real(real64) :: phi_dt
+        end function get_phi_deltatau_region3
     end interface
 
 contains
