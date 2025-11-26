@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws_auxiliary
+submodule(physics_material_iapws) iapws97_auxiliary
     implicit none
     real(real64), parameter :: T_starb23 = 1.0d0 ! K
     real(real64), parameter :: p_starb23 = 1.0d0 ! MPa
@@ -50,4 +50,4 @@ contains
         temperature = theta * T_starb23
 
     end function get_boundary_temperature_region23
-end submodule iapws_auxiliary
+end submodule iapws97_auxiliary

@@ -6,7 +6,7 @@ contains
     !> Calculate the specific isobaric heat capacity (Cp) for liquid water (Region 1).
     !> Valid range: \( 273.15 \text{ K} \le T \le 623.15 \text{ K} \), \( P_s(T) \le P \le 100 \text{ MPa} \).
     !> Formula: \( C_p = R \left[ -\tau^2 \gamma_{\tau\tau} + \frac{(\gamma_{\tau} - \tau \gamma_{\pi\tau})^2}{\gamma_{\pi}} \right] \)
-    module pure elemental function get_cp_iapws_region1(T_in, P_in) result(cp)
+    module pure elemental function get_cp_iapws97_region1(T_in, P_in) result(cp)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -16,7 +16,7 @@ contains
         real(real64) :: cp
 
         real(real64) :: pi, tau
-        real(real64) :: gamma_tautau
+        real(real64) :: gamma_tt
         ! ==========================================================
         ! Dimensionless variables
         ! ==========================================================
@@ -26,15 +26,15 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_tautau = get_gamma_tautau_region1(pi, tau)
+        gamma_tt = get_gamma_tautau_region1(pi, tau)
 
         ! ==========================================================
         ! Convert to physical units [J/(kg K)]
         ! ==========================================================
         ! specific_gas_constant_water is in [kJ/(kg K)], so multiply by 1000
-        cp = -tau**2.0d0 * gamma_tautau * specific_gas_constant_water * 1000.0d0
+        cp = -tau**2.0d0 * gamma_tt * specific_gas_constant_water * 1000.0d0
 
-    end function get_cp_iapws_region1
+    end function get_cp_iapws97_region1
 
     ! !> Calculate the derivative of Cp with respect to temperature at constant pressure.
     ! !> Computes \( \left(\frac{\partial C_p}{\partial T}\right)_P \).

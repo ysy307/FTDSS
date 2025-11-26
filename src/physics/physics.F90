@@ -1,6 +1,7 @@
-module module_properties
+module module_physics
     ! use :: physics_registry, only:type_physics_registry
     ! use :: physics_service, only:type_properties_manager, type_phase_property
+    use :: module_iapws
     implicit none
     ! private
 
@@ -8,4 +9,4 @@ module module_properties
     ! public :: type_properties_manager
     ! public :: type_phase_property
 
-end module module_properties
+end module module_physics

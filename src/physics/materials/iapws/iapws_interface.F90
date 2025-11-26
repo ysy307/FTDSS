@@ -3,6 +3,15 @@ module physics_material_iapws
     use :: module_core
     implicit none
     private
+    public :: get_boundary_pressure_region23
+    public :: get_boundary_temperature_region23
+    public :: get_nu_iapws97_region1
+    public :: get_u_iapws97_region1
+    public :: get_s_iapws97_region1
+    public :: get_h_iapws97_region1
+    public :: get_cp_iapws97_region1
+    public :: get_cv_iapws97_region1
+    public :: get_w_iapws97_region1
 
     !------------------------------------------------------------------------------------------
     ! Reigon1: Saturated liquid water (IAPWS-IF97)
@@ -133,19 +142,52 @@ module physics_material_iapws
             real(real64) :: nu
         end function get_nu_iapws97_region1
 
-        module pure elemental function get_cp_iapws_region1(T_in, P_in) result(cp)
+        module pure elemental function get_u_iapws97_region1(T_in, P_in) result(u)
             implicit none
             real(real64), intent(in) :: T_in
             real(real64), intent(in) :: P_in
-            real(real64) :: cp
-        end function get_cp_iapws_region1
+            real(real64) :: u
 
-        module pure elemental function get_specific_enthalpy_iapws97_region1(T_in, P_in) result(h)
+        end function get_u_iapws97_region1
+
+        module pure elemental function get_s_iapws97_region1(T_in, P_in) result(s)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: s
+
+        end function get_s_iapws97_region1
+
+        module pure elemental function get_h_iapws97_region1(T_in, P_in) result(h)
             implicit none
             real(real64), intent(in) :: T_in
             real(real64), intent(in) :: P_in
             real(real64) :: h
-        end function get_specific_enthalpy_iapws97_region1
+        end function get_h_iapws97_region1
+
+        module pure elemental function get_cp_iapws97_region1(T_in, P_in) result(cp)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: cp
+        end function get_cp_iapws97_region1
+
+        module pure elemental function get_cv_iapws97_region1(T_in, P_in) result(cv)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: cv
+
+        end function get_cv_iapws97_region1
+
+        module pure elemental function get_w_iapws97_region1(T_in, P_in) result(w)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: w
+
+        end function get_w_iapws97_region1
+
     end interface
 
     interface

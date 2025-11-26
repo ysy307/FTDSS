@@ -24,6 +24,14 @@ elseif(TEST_NAME STREQUAL "linalg")
         Solver::Linalg
     )
     add_test(NAME test_linalg COMMAND $<TARGET_FILE:test_linalg>)
+elseif(TEST_NAME STREQUAL "physics")
+    add_executable(test_physics test_physics.F90)
+    set_target_properties(test_physics PROPERTIES LINKER_LANGUAGE Fortran)
+    target_link_libraries(test_physics PRIVATE
+        Solver::Core
+        Solver::Physics
+    )
+    add_test(NAME test_physics COMMAND $<TARGET_FILE:test_physics>)
 elseif(TEST_NAME STREQUAL "solver")
     add_executable(test_solver test_solver.F90)
     set_target_properties(test_solver PROPERTIES LINKER_LANGUAGE Fortran)
