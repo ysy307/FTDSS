@@ -1,9 +1,9 @@
-submodule(physics_material_iapws) iapws_enthalpy
+submodule(physics_material_iapws) iapws_specific_enthalpy
     implicit none
 contains
     !> Calculate the specific enthalpy of liquid water (Region 1).
     !> Valid range: \( 273.15 \text{ K} \le T \le 623.15 \text{ K} \), \( P_s(T) \le P \le 100 \text{ MPa} \).
-    module pure elemental function get_enthalpy_iapws_region1(T_in, P_in) result(h)
+    module pure elemental function get_specific_enthalpy_iapws97_region1(T_in, P_in) result(h)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -28,7 +28,7 @@ contains
         ! ==========================================================
         h = specific_gas_constant_water * T_in * tau * gamma_tau * 1000.0d0
 
-    end function get_enthalpy_iapws_region1
+    end function get_specific_enthalpy_iapws97_region1
 
     module pure elemental function get_enthalpy_iapws_region2(T_in, P_in) result(h)
         implicit none
@@ -57,4 +57,4 @@ contains
 
     end function get_enthalpy_iapws_region2
 
-end submodule iapws_enthalpy
+end submodule iapws_specific_enthalpy

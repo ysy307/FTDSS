@@ -126,65 +126,12 @@ module physics_material_iapws
 
         end function get_gamma_pitau_region1
 
-        !> Calculate the third derivative \(\gamma_{\pi\pi\tau}\).
-        !> Computes \(\frac{\partial^3 \gamma}{\partial \pi^2 \partial \tau}\).
-        module pure elemental function get_gamma_pipi_tau_region1(pi, tau) result(val)
-            implicit none
-            !> Dimensionless pressure \(\pi\)
-            real(real64), intent(in) :: pi
-            !> Dimensionless temperature \(\tau\)
-            real(real64), intent(in) :: tau
-            !> Derivative \(\gamma_{\pi\pi\tau}\)
-            real(real64) :: val
-
-        end function get_gamma_pipi_tau_region1
-
-        !> Calculate the third derivative \(\gamma_{\pi\tau\tau}\).
-        !> Computes \(\frac{\partial^3 \gamma}{\partial \pi \partial \tau^2}\).
-        module pure elemental function get_gamma_pi_tautau_region1(pi, tau) result(val)
-            implicit none
-            !> Dimensionless pressure \(\pi\)
-            real(real64), intent(in) :: pi
-            !> Dimensionless temperature \(\tau\)
-            real(real64), intent(in) :: tau
-            !> Derivative \(\gamma_{\pi\tau\tau}\)
-            real(real64) :: val
-
-        end function get_gamma_pi_tautau_region1
-
-        !> Calculate the third derivative \(\gamma_{\tau\tau\tau}\).
-        !> Computes \(\frac{\partial^3 \gamma}{\partial \tau^3}\).
-        module pure elemental function get_gamma_tautau_tau_region1(pi, tau) result(val)
-            implicit none
-            !> Dimensionless pressure \(\pi\)
-            real(real64), intent(in) :: pi
-            !> Dimensionless temperature \(\tau\)
-            real(real64), intent(in) :: tau
-            !> Derivative \(\gamma_{\tau\tau\tau}\)
-            real(real64) :: val
-
-        end function get_gamma_tautau_tau_region1
-
-        module pure elemental function get_density_iapws_region1(T_in, P_in) result(rho)
+        module pure elemental function get_nu_iapws97_region1(T_in, P_in) result(nu)
             implicit none
             real(real64), intent(in) :: T_in
             real(real64), intent(in) :: P_in
-            real(real64) :: rho
-        end function get_density_iapws_region1
-
-        module pure elemental function get_drho_dt_iapws_region1(T_in, P_in) result(drho_dt)
-            implicit none
-            real(real64), intent(in) :: T_in
-            real(real64), intent(in) :: P_in
-            real(real64) :: drho_dt
-        end function get_drho_dt_iapws_region1
-
-        module pure elemental function get_drho_dp_iapws_region1(T_in, P_in) result(drho_dp)
-            implicit none
-            real(real64), intent(in) :: T_in
-            real(real64), intent(in) :: P_in
-            real(real64) :: drho_dp
-        end function get_drho_dp_iapws_region1
+            real(real64) :: nu
+        end function get_nu_iapws97_region1
 
         module pure elemental function get_cp_iapws_region1(T_in, P_in) result(cp)
             implicit none
@@ -193,26 +140,12 @@ module physics_material_iapws
             real(real64) :: cp
         end function get_cp_iapws_region1
 
-        module pure elemental function get_dcp_dt_iapws_region1(T_in, P_in) result(dcp_dt)
-            implicit none
-            real(real64), intent(in) :: T_in
-            real(real64), intent(in) :: P_in
-            real(real64) :: dcp_dt
-        end function get_dcp_dt_iapws_region1
-
-        module pure elemental function get_dcp_dp_iapws_region1(T_in, P_in) result(dcp_dp)
-            implicit none
-            real(real64), intent(in) :: T_in
-            real(real64), intent(in) :: P_in
-            real(real64) :: dcp_dp
-        end function get_dcp_dp_iapws_region1
-
-        module pure elemental function get_enthalpy_iapws_region1(T_in, P_in) result(h)
+        module pure elemental function get_specific_enthalpy_iapws97_region1(T_in, P_in) result(h)
             implicit none
             real(real64), intent(in) :: T_in
             real(real64), intent(in) :: P_in
             real(real64) :: h
-        end function get_enthalpy_iapws_region1
+        end function get_specific_enthalpy_iapws97_region1
     end interface
 
     interface
