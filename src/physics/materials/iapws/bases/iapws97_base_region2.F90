@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_base2
+submodule(physics_material_iapws) iapws97_base_region2
     implicit none
     !------------------------------------------------------------------------------------------
     ! Region2: Superheated Steam (IAPWS-IF97)
@@ -295,4 +295,4 @@ contains
 
     end function calc_gammar_pitau_region2
 
-end submodule iapws97_base2
+end submodule iapws97_base_region2

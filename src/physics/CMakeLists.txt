@@ -7,11 +7,11 @@
 # --- IAPWS-IF97/IAPWS-06 Properties ---
 set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/iapws_interface.F90
-    materials/iapws/bases/iapws97_base1.F90
-    materials/iapws/bases/iapws97_base2.F90
-    materials/iapws/bases/iapws97_base3.F90
-    materials/iapws/bases/iapws97_base4.F90
-    materials/iapws/bases/iapws97_base5.F90
+    materials/iapws/bases/iapws97_base_region1.F90
+    materials/iapws/bases/iapws97_base_region2.F90
+    materials/iapws/bases/iapws97_base_region3.F90
+    materials/iapws/bases/iapws97_base_region4.F90
+    materials/iapws/bases/iapws97_base_region5.F90
     materials/iapws/bases/iapws97_auxiliary.F90
     materials/iapws/properties/specific_volume.F90
     materials/iapws/properties/pressure.F90

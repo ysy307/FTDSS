@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_region3
+submodule(physics_material_iapws) iapws97_base_region3
     implicit none
     !------------------------------------------------------------------------------------------
     ! Region3: High Pressure Liquid Water and Steam (IAPWS-IF97)
@@ -164,4 +164,4 @@ contains
         end do
     end function calc_phi_deltatau_region3
 
-end submodule iapws97_region3
+end submodule iapws97_base_region3

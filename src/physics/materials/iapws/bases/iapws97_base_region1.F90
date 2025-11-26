@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_base1
+submodule(physics_material_iapws) iapws97_base_region1
     implicit none
     !------------------------------------------------------------------------------------------
     ! Region1: Saturated liquid water (IAPWS-IF97)
@@ -226,4 +226,4 @@ contains
     !               * J_r1(i) * (J_r1(i) - 1.0d0) * (J_r1(i) - 2.0d0) * (tau - 1.222d0)**(J_r1(i) - 3.0d0)
     !     end do
     ! end function calc_gamma_tautau_tau_region1
-end submodule iapws97_base1
+end submodule iapws97_base_region1

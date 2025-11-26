@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_region5
+submodule(physics_material_iapws) iapws97_base_region5
     implicit none
     !------------------------------------------------------------------------------------------
     ! Region5: High temperature region (IAPWS-IF97)
@@ -181,4 +181,4 @@ contains
         end do
     end function calc_gammar_pitau_region5
 
-end submodule iapws97_region5
+end submodule iapws97_base_region5
