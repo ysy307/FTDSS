@@ -1,7 +1,7 @@
 submodule(physics_material_iapws) iapws_sound_speed
     implicit none
 contains
-    module pure elemental function get_w_iapws97_region1(T_in, P_in) result(w)
+    module pure elemental function calc_w_iapws97_region1(T_in, P_in) result(w)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -24,10 +24,10 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_p = get_gamma_pi_region1(pi, tau)
-        gamma_tt = get_gamma_tautau_region1(pi, tau)
-        gamma_pp = get_gamma_pipi_region1(pi, tau)
-        gamma_pt = get_gamma_pitau_region1(pi, tau)
+        gamma_p = calc_gamma_pi_region1(pi, tau)
+        gamma_tt = calc_gamma_tautau_region1(pi, tau)
+        gamma_pp = calc_gamma_pipi_region1(pi, tau)
+        gamma_pt = calc_gamma_pitau_region1(pi, tau)
 
         numerator = gamma_p**2
 
@@ -41,9 +41,9 @@ contains
         ! R is typically in kJ/(kg K), so multiply by 1000 to get J/(kg K) = m^2/s^2
         w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
 
-    end function get_w_iapws97_region1
+    end function calc_w_iapws97_region1
 
-    module pure elemental function get_w_iapws97_region2(T_in, P_in) result(w)
+    module pure elemental function calc_w_iapws97_region2(T_in, P_in) result(w)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -70,13 +70,13 @@ contains
         ! ==========================================================
 
         ! Residual part derivatives
-        gammar_p = get_gammar_pi_region2(pi, tau)
-        gammar_pp = get_gammar_pipi_region2(pi, tau)
-        gammar_pt = get_gammar_pitau_region2(pi, tau)
-        gammar_tt = get_gammar_tautau_region2(pi, tau)
+        gammar_p = calc_gammar_pi_region2(pi, tau)
+        gammar_pp = calc_gammar_pipi_region2(pi, tau)
+        gammar_pt = calc_gammar_pitau_region2(pi, tau)
+        gammar_tt = calc_gammar_tautau_region2(pi, tau)
 
         ! Ideal gas part derivative (only gamma0_tautau is needed for the denominator)
-        gamma0_tt = get_gamma0_tautau_region2(pi, tau)
+        gamma0_tt = calc_gamma0_tautau_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate Speed of Sound using explicit Region 2 formula
@@ -101,9 +101,9 @@ contains
         ! R is in [kJ/(kg K)], so *1000 to get [J/(kg K)] = [m^2/s^2]
         w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
 
-    end function get_w_iapws97_region2
+    end function calc_w_iapws97_region2
 
-    module pure elemental function get_w_iapws97_region3(T_in, rho_in) result(w)
+    module pure elemental function calc_w_iapws97_region3(T_in, rho_in) result(w)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -125,11 +125,11 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        phi_d = get_phi_delta_region3(delta, tau)
-        phi_dd = get_phi_deltadelta_region3(delta, tau)
+        phi_d = calc_phi_delta_region3(delta, tau)
+        phi_dd = calc_phi_deltadelta_region3(delta, tau)
         ! 修正: 混合偏微分 phi_deltatau を取得 (元コードは phi_tautau でした)
-        phi_gt = get_phi_deltatau_region3(delta, tau)
-        phi_tt = get_phi_tautau_region3(delta, tau)
+        phi_gt = calc_phi_deltatau_region3(delta, tau)
+        phi_tt = calc_phi_tautau_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Speed of Sound [m/s]
@@ -143,9 +143,9 @@ contains
         ! Ensure the argument for sqrt is non-negative
         w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
 
-    end function get_w_iapws97_region3
+    end function calc_w_iapws97_region3
 
-    module pure elemental function get_w_iapws97_region5(T_in, P_in) result(w)
+    module pure elemental function calc_w_iapws97_region5(T_in, P_in) result(w)
         implicit none
         real(real64), intent(in) :: T_in
         real(real64), intent(in) :: P_in
@@ -169,13 +169,13 @@ contains
         ! ==========================================================
 
         ! Residual part derivatives
-        gammar_p = get_gammar_pi_region5(pi, tau)
-        gammar_pp = get_gammar_pipi_region5(pi, tau)
-        gammar_pt = get_gammar_pitau_region5(pi, tau)
-        gammar_tt = get_gammar_tautau_region5(pi, tau)
+        gammar_p = calc_gammar_pi_region5(pi, tau)
+        gammar_pp = calc_gammar_pipi_region5(pi, tau)
+        gammar_pt = calc_gammar_pitau_region5(pi, tau)
+        gammar_tt = calc_gammar_tautau_region5(pi, tau)
 
         ! Ideal gas part derivative (only gamma0_tautau is needed)
-        gamma0_tt = get_gamma0_tautau_region5(pi, tau)
+        gamma0_tt = calc_gamma0_tautau_region5(pi, tau)
 
         ! ==========================================================
         ! Calculate Speed of Sound using explicit formula (Eq. 16 style)
@@ -200,5 +200,5 @@ contains
         ! Convert to dimensions [m/s]
         w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
 
-    end function get_w_iapws97_region5
+    end function calc_w_iapws97_region5
 end submodule iapws_sound_speed

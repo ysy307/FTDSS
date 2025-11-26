@@ -3,7 +3,7 @@ submodule(physics_material_iapws) iapws_specific_enthalpy
 contains
     !> Calculate the specific enthalpy of liquid water (Region 1).
     !> Valid range: \( 273.15 \text{ K} \le T \le 623.15 \text{ K} \), \( P_s(T) \le P \le 100 \text{ MPa} \).
-    module pure elemental function get_h_iapws97_region1(T_in, P_in) result(h)
+    module pure elemental function calc_h_iapws97_region1(T_in, P_in) result(h)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -21,16 +21,16 @@ contains
         pi = P_in / p_star1
         tau = T_star1 / T_in
 
-        gamma_t = get_gamma_tau_region1(pi, tau)
+        gamma_t = calc_gamma_tau_region1(pi, tau)
 
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
         ! ==========================================================
         h = specific_gas_constant_water * T_in * tau * gamma_t
 
-    end function get_h_iapws97_region1
+    end function calc_h_iapws97_region1
 
-    module pure elemental function get_h_iapws97_region2(T_in, P_in) result(h)
+    module pure elemental function calc_h_iapws97_region2(T_in, P_in) result(h)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -48,16 +48,16 @@ contains
         pi = P_in / p_star2
         tau = T_star2 / T_in
 
-        gamma_t = get_gamma0_tau_region2(pi, tau) + get_gammar_tau_region2(pi, tau)
+        gamma_t = calc_gamma0_tau_region2(pi, tau) + calc_gammar_tau_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
         ! ==========================================================
         h = specific_gas_constant_water * T_in * tau * gamma_t
 
-    end function get_h_iapws97_region2
+    end function calc_h_iapws97_region2
 
-    module pure elemental function get_h_iapws97_region3(T_in, rho_in) result(h)
+    module pure elemental function calc_h_iapws97_region3(T_in, rho_in) result(h)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -75,19 +75,19 @@ contains
         delta = rho_in / rho_star3
         tau = T_star3 / T_in
 
-        phi_t = get_phi_tau_region3(delta, tau)
-        phi_d = get_phi_delta_region3(delta, tau)
+        phi_t = calc_phi_tau_region3(delta, tau)
+        phi_d = calc_phi_delta_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
         ! ==========================================================
         h = specific_gas_constant_water * T_in * (tau * phi_t + delta * phi_d)
 
-    end function get_h_iapws97_region3
+    end function calc_h_iapws97_region3
 
     !> Specific Enthalpy [J/kg]
     !> Formula: h = R*T * tau * gamma_tau
-    module pure elemental function get_h_iapws97_region5(T_in, P_in) result(h)
+    module pure elemental function calc_h_iapws97_region5(T_in, P_in) result(h)
         implicit none
         real(real64), intent(in) :: T_in
         real(real64), intent(in) :: P_in
@@ -99,9 +99,9 @@ contains
         pi = P_in / p_star5
         tau = T_star5 / T_in
 
-        gamma_t = get_gamma0_tau_region5(pi, tau) + get_gammar_tau_region5(pi, tau)
+        gamma_t = calc_gamma0_tau_region5(pi, tau) + calc_gammar_tau_region5(pi, tau)
 
         h = specific_gas_constant_water * T_in * tau * gamma_t
-    end function get_h_iapws97_region5
+    end function calc_h_iapws97_region5
 
 end submodule iapws_specific_enthalpy

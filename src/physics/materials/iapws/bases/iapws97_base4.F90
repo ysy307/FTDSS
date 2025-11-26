@@ -18,7 +18,7 @@ submodule(physics_material_iapws) iapws97_region4
 
 contains
 
-    pure elemental function get_beta_region4(pressure) result(beta)
+    pure elemental function calc_beta_region4(pressure) result(beta)
         implicit none
         real(real64), intent(in) :: pressure
         real(real64) :: beta
@@ -26,9 +26,9 @@ contains
         ! Eq 29a: Transformed pressure beta
         beta = (pressure / P_star4)**0.25d0
 
-    end function get_beta_region4
+    end function calc_beta_region4
 
-    pure elemental function get_vartheta_region4(temperature) result(vartheta)
+    pure elemental function calc_vartheta_region4(temperature) result(vartheta)
         implicit none
         real(real64), intent(in) :: temperature
         real(real64) :: vartheta
@@ -36,17 +36,17 @@ contains
         ! Eq 29b: Transformed temperature vartheta
         vartheta = temperature / T_star4 + n_r4(9) / (temperature / T_star4 - n_r4(10))
 
-    end function get_vartheta_region4
+    end function calc_vartheta_region4
 
     !> Saturation Pressure (Equation 30) [cite: 921]
-    module pure elemental function get_sat_pressure_region4(temperature) result(P_sat)
+    module pure elemental function calc_sat_pressure_region4(temperature) result(P_sat)
         implicit none
         real(real64), intent(in) :: temperature
         real(real64) :: P_sat
 
         real(real64) :: vartheta, A, B, C
 
-        vartheta = get_vartheta_region4(temperature)
+        vartheta = calc_vartheta_region4(temperature)
 
         ! Eq 30 auxiliary terms
         A = vartheta**2 + n_r4(1) * vartheta + n_r4(2)
@@ -56,11 +56,11 @@ contains
         ! Eq 30: ps/p* = [ 2C / (-B + sqrt...) ]^4
         P_sat = P_star4 * (((2.0d0 * C) / (-B + sqrt(max((B**2 - 4.0d0 * A * C), 0.0d0))))**4)
 
-    end function get_sat_pressure_region4
+    end function calc_sat_pressure_region4
 
     !> Saturation Temperature (Equation 31 - Backward Equation)
     !! Calculated explicitly using the same coefficients as Eq 30.
-    module pure elemental function get_sat_temperature_region4(pressure) result(T_sat)
+    module pure elemental function calc_sat_temperature_region4(pressure) result(T_sat)
         implicit none
         real(real64), intent(in) :: pressure
         real(real64) :: T_sat
@@ -68,7 +68,7 @@ contains
         real(real64) :: beta, E, F, G, D
 
         ! beta = (p / p*)^0.25
-        beta = get_beta_region4(pressure)
+        beta = calc_beta_region4(pressure)
 
         ! Eq 31 auxiliary terms
         E = beta**2 + n_r4(3) * beta + n_r4(6)
@@ -81,6 +81,6 @@ contains
         ! Ts/T* = (n10 + D - sqrt((n10 + D)^2 - 4(n9 + n10*D))) / 2
         T_sat = T_star4 * (n_r4(10) + D - sqrt(max((n_r4(10) + D)**2 - 4.0d0 * (n_r4(9) + n_r4(10) * D), 0.0d0))) / 2.0d0
 
-    end function get_sat_temperature_region4
+    end function calc_sat_temperature_region4
 
 end submodule iapws97_region4

@@ -59,7 +59,7 @@ submodule(physics_material_iapws) iapws97_region3
 contains
 
     !> Calculate phi (Equation 28)
-    module pure elemental function get_phi_region3(delta, tau) result(phi)
+    module pure elemental function calc_phi_region3(delta, tau) result(phi)
         implicit none
         real(real64), intent(in) :: delta
         real(real64), intent(in) :: tau
@@ -73,10 +73,10 @@ contains
         do i = 2, N3_terms
             phi = phi + n_r3(i) * (delta**I_r3(i)) * (tau**J_r3(i))
         end do
-    end function get_phi_region3
+    end function calc_phi_region3
 
     !> Calculate phi_delta (1st derivative w.r.t delta)
-    module pure elemental function get_phi_delta_region3(delta, tau) result(phi_d)
+    module pure elemental function calc_phi_delta_region3(delta, tau) result(phi_d)
         implicit none
         real(real64), intent(in) :: delta
         real(real64), intent(in) :: tau
@@ -91,10 +91,10 @@ contains
             ! n_i * I_i * delta^(I_i-1) * tau^J_i
             phi_d = phi_d + n_r3(i) * I_r3(i) * (delta**(I_r3(i) - 1.0d0)) * (tau**J_r3(i))
         end do
-    end function get_phi_delta_region3
+    end function calc_phi_delta_region3
 
     !> Calculate phi_delta_delta (2nd derivative w.r.t delta)
-    module pure elemental function get_phi_deltadelta_region3(delta, tau) result(phi_dd)
+    module pure elemental function calc_phi_deltadelta_region3(delta, tau) result(phi_dd)
         implicit none
         real(real64), intent(in) :: delta
         real(real64), intent(in) :: tau
@@ -109,10 +109,10 @@ contains
             ! n_i * I_i * (I_i-1) * delta^(I_i-2) * tau^J_i
             phi_dd = phi_dd + n_r3(i) * I_r3(i) * (I_r3(i) - 1.0d0) * (delta**(I_r3(i) - 2.0d0)) * (tau**J_r3(i))
         end do
-    end function get_phi_deltadelta_region3
+    end function calc_phi_deltadelta_region3
 
     !> Calculate phi_tau (1st derivative w.r.t tau)
-    module pure elemental function get_phi_tau_region3(delta, tau) result(phi_t)
+    module pure elemental function calc_phi_tau_region3(delta, tau) result(phi_t)
         implicit none
         real(real64), intent(in) :: delta
         real(real64), intent(in) :: tau
@@ -127,10 +127,10 @@ contains
             ! n_i * J_i * delta^I_i * tau^(J_i-1)
             phi_t = phi_t + n_r3(i) * J_r3(i) * (delta**I_r3(i)) * (tau**(J_r3(i) - 1.0d0))
         end do
-    end function get_phi_tau_region3
+    end function calc_phi_tau_region3
 
     !> Calculate phi_tau_tau (2nd derivative w.r.t tau)
-    module pure elemental function get_phi_tautau_region3(delta, tau) result(phi_tt)
+    module pure elemental function calc_phi_tautau_region3(delta, tau) result(phi_tt)
         implicit none
         real(real64), intent(in) :: delta
         real(real64), intent(in) :: tau
@@ -144,10 +144,10 @@ contains
             ! n_i * J_i * (J_i-1) * delta^I_i * tau^(J_i-2)
             phi_tt = phi_tt + n_r3(i) * J_r3(i) * (J_r3(i) - 1.0d0) * (delta**I_r3(i)) * (tau**(J_r3(i) - 2.0d0))
         end do
-    end function get_phi_tautau_region3
+    end function calc_phi_tautau_region3
 
     !> Calculate phi_delta_tau (Mixed derivative)
-    module pure elemental function get_phi_deltatau_region3(delta, tau) result(phi_dt)
+    module pure elemental function calc_phi_deltatau_region3(delta, tau) result(phi_dt)
         implicit none
         real(real64), intent(in) :: delta
         real(real64), intent(in) :: tau
@@ -162,6 +162,6 @@ contains
             ! n_i * I_i * J_i * delta^(I_i-1) * tau^(J_i-1)
             phi_dt = phi_dt + n_r3(i) * I_r3(i) * J_r3(i) * (delta**(I_r3(i) - 1.0d0)) * (tau**(J_r3(i) - 1.0d0))
         end do
-    end function get_phi_deltatau_region3
+    end function calc_phi_deltatau_region3
 
 end submodule iapws97_region3

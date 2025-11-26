@@ -6,7 +6,7 @@ contains
     !> Calculate the specific isobaric heat capacity (Cp) for liquid water (Region 1).
     !> Valid range: \( 273.15 \text{ K} \le T \le 623.15 \text{ K} \), \( P_s(T) \le P \le 100 \text{ MPa} \).
     !> Formula: \( C_p = R \left[ -\tau^2 \gamma_{\tau\tau} + \frac{(\gamma_{\tau} - \tau \gamma_{\pi\tau})^2}{\gamma_{\pi}} \right] \)
-    module pure elemental function get_cp_iapws97_region1(T_in, P_in) result(cp)
+    module pure elemental function calc_cp_iapws97_region1(T_in, P_in) result(cp)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -26,16 +26,16 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_tt = get_gamma_tautau_region1(pi, tau)
+        gamma_tt = calc_gamma_tautau_region1(pi, tau)
 
         ! ==========================================================
         ! Convert to physical units [J/(kg K)]
         ! ==========================================================
         cp = -tau**2.0d0 * gamma_tt * specific_gas_constant_water
 
-    end function get_cp_iapws97_region1
+    end function calc_cp_iapws97_region1
 
-    module pure elemental function get_cp_iapws97_region2(T_in, P_in) result(cp)
+    module pure elemental function calc_cp_iapws97_region2(T_in, P_in) result(cp)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -56,13 +56,13 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_tt = get_gamma0_tautau_region2(pi, tau) + get_gammar_tautau_region2(pi, tau)
+        gamma_tt = calc_gamma0_tautau_region2(pi, tau) + calc_gammar_tautau_region2(pi, tau)
 
         cp = -tau**2.0d0 * gamma_tt * specific_gas_constant_water
 
-    end function get_cp_iapws97_region2
+    end function calc_cp_iapws97_region2
 
-    module pure elemental function get_cp_iapws97_region3(T_in, rho_in) result(cp)
+    module pure elemental function calc_cp_iapws97_region3(T_in, rho_in) result(cp)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -88,10 +88,10 @@ contains
         ! phi_dt : phi_delta_tau
         ! phi_tt : phi_tau_tau
         ! ==========================================================
-        phi_d = get_phi_delta_region3(delta, tau)
-        phi_dd = get_phi_deltadelta_region3(delta, tau)
-        phi_dt = get_phi_deltatau_region3(delta, tau)
-        phi_tt = get_phi_tautau_region3(delta, tau)
+        phi_d = calc_phi_delta_region3(delta, tau)
+        phi_dd = calc_phi_deltadelta_region3(delta, tau)
+        phi_dt = calc_phi_deltatau_region3(delta, tau)
+        phi_tt = calc_phi_tautau_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Cp [J/(kg K)]
@@ -107,11 +107,11 @@ contains
 
         cp = (term1 + numerator / denominator) * specific_gas_constant_water
 
-    end function get_cp_iapws97_region3
+    end function calc_cp_iapws97_region3
 
     !> Specific Isobaric Heat Capacity [J/(kg K)]
     !> Formula: cp = -R * tau^2 * gamma_tautau
-    module pure elemental function get_cp_iapws97_region5(T_in, P_in) result(cp)
+    module pure elemental function calc_cp_iapws97_region5(T_in, P_in) result(cp)
         implicit none
         real(real64), intent(in) :: T_in
         real(real64), intent(in) :: P_in
@@ -123,9 +123,9 @@ contains
         pi = P_in / p_star5
         tau = T_star5 / T_in
 
-        gamma_tt = get_gamma0_tautau_region5(pi, tau) + get_gammar_tautau_region5(pi, tau)
+        gamma_tt = calc_gamma0_tautau_region5(pi, tau) + calc_gammar_tautau_region5(pi, tau)
 
         cp = specific_gas_constant_water * (-tau**2 * gamma_tt)
-    end function get_cp_iapws97_region5
+    end function calc_cp_iapws97_region5
 
 end submodule iapws_specific_isobaric_heat_capacity

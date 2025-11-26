@@ -9,7 +9,7 @@ contains
     !> Maxwell criterion Eq 1 (Liquid phase pressure consistency)
     !> Residual = p_s / (rho' * R * T) - delta' * phi_delta'
     !> Should be zero at equilibrium.
-    module pure elemental function get_maxwell_residual_1(T_in, rho_liq, p_sat) result(res)
+    module pure elemental function calc_maxwell_residual_1(T_in, rho_liq, p_sat) result(res)
         implicit none
         real(real64), intent(in) :: T_in ! Temperature [K]
         real(real64), intent(in) :: rho_liq ! Saturated Liquid Density [kg/m^3] (rho')
@@ -24,19 +24,19 @@ contains
         tau = T_star3 / T_in
 
         ! Derivative
-        phi_d_liq = get_phi_delta_region3(delta_liq, tau)
+        phi_d_liq = calc_phi_delta_region3(delta_liq, tau)
 
         ! Calculate Residual 1
         ! LHS = p_s / (R * T * rho')
         ! RHS = delta' * phi_delta'
         res = p_sat / (specific_gas_constant_water * T_in * rho_liq) - delta_liq * phi_d_liq
 
-    end function get_maxwell_residual_1
+    end function calc_maxwell_residual_1
 
     !> Maxwell criterion Eq 2 (Vapor phase pressure consistency)
     !> Residual = p_s / (rho'' * R * T) - delta'' * phi_delta''
     !> Should be zero at equilibrium.
-    module pure elemental function get_maxwell_residual_2(T_in, rho_vap, p_sat) result(res)
+    module pure elemental function calc_maxwell_residual_2(T_in, rho_vap, p_sat) result(res)
         implicit none
         real(real64), intent(in) :: T_in ! Temperature [K]
         real(real64), intent(in) :: rho_vap ! Saturated Vapor Density [kg/m^3] (rho'')
@@ -51,19 +51,19 @@ contains
         tau = T_star3 / T_in
 
         ! Derivative
-        phi_d_vap = get_phi_delta_region3(delta_vap, tau)
+        phi_d_vap = calc_phi_delta_region3(delta_vap, tau)
 
         ! Calculate Residual 2
         ! LHS = p_s / (R * T * rho'')
         ! RHS = delta'' * phi_delta''
         res = p_sat / (specific_gas_constant_water * T_in * rho_vap) - delta_vap * phi_d_vap
 
-    end function get_maxwell_residual_2
+    end function calc_maxwell_residual_2
 
     !> Maxwell criterion Eq 3 (Gibbs energy consistency / Equal Area Rule)
     !> Residual = (p_s / (R*T)) * (1/rho'' - 1/rho') - (phi(delta') - phi(delta''))
     !> Should be zero at equilibrium.
-    module pure elemental function get_maxwell_residual_3(T_in, rho_liq, rho_vap, p_sat) result(res)
+    module pure elemental function calc_maxwell_residual_3(T_in, rho_liq, rho_vap, p_sat) result(res)
         implicit none
         real(real64), intent(in) :: T_in ! Temperature [K]
         real(real64), intent(in) :: rho_liq ! Saturated Liquid Density [kg/m^3] (rho')
@@ -81,8 +81,8 @@ contains
         tau = T_star3 / T_in
 
         ! Helmholtz free energies
-        phi_liq = get_phi_region3(delta_liq, tau)
-        phi_vap = get_phi_region3(delta_vap, tau)
+        phi_liq = calc_phi_region3(delta_liq, tau)
+        phi_vap = calc_phi_region3(delta_vap, tau)
 
         ! Calculate Residual 3
         ! LHS = (p_s / (R * T)) * (1/rho'' - 1/rho')
@@ -93,5 +93,5 @@ contains
 
         res = lhs - rhs
 
-    end function get_maxwell_residual_3
+    end function calc_maxwell_residual_3
 end submodule iapws_maxwell_criterion

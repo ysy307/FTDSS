@@ -15,7 +15,7 @@ contains
     !! B23-equation: pi = n1 + n2*theta + n3*theta^2
     !!
     !! temperature : 温度 [K]
-    module pure elemental function get_boundary_pressure_region23(temperature) result(pressure)
+    module pure elemental function calc_boundary_pressure_region23(temperature) result(pressure)
         implicit none
         real(real64), intent(in) :: temperature
         real(real64) :: pressure
@@ -28,7 +28,7 @@ contains
 
         pressure = pi_val * p_starb23 * 1.0d6 ! MPa -> Pa
 
-    end function get_boundary_pressure_region23
+    end function calc_boundary_pressure_region23
 
     !> 領域2と3の境界における温度を計算する（式6）
     !!
@@ -36,7 +36,7 @@ contains
     !! Equation: theta = n4 + sqrt((pi - n5) / n3)
     !!
     !! pressure : 圧力 [Pa]
-    module pure elemental function get_boundary_temperature_region23(pressure) result(temperature)
+    module pure elemental function calc_boundary_temperature_region23(pressure) result(temperature)
         implicit none
         real(real64), intent(in) :: pressure
         real(real64) :: temperature
@@ -49,5 +49,5 @@ contains
 
         temperature = theta * T_starb23
 
-    end function get_boundary_temperature_region23
+    end function calc_boundary_temperature_region23
 end submodule iapws97_auxiliary

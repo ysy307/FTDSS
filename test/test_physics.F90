@@ -52,8 +52,8 @@ contains
 
         real(real64) :: p_boundary, T_boundary
 
-        p_boundary = get_boundary_pressure_region23(T_test)
-        T_boundary = get_boundary_temperature_region23(p_test)
+        p_boundary = calc_boundary_pressure_region23(T_test)
+        T_boundary = calc_boundary_temperature_region23(p_test)
 
         call check_variable(p_boundary, p_test, "IAPWS-IF97 boundary pressure (region 2-3)")
         call check_variable(T_boundary, T_test, "IAPWS-IF97 boundary temperature (region 2-3)")
@@ -83,12 +83,12 @@ contains
         integer(int32) :: i
 
         do i = 1, test_points
-            nu(i) = get_nu_iapws97_region1(T(i), p(i))
-            h(i) = get_h_iapws97_region1(T(i), p(i))
-            u(i) = get_u_iapws97_region1(T(i), p(i))
-            s(i) = get_s_iapws97_region1(T(i), p(i))
-            cp(i) = get_cp_iapws97_region1(T(i), p(i))
-            w(i) = get_w_iapws97_region1(T(i), p(i))
+            nu(i) = calc_nu_iapws97_region1(T(i), p(i))
+            h(i) = calc_h_iapws97_region1(T(i), p(i))
+            u(i) = calc_u_iapws97_region1(T(i), p(i))
+            s(i) = calc_s_iapws97_region1(T(i), p(i))
+            cp(i) = calc_cp_iapws97_region1(T(i), p(i))
+            w(i) = calc_w_iapws97_region1(T(i), p(i))
         end do
 
         call check_variables(nu, nu_exact, "IAPWS Region 1 specific volume")
@@ -158,12 +158,12 @@ contains
 
         ! 計算実行
         do i = 1, test_points
-            nu(i) = get_nu_iapws97_region2(T(i), p(i))
-            h(i) = get_h_iapws97_region2(T(i), p(i))
-            u(i) = get_u_iapws97_region2(T(i), p(i))
-            s(i) = get_s_iapws97_region2(T(i), p(i))
-            cp(i) = get_cp_iapws97_region2(T(i), p(i))
-            w(i) = get_w_iapws97_region2(T(i), p(i))
+            nu(i) = calc_nu_iapws97_region2(T(i), p(i))
+            h(i) = calc_h_iapws97_region2(T(i), p(i))
+            u(i) = calc_u_iapws97_region2(T(i), p(i))
+            s(i) = calc_s_iapws97_region2(T(i), p(i))
+            cp(i) = calc_cp_iapws97_region2(T(i), p(i))
+            w(i) = calc_w_iapws97_region2(T(i), p(i))
         end do
 
         ! 検証（check_variablesサブルーチンが存在すると仮定）
@@ -236,12 +236,12 @@ contains
 
         ! Execute calculations
         do i = 1, test_points
-            p(i) = get_p_iapws97_region3(T(i), rho(i))
-            u(i) = get_u_iapws97_region3(T(i), rho(i))
-            s(i) = get_s_iapws97_region3(T(i), rho(i))
-            h(i) = get_h_iapws97_region3(T(i), rho(i))
-            cp(i) = get_cp_iapws97_region3(T(i), rho(i))
-            w(i) = get_w_iapws97_region3(T(i), rho(i))
+            p(i) = calc_p_iapws97_region3(T(i), rho(i))
+            u(i) = calc_u_iapws97_region3(T(i), rho(i))
+            s(i) = calc_s_iapws97_region3(T(i), rho(i))
+            h(i) = calc_h_iapws97_region3(T(i), rho(i))
+            cp(i) = calc_cp_iapws97_region3(T(i), rho(i))
+            w(i) = calc_w_iapws97_region3(T(i), rho(i))
         end do
 
         ! Verify results
@@ -295,7 +295,7 @@ contains
         ! Execute Calculation: Saturation Pressure
         ! ----------------------------------------------------------
         do i = 1, test_points_p
-            P_sat_calc(i) = get_sat_pressure_region4(T_in(i))
+            P_sat_calc(i) = calc_sat_pressure_region4(T_in(i))
         end do
 
         call check_variables(P_sat_calc, P_sat_exact, "IAPWS Region 4 Saturation Pressure")
@@ -304,7 +304,7 @@ contains
         ! Execute Calculation: Saturation Temperature
         ! ----------------------------------------------------------
         do i = 1, test_points_t
-            T_sat_calc(i) = get_sat_temperature_region4(P_in(i))
+            T_sat_calc(i) = calc_sat_temperature_region4(P_in(i))
         end do
 
         call check_variables(T_sat_calc, T_sat_exact, "IAPWS Region 4 Saturation Temperature")
@@ -372,12 +372,12 @@ contains
 
         ! Execute calculations
         do i = 1, test_points
-            nu(i) = get_nu_iapws97_region5(T(i), p(i))
-            h(i) = get_h_iapws97_region5(T(i), p(i))
-            u(i) = get_u_iapws97_region5(T(i), p(i))
-            s(i) = get_s_iapws97_region5(T(i), p(i))
-            cp(i) = get_cp_iapws97_region5(T(i), p(i))
-            w(i) = get_w_iapws97_region5(T(i), p(i))
+            nu(i) = calc_nu_iapws97_region5(T(i), p(i))
+            h(i) = calc_h_iapws97_region5(T(i), p(i))
+            u(i) = calc_u_iapws97_region5(T(i), p(i))
+            s(i) = calc_s_iapws97_region5(T(i), p(i))
+            cp(i) = calc_cp_iapws97_region5(T(i), p(i))
+            w(i) = calc_w_iapws97_region5(T(i), p(i))
         end do
 
         ! Verify results

@@ -31,7 +31,7 @@ contains
 
     !> Calculate the dimensionless Gibbs free energy \(\gamma\) for Region 1.
     !> Formula: \(\gamma = \sum n_i (7.1 - \pi)^{I_i} (\tau - 1.222)^{J_i}\)
-    module pure elemental function get_gamma_region1(pi, tau) result(gamma)
+    module pure elemental function calc_gamma_region1(pi, tau) result(gamma)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -50,11 +50,11 @@ contains
             gamma = gamma + term
         end do
 
-    end function get_gamma_region1
+    end function calc_gamma_region1
 
     !> Calculate the first derivative of \(\gamma\) with respect to \(\pi\).
     !> Computes \(\gamma_{\pi} = \left(\frac{\partial \gamma}{\partial \pi}\right)_{\tau}\).
-    module pure elemental function get_gamma_pi_region1(pi, tau) result(gamma_pi)
+    module pure elemental function calc_gamma_pi_region1(pi, tau) result(gamma_pi)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -73,11 +73,11 @@ contains
             gamma_pi = gamma_pi + term_pi
         end do
 
-    end function get_gamma_pi_region1
+    end function calc_gamma_pi_region1
 
     !> Calculate the first derivative of \(\gamma\) with respect to \(\tau\).
     !> Computes \(\gamma_{\tau} = \left(\frac{\partial \gamma}{\partial \tau}\right)_{\pi}\).
-    module pure elemental function get_gamma_tau_region1(pi, tau) result(gamma_tau)
+    module pure elemental function calc_gamma_tau_region1(pi, tau) result(gamma_tau)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -96,11 +96,11 @@ contains
             gamma_tau = gamma_tau + term_tau
         end do
 
-    end function get_gamma_tau_region1
+    end function calc_gamma_tau_region1
 
     !> Calculate the second derivative of \(\gamma\) with respect to \(\pi\).
     !> Computes \(\gamma_{\pi\pi} = \left(\frac{\partial^2 \gamma}{\partial \pi^2}\right)_{\tau}\).
-    module pure elemental function get_gamma_pipi_region1(pi, tau) result(gamma_pipi)
+    module pure elemental function calc_gamma_pipi_region1(pi, tau) result(gamma_pipi)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -119,11 +119,11 @@ contains
             gamma_pipi = gamma_pipi + term_pipi
         end do
 
-    end function get_gamma_pipi_region1
+    end function calc_gamma_pipi_region1
 
     !> Calculate the second derivative of \(\gamma\) with respect to \(\tau\).
     !> Computes \(\gamma_{\tau\tau} = \left(\frac{\partial^2 \gamma}{\partial \tau^2}\right)_{\pi}\).
-    module pure elemental function get_gamma_tautau_region1(pi, tau) result(gamma_tautau)
+    module pure elemental function calc_gamma_tautau_region1(pi, tau) result(gamma_tautau)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -142,11 +142,11 @@ contains
             gamma_tautau = gamma_tautau + term_tautau
         end do
 
-    end function get_gamma_tautau_region1
+    end function calc_gamma_tautau_region1
 
     !> Calculate the mixed second derivative of \(\gamma\).
     !> Computes \(\gamma_{\pi\tau} = \frac{\partial^2 \gamma}{\partial \pi \partial \tau}\).
-    module pure elemental function get_gamma_pitau_region1(pi, tau) result(gamma_pitau)
+    module pure elemental function calc_gamma_pitau_region1(pi, tau) result(gamma_pitau)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -165,11 +165,11 @@ contains
             gamma_pitau = gamma_pitau + term_pitau
         end do
 
-    end function get_gamma_pitau_region1
+    end function calc_gamma_pitau_region1
 
     ! !> Calculate the third derivative \(\gamma_{\pi\pi\tau}\).
     ! !> Computes \(\frac{\partial^3 \gamma}{\partial \pi^2 \partial \tau}\).
-    ! module pure elemental function get_gamma_pipi_tau_region1(pi, tau) result(val)
+    ! module pure elemental function calc_gamma_pipi_tau_region1(pi, tau) result(val)
     !     implicit none
     !     !> Dimensionless pressure \(\pi\)
     !     real(real64), intent(in) :: pi
@@ -185,11 +185,11 @@ contains
     !         val = val + n_r1(i) * I_r1(i) * (I_r1(i) - 1.0d0) * (7.1d0 - pi)**(I_r1(i) - 2.0d0) &
     !               * J_r1(i) * (tau - 1.222d0)**(J_r1(i) - 1.0d0)
     !     end do
-    ! end function get_gamma_pipi_tau_region1
+    ! end function calc_gamma_pipi_tau_region1
 
     ! !> Calculate the third derivative \(\gamma_{\pi\tau\tau}\).
     ! !> Computes \(\frac{\partial^3 \gamma}{\partial \pi \partial \tau^2}\).
-    ! module pure elemental function get_gamma_pi_tautau_region1(pi, tau) result(val)
+    ! module pure elemental function calc_gamma_pi_tautau_region1(pi, tau) result(val)
     !     implicit none
     !     !> Dimensionless pressure \(\pi\)
     !     real(real64), intent(in) :: pi
@@ -205,11 +205,11 @@ contains
     !         val = val - n_r1(i) * I_r1(i) * (7.1d0 - pi)**(I_r1(i) - 1.0d0) &
     !               * J_r1(i) * (J_r1(i) - 1.0d0) * (tau - 1.222d0)**(J_r1(i) - 2.0d0)
     !     end do
-    ! end function get_gamma_pi_tautau_region1
+    ! end function calc_gamma_pi_tautau_region1
 
     ! !> Calculate the third derivative \(\gamma_{\tau\tau\tau}\).
     ! !> Computes \(\frac{\partial^3 \gamma}{\partial \tau^3}\).
-    ! module pure elemental function get_gamma_tautau_tau_region1(pi, tau) result(val)
+    ! module pure elemental function calc_gamma_tautau_tau_region1(pi, tau) result(val)
     !     implicit none
     !     !> Dimensionless pressure \(\pi\)
     !     real(real64), intent(in) :: pi
@@ -225,5 +225,5 @@ contains
     !         val = val + n_r1(i) * (7.1d0 - pi)**I_r1(i) &
     !               * J_r1(i) * (J_r1(i) - 1.0d0) * (J_r1(i) - 2.0d0) * (tau - 1.222d0)**(J_r1(i) - 3.0d0)
     !     end do
-    ! end function get_gamma_tautau_tau_region1
+    ! end function calc_gamma_tautau_tau_region1
 end submodule iapws97_base1

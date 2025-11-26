@@ -1,7 +1,7 @@
 submodule(physics_material_iapws) iapws_specific_entropy
     implicit none
 contains
-    module pure elemental function get_s_iapws97_region1(T_in, P_in) result(s)
+    module pure elemental function calc_s_iapws97_region1(T_in, P_in) result(s)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -19,17 +19,17 @@ contains
         pi = P_in / p_star1
         tau = T_star1 / T_in
 
-        gamma = get_gamma_region1(pi, tau)
-        gamma_t = get_gamma_tau_region1(pi, tau)
+        gamma = calc_gamma_region1(pi, tau)
+        gamma_t = calc_gamma_tau_region1(pi, tau)
 
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
         ! ==========================================================
         s = specific_gas_constant_water * (tau * gamma_t - gamma)
 
-    end function get_s_iapws97_region1
+    end function calc_s_iapws97_region1
 
-    module pure elemental function get_s_iapws97_region2(T_in, P_in) result(s)
+    module pure elemental function calc_s_iapws97_region2(T_in, P_in) result(s)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -47,19 +47,19 @@ contains
         pi = P_in / p_star2
         tau = T_star2 / T_in
 
-        gamma0 = get_gamma0_region2(pi, tau)
-        gammar = get_gammar_region2(pi, tau)
-        gamma0_t = get_gamma0_tau_region2(pi, tau)
-        gammar_t = get_gammar_tau_region2(pi, tau)
+        gamma0 = calc_gamma0_region2(pi, tau)
+        gammar = calc_gammar_region2(pi, tau)
+        gamma0_t = calc_gamma0_tau_region2(pi, tau)
+        gammar_t = calc_gammar_tau_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
         ! ==========================================================
         s = specific_gas_constant_water * (tau * (gamma0_t + gammar_t) - (gamma0 + gammar))
 
-    end function get_s_iapws97_region2
+    end function calc_s_iapws97_region2
 
-    module pure elemental function get_s_iapws97_region3(T_in, rho_in) result(s)
+    module pure elemental function calc_s_iapws97_region3(T_in, rho_in) result(s)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -77,18 +77,18 @@ contains
         delta = rho_in / rho_star3
         tau = T_star3 / T_in
 
-        phi = get_phi_region3(delta, tau)
-        phi_t = get_phi_tau_region3(delta, tau)
+        phi = calc_phi_region3(delta, tau)
+        phi_t = calc_phi_tau_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
         ! ==========================================================
         s = specific_gas_constant_water * (tau * phi_t - phi)
-    end function get_s_iapws97_region3
+    end function calc_s_iapws97_region3
 
     !> Specific Entropy [J/(kg K)]
     !> Formula: s = R * (tau*gamma_tau - gamma)
-    module pure elemental function get_s_iapws97_region5(T_in, P_in) result(s)
+    module pure elemental function calc_s_iapws97_region5(T_in, P_in) result(s)
         implicit none
         real(real64), intent(in) :: T_in
         real(real64), intent(in) :: P_in
@@ -100,10 +100,10 @@ contains
         pi = P_in / p_star5
         tau = T_star5 / T_in
 
-        gamma = get_gamma0_region5(pi, tau) + get_gammar_region5(pi, tau)
-        gamma_t = get_gamma0_tau_region5(pi, tau) + get_gammar_tau_region5(pi, tau)
+        gamma = calc_gamma0_region5(pi, tau) + calc_gammar_region5(pi, tau)
+        gamma_t = calc_gamma0_tau_region5(pi, tau) + calc_gammar_tau_region5(pi, tau)
 
         s = specific_gas_constant_water * (tau * gamma_t - gamma)
-    end function get_s_iapws97_region5
+    end function calc_s_iapws97_region5
 
 end submodule iapws_specific_entropy

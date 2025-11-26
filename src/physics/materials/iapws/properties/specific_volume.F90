@@ -2,7 +2,7 @@ submodule(physics_material_iapws) iapws_specific_volume
     implicit none
 contains
 
-    module pure elemental function get_nu_iapws97_region1(T_in, P_in) result(nu)
+    module pure elemental function calc_nu_iapws97_region1(T_in, P_in) result(nu)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -19,15 +19,15 @@ contains
         pi = P_in / p_star1
         tau = T_star1 / T_in
 
-        gamma_pi = get_gamma_pi_region1(pi, tau)
+        gamma_pi = calc_gamma_pi_region1(pi, tau)
 
         ! ==========================================================
         ! Calculate specific volume [m^3/kg]
         ! ==========================================================
         nu = specific_gas_constant_water * T_in * gamma_pi / p_star1
-    end function get_nu_iapws97_region1
+    end function calc_nu_iapws97_region1
 
-    module pure elemental function get_nu_iapws97_region2(T_in, P_in) result(nu)
+    module pure elemental function calc_nu_iapws97_region2(T_in, P_in) result(nu)
         implicit none
         !> Temperature [K]
         real(real64), intent(in) :: T_in
@@ -47,14 +47,14 @@ contains
         ! ==========================================================
         ! Calculate Density
         ! ==========================================================
-        gamma_pi = get_gamma0_pi_region2(pi, tau) + get_gammar_pi_region2(pi, tau)
+        gamma_pi = calc_gamma0_pi_region2(pi, tau) + calc_gammar_pi_region2(pi, tau)
         nu = specific_gas_constant_water * T_in * gamma_pi / p_star2
 
-    end function get_nu_iapws97_region2
+    end function calc_nu_iapws97_region2
 
     !> Specific Volume [m^3/kg]
     !> Formula: v = (R*T/P) * pi * gamma_pi
-    module pure elemental function get_nu_iapws97_region5(T_in, P_in) result(nu)
+    module pure elemental function calc_nu_iapws97_region5(T_in, P_in) result(nu)
         implicit none
         real(real64), intent(in) :: T_in ! Temperature [K]
         real(real64), intent(in) :: P_in ! Pressure [Pa] (Modified from rho_in)
@@ -68,8 +68,8 @@ contains
         tau = T_star5 / T_in
 
         ! Derivatives
-        gamma0_p = get_gamma0_pi_region5(pi, tau)
-        gammar_p = get_gammar_pi_region5(pi, tau)
+        gamma0_p = calc_gamma0_pi_region5(pi, tau)
+        gammar_p = calc_gammar_pi_region5(pi, tau)
         gamma_p = gamma0_p + gammar_p
 
         ! v = (R * T / P) * pi * gamma_pi
@@ -81,6 +81,6 @@ contains
         nu = (specific_gas_constant_water * T_in / p_star5) * gamma_p
         ! Or simply using input P:
         ! nu = (specific_gas_constant_water * T_in / P_in) * pi * gamma_p
-    end function get_nu_iapws97_region5
+    end function calc_nu_iapws97_region5
 
 end submodule iapws_specific_volume
