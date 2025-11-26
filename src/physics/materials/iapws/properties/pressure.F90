@@ -19,7 +19,7 @@ contains
         delta = rho_in / rho_star3
         tau = T_star3 / T_in
 
-        phi_delta = calc_phi_delta_region3(delta, tau)
+        phi_delta = calc_phi_d_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Pressure [Pa]

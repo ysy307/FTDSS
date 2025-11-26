@@ -24,7 +24,7 @@ contains
         tau = T_star3 / T_in
 
         ! Derivative
-        phi_d_liq = calc_phi_delta_region3(delta_liq, tau)
+        phi_d_liq = calc_phi_d_region3(delta_liq, tau)
 
         ! Calculate Residual 1
         ! LHS = p_s / (R * T * rho')
@@ -51,7 +51,7 @@ contains
         tau = T_star3 / T_in
 
         ! Derivative
-        phi_d_vap = calc_phi_delta_region3(delta_vap, tau)
+        phi_d_vap = calc_phi_d_region3(delta_vap, tau)
 
         ! Calculate Residual 2
         ! LHS = p_s / (R * T * rho'')

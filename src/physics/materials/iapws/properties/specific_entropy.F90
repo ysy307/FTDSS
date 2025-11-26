@@ -20,7 +20,7 @@ contains
         tau = T_star1 / T_in
 
         gamma = calc_gamma_region1(pi, tau)
-        gamma_t = calc_gamma_tau_region1(pi, tau)
+        gamma_t = calc_gamma_t_region1(pi, tau)
 
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
@@ -49,8 +49,8 @@ contains
 
         gamma0 = calc_gamma0_region2(pi, tau)
         gammar = calc_gammar_region2(pi, tau)
-        gamma0_t = calc_gamma0_tau_region2(pi, tau)
-        gammar_t = calc_gammar_tau_region2(pi, tau)
+        gamma0_t = calc_gamma0_t_region2(pi, tau)
+        gammar_t = calc_gammar_t_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
@@ -78,7 +78,7 @@ contains
         tau = T_star3 / T_in
 
         phi = calc_phi_region3(delta, tau)
-        phi_t = calc_phi_tau_region3(delta, tau)
+        phi_t = calc_phi_t_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
@@ -101,7 +101,7 @@ contains
         tau = T_star5 / T_in
 
         gamma = calc_gamma0_region5(pi, tau) + calc_gammar_region5(pi, tau)
-        gamma_t = calc_gamma0_tau_region5(pi, tau) + calc_gammar_tau_region5(pi, tau)
+        gamma_t = calc_gamma0_t_region5(pi, tau) + calc_gammar_t_region5(pi, tau)
 
         s = specific_gas_constant_water * (tau * gamma_t - gamma)
     end function calc_s_iapws97_region5

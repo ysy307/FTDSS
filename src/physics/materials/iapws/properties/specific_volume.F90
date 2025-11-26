@@ -19,7 +19,7 @@ contains
         pi = P_in / p_star1
         tau = T_star1 / T_in
 
-        gamma_pi = calc_gamma_pi_region1(pi, tau)
+        gamma_pi = calc_gamma_p_region1(pi, tau)
 
         ! ==========================================================
         ! Calculate specific volume [m^3/kg]
@@ -47,7 +47,7 @@ contains
         ! ==========================================================
         ! Calculate Density
         ! ==========================================================
-        gamma_pi = calc_gamma0_pi_region2(pi, tau) + calc_gammar_pi_region2(pi, tau)
+        gamma_pi = calc_gamma0_p_region2(pi, tau) + calc_gammar_p_region2(pi, tau)
         nu = specific_gas_constant_water * T_in * gamma_pi / p_star2
 
     end function calc_nu_iapws97_region2
@@ -68,8 +68,8 @@ contains
         tau = T_star5 / T_in
 
         ! Derivatives
-        gamma0_p = calc_gamma0_pi_region5(pi, tau)
-        gammar_p = calc_gammar_pi_region5(pi, tau)
+        gamma0_p = calc_gamma0_p_region5(pi, tau)
+        gammar_p = calc_gammar_p_region5(pi, tau)
         gamma_p = gamma0_p + gammar_p
 
         ! v = (R * T / P) * pi * gamma_pi

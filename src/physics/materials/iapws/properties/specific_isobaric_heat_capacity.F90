@@ -26,7 +26,7 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_tt = calc_gamma_tautau_region1(pi, tau)
+        gamma_tt = calc_gamma_tt_region1(pi, tau)
 
         ! ==========================================================
         ! Convert to physical units [J/(kg K)]
@@ -56,7 +56,7 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_tt = calc_gamma0_tautau_region2(pi, tau) + calc_gammar_tautau_region2(pi, tau)
+        gamma_tt = calc_gamma0_tt_region2(pi, tau) + calc_gammar_tt_region2(pi, tau)
 
         cp = -tau**2.0d0 * gamma_tt * specific_gas_constant_water
 
@@ -84,14 +84,14 @@ contains
         ! ==========================================================
         ! Get derivatives
         ! phi_d  : phi_delta
-        ! phi_dd : phi_delta_delta
-        ! phi_dt : phi_delta_tau
-        ! phi_tt : phi_tau_tau
+        ! phi_dd : phi_d_delta
+        ! phi_dt : phi_d_tau
+        ! phi_tt : phi_t_tau
         ! ==========================================================
-        phi_d = calc_phi_delta_region3(delta, tau)
-        phi_dd = calc_phi_deltadelta_region3(delta, tau)
-        phi_dt = calc_phi_deltatau_region3(delta, tau)
-        phi_tt = calc_phi_tautau_region3(delta, tau)
+        phi_d = calc_phi_d_region3(delta, tau)
+        phi_dd = calc_phi_dd_region3(delta, tau)
+        phi_dt = calc_phi_dt_region3(delta, tau)
+        phi_tt = calc_phi_tt_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Cp [J/(kg K)]
@@ -123,7 +123,7 @@ contains
         pi = P_in / p_star5
         tau = T_star5 / T_in
 
-        gamma_tt = calc_gamma0_tautau_region5(pi, tau) + calc_gammar_tautau_region5(pi, tau)
+        gamma_tt = calc_gamma0_tt_region5(pi, tau) + calc_gammar_tt_region5(pi, tau)
 
         cp = specific_gas_constant_water * (-tau**2 * gamma_tt)
     end function calc_cp_iapws97_region5

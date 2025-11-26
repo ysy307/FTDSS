@@ -21,7 +21,7 @@ contains
         pi = P_in / p_star1
         tau = T_star1 / T_in
 
-        gamma_t = calc_gamma_tau_region1(pi, tau)
+        gamma_t = calc_gamma_t_region1(pi, tau)
 
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
@@ -48,7 +48,7 @@ contains
         pi = P_in / p_star2
         tau = T_star2 / T_in
 
-        gamma_t = calc_gamma0_tau_region2(pi, tau) + calc_gammar_tau_region2(pi, tau)
+        gamma_t = calc_gamma0_t_region2(pi, tau) + calc_gammar_t_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
@@ -75,8 +75,8 @@ contains
         delta = rho_in / rho_star3
         tau = T_star3 / T_in
 
-        phi_t = calc_phi_tau_region3(delta, tau)
-        phi_d = calc_phi_delta_region3(delta, tau)
+        phi_t = calc_phi_t_region3(delta, tau)
+        phi_d = calc_phi_d_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
@@ -99,7 +99,7 @@ contains
         pi = P_in / p_star5
         tau = T_star5 / T_in
 
-        gamma_t = calc_gamma0_tau_region5(pi, tau) + calc_gammar_tau_region5(pi, tau)
+        gamma_t = calc_gamma0_t_region5(pi, tau) + calc_gammar_t_region5(pi, tau)
 
         h = specific_gas_constant_water * T_in * tau * gamma_t
     end function calc_h_iapws97_region5

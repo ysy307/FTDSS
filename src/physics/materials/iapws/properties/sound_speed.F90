@@ -24,10 +24,10 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_p = calc_gamma_pi_region1(pi, tau)
-        gamma_tt = calc_gamma_tautau_region1(pi, tau)
-        gamma_pp = calc_gamma_pipi_region1(pi, tau)
-        gamma_pt = calc_gamma_pitau_region1(pi, tau)
+        gamma_p = calc_gamma_p_region1(pi, tau)
+        gamma_tt = calc_gamma_tt_region1(pi, tau)
+        gamma_pp = calc_gamma_pp_region1(pi, tau)
+        gamma_pt = calc_gamma_pt_region1(pi, tau)
 
         numerator = gamma_p**2
 
@@ -70,13 +70,13 @@ contains
         ! ==========================================================
 
         ! Residual part derivatives
-        gammar_p = calc_gammar_pi_region2(pi, tau)
-        gammar_pp = calc_gammar_pipi_region2(pi, tau)
-        gammar_pt = calc_gammar_pitau_region2(pi, tau)
-        gammar_tt = calc_gammar_tautau_region2(pi, tau)
+        gammar_p = calc_gammar_p_region2(pi, tau)
+        gammar_pp = calc_gammar_pp_region2(pi, tau)
+        gammar_pt = calc_gammar_pt_region2(pi, tau)
+        gammar_tt = calc_gammar_tt_region2(pi, tau)
 
         ! Ideal gas part derivative (only gamma0_tautau is needed for the denominator)
-        gamma0_tt = calc_gamma0_tautau_region2(pi, tau)
+        gamma0_tt = calc_gamma0_tt_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate Speed of Sound using explicit Region 2 formula
@@ -125,11 +125,11 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        phi_d = calc_phi_delta_region3(delta, tau)
-        phi_dd = calc_phi_deltadelta_region3(delta, tau)
+        phi_d = calc_phi_d_region3(delta, tau)
+        phi_dd = calc_phi_dd_region3(delta, tau)
         ! 修正: 混合偏微分 phi_deltatau を取得 (元コードは phi_tautau でした)
-        phi_gt = calc_phi_deltatau_region3(delta, tau)
-        phi_tt = calc_phi_tautau_region3(delta, tau)
+        phi_gt = calc_phi_dt_region3(delta, tau)
+        phi_tt = calc_phi_tt_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Speed of Sound [m/s]
@@ -169,13 +169,13 @@ contains
         ! ==========================================================
 
         ! Residual part derivatives
-        gammar_p = calc_gammar_pi_region5(pi, tau)
-        gammar_pp = calc_gammar_pipi_region5(pi, tau)
-        gammar_pt = calc_gammar_pitau_region5(pi, tau)
-        gammar_tt = calc_gammar_tautau_region5(pi, tau)
+        gammar_p = calc_gammar_p_region5(pi, tau)
+        gammar_pp = calc_gammar_pp_region5(pi, tau)
+        gammar_pt = calc_gammar_pt_region5(pi, tau)
+        gammar_tt = calc_gammar_tt_region5(pi, tau)
 
         ! Ideal gas part derivative (only gamma0_tautau is needed)
-        gamma0_tt = calc_gamma0_tautau_region5(pi, tau)
+        gamma0_tt = calc_gamma0_tt_region5(pi, tau)
 
         ! ==========================================================
         ! Calculate Speed of Sound using explicit formula (Eq. 16 style)

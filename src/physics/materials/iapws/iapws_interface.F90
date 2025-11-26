@@ -62,6 +62,11 @@ module physics_material_iapws
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star5 = 1000.0d0 ! 基準温度 [K]
     real(real64), parameter :: p_star5 = 1.0d6 ! 基準圧力 [Pa]
+    !------------------------------------------------------------------------------------------
+    ! Ice Ih properties (IAPWS-06)
+    !------------------------------------------------------------------------------------------
+    real(real64), parameter :: T_starIh = water_triple_point_temperature ! 基準温度 [K]
+    real(real64), parameter :: p_starIh = water_triple_point_pressure ! 基準圧力 [Pa]
 
     interface
         module pure elemental function calc_boundary_pressure_region23(temperature) result(pressure)
@@ -95,7 +100,7 @@ module physics_material_iapws
 
         !> Calculate the first derivative of \(\gamma\) with respect to \(\pi\).
         !> Computes \(\gamma_{\pi} = \left(\frac{\partial \gamma}{\partial \pi}\right)_{\tau}\).
-        module pure elemental function calc_gamma_pi_region1(pi, tau) result(gamma_pi)
+        module pure elemental function calc_gamma_p_region1(pi, tau) result(gamma_pi)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -104,11 +109,11 @@ module physics_material_iapws
             !> Derivative \(\gamma_{\pi}\)
             real(real64) :: gamma_pi
 
-        end function calc_gamma_pi_region1
+        end function calc_gamma_p_region1
 
         !> Calculate the first derivative of \(\gamma\) with respect to \(\tau\).
         !> Computes \(\gamma_{\tau} = \left(\frac{\partial \gamma}{\partial \tau}\right)_{\pi}\).
-        module pure elemental function calc_gamma_tau_region1(pi, tau) result(gamma_tau)
+        module pure elemental function calc_gamma_t_region1(pi, tau) result(gamma_tau)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -117,11 +122,11 @@ module physics_material_iapws
             !> Derivative \(\gamma_{\tau}\)
             real(real64) :: gamma_tau
 
-        end function calc_gamma_tau_region1
+        end function calc_gamma_t_region1
 
         !> Calculate the second derivative of \(\gamma\) with respect to \(\pi\).
         !> Computes \(\gamma_{\pi\pi} = \left(\frac{\partial^2 \gamma}{\partial \pi^2}\right)_{\tau}\).
-        module pure elemental function calc_gamma_pipi_region1(pi, tau) result(gamma_pipi)
+        module pure elemental function calc_gamma_pp_region1(pi, tau) result(gamma_pipi)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -130,11 +135,11 @@ module physics_material_iapws
             !> Derivative \(\gamma_{\pi\pi}\)
             real(real64) :: gamma_pipi
 
-        end function calc_gamma_pipi_region1
+        end function calc_gamma_pp_region1
 
         !> Calculate the second derivative of \(\gamma\) with respect to \(\tau\).
         !> Computes \(\gamma_{\tau\tau} = \left(\frac{\partial^2 \gamma}{\partial \tau^2}\right)_{\pi}\).
-        module pure elemental function calc_gamma_tautau_region1(pi, tau) result(gamma_tautau)
+        module pure elemental function calc_gamma_tt_region1(pi, tau) result(gamma_tautau)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -143,11 +148,11 @@ module physics_material_iapws
             !> Derivative \(\gamma_{\tau\tau}\)
             real(real64) :: gamma_tautau
 
-        end function calc_gamma_tautau_region1
+        end function calc_gamma_tt_region1
 
         !> Calculate the mixed second derivative of \(\gamma\).
         !> Computes \(\gamma_{\pi\tau} = \frac{\partial^2 \gamma}{\partial \pi \partial \tau}\).
-        module pure elemental function calc_gamma_pitau_region1(pi, tau) result(gamma_pitau)
+        module pure elemental function calc_gamma_pt_region1(pi, tau) result(gamma_pitau)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -156,7 +161,7 @@ module physics_material_iapws
             !> Derivative \(\gamma_{\pi\tau}\)
             real(real64) :: gamma_pitau
 
-        end function calc_gamma_pitau_region1
+        end function calc_gamma_pt_region1
 
         module pure elemental function calc_nu_iapws97_region1(T_in, P_in) result(nu)
             implicit none
@@ -228,7 +233,7 @@ module physics_material_iapws
 
         end function calc_gamma0_region2
 
-        module pure elemental function calc_gamma0_pi_region2(pi, tau) result(gamma0_p)
+        module pure elemental function calc_gamma0_p_region2(pi, tau) result(gamma0_p)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -237,9 +242,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^o_{\pi}\)
             real(real64) :: gamma0_p
 
-        end function calc_gamma0_pi_region2
+        end function calc_gamma0_p_region2
 
-        module pure elemental function calc_gamma0_pipi_region2(pi, tau) result(gamma0_pp)
+        module pure elemental function calc_gamma0_pp_region2(pi, tau) result(gamma0_pp)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -248,9 +253,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^o_{\pi}\)
             real(real64) :: gamma0_pp
 
-        end function calc_gamma0_pipi_region2
+        end function calc_gamma0_pp_region2
 
-        module pure elemental function calc_gamma0_tau_region2(pi, tau) result(gamma0_t)
+        module pure elemental function calc_gamma0_t_region2(pi, tau) result(gamma0_t)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -259,9 +264,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\pi}\)
             real(real64) :: gamma0_t
 
-        end function calc_gamma0_tau_region2
+        end function calc_gamma0_t_region2
 
-        module pure elemental function calc_gamma0_tautau_region2(pi, tau) result(gamma0_tt)
+        module pure elemental function calc_gamma0_tt_region2(pi, tau) result(gamma0_tt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -270,9 +275,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\pi}\)
             real(real64) :: gamma0_tt
 
-        end function calc_gamma0_tautau_region2
+        end function calc_gamma0_tt_region2
 
-        module pure elemental function calc_gamma0_pitau_region2(pi, tau) result(gamma0_pt)
+        module pure elemental function calc_gamma0_pt_region2(pi, tau) result(gamma0_pt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -281,7 +286,7 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\pi}\)
             real(real64) :: gamma0_pt
 
-        end function calc_gamma0_pitau_region2
+        end function calc_gamma0_pt_region2
 
         module pure elemental function calc_gammar_region2(pi, tau) result(gammar)
             implicit none
@@ -294,7 +299,7 @@ module physics_material_iapws
 
         end function calc_gammar_region2
 
-        module pure elemental function calc_gammar_pi_region2(pi, tau) result(gammar_p)
+        module pure elemental function calc_gammar_p_region2(pi, tau) result(gammar_p)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -303,9 +308,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\pi}\)
             real(real64) :: gammar_p
 
-        end function calc_gammar_pi_region2
+        end function calc_gammar_p_region2
 
-        module pure elemental function calc_gammar_pipi_region2(pi, tau) result(gammar_pp)
+        module pure elemental function calc_gammar_pp_region2(pi, tau) result(gammar_pp)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -314,9 +319,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\pi\pi}\)
             real(real64) :: gammar_pp
 
-        end function calc_gammar_pipi_region2
+        end function calc_gammar_pp_region2
 
-        module pure elemental function calc_gammar_tau_region2(pi, tau) result(gammar_t)
+        module pure elemental function calc_gammar_t_region2(pi, tau) result(gammar_t)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -325,9 +330,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\tau}\)
             real(real64) :: gammar_t
 
-        end function calc_gammar_tau_region2
+        end function calc_gammar_t_region2
 
-        module pure elemental function calc_gammar_tautau_region2(pi, tau) result(gammar_tt)
+        module pure elemental function calc_gammar_tt_region2(pi, tau) result(gammar_tt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -336,9 +341,9 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\tau\tau}\)
             real(real64) :: gammar_tt
 
-        end function calc_gammar_tautau_region2
+        end function calc_gammar_tt_region2
 
-        module pure elemental function calc_gammar_pitau_region2(pi, tau) result(gammar_pt)
+        module pure elemental function calc_gammar_pt_region2(pi, tau) result(gammar_pt)
             implicit none
             !> Dimensionless pressure \(\pi\)
             real(real64), intent(in) :: pi
@@ -347,7 +352,7 @@ module physics_material_iapws
             !> Derivative \(\gamma^r_{\pi\tau}\)
             real(real64) :: gammar_pt
 
-        end function calc_gammar_pitau_region2
+        end function calc_gammar_pt_region2
 
         module pure elemental function calc_nu_iapws97_region2(T_in, P_in) result(nu)
             implicit none
@@ -442,44 +447,44 @@ module physics_material_iapws
         end function calc_phi_region3
 
         !> First derivative w.r.t. \(\delta\): \(\phi_{\delta} = (\partial \phi / \partial \delta)_{\tau}\)
-        module pure elemental function calc_phi_delta_region3(delta, tau) result(phi_d)
+        module pure elemental function calc_phi_d_region3(delta, tau) result(phi_d)
             implicit none
             real(real64), intent(in) :: delta
             real(real64), intent(in) :: tau
             real(real64) :: phi_d
-        end function calc_phi_delta_region3
+        end function calc_phi_d_region3
 
         !> Second derivative w.r.t. \(\delta\): \(\phi_{\delta\delta} = (\partial^2 \phi / \partial \delta^2)_{\tau}\)
-        module pure elemental function calc_phi_deltadelta_region3(delta, tau) result(phi_dd)
+        module pure elemental function calc_phi_dd_region3(delta, tau) result(phi_dd)
             implicit none
             real(real64), intent(in) :: delta
             real(real64), intent(in) :: tau
             real(real64) :: phi_dd
-        end function calc_phi_deltadelta_region3
+        end function calc_phi_dd_region3
 
         !> First derivative w.r.t. \(\tau\): \(\phi_{\tau} = (\partial \phi / \partial \tau)_{\delta}\)
-        module pure elemental function calc_phi_tau_region3(delta, tau) result(phi_t)
+        module pure elemental function calc_phi_t_region3(delta, tau) result(phi_t)
             implicit none
             real(real64), intent(in) :: delta
             real(real64), intent(in) :: tau
             real(real64) :: phi_t
-        end function calc_phi_tau_region3
+        end function calc_phi_t_region3
 
         !> Second derivative w.r.t. \(\tau\): \(\phi_{\tau\tau} = (\partial^2 \phi / \partial \tau^2)_{\delta}\)
-        module pure elemental function calc_phi_tautau_region3(delta, tau) result(phi_tt)
+        module pure elemental function calc_phi_tt_region3(delta, tau) result(phi_tt)
             implicit none
             real(real64), intent(in) :: delta
             real(real64), intent(in) :: tau
             real(real64) :: phi_tt
-        end function calc_phi_tautau_region3
+        end function calc_phi_tt_region3
 
         !> Mixed derivative: \(\phi_{\delta\tau} = \partial^2 \phi / (\partial \delta \partial \tau)\)
-        module pure elemental function calc_phi_deltatau_region3(delta, tau) result(phi_dt)
+        module pure elemental function calc_phi_dt_region3(delta, tau) result(phi_dt)
             implicit none
             real(real64), intent(in) :: delta
             real(real64), intent(in) :: tau
             real(real64) :: phi_dt
-        end function calc_phi_deltatau_region3
+        end function calc_phi_dt_region3
 
         module pure elemental function calc_p_iapws97_region3(T_in, rho_in) result(p)
             implicit none
@@ -612,44 +617,44 @@ module physics_material_iapws
 
         end function calc_gamma0_region5
 
-        module pure elemental function calc_gamma0_pi_region5(pi, tau) result(gamma0_p)
+        module pure elemental function calc_gamma0_p_region5(pi, tau) result(gamma0_p)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gamma0_p
-        end function calc_gamma0_pi_region5
+        end function calc_gamma0_p_region5
 
-        module pure elemental function calc_gamma0_pipi_region5(pi, tau) result(gamma0_pp)
+        module pure elemental function calc_gamma0_pp_region5(pi, tau) result(gamma0_pp)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gamma0_pp
 
-        end function calc_gamma0_pipi_region5
+        end function calc_gamma0_pp_region5
 
-        module pure elemental function calc_gamma0_tau_region5(pi, tau) result(gamma0_t)
+        module pure elemental function calc_gamma0_t_region5(pi, tau) result(gamma0_t)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gamma0_t
 
-        end function calc_gamma0_tau_region5
+        end function calc_gamma0_t_region5
 
-        module pure elemental function calc_gamma0_tautau_region5(pi, tau) result(gamma0_tt)
+        module pure elemental function calc_gamma0_tt_region5(pi, tau) result(gamma0_tt)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gamma0_tt
 
-        end function calc_gamma0_tautau_region5
+        end function calc_gamma0_tt_region5
 
-        module pure elemental function calc_gamma0_pitau_region5(pi, tau) result(gamma0_pt)
+        module pure elemental function calc_gamma0_pt_region5(pi, tau) result(gamma0_pt)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gamma0_pt
 
-        end function calc_gamma0_pitau_region5
+        end function calc_gamma0_pt_region5
 
         module pure elemental function calc_gammar_region5(pi, tau) result(gammar)
             implicit none
@@ -659,45 +664,45 @@ module physics_material_iapws
 
         end function calc_gammar_region5
 
-        module pure elemental function calc_gammar_pi_region5(pi, tau) result(gammar_p)
+        module pure elemental function calc_gammar_p_region5(pi, tau) result(gammar_p)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gammar_p
 
-        end function calc_gammar_pi_region5
+        end function calc_gammar_p_region5
 
-        module pure elemental function calc_gammar_pipi_region5(pi, tau) result(gammar_pp)
+        module pure elemental function calc_gammar_pp_region5(pi, tau) result(gammar_pp)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gammar_pp
 
-        end function calc_gammar_pipi_region5
+        end function calc_gammar_pp_region5
 
-        module pure elemental function calc_gammar_tau_region5(pi, tau) result(gammar_t)
+        module pure elemental function calc_gammar_t_region5(pi, tau) result(gammar_t)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gammar_t
 
-        end function calc_gammar_tau_region5
+        end function calc_gammar_t_region5
 
-        module pure elemental function calc_gammar_tautau_region5(pi, tau) result(gammar_tt)
+        module pure elemental function calc_gammar_tt_region5(pi, tau) result(gammar_tt)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gammar_tt
 
-        end function calc_gammar_tautau_region5
+        end function calc_gammar_tt_region5
 
-        module pure elemental function calc_gammar_pitau_region5(pi, tau) result(gammar_pt)
+        module pure elemental function calc_gammar_pt_region5(pi, tau) result(gammar_pt)
             implicit none
             real(real64), intent(in) :: pi
             real(real64), intent(in) :: tau
             real(real64) :: gammar_pt
 
-        end function calc_gammar_pitau_region5
+        end function calc_gammar_pt_region5
 
         module pure elemental function calc_nu_iapws97_region5(T_in, P_in) result(u)
             implicit none
@@ -777,6 +782,73 @@ module physics_material_iapws
         end function calc_w_iapws97_region5
     end interface
 
-contains
+    interface
 
+        !---------------------------------------------------------------------------
+        ! Gibbs Energy: g(T,p) [Eq 1]
+        !---------------------------------------------------------------------------
+        module pure elemental function calc_gamma_Ih(T_in, P_in) result(gamma)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            real(real64) :: gamma
+
+        end function calc_gamma_Ih
+
+        !---------------------------------------------------------------------------
+        ! Derivative w.r.t Temperature: g_T [Table 4, 2nd eq]
+        ! Result unit: J / (kg K) -> -Entropy
+        !---------------------------------------------------------------------------
+        module pure elemental function calc_gamma_t_Ih(T_in, P_in) result(gamma_t)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            real(real64) :: gamma_t
+
+        end function calc_gamma_t_Ih
+
+        module pure elemental function calc_gamma_p_Ih(T_in, P_in) result(gamma_p)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            real(real64) :: gamma_p
+
+        end function calc_gamma_p_Ih
+
+        module pure elemental function calc_gamma_tt_Ih(T_in, P_in) result(gamma_tt)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            real(real64) :: gamma_tt
+
+        end function calc_gamma_tt_Ih
+
+        module pure elemental function calc_gamma_tp_Ih(T_in, P_in) result(gamma_tp)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            real(real64) :: gamma_tp
+
+        end function calc_gamma_tp_Ih
+
+        module pure elemental function calc_gamma_pp_Ih(T_in, P_in) result(gamma_pp)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            real(real64) :: gamma_pp
+
+        end function calc_gamma_pp_Ih
+    end interface
 end module physics_material_iapws

@@ -88,7 +88,7 @@ contains
 
     end function calc_gamma0_region2
 
-    module pure elemental function calc_gamma0_pi_region2(pi, tau) result(gamma0_p)
+    module pure elemental function calc_gamma0_p_region2(pi, tau) result(gamma0_p)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -99,9 +99,9 @@ contains
 
         gamma0_p = 1.0d0 / pi
 
-    end function calc_gamma0_pi_region2
+    end function calc_gamma0_p_region2
 
-    module pure elemental function calc_gamma0_pipi_region2(pi, tau) result(gamma0_pp)
+    module pure elemental function calc_gamma0_pp_region2(pi, tau) result(gamma0_pp)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -112,9 +112,9 @@ contains
 
         gamma0_pp = -1.0d0 / pi**2.0d0
 
-    end function calc_gamma0_pipi_region2
+    end function calc_gamma0_pp_region2
 
-    module pure elemental function calc_gamma0_tau_region2(pi, tau) result(gamma0_t)
+    module pure elemental function calc_gamma0_t_region2(pi, tau) result(gamma0_t)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -133,9 +133,9 @@ contains
             gamma0_t = gamma0_t + term_t
         end do
 
-    end function calc_gamma0_tau_region2
+    end function calc_gamma0_t_region2
 
-    module pure elemental function calc_gamma0_tautau_region2(pi, tau) result(gamma0_tt)
+    module pure elemental function calc_gamma0_tt_region2(pi, tau) result(gamma0_tt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -154,9 +154,9 @@ contains
             gamma0_tt = gamma0_tt + term_tt
         end do
 
-    end function calc_gamma0_tautau_region2
+    end function calc_gamma0_tt_region2
 
-    module pure elemental function calc_gamma0_pitau_region2(pi, tau) result(gamma0_pt)
+    module pure elemental function calc_gamma0_pt_region2(pi, tau) result(gamma0_pt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -167,7 +167,7 @@ contains
 
         gamma0_pt = 0.0d0
 
-    end function calc_gamma0_pitau_region2
+    end function calc_gamma0_pt_region2
 
     module pure elemental function calc_gammar_region2(pi, tau) result(gammar)
         implicit none
@@ -190,7 +190,7 @@ contains
 
     end function calc_gammar_region2
 
-    module pure elemental function calc_gammar_pi_region2(pi, tau) result(gammar_p)
+    module pure elemental function calc_gammar_p_region2(pi, tau) result(gammar_p)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -209,9 +209,9 @@ contains
             gammar_p = gammar_p + term_p
         end do
 
-    end function calc_gammar_pi_region2
+    end function calc_gammar_p_region2
 
-    module pure elemental function calc_gammar_pipi_region2(pi, tau) result(gammar_pp)
+    module pure elemental function calc_gammar_pp_region2(pi, tau) result(gammar_pp)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -230,9 +230,9 @@ contains
             gammar_pp = gammar_pp + term_pp
         end do
 
-    end function calc_gammar_pipi_region2
+    end function calc_gammar_pp_region2
 
-    module pure elemental function calc_gammar_tau_region2(pi, tau) result(gammar_t)
+    module pure elemental function calc_gammar_t_region2(pi, tau) result(gammar_t)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -251,9 +251,9 @@ contains
             gammar_t = gammar_t + term_t
         end do
 
-    end function calc_gammar_tau_region2
+    end function calc_gammar_t_region2
 
-    module pure elemental function calc_gammar_tautau_region2(pi, tau) result(gammar_tt)
+    module pure elemental function calc_gammar_tt_region2(pi, tau) result(gammar_tt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -272,9 +272,9 @@ contains
             gammar_tt = gammar_tt + term_tt
         end do
 
-    end function calc_gammar_tautau_region2
+    end function calc_gammar_tt_region2
 
-    module pure elemental function calc_gammar_pitau_region2(pi, tau) result(gammar_pt)
+    module pure elemental function calc_gammar_pt_region2(pi, tau) result(gammar_pt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
@@ -293,6 +293,6 @@ contains
             gammar_pt = gammar_pt + term_pt
         end do
 
-    end function calc_gammar_pitau_region2
+    end function calc_gammar_pt_region2
 
 end submodule iapws97_base_region2

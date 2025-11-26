@@ -23,10 +23,10 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gamma_p = calc_gamma_pi_region1(pi, tau)
-        gamma_tt = calc_gamma_tautau_region1(pi, tau)
-        gamma_pp = calc_gamma_pipi_region1(pi, tau)
-        gamma_pt = calc_gamma_pitau_region1(pi, tau)
+        gamma_p = calc_gamma_p_region1(pi, tau)
+        gamma_tt = calc_gamma_tt_region1(pi, tau)
+        gamma_pp = calc_gamma_pp_region1(pi, tau)
+        gamma_pt = calc_gamma_pt_region1(pi, tau)
 
         cv = (-tau**2.0d0 * gamma_tt + (gamma_p - tau * gamma_pt)**2.0d0 / gamma_pp) * specific_gas_constant_water
 
@@ -55,13 +55,13 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        gammar_p = calc_gammar_pi_region2(pi, tau)
-        gamma0_tt = calc_gamma0_tautau_region2(pi, tau)
-        gammar_tt = calc_gammar_tautau_region2(pi, tau)
-        gamma0_pp = calc_gamma0_pipi_region2(pi, tau)
-        gammar_pp = calc_gammar_pipi_region2(pi, tau)
-        gamma0_pt = calc_gamma0_pitau_region2(pi, tau)
-        gammar_pt = calc_gammar_pitau_region2(pi, tau)
+        gammar_p = calc_gammar_p_region2(pi, tau)
+        gamma0_tt = calc_gamma0_tt_region2(pi, tau)
+        gammar_tt = calc_gammar_tt_region2(pi, tau)
+        gamma0_pp = calc_gamma0_pp_region2(pi, tau)
+        gammar_pp = calc_gammar_pp_region2(pi, tau)
+        gamma0_pt = calc_gamma0_pt_region2(pi, tau)
+        gammar_pt = calc_gammar_pt_region2(pi, tau)
 
         cv = (-tau**2.0d0 * (gamma0_tt + gammar_tt) - (1.0d0 + pi * gammar_p - tau * pi * gammar_pt)**2.0d0 / (1 - pi**2.0d0 * gamma0_pp)) * specific_gas_constant_water
 
@@ -88,7 +88,7 @@ contains
         ! ==========================================================
         ! Get derivatives from parent module
         ! ==========================================================
-        phi_tt = calc_phi_tautau_region3(delta, tau)
+        phi_tt = calc_phi_tt_region3(delta, tau)
 
         cv = -tau**2.0d0 * phi_tt * specific_gas_constant_water
 
@@ -110,10 +110,10 @@ contains
         tau = T_star5 / T_in
 
         ! Get all total derivatives (ideal + residual)
-        gamma_tt = calc_gamma0_tautau_region5(pi, tau) + calc_gammar_tautau_region5(pi, tau)
-        gamma_p = calc_gamma0_pi_region5(pi, tau) + calc_gammar_pi_region5(pi, tau)
-        gamma_pp = calc_gamma0_pipi_region5(pi, tau) + calc_gammar_pipi_region5(pi, tau)
-        gamma_pt = calc_gamma0_pitau_region5(pi, tau) + calc_gammar_pitau_region5(pi, tau)
+        gamma_tt = calc_gamma0_tt_region5(pi, tau) + calc_gammar_tt_region5(pi, tau)
+        gamma_p = calc_gamma0_p_region5(pi, tau) + calc_gammar_p_region5(pi, tau)
+        gamma_pp = calc_gamma0_pp_region5(pi, tau) + calc_gammar_pp_region5(pi, tau)
+        gamma_pt = calc_gamma0_pt_region5(pi, tau) + calc_gammar_pt_region5(pi, tau)
 
         ! Calculate Cp first
         cp_val = specific_gas_constant_water * (-tau**2 * gamma_tt)

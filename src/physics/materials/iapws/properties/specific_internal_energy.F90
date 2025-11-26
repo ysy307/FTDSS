@@ -20,8 +20,8 @@ contains
         pi = P_in / p_star1
         tau = T_star1 / T_in
 
-        gamma_t = calc_gamma_tau_region1(pi, tau)
-        gamma_p = calc_gamma_pi_region1(pi, tau)
+        gamma_t = calc_gamma_t_region1(pi, tau)
+        gamma_p = calc_gamma_p_region1(pi, tau)
 
         ! ==========================================================
         ! Calculate Specific internal energy [J/kg]
@@ -48,8 +48,8 @@ contains
         pi = P_in / p_star2
         tau = T_star2 / T_in
 
-        gamma_tau = calc_gamma0_tau_region2(pi, tau) + calc_gammar_tau_region2(pi, tau)
-        gamma_pi = calc_gamma0_pi_region2(pi, tau) + calc_gammar_pi_region2(pi, tau)
+        gamma_tau = calc_gamma0_t_region2(pi, tau) + calc_gammar_t_region2(pi, tau)
+        gamma_pi = calc_gamma0_p_region2(pi, tau) + calc_gammar_p_region2(pi, tau)
 
         ! ==========================================================
         ! Calculate Specific internal energy [J/kg]
@@ -76,7 +76,7 @@ contains
         delta = rho_in / rho_star3
         tau = T_star3 / T_in
 
-        phi_t = calc_phi_tau_region3(delta, tau)
+        phi_t = calc_phi_t_region3(delta, tau)
 
         ! ==========================================================
         ! Calculate Specific internal energy [J/kg]
@@ -100,8 +100,8 @@ contains
         tau = T_star5 / T_in
 
         ! Sum of ideal and residual derivatives
-        gamma_p = calc_gamma0_pi_region5(pi, tau) + calc_gammar_pi_region5(pi, tau)
-        gamma_t = calc_gamma0_tau_region5(pi, tau) + calc_gammar_tau_region5(pi, tau)
+        gamma_p = calc_gamma0_p_region5(pi, tau) + calc_gammar_p_region5(pi, tau)
+        gamma_t = calc_gamma0_t_region5(pi, tau) + calc_gammar_t_region5(pi, tau)
 
         u = specific_gas_constant_water * T_in * (tau * gamma_t - pi * gamma_p)
     end function calc_u_iapws97_region5
