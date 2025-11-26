@@ -85,4 +85,25 @@ contains
 
     end function get_u_iapws97_region3
 
+    !> Specific Internal Energy [J/kg]
+    !> Formula: u = R*T * (tau*gamma_tau - pi*gamma_pi)
+    module pure elemental function get_u_iapws97_region5(T_in, P_in) result(u)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: u
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma_p, gamma_t
+
+        pi = P_in / p_star5
+        tau = T_star5 / T_in
+
+        ! Sum of ideal and residual derivatives
+        gamma_p = get_gamma0_pi_region5(pi, tau) + get_gammar_pi_region5(pi, tau)
+        gamma_t = get_gamma0_tau_region5(pi, tau) + get_gammar_tau_region5(pi, tau)
+
+        u = specific_gas_constant_water * T_in * (tau * gamma_t - pi * gamma_p)
+    end function get_u_iapws97_region5
+
 end submodule iapws_specific_internal_energy

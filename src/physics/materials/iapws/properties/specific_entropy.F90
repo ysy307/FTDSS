@@ -86,4 +86,24 @@ contains
         s = specific_gas_constant_water * (tau * phi_t - phi)
     end function get_s_iapws97_region3
 
+    !> Specific Entropy [J/(kg K)]
+    !> Formula: s = R * (tau*gamma_tau - gamma)
+    module pure elemental function get_s_iapws97_region5(T_in, P_in) result(s)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: s
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma, gamma_t
+
+        pi = P_in / p_star5
+        tau = T_star5 / T_in
+
+        gamma = get_gamma0_region5(pi, tau) + get_gammar_region5(pi, tau)
+        gamma_t = get_gamma0_tau_region5(pi, tau) + get_gammar_tau_region5(pi, tau)
+
+        s = specific_gas_constant_water * (tau * gamma_t - gamma)
+    end function get_s_iapws97_region5
+
 end submodule iapws_specific_entropy

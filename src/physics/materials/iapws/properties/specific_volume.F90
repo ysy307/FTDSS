@@ -52,4 +52,35 @@ contains
 
     end function get_nu_iapws97_region2
 
+    !> Specific Volume [m^3/kg]
+    !> Formula: v = (R*T/P) * pi * gamma_pi
+    module pure elemental function get_nu_iapws97_region5(T_in, P_in) result(nu)
+        implicit none
+        real(real64), intent(in) :: T_in ! Temperature [K]
+        real(real64), intent(in) :: P_in ! Pressure [Pa] (Modified from rho_in)
+        real(real64) :: nu
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma0_p, gammar_p, gamma_p
+
+        ! Dimensionless variables
+        pi = P_in / p_star5
+        tau = T_star5 / T_in
+
+        ! Derivatives
+        gamma0_p = get_gamma0_pi_region5(pi, tau)
+        gammar_p = get_gammar_pi_region5(pi, tau)
+        gamma_p = gamma0_p + gammar_p
+
+        ! v = (R * T / P) * pi * gamma_pi
+        ! Note: pi = P / P_star -> P = pi * P_star
+        ! v = (R * T / (pi * P_star)) * pi * gamma_pi
+        ! v = (R * T / P_star) * gamma_pi
+        ! P_star5 is 10 MPa = 10^7 Pa. R is J/kgK.
+
+        nu = (specific_gas_constant_water * T_in / p_star5) * gamma_p
+        ! Or simply using input P:
+        ! nu = (specific_gas_constant_water * T_in / P_in) * pi * gamma_p
+    end function get_nu_iapws97_region5
+
 end submodule iapws_specific_volume

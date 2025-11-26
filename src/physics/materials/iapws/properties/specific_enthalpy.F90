@@ -85,4 +85,23 @@ contains
 
     end function get_h_iapws97_region3
 
+    !> Specific Enthalpy [J/kg]
+    !> Formula: h = R*T * tau * gamma_tau
+    module pure elemental function get_h_iapws97_region5(T_in, P_in) result(h)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: h
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma_t
+
+        pi = P_in / p_star5
+        tau = T_star5 / T_in
+
+        gamma_t = get_gamma0_tau_region5(pi, tau) + get_gammar_tau_region5(pi, tau)
+
+        h = specific_gas_constant_water * T_in * tau * gamma_t
+    end function get_h_iapws97_region5
+
 end submodule iapws_specific_enthalpy

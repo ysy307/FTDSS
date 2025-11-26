@@ -40,6 +40,9 @@ contains
 
         write (unit, '(a)') "### IAPWS-IF97 Region 4"
         call test_iapws_region4()
+
+        write (unit, '(a)') "### IAPWS-IF97 Region 5"
+        call test_iapws_region5()
     end subroutine test_iapws
 
     subroutine test_auxiliary()
@@ -307,6 +310,85 @@ contains
         call check_variables(T_sat_calc, T_sat_exact, "IAPWS Region 4 Saturation Temperature")
 
     end subroutine test_iapws_region4
+
+    subroutine test_iapws_region5()
+        implicit none
+        integer(int32), parameter :: test_points = 3
+
+        ! Table 42 Inputs
+        ! Point 1: T=1500 K, p=0.5 MPa
+        ! Point 2: T=1500 K, p=30 MPa
+        ! Point 3: T=2000 K, p=30 MPa
+        real(real64), parameter :: T(test_points) = [1500.0d0, 1500.0d0, 2000.0d0]
+        ! Pressure: MPa -> Pa (* 1.0d6)
+        real(real64), parameter :: p(test_points) = [0.5d0, 30.0d0, 30.0d0] * 1.0d6
+
+        real(real64) :: nu(test_points)
+        real(real64) :: h(test_points)
+        real(real64) :: u(test_points)
+        real(real64) :: s(test_points)
+        real(real64) :: cp(test_points)
+        real(real64) :: w(test_points)
+
+        ! Table 42 Reference Data (Converted to SI units)
+
+        ! Specific Volume: m^3/kg (No conversion needed)
+        real(real64), parameter :: nu_exact(test_points) = [ &
+                                   0.138455090d1, &
+                                   0.230761299d-1, &
+                                   0.311385219d-1]
+
+        ! Enthalpy: kJ/kg -> J/kg (* 1.0d3)
+        real(real64), parameter :: h_exact(test_points) = [ &
+                                   0.521976855d4, &
+                                   0.516723514d4, &
+                                   0.657122604d4] * 1.0d3
+
+        ! Internal Energy: kJ/kg -> J/kg (* 1.0d3)
+        real(real64), parameter :: u_exact(test_points) = [ &
+                                   0.452749310d4, &
+                                   0.447495124d4, &
+                                   0.563707038d4] * 1.0d3
+
+        ! Entropy: kJ/(kg K) -> J/(kg K) (* 1.0d3)
+        real(real64), parameter :: s_exact(test_points) = [ &
+                                   0.965408875d1, &
+                                   0.772970133d1, &
+                                   0.853640523d1] * 1.0d3
+
+        ! Isobaric Heat Capacity: kJ/(kg K) -> J/(kg K) (* 1.0d3)
+        real(real64), parameter :: cp_exact(test_points) = [ &
+                                   0.261609445d1, &
+                                   0.272724317d1, &
+                                   0.288569882d1] * 1.0d3
+
+        ! Speed of Sound: m/s (No conversion needed)
+        real(real64), parameter :: w_exact(test_points) = [ &
+                                   0.917068690d3, &
+                                   0.928548002d3, &
+                                   0.106736948d4]
+
+        integer(int32) :: i
+
+        ! Execute calculations
+        do i = 1, test_points
+            nu(i) = get_nu_iapws97_region5(T(i), p(i))
+            h(i) = get_h_iapws97_region5(T(i), p(i))
+            u(i) = get_u_iapws97_region5(T(i), p(i))
+            s(i) = get_s_iapws97_region5(T(i), p(i))
+            cp(i) = get_cp_iapws97_region5(T(i), p(i))
+            w(i) = get_w_iapws97_region5(T(i), p(i))
+        end do
+
+        ! Verify results
+        call check_variables(nu, nu_exact, "IAPWS Region 5 Specific Volume")
+        call check_variables(h, h_exact, "IAPWS Region 5 Enthalpy")
+        call check_variables(u, u_exact, "IAPWS Region 5 Internal Energy")
+        call check_variables(s, s_exact, "IAPWS Region 5 Entropy")
+        call check_variables(cp, cp_exact, "IAPWS Region 5 Isobaric Heat Capacity")
+        call check_variables(w, w_exact, "IAPWS Region 5 Speed of Sound")
+
+    end subroutine test_iapws_region5
 
     subroutine check_variable(v, v_exa, v_name)
         implicit none

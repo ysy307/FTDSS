@@ -109,4 +109,23 @@ contains
 
     end function get_cp_iapws97_region3
 
+    !> Specific Isobaric Heat Capacity [J/(kg K)]
+    !> Formula: cp = -R * tau^2 * gamma_tautau
+    module pure elemental function get_cp_iapws97_region5(T_in, P_in) result(cp)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: cp
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma_tt
+
+        pi = P_in / p_star5
+        tau = T_star5 / T_in
+
+        gamma_tt = get_gamma0_tautau_region5(pi, tau) + get_gammar_tautau_region5(pi, tau)
+
+        cp = specific_gas_constant_water * (-tau**2 * gamma_tt)
+    end function get_cp_iapws97_region5
+
 end submodule iapws_specific_isobaric_heat_capacity

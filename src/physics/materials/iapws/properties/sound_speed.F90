@@ -144,4 +144,61 @@ contains
         w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
 
     end function get_w_iapws97_region3
+
+    module pure elemental function get_w_iapws97_region5(T_in, P_in) result(w)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: w
+
+        real(real64) :: pi, tau
+        real(real64) :: gammar_p, gammar_pp, gammar_pt, gammar_tt
+        real(real64) :: gamma0_tt
+        real(real64) :: numerator, denom_term1, denom_term2, w2_dimless
+
+        ! Region 5 Reference Pressure is 1 MPa
+        real(real64), parameter :: p_ref_r5 = 1.0d6
+
+        ! Dimensionless variables
+        pi = P_in / p_ref_r5
+        tau = T_star5 / T_in
+
+        ! ==========================================================
+        ! Calculate derivatives needed for the explicit formula
+        ! Use Residual parts (gammar) and Ideal part (gamma0_tt only)
+        ! ==========================================================
+
+        ! Residual part derivatives
+        gammar_p = get_gammar_pi_region5(pi, tau)
+        gammar_pp = get_gammar_pipi_region5(pi, tau)
+        gammar_pt = get_gammar_pitau_region5(pi, tau)
+        gammar_tt = get_gammar_tautau_region5(pi, tau)
+
+        ! Ideal gas part derivative (only gamma0_tautau is needed)
+        gamma0_tt = get_gamma0_tautau_region5(pi, tau)
+
+        ! ==========================================================
+        ! Calculate Speed of Sound using explicit formula (Eq. 16 style)
+        ! w^2/RT = Numerator / Denominator
+        ! ==========================================================
+
+        ! Numerator = 1 + 2*pi*gammar_pi + (pi*gammar_pi)^2
+        numerator = 1.0d0 + 2.0d0 * pi * gammar_p + (pi * gammar_p)**2
+
+        ! Denominator Term 1 = 1 - pi^2 * gammar_pipi
+        denom_term1 = 1.0d0 - pi**2 * gammar_pp
+
+        ! Denominator Term 2 = (1 + pi*gammar_pi - tau*pi*gammar_pitau)^2 / (tau^2 * (gamma0_tautau + gammar_tautau))
+        ! Note: (gamma0_tt + gammar_tt) corresponds to -Cp*tau^2/R and is negative.
+        ! So denom_term2 will be a negative value subtraction.
+        denom_term2 = ((1.0d0 + pi * gammar_p - tau * pi * gammar_pt)**2) / &
+                      (tau**2 * (gamma0_tt + gammar_tt))
+
+        ! Total Denominator = Term1 + Term2 (as per the image formula)
+        w2_dimless = numerator / (denom_term1 + denom_term2)
+
+        ! Convert to dimensions [m/s]
+        w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
+
+    end function get_w_iapws97_region5
 end submodule iapws_sound_speed

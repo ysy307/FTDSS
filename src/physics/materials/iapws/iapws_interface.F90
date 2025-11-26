@@ -7,25 +7,32 @@ module physics_material_iapws
     public :: get_boundary_temperature_region23
     public :: get_nu_iapws97_region1
     public :: get_nu_iapws97_region2
+    public :: get_nu_iapws97_region5
     public :: get_p_iapws97_region3
     public :: get_u_iapws97_region1
     public :: get_u_iapws97_region2
     public :: get_u_iapws97_region3
+    public :: get_u_iapws97_region5
     public :: get_s_iapws97_region1
     public :: get_s_iapws97_region2
     public :: get_s_iapws97_region3
+    public :: get_s_iapws97_region5
     public :: get_h_iapws97_region1
     public :: get_h_iapws97_region2
     public :: get_h_iapws97_region3
+    public :: get_h_iapws97_region5
     public :: get_cp_iapws97_region1
     public :: get_cp_iapws97_region2
     public :: get_cp_iapws97_region3
+    public :: get_cp_iapws97_region5
     public :: get_cv_iapws97_region1
     public :: get_cv_iapws97_region2
     public :: get_cv_iapws97_region3
+    public :: get_cv_iapws97_region5
     public :: get_w_iapws97_region1
     public :: get_w_iapws97_region2
     public :: get_w_iapws97_region3
+    public :: get_w_iapws97_region5
     public :: get_sat_pressure_region4
     public :: get_sat_temperature_region4
 
@@ -54,7 +61,7 @@ module physics_material_iapws
     ! Reigon5: High Temperature Steam (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
     real(real64), parameter :: T_star5 = 1000.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star5 = 10.0d6 ! 基準圧力 [Pa]
+    real(real64), parameter :: p_star5 = 1.0d6 ! 基準圧力 [Pa]
 
     interface
         module pure elemental function get_boundary_pressure_region23(temperature) result(pressure)
@@ -550,6 +557,34 @@ module physics_material_iapws
             real(real64) :: w
 
         end function get_w_iapws97_region3
+
+        module pure elemental function get_maxwell_residual_1(T_in, rho_liq, p_sat) result(res)
+            implicit none
+            real(real64), intent(in) :: T_in ! Temperature [K]
+            real(real64), intent(in) :: rho_liq ! Saturated Liquid Density [kg/m^3] (rho')
+            real(real64), intent(in) :: p_sat ! Saturation Pressure [Pa] (p_s)
+            real(real64) :: res
+
+        end function get_maxwell_residual_1
+
+        module pure elemental function get_maxwell_residual_2(T_in, rho_vap, p_sat) result(res)
+            implicit none
+            real(real64), intent(in) :: T_in ! Temperature [K]
+            real(real64), intent(in) :: rho_vap ! Saturated Vapor Density [kg/m^3] (rho'')
+            real(real64), intent(in) :: p_sat ! Saturation Pressure [Pa] (p_s)
+            real(real64) :: res
+
+        end function get_maxwell_residual_2
+
+        module pure elemental function get_maxwell_residual_3(T_in, rho_liq, rho_vap, p_sat) result(res)
+            implicit none
+            real(real64), intent(in) :: T_in ! Temperature [K]
+            real(real64), intent(in) :: rho_liq ! Saturated Liquid Density [kg/m^3] (rho')
+            real(real64), intent(in) :: rho_vap ! Saturated Vapor Density [kg/m^3] (rho'')
+            real(real64), intent(in) :: p_sat ! Saturation Pressure [Pa] (p_s)
+            real(real64) :: res
+
+        end function get_maxwell_residual_3
     end interface
 
     interface
@@ -663,6 +698,83 @@ module physics_material_iapws
             real(real64) :: gammar_pt
 
         end function get_gammar_pitau_region5
+
+        module pure elemental function get_nu_iapws97_region5(T_in, P_in) result(u)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific internal energy [J/kg]
+            real(real64) :: u
+
+        end function get_nu_iapws97_region5
+
+        module pure elemental function get_u_iapws97_region5(T_in, P_in) result(u)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific internal energy [J/kg]
+            real(real64) :: u
+
+        end function get_u_iapws97_region5
+
+        module pure elemental function get_s_iapws97_region5(T_in, P_in) result(s)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific entropy [J/kg-K]
+            real(real64) :: s
+
+        end function get_s_iapws97_region5
+
+        module pure elemental function get_h_iapws97_region5(T_in, P_in) result(h)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific enthalpy [J/kg]
+            real(real64) :: h
+
+        end function get_h_iapws97_region5
+
+        module pure elemental function get_cp_iapws97_region5(T_in, P_in) result(cp)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific heat capacity at constant pressure [J/kg-K]
+            real(real64) :: cp
+
+        end function get_cp_iapws97_region5
+
+        module pure elemental function get_cv_iapws97_region5(T_in, P_in) result(cv)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific heat capacity at constant volume [J/kg-K]
+            real(real64) :: cv
+
+        end function get_cv_iapws97_region5
+
+        module pure elemental function get_w_iapws97_region5(T_in, P_in) result(w)
+            implicit none
+            !> Temperature [K]
+            real(real64), intent(in) :: T_in
+            !> Pressure [Pa]
+            real(real64), intent(in) :: P_in
+            !> Specific speed of sound [m/s]
+            real(real64) :: w
+
+        end function get_w_iapws97_region5
     end interface
 
 contains

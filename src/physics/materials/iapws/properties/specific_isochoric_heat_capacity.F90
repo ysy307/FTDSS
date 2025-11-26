@@ -94,4 +94,34 @@ contains
 
     end function get_cv_iapws97_region3
 
+    !> Specific Isochoric Heat Capacity [J/(kg K)]
+    !> Formula: cv = cp - R * (gamma_pi - tau*gamma_pitau)^2 / (-gamma_pipi)
+    module pure elemental function get_cv_iapws97_region5(T_in, P_in) result(cv)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: cv
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma_tt, gamma_p, gamma_pp, gamma_pt
+        real(real64) :: cp_val, numerator, denominator
+
+        pi = P_in / p_star5
+        tau = T_star5 / T_in
+
+        ! Get all total derivatives (ideal + residual)
+        gamma_tt = get_gamma0_tautau_region5(pi, tau) + get_gammar_tautau_region5(pi, tau)
+        gamma_p = get_gamma0_pi_region5(pi, tau) + get_gammar_pi_region5(pi, tau)
+        gamma_pp = get_gamma0_pipi_region5(pi, tau) + get_gammar_pipi_region5(pi, tau)
+        gamma_pt = get_gamma0_pitau_region5(pi, tau) + get_gammar_pitau_region5(pi, tau)
+
+        ! Calculate Cp first
+        cp_val = specific_gas_constant_water * (-tau**2 * gamma_tt)
+
+        numerator = (gamma_p - tau * gamma_pt)**2
+        denominator = -gamma_pp ! Note: gamma_pp is typically negative
+
+        cv = cp_val - specific_gas_constant_water * (numerator / denominator)
+    end function get_cv_iapws97_region5
+
 end submodule iapws_specific_isochoric_heat_capacity
