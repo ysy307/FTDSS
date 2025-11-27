@@ -83,4 +83,20 @@ contains
         ! nu = (specific_gas_constant_water * T_in / P_in) * pi * gamma_p
     end function calc_nu_iapws97_region5
 
+    module pure elemental function calc_nu_iapws06_Ih(T_in, P_in) result(nu)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: nu
+
+        real(real64) :: pi, tau
+
+        ! Dimensionless variables
+        pi = P_in / p_starIh
+        tau = T_in / T_starIh
+
+        ! Specific Volume [m^3/kg]
+        nu = calc_gamma_p_iapws06_Ih(pi, tau)
+
+    end function calc_nu_iapws06_Ih
 end submodule iapws_specific_volume

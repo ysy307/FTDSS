@@ -128,4 +128,34 @@ contains
         cp = specific_gas_constant_water * (-tau**2 * gamma_tt)
     end function calc_cp_iapws97_region5
 
+    module pure elemental function calc_cp_iapws06_Ih(T_in, P_in) result(cp)
+        implicit none
+        !> Temperature [K]
+        real(real64), intent(in) :: T_in
+        !> Pressure [Pa]
+        real(real64), intent(in) :: P_in
+        !> Specific heat capacity at constant pressure [J/(kg K)]
+        real(real64) :: cp
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma_tt
+
+        ! ==========================================================
+        ! Dimensionless variables
+        ! ==========================================================
+        pi = P_in / p_starIh
+        tau = T_in / T_starIh
+
+        ! ==========================================================
+        ! Get derivatives from parent module
+        ! ==========================================================
+        gamma_tt = calc_gamma_tt_iapws06_Ih(pi, tau)
+
+        ! ==========================================================
+        ! Convert to physical units [J/(kg K)]
+        ! ==========================================================
+        cp = -T_in * gamma_tt
+
+    end function calc_cp_iapws06_Ih
+
 end submodule iapws_specific_isobaric_heat_capacity

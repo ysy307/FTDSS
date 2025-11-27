@@ -36,6 +36,16 @@ module physics_material_iapws
     public :: calc_sat_pressure_region4
     public :: calc_sat_temperature_region4
 
+    public :: calc_nu_iapws06_Ih
+    public :: calc_u_iapws06_Ih
+    public :: calc_s_iapws06_Ih
+    public :: calc_h_iapws06_Ih
+    public :: calc_cp_iapws06_Ih
+    public :: calc_alpha_iapws06_Ih
+    public :: calc_beta_iapws06_Ih
+    public :: calc_kappa_s_iapws06_Ih
+    public :: calc_kappa_T_iapws06_Ih
+
     !------------------------------------------------------------------------------------------
     ! Reigon1: Saturated liquid water (IAPWS-IF97)
     !------------------------------------------------------------------------------------------
@@ -356,9 +366,7 @@ module physics_material_iapws
 
         module pure elemental function calc_nu_iapws97_region2(T_in, P_in) result(nu)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
             !> Specific volume [m^3/kg]
             real(real64) :: nu
@@ -367,9 +375,7 @@ module physics_material_iapws
 
         module pure elemental function calc_u_iapws97_region2(T_in, P_in) result(u)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
             !> Specific internal energy [J/kg]
             real(real64) :: u
@@ -378,9 +384,7 @@ module physics_material_iapws
 
         module pure elemental function calc_s_iapws97_region2(T_in, P_in) result(s)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
             !> Specific entropy [J/kg-K]
             real(real64) :: s
@@ -389,9 +393,7 @@ module physics_material_iapws
 
         module pure elemental function calc_h_iapws97_region2(T_in, P_in) result(h)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
             !> Specific enthalpy [J/kg]
             real(real64) :: h
@@ -400,9 +402,7 @@ module physics_material_iapws
 
         module pure elemental function calc_cp_iapws97_region2(T_in, P_in) result(cp)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
             !> Specific heat capacity at constant pressure [J/(kg K)]
             real(real64) :: cp
@@ -411,9 +411,7 @@ module physics_material_iapws
 
         module pure elemental function calc_cv_iapws97_region2(T_in, P_in) result(cv)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
             !> Specific heat capacity at constant volume [J/(kg K)]
             real(real64) :: cv
@@ -422,9 +420,7 @@ module physics_material_iapws
 
         module pure elemental function calc_w_iapws97_region2(T_in, P_in) result(w)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
             !> Speed of sound [m/s]
             real(real64) :: w
@@ -488,18 +484,15 @@ module physics_material_iapws
 
         module pure elemental function calc_p_iapws97_region3(T_in, rho_in) result(p)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Density [kg/m^3]
             real(real64), intent(in) :: rho_in
-            !> Pressure [Pa]
             real(real64) :: p
 
         end function calc_p_iapws97_region3
 
         module pure elemental function calc_u_iapws97_region3(T_in, rho_in) result(u)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Density [kg/m^3]
             real(real64), intent(in) :: rho_in
@@ -510,7 +503,6 @@ module physics_material_iapws
 
         module pure elemental function calc_s_iapws97_region3(T_in, rho_in) result(s)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Density [kg/m^3]
             real(real64), intent(in) :: rho_in
@@ -521,7 +513,6 @@ module physics_material_iapws
 
         module pure elemental function calc_h_iapws97_region3(T_in, rho_in) result(h)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Density [kg/m^3]
             real(real64), intent(in) :: rho_in
@@ -532,7 +523,6 @@ module physics_material_iapws
 
         module pure elemental function calc_cp_iapws97_region3(T_in, rho_in) result(cp)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Density [kg/m^3]
             real(real64), intent(in) :: rho_in
@@ -543,7 +533,6 @@ module physics_material_iapws
 
         module pure elemental function calc_cv_iapws97_region3(T_in, rho_in) result(cv)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Density [kg/m^3]
             real(real64), intent(in) :: rho_in
@@ -554,7 +543,6 @@ module physics_material_iapws
 
         module pure elemental function calc_w_iapws97_region3(T_in, rho_in) result(w)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
             !> Density [kg/m^3]
             real(real64), intent(in) :: rho_in
@@ -574,19 +562,19 @@ module physics_material_iapws
 
         module pure elemental function calc_maxwell_residual_2(T_in, rho_vap, p_sat) result(res)
             implicit none
-            real(real64), intent(in) :: T_in ! Temperature [K]
-            real(real64), intent(in) :: rho_vap ! Saturated Vapor Density [kg/m^3] (rho'')
-            real(real64), intent(in) :: p_sat ! Saturation Pressure [Pa] (p_s)
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: rho_vap
+            real(real64), intent(in) :: p_sat
             real(real64) :: res
 
         end function calc_maxwell_residual_2
 
         module pure elemental function calc_maxwell_residual_3(T_in, rho_liq, rho_vap, p_sat) result(res)
             implicit none
-            real(real64), intent(in) :: T_in ! Temperature [K]
-            real(real64), intent(in) :: rho_liq ! Saturated Liquid Density [kg/m^3] (rho')
-            real(real64), intent(in) :: rho_vap ! Saturated Vapor Density [kg/m^3] (rho'')
-            real(real64), intent(in) :: p_sat ! Saturation Pressure [Pa] (p_s)
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: rho_liq
+            real(real64), intent(in) :: rho_vap
+            real(real64), intent(in) :: p_sat
             real(real64) :: res
 
         end function calc_maxwell_residual_3
@@ -706,77 +694,56 @@ module physics_material_iapws
 
         module pure elemental function calc_nu_iapws97_region5(T_in, P_in) result(u)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific internal energy [J/kg]
             real(real64) :: u
 
         end function calc_nu_iapws97_region5
 
         module pure elemental function calc_u_iapws97_region5(T_in, P_in) result(u)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific internal energy [J/kg]
             real(real64) :: u
 
         end function calc_u_iapws97_region5
 
         module pure elemental function calc_s_iapws97_region5(T_in, P_in) result(s)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific entropy [J/kg-K]
             real(real64) :: s
 
         end function calc_s_iapws97_region5
 
         module pure elemental function calc_h_iapws97_region5(T_in, P_in) result(h)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific enthalpy [J/kg]
             real(real64) :: h
 
         end function calc_h_iapws97_region5
 
         module pure elemental function calc_cp_iapws97_region5(T_in, P_in) result(cp)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific heat capacity at constant pressure [J/kg-K]
             real(real64) :: cp
 
         end function calc_cp_iapws97_region5
 
         module pure elemental function calc_cv_iapws97_region5(T_in, P_in) result(cv)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific heat capacity at constant volume [J/kg-K]
             real(real64) :: cv
 
         end function calc_cv_iapws97_region5
 
         module pure elemental function calc_w_iapws97_region5(T_in, P_in) result(w)
             implicit none
-            !> Temperature [K]
             real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
             real(real64), intent(in) :: P_in
-            !> Specific speed of sound [m/s]
             real(real64) :: w
 
         end function calc_w_iapws97_region5
@@ -787,68 +754,122 @@ module physics_material_iapws
         !---------------------------------------------------------------------------
         ! Gibbs Energy: g(T,p) [Eq 1]
         !---------------------------------------------------------------------------
-        module pure elemental function calc_gamma_Ih(T_in, P_in) result(gamma)
+        module pure elemental function calc_gamma_iapws06_Ih(pi, tau) result(gamma)
             implicit none
-            !> Temperature [K]
-            real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
-            real(real64), intent(in) :: P_in
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
             real(real64) :: gamma
 
-        end function calc_gamma_Ih
+        end function calc_gamma_iapws06_Ih
 
-        !---------------------------------------------------------------------------
-        ! Derivative w.r.t Temperature: g_T [Table 4, 2nd eq]
-        ! Result unit: J / (kg K) -> -Entropy
-        !---------------------------------------------------------------------------
-        module pure elemental function calc_gamma_t_Ih(T_in, P_in) result(gamma_t)
+        module pure elemental function calc_gamma_t_iapws06_Ih(pi, tau) result(gamma_t)
             implicit none
-            !> Temperature [K]
-            real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
-            real(real64), intent(in) :: P_in
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
             real(real64) :: gamma_t
 
-        end function calc_gamma_t_Ih
+        end function calc_gamma_t_iapws06_Ih
 
-        module pure elemental function calc_gamma_p_Ih(T_in, P_in) result(gamma_p)
+        module pure elemental function calc_gamma_p_iapws06_Ih(pi, tau) result(gamma_p)
             implicit none
-            !> Temperature [K]
-            real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
-            real(real64), intent(in) :: P_in
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
             real(real64) :: gamma_p
 
-        end function calc_gamma_p_Ih
+        end function calc_gamma_p_iapws06_Ih
 
-        module pure elemental function calc_gamma_tt_Ih(T_in, P_in) result(gamma_tt)
+        module pure elemental function calc_gamma_tt_iapws06_Ih(pi, tau) result(gamma_tt)
             implicit none
-            !> Temperature [K]
-            real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
-            real(real64), intent(in) :: P_in
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
             real(real64) :: gamma_tt
 
-        end function calc_gamma_tt_Ih
+        end function calc_gamma_tt_iapws06_Ih
 
-        module pure elemental function calc_gamma_tp_Ih(T_in, P_in) result(gamma_tp)
+        module pure elemental function calc_gamma_tp_iapws06_Ih(pi, tau) result(gamma_tp)
             implicit none
-            !> Temperature [K]
-            real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
-            real(real64), intent(in) :: P_in
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
             real(real64) :: gamma_tp
 
-        end function calc_gamma_tp_Ih
+        end function calc_gamma_tp_iapws06_Ih
 
-        module pure elemental function calc_gamma_pp_Ih(T_in, P_in) result(gamma_pp)
+        module pure elemental function calc_gamma_pp_iapws06_Ih(pi, tau) result(gamma_pp)
             implicit none
-            !> Temperature [K]
-            real(real64), intent(in) :: T_in
-            !> Pressure [Pa]
-            real(real64), intent(in) :: P_in
+            real(real64), intent(in) :: pi
+            real(real64), intent(in) :: tau
             real(real64) :: gamma_pp
 
-        end function calc_gamma_pp_Ih
+        end function calc_gamma_pp_iapws06_Ih
+
+        module pure elemental function calc_nu_iapws06_Ih(T_in, P_in) result(nu)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: nu
+        end function calc_nu_iapws06_Ih
+
+        module pure elemental function calc_u_iapws06_Ih(T_in, P_in) result(u)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: u
+        end function calc_u_iapws06_Ih
+
+        module pure elemental function calc_s_iapws06_Ih(T_in, P_in) result(s)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: s
+        end function calc_s_iapws06_Ih
+
+        module pure elemental function calc_h_iapws06_Ih(T_in, P_in) result(h)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: h
+
+        end function calc_h_iapws06_Ih
+
+        module pure elemental function calc_cp_iapws06_Ih(T_in, P_in) result(cp)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: cp
+
+        end function calc_cp_iapws06_Ih
+
+        module pure elemental function calc_alpha_iapws06_Ih(T_in, P_in) result(alpha)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: alpha
+
+        end function calc_alpha_iapws06_Ih
+
+        module pure elemental function calc_beta_iapws06_Ih(T_in, P_in) result(beta)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: beta
+
+        end function calc_beta_iapws06_Ih
+
+        module pure elemental function calc_kappa_T_iapws06_Ih(T_in, P_in) result(kappa_T)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: kappa_T
+
+        end function calc_kappa_T_iapws06_Ih
+
+        module pure elemental function calc_kappa_s_iapws06_Ih(T_in, P_in) result(kappa_T)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: kappa_T
+
+        end function calc_kappa_s_iapws06_Ih
+
     end interface
 end module physics_material_iapws

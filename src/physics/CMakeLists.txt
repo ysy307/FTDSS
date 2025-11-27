@@ -23,6 +23,10 @@ set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/properties/specific_isochoric_heat_capacity.F90
     materials/iapws/properties/sound_speed.F90
     materials/iapws/properties/maxwell_criterion.F90
+    materials/iapws/properties/cubic_expansion_coefficient.F90
+    materials/iapws/properties/isothermal_compressibility.F90
+    materials/iapws/properties/pressure_coefficient.F90
+    materials/iapws/properties/isentropic_compressibility.F90
     materials/iapws/iapws.F90
 )
 add_library(Physics_Material_IAPWS STATIC ${PHYSICS_MATERIAL_IAPWS_SOURCES})

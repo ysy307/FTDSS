@@ -104,4 +104,25 @@ contains
         h = specific_gas_constant_water * T_in * tau * gamma_t
     end function calc_h_iapws97_region5
 
+    module pure elemental function calc_h_iapws06_Ih(T_in, P_in) result(h)
+        implicit none
+        real(real64), intent(in) :: T_in ! Temperature [K]
+        real(real64), intent(in) :: P_in ! Pressure [Pa]
+        real(real64) :: h
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma, gamma_t
+
+        ! Dimensionless variables
+        pi = P_in / p_starIh
+        tau = T_in / T_starIh
+
+        gamma = calc_gamma_iapws06_Ih(pi, tau)
+        gamma_t = calc_gamma_t_iapws06_Ih(pi, tau)
+
+        ! Calculate specific enthalpy [J/kg]
+        h = gamma - T_in * gamma_t
+
+    end function calc_h_iapws06_Ih
+
 end submodule iapws_specific_enthalpy

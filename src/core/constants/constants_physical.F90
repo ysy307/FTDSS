@@ -3,7 +3,7 @@ module core_constants_physical
     implicit none
     private
     !> Mathematical constant pi
-    real(real64), parameter, public :: pi = 3.141592653589793d0
+    real(real64), parameter, public :: circle_ratio = 3.141592653589793d0
 
     !> Conversion from Celsius to Kelvin [K]
     real(real64), parameter, public :: celsius_to_kelvin = 273.15d0

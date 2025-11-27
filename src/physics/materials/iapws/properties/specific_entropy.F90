@@ -106,4 +106,29 @@ contains
         s = specific_gas_constant_water * (tau * gamma_t - gamma)
     end function calc_s_iapws97_region5
 
+    module pure elemental function calc_s_iapws06_Ih(T_in, P_in) result(s)
+        implicit none
+        !> Temperature [K]
+        real(real64), intent(in) :: T_in
+        !> Pressure [Pa]
+        real(real64), intent(in) :: P_in
+        !> Specific entropy [J/(kg K)]
+        real(real64) :: s
+
+        real(real64) :: pi, tau
+        real(real64) :: gamma_t
+
+        ! ==========================================================
+        ! Dimensionless variables
+        ! ==========================================================
+        pi = P_in / p_starIh
+        tau = T_in / T_starIh
+
+        ! ==========================================================
+        ! Calculate Specific entropy [J/(kg K)]
+        ! ==========================================================
+        s = -calc_gamma_t_iapws06_Ih(pi, tau)
+
+    end function calc_s_iapws06_Ih
+
 end submodule iapws_specific_entropy

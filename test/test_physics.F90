@@ -27,25 +27,28 @@ contains
     subroutine test_iapws()
         implicit none
         write (unit, '(a)') "### IAPWS-IF97 Auxiliary functions"
-        call test_auxiliary()
+        call test_iapws97_auxiliary()
 
         write (unit, '(a)') "### IAPWS-IF97 Region 1"
-        call test_iapws_region1()
+        call test_iapws97_region1()
 
         write (unit, '(a)') "### IAPWS-IF97 Region 2"
-        call test_iapws_region2()
+        call test_iapws97_region2()
 
         write (unit, '(a)') "### IAPWS-IF97 Region 3"
-        call test_iapws_region3()
+        call test_iapws97_region3()
 
         write (unit, '(a)') "### IAPWS-IF97 Region 4"
-        call test_iapws_region4()
+        call test_iapws97_region4()
 
         write (unit, '(a)') "### IAPWS-IF97 Region 5"
-        call test_iapws_region5()
+        call test_iapws97_region5()
+
+        write (unit, '(a)') "### IAPWS-06 Ice Ih"
+        call test_iapws06_Ih()
     end subroutine test_iapws
 
-    subroutine test_auxiliary()
+    subroutine test_iapws97_auxiliary()
         implicit none
         real(real64), parameter :: T_test = 0.623150000d3 ! K
         real(real64), parameter :: p_test = 0.165291643d8 ! Pa
@@ -58,9 +61,9 @@ contains
         call check_variable(p_boundary, p_test, "IAPWS-IF97 boundary pressure (region 2-3)")
         call check_variable(T_boundary, T_test, "IAPWS-IF97 boundary temperature (region 2-3)")
 
-    end subroutine test_auxiliary
+    end subroutine test_iapws97_auxiliary
 
-    subroutine test_iapws_region1()
+    subroutine test_iapws97_region1()
         implicit none
         integer(int32), parameter :: test_points = 3
         real(real64), parameter :: T(test_points) = [300.0d0, 300.0d0, 500.0d0]
@@ -98,9 +101,9 @@ contains
         call check_variables(cp, cp_exact, "IAPWS Region 1 isobaric heat capacity")
         call check_variables(w, w_exact, "IAPWS Region 1 speed of sound")
 
-    end subroutine test_iapws_region1
+    end subroutine test_iapws97_region1
 
-    subroutine test_iapws_region2()
+    subroutine test_iapws97_region2()
         implicit none
         integer(int32), parameter :: test_points = 3
         ! Table 15のテスト条件
@@ -174,9 +177,9 @@ contains
         call check_variables(cp, cp_exact, "IAPWS Region 2 isobaric heat capacity")
         call check_variables(w, w_exact, "IAPWS Region 2 speed of sound")
 
-    end subroutine test_iapws_region2
+    end subroutine test_iapws97_region2
 
-    subroutine test_iapws_region3()
+    subroutine test_iapws97_region3()
         implicit none
         integer(int32), parameter :: test_points = 3
 
@@ -252,9 +255,9 @@ contains
         call check_variables(cp, cp_exact, "IAPWS Region 3 Isobaric Heat Capacity")
         call check_variables(w, w_exact, "IAPWS Region 3 Speed of Sound")
 
-    end subroutine test_iapws_region3
+    end subroutine test_iapws97_region3
 
-    subroutine test_iapws_region4()
+    subroutine test_iapws97_region4()
         implicit none
         integer(int32), parameter :: test_points_p = 3
         integer(int32), parameter :: test_points_t = 3
@@ -309,9 +312,9 @@ contains
 
         call check_variables(T_sat_calc, T_sat_exact, "IAPWS Region 4 Saturation Temperature")
 
-    end subroutine test_iapws_region4
+    end subroutine test_iapws97_region4
 
-    subroutine test_iapws_region5()
+    subroutine test_iapws97_region5()
         implicit none
         integer(int32), parameter :: test_points = 3
 
@@ -388,7 +391,75 @@ contains
         call check_variables(cp, cp_exact, "IAPWS Region 5 Isobaric Heat Capacity")
         call check_variables(w, w_exact, "IAPWS Region 5 Speed of Sound")
 
-    end subroutine test_iapws_region5
+    end subroutine test_iapws97_region5
+
+    subroutine test_iapws06_Ih()
+        implicit none
+        integer(int32), parameter :: test_points = 3
+
+        ! Table 3の条件 (T, p)
+        ! 1. Triple point: Tt = 273.16 K, pt = 611.657 Pa
+        ! 2. Melting point at p0: Tmelt = 273.152519 K, p0 = 101325 Pa
+        ! 3. T = 100 K, p = 100 MPa
+        real(real64), parameter :: T(test_points) = [273.16d0, 273.152519d0, 100.0d0]
+        real(real64), parameter :: p(test_points) = [611.657d0, 101325.0d0, 100.0d6]
+
+        real(real64) :: nu(test_points)
+        real(real64) :: h(test_points)
+        real(real64) :: u(test_points)
+        real(real64) :: s(test_points)
+        real(real64) :: cp(test_points)
+        real(real64) :: alpha(test_points)
+        real(real64) :: beta(test_points)
+        real(real64) :: kappa_T(test_points)
+        real(real64) :: kappa_s(test_points)
+
+        ! 画像のTable 3より抽出 (Quantityと対応関数)
+        ! (dg/dp)T -> nu (Specific volume)
+        ! h -> h (Enthalpy)
+        ! u -> u (Internal energy)
+        ! s -> s (Entropy)
+        ! cp -> cp (Isobaric heat capacity)
+        ! alpha -> alpha (Volume expansivity)
+        ! beta -> beta (Pressure coefficient, dP/dT|v) [Pa K^-1]
+        ! kappa_T -> kappa_T (Isothermal compressibility) [Pa^-1]
+        ! kappa_s -> kappa_s (Isentropic compressibility) [Pa^-1]
+
+        real(real64), parameter :: nu_exact(test_points) = [0.109085812737d-2, 0.109084388214d-2, 0.106193389260d-2]
+        real(real64), parameter :: h_exact(test_points) = [-0.333444253966d6, -0.333354873637d6, -0.483491635676d6]
+        real(real64), parameter :: u_exact(test_points) = [-0.333444921197d6, -0.333465403393d6, -0.589685024936d6]
+        real(real64), parameter :: s_exact(test_points) = [-0.122069433940d4, -0.122076932550d4, -0.261195122589d4]
+        real(real64), parameter :: cp_exact(test_points) = [0.209678431622d4, 0.209671391024d4, 0.866333195517d3]
+        real(real64), parameter :: alpha_exact(test_points) = [0.159863102566d-3, 0.159841589458d-3, 0.258495528207d-4]
+        real(real64), parameter :: beta_exact(test_points) = [0.135714764659d7, 0.135705899321d7, 0.291466166994d6]
+        real(real64), parameter :: kappa_T_exact(test_points) = [0.117793449348d-9, 0.117785291765d-9, 0.886880048115d-10]
+        real(real64), parameter :: kappa_s_exact(test_points) = [0.114161597779d-9, 0.114154442556d-9, 0.886060982687d-10]
+
+        integer(int32) :: i
+
+        do i = 1, test_points
+            nu(i) = calc_nu_iapws06_Ih(T(i), p(i))
+            h(i) = calc_h_iapws06_Ih(T(i), p(i))
+            u(i) = calc_u_iapws06_Ih(T(i), p(i))
+            s(i) = calc_s_iapws06_Ih(T(i), p(i))
+            cp(i) = calc_cp_iapws06_Ih(T(i), p(i))
+            alpha(i) = calc_alpha_iapws06_Ih(T(i), p(i))
+            beta(i) = calc_beta_iapws06_Ih(T(i), p(i))
+            kappa_T(i) = calc_kappa_T_iapws06_Ih(T(i), p(i))
+            kappa_s(i) = calc_kappa_s_iapws06_Ih(T(i), p(i))
+        end do
+
+        call check_variables(nu, nu_exact, "IAPWS-06 Ice Ih specific volume")
+        call check_variables(h, h_exact, "IAPWS-06 Ice Ih enthalpy")
+        call check_variables(u, u_exact, "IAPWS-06 Ice Ih internal energy")
+        call check_variables(s, s_exact, "IAPWS-06 Ice Ih entropy")
+        call check_variables(cp, cp_exact, "IAPWS-06 Ice Ih isobaric heat capacity")
+        call check_variables(alpha, alpha_exact, "IAPWS-06 Ice Ih cubic expansion coefficient")
+        call check_variables(beta, beta_exact, "IAPWS-06 Ice Ih pressure coefficient")
+        call check_variables(kappa_T, kappa_T_exact, "IAPWS-06 Ice Ih isothermal compressibility")
+        call check_variables(kappa_s, kappa_s_exact, "IAPWS-06 Ice Ih isentropic compressibility")
+
+    end subroutine test_iapws06_Ih
 
     subroutine check_variable(v, v_exa, v_name)
         implicit none
@@ -397,16 +468,17 @@ contains
         character(len=*), intent(in) :: v_name
 
         real(real64), parameter :: tol = 1.0d-8
-        real(real64) :: diff
+        real(real64) :: rel_diff
 
-        diff = abs(v - v_exa) / v_exa
+        rel_diff = abs(v - v_exa) / v_exa
 
-        if (diff > tol) then
+        if (rel_diff > tol) then
             write (unit, '(a)') "**FAIL**: `"//v_name//"`"
             write (unit, '(a)') ""
-            write (unit, '(a)') "| value | exact | rel_diff |"
-            write (unit, '(a)') "|------:|------:|----------:|"
-            write (unit, '("|",i6,"|",es12.4,"|",es12.4,"|",es12.4,"|")') v, v_exa, diff
+            write (unit, '("|",a6,"|",a12,"|",a12,"|",a12,"|")') "index", "computed", "expected", "rel_diff"
+            write (unit, '("|",a6,"|",a12,"|",a12,"|",a12,"|")') &
+                repeat('-', 5)//':', repeat('-', 11)//':', repeat('-', 11)//':', repeat('-', 11)//':'
+            write (unit, '("|",i6,"|",es12.4,"|",es12.4,"|",es12.4,"|")') v, v_exa, rel_diff
             write (unit, '(a)') ""
         else
             write (unit, '(a)') "PASS: `"//v_name//"`"
@@ -421,16 +493,19 @@ contains
         character(len=*), intent(in) :: v_name
 
         real(real64), parameter :: tol = 1.0d-8
+        real(real64) :: rel_diff(size(v))
         integer(int32) :: i
 
-        if (any(abs(v - v_exa) / v_exa > tol)) then
+        rel_diff = abs(v - v_exa) / v_exa
+
+        if (any(rel_diff > tol)) then
             write (unit, '(a)') "**FAIL**: `"//v_name//"`"
             write (unit, '(a)') ""
-            write (unit, '(a)') "| index | computed | expected | diff |"
-            write (unit, '(a)') "|------:|---------:|---------:|------:|"
-
+            write (unit, '("|",a6,"|",a12,"|",a12,"|",a12,"|")') "index", "computed", "expected", "rel_diff"
+            write (unit, '("|",a6,"|",a12,"|",a12,"|",a12,"|")') &
+                repeat('-', 5)//':', repeat('-', 11)//':', repeat('-', 11)//':', repeat('-', 11)//':'
             do i = 1, size(v)
-                write (unit, '("|",i6,"|",es12.4,"|",es12.4,"|",es12.4,"|")') i, v(i), v_exa(i), v(i) - v_exa(i)
+                write (unit, '("|",i6,"|",es12.4,"|",es12.4,"|",es12.4,"|")') i, v(i), v_exa(i), rel_diff(i)
             end do
             write (unit, '(a)') ""
         else
