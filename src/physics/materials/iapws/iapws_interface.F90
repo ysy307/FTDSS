@@ -3,8 +3,9 @@ module physics_material_iapws
     use :: module_core
     implicit none
     private
-    public :: calc_boundary_pressure_region23
-    public :: calc_boundary_temperature_region23
+
+    public :: calc_p_boundary_iapws97_region23
+    public :: calc_t_boundary_iapws97_region23
     public :: calc_nu_iapws97_region1
     public :: calc_nu_iapws97_region2
     public :: calc_nu_iapws97_region5
@@ -33,8 +34,8 @@ module physics_material_iapws
     public :: calc_w_iapws97_region2
     public :: calc_w_iapws97_region3
     public :: calc_w_iapws97_region5
-    public :: calc_sat_pressure_region4
-    public :: calc_sat_temperature_region4
+    public :: calc_psat_iapws97_region4
+    public :: calc_tsat_iapws97_region4
 
     public :: calc_nu_iapws06_Ih
     public :: calc_u_iapws06_Ih
@@ -45,6 +46,13 @@ module physics_material_iapws
     public :: calc_beta_iapws06_Ih
     public :: calc_kappa_s_iapws06_Ih
     public :: calc_kappa_T_iapws06_Ih
+
+    public :: calc_p_boundary_iapws08_iceIh_melting
+    public :: calc_p_boundary_iapws08_iceIh_sublimation
+    public :: calc_p_boundary_iapws08_iceIII_melting
+    public :: calc_p_boundary_iapws08_iceV_melting
+    public :: calc_p_boundary_iapws08_iceVI_melting
+    public :: calc_p_boundary_iapws08_iceVII_melting
 
     !------------------------------------------------------------------------------------------
     ! Reigon1: Saturated liquid water (IAPWS-IF97)
@@ -79,19 +87,19 @@ module physics_material_iapws
     real(real64), parameter :: p_starIh = water_triple_point_pressure ! 基準圧力 [Pa]
 
     interface
-        module pure elemental function calc_boundary_pressure_region23(temperature) result(pressure)
+        module pure elemental function calc_p_boundary_iapws97_region23(temperature) result(pressure)
             implicit none
             real(real64), intent(in) :: temperature
             real(real64) :: pressure
 
-        end function calc_boundary_pressure_region23
+        end function calc_p_boundary_iapws97_region23
 
-        module pure elemental function calc_boundary_temperature_region23(pressure) result(temperature)
+        module pure elemental function calc_t_boundary_iapws97_region23(pressure) result(temperature)
             implicit none
             real(real64), intent(in) :: pressure
             real(real64) :: temperature
 
-        end function calc_boundary_temperature_region23
+        end function calc_t_boundary_iapws97_region23
     end interface
 
     interface
@@ -581,19 +589,19 @@ module physics_material_iapws
     end interface
 
     interface
-        module pure elemental function calc_sat_pressure_region4(temperature) result(P_sat)
+        module pure elemental function calc_psat_iapws97_region4(temperature) result(P_sat)
             implicit none
             real(real64), intent(in) :: temperature
             real(real64) :: P_sat
 
-        end function calc_sat_pressure_region4
+        end function calc_psat_iapws97_region4
 
-        module pure elemental function calc_sat_temperature_region4(pressure) result(T_sat)
+        module pure elemental function calc_tsat_iapws97_region4(pressure) result(T_sat)
             implicit none
             real(real64), intent(in) :: pressure
             real(real64) :: T_sat
 
-        end function calc_sat_temperature_region4
+        end function calc_tsat_iapws97_region4
     end interface
 
     interface
@@ -871,5 +879,48 @@ module physics_material_iapws
 
         end function calc_kappa_s_iapws06_Ih
 
+    end interface
+
+    interface
+        module pure elemental function calc_p_boundary_iapws08_iceIh_melting(T_in) result(p)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64) :: p
+
+        end function calc_p_boundary_iapws08_iceIh_melting
+
+        module pure elemental function calc_p_boundary_iapws08_iceIh_sublimation(T_in) result(p)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64) :: p
+
+        end function calc_p_boundary_iapws08_iceIh_sublimation
+
+        module pure elemental function calc_p_boundary_iapws08_iceIII_melting(T_in) result(p)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64) :: p
+
+        end function calc_p_boundary_iapws08_iceIII_melting
+
+        module pure elemental function calc_p_boundary_iapws08_iceV_melting(T_in) result(p)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64) :: p
+
+        end function calc_p_boundary_iapws08_iceV_melting
+
+        module pure elemental function calc_p_boundary_iapws08_iceVI_melting(T_in) result(p)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64) :: p
+
+        end function calc_p_boundary_iapws08_iceVI_melting
+
+        module pure elemental function calc_p_boundary_iapws08_iceVII_melting(T_in) result(p)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64) :: p
+        end function calc_p_boundary_iapws08_iceVII_melting
     end interface
 end module physics_material_iapws
