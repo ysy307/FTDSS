@@ -29,7 +29,7 @@ contains
         ! Calculate Residual 1
         ! LHS = p_s / (R * T * rho')
         ! RHS = delta' * phi_delta'
-        res = p_sat / (specific_gas_constant_water * T_in * rho_liq) - delta_liq * phi_d_liq
+        res = p_sat / (R_w * T_in * rho_liq) - delta_liq * phi_d_liq
 
     end function calc_maxwell_residual_1
 
@@ -56,7 +56,7 @@ contains
         ! Calculate Residual 2
         ! LHS = p_s / (R * T * rho'')
         ! RHS = delta'' * phi_delta''
-        res = p_sat / (specific_gas_constant_water * T_in * rho_vap) - delta_vap * phi_d_vap
+        res = p_sat / (R_w * T_in * rho_vap) - delta_vap * phi_d_vap
 
     end function calc_maxwell_residual_2
 
@@ -86,7 +86,7 @@ contains
 
         ! Calculate Residual 3
         ! LHS = (p_s / (R * T)) * (1/rho'' - 1/rho')
-        lhs = (p_sat / (specific_gas_constant_water * T_in)) * (1.0d0 / rho_vap - 1.0d0 / rho_liq)
+        lhs = (p_sat / (R_w * T_in)) * (1.0d0 / rho_vap - 1.0d0 / rho_liq)
 
         ! RHS = phi(delta') - phi(delta'')
         rhs = phi_liq - phi_vap

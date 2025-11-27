@@ -1,6 +1,6 @@
 module physics_material_iapws
     use, intrinsic :: iso_fortran_env
-    use :: physics_constants, only:standard_atmospheric_pressure, specific_gas_constant_water
+    use :: physics_constants, only:standard_atmospheric_pressure, R_w => specific_gas_constant_water
     use :: physics_material_iapws_constants
     implicit none
     private

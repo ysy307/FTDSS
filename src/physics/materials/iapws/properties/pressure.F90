@@ -24,7 +24,7 @@ contains
         ! ==========================================================
         ! Calculate Pressure [Pa]
         ! ==========================================================
-        p = rho_in * specific_gas_constant_water * T_in * delta * phi_delta
+        p = rho_in * R_w * T_in * delta * phi_delta
 
     end function calc_p_iapws97_region3
 

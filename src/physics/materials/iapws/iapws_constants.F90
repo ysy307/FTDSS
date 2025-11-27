@@ -1,6 +1,5 @@
 module physics_material_iapws_constants
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    ! 物理定数モジュールから基本定数を引き継ぐ
     use :: physics_constants, only: &
         water_critical_point_temperature, &
         water_critical_point_pressure, &

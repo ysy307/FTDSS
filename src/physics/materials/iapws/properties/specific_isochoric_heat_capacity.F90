@@ -28,7 +28,7 @@ contains
         gamma_pp = calc_gamma_pp_region1(pi, tau)
         gamma_pt = calc_gamma_pt_region1(pi, tau)
 
-        cv = (-tau**2.0d0 * gamma_tt + (gamma_p - tau * gamma_pt)**2.0d0 / gamma_pp) * specific_gas_constant_water
+        cv = (-tau**2.0d0 * gamma_tt + (gamma_p - tau * gamma_pt)**2.0d0 / gamma_pp) * R_w
 
     end function calc_cv_iapws97_region1
 
@@ -63,7 +63,8 @@ contains
         gamma0_pt = calc_gamma0_pt_region2(pi, tau)
         gammar_pt = calc_gammar_pt_region2(pi, tau)
 
-        cv = (-tau**2.0d0 * (gamma0_tt + gammar_tt) - (1.0d0 + pi * gammar_p - tau * pi * gammar_pt)**2.0d0 / (1 - pi**2.0d0 * gamma0_pp)) * specific_gas_constant_water
+        cv = (-tau**2.0d0 * (gamma0_tt + gammar_tt) &
+              - (1.0d0 + pi * gammar_p - tau * pi * gammar_pt)**2.0d0 / (1 - pi**2.0d0 * gamma0_pp)) * R_w
 
     end function calc_cv_iapws97_region2
 
@@ -90,7 +91,7 @@ contains
         ! ==========================================================
         phi_tt = calc_phi_tt_region3(delta, tau)
 
-        cv = -tau**2.0d0 * phi_tt * specific_gas_constant_water
+        cv = -tau**2.0d0 * phi_tt * R_w
 
     end function calc_cv_iapws97_region3
 
@@ -116,12 +117,12 @@ contains
         gamma_pt = calc_gamma0_pt_region5(pi, tau) + calc_gammar_pt_region5(pi, tau)
 
         ! Calculate Cp first
-        cp_val = specific_gas_constant_water * (-tau**2 * gamma_tt)
+        cp_val = R_w * (-tau**2 * gamma_tt)
 
         numerator = (gamma_p - tau * gamma_pt)**2
         denominator = -gamma_pp ! Note: gamma_pp is typically negative
 
-        cv = cp_val - specific_gas_constant_water * (numerator / denominator)
+        cv = cp_val - R_w * (numerator / denominator)
     end function calc_cv_iapws97_region5
 
 end submodule iapws_specific_isochoric_heat_capacity

@@ -25,7 +25,7 @@ contains
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
         ! ==========================================================
-        s = specific_gas_constant_water * (tau * gamma_t - gamma)
+        s = R_w * (tau * gamma_t - gamma)
 
     end function calc_s_iapws97_region1
 
@@ -55,7 +55,7 @@ contains
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
         ! ==========================================================
-        s = specific_gas_constant_water * (tau * (gamma0_t + gammar_t) - (gamma0 + gammar))
+        s = R_w * (tau * (gamma0_t + gammar_t) - (gamma0 + gammar))
 
     end function calc_s_iapws97_region2
 
@@ -83,7 +83,7 @@ contains
         ! ==========================================================
         ! Calculate Specific entropy [J/kg-K]
         ! ==========================================================
-        s = specific_gas_constant_water * (tau * phi_t - phi)
+        s = R_w * (tau * phi_t - phi)
     end function calc_s_iapws97_region3
 
     !> Specific Entropy [J/(kg K)]
@@ -103,7 +103,7 @@ contains
         gamma = calc_gamma0_region5(pi, tau) + calc_gammar_region5(pi, tau)
         gamma_t = calc_gamma0_t_region5(pi, tau) + calc_gammar_t_region5(pi, tau)
 
-        s = specific_gas_constant_water * (tau * gamma_t - gamma)
+        s = R_w * (tau * gamma_t - gamma)
     end function calc_s_iapws97_region5
 
     module pure elemental function calc_s_iapws06_Ih(T_in, P_in) result(s)

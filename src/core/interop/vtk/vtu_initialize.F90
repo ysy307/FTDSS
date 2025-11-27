@@ -4,8 +4,6 @@ contains
     module subroutine type_vtk_vtu_initialize(self, file_name, global_node_id_key, node_type_key, num_sharing_ranks_key, &
                                               owner_ranks_key, communication_partners_key, cell_id_key, rank_key, &
                                               color_key, point_field_names)
-        !> VTUファイルをC++バックエンドを用いて読み込み、vtkデータ構造を初期化する
-        !> [最終修正] メモリリーク防止、必須の並列処理ロジックの有効化、データ代入漏れと変数名の修正を実施
         implicit none
         class(type_vtk), intent(inout) :: self
         character(*), intent(in) :: file_name

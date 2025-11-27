@@ -31,7 +31,7 @@ contains
         ! ==========================================================
         ! Convert to physical units [J/(kg K)]
         ! ==========================================================
-        cp = -tau**2.0d0 * gamma_tt * specific_gas_constant_water
+        cp = -tau**2.0d0 * gamma_tt * R_w
 
     end function calc_cp_iapws97_region1
 
@@ -58,7 +58,7 @@ contains
         ! ==========================================================
         gamma_tt = calc_gamma0_tt_region2(pi, tau) + calc_gammar_tt_region2(pi, tau)
 
-        cp = -tau**2.0d0 * gamma_tt * specific_gas_constant_water
+        cp = -tau**2.0d0 * gamma_tt * R_w
 
     end function calc_cp_iapws97_region2
 
@@ -105,7 +105,7 @@ contains
 
         denominator = 2.0d0 * delta * phi_d + delta**2 * phi_dd
 
-        cp = (term1 + numerator / denominator) * specific_gas_constant_water
+        cp = (term1 + numerator / denominator) * R_w
 
     end function calc_cp_iapws97_region3
 
@@ -125,7 +125,7 @@ contains
 
         gamma_tt = calc_gamma0_tt_region5(pi, tau) + calc_gammar_tt_region5(pi, tau)
 
-        cp = specific_gas_constant_water * (-tau**2 * gamma_tt)
+        cp = R_w * (-tau**2 * gamma_tt)
     end function calc_cp_iapws97_region5
 
     module pure elemental function calc_cp_iapws06_Ih(T_in, P_in) result(cp)

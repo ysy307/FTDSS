@@ -24,7 +24,7 @@ contains
         ! ==========================================================
         ! Calculate specific volume [m^3/kg]
         ! ==========================================================
-        nu = specific_gas_constant_water * T_in * gamma_pi / p_star1
+        nu = R_w * T_in * gamma_pi / p_star1
     end function calc_nu_iapws97_region1
 
     module pure elemental function calc_nu_iapws97_region2(T_in, P_in) result(nu)
@@ -48,7 +48,7 @@ contains
         ! Calculate Density
         ! ==========================================================
         gamma_pi = calc_gamma0_p_region2(pi, tau) + calc_gammar_p_region2(pi, tau)
-        nu = specific_gas_constant_water * T_in * gamma_pi / p_star2
+        nu = R_w * T_in * gamma_pi / p_star2
 
     end function calc_nu_iapws97_region2
 
@@ -78,9 +78,9 @@ contains
         ! v = (R * T / P_star) * gamma_pi
         ! P_star5 is 10 MPa = 10^7 Pa. R is J/kgK.
 
-        nu = (specific_gas_constant_water * T_in / p_star5) * gamma_p
+        nu = (R_w * T_in / p_star5) * gamma_p
         ! Or simply using input P:
-        ! nu = (specific_gas_constant_water * T_in / P_in) * pi * gamma_p
+        ! nu = (R_w * T_in / P_in) * pi * gamma_p
     end function calc_nu_iapws97_region5
 
     module pure elemental function calc_nu_iapws06_Ih(T_in, P_in) result(nu)

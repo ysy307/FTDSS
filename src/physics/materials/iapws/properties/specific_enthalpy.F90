@@ -26,7 +26,7 @@ contains
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
         ! ==========================================================
-        h = specific_gas_constant_water * T_in * tau * gamma_t
+        h = R_w * T_in * tau * gamma_t
 
     end function calc_h_iapws97_region1
 
@@ -53,7 +53,7 @@ contains
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
         ! ==========================================================
-        h = specific_gas_constant_water * T_in * tau * gamma_t
+        h = R_w * T_in * tau * gamma_t
 
     end function calc_h_iapws97_region2
 
@@ -81,7 +81,7 @@ contains
         ! ==========================================================
         ! Calculate specific enthalpy [J/kg]
         ! ==========================================================
-        h = specific_gas_constant_water * T_in * (tau * phi_t + delta * phi_d)
+        h = R_w * T_in * (tau * phi_t + delta * phi_d)
 
     end function calc_h_iapws97_region3
 
@@ -101,7 +101,7 @@ contains
 
         gamma_t = calc_gamma0_t_region5(pi, tau) + calc_gammar_t_region5(pi, tau)
 
-        h = specific_gas_constant_water * T_in * tau * gamma_t
+        h = R_w * T_in * tau * gamma_t
     end function calc_h_iapws97_region5
 
     module pure elemental function calc_h_iapws06_Ih(T_in, P_in) result(h)

@@ -39,7 +39,7 @@ contains
 
         ! Convert to dimensions [m/s]
         ! R is typically in kJ/(kg K), so multiply by 1000 to get J/(kg K) = m^2/s^2
-        w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
+        w = sqrt(max(R_w * T_in * w2_dimless, 0.0d0))
 
     end function calc_w_iapws97_region1
 
@@ -99,7 +99,7 @@ contains
 
         ! Convert to dimensions [m/s]
         ! R is in [kJ/(kg K)], so *1000 to get [J/(kg K)] = [m^2/s^2]
-        w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
+        w = sqrt(max(R_w * T_in * w2_dimless, 0.0d0))
 
     end function calc_w_iapws97_region2
 
@@ -141,7 +141,7 @@ contains
 
         ! Convert to dimensions [m/s]
         ! Ensure the argument for sqrt is non-negative
-        w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
+        w = sqrt(max(R_w * T_in * w2_dimless, 0.0d0))
 
     end function calc_w_iapws97_region3
 
@@ -198,7 +198,7 @@ contains
         w2_dimless = numerator / (denom_term1 + denom_term2)
 
         ! Convert to dimensions [m/s]
-        w = sqrt(max(specific_gas_constant_water * T_in * w2_dimless, 0.0d0))
+        w = sqrt(max(R_w * T_in * w2_dimless, 0.0d0))
 
     end function calc_w_iapws97_region5
 end submodule iapws_sound_speed

@@ -79,14 +79,16 @@ module core_vtk_vtu_wrapper
         end subroutine vtu_get_cell_info
 
         ! --- ここから追加 ---
-        subroutine vtu_get_num_cell_data_components(handle, array_name, num_components) bind(C, name='c_vtu_get_num_cell_data_components')
+        subroutine vtu_get_num_cell_data_components(handle, array_name, num_components) &
+            bind(C, name='c_vtu_get_num_cell_data_components')
             import :: c_ptr, c_char, c_int
             type(c_ptr), value, intent(in) :: handle
             character(kind=c_char), intent(in) :: array_name(*)
             integer(c_int), intent(out) :: num_components
         end subroutine vtu_get_num_cell_data_components
 
-        subroutine vtu_get_num_point_data_components(handle, array_name, num_components) bind(C, name='c_vtu_get_num_point_data_components')
+        subroutine vtu_get_num_point_data_components(handle, array_name, num_components) &
+            bind(C, name='c_vtu_get_num_point_data_components')
             import :: c_ptr, c_char, c_int
             type(c_ptr), value, intent(in) :: handle
             character(kind=c_char), intent(in) :: array_name(*)

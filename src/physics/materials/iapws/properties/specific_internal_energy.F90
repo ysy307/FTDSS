@@ -26,7 +26,7 @@ contains
         ! ==========================================================
         ! Calculate Specific internal energy [J/kg]
         ! ==========================================================
-        u = specific_gas_constant_water * T_in * (tau * gamma_t - pi * gamma_p)
+        u = R_w * T_in * (tau * gamma_t - pi * gamma_p)
 
     end function calc_u_iapws97_region1
 
@@ -54,7 +54,7 @@ contains
         ! ==========================================================
         ! Calculate Specific internal energy [J/kg]
         ! ==========================================================
-        u = specific_gas_constant_water * T_in * (tau * gamma_tau - pi * gamma_pi)
+        u = R_w * T_in * (tau * gamma_tau - pi * gamma_pi)
 
     end function calc_u_iapws97_region2
 
@@ -81,7 +81,7 @@ contains
         ! ==========================================================
         ! Calculate Specific internal energy [J/kg]
         ! ==========================================================
-        u = specific_gas_constant_water * T_in * tau * phi_t
+        u = R_w * T_in * tau * phi_t
 
     end function calc_u_iapws97_region3
 
@@ -103,7 +103,7 @@ contains
         gamma_p = calc_gamma0_p_region5(pi, tau) + calc_gammar_p_region5(pi, tau)
         gamma_t = calc_gamma0_t_region5(pi, tau) + calc_gammar_t_region5(pi, tau)
 
-        u = specific_gas_constant_water * T_in * (tau * gamma_t - pi * gamma_p)
+        u = R_w * T_in * (tau * gamma_t - pi * gamma_p)
     end function calc_u_iapws97_region5
 
     module pure elemental function calc_u_iapws06_Ih(T_in, P_in) result(u)
