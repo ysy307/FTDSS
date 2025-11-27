@@ -1,6 +1,7 @@
 module physics_material_iapws
     use, intrinsic :: iso_fortran_env
-    use :: module_core
+    use :: physics_constants, only:standard_atmospheric_pressure, specific_gas_constant_water
+    use :: physics_material_iapws_constants
     implicit none
     private
 
@@ -53,38 +54,6 @@ module physics_material_iapws
     public :: calc_p_boundary_iapws08_iceV_melting
     public :: calc_p_boundary_iapws08_iceVI_melting
     public :: calc_p_boundary_iapws08_iceVII_melting
-
-    !------------------------------------------------------------------------------------------
-    ! Reigon1: Saturated liquid water (IAPWS-IF97)
-    !------------------------------------------------------------------------------------------
-    real(real64), parameter :: T_star1 = 1386.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star1 = 16.53d6 ! 基準圧力 [Pa]
-    !------------------------------------------------------------------------------------------
-    ! Reigon2: Superheated Steam (IAPWS-IF97)
-    !------------------------------------------------------------------------------------------
-    real(real64), parameter :: T_star2 = 540.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star2 = 1.0d6 ! 基準圧力 [Pa]
-    !------------------------------------------------------------------------------------------
-    ! Reigon3: High Pressure Liquid Water and Steam (IAPWS-IF97)
-    !------------------------------------------------------------------------------------------
-    real(real64), parameter :: T_star3 = water_critical_point_temperature ! 基準温度 [K]
-    real(real64), parameter :: p_star3 = water_critical_point_pressure ! 基準圧力 [Pa]
-    real(real64), parameter :: rho_star3 = water_critical_point_density ! 基準密度 [kg/m^3]
-    !------------------------------------------------------------------------------------------
-    ! Reigon4: Saturation curve between liquid and vapor (IAPWS-IF97)
-    !------------------------------------------------------------------------------------------
-    real(real64), parameter :: T_star4 = 1.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star4 = 1.0d6 ! 基準圧力 [Pa]
-    !------------------------------------------------------------------------------------------
-    ! Reigon5: High Temperature Steam (IAPWS-IF97)
-    !------------------------------------------------------------------------------------------
-    real(real64), parameter :: T_star5 = 1000.0d0 ! 基準温度 [K]
-    real(real64), parameter :: p_star5 = 1.0d6 ! 基準圧力 [Pa]
-    !------------------------------------------------------------------------------------------
-    ! Ice Ih properties (IAPWS-06)
-    !------------------------------------------------------------------------------------------
-    real(real64), parameter :: T_starIh = water_triple_point_temperature ! 基準温度 [K]
-    real(real64), parameter :: p_starIh = water_triple_point_pressure ! 基準圧力 [Pa]
 
     interface
         module pure elemental function calc_p_boundary_iapws97_region23(temperature) result(pressure)

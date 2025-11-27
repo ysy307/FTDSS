@@ -4,17 +4,25 @@
 # ====================================================================
 # 1. Material Property Libraries (materials/*)
 # ====================================================================
+set(PHYSICS_CONSTANTS_SOURCES
+    physics_constants.F90
+)
+add_library(Physics_Constants STATIC ${PHYSICS_CONSTANTS_SOURCES})
+target_include_directories(Physics_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+enable_build_flags(Physics_Constants)
+
 # --- IAPWS-IF97/IAPWS-06 Properties ---
 set(PHYSICS_MATERIAL_IAPWS_SOURCES
+    materials/iapws/iapws_constants.F90
     materials/iapws/iapws_interface.F90
-    materials/iapws/bases/iapws97_base_region1.F90
-    materials/iapws/bases/iapws97_base_region2.F90
-    materials/iapws/bases/iapws97_base_region3.F90
-    materials/iapws/bases/iapws97_base_region4.F90
-    materials/iapws/bases/iapws97_base_region5.F90
-    materials/iapws/bases/iapws97_auxiliary.F90
-    materials/iapws/bases/iapws06_base_Ih.F90
-    materials/iapws/bases/iapws08_base.F90
+    materials/iapws/core/iapws97_base_region1.F90
+    materials/iapws/core/iapws97_base_region2.F90
+    materials/iapws/core/iapws97_base_region3.F90
+    materials/iapws/core/iapws97_base_region4.F90
+    materials/iapws/core/iapws97_base_region5.F90
+    materials/iapws/core/iapws97_auxiliary.F90
+    materials/iapws/core/iapws06_base_Ih.F90
+    materials/iapws/core/iapws08_base.F90
     materials/iapws/properties/specific_volume.F90
     materials/iapws/properties/pressure.F90
     materials/iapws/properties/specific_internal_energy.F90
@@ -28,14 +36,18 @@ set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/properties/isothermal_compressibility.F90
     materials/iapws/properties/pressure_coefficient.F90
     materials/iapws/properties/isentropic_compressibility.F90
+    materials/iapws/iapws_wrapper_interface.F90
+    materials/iapws/wrapper/determine_regions.F90
     materials/iapws/iapws.F90
 )
 add_library(Physics_Material_IAPWS STATIC ${PHYSICS_MATERIAL_IAPWS_SOURCES})
 target_include_directories(Physics_Material_IAPWS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_IAPWS PUBLIC 
-    Solver::Core
+    # Solver::Core
+    Physics_Constants
 )
 enable_build_flags(Physics_Material_IAPWS)
+enable_thirdparty (Physics_Material_IAPWS)
 
 # # --- Density ---
 # set(PHYSICS_MATERIAL_DENSITY_SOURCES

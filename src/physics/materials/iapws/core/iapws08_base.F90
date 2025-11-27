@@ -1,7 +1,5 @@
 submodule(physics_material_iapws) iapws08_base
     implicit none
-    real(real64), parameter :: T_starIh = water_triple_point_temperature
-    real(real64), parameter :: P_starIh = water_triple_point_pressure
     integer(int32), parameter :: N_Ih_melt_terms = 3
     real(real64), parameter :: a_Ih_melt(N_Ih_melt_terms) = [0.119539337d7, 0.808183159d5, 0.333826860d4]
     real(real64), parameter :: b_Ih_melt(N_Ih_melt_terms) = [0.300000d1, 0.257500d2, 0.103750d3]
@@ -9,17 +7,6 @@ submodule(physics_material_iapws) iapws08_base
     real(real64), parameter :: a_Ih_sub(N_Ih_sub_terms) = [-0.212144006d2, 0.273203819d2, -0.610598130d1]
     real(real64), parameter :: b_Ih_sub(N_Ih_sub_terms) = [0.333333333d-2, 0.120666667d1, 0.170333333d1]
 
-    real(real64), parameter :: T_starIII = 251.165d0 ! K
-    real(real64), parameter :: P_starIII = 208.566d6 ! Pa
-
-    real(real64), parameter :: T_starV = 256.164d0 ! K
-    real(real64), parameter :: P_starV = 350.1d6 ! Pa
-
-    real(real64), parameter :: T_starVI = 273.31d0 ! K
-    real(real64), parameter :: P_starVI = 632.4d6 ! Pa
-
-    real(real64), parameter :: T_starVII = 355.0d0 ! K
-    real(real64), parameter :: P_starVII = 2216.0d6 ! Pa
 contains
     !---------------------------------------------------------------------------
     ! Eq (1): Melting pressure of Ice Ih (Liquid-Solid boundary)

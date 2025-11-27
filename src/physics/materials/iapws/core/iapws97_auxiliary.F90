@@ -1,7 +1,5 @@
 submodule(physics_material_iapws) iapws97_auxiliary
     implicit none
-    real(real64), parameter :: T_starb23 = 1.0d0 ! K
-    real(real64), parameter :: p_starb23 = 1.0d6 ! Pa
     real(real64), parameter :: nb23(5) = [ 0.34805185628969d3, & !&
                                          -0.11671859879975d1, & !&
                                           0.10192970039326d-2, & !&

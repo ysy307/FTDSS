@@ -323,7 +323,7 @@ module core_constants_solver
     ! IAPWS Constants
     !=========================================================
     integer(int32), parameter, public :: IAPWS_OUT_OF_RANGE = -1
-    integer(int32), parameter, public :: IAPWS_REGION_ICEI4 = 14
+    integer(int32), parameter, public :: IAPWS_REGION_ICE_Ih = 14
     integer(int32), parameter, public :: IAPWS97_REGION_1 = 1 ! Liquid
     integer(int32), parameter, public :: IAPWS97_REGION_2 = 2 ! Vapor
     integer(int32), parameter, public :: IAPWS97_REGION_3 = 3 ! Critical / High P
