@@ -318,4 +318,15 @@ module core_constants_solver
     integer(int32), parameter, public :: VECTOR_STATUS_ILL_OPERATIONS = -1
     integer(int32), parameter, public :: VECTOR_STATUS_OUT_OF_MEMORY = -3
     integer(int32), parameter, public :: VECTOR_STATUS_NOT_IMPLEMENTED = -5
+
+    !=========================================================
+    ! IAPWS Constants
+    !=========================================================
+    integer(int32), parameter, public :: IAPWS_OUT_OF_RANGE = -1
+    integer(int32), parameter, public :: IAPWS_REGION_ICEI4 = 14
+    integer(int32), parameter, public :: IAPWS97_REGION_1 = 1 ! Liquid
+    integer(int32), parameter, public :: IAPWS97_REGION_2 = 2 ! Vapor
+    integer(int32), parameter, public :: IAPWS97_REGION_3 = 3 ! Critical / High P
+    integer(int32), parameter, public :: IAPWS97_REGION_4 = 4 ! Saturation (通常は判定結果として返さないが内部で使用)
+    integer(int32), parameter, public :: IAPWS97_REGION_5 = 5 ! High Temp Vapor
 end module core_constants_solver
