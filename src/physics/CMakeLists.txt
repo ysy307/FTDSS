@@ -15,7 +15,7 @@ enable_build_flags(Physics_Constants)
 set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/iapws_constants.F90
     # interface 実装
-    materials/iapws/interfaces/iapws06_IceIh_interface.F90
+    materials/iapws/interfaces/iapws06_iceIh_interface.F90
     materials/iapws/interfaces/iapws08_interface.F90
     materials/iapws/interfaces/iapws97_auxiliary_interface.F90
     materials/iapws/interfaces/iapws97_region1_interface.F90
