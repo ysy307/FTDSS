@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_base_region1
+submodule(physics_material_iapws97_region1) iapws97_base_region1
     implicit none
     !------------------------------------------------------------------------------------------
     ! Region1: Saturated liquid water (IAPWS-IF97)
@@ -54,176 +54,117 @@ contains
 
     !> Calculate the first derivative of \(\gamma\) with respect to \(\pi\).
     !> Computes \(\gamma_{\pi} = \left(\frac{\partial \gamma}{\partial \pi}\right)_{\tau}\).
-    module pure elemental function calc_gamma_p_region1(pi, tau) result(gamma_pi)
+    module pure elemental function calc_gamma_p_region1(pi, tau) result(gamma_p)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma_{\pi}\)
-        real(real64) :: gamma_pi
+        real(real64) :: gamma_p
 
         integer(int32) :: i
         real(real64) :: term_pi
 
-        gamma_pi = 0.0d0
+        gamma_p = 0.0d0
 
         do i = 1, N1_terms
             term_pi = -n_r1(i) * I_r1(i) * (7.1d0 - pi)**(I_r1(i) - 1) * (tau - 1.222d0)**J_r1(i)
-            gamma_pi = gamma_pi + term_pi
+            gamma_p = gamma_p + term_pi
         end do
 
     end function calc_gamma_p_region1
 
     !> Calculate the first derivative of \(\gamma\) with respect to \(\tau\).
     !> Computes \(\gamma_{\tau} = \left(\frac{\partial \gamma}{\partial \tau}\right)_{\pi}\).
-    module pure elemental function calc_gamma_t_region1(pi, tau) result(gamma_tau)
+    module pure elemental function calc_gamma_t_region1(pi, tau) result(gamma_t)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma_{\tau}\)
-        real(real64) :: gamma_tau
+        real(real64) :: gamma_t
 
         integer(int32) :: i
         real(real64) :: term_tau
 
-        gamma_tau = 0.0d0
+        gamma_t = 0.0d0
 
         do i = 1, N1_terms
             term_tau = n_r1(i) * (7.1d0 - pi)**I_r1(i) * J_r1(i) * (tau - 1.222d0)**(J_r1(i) - 1.0d0)
-            gamma_tau = gamma_tau + term_tau
+            gamma_t = gamma_t + term_tau
         end do
 
     end function calc_gamma_t_region1
 
     !> Calculate the second derivative of \(\gamma\) with respect to \(\pi\).
     !> Computes \(\gamma_{\pi\pi} = \left(\frac{\partial^2 \gamma}{\partial \pi^2}\right)_{\tau}\).
-    module pure elemental function calc_gamma_pp_region1(pi, tau) result(gamma_pipi)
+    module pure elemental function calc_gamma_pp_region1(pi, tau) result(gamma_pp)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma_{\pi\pi}\)
-        real(real64) :: gamma_pipi
+        real(real64) :: gamma_pp
 
         integer(int32) :: i
         real(real64) :: term_pipi
 
-        gamma_pipi = 0.0d0
+        gamma_pp = 0.0d0
 
         do i = 1, N1_terms
             term_pipi = n_r1(i) * I_r1(i) * (I_r1(i) - 1.0d0) * (7.1d0 - pi)**(I_r1(i) - 2.0d0) * (tau - 1.222d0)**J_r1(i)
-            gamma_pipi = gamma_pipi + term_pipi
+            gamma_pp = gamma_pp + term_pipi
         end do
 
     end function calc_gamma_pp_region1
 
     !> Calculate the second derivative of \(\gamma\) with respect to \(\tau\).
     !> Computes \(\gamma_{\tau\tau} = \left(\frac{\partial^2 \gamma}{\partial \tau^2}\right)_{\pi}\).
-    module pure elemental function calc_gamma_tt_region1(pi, tau) result(gamma_tautau)
+    module pure elemental function calc_gamma_tt_region1(pi, tau) result(gamma_tt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma_{\tau\tau}\)
-        real(real64) :: gamma_tautau
+        real(real64) :: gamma_tt
 
         integer(int32) :: i
         real(real64) :: term_tautau
 
-        gamma_tautau = 0.0d0
+        gamma_tt = 0.0d0
 
         do i = 1, N1_terms
             term_tautau = n_r1(i) * (7.1d0 - pi)**I_r1(i) * J_r1(i) * (J_r1(i) - 1.0d0) * (tau - 1.222d0)**(J_r1(i) - 2.0d0)
-            gamma_tautau = gamma_tautau + term_tautau
+            gamma_tt = gamma_tt + term_tautau
         end do
 
     end function calc_gamma_tt_region1
 
     !> Calculate the mixed second derivative of \(\gamma\).
     !> Computes \(\gamma_{\pi\tau} = \frac{\partial^2 \gamma}{\partial \pi \partial \tau}\).
-    module pure elemental function calc_gamma_pt_region1(pi, tau) result(gamma_pitau)
+    module pure elemental function calc_gamma_pt_region1(pi, tau) result(gamma_pt)
         implicit none
         !> Dimensionless pressure \(\pi\)
         real(real64), intent(in) :: pi
         !> Dimensionless temperature \(\tau\)
         real(real64), intent(in) :: tau
         !> Derivative \(\gamma_{\pi\tau}\)
-        real(real64) :: gamma_pitau
+        real(real64) :: gamma_pt
 
         integer(int32) :: i
         real(real64) :: term_pitau
 
-        gamma_pitau = 0.0d0
+        gamma_pt = 0.0d0
 
         do i = 1, N1_terms
             term_pitau = -n_r1(i) * I_r1(i) * (7.1d0 - pi)**(I_r1(i) - 1.0d0) * J_r1(i) * (tau - 1.222d0)**(J_r1(i) - 1.0d0)
-            gamma_pitau = gamma_pitau + term_pitau
+            gamma_pt = gamma_pt + term_pitau
         end do
 
     end function calc_gamma_pt_region1
 
-    ! !> Calculate the third derivative \(\gamma_{\pi\pi\tau}\).
-    ! !> Computes \(\frac{\partial^3 \gamma}{\partial \pi^2 \partial \tau}\).
-    ! module pure elemental function calc_gamma_pp_t_region1(pi, tau) result(val)
-    !     implicit none
-    !     !> Dimensionless pressure \(\pi\)
-    !     real(real64), intent(in) :: pi
-    !     !> Dimensionless temperature \(\tau\)
-    !     real(real64), intent(in) :: tau
-    !     !> Derivative \(\gamma_{\pi\pi\tau}\)
-    !     real(real64) :: val
-
-    !     integer(int32) :: i
-
-    !     val = 0.0d0
-    !     do i = 1, N1_terms
-    !         val = val + n_r1(i) * I_r1(i) * (I_r1(i) - 1.0d0) * (7.1d0 - pi)**(I_r1(i) - 2.0d0) &
-    !               * J_r1(i) * (tau - 1.222d0)**(J_r1(i) - 1.0d0)
-    !     end do
-    ! end function calc_gamma_pp_t_region1
-
-    ! !> Calculate the third derivative \(\gamma_{\pi\tau\tau}\).
-    ! !> Computes \(\frac{\partial^3 \gamma}{\partial \pi \partial \tau^2}\).
-    ! module pure elemental function calc_gamma_p_tt_region1(pi, tau) result(val)
-    !     implicit none
-    !     !> Dimensionless pressure \(\pi\)
-    !     real(real64), intent(in) :: pi
-    !     !> Dimensionless temperature \(\tau\)
-    !     real(real64), intent(in) :: tau
-    !     !> Derivative \(\gamma_{\pi\tau\tau}\)
-    !     real(real64) :: val
-
-    !     integer(int32) :: i
-
-    !     val = 0.0d0
-    !     do i = 1, N1_terms
-    !         val = val - n_r1(i) * I_r1(i) * (7.1d0 - pi)**(I_r1(i) - 1.0d0) &
-    !               * J_r1(i) * (J_r1(i) - 1.0d0) * (tau - 1.222d0)**(J_r1(i) - 2.0d0)
-    !     end do
-    ! end function calc_gamma_p_tt_region1
-
-    ! !> Calculate the third derivative \(\gamma_{\tau\tau\tau}\).
-    ! !> Computes \(\frac{\partial^3 \gamma}{\partial \tau^3}\).
-    ! module pure elemental function calc_gamma_tt_t_region1(pi, tau) result(val)
-    !     implicit none
-    !     !> Dimensionless pressure \(\pi\)
-    !     real(real64), intent(in) :: pi
-    !     !> Dimensionless temperature \(\tau\)
-    !     real(real64), intent(in) :: tau
-    !     !> Derivative \(\gamma_{\tau\tau\tau}\)
-    !     real(real64) :: val
-
-    !     integer(int32) :: i
-
-    !     val = 0.0d0
-    !     do i = 1, N1_terms
-    !         val = val + n_r1(i) * (7.1d0 - pi)**I_r1(i) &
-    !               * J_r1(i) * (J_r1(i) - 1.0d0) * (J_r1(i) - 2.0d0) * (tau - 1.222d0)**(J_r1(i) - 3.0d0)
-    !     end do
-    ! end function calc_gamma_tt_t_region1
 end submodule iapws97_base_region1

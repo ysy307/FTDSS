@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws08_base
+submodule(physics_material_iapws08) iapws08_base
     implicit none
     integer(int32), parameter :: N_Ih_melt_terms = 3
     real(real64), parameter :: a_Ih_melt(N_Ih_melt_terms) = [0.119539337d7, 0.808183159d5, 0.333826860d4]

@@ -1,6 +1,6 @@
-submodule(physics_material_iapws) iapws06_base_Ih
+submodule(physics_material_iapws06_IceIh) iapws06_base_Ih
     implicit none
-    real(real64), parameter :: pi_0 = standard_atmospheric_pressure / p_starIh
+    real(real64), parameter :: pi_0 = P_0 / p_starIh
     real(real64), parameter :: s0_Ih = -0.332733756492168d4
     integer(int32), parameter :: gamma0_terms = 5
     real(real64), parameter :: gamma0_Ih(gamma0_terms) = [ & !&

@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_auxiliary
+submodule(physics_material_iapws97_auxiliary) iapws97_auxiliary
     implicit none
     real(real64), parameter :: nb23(5) = [ 0.34805185628969d3, & !&
                                          -0.11671859879975d1, & !&

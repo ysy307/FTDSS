@@ -2,8 +2,16 @@ module physics_material_iapws_wrapper
     use, intrinsic :: iso_fortran_env, only: real64, int32
     use :: stdlib_optval, only:optval
     use :: physics_constants
-    use :: physics_material_iapws
+    ! use :: physics_material_iapws
     use :: physics_material_iapws_constants
+    use :: physics_material_iapws06_IceIh
+    use :: physics_material_iapws08
+    use :: physics_material_iapws97_region1
+    use :: physics_material_iapws97_region2
+    use :: physics_material_iapws97_region3
+    use :: physics_material_iapws97_region4
+    use :: physics_material_iapws97_region5
+    use :: physics_material_iapws97_auxiliary
     implicit none
 
     interface

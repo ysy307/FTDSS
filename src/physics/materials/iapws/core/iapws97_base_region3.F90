@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_base_region3
+submodule(physics_material_iapws97_region3) iapws97_base_region3
     implicit none
     !------------------------------------------------------------------------------------------
     ! Region3: High Pressure Liquid Water and Steam (IAPWS-IF97)

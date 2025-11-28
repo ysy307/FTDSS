@@ -1,4 +1,4 @@
-submodule(physics_material_iapws) iapws97_base_region4
+submodule(physics_material_iapws97_region4) iapws97_base_region4
     implicit none
     !------------------------------------------------------------------------------------------
     ! Region4: Saturation curve between liquid and vapor (IAPWS-IF97)

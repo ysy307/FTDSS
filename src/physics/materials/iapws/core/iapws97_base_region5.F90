@@ -1,8 +1,8 @@
-submodule(physics_material_iapws) iapws97_base_region5
+submodule(physics_material_iapws97_region5) iapws97_base_region5
     implicit none
-    !------------------------------------------------------------------------------------------
-    ! Region5: High temperature region (IAPWS-IF97)
-    !------------------------------------------------------------------------------------------
+!------------------------------------------------------------------------------------------
+! Region5: High temperature region (IAPWS-IF97)
+!------------------------------------------------------------------------------------------
     integer(int32), parameter :: N05_terms = 6
     real(real64), parameter :: J0_r5(N05_terms) = [0.0d0, 1.0d0, -3.0d0, -2.0d0, -1.0d0, 2.0d0]
     real(real64), parameter :: n0_r5(N05_terms) = [ &
