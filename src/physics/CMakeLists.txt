@@ -20,7 +20,6 @@ set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/interfaces/iapws97_auxiliary_interface.F90
     materials/iapws/interfaces/iapws97_region1_interface.F90
     materials/iapws/interfaces/iapws97_region2_interface.F90
-    materials/iapws/interfaces/iapws97_region3_interface.F90
     materials/iapws/interfaces/iapws97_region4_interface.F90
     materials/iapws/interfaces/iapws97_region5_interface.F90
     # core 実装 
@@ -30,6 +29,7 @@ set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/core/iapws97_base_region1.F90
     materials/iapws/core/iapws97_base_region2.F90
     materials/iapws/core/iapws97_base_region3.F90
+    materials/iapws/core/iapws97_region3_interface.F90
     materials/iapws/core/iapws97_base_region4.F90
     materials/iapws/core/iapws97_base_region5.F90
     # properties 実装
@@ -41,7 +41,8 @@ set(PHYSICS_MATERIAL_IAPWS_SOURCES
     # wrapper interface
     materials/iapws/interfaces/iapws_wrapper_interface.F90
     # wrapper 実装
-    materials/iapws/wrapper/determine_regions.F90
+    materials/iapws/wrapper/iapws_determine_regions.F90
+    materials/iapws/wrapper/iapws_computations.F90
     # トップレベル
     materials/iapws/iapws.F90
 )

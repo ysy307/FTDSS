@@ -6,6 +6,7 @@ module physics_material_iapws97_region5
     private
 
     public :: calc_nu_iapws97_region5
+    public :: calc_rho_iapws97_region5
     public :: calc_u_iapws97_region5
     public :: calc_s_iapws97_region5
     public :: calc_h_iapws97_region5
@@ -109,13 +110,21 @@ module physics_material_iapws97_region5
 
         end function calc_gammar_pt_region5
 
-        module pure elemental function calc_nu_iapws97_region5(T_in, P_in) result(u)
+        module pure elemental function calc_nu_iapws97_region5(T_in, P_in) result(nu)
             implicit none
             real(real64), intent(in) :: T_in
             real(real64), intent(in) :: P_in
-            real(real64) :: u
+            real(real64) :: nu
 
         end function calc_nu_iapws97_region5
+
+        module pure elemental function calc_rho_iapws97_region5(T_in, P_in) result(rho)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: rho
+
+        end function calc_rho_iapws97_region5
 
         module pure elemental function calc_u_iapws97_region5(T_in, P_in) result(u)
             implicit none

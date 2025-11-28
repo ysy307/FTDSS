@@ -23,13 +23,10 @@ set(MKL_SYCL_LINK OFF)
 # コンパイラに応じたスレッド層の選択
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
     set(MKL_THREADING "intel_thread")
-    message(STATUS "MKL Threading: Intel OpenMP")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     set(MKL_THREADING "gnu_thread")
-    message(STATUS "MKL Threading: GNU OpenMP")
 else()
     set(MKL_THREADING "intel_thread")
-    message(WARNING "Defaulting to Intel OpenMP threading.")
 endif()
 
 # MKLコンポーネントの決定 (MPI有無で分岐)
@@ -37,7 +34,6 @@ set(MKL_COMPONENTS_LIST)
 if(ENABLE_MPI)
     set(ENABLE_SCALAPACK ON CACHE BOOL "Enable ScaLAPACK components")
     list(APPEND MKL_COMPONENTS_LIST ScaLAPACK)
-    message(STATUS "MKL: ScaLAPACK enabled.")
 endif()
 
 # MKL探索実行
@@ -88,13 +84,11 @@ function(enable_build_flags target)
         set(KEYWORD INTERFACE)
     endif()
 
-    # --- 1. コンパイルオプション (言語ごとに厳密に分離) ---
     if(NOT KEYWORD STREQUAL "INTERFACE")
-        
         # ---------------------------------------------------------
-        # Fortran 用オプション (C++ には適用させない)
+        # Fortran Compile Options
         # ---------------------------------------------------------
-        # 基本フラグ (-fpp 等)
+        # Basic Options
         target_compile_options(${target} ${KEYWORD} 
             $<$<COMPILE_LANGUAGE:Fortran>:-stand f2018 -fpp -traceback>
         )
@@ -119,7 +113,7 @@ function(enable_build_flags target)
         endif()
 
         # ---------------------------------------------------------
-        # C++ (CXX) 用オプション
+        # C++ Compile Options
         # ---------------------------------------------------------
         if(CMAKE_CXX_COMPILER_ID MATCHES "Intel|IntelLLVM")
             target_compile_options(${target} ${KEYWORD}
@@ -138,7 +132,6 @@ function(enable_build_flags target)
     # --- 2. マクロ定義 (USE_DEBUG) ---
     # BuildTypeがDebug または ENABLE_DEBUGがON の場合に定義
     if(CMAKE_BUILD_TYPE MATCHES "Debug" OR ENABLE_DEBUG)
-        message(STATUS "[DEBUG] Enabling USE_DEBUG checks for target: ${target}")
         target_compile_definitions(${target} ${KEYWORD} USE_DEBUG)
     endif()
 
@@ -148,16 +141,9 @@ function(enable_build_flags target)
 
     if(ENABLE_MPI)
         target_compile_definitions(${target} ${KEYWORD} _MPI)
-        
-        # Fortranメインの場合、通常は MPI::MPI_Fortran をリンクする
         target_link_libraries(${target} ${KEYWORD} MPI::MPI_Fortran)
-
-        # ScaLAPACKを含むターゲットをリンク
-        message(STATUS "Linking MKL::MKL_SCALAPACK for target ${target}")
         target_link_libraries(${target} ${KEYWORD} MKL::MKL_SCALAPACK)
     else()
-        # 通常のMKLリンク
-        message(STATUS "Linking MKL::MKL for target ${target}")
         target_link_libraries(${target} ${KEYWORD} MKL::MKL)
     endif()
 endfunction()

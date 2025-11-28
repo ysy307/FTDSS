@@ -26,6 +26,16 @@ contains
         nu = R_w * T_in * gamma_p / p_star1
     end function calc_nu_iapws97_region1
 
+    module pure elemental function calc_rho_iapws97_region1(T_in, P_in) result(rho)
+        implicit none
+        real(real64), intent(in) :: T_in
+        real(real64), intent(in) :: P_in
+        real(real64) :: rho
+
+        rho = 1.0d0 / calc_nu_iapws97_region1(T_in, P_in)
+
+    end function calc_rho_iapws97_region1
+
     module pure elemental function calc_u_iapws97_region1(T_in, P_in) result(u)
         implicit none
         !> Temperature [K]

@@ -1,10 +1,25 @@
 module physics_material_iapws97_region3
     use, intrinsic :: iso_fortran_env
     use :: physics_constants, only:R_w => specific_gas_constant_water
-    use :: physics_material_iapws_constants, only:T_star3, rho_star3
+    use :: physics_material_iapws_constants
     implicit none
     private
 
+    public :: calc_T3ab
+    public :: calc_T3cd
+    public :: calc_T3gh
+    public :: calc_T3ij
+    public :: calc_T3jk
+    public :: calc_T3mn
+    public :: calc_T3op
+    public :: calc_T3qu
+    public :: calc_T3rx
+    public :: calc_T3ef
+    public :: calc_T3uv
+    public :: calc_T3wx
+
+    public :: calc_rho_iapws97_region3
+    public :: calc_nu_iapws97_region3
     public :: calc_p_iapws97_region3
     public :: calc_u_iapws97_region3
     public :: calc_s_iapws97_region3
@@ -15,6 +30,12 @@ module physics_material_iapws97_region3
     public :: calc_maxwell_residual_1
     public :: calc_maxwell_residual_2
     public :: calc_maxwell_residual_3
+
+    type :: r3_coeff_type
+        integer(int32), allocatable :: I(:)
+        integer(int32), allocatable :: J(:)
+        real(real64), allocatable :: n(:)
+    end type r3_coeff_type
 
     interface
         !> Calculate the dimensionless Helmholtz free energy \(\phi\) for Region 3.
@@ -68,6 +89,112 @@ module physics_material_iapws97_region3
             real(real64), intent(in) :: tau
             real(real64) :: phi_dt
         end function calc_phi_dt_region3
+
+        module pure elemental function calc_T3ab(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3ab
+
+        ! T3cd(p)
+        module pure elemental function calc_T3cd(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3cd
+
+        ! T3gh(p)
+        module pure elemental function calc_T3gh(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3gh
+
+        ! T3ij(p)
+        module pure elemental function calc_T3ij(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3ij
+
+        ! T3jk(p)
+        module pure elemental function calc_T3jk(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3jk
+
+        ! T3mn(p)
+        module pure elemental function calc_T3mn(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3mn
+
+        ! T3op(p)
+        module pure elemental function calc_T3op(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3op
+
+        module pure elemental function calc_T3qu(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3qu
+
+        module pure elemental function calc_T3rx(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3rx
+
+        module pure elemental function calc_T3ef(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3ef
+
+        module pure elemental function calc_T3uv(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3uv
+
+        module pure elemental function calc_T3wx(P) result(T)
+            implicit none
+            real(real64), intent(in) :: P
+            real(real64) :: T
+
+        end function calc_T3wx
+
+        module pure elemental function calc_rho_iapws97_region3(T_in, P_in, id) result(rho)
+            real(real64), intent(in) :: T_in, P_in
+            integer(int32), intent(in) :: id
+            real(real64) :: rho
+            real(real64) :: v
+
+        end function calc_rho_iapws97_region3
+
+        module pure elemental function calc_nu_iapws97_region3(T_in, P_in, id) result(v)
+            implicit none
+            real(real64), intent(in) :: T_in, P_in
+            integer(int32), intent(in) :: id
+            real(real64) :: v
+
+        end function calc_nu_iapws97_region3
 
         module pure elemental function calc_p_iapws97_region3(T_in, rho_in) result(p)
             implicit none

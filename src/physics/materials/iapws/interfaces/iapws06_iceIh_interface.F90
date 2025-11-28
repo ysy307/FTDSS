@@ -6,6 +6,7 @@ module physics_material_iapws06_IceIh
     private
 
     public :: calc_nu_iapws06_Ih
+    public :: calc_rho_iapws06_Ih
     public :: calc_u_iapws06_Ih
     public :: calc_s_iapws06_Ih
     public :: calc_h_iapws06_Ih
@@ -74,6 +75,13 @@ module physics_material_iapws06_IceIh
             real(real64), intent(in) :: P_in
             real(real64) :: nu
         end function calc_nu_iapws06_Ih
+
+        module pure elemental function calc_rho_iapws06_Ih(T_in, P_in) result(rho)
+            implicit none
+            real(real64), intent(in) :: T_in
+            real(real64), intent(in) :: P_in
+            real(real64) :: rho
+        end function calc_rho_iapws06_Ih
 
         module pure elemental function calc_u_iapws06_Ih(T_in, P_in) result(u)
             implicit none
