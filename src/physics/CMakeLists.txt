@@ -14,36 +14,40 @@ enable_build_flags(Physics_Constants)
 # --- IAPWS-IF97/IAPWS-06 Properties ---
 set(PHYSICS_MATERIAL_IAPWS_SOURCES
     materials/iapws/iapws_constants.F90
-    materials/iapws/iapws_interface.F90
+    # interface 実装
+    materials/iapws/interfaces/iapws06_IceIh_interface.F90
+    materials/iapws/interfaces/iapws08_interface.F90
+    materials/iapws/interfaces/iapws97_auxiliary_interface.F90
+    materials/iapws/interfaces/iapws97_region1_interface.F90
+    materials/iapws/interfaces/iapws97_region2_interface.F90
+    materials/iapws/interfaces/iapws97_region3_interface.F90
+    materials/iapws/interfaces/iapws97_region4_interface.F90
+    materials/iapws/interfaces/iapws97_region5_interface.F90
+    # core 実装 
+    materials/iapws/core/iapws06_base_Ih.F90
+    materials/iapws/core/iapws08_base.F90
+    materials/iapws/core/iapws97_auxiliary.F90
     materials/iapws/core/iapws97_base_region1.F90
     materials/iapws/core/iapws97_base_region2.F90
     materials/iapws/core/iapws97_base_region3.F90
     materials/iapws/core/iapws97_base_region4.F90
     materials/iapws/core/iapws97_base_region5.F90
-    materials/iapws/core/iapws97_auxiliary.F90
-    materials/iapws/core/iapws06_base_Ih.F90
-    materials/iapws/core/iapws08_base.F90
-    materials/iapws/properties/specific_volume.F90
-    materials/iapws/properties/pressure.F90
-    materials/iapws/properties/specific_internal_energy.F90
-    materials/iapws/properties/specific_entropy.F90
-    materials/iapws/properties/specific_enthalpy.F90
-    materials/iapws/properties/specific_isobaric_heat_capacity.F90
-    materials/iapws/properties/specific_isochoric_heat_capacity.F90
-    materials/iapws/properties/sound_speed.F90
-    materials/iapws/properties/maxwell_criterion.F90
-    materials/iapws/properties/cubic_expansion_coefficient.F90
-    materials/iapws/properties/isothermal_compressibility.F90
-    materials/iapws/properties/pressure_coefficient.F90
-    materials/iapws/properties/isentropic_compressibility.F90
-    materials/iapws/iapws_wrapper_interface.F90
+    # properties 実装
+    materials/iapws/properties/iapws06_IceIh.F90
+    materials/iapws/properties/iapws97_region1.F90
+    materials/iapws/properties/iapws97_region2.F90
+    materials/iapws/properties/iapws97_region3.F90
+    materials/iapws/properties/iapws97_region5.F90
+    # wrapper interface
+    materials/iapws/interfaces/iapws_wrapper_interface.F90
+    # wrapper 実装
     materials/iapws/wrapper/determine_regions.F90
+    # トップレベル
     materials/iapws/iapws.F90
 )
 add_library(Physics_Material_IAPWS STATIC ${PHYSICS_MATERIAL_IAPWS_SOURCES})
 target_include_directories(Physics_Material_IAPWS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_IAPWS PUBLIC 
-    # Solver::Core
     Physics_Constants
 )
 enable_build_flags(Physics_Material_IAPWS)
