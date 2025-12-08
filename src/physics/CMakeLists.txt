@@ -1,8 +1,7 @@
 # CMakeLists.txt for src/physics
-# Physics materials and models with cycle-free dependencies
 
 # ====================================================================
-# 1. Material Property Libraries (materials/*)
+# IAPWS Property Library
 # ====================================================================
 set(PHYSICS_CONSTANTS_SOURCES
     physics_constants.F90
@@ -11,50 +10,54 @@ add_library(Physics_Constants STATIC ${PHYSICS_CONSTANTS_SOURCES})
 target_include_directories(Physics_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Physics_Constants)
 
-# --- IAPWS-IF97/IAPWS-06 Properties ---
-set(PHYSICS_MATERIAL_IAPWS_SOURCES
-    materials/iapws/iapws_constants.F90
-    # interface 実装
-    materials/iapws/interfaces/iapws06_iceIh_interface.F90
-    materials/iapws/interfaces/iapws08_interface.F90
-    materials/iapws/interfaces/iapws97_auxiliary_interface.F90
-    materials/iapws/interfaces/iapws97_region1_interface.F90
-    materials/iapws/interfaces/iapws97_region2_interface.F90
-    materials/iapws/interfaces/iapws97_region4_interface.F90
-    materials/iapws/interfaces/iapws97_region5_interface.F90
-    # core 実装 
-    materials/iapws/core/iapws06_base_Ih.F90
-    materials/iapws/core/iapws08_base.F90
-    materials/iapws/core/iapws97_auxiliary.F90
-    materials/iapws/core/iapws97_base_region1.F90
-    materials/iapws/core/iapws97_base_region2.F90
-    materials/iapws/core/iapws97_base_region3.F90
-    materials/iapws/core/iapws97_region3_interface.F90
-    materials/iapws/core/iapws97_base_region4.F90
-    materials/iapws/core/iapws97_base_region5.F90
-    # properties 実装
-    materials/iapws/properties/iapws06_IceIh.F90
-    materials/iapws/properties/iapws97_region1.F90
-    materials/iapws/properties/iapws97_region2.F90
-    materials/iapws/properties/iapws97_region3.F90
-    materials/iapws/properties/iapws97_region5.F90
-    # wrapper interface
-    materials/iapws/interfaces/iapws_wrapper_interface.F90
-    # wrapper 実装
-    materials/iapws/wrapper/iapws_determine_regions.F90
-    materials/iapws/wrapper/iapws_computations.F90
-    # トップレベル
-    materials/iapws/iapws.F90
-)
-add_library(Physics_Material_IAPWS STATIC ${PHYSICS_MATERIAL_IAPWS_SOURCES})
-target_include_directories(Physics_Material_IAPWS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_IAPWS PUBLIC 
-    Physics_Constants
-)
-enable_build_flags(Physics_Material_IAPWS)
-enable_thirdparty (Physics_Material_IAPWS)
+# ====================================================================
+# IAPWS Property Library
+# ====================================================================
+# set(PHYSICS_MATERIAL_IAPWS_SOURCES
+#     # Constants
+#     materials/iapws/iapws_constants.F90
+#     # Interface implementations
+#     materials/iapws/interfaces/iapws06_iceIh_interface.F90
+#     materials/iapws/interfaces/iapws08_interface.F90
+#     materials/iapws/interfaces/iapws97_auxiliary_interface.F90
+#     materials/iapws/interfaces/iapws97_region1_interface.F90
+#     materials/iapws/interfaces/iapws97_region2_interface.F90
+#     materials/iapws/interfaces/iapws97_region3_interface.F90
+#     materials/iapws/interfaces/iapws97_region4_interface.F90
+#     materials/iapws/interfaces/iapws97_region5_interface.F90
+#     # Core implementations
+#     materials/iapws/core/iapws06_base_Ih.F90
+#     materials/iapws/core/iapws08_base.F90
+#     materials/iapws/core/iapws97_auxiliary.F90
+#     materials/iapws/core/iapws97_base_region1.F90
+#     materials/iapws/core/iapws97_base_region2.F90
+#     materials/iapws/core/iapws97_base_region3.F90
+#     materials/iapws/core/iapws97_boundary_region3.F90
+#     materials/iapws/core/iapws97_base_region4.F90
+#     materials/iapws/core/iapws97_base_region5.F90
+#     # Properties implementations
+#     materials/iapws/properties/iapws06_IceIh.F90
+#     materials/iapws/properties/iapws97_region1.F90
+#     materials/iapws/properties/iapws97_region2.F90
+#     materials/iapws/properties/iapws97_region3.F90
+#     materials/iapws/properties/iapws97_region5.F90
+#     # Wrapper interfaces
+#     materials/iapws/interfaces/iapws_wrapper_interface.F90
+#     # Wrapper implementations
+#     materials/iapws/wrapper/iapws_determine_regions.F90
+#     materials/iapws/wrapper/iapws_computations.F90
+#     # Top level
+#     materials/iapws/iapws.F90
+# )
+# add_library(Physics_Material_IAPWS STATIC ${PHYSICS_MATERIAL_IAPWS_SOURCES})
+# target_include_directories(Physics_Material_IAPWS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+# target_link_libraries(Physics_Material_IAPWS PUBLIC
+#     Physics_Constants
+# )
+# enable_build_flags(Physics_Material_IAPWS)
+# enable_thirdparty (Physics_Material_IAPWS)
 
-# # --- Density ---
+# --- Density ---
 # set(PHYSICS_MATERIAL_DENSITY_SOURCES
 #     materials/density/density_interface.F90
 #     materials/density/density_base.F90
@@ -111,14 +114,14 @@ enable_thirdparty (Physics_Material_IAPWS)
 # enable_build_flags(Physics_Material_HeatCapacity)
 
 # --- Materials aggregator ---
-add_library(Physics_Materials INTERFACE)
-target_link_libraries(Physics_Materials INTERFACE
-    Physics_Material_IAPWS
+# add_library(Physics_Materials INTERFACE)
+# target_link_libraries(Physics_Materials INTERFACE
+#     Physics_Material_IAPWS
     # Physics_Material_Density
     # Physics_Material_SpecificHeat
     # Physics_Material_ThermalConductivity
     # Physics_Material_HeatCapacity
-)
+# )
 
 # ====================================================================
 # 2. Constitutive Model Libraries (models/*)
@@ -198,7 +201,7 @@ set(PHYSICS_SERVICE_SOURCES
 add_library(Physics_Service STATIC ${PHYSICS_SERVICE_SOURCES})
 target_include_directories(Physics_Service PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Service PUBLIC
-    Physics_Materials
+    # Physics_Materials
     # Physics_Models
     Solver::Core
     # Solver::Control

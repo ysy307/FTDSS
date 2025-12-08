@@ -63,6 +63,9 @@ find_package(jsonfortran-intelllvm REQUIRED)
 # --- VTK (C++本体) ---
 find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
 
+# --- IAPWS ---
+find_package(IAPWS REQUIRED)
+
 # --- VTKFortran (ラッパー静的ライブラリ) ---
 if(NOT TARGET VTK::VTKFortran)
     add_library(VTK::VTKFortran STATIC IMPORTED GLOBAL)
@@ -159,6 +162,7 @@ function(enable_thirdparty target)
         ${PROJECT_SOURCE_DIR}/third_party/.local/include/VTKFortran
         $<TARGET_PROPERTY:fortran_stdlib::fortran_stdlib,INTERFACE_INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:jsonfortran-intelllvm::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
+        $<TARGET_PROPERTY:IAPWS::IAPWS,INTERFACE_INCLUDE_DIRECTORIES>
     )
 
     # ライブラリリンク
@@ -168,5 +172,6 @@ function(enable_thirdparty target)
         VTK::CommonCore VTK::CommonDataModel VTK::IOLegacy VTK::IOXML
         fortran_stdlib::fortran_stdlib
         jsonfortran-intelllvm::jsonfortran-static
+        IAPWS::IAPWS
     )
 endfunction()

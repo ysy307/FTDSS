@@ -3,7 +3,6 @@
     "dockerFile": "Dockerfile",
     "build": {
         "args": {
-            // Dockerfile内のUSERNAME引数に値を渡す
             "USERNAME": "devuser"
         }
     },
@@ -13,7 +12,6 @@
         "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached"
     ],
     "runArgs": [
-        // 権限問題を解決するため、--userの指定はここから削除
         "--hostname=ftdss-dev",
         "--privileged",
         "--cap-add=SYS_ADMIN",
@@ -23,7 +21,6 @@
         "--cpus=32",
         "--memory=96g"
     ],
-    // コンテナ内で作業するユーザーを 'devuser' に指定
     "remoteUser": "devuser",
     "customizations": {
         "vscode": {
@@ -40,6 +37,5 @@
             ]
         }
     },
-    // コンテナ作成後にワークスペースフォルダの所有権を devuser に変更し、書き込み権限を付与
     "postCreateCommand": "sudo chown -R devuser:devuser /workspaces"
 }

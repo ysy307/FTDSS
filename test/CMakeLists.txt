@@ -26,6 +26,8 @@ elseif(TEST_NAME STREQUAL "linalg")
     add_test(NAME test_linalg COMMAND $<TARGET_FILE:test_linalg>)
 elseif(TEST_NAME STREQUAL "physics")
     add_executable(test_physics test_physics.F90)
+    enable_build_flags(test_physics)
+    enable_thirdparty(test_physics)
     set_target_properties(test_physics PROPERTIES LINKER_LANGUAGE Fortran)
     target_link_libraries(test_physics PRIVATE
         Solver::Core
