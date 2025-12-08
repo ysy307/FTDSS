@@ -1,44 +1,67 @@
 module physics_models_vaporization
     use, intrinsic :: iso_fortran_env
-    use :: module_core, only: &
+    use :: iapws, only:type_iapws97
+    use :: physics_constants, only: &
         g => gravity_acceleration, &
         TtoK => celsius_to_kelvin, &
         R => universal_gas_constant, &
         Mw => molar_mass_water
     implicit none
+    private
 
     type :: type_evaporation_model
+        private
+        type(type_iapws97), pointer :: water => null()
+    contains
+        procedure, pass(self), public :: initialize => initialize_evaporation_model
+        procedure, pass(self), public :: latent_heat_vaporization
+        procedure, pass(self), public :: relative_humidity
     end type type_evaporation_model
 
 contains
+    !>
+    !> initialize evaporation model
+    subroutine initialize_evaporation_model(self, water)
+        implicit none
+        class(type_evaporation_model), intent(inout) :: self
+        type(type_iapws97), intent(in), target :: water
+
+        self%water => water
+    end subroutine initialize_evaporation_model
 
     !>
-    !> Laten heat of vaporization model
+    !> Laten heat of watre vaporization calculation
     !>
-    pure function latent_heat_vaporization(temperature) result(latent_heat)
+    pure subroutine latent_heat_vaporization(self, temperature, latent_heat)
         implicit none
+        class(type_evaporation_model), intent(in) :: self
         !> Temperature at which vaporization occurs (K)
         real(real64), intent(in) :: temperature
         !> Latent heat of vaporization of liquid water (J/kg)
-        real(real64) :: latent_heat
+        real(real64), intent(inout) :: latent_heat
 
-        latent_heat = 2.501d6 - 2369.2 * temperature
+        if (associated(self%water)) then
+            call self%water%calc_latent_heat(latent_heat, temperature)
+        else
+            latent_heat = 2.501d6 - 2369.2 * temperature
+        end if
 
-    end function latent_heat_vaporization
+    end subroutine latent_heat_vaporization
 
     !>
     !> Relative humidity calculation based on temperature and pressure
     !>
-    pure function relative_humidity(temperature, pressure) result(rh)
+    pure elemental subroutine relative_humidity(self, temperature, pressure, rh)
         implicit none
-        !> Temperature (degree Celsius)
+        class(type_evaporation_model), intent(in) :: self
+        !> Temperature [C]
         real(real64), intent(in) :: temperature
-        !> Pressure - matirx potential (m)
+        !> Pressure - matirx potential [m]
         real(real64), intent(in) :: pressure
         !> Relative humidity (0 to 1)
-        real(real64) :: rh
+        real(real64), intent(inout) :: rh
 
         rh = exp(pressure * Mw * g / (R * (TtoK + temperature)))
-    end function relative_humidity
+    end subroutine relative_humidity
 
 end module physics_models_vaporization

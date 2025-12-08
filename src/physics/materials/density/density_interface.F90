@@ -1,15 +1,17 @@
 module physics_material_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, TtoK => celsius_to_kelvin
+    use :: iapws, only:type_iapws97, type_iapws06
+    use :: module_core, only:type_state, type_physics_phase
+    use :: physics_constants, only:TtoK => celsius_to_kelvin
     implicit none
     private
 
-    ! --- 公開する型定義 ---
     public :: holder_dens
     public :: abst_den
+    public :: type_den_2phase
     public :: type_den_3phase
+    public :: type_den_4phase
 
-    ! --- ポリモーフィックなコンテナ ---
     type :: holder_dens
         class(abst_den), allocatable :: p
     contains
@@ -17,77 +19,142 @@ module physics_material_density
     end type holder_dens
 
     interface
-        module subroutine initialize_holder_dens(self, material_id, phase_info)
+        module subroutine initialize_holder_dens(self, material_id, phase_info, water, ice)
             implicit none
             class(holder_dens), intent(inout) :: self
             integer(int32), intent(in) :: material_id
             type(type_physics_phase), intent(in) :: phase_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
 
         end subroutine initialize_holder_dens
     end interface
 
-    ! --- 密度の抽象基底クラス (インターフェースの契約) ---
     type, abstract :: abst_den
-        integer(int32) :: material_id
-        real(real64) :: material1 !! soil, rock, concrete
-        real(real64) :: material2 !! water
-        real(real64) :: material3 !! ice
-        real(real64) :: material4 !! gas
+        integer(int32) :: material_id = -1
+        real(real64) :: material1 = 0.0d0 !! soil, rock, concrete
+        real(real64) :: material2 = 0.0d0 !! water
+        real(real64) :: material3 = 0.0d0 !! ice
+        real(real64) :: material4 = 0.0d0 !! gas
+        type(type_iapws97), pointer :: water => null()
+        type(type_iapws06), pointer :: ice => null()
     contains
         procedure(initialize_abst_den), pass(self), public, deferred :: initialize
-        procedure(abst_calc_den_gauss_point), pass(self), public, deferred :: calc
+        procedure(abst_calc_den_gp), pass(self), public, deferred :: calc
     end type abst_den
 
     abstract interface
-        subroutine initialize_abst_den(self, material_id, phase_info)
-            import :: abst_den, type_physics_phase, int32
+        subroutine initialize_abst_den(self, material_id, phase_info, water, ice)
+            import :: abst_den, type_physics_phase, int32, type_iapws97, type_iapws06
             implicit none
             class(abst_den), intent(inout) :: self
             integer(int32), intent(in) :: material_id
             type(type_physics_phase), intent(in) :: phase_info
-
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
         end subroutine initialize_abst_den
 
-        pure elemental function abst_calc_den_gauss_point(self, state) result(density)
-            import :: abst_den, type_state, real64
+        pure elemental subroutine abst_calc_den_gp(self, state, density)
+            import :: abst_den, type_state, type_iapws97, type_iapws06, real64
             implicit none
             class(abst_den), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64) :: density
-        end function abst_calc_den_gauss_point
+            real(real64), intent(inout) :: density
+        end subroutine abst_calc_den_gp
+    end interface
+
+    type, extends(abst_den) :: type_den_2phase
+    contains
+        procedure, pass(self) :: initialize => initialize_type_den_2phase
+        procedure, pass(self) :: calc => calc_den_gp_2phase
+    end type type_den_2phase
+
+    interface
+        module subroutine initialize_type_den_2phase(self, material_id, phase_info, water, ice)
+            implicit none
+            class(type_den_2phase), intent(inout) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_physics_phase), intent(in) :: phase_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
+
+        end subroutine initialize_type_den_2phase
+
+        module pure elemental subroutine calc_den_gp_2phase(self, state, density)
+            implicit none
+            class(type_den_2phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_2phase
     end interface
 
     type, extends(abst_den) :: type_den_3phase
     contains
         procedure, pass(self) :: initialize => initialize_type_den_3phase
-        procedure, pass(self) :: calc => calc_den_gauss_point_3phase
+        procedure, pass(self) :: calc => calc_den_gp_3phase
     end type type_den_3phase
 
     interface
-        module subroutine initialize_type_den_3phase(self, material_id, phase_info)
+        module subroutine initialize_type_den_3phase(self, material_id, phase_info, water, ice)
             implicit none
             class(type_den_3phase), intent(inout) :: self
             integer(int32), intent(in) :: material_id
             type(type_physics_phase), intent(in) :: phase_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
 
         end subroutine initialize_type_den_3phase
 
-        module pure elemental function calc_den_gauss_point_3phase(self, state) result(density)
+        module pure elemental subroutine calc_den_gp_3phase(self, state, density)
             implicit none
             class(type_den_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64) :: density
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_3phase
+    end interface
 
-        end function calc_den_gauss_point_3phase
+    type, extends(abst_den) :: type_den_4phase
+    contains
+        procedure, pass(self) :: initialize => initialize_type_den_4phase
+        procedure, pass(self) :: calc => calc_den_gp_4phase
+    end type type_den_4phase
+
+    interface
+        module subroutine initialize_type_den_4phase(self, material_id, phase_info, water, ice)
+            implicit none
+            class(type_den_4phase), intent(inout) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_physics_phase), intent(in) :: phase_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
+        end subroutine initialize_type_den_4phase
+
+        module pure elemental subroutine calc_den_gp_4phase(self, state, density)
+            implicit none
+            class(type_den_4phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_4phase
     end interface
 
     ! ------------------------------------------------------------------------------
     ! 密度計算のための関数インターフェース
     ! ------------------------------------------------------------------------------
     interface
-        module pure elemental function calc_den_3(density_soil, phi_soil, &
-                                                  density_water, phi_water, &
-                                                  density_ice, phi_ice) result(density)
+        module pure elemental subroutine calc_den_2(density_soil, phi_soil, &
+                                                    density_water, phi_water, density)
+            implicit none
+            real(real64), intent(in) :: density_soil
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(inout) :: density
+
+        end subroutine calc_den_2
+
+        module pure elemental subroutine calc_den_3(density_soil, phi_soil, &
+                                                    density_water, phi_water, &
+                                                    density_ice, phi_ice, density)
             implicit none
             real(real64), intent(in) :: density_soil
             real(real64), intent(in) :: phi_soil
@@ -95,14 +162,33 @@ module physics_material_density
             real(real64), intent(in) :: phi_water
             real(real64), intent(in) :: density_ice
             real(real64), intent(in) :: phi_ice
-            real(real64) :: density
-        end function calc_den_3
+            real(real64), intent(inout) :: density
 
-        module pure elemental function calc_den_saturated_vapor(temperature) result(density_vapor)
+        end subroutine calc_den_3
+
+        module pure elemental subroutine calc_den_4(density_soil, phi_soil, &
+                                                    density_water, phi_water, &
+                                                    density_ice, phi_ice, &
+                                                    density_vapor, phi_vapor, density)
+            implicit none
+            real(real64), intent(in) :: density_soil
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(in) :: density_ice
+            real(real64), intent(in) :: phi_ice
+            real(real64), intent(in) :: density_vapor
+            real(real64), intent(in) :: phi_vapor
+            real(real64), intent(inout) :: density
+
+        end subroutine calc_den_4
+
+        module pure elemental subroutine calc_den_saturated_vapor(temperature, density_vapor, water)
             implicit none
             real(real64), intent(in) :: temperature
-            real(real64) :: density_vapor
-        end function calc_den_saturated_vapor
+            real(real64), intent(inout) :: density_vapor
+            type(type_iapws97), intent(in), optional :: water
+        end subroutine calc_den_saturated_vapor
     end interface
 
 end module physics_material_density

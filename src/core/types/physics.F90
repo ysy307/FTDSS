@@ -7,17 +7,26 @@ module core_types_physics
     public :: type_physics_phase
 
     type :: type_state
-        real(real64) :: temperature !! T
-        real(real64) :: pressure !! P
-        real(real64) :: water_content !! \theta_w
-        real(real64) :: ice_content !! \theta_i
-        real(real64) :: dot_ice !! \dot{\theta_i}
-        real(real64) :: porosity !! \phi
-        real(real64) :: latent_heat !! L_f
-        real(real64) :: dQw_dT !! dQw/dT
-        real(real64) :: density_water !! \rho_w
-        real(real64) :: density_ice !! \rho_i
-        real(real64) :: vhc_water !! C_w
+        !> Temperature [C]
+        real(real64) :: temperature
+        !> Pressure [m]
+        real(real64) :: pressure
+        !> Water content, \(\theta_w\) [-]
+        real(real64) :: water_content
+        !> Ice content, \(\theta_i\) [-]
+        real(real64) :: ice_content
+        !> Rate of change of ice content, \(\dot{\theta_i}\) [-]
+        real(real64) :: dot_ice
+        !> Porosity, \(\phi\) [-]
+        real(real64) :: porosity
+        !> Latent heat, \(L_f\) [J/kg]
+        real(real64) :: latent_heat
+        real(real64) :: dQw_dT
+        real(real64) :: density_water
+        real(real64) :: density_ice
+        real(real64) :: vhc_water
+        !> Relative humidity, \(H_\mathrm{r}\) [-]
+        real(real64) :: relative_humidity
     end type type_state
 
     type :: type_physics_phase

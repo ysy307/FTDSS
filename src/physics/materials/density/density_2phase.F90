@@ -1,12 +1,12 @@
-submodule(physics_material_density) density_3phase
+submodule(physics_material_density) density_2phase
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module subroutine initialize_type_den_3phase(self, material_id, phase_info, water, ice)
+    module subroutine initialize_type_den_2phase(self, material_id, phase_info, water, ice)
         implicit none
-        class(type_den_3phase), intent(inout) :: self
+        class(type_den_2phase), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_physics_phase), intent(in) :: phase_info
         type(type_iapws97), intent(in), target :: water
@@ -16,16 +16,14 @@ contains
 
         self%material1 = phase_info%solid
         self%material2 = phase_info%water
-        self%material3 = phase_info%ice
 
         self%water => water
-        self%ice => ice
 
-    end subroutine initialize_type_den_3phase
+    end subroutine initialize_type_den_2phase
 
-    module pure elemental subroutine calc_den_gp_3phase(self, state, density)
+    module pure elemental subroutine calc_den_gp_2phase(self, state, density)
         implicit none
-        class(type_den_3phase), intent(in) :: self
+        class(type_den_2phase), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: density
 
@@ -34,8 +32,7 @@ contains
         real(real64) :: density_water, density_ice
 
         phi1 = 1.0d0 - state%porosity
-        phi2 = state%water_content
-        phi3 = state%ice_content
+        phi2 = state%porosity
 
         temp_K = state%temperature + TtoK
         if (associated(self%water)) then
@@ -44,13 +41,7 @@ contains
             density_water = self%material2
         end if
 
-        if (associated(self%ice)) then
-            call self%ice%calc_rho(temp_K, state%pressure, density_ice)
-        else
-            density_ice = self%material3
-        end if
+        call calc_den_2(self%material1, phi1, density_water, phi2, density)
+    end subroutine calc_den_gp_2phase
 
-        call calc_den_3(self%material1, phi1, density_water, phi2, density_ice, phi3, density)
-    end subroutine calc_den_gp_3phase
-
-end submodule density_3phase
+end submodule density_2phase
