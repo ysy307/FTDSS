@@ -2,20 +2,20 @@ submodule(physics_material_specific_heat) specific_heat_4phase
     implicit none
 contains
 
-    module subroutine initialize_sph_4phase(self, material_id, phase_info, water, ice)
+    module subroutine initialize_sph_4phase(self, material_id, physics_info, water, ice)
         implicit none
         class(type_sph_4phase), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_physics_phase), intent(in) :: phase_info
+        type(type_physics_info), intent(in) :: physics_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
         self%material_id = material_id
 
-        self%material1 = phase_info%solid
-        self%material2 = phase_info%water
-        self%material3 = phase_info%ice
-        self%material4 = phase_info%vapor
+        self%material1 = physics_info%solid
+        self%material2 = physics_info%water
+        self%material3 = physics_info%ice
+        self%material4 = physics_info%vapor
 
         self%water => water
         self%ice => ice
@@ -41,7 +41,6 @@ contains
         if (associated(self%water)) then
             call self%water%calc_cp(temp_K, state%pressure, sph_water)
             call self%water%calc_saturation_cp(temp_K, sph_vapor)
-            sph_vapor = max(sph_vapor * state%relative_humidity, 1.0d-8)
         else
             sph_water = self%material2
         end if

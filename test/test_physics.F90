@@ -30,6 +30,7 @@ program test_physics
         write (unit, '(a)') "# Physics module tests"
         write (unit, '(a)') "---"
         call test_density()
+        call test_specific_heat()
         write (unit, '(a)') "---"
         write (unit, '(a)') "## Completed"
         close (unit)
@@ -43,7 +44,7 @@ contains
     subroutine test_density()
         implicit none
         type(type_state) :: state
-        type(type_physics_phase) :: phase_info
+        type(type_physics_info) :: physics_info
         type(type_iapws97) :: water
         type(type_iapws06) :: ice
         type(holder_dens) :: denstiy
@@ -53,12 +54,12 @@ contains
         ! Initialize IAPWS models
         call water%initialize()
         call ice%initialize()
-        phase_info%num_phases = 4
-        phase_info%solid = 2650.0d0 ! soil density [kg/m3]
-        phase_info%water = 1000.0d0 ! water density [kg/m3]
-        phase_info%ice = 917.0d0 ! ice density [kg/m3]
-        phase_info%vapor = 0.6d0 ! vapor density [kg/m3]
-        call denstiy%initialize(1, phase_info, water, ice)
+        physics_info%num_phases = 4
+        physics_info%solid = 2650.0d0 ! soil density [kg/m3]
+        physics_info%water = 1000.0d0 ! water density [kg/m3]
+        physics_info%ice = 917.0d0 ! ice density [kg/m3]
+        physics_info%vapor = 0.6d0 ! vapor density [kg/m3]
+        call denstiy%initialize(1, physics_info, water, ice)
 
         ! Test case 1
         state%temperature = 10.0d0 ! [C]
@@ -72,6 +73,39 @@ contains
         call check_variable(computed_density, expected_density, "Density Test")
 
     end subroutine test_density
+
+    subroutine test_specific_heat()
+        implicit none
+        type(type_state) :: state
+        type(type_physics_info) :: physics_info
+        type(type_iapws97) :: water
+        type(type_iapws06) :: ice
+        type(holder_sphs) :: specific_heat
+
+        real(real64) :: computed_specific_heat, expected_specific_heat
+
+        ! Initialize IAPWS models
+        call water%initialize()
+        call ice%initialize()
+        physics_info%num_phases = 4
+        physics_info%solid = 800d0
+        physics_info%water = 4180d0
+        physics_info%ice = 2100.0d0
+        physics_info%vapor = 1200.d0
+        call specific_heat%initialize(1, physics_info, water, ice)
+
+        ! Test case 1
+        state%temperature = 10.0d0 ! [C]
+        state%pressure = 101325.0d0 ! [Pa]
+        state%porosity = 0.4d0
+        state%water_content = 0.2d0
+        state%ice_content = 0.1d0
+        state%relative_humidity = 0.6d0
+        call specific_heat%p%calc(state, computed_specific_heat)
+        expected_specific_heat = 1.725720228875d3
+        call check_variable(computed_specific_heat, expected_specific_heat, "Specific Heat Test")
+
+    end subroutine test_specific_heat
 
     ! ======================================================================
     ! Check Utilities

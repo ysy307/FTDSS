@@ -1,10 +1,11 @@
 module core_types_physics
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: core_types_coordinate, only:type_coordinate_dp
     implicit none
     private
 
     public :: type_state
-    public :: type_physics_phase
+    public :: type_physics_info
 
     type :: type_state
         !> Temperature [C]
@@ -27,15 +28,20 @@ module core_types_physics
         real(real64) :: vhc_water
         !> Relative humidity, \(H_\mathrm{r}\) [-]
         real(real64) :: relative_humidity
+        !> Water flux vector, \(\mathbf{q}_w\) [m/s]
+        type(type_coordinate_dp) :: water_flux
+
     end type type_state
 
-    type :: type_physics_phase
+    type :: type_physics_info
         integer(int32) :: num_phases = 0
         real(real64) :: solid = 0.0d0
         real(real64) :: water = 0.0d0
         real(real64) :: ice = 0.0d0
         real(real64) :: vapor = 0.0d0
         real(real64) :: air = 0.0d0
-    end type type_physics_phase
+        real(real64), allocatable :: dispersity(:)
+        real(real64), allocatable :: params(:)
+    end type type_physics_info
 
 end module core_types_physics

@@ -3,24 +3,24 @@ submodule(physics_material_specific_heat) specific_heat_base
 
 contains
 
-    module subroutine initialize_holder_sphs(self, material_id, phase_info, water, ice)
+    module subroutine initialize_holder_sphs(self, material_id, physics_info, water, ice)
         implicit none
         class(holder_sphs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_physics_phase), intent(in) :: phase_info
+        type(type_physics_info), intent(in) :: physics_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
-        select case (phase_info%num_phases)
+        select case (physics_info%num_phases)
         case (2)
             allocate (type_sph_2phase :: self%p)
-            call self%p%initialize(material_id, phase_info, water, ice)
+            call self%p%initialize(material_id, physics_info, water, ice)
         case (3)
             allocate (type_sph_3phase :: self%p)
-            call self%p%initialize(material_id, phase_info, water, ice)
+            call self%p%initialize(material_id, physics_info, water, ice)
         case (4)
             allocate (type_sph_4phase :: self%p)
-            call self%p%initialize(material_id, phase_info, water, ice)
+            call self%p%initialize(material_id, physics_info, water, ice)
         end select
 
     end subroutine initialize_holder_sphs

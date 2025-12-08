@@ -37,18 +37,18 @@ target_link_libraries(Physics_Material_SpecificHeat PUBLIC
 )
 enable_build_flags(Physics_Material_SpecificHeat)
 
-# # --- Thermal Conductivity ---
-# set(PHYSICS_MATERIAL_THC_SOURCES
-#     materials/thermal_conductivity/thermal_conductivity_interface.F90
-#     materials/thermal_conductivity/thermal_conductivity_base.F90
-#     materials/thermal_conductivity/thermal_conductivity_3phase.F90
-# )
-# add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_SOURCES})
-# target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# target_link_libraries(Physics_Material_ThermalConductivity PUBLIC 
-#     Solver::Core 
-# )
-# enable_build_flags(Physics_Material_ThermalConductivity)
+# --- Thermal Conductivity ---
+set(PHYSICS_MATERIAL_THC_SOURCES
+    materials/thermal_conductivity/thermal_conductivity_interface.F90
+    materials/thermal_conductivity/thermal_conductivity_base.F90
+    materials/thermal_conductivity/thermal_conductivity_3phase.F90
+)
+add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_SOURCES})
+target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Material_ThermalConductivity PUBLIC 
+    Solver::Core 
+)
+enable_build_flags(Physics_Material_ThermalConductivity)
 
 # # --- Heat Capacity (depends on Density) ---
 # set(PHYSICS_MATERIAL_VHC_SOURCES

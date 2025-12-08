@@ -4,19 +4,19 @@ contains
     !----------------------------------------------------------------------------------------------------
     ! Construct each type of density
     !----------------------------------------------------------------------------------------------------
-    module subroutine initialize_type_den_3phase(self, material_id, phase_info, water, ice)
+    module subroutine initialize_type_den_3phase(self, material_id, physics_info, water, ice)
         implicit none
         class(type_den_3phase), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_physics_phase), intent(in) :: phase_info
+        type(type_physics_info), intent(in) :: physics_info
         type(type_iapws97), intent(in), target :: water
         type(type_iapws06), intent(in), target :: ice
 
         self%material_id = material_id
 
-        self%material1 = phase_info%solid
-        self%material2 = phase_info%water
-        self%material3 = phase_info%ice
+        self%material1 = physics_info%solid
+        self%material2 = physics_info%water
+        self%material3 = physics_info%ice
 
         self%water => water
         self%ice => ice

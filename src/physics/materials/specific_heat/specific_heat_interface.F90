@@ -1,15 +1,16 @@
 module physics_material_specific_heat
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_physics_phase
+    use :: module_core, only:type_state, type_physics_info
     use :: physics_constants, only:TtoK => celsius_to_kelvin
     implicit none
     private
 
-    ! --- 公開する型定義 ---
     public :: holder_sphs
     public :: abst_sph
+    public :: type_sph_2phase
     public :: type_sph_3phase
+    public :: type_sph_4phase
 
     ! --- ポリモーフィックなコンテナ ---
     type :: holder_sphs
@@ -19,11 +20,11 @@ module physics_material_specific_heat
     end type holder_sphs
 
     interface
-        module subroutine initialize_holder_sphs(self, material_id, phase_info, water, ice)
+        module subroutine initialize_holder_sphs(self, material_id, physics_info, water, ice)
             implicit none
             class(holder_sphs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_phase), intent(in) :: phase_info
+            type(type_physics_info), intent(in) :: physics_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -44,12 +45,12 @@ module physics_material_specific_heat
     end type abst_sph
 
     abstract interface
-        subroutine abst_initialize_sph(self, material_id, phase_info, water, ice)
-            import :: abst_sph, type_physics_phase, int32, type_iapws97, type_iapws06
+        subroutine abst_initialize_sph(self, material_id, physics_info, water, ice)
+            import :: abst_sph, type_physics_info, int32, type_iapws97, type_iapws06
             implicit none
             class(abst_sph), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_phase), intent(in) :: phase_info
+            type(type_physics_info), intent(in) :: physics_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -71,11 +72,11 @@ module physics_material_specific_heat
     end type type_sph_2phase
 
     interface
-        module subroutine initialize_sph_2phase(self, material_id, phase_info, water, ice)
+        module subroutine initialize_sph_2phase(self, material_id, physics_info, water, ice)
             implicit none
             class(type_sph_2phase), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_phase), intent(in) :: phase_info
+            type(type_physics_info), intent(in) :: physics_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -96,11 +97,11 @@ module physics_material_specific_heat
     end type type_sph_3phase
 
     interface
-        module subroutine initialize_sph_3phase(self, material_id, phase_info, water, ice)
+        module subroutine initialize_sph_3phase(self, material_id, physics_info, water, ice)
             implicit none
             class(type_sph_3phase), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_phase), intent(in) :: phase_info
+            type(type_physics_info), intent(in) :: physics_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
@@ -121,11 +122,11 @@ module physics_material_specific_heat
     end type type_sph_4phase
 
     interface
-        module subroutine initialize_sph_4phase(self, material_id, phase_info, water, ice)
+        module subroutine initialize_sph_4phase(self, material_id, physics_info, water, ice)
             implicit none
             class(type_sph_4phase), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_physics_phase), intent(in) :: phase_info
+            type(type_physics_info), intent(in) :: physics_info
             type(type_iapws97), intent(in), target :: water
             type(type_iapws06), intent(in), target :: ice
 
