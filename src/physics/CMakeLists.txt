@@ -1,8 +1,5 @@
-# CMakeLists.txt for src/physics
 
-# ====================================================================
-# IAPWS Property Library
-# ====================================================================
+# --- Physics Constants ---
 set(PHYSICS_CONSTANTS_SOURCES
     physics_constants.F90
 )
@@ -25,19 +22,20 @@ target_link_libraries(Physics_Material_Density PUBLIC
 )
 enable_build_flags(Physics_Material_Density)
 
-# # --- Specific Heat ---
-# set(PHYSICS_MATERIAL_SPH_SOURCES
-#     materials/specific_heat/specific_heat_interface.F90
-#     materials/specific_heat/specific_heat_base.F90
-#     materials/specific_heat/specific_heat_3phase.F90
-# )
-# add_library(Physics_Material_SpecificHeat STATIC ${PHYSICS_MATERIAL_SPH_SOURCES})
-# target_include_directories(Physics_Material_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# target_link_libraries(Physics_Material_SpecificHeat PUBLIC 
-#     Solver::Core
-#     Physics_Material_IAPWS
-# )
-# enable_build_flags(Physics_Material_SpecificHeat)
+# --- Specific Heat ---
+set(PHYSICS_MATERIAL_SPH_SOURCES
+    materials/specific_heat/specific_heat_interface.F90
+    materials/specific_heat/specific_heat_base.F90
+    materials/specific_heat/specific_heat_2phase.F90
+    materials/specific_heat/specific_heat_3phase.F90
+    materials/specific_heat/specific_heat_4phase.F90
+)
+add_library(Physics_Material_SpecificHeat STATIC ${PHYSICS_MATERIAL_SPH_SOURCES})
+target_include_directories(Physics_Material_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Material_SpecificHeat PUBLIC 
+    Solver::Core
+)
+enable_build_flags(Physics_Material_SpecificHeat)
 
 # # --- Thermal Conductivity ---
 # set(PHYSICS_MATERIAL_THC_SOURCES
@@ -71,7 +69,7 @@ enable_build_flags(Physics_Material_Density)
 add_library(Physics_Materials INTERFACE)
 target_link_libraries(Physics_Materials INTERFACE
     Physics_Material_Density
-    # Physics_Material_SpecificHeat
+    Physics_Material_SpecificHeat
     # Physics_Material_ThermalConductivity
     # Physics_Material_HeatCapacity
 )

@@ -1,7 +1,7 @@
 module physics_material_heat_capacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
-    use :: module_input, only:type_input
+    ! use :: module_input, only:type_input
     use :: physics_material_density, only:holder_dens, abst_den
     implicit none
     private

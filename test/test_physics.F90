@@ -69,7 +69,7 @@ contains
         state%relative_humidity = 0.6d0
         call denstiy%p%calc(state, computed_density)
         expected_density = 1881.464474792440d0
-        call check_variable(computed_density, expected_density, "Density Test Case 1")
+        call check_variable(computed_density, expected_density, "Density Test")
 
     end subroutine test_density
 
