@@ -130,6 +130,43 @@ module physics_material_thermal_conductivity
         end subroutine calc_thc_dispersity_gp_3phase
     end interface
 
+    type, extends(abst_thc) :: type_thc_4phase
+        real(real64), allocatable :: dispersity(:)
+        real(real64), allocatable :: params(:)
+    contains
+        procedure, pass(self) :: initialize => initialize_type_thc_4phase
+        procedure, pass(self) :: calc_lambda_0 => calc_thc_gp_4phase
+        procedure, pass(self) :: calc_lambda_dispersity => calc_thc_dispersity_gp_4phase
+    end type type_thc_4phase
+
+    interface
+        module subroutine initialize_type_thc_4phase(self, material_id, physics_info, water, ice)
+            implicit none
+            class(type_thc_4phase), intent(inout) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_physics_info), intent(in) :: physics_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
+
+        end subroutine initialize_type_thc_4phase
+
+        module pure elemental subroutine calc_thc_gp_4phase(self, state, lambda)
+            implicit none
+            class(type_thc_4phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: lambda
+
+        end subroutine calc_thc_gp_4phase
+
+        module pure elemental subroutine calc_thc_dispersity_gp_4phase(self, state, lambda)
+            implicit none
+            class(type_thc_4phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            type(type_thc_dispersity), intent(inout) :: lambda
+
+        end subroutine calc_thc_dispersity_gp_4phase
+    end interface
+
     interface
         module pure elemental subroutine calc_thc_2(lambda_soil, phi_soil, &
                                                     lambda_water, phi_water, lambda)
@@ -172,6 +209,15 @@ module physics_material_thermal_conductivity
             real(real64), intent(inout) :: lambda
 
         end subroutine calc_thc_4
+
+        module pure elemental subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, phi_vapor, lambda)
+            implicit none
+            real(real64), intent(in) :: A, B, C, D
+            real(real64), intent(in) :: F1, F2
+            real(real64), intent(in) :: phi_water, phi_ice, phi_vapor
+            real(real64), intent(inout) :: lambda
+
+        end subroutine calc_thc_4_vadoze
 
         module pure elemental subroutine calc_thc_dispersity(lambda_0, lambda_T, lambda_L, &
                                                              htc_water, q_x, q_y, q_z, lambda)

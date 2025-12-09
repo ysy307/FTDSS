@@ -1,7 +1,6 @@
 module physics_models_gcc
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: module_core, only:type_state
-    use :: module_input, only:type_input
     implicit none
     private
 
@@ -70,10 +69,9 @@ module physics_models_gcc
     end interface
 
     interface
-        module subroutine initialize_holder_gccs(self, input, i_material)
+        module subroutine initialize_holder_gccs(self, i_material)
             implicit none
             class(holder_gccs), intent(inout) :: self
-            type(type_input), intent(in) :: input
             integer(int32), intent(in) :: i_material
 
         end subroutine initialize_holder_gccs

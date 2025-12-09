@@ -42,6 +42,7 @@ set(PHYSICS_MATERIAL_THC_SOURCES
     materials/thermal_conductivity/thermal_conductivity_interface.F90
     materials/thermal_conductivity/thermal_conductivity_base.F90
     materials/thermal_conductivity/thermal_conductivity_3phase.F90
+    materials/thermal_conductivity/thermal_conductivity_4phase.F90
 )
 add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_SOURCES})
 target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
@@ -70,7 +71,7 @@ add_library(Physics_Materials INTERFACE)
 target_link_libraries(Physics_Materials INTERFACE
     Physics_Material_Density
     Physics_Material_SpecificHeat
-    # Physics_Material_ThermalConductivity
+    Physics_Material_ThermalConductivity
     # Physics_Material_HeatCapacity
 )
 

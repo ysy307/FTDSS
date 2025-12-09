@@ -84,6 +84,23 @@ contains
 
     end subroutine calc_thc_4
 
+    module pure elemental subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, phi_vapor, lambda)
+        implicit none
+        real(real64), intent(in) :: A, B, C, D
+        real(real64), intent(in) :: F1, F2
+        real(real64), intent(in) :: phi_water, phi_ice, phi_vapor
+        real(real64), intent(inout) :: lambda
+
+        real(real64) :: F_ice
+        real(real64) :: theta
+
+        F_ice = 1.0d0 + F1 * phi_ice**F2
+        theta = phi_water + phi_vapor + F_ice * phi_ice
+
+        lambda = A + B * theta - (A - D) * exp(-(C * theta)**4)
+
+    end subroutine calc_thc_4_vadoze
+
     module pure elemental subroutine calc_thc_dispersity(lambda_0, lambda_T, lambda_L, &
                                                          htc_water, q_x, q_y, q_z, lambda)
         implicit none
