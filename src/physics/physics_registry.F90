@@ -1,13 +1,13 @@
 module physics_registry
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_input, only:type_input
+    ! use :: module_input, only:type_input
     use :: physics_material_thermal_conductivity, only:holder_thcs, abst_thc
-    use :: physics_material_heat_capacity, only:holder_vhcs, abst_vhc
+    ! use :: physics_material_heat_capacity, only:holder_vhcs, abst_vhc
     use :: physics_material_density, only:holder_dens, abst_den
     use :: physics_material_specific_heat, only:holder_sphs, abst_sph
-    use :: physics_models_hcf, only:holder_hcfs, abst_hcf
-    use :: physics_models_gcc, only:holder_gccs, abst_gcc
-    use :: physics_models_wrf, only:holder_wrfs, abst_wrf
+    ! use :: physics_models_hcf, only:holder_hcfs, abst_hcf
+    ! use :: physics_models_gcc, only:holder_gccs, abst_gcc
+    ! use :: physics_models_wrf, only:holder_wrfs, abst_wrf
     implicit none
 
     public :: type_physics_registry
@@ -17,10 +17,10 @@ module physics_registry
         type(holder_thcs), allocatable :: thc(:)
         type(holder_dens), allocatable :: den(:)
         type(holder_sphs), allocatable :: sph(:)
-        type(holder_vhcs), allocatable :: vhc(:)
-        type(holder_gccs), allocatable :: gcc(:)
-        type(holder_wrfs), allocatable :: wrf(:)
-        type(holder_hcfs), allocatable :: hcf(:)
+        ! type(holder_vhcs), allocatable :: vhc(:)
+        ! type(holder_gccs), allocatable :: gcc(:)
+        ! type(holder_wrfs), allocatable :: wrf(:)
+        ! type(holder_hcfs), allocatable :: hcf(:)
 
         integer(int32), allocatable :: region_id_map(:)
     contains

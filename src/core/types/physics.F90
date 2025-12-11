@@ -20,9 +20,15 @@ module core_types_physics
         real(real64) :: dot_ice
         !> Porosity, \(\phi\) [-]
         real(real64) :: porosity
-        !> Latent heat, \(L_f\) [J/kg]
-        real(real64) :: latent_heat
+        !> Latent heat of fusion, \(L_\mathrm{f}\) [J/kg]
+        real(real64) :: latent_heat_fusion
+        !> Latent heat of vaporization, \(h_\mathrm{v}\) [J/kg]
+        real(real64) :: latent_heat_vaporization
+        !> Rate of change of water content with respect to temperature, \(\frac{d\theta_w}{dT}\) [-/K]
         real(real64) :: dQw_dT
+        !> Rate of change of vapor content with respect to temperature, \(\frac{d\theta_v}{dT}\) [-/K]
+        real(real64) :: dQv_dT
+        !> Density of water [kg/m^3]
         real(real64) :: density_water
         real(real64) :: density_ice
         real(real64) :: vhc_water

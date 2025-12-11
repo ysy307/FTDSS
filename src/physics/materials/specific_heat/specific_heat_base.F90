@@ -1,4 +1,4 @@
-submodule(physics_material_specific_heat) specific_heat_base
+submodule(physics_materials_specific_heat) specific_heat_base
     implicit none
 
 contains

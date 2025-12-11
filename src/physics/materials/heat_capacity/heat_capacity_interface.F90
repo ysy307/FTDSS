@@ -1,8 +1,9 @@
-module physics_material_heat_capacity
+module physics_materials_heat_capacity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state, type_physics_info
     use :: physics_constants, only:TtoK => celsius_to_kelvin
+    use :: materials_base, only:abst_material
     implicit none
     private
 
@@ -10,7 +11,7 @@ module physics_material_heat_capacity
     public :: holder_vhcs
     public :: abst_vhc
     public :: type_vhc_3phase
-    public :: type_vhc_3phase_apparent
+    ! public :: type_vhc_3phase_apparent
 
     ! --- ポリモーフィックなコンテナ ---
     type :: holder_vhcs
@@ -19,119 +20,123 @@ module physics_material_heat_capacity
         procedure, pass(self) :: initialize => initialize_holder_vhcs
     end type holder_vhcs
 
-    type, abstract :: abst_vhc
-        integer(int32) :: material_id
-        real(real64) :: material1 !! soil, rock, concrete
-        real(real64) :: material2 !! water
-        real(real64) :: material3 !! ice
-        real(real64) :: material4 !! gas
+    interface
+        module subroutine initialize_holder_vhcs(self, material_id, physics_info, water, ice)
+            implicit none
+            class(holder_vhcs), intent(inout) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_physics_info), intent(in) :: physics_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
+
+        end subroutine initialize_holder_vhcs
+    end interface
+
+    type, extends(abst_material), abstract :: abst_vhc
     contains
-        procedure(abst_calc_vhc_gauss_point), pass(self), deferred :: calc
+        procedure(abst_calc_vhc_gp), pass(self), public, deferred :: calc
     end type abst_vhc
 
-    ! --- 3相モデルの具象クラス ---
-    type, extends(abst_vhc) :: type_vhc_3phase
-    contains
-        procedure :: calc => calc_vhc_gauss_point_3phase
-
-    end type type_vhc_3phase
-    type, extends(abst_vhc) :: type_vhc_3phase_apparent
-    contains
-        procedure :: calc => calc_vhc_gauss_point_3phase_apparent
-    end type type_vhc_3phase_apparent
-
-    ! --- 手続きのインターフェース宣言 ---
     abstract interface
-        pure elemental function abst_calc_vhc_gauss_point(self, state) result(VHC)
-            import :: abst_vhc, type_state, abst_den, real64
+        pure elemental subroutine abst_calc_vhc_gp(self, state, vhc)
+            import :: abst_vhc, type_state, real64
             implicit none
             class(abst_vhc), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64) :: VHC
-        end function abst_calc_vhc_gauss_point
-
+            real(real64), intent(inout) :: vhc
+        end subroutine abst_calc_vhc_gp
     end interface
 
+    type, extends(abst_vhc) :: type_vhc_2phase
+    contains
+        procedure :: calc => calc_vhc_gp_2phase
+    end type type_vhc_2phase
+
     interface
-        module subroutine initialize_holder_vhcs(self, input, material_id)
+        module pure elemental subroutine calc_vhc_gp_2phase(self, state, vhc)
             implicit none
-            class(holder_vhcs), intent(inout) :: self
-            type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: material_id
+            class(type_vhc_2phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: vhc
+        end subroutine calc_vhc_gp_2phase
+    end interface
 
-        end subroutine initialize_holder_vhcs
+    type, extends(abst_vhc) :: type_vhc_3phase
+    contains
+        procedure :: calc => calc_vhc_gp_3phase
+    end type type_vhc_3phase
 
-        module function construct_type_vhc_3phase(input, material_id) result(property)
-            implicit none
-            class(abst_vhc), allocatable :: property
-            type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: material_id
-
-        end function construct_type_vhc_3phase
-
-        module pure elemental function calc_vhc_gauss_point_3phase(self, state) result(VHC)
+    interface
+        module pure elemental subroutine calc_vhc_gp_3phase(self, state, vhc)
             implicit none
             class(type_vhc_3phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64) :: VHC
+            real(real64), intent(inout) :: vhc
+        end subroutine calc_vhc_gp_3phase
+    end interface
 
-        end function calc_vhc_gauss_point_3phase
+    type, extends(abst_vhc) :: type_vhc_4phase
+    contains
+        procedure :: calc => calc_vhc_gp_4phase
+    end type type_vhc_4phase
 
-        module function construct_type_vhc_3phase_apparent(input, material_id) result(property)
+    interface
+        module pure elemental subroutine calc_vhc_gp_4phase(self, state, vhc)
             implicit none
-            class(abst_vhc), allocatable :: property
-            type(type_input), intent(in) :: input
-            integer(int32), intent(in) :: material_id
-
-        end function construct_type_vhc_3phase_apparent
-
-        module pure elemental function calc_vhc_gauss_point_3phase_apparent(self, state) result(VHC)
-            implicit none
-            class(type_vhc_3phase_apparent), intent(in) :: self
+            class(type_vhc_4phase), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64) :: VHC
-
-        end function calc_vhc_gauss_point_3phase_apparent
+            real(real64), intent(inout) :: vhc
+        end subroutine calc_vhc_gp_4phase
     end interface
 
     interface
-
-        module pure elemental function calc_vhc_3(VHC_soil, phi_soil, &
-                                                  VHC_water, phi_water, &
-                                                  VHC_ice, phi_ice) result(VHC)
+        module pure elemental subroutine calc_vhc_2(vhc_soil, phi_soil, &
+                                                    vhc_water, phi_water, vhc)
             implicit none
-            real(real64), intent(in) :: VHC_soil
+            real(real64), intent(in) :: vhc_soil
             real(real64), intent(in) :: phi_soil
-            real(real64), intent(in) :: VHC_water
+            real(real64), intent(in) :: vhc_water
             real(real64), intent(in) :: phi_water
-            real(real64), intent(in) :: VHC_ice
-            real(real64), intent(in) :: phi_ice
-            real(real64) :: VHC
-        end function calc_vhc_3
+            real(real64), intent(inout) :: vhc
 
-        module pure elemental function calc_vhc_3a(VHC_soil, phi_soil, VHC_water, phi_water, &
-                                                   VHC_ice, phi_ice, Lf, density_water, dQw_dT) result(VHC)
+        end subroutine calc_vhc_2
+
+        module pure elemental subroutine calc_vhc_3a(vhc_soil, phi_soil, vhc_water, phi_water, &
+                                                     vhc_ice, phi_ice, density_water, latent_heat_fusion, dQw_dT, vhc)
             implicit none
-            real(real64), intent(in) :: VHC_soil
+            real(real64), intent(in) :: vhc_soil
             real(real64), intent(in) :: phi_soil
-            real(real64), intent(in) :: VHC_water
+            real(real64), intent(in) :: vhc_water
             real(real64), intent(in) :: phi_water
-            real(real64), intent(in) :: VHC_ice
+            real(real64), intent(in) :: vhc_ice
             real(real64), intent(in) :: phi_ice
-            real(real64), intent(in) :: Lf
             real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: latent_heat_fusion
             real(real64), intent(in) :: dQw_dT
-            real(real64) :: VHC
+            real(real64), intent(inout) :: vhc
 
-        end function calc_vhc_3a
+        end subroutine calc_vhc_3a
+
+        module pure elemental subroutine calc_vhc_4a(vhc_soil, phi_soil, vhc_water, phi_water, &
+                                                     vhc_ice, phi_ice, phi_vapor, vhc_vapor, density_water, latent_heat_fusion, &
+                                                     dQw_dT, latent_heat_vaporization, dQv_dT, vhc)
+            implicit none
+            real(real64), intent(in) :: vhc_soil
+            real(real64), intent(in) :: phi_soil
+            real(real64), intent(in) :: vhc_water
+            real(real64), intent(in) :: phi_water
+            real(real64), intent(in) :: vhc_ice
+            real(real64), intent(in) :: phi_ice
+            real(real64), intent(in) :: phi_vapor
+            real(real64), intent(in) :: vhc_vapor
+            real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: latent_heat_fusion
+            real(real64), intent(in) :: dQw_dT
+            real(real64), intent(in) :: latent_heat_vaporization
+            real(real64), intent(in) :: dQv_dT
+            real(real64), intent(inout) :: vhc
+
+        end subroutine calc_vhc_4a
     end interface
 
-    interface type_vhc_3phase
-        module procedure construct_type_vhc_3phase
-    end interface
-
-    interface type_vhc_3phase_apparent
-        module procedure construct_type_vhc_3phase_apparent
-    end interface
-
-end module physics_material_heat_capacity
+end module physics_materials_heat_capacity

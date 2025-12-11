@@ -8,7 +8,9 @@ module physics_material_thermal_conductivity
 
     public :: holder_thcs
     public :: abst_thc
+    public :: type_thc_2phase
     public :: type_thc_3phase
+    public :: type_thc_4phase
 
     type :: holder_thcs
         class(abst_thc), allocatable :: p
@@ -94,6 +96,42 @@ module physics_material_thermal_conductivity
     end interface
 
     !--------------------------------------------------------------------------------
+    type, extends(abst_thc) :: type_thc_2phase
+        real(real64), allocatable :: dispersity(:)
+    contains
+        procedure, pass(self) :: initialize => initialize_type_thc_2phase
+        procedure, pass(self) :: calc_lambda_0 => calc_thc_gp_2phase
+        procedure, pass(self) :: calc_lambda_dispersity => calc_thc_dispersity_gp_2phase
+    end type type_thc_2phase
+
+    interface
+        module subroutine initialize_type_thc_2phase(self, material_id, physics_info, water, ice)
+            implicit none
+            class(type_thc_2phase), intent(inout) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_physics_info), intent(in) :: physics_info
+            type(type_iapws97), intent(in), target :: water
+            type(type_iapws06), intent(in), target :: ice
+
+        end subroutine initialize_type_thc_2phase
+
+        module pure elemental subroutine calc_thc_gp_2phase(self, state, lambda)
+            implicit none
+            class(type_thc_2phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: lambda
+
+        end subroutine calc_thc_gp_2phase
+
+        module pure elemental subroutine calc_thc_dispersity_gp_2phase(self, state, lambda)
+            implicit none
+            class(type_thc_2phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            type(type_thc_dispersity), intent(inout) :: lambda
+
+        end subroutine calc_thc_dispersity_gp_2phase
+    end interface
+
     type, extends(abst_thc) :: type_thc_3phase
         real(real64), allocatable :: dispersity(:)
     contains

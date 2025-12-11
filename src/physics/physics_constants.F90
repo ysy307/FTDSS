@@ -35,6 +35,11 @@ module physics_constants
     !> Water critical point density [kg/m^3]
     real(real64), parameter, public :: water_critical_point_density = 322.0d0
 
+    !> Latent heat of fusion for water at 0 degC [J/kg]
+    real(real64), parameter, public :: latent_heat_fusion_water_0C = 334560.0d0
+    !> Water freezing point at standard atmospheric pressure [degC]
+    real(real64), parameter, public :: water_freezing_point_at_standard_atmospheric_pressure = 0.0d0
+
     !> Molar mass of water [kg/mol]
     real(real64), parameter, public :: molar_mass_water = 0.01801528d0
 

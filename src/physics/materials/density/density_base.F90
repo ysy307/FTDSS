@@ -1,4 +1,4 @@
-submodule(physics_material_density) density_base
+submodule(physics_materials_density) density_base
     implicit none
 
 contains

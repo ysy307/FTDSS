@@ -7,18 +7,29 @@ add_library(Physics_Constants STATIC ${PHYSICS_CONSTANTS_SOURCES})
 target_include_directories(Physics_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Physics_Constants)
 
+# --- Materials Libraries (materials/*) ---
+set(PHYSICS_MATERIALS_SOURCES
+    materials/materials_base.F90
+)
+add_library(Physics_Materials_Base STATIC ${PHYSICS_MATERIALS_SOURCES})
+target_include_directories(Physics_Materials_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Materials_Base PUBLIC
+    Solver::Core
+    Physics_Constants
+)
+enable_build_flags(Physics_Materials_Base)
+
 # --- Density ---
 set(PHYSICS_MATERIAL_DENSITY_SOURCES
     materials/density/density_interface.F90
     materials/density/density_base.F90
-    materials/density/density_2phase.F90
-    materials/density/density_3phase.F90
-    materials/density/density_4phase.F90
+    materials/density/density_multiphase.F90
 )
 add_library(Physics_Material_Density STATIC ${PHYSICS_MATERIAL_DENSITY_SOURCES})
 target_include_directories(Physics_Material_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_Density PUBLIC 
     Solver::Core
+    Physics_Materials_Base
 )
 enable_build_flags(Physics_Material_Density)
 
@@ -26,14 +37,13 @@ enable_build_flags(Physics_Material_Density)
 set(PHYSICS_MATERIAL_SPH_SOURCES
     materials/specific_heat/specific_heat_interface.F90
     materials/specific_heat/specific_heat_base.F90
-    materials/specific_heat/specific_heat_2phase.F90
-    materials/specific_heat/specific_heat_3phase.F90
-    materials/specific_heat/specific_heat_4phase.F90
+    materials/specific_heat/specific_heat_multiphase.F90
 )
 add_library(Physics_Material_SpecificHeat STATIC ${PHYSICS_MATERIAL_SPH_SOURCES})
 target_include_directories(Physics_Material_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_SpecificHeat PUBLIC 
     Solver::Core
+    Physics_Materials_Base
 )
 enable_build_flags(Physics_Material_SpecificHeat)
 
@@ -41,30 +51,31 @@ enable_build_flags(Physics_Material_SpecificHeat)
 set(PHYSICS_MATERIAL_THC_SOURCES
     materials/thermal_conductivity/thermal_conductivity_interface.F90
     materials/thermal_conductivity/thermal_conductivity_base.F90
+    materials/thermal_conductivity/thermal_conductivity_2phase.F90
     materials/thermal_conductivity/thermal_conductivity_3phase.F90
     materials/thermal_conductivity/thermal_conductivity_4phase.F90
 )
 add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_SOURCES})
 target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Material_ThermalConductivity PUBLIC 
-    Solver::Core 
+    Solver::Core
+    Physics_Materials_Base
 )
 enable_build_flags(Physics_Material_ThermalConductivity)
 
-# # --- Heat Capacity (depends on Density) ---
-# set(PHYSICS_MATERIAL_VHC_SOURCES
-#     materials/heat_capacity/heat_capacity_interface.F90
-#     materials/heat_capacity/heat_capacity_base.F90
-#     materials/heat_capacity/heat_capacity_3phase.F90
-#     materials/heat_capacity/heat_capacity_3phase_apparent.F90
-# )
-# add_library(Physics_Material_HeatCapacity STATIC ${PHYSICS_MATERIAL_VHC_SOURCES})
-# target_include_directories(Physics_Material_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# target_link_libraries(Physics_Material_HeatCapacity PUBLIC
-#     Solver::Core
-#     Physics_Material_Density
-# )
-# enable_build_flags(Physics_Material_HeatCapacity)
+# --- Vomumetric Heat Capacity ---
+set(PHYSICS_MATERIAL_VHC_SOURCES
+    materials/heat_capacity/heat_capacity_interface.F90
+    materials/heat_capacity/heat_capacity_base.F90
+    materials/heat_capacity/heat_capacity_multiphase.F90
+)
+add_library(Physics_Material_HeatCapacity STATIC ${PHYSICS_MATERIAL_VHC_SOURCES})
+target_include_directories(Physics_Material_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Material_HeatCapacity PUBLIC
+    Solver::Core
+    Physics_Materials_Base
+)
+enable_build_flags(Physics_Material_HeatCapacity)
 
 # --- Materials aggregator ---
 add_library(Physics_Materials INTERFACE)
@@ -72,7 +83,7 @@ target_link_libraries(Physics_Materials INTERFACE
     Physics_Material_Density
     Physics_Material_SpecificHeat
     Physics_Material_ThermalConductivity
-    # Physics_Material_HeatCapacity
+    Physics_Material_HeatCapacity
 )
 
 # ====================================================================

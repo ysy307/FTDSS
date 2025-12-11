@@ -1,8 +1,9 @@
-module physics_material_density
+module physics_materials_density
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state, type_physics_info
     use :: physics_constants, only:TtoK => celsius_to_kelvin
+    use :: materials_base, only:abst_material
     implicit none
     private
 
@@ -30,30 +31,12 @@ module physics_material_density
         end subroutine initialize_holder_dens
     end interface
 
-    type, abstract :: abst_den
-        integer(int32) :: material_id = -1
-        real(real64) :: material1 = 0.0d0 !! soil, rock, concrete
-        real(real64) :: material2 = 0.0d0 !! water
-        real(real64) :: material3 = 0.0d0 !! ice
-        real(real64) :: material4 = 0.0d0 !! gas
-        type(type_iapws97), pointer :: water => null()
-        type(type_iapws06), pointer :: ice => null()
+    type, extends(abst_material), abstract :: abst_den
     contains
-        procedure(initialize_abst_den), pass(self), public, deferred :: initialize
         procedure(abst_calc_den_gp), pass(self), public, deferred :: calc
     end type abst_den
 
     abstract interface
-        subroutine initialize_abst_den(self, material_id, physics_info, water, ice)
-            import :: abst_den, type_physics_info, int32, type_iapws97, type_iapws06
-            implicit none
-            class(abst_den), intent(inout) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
-            type(type_iapws97), intent(in), target :: water
-            type(type_iapws06), intent(in), target :: ice
-        end subroutine initialize_abst_den
-
         pure elemental subroutine abst_calc_den_gp(self, state, density)
             import :: abst_den, type_state, type_iapws97, type_iapws06, real64
             implicit none
@@ -65,21 +48,10 @@ module physics_material_density
 
     type, extends(abst_den) :: type_den_2phase
     contains
-        procedure, pass(self) :: initialize => initialize_type_den_2phase
         procedure, pass(self) :: calc => calc_den_gp_2phase
     end type type_den_2phase
 
     interface
-        module subroutine initialize_type_den_2phase(self, material_id, physics_info, water, ice)
-            implicit none
-            class(type_den_2phase), intent(inout) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
-            type(type_iapws97), intent(in), target :: water
-            type(type_iapws06), intent(in), target :: ice
-
-        end subroutine initialize_type_den_2phase
-
         module pure elemental subroutine calc_den_gp_2phase(self, state, density)
             implicit none
             class(type_den_2phase), intent(in) :: self
@@ -90,21 +62,10 @@ module physics_material_density
 
     type, extends(abst_den) :: type_den_3phase
     contains
-        procedure, pass(self) :: initialize => initialize_type_den_3phase
         procedure, pass(self) :: calc => calc_den_gp_3phase
     end type type_den_3phase
 
     interface
-        module subroutine initialize_type_den_3phase(self, material_id, physics_info, water, ice)
-            implicit none
-            class(type_den_3phase), intent(inout) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
-            type(type_iapws97), intent(in), target :: water
-            type(type_iapws06), intent(in), target :: ice
-
-        end subroutine initialize_type_den_3phase
-
         module pure elemental subroutine calc_den_gp_3phase(self, state, density)
             implicit none
             class(type_den_3phase), intent(in) :: self
@@ -115,20 +76,10 @@ module physics_material_density
 
     type, extends(abst_den) :: type_den_4phase
     contains
-        procedure, pass(self) :: initialize => initialize_type_den_4phase
         procedure, pass(self) :: calc => calc_den_gp_4phase
     end type type_den_4phase
 
     interface
-        module subroutine initialize_type_den_4phase(self, material_id, physics_info, water, ice)
-            implicit none
-            class(type_den_4phase), intent(inout) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_physics_info), intent(in) :: physics_info
-            type(type_iapws97), intent(in), target :: water
-            type(type_iapws06), intent(in), target :: ice
-        end subroutine initialize_type_den_4phase
-
         module pure elemental subroutine calc_den_gp_4phase(self, state, density)
             implicit none
             class(type_den_4phase), intent(in) :: self
@@ -191,4 +142,4 @@ module physics_material_density
         end subroutine calc_den_saturated_vapor
     end interface
 
-end module physics_material_density
+end module physics_materials_density
