@@ -7,11 +7,12 @@ module physics_materials_heat_capacity
     implicit none
     private
 
-    ! --- 公開する型定義 ---
     public :: holder_vhcs
     public :: abst_vhc
+    public :: type_vhc_1phase
+    public :: type_vhc_2phase
     public :: type_vhc_3phase
-    ! public :: type_vhc_3phase_apparent
+    public :: type_vhc_4phase
 
     ! --- ポリモーフィックなコンテナ ---
     type :: holder_vhcs
@@ -45,6 +46,20 @@ module physics_materials_heat_capacity
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: vhc
         end subroutine abst_calc_vhc_gp
+    end interface
+
+    type, extends(abst_vhc) :: type_vhc_1phase
+    contains
+        procedure :: calc => calc_vhc_gp_1phase
+    end type type_vhc_1phase
+
+    interface
+        module pure elemental subroutine calc_vhc_gp_1phase(self, state, vhc)
+            implicit none
+            class(type_vhc_1phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: vhc
+        end subroutine calc_vhc_gp_1phase
     end interface
 
     type, extends(abst_vhc) :: type_vhc_2phase

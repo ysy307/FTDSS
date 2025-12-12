@@ -1,6 +1,14 @@
 submodule(physics_materials_heat_capacity) heat_capacity_multiphase
     implicit none
 contains
+    module pure elemental subroutine calc_vhc_gp_1phase(self, state, vhc)
+        implicit none
+        class(type_vhc_1phase), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: vhc
+
+        vhc = self%material1
+    end subroutine calc_vhc_gp_1phase
 
     module pure elemental subroutine calc_vhc_gp_2phase(self, state, vhc)
         implicit none

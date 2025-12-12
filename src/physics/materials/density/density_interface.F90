@@ -9,6 +9,7 @@ module physics_materials_density
 
     public :: holder_dens
     public :: abst_den
+    public :: type_den_1phase
     public :: type_den_2phase
     public :: type_den_3phase
     public :: type_den_4phase
@@ -44,6 +45,20 @@ module physics_materials_density
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: density
         end subroutine abst_calc_den_gp
+    end interface
+
+    type, extends(abst_den) :: type_den_1phase
+    contains
+        procedure, pass(self) :: calc => calc_den_gp_1phase
+    end type type_den_1phase
+
+    interface
+        module pure elemental subroutine calc_den_gp_1phase(self, state, density)
+            implicit none
+            class(type_den_1phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: density
+        end subroutine calc_den_gp_1phase
     end interface
 
     type, extends(abst_den) :: type_den_2phase

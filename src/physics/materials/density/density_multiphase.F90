@@ -1,6 +1,14 @@
 submodule(physics_materials_density) density_multiphase
     implicit none
 contains
+    module pure elemental subroutine calc_den_gp_1phase(self, state, density)
+        implicit none
+        class(type_den_1phase), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: density
+
+        density = self%material1
+    end subroutine calc_den_gp_1phase
 
     module pure elemental subroutine calc_den_gp_2phase(self, state, density)
         implicit none

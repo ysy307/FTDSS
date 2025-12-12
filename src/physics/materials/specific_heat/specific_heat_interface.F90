@@ -9,6 +9,7 @@ module physics_materials_specific_heat
 
     public :: holder_sphs
     public :: abst_sph
+    public :: type_sph_1phase
     public :: type_sph_2phase
     public :: type_sph_3phase
     public :: type_sph_4phase
@@ -45,6 +46,20 @@ module physics_materials_specific_heat
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: specific_heat
         end subroutine abst_calc_sph_gp
+    end interface
+
+    type, extends(abst_sph) :: type_sph_1phase
+    contains
+        procedure :: calc => calc_sph_gp_1phase
+    end type type_sph_1phase
+
+    interface
+        module pure elemental subroutine calc_sph_gp_1phase(self, state, specific_heat)
+            implicit none
+            class(type_sph_1phase), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: specific_heat
+        end subroutine calc_sph_gp_1phase
     end interface
 
     type, extends(abst_sph) :: type_sph_2phase

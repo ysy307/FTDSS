@@ -12,6 +12,9 @@ contains
         type(type_iapws06), intent(in), target :: ice
 
         select case (physics_info%num_phases)
+        case (1)
+            allocate (type_sph_1phase :: self%p)
+            call self%p%initialize(material_id, physics_info, water, ice)
         case (2)
             allocate (type_sph_2phase :: self%p)
             call self%p%initialize(material_id, physics_info, water, ice)

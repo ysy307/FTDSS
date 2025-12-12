@@ -1,3 +1,6 @@
+# ====================================================================
+# 1. Physics Materials Libraries
+# ====================================================================
 
 # --- Physics Constants ---
 set(PHYSICS_CONSTANTS_SOURCES
@@ -7,11 +10,12 @@ add_library(Physics_Constants STATIC ${PHYSICS_CONSTANTS_SOURCES})
 target_include_directories(Physics_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Physics_Constants)
 
-# --- Materials Libraries (materials/*) ---
-set(PHYSICS_MATERIALS_SOURCES
+# --- Materials Base ---
+# 修正: 変数名のタイポ修正 (MATERIALSS -> MATERIALS_BASE)
+set(PHYSICS_MATERIALS_BASE_SOURCES
     materials/materials_base.F90
 )
-add_library(Physics_Materials_Base STATIC ${PHYSICS_MATERIALS_SOURCES})
+add_library(Physics_Materials_Base STATIC ${PHYSICS_MATERIALS_BASE_SOURCES})
 target_include_directories(Physics_Materials_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Materials_Base PUBLIC
     Solver::Core
@@ -20,70 +24,92 @@ target_link_libraries(Physics_Materials_Base PUBLIC
 enable_build_flags(Physics_Materials_Base)
 
 # --- Density ---
-set(PHYSICS_MATERIAL_DENSITY_SOURCES
+set(PHYSICS_MATERIALS_DENSITY_SOURCES
     materials/density/density_interface.F90
     materials/density/density_base.F90
     materials/density/density_multiphase.F90
 )
-add_library(Physics_Material_Density STATIC ${PHYSICS_MATERIAL_DENSITY_SOURCES})
-target_include_directories(Physics_Material_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_Density PUBLIC 
+add_library(Physics_Materials_Density STATIC ${PHYSICS_MATERIALS_DENSITY_SOURCES})
+target_include_directories(Physics_Materials_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Materials_Density PUBLIC 
     Solver::Core
     Physics_Materials_Base
 )
-enable_build_flags(Physics_Material_Density)
+enable_build_flags(Physics_Materials_Density)
 
 # --- Specific Heat ---
-set(PHYSICS_MATERIAL_SPH_SOURCES
+set(PHYSICS_MATERIALS_SPH_SOURCES
     materials/specific_heat/specific_heat_interface.F90
     materials/specific_heat/specific_heat_base.F90
     materials/specific_heat/specific_heat_multiphase.F90
 )
-add_library(Physics_Material_SpecificHeat STATIC ${PHYSICS_MATERIAL_SPH_SOURCES})
-target_include_directories(Physics_Material_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_SpecificHeat PUBLIC 
+add_library(Physics_Materials_SpecificHeat STATIC ${PHYSICS_MATERIALS_SPH_SOURCES})
+target_include_directories(Physics_Materials_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Materials_SpecificHeat PUBLIC 
     Solver::Core
     Physics_Materials_Base
 )
-enable_build_flags(Physics_Material_SpecificHeat)
+enable_build_flags(Physics_Materials_SpecificHeat)
 
 # --- Thermal Conductivity ---
-set(PHYSICS_MATERIAL_THC_SOURCES
+# ここはファイル名変更なし（2phase, 3phase...）のままとしています
+set(PHYSICS_MATERIALS_THC_SOURCES
     materials/thermal_conductivity/thermal_conductivity_interface.F90
     materials/thermal_conductivity/thermal_conductivity_base.F90
     materials/thermal_conductivity/thermal_conductivity_2phase.F90
     materials/thermal_conductivity/thermal_conductivity_3phase.F90
     materials/thermal_conductivity/thermal_conductivity_4phase.F90
 )
-add_library(Physics_Material_ThermalConductivity STATIC ${PHYSICS_MATERIAL_THC_SOURCES})
-target_include_directories(Physics_Material_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_ThermalConductivity PUBLIC 
+add_library(Physics_Materials_ThermalConductivity STATIC ${PHYSICS_MATERIALS_THC_SOURCES})
+target_include_directories(Physics_Materials_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Materials_ThermalConductivity PUBLIC 
     Solver::Core
     Physics_Materials_Base
 )
-enable_build_flags(Physics_Material_ThermalConductivity)
+enable_build_flags(Physics_Materials_ThermalConductivity)
 
-# --- Vomumetric Heat Capacity ---
-set(PHYSICS_MATERIAL_VHC_SOURCES
+# --- Volumetric Heat Capacity ---
+set(PHYSICS_MATERIALS_VHC_SOURCES
     materials/heat_capacity/heat_capacity_interface.F90
     materials/heat_capacity/heat_capacity_base.F90
     materials/heat_capacity/heat_capacity_multiphase.F90
 )
-add_library(Physics_Material_HeatCapacity STATIC ${PHYSICS_MATERIAL_VHC_SOURCES})
-target_include_directories(Physics_Material_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Material_HeatCapacity PUBLIC
+add_library(Physics_Materials_HeatCapacity STATIC ${PHYSICS_MATERIALS_VHC_SOURCES})
+target_include_directories(Physics_Materials_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Materials_HeatCapacity PUBLIC
     Solver::Core
     Physics_Materials_Base
 )
-enable_build_flags(Physics_Material_HeatCapacity)
+enable_build_flags(Physics_Materials_HeatCapacity)
 
 # --- Materials aggregator ---
+# 修正: materials.F90 をコンパイルするための独立したライブラリを作成
+# 元のコードではここで Physics_Service を定義してしまっており、下の定義と衝突していました。
+set(PHYSICS_MATERIALS_ENTRY_SOURCES
+    materials/materials.F90
+)
+add_library(Physics_Materials_Entry STATIC ${PHYSICS_MATERIALS_ENTRY_SOURCES})
+target_include_directories(Physics_Materials_Entry PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
+# materials.F90 が各サブモジュール(Density等)を使用(use)する場合は依存関係が必要です
+target_link_libraries(Physics_Materials_Entry PUBLIC
+    Solver::Core
+    Physics_Materials_Base
+    Physics_Materials_Density
+    Physics_Materials_SpecificHeat
+    Physics_Materials_ThermalConductivity
+    Physics_Materials_HeatCapacity
+)
+enable_build_flags(Physics_Materials_Entry)
+
+# 統合インターフェース
 add_library(Physics_Materials INTERFACE)
 target_link_libraries(Physics_Materials INTERFACE
-    Physics_Material_Density
-    Physics_Material_SpecificHeat
-    Physics_Material_ThermalConductivity
-    Physics_Material_HeatCapacity
+    Physics_Materials_Entry  # materials.F90を含むライブラリ
+    Physics_Materials_Density
+    Physics_Materials_SpecificHeat
+    Physics_Materials_ThermalConductivity
+    Physics_Materials_HeatCapacity
 )
 
 # ====================================================================
@@ -156,11 +182,14 @@ target_link_libraries(Physics_Materials INTERFACE
 # 3. Service Layer (トップレイヤー)
 # ====================================================================
 
+# 修正: 変数名を正確に定義
 set(PHYSICS_SERVICE_SOURCES
     # physics_registry.F90
     # physics_service.F90
     physics.F90
 )
+
+# ここで Physics_Service を定義（重複排除済み）
 add_library(Physics_Service STATIC ${PHYSICS_SERVICE_SOURCES})
 target_include_directories(Physics_Service PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Service PUBLIC
