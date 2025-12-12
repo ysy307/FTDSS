@@ -5,6 +5,7 @@ module physics_models_hcf
     private
 
     public :: abst_hcf
+    public :: type_params_hcf
     public :: holder_hcfs
     public :: type_hcf_base
     public :: type_hcf_impedance

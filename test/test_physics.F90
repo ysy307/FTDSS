@@ -31,6 +31,7 @@ program test_physics
         write (unit, '(a)') "---"
         call test_density()
         call test_specific_heat()
+        call test_hcf()
         write (unit, '(a)') "---"
         write (unit, '(a)') "## Completed"
         close (unit)
@@ -106,6 +107,64 @@ contains
         call check_variable(computed_specific_heat, expected_specific_heat, "Specific Heat Test")
 
     end subroutine test_specific_heat
+
+    subroutine test_hcf()
+        implicit none
+        type(holder_hcfs) :: hcf_model
+        type(type_params_hcf) :: params
+        type(type_state) :: state
+        integer(int32) :: i, n_steps
+        real(real64) :: h, kr, h_min, h_max, dh
+        integer(int32) :: file_unit
+        ! Placeholder for hydraulic conductivity function tests
+        !-------------------------------------------------
+        ! 1. パラメータ設定 (Python側と同じにする)
+        !-------------------------------------------------
+        ! 例として Van Genuchten モデルを使用
+        call params%reset()
+        params%model_number = 1 ! HCF_BASE (interface参照)
+        params%hcf_model_number = 2 ! VGモデル (construct_hcf_base参照: 2=VG)
+        params%water_viscosity_model = 1
+        params%k_s = 1.0d0 ! Ks=1.0 にすれば Kr = K となる
+
+        ! VG パラメータ
+        params%alpha1 = 0.01d0
+        params%n1 = 2.0d0
+        params%m1 = 0.5d0
+        params%l = 0.5d0
+
+        !-------------------------------------------------
+        ! 2. 初期化 (ここで親ポインタ等の接続がテストされる)
+        !-------------------------------------------------
+        call hcf_model%initialize(material_id=1, params=params)
+
+        !-------------------------------------------------
+        ! 3. 計算ループとCSV出力
+        !-------------------------------------------------
+        open (newunit=file_unit, file='fortran_output.csv', status='replace', action='write')
+        write (file_unit, '(A)') 'h,kr' ! ヘッダー
+
+        h_min = -1000.0d0
+        h_max = 0.0d0
+        n_steps = 100
+        dh = (h_max - h_min) / real(n_steps, real64)
+
+        do i = 0, n_steps
+            h = h_min + real(i, real64) * dh
+
+            ! 状態変数に h をセット
+            state%pressure = h
+
+            ! 計算実行 (calc_kflh -> calc_kr_base_vg)
+            call hcf_model%p%calc_kflh(state, kr)
+
+            ! 出力
+            write (file_unit, '(F12.4, ",", ES20.12)') h, kr
+        end do
+
+        close (file_unit)
+        print *, "Success: fortran_output.csv generated."
+    end subroutine test_hcf
 
     ! ======================================================================
     ! Check Utilities

@@ -6,6 +6,9 @@ module module_physics
     use :: physics_materials_specific_heat
     use :: physics_materials_thermal_conductivity
     use :: physics_materials_heat_capacity
+
+    use :: physics_models_wrf
+    use :: physics_models_hcf
     implicit none
     ! private
 

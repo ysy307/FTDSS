@@ -157,13 +157,13 @@ enable_build_flags(Physics_Model_WaterRetention)
 # target_link_libraries(Physics_Model_PhaseChange PUBLIC Solver::Core Solver::Input)
 # enable_build_flags(Physics_Model_PhaseChange)
 
-# # Models aggregator
-# add_library(Physics_Models INTERFACE)
-# target_link_libraries(Physics_Models INTERFACE
-#     Physics_Model_HydraulicConductivity
-#     Physics_Model_WaterRetention
-#     Physics_Model_PhaseChange
-# )
+# Models aggregator
+add_library(Physics_Models INTERFACE)
+target_link_libraries(Physics_Models INTERFACE
+    Physics_Model_HydraulicConductivity
+    Physics_Model_WaterRetention
+    # Physics_Model_PhaseChange
+)
 
 # ====================================================================
 # 3. Service Layer (トップレイヤー)
@@ -181,7 +181,7 @@ add_library(Physics_Service STATIC ${PHYSICS_SERVICE_SOURCES})
 target_include_directories(Physics_Service PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Service PUBLIC
     Physics_Materials
-    # Physics_Models
+    Physics_Models
     Solver::Core
 )
 enable_build_flags(Physics_Service)
