@@ -137,24 +137,23 @@ target_link_libraries(Physics_Materials INTERFACE
 # )
 # enable_build_flags(Physics_Model_HydraulicConductivity)
 
-# # Water Retention
-# set(PHYSICS_MODEL_WRF_SOURCES
-#     models/water_retention/wrf_interface.f90
-#     models/water_retention/wrf_base.F90
-#     models/water_retention/wrf_bc.F90
-#     models/water_retention/wrf_vg.F90
-#     models/water_retention/wrf_ko.F90
-#     models/water_retention/wrf_mvg.F90
-#     models/water_retention/wrf_durner.F90
-#     models/water_retention/wrf_dvgch.F90
-# )
-# add_library(Physics_Model_WaterRetention STATIC ${PHYSICS_MODEL_WRF_SOURCES})
-# target_include_directories(Physics_Model_WaterRetention PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# target_link_libraries(Physics_Model_WaterRetention PUBLIC
-#     Solver::Core
-#     Solver::Input
-# )
-# enable_build_flags(Physics_Model_WaterRetention)
+# Water Retention
+set(PHYSICS_MODEL_WRF_SOURCES
+    models/water_retention/wrf_interface.f90
+    models/water_retention/wrf_base.F90
+    models/water_retention/wrf_bc.F90
+    models/water_retention/wrf_vg.F90
+    models/water_retention/wrf_ko.F90
+    models/water_retention/wrf_mvg.F90
+    models/water_retention/wrf_durner.F90
+    models/water_retention/wrf_dvgch.F90
+)
+add_library(Physics_Model_WaterRetention STATIC ${PHYSICS_MODEL_WRF_SOURCES})
+target_include_directories(Physics_Model_WaterRetention PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Model_WaterRetention PUBLIC
+    Solver::Core
+)
+enable_build_flags(Physics_Model_WaterRetention)
 
 # # Phase Change
 # set(PHYSICS_MODEL_GCC_SOURCES

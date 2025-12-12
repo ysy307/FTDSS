@@ -148,13 +148,6 @@ module physics_materials_density
             real(real64), intent(inout) :: density
 
         end subroutine calc_den_4
-
-        module pure elemental subroutine calc_den_saturated_vapor(temperature, density_vapor, water)
-            implicit none
-            real(real64), intent(in) :: temperature
-            real(real64), intent(inout) :: density_vapor
-            type(type_iapws97), intent(in), optional :: water
-        end subroutine calc_den_saturated_vapor
     end interface
 
 end module physics_materials_density
