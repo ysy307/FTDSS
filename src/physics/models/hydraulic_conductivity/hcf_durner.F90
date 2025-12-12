@@ -2,37 +2,9 @@ submodule(physics_models_hcf) hcf_durner
     implicit none
 contains
     !----------------------------------------------------------------------------------------------------
-    ! Constructe each types by using Modified Durner model
-    !----------------------------------------------------------------------------------------------------
-    module function construct_type_hcf_base_durner(alpha1, n1, w1, alpha2, n2, l) result(structure)
-        implicit none
-        real(real64), intent(in) :: alpha1
-        real(real64), intent(in) :: n1
-        real(real64), intent(in) :: w1
-        real(real64), intent(in) :: alpha2
-        real(real64), intent(in) :: n2
-        real(real64), intent(in) :: l
-        class(abst_hcf_base), allocatable :: structure
-
-        if (allocated(structure)) deallocate (structure)
-        allocate (type_hcf_base_durner :: structure)
-
-        structure%alpha1 = alpha1
-        structure%n1 = n1
-        structure%m1 = 1.0d0 - 1.0d0 / n1
-        structure%w1 = w1
-        structure%alpha2 = alpha2
-        structure%n2 = n2
-        structure%m2 = 1.0d0 - 1.0d0 / n2
-        structure%w2 = 1.0d0 - w1
-        structure%l = l
-
-    end function construct_type_hcf_base_durner
-
-    !----------------------------------------------------------------------------------------------------
     ! Calculate kr for Modified Durner model
     !----------------------------------------------------------------------------------------------------
-    pure elemental function calc_kr_durner(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h) result(kr)
+    pure elemental subroutine calc_kr_durner(alpha1, n1, m1, w1, alpha2, n2, m2, w2, l, h, kr)
         implicit none
         real(real64), intent(in) :: alpha1, alpha2
         real(real64), intent(in) :: n1, n2
@@ -40,7 +12,7 @@ contains
         real(real64), intent(in) :: w1, w2
         real(real64), intent(in) :: l
         real(real64), intent(in) :: h
-        real(real64) :: kr
+        real(real64), intent(inout) :: kr
         real(real64) :: Sw1, Sw2
 
         if (h < 0.0d0) then
@@ -48,22 +20,25 @@ contains
             Sw2 = (1.0d0 + (-alpha2 * h)**n2)**(-m2)
             kr = (w1 * Sw1 + w2 * Sw2)**l * &
                  (w1 * alpha1 * (1.0d0 - (1.0d0 - Sw1**(1.0d0 / m1))**m1) &
-                  + w2 * alpha2 * (1.0d0 - (1.0d0 - Sw2**(1.0d0 / m2))**m2))**2.0d0 / &
-                 (w1 * alpha1 + w2 * alpha2)**2.0d0
+                  + w2 * alpha2 * (1.0d0 - (1.0d0 - Sw2**(1.0d0 / m2))**m2))**2 / &
+                 (w1 * alpha1 + w2 * alpha2)**2
         else
             kr = 1.0d0
         end if
 
-    end function calc_kr_durner
+    end subroutine calc_kr_durner
 
-    pure elemental module function calc_kr_base_durner(self, h) result(kr)
+    pure elemental module subroutine calc_kr_base_durner(self, h, kr)
         implicit none
         class(type_hcf_base_durner), intent(in) :: self
         real(real64), intent(in) :: h
-        real(real64) :: kr
+        real(real64), intent(inout) :: kr
 
-        kr = calc_kr_durner(self%alpha1, self%n1, self%m1, self%w1, self%alpha2, self%n2, self%m2, self%w2, self%l, h)
+        associate (params => self%parent%params)
+            call calc_kr_durner(params%alpha1, params%n1, params%m1, params%w1, &
+                                params%alpha2, params%n2, params%m2, params%w2, params%l, h, kr)
+        end associate
 
-    end function calc_kr_base_durner
+    end subroutine calc_kr_base_durner
 
 end submodule hcf_durner

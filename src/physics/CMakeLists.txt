@@ -11,15 +11,14 @@ target_include_directories(Physics_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Physics_Constants)
 
 # --- Materials Base ---
-# 修正: 変数名のタイポ修正 (MATERIALSS -> MATERIALS_BASE)
 set(PHYSICS_MATERIALS_BASE_SOURCES
     materials/materials_base.F90
 )
 add_library(Physics_Materials_Base STATIC ${PHYSICS_MATERIALS_BASE_SOURCES})
 target_include_directories(Physics_Materials_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Materials_Base PUBLIC
-    Solver::Core
     Physics_Constants
+    Solver::Core
 )
 enable_build_flags(Physics_Materials_Base)
 
@@ -32,8 +31,8 @@ set(PHYSICS_MATERIALS_DENSITY_SOURCES
 add_library(Physics_Materials_Density STATIC ${PHYSICS_MATERIALS_DENSITY_SOURCES})
 target_include_directories(Physics_Materials_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Materials_Density PUBLIC 
-    Solver::Core
     Physics_Materials_Base
+    Solver::Core
 )
 enable_build_flags(Physics_Materials_Density)
 
@@ -46,25 +45,22 @@ set(PHYSICS_MATERIALS_SPH_SOURCES
 add_library(Physics_Materials_SpecificHeat STATIC ${PHYSICS_MATERIALS_SPH_SOURCES})
 target_include_directories(Physics_Materials_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Materials_SpecificHeat PUBLIC 
-    Solver::Core
     Physics_Materials_Base
+    Solver::Core
 )
 enable_build_flags(Physics_Materials_SpecificHeat)
 
 # --- Thermal Conductivity ---
-# ここはファイル名変更なし（2phase, 3phase...）のままとしています
 set(PHYSICS_MATERIALS_THC_SOURCES
     materials/thermal_conductivity/thermal_conductivity_interface.F90
     materials/thermal_conductivity/thermal_conductivity_base.F90
-    materials/thermal_conductivity/thermal_conductivity_2phase.F90
-    materials/thermal_conductivity/thermal_conductivity_3phase.F90
-    materials/thermal_conductivity/thermal_conductivity_4phase.F90
+    materials/thermal_conductivity/thermal_conductivity_multiphase.F90
 )
 add_library(Physics_Materials_ThermalConductivity STATIC ${PHYSICS_MATERIALS_THC_SOURCES})
 target_include_directories(Physics_Materials_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Materials_ThermalConductivity PUBLIC 
-    Solver::Core
     Physics_Materials_Base
+    Solver::Core
 )
 enable_build_flags(Physics_Materials_ThermalConductivity)
 
@@ -77,23 +73,19 @@ set(PHYSICS_MATERIALS_VHC_SOURCES
 add_library(Physics_Materials_HeatCapacity STATIC ${PHYSICS_MATERIALS_VHC_SOURCES})
 target_include_directories(Physics_Materials_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Materials_HeatCapacity PUBLIC
-    Solver::Core
     Physics_Materials_Base
+    Solver::Core
 )
 enable_build_flags(Physics_Materials_HeatCapacity)
 
 # --- Materials aggregator ---
-# 修正: materials.F90 をコンパイルするための独立したライブラリを作成
-# 元のコードではここで Physics_Service を定義してしまっており、下の定義と衝突していました。
 set(PHYSICS_MATERIALS_ENTRY_SOURCES
     materials/materials.F90
 )
 add_library(Physics_Materials_Entry STATIC ${PHYSICS_MATERIALS_ENTRY_SOURCES})
 target_include_directories(Physics_Materials_Entry PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-# materials.F90 が各サブモジュール(Density等)を使用(use)する場合は依存関係が必要です
 target_link_libraries(Physics_Materials_Entry PUBLIC
-    Solver::Core
     Physics_Materials_Base
     Physics_Materials_Density
     Physics_Materials_SpecificHeat
@@ -105,37 +97,32 @@ enable_build_flags(Physics_Materials_Entry)
 # 統合インターフェース
 add_library(Physics_Materials INTERFACE)
 target_link_libraries(Physics_Materials INTERFACE
-    Physics_Materials_Entry  # materials.F90を含むライブラリ
-    Physics_Materials_Density
-    Physics_Materials_SpecificHeat
-    Physics_Materials_ThermalConductivity
-    Physics_Materials_HeatCapacity
+    Physics_Materials_Entry
 )
 
 # ====================================================================
 # 2. Constitutive Model Libraries (models/*)
 # ====================================================================
 
-# # Hydraulic Conductivity
-# set(PHYSICS_MODEL_HCF_SOURCES
-#     models/hydraulic_conductivity/hcf_interface.F90
-#     models/hydraulic_conductivity/hcf_base.F90
-#     models/hydraulic_conductivity/hcf_bc.F90
-#     models/hydraulic_conductivity/hcf_vg.F90
-#     models/hydraulic_conductivity/hcf_ko.F90
-#     models/hydraulic_conductivity/hcf_mvg.F90
-#     models/hydraulic_conductivity/hcf_durner.F90
-#     models/hydraulic_conductivity/hcf_dvgch.F90
-#     models/hydraulic_conductivity/hcf_impedance.F90
-#     models/hydraulic_conductivity/hcf_viscosity.F90
-# )
-# add_library(Physics_Model_HydraulicConductivity STATIC ${PHYSICS_MODEL_HCF_SOURCES})
-# target_include_directories(Physics_Model_HydraulicConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC
-#     Solver::Core
-#     Solver::Input
-# )
-# enable_build_flags(Physics_Model_HydraulicConductivity)
+# Hydraulic Conductivity
+set(PHYSICS_MODEL_HCF_SOURCES
+    models/hydraulic_conductivity/hcf_interface.F90
+    models/hydraulic_conductivity/hcf_base.F90
+    models/hydraulic_conductivity/hcf_bc.F90
+    models/hydraulic_conductivity/hcf_vg.F90
+    models/hydraulic_conductivity/hcf_ko.F90
+    models/hydraulic_conductivity/hcf_mvg.F90
+    models/hydraulic_conductivity/hcf_durner.F90
+    models/hydraulic_conductivity/hcf_dvgch.F90
+    models/hydraulic_conductivity/hcf_impedance.F90
+    models/hydraulic_conductivity/hcf_viscosity.F90
+)
+add_library(Physics_Model_HydraulicConductivity STATIC ${PHYSICS_MODEL_HCF_SOURCES})
+target_include_directories(Physics_Model_HydraulicConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC
+    Solver::Core
+)
+enable_build_flags(Physics_Model_HydraulicConductivity)
 
 # Water Retention
 set(PHYSICS_MODEL_WRF_SOURCES
@@ -151,6 +138,7 @@ set(PHYSICS_MODEL_WRF_SOURCES
 add_library(Physics_Model_WaterRetention STATIC ${PHYSICS_MODEL_WRF_SOURCES})
 target_include_directories(Physics_Model_WaterRetention PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Model_WaterRetention PUBLIC
+    Physics_Constants
     Solver::Core
 )
 enable_build_flags(Physics_Model_WaterRetention)

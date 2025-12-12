@@ -1,42 +1,27 @@
 submodule(physics_models_hcf) hcf_impedance
     implicit none
 contains
-    !----------------------------------------------------------------------------------------------------
-    ! Constructe the type
-    !----------------------------------------------------------------------------------------------------
-    module function construct_type_hcf_impedance(omega) result(structure)
+
+    pure elemental subroutine calc_impedance_exponential(omega, Qice, impedance)
         implicit none
         real(real64), intent(in) :: omega
-        class(abst_hcf_impedance), allocatable :: structure
+        real(real64), intent(in) :: Qice
+        real(real64), intent(inout) :: impedance
 
-        if (allocated(structure)) deallocate (structure)
-        allocate (type_hcf_impedance_exp :: structure)
+        impedance = 10.0d0**(-omega * Qice)
 
-        structure%omega = omega
+    end subroutine calc_impedance_exponential
 
-    end function construct_type_hcf_impedance
-
-    !----------------------------------------------------------------------------------------------------
-    ! Wrapper of the function to calculate the impedance factor
-    !----------------------------------------------------------------------------------------------------
-    module pure elemental function calc_impedance_exp(self, q_ice) result(kr)
+    module pure elemental subroutine calc_impedance_exp(self, Qice, kr)
         implicit none
         class(type_hcf_impedance_exp), intent(in) :: self
-        real(real64), intent(in) :: q_ice
-        real(real64) :: kr
+        real(real64), intent(in) :: Qice
+        real(real64), intent(inout) :: kr
 
-        kr = calc_impedance_exponential(self%omega, q_ice)
+        associate (params => self%parent%params)
+            call calc_impedance_exponential(params%omega, Qice, kr)
+        end associate
 
-    end function calc_impedance_exp
-
-    pure elemental function calc_impedance_exponential(omega, q_ice) result(impedance)
-        implicit none
-        real(real64), intent(in) :: omega
-        real(real64), intent(in) :: q_ice
-        real(real64) :: impedance
-
-        impedance = 10.0d0**(-omega * q_ice)
-
-    end function calc_impedance_exponential
+    end subroutine calc_impedance_exp
 
 end submodule hcf_impedance

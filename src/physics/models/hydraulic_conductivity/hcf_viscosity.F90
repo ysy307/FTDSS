@@ -1,71 +1,53 @@
 submodule(physics_models_hcf) hcf_viscosity
     implicit none
 contains
-    !----------------------------------------------------------------------------------------------------
-    ! Constructe the type
-    !----------------------------------------------------------------------------------------------------
-    module function construct_type_hcf_viscosity(water_viscosity_model) result(structure)
+    module subroutine initialize_abst_hcf_viscosity(self, temperature_critical)
         implicit none
-        integer(int32), intent(in) :: water_viscosity_model
-        class(abst_hcf_viscosity), allocatable :: structure
+        class(abst_hcf_viscosity), intent(inout) :: self
+        real(real64), intent(in), optional :: temperature_critical
 
-        if (allocated(structure)) deallocate (structure)
+        real(real64) :: temp_critical
 
-        select case (water_viscosity_model)
-        case (1)
-            allocate (type_hcf_viscosity_exp :: structure)
-        case (2)
-            allocate (type_hcf_viscosity_supercool :: structure)
-        end select
+        if (present(temperature_critical)) then
+            temp_critical = temperature_critical
+        else
+            temp_critical = 15.0d0
+        end if
 
-        select type (this => structure)
-        type is (type_hcf_viscosity_exp)
-            this%mu_zero = this%calc_viscosity(15.0d0)
-        type is (type_hcf_viscosity_supercool)
-            this%mu_zero = this%calc_viscosity(15.0d0)
-        end select
+        call self%calc_mu(temp_critical, self%mu_zero)
+    end subroutine initialize_abst_hcf_viscosity
 
-    end function construct_type_hcf_viscosity
+    module pure elemental subroutine calc_kr_abst_hcf_viscosity(self, temperature, kr)
+        implicit none
+        class(abst_hcf_viscosity), intent(in) :: self
+        real(real64), intent(in) :: temperature
+        real(real64), intent(inout) :: kr
 
-    !----------------------------------------------------------------------------------------------------
-    ! Calculate water viscosity depending on the temperature
-    !----------------------------------------------------------------------------------------------------
-    module pure elemental function calc_viscosity_exp(self, temperature) result(kr)
+        real(real64) :: mu
+
+        call self%calc_viscosity(temperature, mu)
+        kr = self%mu_zero / mu
+
+    end subroutine calc_kr_abst_hcf_viscosity
+
+    module pure elemental subroutine calc_mu_exponential(self, temperature, mu)
         implicit none
         class(type_hcf_viscosity_exp), intent(in) :: self
         real(real64), intent(in) :: temperature
-        real(real64) :: kr
+        real(real64), intent(inout) :: mu
 
-        kr = self%mu_zero / calc_mu_exponential(temperature)
+        mu = 2.1d-6 * exp(1808.5d0 / (temperature + 273.15d0))
 
-    end function calc_viscosity_exp
+    end subroutine calc_mu_exponential
 
-    module pure elemental function calc_viscosity_supercool(self, temperature) result(kr)
+    module pure elemental subroutine calc_mu_exponential_supercooled(self, temperature, mu)
         implicit none
         class(type_hcf_viscosity_supercool), intent(in) :: self
         real(real64), intent(in) :: temperature
-        real(real64) :: kr
+        real(real64), intent(inout) :: mu
 
-        kr = self%mu_zero / calc_mu_exponential_supercooled(temperature)
+        mu = 1.3788d-4 * ((273.15d0 + temperature) / 225.66d0 - 1.0d0)**(-1.6438d0)
 
-    end function calc_viscosity_supercool
-
-    pure elemental function calc_mu_exponential(temperature) result(viscosity)
-        implicit none
-        real(real64), intent(in) :: temperature
-        real(real64) :: viscosity
-
-        viscosity = 2.1d-6 * exp(1808.5d0 / (temperature + 273.15d0))
-
-    end function calc_mu_exponential
-
-    pure elemental function calc_mu_exponential_supercooled(temperature) result(viscosity)
-        implicit none
-        real(real64), intent(in) :: temperature
-        real(real64) :: viscosity
-
-        viscosity = 1.3788d-4 * ((273.15d0 + temperature) / 225.66d0 - 1.0d0)**(-1.6438d0)
-
-    end function calc_mu_exponential_supercooled
+    end subroutine calc_mu_exponential_supercooled
 
 end submodule hcf_viscosity
