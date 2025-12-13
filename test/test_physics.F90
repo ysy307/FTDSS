@@ -31,6 +31,7 @@ program test_physics
         write (unit, '(a)') "---"
         call test_density()
         call test_specific_heat()
+        call test_wrf()
         call test_hcf()
         write (unit, '(a)') "---"
         write (unit, '(a)') "## Completed"
@@ -107,42 +108,88 @@ contains
         call check_variable(computed_specific_heat, expected_specific_heat, "Specific Heat Test")
 
     end subroutine test_specific_heat
-
-    subroutine test_hcf()
+    subroutine test_wrf()
+        use physics_models_wrf
+        use module_core
         implicit none
-        type(holder_hcfs) :: hcf_model
-        type(type_params_hcf) :: params
-        type(type_state) :: state
-        integer(int32) :: i, n_steps
-        real(real64) :: h, kr, h_min, h_max, dh
+
+        ! 6つのモデルを保持する配列
+        type(holder_wrfs) :: wrf_models(6)
+        type(type_params_wrf) :: params(6)
+
+        integer(int32) :: i, j, n_steps
+        real(real64) :: h, theta_vals(6), h_min, h_max, dh
         integer(int32) :: file_unit
-        ! Placeholder for hydraulic conductivity function tests
-        !-------------------------------------------------
-        ! 1. パラメータ設定 (Python側と同じにする)
-        !-------------------------------------------------
-        ! 例として Van Genuchten モデルを使用
-        call params%reset()
-        params%model_number = 1 ! HCF_BASE (interface参照)
-        params%hcf_model_number = 2 ! VGモデル (construct_hcf_base参照: 2=VG)
-        params%water_viscosity_model = 1
-        params%k_s = 1.0d0 ! Ks=1.0 にすれば Kr = K となる
-
-        ! VG パラメータ
-        params%alpha1 = 0.01d0
-        params%n1 = 2.0d0
-        params%m1 = 0.5d0
-        params%l = 0.5d0
 
         !-------------------------------------------------
-        ! 2. 初期化 (ここで親ポインタ等の接続がテストされる)
+        ! 1. 各モデルのパラメータ設定
         !-------------------------------------------------
-        call hcf_model%initialize(material_id=1, params=params)
+        ! 共通設定
+        do j = 1, 6
+            call params(j)%reset()
+            params(j)%theta_s = 0.5d0
+            params(j)%theta_r = 0.1d0
+        end do
+
+        ! --- (1) Brooks-Corey (BC) ---
+        params(1)%model_number = 1 ! WRF_BC
+        params(1)%alpha1 = -10.0d0 ! 空気侵入値 (cm, 負の値)
+        params(1)%n1 = 2.0d0 ! lambda
+
+        ! --- (2) Van Genuchten (VG) ---
+        params(2)%model_number = 2 ! WRF_VG
+        params(2)%alpha1 = 0.01d0 ! 1/cm (正の値)
+        params(2)%n1 = 2.0d0
+        params(2)%m1 = 0.5d0
+
+        ! --- (3) Kosugi (KO) ---
+        params(3)%model_number = 3 ! WRF_KO
+        params(3)%alpha1 = -100.0d0 ! hm (cm, 負の値)
+        params(3)%n1 = 1.0d0 ! sigma
+
+        ! --- (4) Modified VG (MVG) ---
+        params(4)%model_number = 4 ! WRF_MVG
+        params(4)%alpha1 = 0.01d0
+        params(4)%n1 = 2.0d0
+        params(4)%m1 = 0.5d0
+        params(4)%h_crit = -5.0d0 ! 臨界圧力水頭
+
+        ! --- (5) Durner (Dual VG) ---
+        params(5)%model_number = 5 ! WRF_DURNER
+        params(5)%w1 = 0.4d0
+        params(5)%alpha1 = 0.01d0
+        params(5)%n1 = 2.0d0
+        params(5)%m1 = 0.5d0
+        params(5)%w2 = 0.6d0
+        params(5)%alpha2 = 0.05d0
+        params(5)%n2 = 3.0d0
+        params(5)%m2 = 1.0d0 - 1.0d0 / 3.0d0
+
+        ! --- (6) Dual VG Common Alpha (DVGCH) ---
+        params(6)%model_number = 6 ! WRF_DVGCH
+        params(6)%w1 = 0.4d0
+        params(6)%alpha1 = 0.01d0 ! 共通alpha
+        params(6)%n1 = 2.0d0
+        params(6)%m1 = 0.5d0
+        params(6)%w2 = 0.6d0
+        ! alpha2は使用しない
+        params(6)%n2 = 3.0d0
+        params(6)%m2 = 1.0d0 - 1.0d0 / 3.0d0
+
+        !-------------------------------------------------
+        ! 2. 初期化
+        !-------------------------------------------------
+        do j = 1, 6
+            call wrf_models(j)%initialize(material_id=1, params=params(j))
+        end do
 
         !-------------------------------------------------
         ! 3. 計算ループとCSV出力
         !-------------------------------------------------
-        open (newunit=file_unit, file='fortran_output.csv', status='replace', action='write')
-        write (file_unit, '(A)') 'h,kr' ! ヘッダー
+        open (newunit=file_unit, file='log/test/wrf.csv', status='replace', action='write')
+
+        ! ヘッダー出力
+        write (file_unit, '(A)') 'h,theta_bc,theta_vg,theta_ko,theta_mvg,theta_durner,theta_dvgch'
 
         h_min = -1000.0d0
         h_max = 0.0d0
@@ -152,18 +199,130 @@ contains
         do i = 0, n_steps
             h = h_min + real(i, real64) * dh
 
-            ! 状態変数に h をセット
-            state%pressure = h
-
-            ! 計算実行 (calc_kflh -> calc_kr_base_vg)
-            call hcf_model%p%calc_kflh(state, kr)
+            ! 全モデル計算
+            do j = 1, 6
+                call wrf_models(j)%p%calc(h, theta_vals(j))
+            end do
 
             ! 出力
-            write (file_unit, '(F12.4, ",", ES20.12)') h, kr
+            write (file_unit, '(F12.4, 6(",", ES20.12))') h, theta_vals(1:6)
         end do
 
         close (file_unit)
-        print *, "Success: fortran_output.csv generated."
+
+    end subroutine test_wrf
+
+    subroutine test_hcf()
+        implicit none
+
+        ! 6つのモデルを保持する配列
+        type(holder_hcfs) :: hcf_models(6)
+        type(type_params_hcf) :: params(6)
+        type(type_state) :: state
+        type(type_iapws97) :: water
+
+        integer(int32) :: i, j, n_steps
+        real(real64) :: h, kr_vals(6), h_min, h_max, dh
+        integer(int32) :: file_unit
+
+        call water%initialize()
+
+        !-------------------------------------------------
+        ! 1. 各モデルのパラメータ設定
+        !-------------------------------------------------
+        ! 共通設定 (HCF_BASE type)
+        do j = 1, 6
+            call params(j)%reset()
+            params(j)%model_number = 1 ! 1 = HCF_BASE
+            params(j)%water_viscosity_model = 1 ! 1 = NONE (or default)
+            params(j)%k_s = 1.0d0 ! Ks = 1.0
+            params(j)%l = 0.5d0 ! Mualem parameter
+            ! デフォルトのtheta (MVG用)
+            params(j)%theta_s = 0.5d0
+            params(j)%theta_r = 0.1d0
+        end do
+
+        ! --- (1) Brooks-Corey (BC) ---
+        params(1)%hcf_model_number = 1
+        params(1)%alpha1 = -10.0d0 ! 空気侵入値 (cm, 負の値)
+        params(1)%n1 = 2.0d0 ! lambda
+
+        ! --- (2) Van Genuchten (VG) ---
+        params(2)%hcf_model_number = 2
+        params(2)%alpha1 = 0.01d0 ! 1/cm (正の値)
+        params(2)%n1 = 2.0d0
+        params(2)%m1 = 0.5d0
+
+        ! --- (3) Kosugi (KO) ---
+        params(3)%hcf_model_number = 3
+        params(3)%alpha1 = -100.0d0 ! hm (cm, 負の値)
+        params(3)%n1 = 1.0d0 ! sigma
+
+        ! --- (4) Modified VG (MVG) ---
+        params(4)%hcf_model_number = 4
+        params(4)%alpha1 = 0.01d0
+        params(4)%n1 = 2.0d0
+        params(4)%m1 = 0.5d0
+        params(4)%h_crit = -5.0d0 ! 臨界圧力水頭
+
+        ! --- (5) Durner (Dual VG) ---
+        params(5)%hcf_model_number = 5
+        params(5)%w1 = 0.4d0
+        params(5)%alpha1 = 0.01d0
+        params(5)%n1 = 2.0d0
+        params(5)%m1 = 0.5d0
+        params(5)%w2 = 0.6d0
+        params(5)%alpha2 = 0.05d0 ! 2つ目の孔隙のalpha
+        params(5)%n2 = 3.0d0
+        params(5)%m2 = 1.0d0 - 1.0d0 / 3.0d0
+
+        ! --- (6) Dual VG Common Alpha (DVGCH) ---
+        params(6)%hcf_model_number = 6
+        params(6)%w1 = 0.4d0
+        params(6)%alpha1 = 0.01d0 ! 共通alpha
+        params(6)%n1 = 2.0d0
+        params(6)%m1 = 0.5d0
+        params(6)%w2 = 0.6d0
+        ! alpha2は使用しない(alpha1共通)
+        params(6)%n2 = 3.0d0
+        params(6)%m2 = 1.0d0 - 1.0d0 / 3.0d0
+
+        !-------------------------------------------------
+        ! 2. 初期化
+        !-------------------------------------------------
+        do j = 1, 6
+            call hcf_models(j)%initialize(material_id=1, params=params(j), water=water)
+        end do
+
+        !-------------------------------------------------
+        ! 3. 計算ループとCSV出力
+        !-------------------------------------------------
+        open (newunit=file_unit, file='log/test/hcf.csv', status='replace', action='write')
+
+        ! ヘッダー出力 (7列)
+        write (file_unit, '(A)') 'h,kr_bc,kr_vg,kr_ko,kr_mvg,kr_durner,kr_dvgch'
+
+        h_min = -1000.0d0
+        h_max = 0.0d0
+        n_steps = 100
+        dh = (h_max - h_min) / real(n_steps, real64)
+
+        do i = 0, n_steps
+            h = h_min + real(i, real64) * dh
+
+            state%pressure = h
+
+            ! 全モデル計算
+            do j = 1, 6
+                call hcf_models(j)%p%calc_kflh(state, kr_vals(j))
+            end do
+
+            ! 出力: h + 6つのkr
+            write (file_unit, '(F12.4, 6(",", ES20.12))') h, kr_vals(1:6)
+        end do
+
+        close (file_unit)
+
     end subroutine test_hcf
 
     ! ======================================================================

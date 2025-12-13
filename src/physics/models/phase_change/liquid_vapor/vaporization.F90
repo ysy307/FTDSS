@@ -4,7 +4,7 @@ module physics_models_vaporization
     use :: physics_constants, only: &
         g => gravity_acceleration, &
         TtoK => celsius_to_kelvin, &
-        R => universal_gas_constant, &
+        Rg => universal_gas_constant, &
         Mw => molar_mass_water
     implicit none
     private
@@ -63,7 +63,7 @@ contains
         !> Relative humidity (0 to 1)
         real(real64), intent(inout) :: relative_humidity
 
-        relative_humidity = exp(pressure * Mw * g / (R * (TtoK + temperature)))
+        relative_humidity = exp(pressure * Mw * g / (Rg * (TtoK + temperature)))
     end subroutine calc_relative_humidity
 
 end module physics_models_vaporization

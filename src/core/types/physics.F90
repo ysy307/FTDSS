@@ -16,6 +16,10 @@ module core_types_physics
         real(real64) :: water_content
         !> Ice content, \(\theta_i\) [-]
         real(real64) :: ice_content
+        !> Vapor content, \(\theta_v\) [-]
+        real(real64) :: vapor_content
+        !> Air content, \(\theta_a\) [-]
+        real(real64) :: air_content
         !> Rate of change of ice content, \(\dot{\theta_i}\) [-]
         real(real64) :: dot_ice
         !> Porosity, \(\phi\) [-]
@@ -36,6 +40,8 @@ module core_types_physics
         real(real64) :: relative_humidity
         !> Water flux vector, \(\mathbf{q}_w\) [m/s]
         type(type_coordinate_dp) :: water_flux
+
+        real(real64) :: mass_fraction_clay
 
     end type type_state
 

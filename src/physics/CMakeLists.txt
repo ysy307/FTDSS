@@ -116,10 +116,12 @@ set(PHYSICS_MODEL_HCF_SOURCES
     models/hydraulic_conductivity/hcf_dvgch.F90
     models/hydraulic_conductivity/hcf_impedance.F90
     models/hydraulic_conductivity/hcf_viscosity.F90
+    models/hydraulic_conductivity/hcf_vapor.F90
 )
 add_library(Physics_Model_HydraulicConductivity STATIC ${PHYSICS_MODEL_HCF_SOURCES})
 target_include_directories(Physics_Model_HydraulicConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC
+    Physics_Constants
     Solver::Core
 )
 enable_build_flags(Physics_Model_HydraulicConductivity)

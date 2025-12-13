@@ -1,6 +1,9 @@
 module physics_models_hcf
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: iapws, only:type_iapws97
     use :: module_core
+    use :: physics_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
+        Rg => universal_gas_constant, g => gravity_acceleration
     implicit none
     private
 
@@ -33,6 +36,7 @@ module physics_models_hcf
         real(real64) :: w2
         real(real64) :: l
         real(real64) :: omega
+        real(real64) :: gain_factor
     contains
         procedure, pass(self), public :: reset => reset_params_hcf
         procedure, pass(self), public :: copy => copy_params_hcf
@@ -60,13 +64,70 @@ module physics_models_hcf
     end type holder_hcfs
 
     interface
-        module subroutine initialize_holder_hcfs(self, material_id, params)
+        module subroutine initialize_holder_hcfs(self, material_id, params, water)
             implicit none
             class(holder_hcfs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
             type(type_params_hcf), intent(in) :: params
+            type(type_iapws97), intent(in), target :: water
 
         end subroutine initialize_holder_hcfs
+    end interface
+
+    type :: type_hcf_vapor
+        private
+        class(abst_hcf), pointer :: parent => null()
+    contains
+        procedure, pass(self), private :: calc_diffusivity => calc_diffusivity_vapor_in_air
+        procedure, pass(self), private :: calc_tortuosity_factor => calc_tortuosity_factor_vapor
+        procedure, pass(self), private :: calc_enhancement_factor => calc_enhancement_factor_vapor
+        procedure, pass(self), public :: calc_Kvh => calc_Kvh_vapor
+        procedure, pass(self), public :: calc_KvT => calc_KvT_vapor
+    end type type_hcf_vapor
+
+    interface
+        module pure elemental subroutine calc_diffusivity_vapor_in_air(self, temperature, Da)
+            implicit none
+            class(type_hcf_vapor), intent(in) :: self
+            real(real64), intent(in) :: temperature
+            real(real64), intent(inout) :: Da
+
+        end subroutine calc_diffusivity_vapor_in_air
+
+        module pure elemental subroutine calc_tortuosity_factor_vapor(self, Qa, Qs, tau)
+            implicit none
+            class(type_hcf_vapor), intent(in) :: self
+            real(real64), intent(in) :: Qa
+            real(real64), intent(in) :: Qs
+            real(real64), intent(inout) :: tau
+
+        end subroutine calc_tortuosity_factor_vapor
+
+        module pure elemental subroutine calc_enhancement_factor_vapor(self, Qw, Qs, fc, eta)
+            implicit none
+            class(type_hcf_vapor), intent(in) :: self
+            real(real64), intent(in) :: Qw
+            real(real64), intent(in) :: Qs
+            real(real64), intent(in) :: fc
+            real(real64), intent(inout) :: eta
+
+        end subroutine calc_enhancement_factor_vapor
+
+        module pure elemental subroutine calc_Kvh_vapor(self, state, Kvh)
+            implicit none
+            class(type_hcf_vapor), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: Kvh
+
+        end subroutine calc_Kvh_vapor
+
+        module pure elemental subroutine calc_KvT_vapor(self, state, KvT)
+            implicit none
+            class(type_hcf_vapor), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: KvT
+
+        end subroutine calc_KvT_vapor
     end interface
 
     type, abstract :: abst_hcf
@@ -75,19 +136,49 @@ module physics_models_hcf
         class(abst_hcf_base), allocatable :: base
         class(abst_hcf_impedance), allocatable :: impedance
         class(abst_hcf_viscosity), allocatable :: viscosity
+        type(type_hcf_vapor) :: vapor
+        type(type_iapws97), pointer :: water => null()
     contains
-        procedure, pass(self) :: initialize => initialize_abst_hcf
+        procedure, pass(self), public :: initialize => initialize_abst_hcf
         procedure(abst_calc_kflh), pass(self), public, deferred :: calc_kflh
+        procedure, pass(self), public :: calc_klT => calc_klT_hcf
+        procedure, pass(self), public :: calc_Kvh => calc_Kvh_hcf
+        procedure, pass(self), public :: calc_KvT => calc_KvT_hcf
     end type abst_hcf
 
     interface
-        module subroutine initialize_abst_hcf(self, material_id, params)
+        module subroutine initialize_abst_hcf(self, material_id, params, water)
             implicit none
             class(abst_hcf), intent(inout), target :: self
             integer(int32), intent(in) :: material_id
             type(type_params_hcf), intent(in) :: params
+            type(type_iapws97), intent(in), target :: water
 
         end subroutine initialize_abst_hcf
+
+        module pure elemental subroutine calc_klT_hcf(self, state, klT)
+            implicit none
+            class(abst_hcf), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: klT
+
+        end subroutine calc_klT_hcf
+
+        module pure elemental subroutine calc_Kvh_hcf(self, state, Kvh)
+            implicit none
+            class(abst_hcf), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: Kvh
+
+        end subroutine calc_Kvh_hcf
+
+        module pure elemental subroutine calc_KvT_hcf(self, state, KvT)
+            implicit none
+            class(abst_hcf), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: KvT
+
+        end subroutine calc_KvT_hcf
     end interface
 
     abstract interface
@@ -413,173 +504,4 @@ module physics_models_hcf
 
     end interface
 
-contains
-
-    ! subroutine construct_hcf_base(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf_base), allocatable :: property
-
-    !     associate (hcf => input%basic%materials(material_id)%hydraulic%hcf)
-    !         select case (hcf%model_number)
-    !         case (1)
-    !             property = construct_type_hcf_base_bc(alpha1=hcf%alpha1, &
-    !                                                   n1=hcf%n1, &
-    !                                                   l=hcf%l)
-    !         case (2)
-    !             property = construct_type_hcf_base_vg(alpha1=hcf%alpha1, &
-    !                                                   n1=hcf%n1, &
-    !                                                   l=hcf%l)
-    !         case (3)
-    !             property = construct_type_hcf_base_ko(alpha1=hcf%alpha1, &
-    !                                                   n1=hcf%n1, &
-    !                                                   l=hcf%l)
-    !         case (4)
-    !             property = construct_type_hcf_base_mvg(theta_s=hcf%theta_s, &
-    !                                                    theta_r=hcf%theta_r, &
-    !                                                    alpha1=hcf%alpha1, &
-    !                                                    n1=hcf%n1, &
-    !                                                    l=hcf%l, &
-    !                                                    h_crit=hcf%h_crit)
-    !         case (5)
-    !             property = construct_type_hcf_base_durner(alpha1=hcf%alpha1, &
-    !                                                       n1=hcf%n1, &
-    !                                                       w1=hcf%w1, &
-    !                                                       alpha2=hcf%alpha2, &
-    !                                                       n2=hcf%n2, &
-    !                                                       l=hcf%l)
-    !         case (6)
-    !             property = construct_type_hcf_base_dvgch(alpha1=hcf%alpha1, &
-    !                                                      n1=hcf%n1, &
-    !                                                      w1=hcf%w1, &
-    !                                                      n2=hcf%n2, &
-    !                                                      l=hcf%l)
-    !         end select
-    !     end associate
-
-    ! end subroutine construct_hcf_base
-
-    ! subroutine construct_hcf_impedance(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf_impedance), allocatable :: property
-
-    !     property = construct_type_hcf_impedance(omega=input%basic%materials(material_id)%hydraulic%impedance_factor)
-
-    ! end subroutine construct_hcf_impedance
-
-    ! subroutine construct_hcf_viscosity(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf_viscosity), allocatable :: property
-
-    !     property = construct_type_hcf_viscosity(input%basic%materials(material_id)%hydraulic%water_viscosity_model)
-
-    ! end subroutine construct_hcf_viscosity
-
-    ! subroutine create_type_hcf_base(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf), allocatable :: property
-
-    !     if (allocated(property)) deallocate (property)
-    !     allocate (type_hcf_base :: property)
-
-    !     property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
-    !     property%base = construct_hcf_base(input, material_id)
-
-    ! end subroutine create_type_hcf_base
-
-    ! subroutine create_type_hcf_impedance(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf), allocatable :: property
-
-    !     if (allocated(property)) deallocate (property)
-    !     allocate (type_hcf_impedance :: property)
-
-    !     property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
-    !     property%impedance = construct_hcf_impedance(input, material_id)
-
-    ! end subroutine create_type_hcf_impedance
-
-    ! subroutine create_type_hcf_viscosity(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf), allocatable :: property
-
-    !     if (allocated(property)) deallocate (property)
-    !     allocate (type_hcf_viscosity :: property)
-
-    !     property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
-    !     property%viscosity = construct_hcf_viscosity(input, material_id)
-
-    ! end subroutine create_type_hcf_viscosity
-
-    ! subroutine create_type_hcf_base_impedance(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf), allocatable :: property
-
-    !     if (allocated(property)) deallocate (property)
-    !     allocate (type_hcf_base_impedance :: property)
-
-    !     property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
-    !     property%base = construct_hcf_base(input, material_id)
-    !     property%impedance = construct_hcf_impedance(input, material_id)
-
-    ! end subroutine create_type_hcf_base_impedance
-
-    ! subroutine create_type_hcf_base_viscosity(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf), allocatable :: property
-
-    !     if (allocated(property)) deallocate (property)
-    !     allocate (type_hcf_base_viscosity :: property)
-
-    !     property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
-    !     property%base = construct_hcf_base(input, material_id)
-    !     property%viscosity = construct_hcf_viscosity(input, material_id)
-
-    ! end subroutine create_type_hcf_base_viscosity
-
-    ! subroutine create_type_hcf_impedance_viscosity(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf), allocatable :: property
-
-    !     if (allocated(property)) deallocate (property)
-    !     allocate (type_hcf_impedance_viscosity :: property)
-
-    !     property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
-    !     property%impedance = construct_hcf_impedance(input, material_id)
-    !     property%viscosity = construct_hcf_viscosity(input, material_id)
-
-    ! end subroutine create_type_hcf_impedance_viscosity
-
-    ! subroutine create_type_hcf_base_impedance_viscosity(input, material_id,property)
-    !     implicit none
-    !     type(type_input), intent(in) :: input
-    !     integer(int32), intent(in) :: material_id
-    !     class(abst_hcf), allocatable :: property
-
-    !     if (allocated(property)) deallocate (property)
-    !     allocate (type_hcf_base_impedance_viscosity :: property)
-
-    !     property%k_s = input%basic%materials(material_id)%hydraulic%hydraulic_conductivity
-    !     property%base = construct_hcf_base(input, material_id)
-    !     property%impedance = construct_hcf_impedance(input, material_id)
-    !     property%viscosity = construct_hcf_viscosity(input, material_id)
-
-    ! end subroutine create_type_hcf_base_impedance_viscosity
 end module physics_models_hcf

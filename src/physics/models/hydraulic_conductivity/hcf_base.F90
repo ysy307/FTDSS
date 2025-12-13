@@ -1,12 +1,14 @@
 submodule(physics_models_hcf) hcf_base
     implicit none
+    real(real64), parameter :: gamma_0 = 71.88875d0 ! g/s^2
 contains
 
-    module subroutine initialize_holder_hcfs(self, material_id, params)
+    module subroutine initialize_holder_hcfs(self, material_id, params, water)
         implicit none
         class(holder_hcfs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_params_hcf), intent(in) :: params
+        type(type_iapws97), intent(in), target :: water
 
         select case (params%model_number)
         case (HCF_BASE)
@@ -26,7 +28,7 @@ contains
         end select
 
         call self%p%params%copy(params)
-        call self%p%initialize(material_id, params)
+        call self%p%initialize(material_id, params, water)
 
     end subroutine initialize_holder_hcfs
 
@@ -36,6 +38,8 @@ contains
 
         self%model_number = 0
         self%water_viscosity_model = 0
+        self%hcf_model_number = 0
+        self%k_s = 0.0d0
         self%theta_s = 0.0d0
         self%theta_r = 0.0d0
         self%alpha1 = 0.0d0
@@ -49,6 +53,7 @@ contains
         self%w2 = 0.0d0
         self%l = 0.0d0
         self%omega = 0.0d0
+        self%gain_factor = 0.0d0
 
     end subroutine reset_params_hcf
 
@@ -59,6 +64,8 @@ contains
 
         self%model_number = source%model_number
         self%water_viscosity_model = source%water_viscosity_model
+        self%hcf_model_number = source%hcf_model_number
+        self%k_s = source%k_s
         self%theta_s = source%theta_s
         self%theta_r = source%theta_r
         self%alpha1 = source%alpha1
@@ -72,43 +79,62 @@ contains
         self%w2 = source%w2
         self%l = source%l
         self%omega = source%omega
+        self%gain_factor = source%gain_factor
 
     end subroutine copy_params_hcf
 
-    module subroutine initialize_abst_hcf(self, material_id, params)
+    module subroutine initialize_abst_hcf(self, material_id, params, water)
         implicit none
         class(abst_hcf), intent(inout), target :: self
         integer(int32), intent(in) :: material_id
         type(type_params_hcf), intent(in) :: params
+        type(type_iapws97), intent(in), target :: water
 
-        select case (params%hcf_model_number)
-        case (HCF_BC)
-            allocate (type_hcf_base_bc :: self%base)
-        case (HCF_VG)
-            allocate (type_hcf_base_vg :: self%base)
-        case (HCF_KO)
-            allocate (type_hcf_base_ko :: self%base)
-        case (HCF_MVG)
-            allocate (type_hcf_base_mvg :: self%base)
-        case (HCF_DURNER)
-            allocate (type_hcf_base_durner :: self%base)
-        case (HCF_DVGCH)
-            allocate (type_hcf_base_dvgch :: self%base)
-        end select
+        if (params%model_number == HCF_BASE .or. &
+            params%model_number == HCF_BASE_IMPEDANCE .or. &
+            params%model_number == HCF_BASE_VISCOSITY .or. &
+            params%model_number == HCF_BASE_IMPEDANCE_VISCOSITY) then
+            select case (params%hcf_model_number)
+            case (HCF_BC)
+                allocate (type_hcf_base_bc :: self%base)
+            case (HCF_VG)
+                allocate (type_hcf_base_vg :: self%base)
+            case (HCF_KO)
+                allocate (type_hcf_base_ko :: self%base)
+            case (HCF_MVG)
+                allocate (type_hcf_base_mvg :: self%base)
+            case (HCF_DURNER)
+                allocate (type_hcf_base_durner :: self%base)
+            case (HCF_DVGCH)
+                allocate (type_hcf_base_dvgch :: self%base)
+            end select
 
-        self%base%parent => self
+            self%base%parent => self
+        end if
 
-        allocate (type_hcf_impedance_exp :: self%impedance)
-        self%impedance%parent => self
+        if (params%model_number == HCF_IMPEDANCE .or. &
+            params%model_number == HCF_BASE_IMPEDANCE .or. &
+            params%model_number == HCF_IMPEDANCE_VISCOSITY .or. &
+            params%model_number == HCF_BASE_IMPEDANCE_VISCOSITY) then
+            allocate (type_hcf_impedance_exp :: self%impedance)
+            self%impedance%parent => self
+        end if
 
-        select case (params%water_viscosity_model)
-        case (HCF_VISCOSITY_EXPONENTIAL)
-            allocate (type_hcf_viscosity_exp :: self%viscosity)
-        case (HCF_VISCOSITY_SUPERCOOLED)
-            allocate (type_hcf_viscosity_supercool :: self%viscosity)
-        end select
-        call self%viscosity%initialize()
-        self%viscosity%parent => self
+        if (params%model_number == HCF_VISCOSITY .or. &
+            params%model_number == HCF_BASE_VISCOSITY .or. &
+            params%model_number == HCF_IMPEDANCE_VISCOSITY .or. &
+            params%model_number == HCF_BASE_IMPEDANCE_VISCOSITY) then
+            select case (params%water_viscosity_model)
+            case (HCF_VISCOSITY_EXPONENTIAL)
+                allocate (type_hcf_viscosity_exp :: self%viscosity)
+            case (HCF_VISCOSITY_SUPERCOOLED)
+                allocate (type_hcf_viscosity_supercool :: self%viscosity)
+            end select
+            call self%viscosity%initialize()
+            self%viscosity%parent => self
+        end if
+
+        self%water => water
 
     end subroutine initialize_abst_hcf
 
@@ -208,4 +234,63 @@ contains
 
     end subroutine calc_kflh_base_impedance_viscosity
 
+    module pure elemental subroutine calc_klT_hcf(self, state, klT)
+        implicit none
+        class(abst_hcf), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: klT
+
+        real(real64) :: Klh_r, dgamma_dT
+
+        if (allocated(self%base)) then
+            call self%base%calc_kr(state%pressure, Klh_r)
+            call calc_derivative_surface_tension(state%temperature, dgamma_dT)
+            klT = self%params%k_s * Klh_r * state%pressure * self%params%gain_factor * (dgamma_dT / gamma_0)
+        else
+            klT = 0.0d0
+        end if
+
+    end subroutine calc_klT_hcf
+
+    pure elemental subroutine calc_surface_tension(temperature, surface_tension)
+        implicit none
+        !> Temperature [C]
+        real(real64), intent(in) :: temperature
+        !> Surface tension [g/s^2]
+        real(real64), intent(inout) :: surface_tension
+
+        surface_tension = 75.6d0 - 0.1425d0 * temperature - 2.38d-4 * temperature**2
+
+    end subroutine calc_surface_tension
+
+    pure elemental subroutine calc_derivative_surface_tension(temperature, dsurface_tension_dT)
+        implicit none
+        !> Temperature [C]
+        real(real64), intent(in) :: temperature
+        !> Derivative of surface tension with respect to temperature [g/(s^2 K)]
+        real(real64), intent(inout) :: dsurface_tension_dT
+
+        dsurface_tension_dT = -0.1425d0 - 4.76d-4 * temperature
+
+    end subroutine calc_derivative_surface_tension
+
+    module pure elemental subroutine calc_Kvh_hcf(self, state, Kvh)
+        implicit none
+        class(abst_hcf), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: Kvh
+
+        call self%vapor%calc_Kvh(state, Kvh)
+
+    end subroutine calc_Kvh_hcf
+
+    module pure elemental subroutine calc_KvT_hcf(self, state, KvT)
+        implicit none
+        class(abst_hcf), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: KvT
+
+        call self%vapor%calc_KvT(state, KvT)
+
+    end subroutine calc_KvT_hcf
 end submodule hcf_base
