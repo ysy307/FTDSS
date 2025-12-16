@@ -3,6 +3,11 @@ module core_constants_physical
     implicit none
     private
 
+    !> Physics unit in systems
+    integer(int32), parameter, public :: PHYSICS_UNIT_M = 1
+    integer(int32), parameter, public :: PHYSICS_UNIT_CM = 2
+    integer(int32), parameter, public :: PHYSICS_UNIT_PA = 3
+
     !> Water retention function of Brooks-Corey model
     integer(int32), parameter, public :: WRF_BC = 1
     !> Water retention function of van-Genuchten model
@@ -33,5 +38,8 @@ module core_constants_physical
 
     integer(int32), parameter, public :: HCF_VISCOSITY_EXPONENTIAL = 1
     integer(int32), parameter, public :: HCF_VISCOSITY_SUPERCOOLED = 2
+
+    integer(int32), parameter, public :: GCC_NON_SEGREGATION = 1
+    integer(int32), parameter, public :: GCC_SEGREGATION = 2
 
 end module core_constants_physical

@@ -3,7 +3,7 @@ module physics_models_hcf
     use :: iapws, only:type_iapws97
     use :: module_core
     use :: physics_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
-        Rg => universal_gas_constant, g => gravity_acceleration
+        Rg => universal_gas_constant, g => gravity_acceleration, rho_std => reference_water_density
     implicit none
     private
 
@@ -19,6 +19,7 @@ module physics_models_hcf
     public :: type_hcf_base_impedance_viscosity
 
     type :: type_params_hcf
+        integer(int32) :: unit_id
         integer(int32) :: model_number
         integer(int32) :: hcf_model_number
         integer(int32) :: water_viscosity_model
@@ -40,6 +41,7 @@ module physics_models_hcf
     contains
         procedure, pass(self), public :: reset => reset_params_hcf
         procedure, pass(self), public :: copy => copy_params_hcf
+        procedure, pass(self), public :: convert => convert_params_hcf
     end type type_params_hcf
 
     interface
@@ -55,6 +57,14 @@ module physics_models_hcf
             type(type_params_hcf), intent(in) :: source
 
         end subroutine copy_params_hcf
+
+        module subroutine convert_params_hcf(self, unit_id, factor)
+            implicit none
+            class(type_params_hcf), intent(inout) :: self
+            integer(int32), intent(in) :: unit_id
+            real(real64), intent(in), optional :: factor
+
+        end subroutine convert_params_hcf
     end interface
 
     type :: holder_hcfs

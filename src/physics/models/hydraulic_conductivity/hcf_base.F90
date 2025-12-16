@@ -28,6 +28,7 @@ contains
         end select
 
         call self%p%params%copy(params)
+        call self%p%params%convert(params%unit_id)
         call self%p%initialize(material_id, params, water)
 
     end subroutine initialize_holder_hcfs
@@ -37,6 +38,7 @@ contains
         class(type_params_hcf), intent(inout) :: self
 
         self%model_number = 0
+        self%unit_id = 0
         self%water_viscosity_model = 0
         self%hcf_model_number = 0
         self%k_s = 0.0d0
@@ -57,12 +59,73 @@ contains
 
     end subroutine reset_params_hcf
 
+    module subroutine convert_params_hcf(self, unit_id, factor)
+        implicit none
+        class(type_params_hcf), intent(inout) :: self
+        integer(int32), intent(in) :: unit_id
+        real(real64), intent(in), optional :: factor
+
+        real(real64) :: pg_val
+        real(real64) :: scale_pres
+        real(real64) :: scale_inv_pres
+
+        ! --- 比重量 (rho*g) の設定 ---
+        if (present(factor)) then
+            ! 指定があればそれを使う (温度変化や油などを考慮する場合)
+            pg_val = factor
+        else
+            ! 指定がなければ標準的な水の値を使う
+            pg_val = rho_std * g
+        end if
+
+        ! --- 変換係数の決定 ---
+        select case (unit_id)
+        case (PHYSICS_UNIT_M)
+            ! m -> Pa
+            scale_pres = pg_val
+            scale_inv_pres = 1.0d0 / pg_val
+
+        case (PHYSICS_UNIT_CM)
+            ! cm -> m -> Pa
+            scale_pres = pg_val / 100.0d0
+            scale_inv_pres = 100.0d0 / pg_val
+
+        case (PHYSICS_UNIT_PA)
+            ! Pa -> Pa (係数は1.0)
+            ! ※ Paの場合は pg_val が何であっても影響しないので安全
+            scale_pres = 1.0d0
+            scale_inv_pres = 1.0d0
+
+        case default
+            scale_pres = 1.0d0
+            scale_inv_pres = 1.0d0
+        end select
+
+        ! --- モデルごとのパラメータ変換 ---
+        select case (self%hcf_model_number)
+        case (HCF_BC, HCF_KO)
+            self%alpha1 = self%alpha1 * scale_pres
+            self%h_crit = self%h_crit * scale_pres
+            self%alpha2 = self%alpha2 * scale_pres
+
+        case (HCF_VG, HCF_MVG, HCF_DURNER, HCF_DVGCH)
+            self%alpha1 = self%alpha1 * scale_inv_pres
+            self%alpha2 = self%alpha2 * scale_inv_pres
+            self%h_crit = self%h_crit * scale_pres
+        case default
+            self%alpha1 = self%alpha1 * scale_inv_pres
+            self%h_crit = self%h_crit * scale_pres
+        end select
+
+    end subroutine convert_params_hcf
+
     module subroutine copy_params_hcf(self, source)
         implicit none
         class(type_params_hcf), intent(inout) :: self
         type(type_params_hcf), intent(in) :: source
 
         self%model_number = source%model_number
+        self%unit_id = source%unit_id
         self%water_viscosity_model = source%water_viscosity_model
         self%hcf_model_number = source%hcf_model_number
         self%k_s = source%k_s

@@ -1,7 +1,8 @@
 module physics_models_wrf
     use, intrinsic :: iso_fortran_env
-    use :: module_core, only:WRF_BC, WRF_VG, WRF_KO, WRF_MVG, WRF_DURNER, WRF_DVGCH
-    use :: physics_constants, only:pi => circle_ratio
+    use :: module_core, only:WRF_BC, WRF_VG, WRF_KO, WRF_MVG, WRF_DURNER, WRF_DVGCH, &
+        PHYSICS_UNIT_M, PHYSICS_UNIT_CM, PHYSICS_UNIT_PA
+    use :: physics_constants, only:pi => circle_ratio, g => gravity_acceleration, rho_std => reference_water_density
     implicit none
     private
 
@@ -20,6 +21,7 @@ module physics_models_wrf
     !-------------------------------------
 
     type :: type_params_wrf
+        integer(int32) :: unit_id
         integer(int32) :: model_number
         real(real64) :: theta_r
         real(real64) :: theta_s
@@ -35,6 +37,7 @@ module physics_models_wrf
     contains
         procedure, pass(self), public :: reset => reset_params_wrf
         procedure, pass(self), public :: copy => copy_params_wrf
+        procedure, pass(self), public :: convert => convert_params_wrf
     end type type_params_wrf
 
     interface
@@ -50,6 +53,14 @@ module physics_models_wrf
             type(type_params_wrf), intent(in) :: source
 
         end subroutine copy_params_wrf
+
+        module subroutine convert_params_wrf(self, unit_id, factor)
+            implicit none
+            class(type_params_wrf), intent(inout) :: self
+            integer(int32), intent(in) :: unit_id
+            real(real64), intent(in), optional :: factor
+        end subroutine convert_params_wrf
+
     end interface
 
     type :: holder_wrfs

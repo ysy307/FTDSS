@@ -6,7 +6,7 @@ program test_physics
     use :: mpi_f08
 #endif
     use :: module_core
-    use :: module_physics
+    use :: module_physics, g => gravity_acceleration, rho_std => reference_water_density
     implicit none
 
     integer(int32) :: unit
@@ -108,18 +108,27 @@ contains
         call check_variable(computed_specific_heat, expected_specific_heat, "Specific Heat Test")
 
     end subroutine test_specific_heat
-    subroutine test_wrf()
-        use physics_models_wrf
-        use module_core
-        implicit none
 
+    subroutine test_wrf()
+        implicit none
         ! 6つのモデルを保持する配列
         type(holder_wrfs) :: wrf_models(6)
         type(type_params_wrf) :: params(6)
 
         integer(int32) :: i, j, n_steps
-        real(real64) :: h, theta_vals(6), h_min, h_max, dh
         integer(int32) :: file_unit
+
+        real(real64) :: h_cm, h_pa ! 入力(cm)と計算用(Pa)を分離
+        real(real64) :: theta_vals(6)
+        real(real64) :: h_min, h_max, dh
+        real(real64) :: conv_factor ! 単位変換係数
+
+        !-------------------------------------------------
+        ! 0. 変換係数の計算 (cm -> Pa)
+        !-------------------------------------------------
+        ! 親モジュールで定義されている g (重力加速度) と rho_std (水の密度) を使用
+        ! 以前のコードの「9.80655d1」のような定数打ち込みによる誤差を排除
+        conv_factor = (rho_std * g) / 100.0d0
 
         !-------------------------------------------------
         ! 1. 各モデルのパラメータ設定
@@ -127,32 +136,33 @@ contains
         ! 共通設定
         do j = 1, 6
             call params(j)%reset()
+            params(j)%unit_id = PHYSICS_UNIT_CM
             params(j)%theta_s = 0.5d0
             params(j)%theta_r = 0.1d0
         end do
 
         ! --- (1) Brooks-Corey (BC) ---
         params(1)%model_number = 1 ! WRF_BC
-        params(1)%alpha1 = -10.0d0 ! 空気侵入値 (cm, 負の値)
-        params(1)%n1 = 2.0d0 ! lambda
+        params(1)%alpha1 = -10.0d0
+        params(1)%n1 = 2.0d0
 
         ! --- (2) Van Genuchten (VG) ---
         params(2)%model_number = 2 ! WRF_VG
-        params(2)%alpha1 = 0.01d0 ! 1/cm (正の値)
+        params(2)%alpha1 = 0.01d0
         params(2)%n1 = 2.0d0
         params(2)%m1 = 0.5d0
 
         ! --- (3) Kosugi (KO) ---
         params(3)%model_number = 3 ! WRF_KO
-        params(3)%alpha1 = -100.0d0 ! hm (cm, 負の値)
-        params(3)%n1 = 1.0d0 ! sigma
+        params(3)%alpha1 = -100.0d0
+        params(3)%n1 = 1.0d0
 
         ! --- (4) Modified VG (MVG) ---
         params(4)%model_number = 4 ! WRF_MVG
         params(4)%alpha1 = 0.01d0
         params(4)%n1 = 2.0d0
         params(4)%m1 = 0.5d0
-        params(4)%h_crit = -5.0d0 ! 臨界圧力水頭
+        params(4)%h_crit = -5.0d0
 
         ! --- (5) Durner (Dual VG) ---
         params(5)%model_number = 5 ! WRF_DURNER
@@ -168,11 +178,10 @@ contains
         ! --- (6) Dual VG Common Alpha (DVGCH) ---
         params(6)%model_number = 6 ! WRF_DVGCH
         params(6)%w1 = 0.4d0
-        params(6)%alpha1 = 0.01d0 ! 共通alpha
+        params(6)%alpha1 = 0.01d0
         params(6)%n1 = 2.0d0
         params(6)%m1 = 0.5d0
         params(6)%w2 = 0.6d0
-        ! alpha2は使用しない
         params(6)%n2 = 3.0d0
         params(6)%m2 = 1.0d0 - 1.0d0 / 3.0d0
 
@@ -197,21 +206,26 @@ contains
         dh = (h_max - h_min) / real(n_steps, real64)
 
         do i = 0, n_steps
-            h = h_min + real(i, real64) * dh
+            ! h_cm: CSV出力用の水頭 (cm)
+            h_cm = h_min + real(i, real64) * dh
 
-            ! 全モデル計算
+            ! h_pa: 計算モデル入力用の圧力 (Pa)
+            ! 内部パラメータと同じ係数を使って変換することで整合性を保証
+            h_pa = h_cm * conv_factor
+
+            ! 全モデル計算 (引数は Pa)
             do j = 1, 6
-                call wrf_models(j)%p%calc(h, theta_vals(j))
+                call wrf_models(j)%p%calc(h_pa, theta_vals(j))
             end do
 
             ! 出力
-            write (file_unit, '(F12.4, 6(",", ES20.12))') h, theta_vals(1:6)
+            ! h_cm をそのまま出し、theta は倍精度(ES24.16E3)で出力して桁落ちを防ぐ
+            write (file_unit, '(ES24.16E3, 6(",", ES24.16E3))') h_cm, theta_vals(1:6)
         end do
 
         close (file_unit)
 
     end subroutine test_wrf
-
     subroutine test_hcf()
         implicit none
 
@@ -222,10 +236,20 @@ contains
         type(type_iapws97) :: water
 
         integer(int32) :: i, j, n_steps
-        real(real64) :: h, kr_vals(6), h_min, h_max, dh
         integer(int32) :: file_unit
 
+        real(real64) :: h_cm, h_pa ! 入力(cm)と計算用(Pa)を分離
+        real(real64) :: kr_vals(6)
+        real(real64) :: h_min, h_max, dh
+        real(real64) :: conv_factor ! 単位変換係数
+
         call water%initialize()
+
+        !-------------------------------------------------
+        ! 0. 変換係数の計算 (cm -> Pa)
+        !-------------------------------------------------
+        ! 親モジュール等で定義されている g (重力加速度) と rho_std (水の密度) を使用
+        conv_factor = (rho_std * g) / 100.0d0
 
         !-------------------------------------------------
         ! 1. 各モデルのパラメータ設定
@@ -233,6 +257,7 @@ contains
         ! 共通設定 (HCF_BASE type)
         do j = 1, 6
             call params(j)%reset()
+            params(j)%unit_id = PHYSICS_UNIT_CM
             params(j)%model_number = 1 ! 1 = HCF_BASE
             params(j)%water_viscosity_model = 1 ! 1 = NONE (or default)
             params(j)%k_s = 1.0d0 ! Ks = 1.0
@@ -244,26 +269,26 @@ contains
 
         ! --- (1) Brooks-Corey (BC) ---
         params(1)%hcf_model_number = 1
-        params(1)%alpha1 = -10.0d0 ! 空気侵入値 (cm, 負の値)
-        params(1)%n1 = 2.0d0 ! lambda
+        params(1)%alpha1 = -10.0d0
+        params(1)%n1 = 2.0d0
 
         ! --- (2) Van Genuchten (VG) ---
         params(2)%hcf_model_number = 2
-        params(2)%alpha1 = 0.01d0 ! 1/cm (正の値)
+        params(2)%alpha1 = 0.01d0
         params(2)%n1 = 2.0d0
         params(2)%m1 = 0.5d0
 
         ! --- (3) Kosugi (KO) ---
         params(3)%hcf_model_number = 3
-        params(3)%alpha1 = -100.0d0 ! hm (cm, 負の値)
-        params(3)%n1 = 1.0d0 ! sigma
+        params(3)%alpha1 = -100.0d0
+        params(3)%n1 = 1.0d0
 
         ! --- (4) Modified VG (MVG) ---
         params(4)%hcf_model_number = 4
         params(4)%alpha1 = 0.01d0
         params(4)%n1 = 2.0d0
         params(4)%m1 = 0.5d0
-        params(4)%h_crit = -5.0d0 ! 臨界圧力水頭
+        params(4)%h_crit = -5.0d0
 
         ! --- (5) Durner (Dual VG) ---
         params(5)%hcf_model_number = 5
@@ -272,7 +297,7 @@ contains
         params(5)%n1 = 2.0d0
         params(5)%m1 = 0.5d0
         params(5)%w2 = 0.6d0
-        params(5)%alpha2 = 0.05d0 ! 2つ目の孔隙のalpha
+        params(5)%alpha2 = 0.05d0
         params(5)%n2 = 3.0d0
         params(5)%m2 = 1.0d0 - 1.0d0 / 3.0d0
 
@@ -283,7 +308,6 @@ contains
         params(6)%n1 = 2.0d0
         params(6)%m1 = 0.5d0
         params(6)%w2 = 0.6d0
-        ! alpha2は使用しない(alpha1共通)
         params(6)%n2 = 3.0d0
         params(6)%m2 = 1.0d0 - 1.0d0 / 3.0d0
 
@@ -308,17 +332,22 @@ contains
         dh = (h_max - h_min) / real(n_steps, real64)
 
         do i = 0, n_steps
-            h = h_min + real(i, real64) * dh
+            ! h_cm: CSV出力用の水頭 (cm)
+            h_cm = h_min + real(i, real64) * dh
 
-            state%pressure = h
+            ! h_pa: 計算モデル入力用の圧力 (Pa)
+            ! 内部パラメータと同じ係数を使って変換することで整合性を保証
+            h_pa = h_cm * conv_factor
+            state%pressure = h_pa
 
             ! 全モデル計算
             do j = 1, 6
                 call hcf_models(j)%p%calc_kflh(state, kr_vals(j))
             end do
 
-            ! 出力: h + 6つのkr
-            write (file_unit, '(F12.4, 6(",", ES20.12))') h, kr_vals(1:6)
+            ! 出力
+            ! h_cm をそのまま出し、kr_vals は倍精度(ES24.16E3)で出力して桁落ちを防ぐ
+            write (file_unit, '(ES24.16E3, 6(",", ES24.16E3))') h_cm, kr_vals(1:6)
         end do
 
         close (file_unit)

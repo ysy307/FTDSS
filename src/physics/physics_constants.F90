@@ -3,6 +3,9 @@ module physics_constants
     implicit none
     private
 
+    !> Reference water density [kg/m^3]
+    real(real64), parameter, public :: reference_water_density = 1000.0d0
+
     !> Mathematical constant pi
     real(real64), parameter, public :: circle_ratio = 3.141592653589793d0
 
@@ -39,6 +42,9 @@ module physics_constants
     real(real64), parameter, public :: latent_heat_fusion_water_0C = 334560.0d0
     !> Water freezing point at standard atmospheric pressure [degC]
     real(real64), parameter, public :: water_freezing_point_at_standard_atmospheric_pressure = 0.0d0
+    !>
+    real(real64), parameter, public :: water_freezing_point_at_standard_atmospheric_pressure_K = &
+                                       water_freezing_point_at_standard_atmospheric_pressure + celsius_to_kelvin
 
     !> Molar mass of water [kg/mol]
     real(real64), parameter, public :: molar_mass_water = 0.01801528d0

@@ -5,6 +5,7 @@ contains
         implicit none
         class(type_params_wrf), intent(inout) :: self
 
+        self%unit_id = 0
         self%model_number = 0
         self%theta_s = 0.0d0
         self%theta_r = 0.0d0
@@ -25,6 +26,7 @@ contains
         class(type_params_wrf), intent(inout) :: self
         type(type_params_wrf), intent(in) :: source
 
+        self%unit_id = source%unit_id
         self%model_number = source%model_number
         self%theta_s = source%theta_s
         self%theta_r = source%theta_r
@@ -39,6 +41,55 @@ contains
         self%w2 = source%w2
 
     end subroutine copy_params_wrf
+
+    module subroutine convert_params_wrf(self, unit_id, factor)
+        implicit none
+        class(type_params_wrf), intent(inout) :: self
+        integer(int32), intent(in) :: unit_id
+        real(real64), intent(in), optional :: factor
+
+        real(real64) :: pg_val
+        real(real64) :: scale_pres
+
+        ! --- 比重量 (rho*g) の設定 ---
+        if (present(factor)) then
+            pg_val = factor
+        else
+            pg_val = rho_std * g
+        end if
+
+        ! --- 変換係数の決定 ---
+        select case (unit_id)
+        case (PHYSICS_UNIT_M)
+            ! m -> Pa
+            scale_pres = pg_val
+        case (PHYSICS_UNIT_CM)
+            ! cm -> m -> Pa
+            scale_pres = pg_val * 1.0d-2
+        case (PHYSICS_UNIT_PA)
+            ! Pa -> Pa (係数は1.0)
+            scale_pres = 1.0d0
+        case default
+            scale_pres = 1.0d0
+        end select
+
+        ! --- モデルごとのパラメータ変換 ---
+        select case (self%model_number)
+        case (WRF_BC, WRF_KO)
+            self%alpha1 = self%alpha1 * scale_pres
+            self%h_crit = self%h_crit * scale_pres
+            self%alpha2 = self%alpha2 * scale_pres
+
+        case (WRF_VG, WRF_MVG, WRF_DURNER, WRF_DVGCH)
+            self%alpha1 = self%alpha1 / scale_pres
+            self%alpha2 = self%alpha2 / scale_pres
+            self%h_crit = self%h_crit * scale_pres
+        case default
+            self%alpha1 = self%alpha1 / scale_pres
+            self%h_crit = self%h_crit * scale_pres
+        end select
+
+    end subroutine convert_params_wrf
 
     module subroutine initialize_holder_wrfs(self, material_id, params)
         implicit none
@@ -72,6 +123,7 @@ contains
         type(type_params_wrf), intent(in) :: params
 
         call self%params%copy(params)
+        call self%params%convert(params%unit_id)
 
     end subroutine initialize_abst_wrf
 
