@@ -11,6 +11,7 @@ module physics_models_phase_change_liquid_solid_gcc
     use :: module_core
     use :: physics_constants, only: &
         T_to_K => celsius_to_kelvin, &
+        P_atm => standard_atmospheric_pressure, &
         lf => latent_heat_fusion_water_0c, &
         g => gravity_acceleration, &
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
@@ -68,11 +69,13 @@ module physics_models_phase_change_liquid_solid_gcc
         procedure(abst_calc_gcc), pass(self), public, deferred :: calc
         procedure(abst_deriv_gcc), pass(self), public, deferred :: deriv
         procedure(abst_deriv2_gcc), pass(self), public, deferred :: deriv2
+        procedure, pass(self), private :: shift_temperature_absolute => shift_temperature_absolute_abst_gcc
+        procedure, pass(self), private :: shift_pressure_absolute => shift_pressure_absolute_abst_gcc
     end type abst_gcc
 
-!>
-!> @brief Abstract interface for calculating suction.
-!>
+    !>
+    !> @brief Abstract interface for calculating suction.
+    !>
     abstract interface
         !>
         !> @brief Calculate suction [Pa].
@@ -129,6 +132,27 @@ module physics_models_phase_change_liquid_solid_gcc
             !> Ice property object
             type(type_iapws06), target, intent(in) :: ice
         end subroutine initialize_abst_gcc
+
+        module pure elemental subroutine shift_temperature_absolute_abst_gcc(self, temperature_degree, temperature_K)
+            implicit none
+            !> GCC object
+            class(abst_gcc), intent(in) :: self
+            !> Temperature in degree Celsius
+            real(real64), intent(in) :: temperature_degree
+            !> Temperature in Kelvin
+            real(real64), intent(inout) :: temperature_K
+
+        end subroutine shift_temperature_absolute_abst_gcc
+
+        module pure elemental subroutine shift_pressure_absolute_abst_gcc(self, pressure_gauge, pressure_absolute)
+            implicit none
+            !> GCC object
+            class(abst_gcc), intent(in) :: self
+            !> Gauge pressure [Pa]
+            real(real64), intent(in) :: pressure_gauge
+            !> Absolute pressure [Pa]
+            real(real64), intent(inout) :: pressure_absolute
+        end subroutine shift_pressure_absolute_abst_gcc
     end interface
 
 !>

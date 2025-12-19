@@ -35,12 +35,15 @@ module physics_models_phase_change_liquid_vapor_vaporization
 contains
 
     subroutine initialize_evaporation_model(self, water)
+        implicit none
         class(type_evaporation), intent(inout) :: self
         type(type_iapws97), intent(in), target, optional :: water
+
         if (present(water)) self%water => water
     end subroutine initialize_evaporation_model
 
     pure subroutine calc_latent_heat_vaporization(self, temperature, latent_heat)
+        implicit none
         class(type_evaporation), intent(in) :: self
         real(real64), intent(in) :: temperature
         real(real64), intent(inout) :: latent_heat
@@ -51,7 +54,6 @@ contains
         end if
     end subroutine calc_latent_heat_vaporization
 
-    !> RH計算は変更なし（負圧でもexp関数は安全）
     pure elemental subroutine calc_relative_humidity_evaporation(self, temperature, pressure, relative_humidity)
         implicit none
         class(type_evaporation), intent(in) :: self

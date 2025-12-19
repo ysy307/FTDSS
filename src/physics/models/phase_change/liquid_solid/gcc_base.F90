@@ -57,6 +57,34 @@ contains
         self%ice => ice
     end subroutine initialize_abst_gcc
 
+    module pure elemental subroutine shift_temperature_absolute_abst_gcc(self, temperature_degree, temperature_K)
+        implicit none
+        !> GCC object
+        class(abst_gcc), intent(in) :: self
+        !> Temperature in degree Celsius
+        real(real64), intent(in) :: temperature_degree
+        !> Temperature in Kelvin
+        real(real64), intent(inout) :: temperature_K
+
+        temperature_K = temperature_degree + T_to_K
+    end subroutine shift_temperature_absolute_abst_gcc
+
+    module pure elemental subroutine shift_pressure_absolute_abst_gcc(self, pressure_gauge, pressure_absolute)
+        implicit none
+        !> GCC object
+        class(abst_gcc), intent(in) :: self
+        !> Gauge pressure [Pa]
+        real(real64), intent(in) :: pressure_gauge
+        !> Absolute pressure [Pa]
+        real(real64), intent(inout) :: pressure_absolute
+
+        if (pressure_gauge < 0.0d0) then
+            pressure_absolute = P_atm
+        else
+            pressure_absolute = P_atm + pressure_gauge
+        end if
+    end subroutine shift_pressure_absolute_abst_gcc
+
     !>
     !> @brief Calculate suction for GCC without segregation [Pa].
     !>
@@ -72,18 +100,17 @@ contains
         !> Calculated suction [Pa]
         real(real64), intent(inout) :: suction
 
+        real(real64) :: temperature_K, pressure_absolute
         real(real64) :: rho_water
-        real(real64) :: Temp_K
 
-        ! Convert Celsius to Kelvin
-        Temp_K = state%temperature + T_to_K
-        call self%water%calc_rho(Temp_K, state%pressure, rho_water)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call self%water%calc_rho(temperature_K, pressure_absolute, rho_water)
 
         if (state%temperature <= Tf0) then
             ! Apply generalized Clausius-Clapeyron equation for non-segregation
             ! Result in Pa (J/m^3)
-            ! Note: The original 1.0d-3 factor (for kPa) has been removed to output Pa.
-            suction = -lf * rho_water * log(Temp_K / Tf0_K)
+            suction = -lf * rho_water * log(temperature_K / Tf0_K)
         else
             suction = 0.0d0
         end if
@@ -101,15 +128,16 @@ contains
         !> Derivative of suction w.r.t temperature [Pa/K]
         real(real64), intent(inout) :: suction_derivative
 
+        real(real64) :: temperature_K, pressure_absolute
         real(real64) :: rho_water
-        real(real64) :: Temp_K
 
-        Temp_K = state%temperature + T_to_K
-        call self%water%calc_rho(Temp_K, state%pressure, rho_water)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call self%water%calc_rho(temperature_K, pressure_absolute, rho_water)
 
         if (state%temperature <= Tf0) then
             ! Derivative of suction w.r.t temperature [Pa/K]
-            suction_derivative = -lf * rho_water / Temp_K
+            suction_derivative = -lf * rho_water / temperature_K
         else
             suction_derivative = 0.0d0
         end if
@@ -127,15 +155,16 @@ contains
         !> Second derivative of suction w.r.t temperature [Pa/K^2]
         real(real64), intent(inout) :: suction_derivative
 
+        real(real64) :: temperature_K, pressure_absolute
         real(real64) :: rho_water
-        real(real64) :: Temp_K
 
-        Temp_K = state%temperature + T_to_K
-        call self%water%calc_rho(Temp_K, state%pressure, rho_water)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call self%water%calc_rho(temperature_K, pressure_absolute, rho_water)
 
         if (state%temperature <= Tf0) then
             ! Second derivative of suction w.r.t temperature [Pa/K^2]
-            suction_derivative = lf * rho_water / (Temp_K * Temp_K)
+            suction_derivative = lf * rho_water / (temperature_K * temperature_K)
         else
             suction_derivative = 0.0d0
         end if
@@ -155,17 +184,18 @@ contains
         !> Calculated suction [Pa]
         real(real64), intent(inout) :: suction
 
+        real(real64) :: temperature_K, pressure_absolute
         real(real64) :: rho_water, rho_ice
-        real(real64) :: Temp_K
 
-        Temp_K = state%temperature + T_to_K
-        call self%water%calc_rho(Temp_K, state%pressure, rho_water)
-        call self%ice%calc_rho(Temp_K, state%pressure, rho_ice)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call self%water%calc_rho(temperature_K, pressure_absolute, rho_water)
+        call self%ice%calc_rho(temperature_K, pressure_absolute, rho_ice)
 
         if (state%temperature <= Tf0) then
             ! Generalized Clausius-Clapeyron equation for segregation
             ! Result in Pa
-            suction = (rho_ice / rho_water - 1.0d0) * state%pressure - lf * rho_ice * log(Temp_K / Tf0_K)
+            suction = (rho_ice / rho_water - 1.0d0) * state%pressure - lf * rho_ice * log(temperature_K / Tf0_K)
         else
             suction = 0.0d0
         end if
@@ -183,15 +213,15 @@ contains
         !> Derivative of suction w.r.t temperature [Pa/K]
         real(real64), intent(inout) :: suction_derivative
 
-        real(real64) :: rho_water, rho_ice
-        real(real64) :: Temp_K
+        real(real64) :: temperature_K, pressure_absolute
+        real(real64) :: rho_ice
 
-        Temp_K = state%temperature + T_to_K
-        call self%water%calc_rho(Temp_K, state%pressure, rho_water)
-        call self%ice%calc_rho(Temp_K, state%pressure, rho_ice)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call self%ice%calc_rho(temperature_K, pressure_absolute, rho_ice)
 
         if (state%temperature <= Tf0) then
-            suction_derivative = (-lf * rho_ice / Temp_K)
+            suction_derivative = (-lf * rho_ice / temperature_K)
         else
             suction_derivative = 0.0d0
         end if
@@ -209,14 +239,15 @@ contains
         !> Second derivative of suction w.r.t temperature [Pa/K^2]
         real(real64), intent(inout) :: suction_derivative
 
+        real(real64) :: temperature_K, pressure_absolute
         real(real64) :: rho_ice
-        real(real64) :: Temp_K
 
-        Temp_K = state%temperature + T_to_K
-        call self%ice%calc_rho(Temp_K, state%pressure, rho_ice)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call self%ice%calc_rho(temperature_K, pressure_absolute, rho_ice)
 
         if (state%temperature <= Tf0) then
-            suction_derivative = (lf * rho_ice / (Temp_K * Temp_K))
+            suction_derivative = (lf * rho_ice / (temperature_K * temperature_K))
         else
             suction_derivative = 0.0d0
         end if

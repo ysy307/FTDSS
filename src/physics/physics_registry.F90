@@ -68,6 +68,7 @@ contains
         integer(int32) :: num_unique_regions
         integer(int32) :: max_region_id
         integer(int32) :: current_material_id
+        integer(int32) :: status
 
         call self%water%initialize()
         call self%ice%initialize()
@@ -78,16 +79,49 @@ contains
         max_region_id = maxval(unique_material_ids)
 
         if (flags_coumpute(1)) then
-            allocate (self%thc(num_unique_regions))
-            allocate (self%den(num_unique_regions))
-            allocate (self%sph(num_unique_regions))
-            allocate (self%vhc(num_unique_regions))
-            allocate (self%gcc(num_unique_regions))
-            allocate (self%wrf(num_unique_regions))
+            allocate (self%thc(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate THC models in physics registry."
+                stop 1
+            end if
+            allocate (self%den(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate DEN models in physics registry."
+                stop 1
+            end if
+            allocate (self%sph(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate SPH models in physics registry."
+                stop 1
+            end if
+            allocate (self%vhc(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate VHC models in physics registry."
+                stop 1
+            end if
+            allocate (self%gcc(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate GCC models in physics registry."
+                stop 1
+            end if
+            allocate (self%wrf(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate WRF models in physics registry."
+                stop 1
+            end if
         end if
 
         if (flags_coumpute(2)) then
-            allocate (self%hcf(num_unique_regions))
+            allocate (self%den(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate DEN models in physics registry."
+                stop 1
+            end if
+            allocate (self%hcf(num_unique_regions), stat=status)
+            if (status /= 0) then
+                print *, "Error: Unable to allocate HCF models in physics registry."
+                stop 1
+            end if
         end if
 
         allocate (self%region_id_map(max_region_id), source=0)
