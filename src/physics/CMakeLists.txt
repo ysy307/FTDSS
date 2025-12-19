@@ -7,7 +7,11 @@ add_library(Physics_Base STATIC
     physics_types.F90
 )
 target_include_directories(Physics_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Base PUBLIC
+    Solver::Core
+)
 enable_build_flags(Physics_Base)
+enable_thirdparty (Physics_Base)
 
 # ====================================================================
 # 2. Physics Materials Group

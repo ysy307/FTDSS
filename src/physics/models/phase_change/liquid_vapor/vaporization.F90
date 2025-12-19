@@ -57,60 +57,58 @@ contains
         end if
     end subroutine calc_latent_heat_vaporization
 
-    pure elemental subroutine calc_relative_humidity_evaporation(self, temperature, pressure, relative_humidity)
+    pure elemental subroutine calc_relative_humidity_evaporation(self, state, relative_humidity)
         implicit none
         class(type_evaporation), intent(in) :: self
-        real(real64), intent(in) :: temperature
-        real(real64), intent(in) :: pressure
+        type(type_state), intent(in) :: state
         real(real64), intent(inout) :: relative_humidity
 
         real(real64) :: temperature_K
 
-        if (pressure >= 0.0d0) then
+        if (state%pressure >= 0.0d0) then
             relative_humidity = 1.0d0
             return
         end if
 
-        call self%shift_temperature_absolute(temperature, temperature_K)
-        relative_humidity = exp((pressure * Mw) / (rho_std * Rg * temperature_K))
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        relative_humidity = exp((state%pressure * Mw) / (rho_std * Rg * temperature_K))
 
     end subroutine calc_relative_humidity_evaporation
 
-    pure elemental subroutine deriv_relative_humidity_temperature_evaporation(self, temperature, pressure, deriv_rh_temp)
+    pure elemental subroutine deriv_relative_humidity_temperature_evaporation(self, state, deriv_rh_temp)
         implicit none
         class(type_evaporation), intent(in) :: self
-        real(real64), intent(in) :: temperature
-        real(real64), intent(in) :: pressure
+        type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv_rh_temp
         real(real64) :: rh, temperature_K
 
-        if (pressure >= 0.0d0) then
+        if (state%pressure >= 0.0d0) then
             deriv_rh_temp = 0.0d0
             return
         end if
 
-        call self%shift_temperature_absolute(temperature, temperature_K)
-        call self%calc_relative_humidity(temperature, pressure, rh)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%calc_relative_humidity(state, rh)
 
-        deriv_rh_temp = rh * (-pressure * Mw) / (rho_std * Rg * temperature_K**2)
+        deriv_rh_temp = rh * (-state%pressure * Mw) / (rho_std * Rg * temperature_K**2)
     end subroutine deriv_relative_humidity_temperature_evaporation
 
-    pure elemental subroutine deriv_relative_humidity_pressure_evaporation(self, temperature, pressure, deriv_rh_pressure)
+    pure elemental subroutine deriv_relative_humidity_pressure_evaporation(self, state, deriv_rh_pressure)
         implicit none
         class(type_evaporation), intent(in) :: self
-        real(real64), intent(in) :: temperature
-        real(real64), intent(in) :: pressure
+        type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv_rh_pressure
         real(real64) :: rh, temperature_K
 
-        if (pressure >= 0.0d0) then
+        if (state%pressure >= 0.0d0) then
             deriv_rh_pressure = 0.0d0
             return
         end if
 
-        call self%shift_temperature_absolute(temperature, temperature_K)
-        call self%calc_relative_humidity(temperature, pressure, rh)
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%calc_relative_humidity(state, rh)
         deriv_rh_pressure = rh * Mw / (rho_std * Rg * temperature_K)
+
     end subroutine deriv_relative_humidity_pressure_evaporation
 
     !> @brief Calculate vapor content.
@@ -122,16 +120,10 @@ contains
 
         real(real64) :: relative_humidity
         real(real64) :: saturation_density, water_density
-        real(real64) :: temperature_K
-        real(real64) :: pressure_absolute
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
-
-        call self%calc_relative_humidity(state%temperature, state%pressure, relative_humidity)
-
-        call self%water%calc_rho(temperature_K, pressure_absolute, water_density)
-        call self%water%calc_saturation_density(temperature_K, saturation_density)
+        call self%calc_relative_humidity(state, relative_humidity)
+        call self%calc_rho_water(state, water_density)
+        call self%calc_rho_vapor_saturation(state, saturation_density)
 
         vapor_content = saturation_density * relative_humidity * state%air_content / water_density
     end subroutine calc_vapor_content_vaporization
@@ -152,8 +144,8 @@ contains
         call self%shift_temperature_absolute(state%temperature, temperature_K)
         call self%shift_pressure_absolute(state%pressure, pressure_absolute)
 
-        call self%calc_relative_humidity(state%temperature, state%pressure, relative_humidity)
-        call self%deriv_relative_humidity_temperature(state%temperature, state%pressure, deriv_rh_temp)
+        call self%calc_relative_humidity(state, relative_humidity)
+        call self%deriv_relative_humidity_temperature(state, deriv_rh_temp)
 
         call self%water%calc_rho(temperature_K, pressure_absolute, water_density)
         call self%water%calc_drho_dT(temperature_K, pressure_absolute, drho_w_dT)
@@ -183,8 +175,8 @@ contains
         call self%shift_temperature_absolute(state%temperature, temperature_K)
         call self%shift_pressure_absolute(state%pressure, pressure_absolute)
 
-        call self%calc_relative_humidity(state%temperature, state%pressure, relative_humidity)
-        call self%deriv_relative_humidity_pressure(state%temperature, state%pressure, deriv_rh_pressure)
+        call self%calc_relative_humidity(state, relative_humidity)
+        call self%deriv_relative_humidity_pressure(state, deriv_rh_pressure)
 
         if (state%pressure < 0.0d0) then
             call self%water%calc_rho(temperature_K, pressure_absolute, water_density)

@@ -28,6 +28,8 @@ module physics_types
         procedure, pass(self), public :: calc_rho_ice => calc_rho_ice_abst_physics
         !> Calculate vapor density based on relative humidity.
         procedure, pass(self), public :: calc_rho_vapor => calc_rho_vapor_abst_physics
+        !> Calculate saturated vapor density.
+        procedure, pass(self), public :: calc_rho_vapor_saturation => calc_rho_vapor_saturation_abst_physics
         !> Calculate specific heat capacity of liquid water.
         procedure, pass(self), public :: calc_cp_water => calc_cp_water_abst_physics
         !> Calculate specific heat capacity of ice.
@@ -131,6 +133,23 @@ contains
         density = max(density * state%relative_humidity, min_vapor_density)
 
     end subroutine calc_rho_vapor_abst_physics
+
+    !> Calculate saturated vapor density using IAPWS-97.
+    pure elemental subroutine calc_rho_vapor_saturation_abst_physics(self, state, density)
+        implicit none
+        !> Physics instance
+        class(abst_physics), intent(in) :: self
+        !> State variables.
+        !> Required: `temperature` [C]
+        type(type_state), intent(in) :: state
+        !> Calculated saturated vapor density [kg/m^3]
+        real(real64), intent(inout) :: density
+
+        real(real64) :: temperature_K
+
+        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%water%calc_saturation_density(temperature_K, density)
+    end subroutine calc_rho_vapor_saturation_abst_physics
 
     !> Calculate specific isobaric heat capacity of liquid water (Cp) using IAPWS-97.
     pure elemental subroutine calc_cp_water_abst_physics(self, state, cp)

@@ -65,7 +65,7 @@ contains
 
         ! Test case 1
         state%temperature = 10.0d0 ! [C]
-        state%pressure = 101325.0d0 ! [Pa]
+        state%pressure = 0.0d0 ! [Pa]
         state%porosity = 0.4d0
         state%water_content = 0.2d0
         state%ice_content = 0.1d0
@@ -98,7 +98,7 @@ contains
 
         ! Test case 1
         state%temperature = 10.0d0 ! [C]
-        state%pressure = 101325.0d0 ! [Pa]
+        state%pressure = 0.0d0 ! [Pa]
         state%porosity = 0.4d0
         state%water_content = 0.2d0
         state%ice_content = 0.1d0
