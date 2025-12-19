@@ -3,7 +3,7 @@ submodule(physics_models_wrf) calculate_wrf_base
 contains
     module subroutine reset_params_wrf(self)
         implicit none
-        class(type_params_wrf), intent(inout) :: self
+        class(type_wrf_params), intent(inout) :: self
 
         self%unit_id = 0
         self%model_number = 0
@@ -23,8 +23,8 @@ contains
 
     module subroutine copy_params_wrf(self, source)
         implicit none
-        class(type_params_wrf), intent(inout) :: self
-        type(type_params_wrf), intent(in) :: source
+        class(type_wrf_params), intent(inout) :: self
+        type(type_wrf_params), intent(in) :: source
 
         self%unit_id = source%unit_id
         self%model_number = source%model_number
@@ -44,7 +44,7 @@ contains
 
     module subroutine convert_params_wrf(self, unit_id, factor)
         implicit none
-        class(type_params_wrf), intent(inout) :: self
+        class(type_wrf_params), intent(inout) :: self
         integer(int32), intent(in) :: unit_id
         real(real64), intent(in), optional :: factor
 
@@ -95,7 +95,7 @@ contains
         implicit none
         class(holder_wrfs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_params_wrf), intent(in) :: params
+        type(type_wrf_params), intent(in) :: params
 
         select case (params%model_number)
         case (WRF_BC)
@@ -120,7 +120,7 @@ contains
     module subroutine initialize_abst_wrf(self, params)
         implicit none
         class(abst_wrf), intent(inout) :: self
-        type(type_params_wrf), intent(in) :: params
+        type(type_wrf_params), intent(in) :: params
 
         call self%params%copy(params)
         call self%params%convert(params%unit_id)

@@ -7,7 +7,7 @@ contains
         implicit none
         class(holder_hcfs), intent(inout) :: self
         integer(int32), intent(in) :: material_id
-        type(type_params_hcf), intent(in) :: params
+        type(type_hcf_params), intent(in) :: params
         type(type_iapws97), intent(in), target :: water
 
         select case (params%model_number)
@@ -35,7 +35,7 @@ contains
 
     module subroutine reset_params_hcf(self)
         implicit none
-        class(type_params_hcf), intent(inout) :: self
+        class(type_hcf_params), intent(inout) :: self
 
         self%model_number = 0
         self%unit_id = 0
@@ -61,7 +61,7 @@ contains
 
     module subroutine convert_params_hcf(self, unit_id, factor)
         implicit none
-        class(type_params_hcf), intent(inout) :: self
+        class(type_hcf_params), intent(inout) :: self
         integer(int32), intent(in) :: unit_id
         real(real64), intent(in), optional :: factor
 
@@ -121,8 +121,8 @@ contains
 
     module subroutine copy_params_hcf(self, source)
         implicit none
-        class(type_params_hcf), intent(inout) :: self
-        type(type_params_hcf), intent(in) :: source
+        class(type_hcf_params), intent(inout) :: self
+        type(type_hcf_params), intent(in) :: source
 
         self%model_number = source%model_number
         self%unit_id = source%unit_id
@@ -150,7 +150,7 @@ contains
         implicit none
         class(abst_hcf), intent(inout), target :: self
         integer(int32), intent(in) :: material_id
-        type(type_params_hcf), intent(in) :: params
+        type(type_hcf_params), intent(in) :: params
         type(type_iapws97), intent(in), target :: water
 
         if (params%model_number == HCF_BASE .or. &

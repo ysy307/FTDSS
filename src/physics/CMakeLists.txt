@@ -1,111 +1,58 @@
 # ====================================================================
-# 1. Physics Materials Libraries
+# 1. Physics Constants
 # ====================================================================
-
-# --- Physics Constants ---
-set(PHYSICS_CONSTANTS_SOURCES
+# 定数は他のすべてから参照されるため、独立させておきます
+add_library(Physics_Constants STATIC
     physics_constants.F90
 )
-add_library(Physics_Constants STATIC ${PHYSICS_CONSTANTS_SOURCES})
 target_include_directories(Physics_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 enable_build_flags(Physics_Constants)
 
-# --- Materials Base ---
-set(PHYSICS_MATERIALS_BASE_SOURCES
-    materials/materials_base.F90
-)
-add_library(Physics_Materials_Base STATIC ${PHYSICS_MATERIALS_BASE_SOURCES})
-target_include_directories(Physics_Materials_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Materials_Base PUBLIC
-    Physics_Constants
-    Solver::Core
-)
-enable_build_flags(Physics_Materials_Base)
+# ====================================================================
+# 2. Physics Materials Group
+# ====================================================================
+# 密度・比熱・熱伝導率などを「Physics_Materials」として1つに統合します。
+# これにより、内部的な依存関係（Base -> Densityなど）をCMakeが自動解決します。
 
-# --- Density ---
-set(PHYSICS_MATERIALS_DENSITY_SOURCES
+set(PHYSICS_MATERIALS_SOURCES
+    # Base
+    materials/materials_base.F90
+    # Density
     materials/density/density_interface.F90
     materials/density/density_base.F90
     materials/density/density_multiphase.F90
-)
-add_library(Physics_Materials_Density STATIC ${PHYSICS_MATERIALS_DENSITY_SOURCES})
-target_include_directories(Physics_Materials_Density PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Materials_Density PUBLIC 
-    Physics_Materials_Base
-    Solver::Core
-)
-enable_build_flags(Physics_Materials_Density)
-
-# --- Specific Heat ---
-set(PHYSICS_MATERIALS_SPH_SOURCES
+    # Specific Heat
     materials/specific_heat/specific_heat_interface.F90
     materials/specific_heat/specific_heat_base.F90
     materials/specific_heat/specific_heat_multiphase.F90
-)
-add_library(Physics_Materials_SpecificHeat STATIC ${PHYSICS_MATERIALS_SPH_SOURCES})
-target_include_directories(Physics_Materials_SpecificHeat PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Materials_SpecificHeat PUBLIC 
-    Physics_Materials_Base
-    Solver::Core
-)
-enable_build_flags(Physics_Materials_SpecificHeat)
-
-# --- Thermal Conductivity ---
-set(PHYSICS_MATERIALS_THC_SOURCES
+    # Thermal Conductivity
     materials/thermal_conductivity/thermal_conductivity_interface.F90
     materials/thermal_conductivity/thermal_conductivity_base.F90
     materials/thermal_conductivity/thermal_conductivity_multiphase.F90
-)
-add_library(Physics_Materials_ThermalConductivity STATIC ${PHYSICS_MATERIALS_THC_SOURCES})
-target_include_directories(Physics_Materials_ThermalConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Materials_ThermalConductivity PUBLIC 
-    Physics_Materials_Base
-    Solver::Core
-)
-enable_build_flags(Physics_Materials_ThermalConductivity)
-
-# --- Volumetric Heat Capacity ---
-set(PHYSICS_MATERIALS_VHC_SOURCES
+    # Volumetric Heat Capacity
     materials/heat_capacity/heat_capacity_interface.F90
     materials/heat_capacity/heat_capacity_base.F90
     materials/heat_capacity/heat_capacity_multiphase.F90
-)
-add_library(Physics_Materials_HeatCapacity STATIC ${PHYSICS_MATERIALS_VHC_SOURCES})
-target_include_directories(Physics_Materials_HeatCapacity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Materials_HeatCapacity PUBLIC
-    Physics_Materials_Base
-    Solver::Core
-)
-enable_build_flags(Physics_Materials_HeatCapacity)
-
-# --- Materials aggregator ---
-set(PHYSICS_MATERIALS_ENTRY_SOURCES
+    # Entry / Aggregator
     materials/materials.F90
 )
-add_library(Physics_Materials_Entry STATIC ${PHYSICS_MATERIALS_ENTRY_SOURCES})
-target_include_directories(Physics_Materials_Entry PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(Physics_Materials_Entry PUBLIC
-    Physics_Materials_Base
-    Physics_Materials_Density
-    Physics_Materials_SpecificHeat
-    Physics_Materials_ThermalConductivity
-    Physics_Materials_HeatCapacity
-)
-enable_build_flags(Physics_Materials_Entry)
+add_library(Physics_Materials STATIC ${PHYSICS_MATERIALS_SOURCES})
 
-# 統合インターフェース
-add_library(Physics_Materials INTERFACE)
-target_link_libraries(Physics_Materials INTERFACE
-    Physics_Materials_Entry
+target_include_directories(Physics_Materials PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Materials PUBLIC
+    Physics_Constants
+    Solver::Core
 )
+enable_build_flags(Physics_Materials)
 
 # ====================================================================
-# 2. Constitutive Model Libraries (models/*)
+# 3. Physics Models Group
 # ====================================================================
+# 透水係数・保水曲線・相変化などを「Physics_Models」として1つに統合します。
 
-# Hydraulic Conductivity
-set(PHYSICS_MODEL_HCF_SOURCES
+set(PHYSICS_MODELS_SOURCES
+    # Hydraulic Conductivity
     models/hydraulic_conductivity/hcf_interface.F90
     models/hydraulic_conductivity/hcf_base.F90
     models/hydraulic_conductivity/hcf_bc.F90
@@ -117,17 +64,7 @@ set(PHYSICS_MODEL_HCF_SOURCES
     models/hydraulic_conductivity/hcf_impedance.F90
     models/hydraulic_conductivity/hcf_viscosity.F90
     models/hydraulic_conductivity/hcf_vapor.F90
-)
-add_library(Physics_Model_HydraulicConductivity STATIC ${PHYSICS_MODEL_HCF_SOURCES})
-target_include_directories(Physics_Model_HydraulicConductivity PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Model_HydraulicConductivity PUBLIC
-    Physics_Constants
-    Solver::Core
-)
-enable_build_flags(Physics_Model_HydraulicConductivity)
-
-# Water Retention
-set(PHYSICS_MODEL_WRF_SOURCES
+    # Water Retention
     models/water_retention/wrf_interface.f90
     models/water_retention/wrf_base.F90
     models/water_retention/wrf_bc.F90
@@ -136,49 +73,34 @@ set(PHYSICS_MODEL_WRF_SOURCES
     models/water_retention/wrf_mvg.F90
     models/water_retention/wrf_durner.F90
     models/water_retention/wrf_dvgch.F90
+    # Phase Change
+    models/phase_change/liquid_solid/gcc_interface.F90
+    models/phase_change/liquid_solid/gcc_base.F90
+    models/phase_change/liquid_solid/fusion.F90
+    models/phase_change/liquid_vapor/vaporization.F90
+    # Entry / Aggregator
+    models/models.F90
 )
-add_library(Physics_Model_WaterRetention STATIC ${PHYSICS_MODEL_WRF_SOURCES})
-target_include_directories(Physics_Model_WaterRetention PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(Physics_Model_WaterRetention PUBLIC
+
+add_library(Physics_Models STATIC ${PHYSICS_MODELS_SOURCES})
+
+target_include_directories(Physics_Models PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(Physics_Models PUBLIC
     Physics_Constants
     Solver::Core
 )
-enable_build_flags(Physics_Model_WaterRetention)
-
-# # Phase Change
-# set(PHYSICS_MODEL_GCC_SOURCES
-#     models/phase_change/liquid_solid/gcc_interface.F90
-#     models/phase_change/liquid_solid/gcc_base.F90
-#     models/phase_change/liquid_solid/gcc_non_segregation_m.F90
-#     models/phase_change/liquid_solid/gcc_non_segregation_pa.F90
-#     models/phase_change/liquid_solid/gcc_segregation_m.F90
-#     models/phase_change/liquid_solid/gcc_segregation_pa.F90
-# )
-# add_library(Physics_Model_PhaseChange STATIC ${PHYSICS_MODEL_GCC_SOURCES})
-# target_include_directories(Physics_Model_PhaseChange PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# target_link_libraries(Physics_Model_PhaseChange PUBLIC Solver::Core Solver::Input)
-# enable_build_flags(Physics_Model_PhaseChange)
-
-# Models aggregator
-add_library(Physics_Models INTERFACE)
-target_link_libraries(Physics_Models INTERFACE
-    Physics_Model_HydraulicConductivity
-    Physics_Model_WaterRetention
-    # Physics_Model_PhaseChange
-)
+enable_build_flags(Physics_Models)
 
 # ====================================================================
-# 3. Service Layer (トップレイヤー)
+# 4. Service Layer (Physics Main)
 # ====================================================================
 
-# 修正: 変数名を正確に定義
 set(PHYSICS_SERVICE_SOURCES
-    # physics_registry.F90
+    physics_registry.F90
     # physics_service.F90
     physics.F90
 )
 
-# ここで Physics_Service を定義（重複排除済み）
 add_library(Physics_Service STATIC ${PHYSICS_SERVICE_SOURCES})
 target_include_directories(Physics_Service PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Service PUBLIC
@@ -188,9 +110,9 @@ target_link_libraries(Physics_Service PUBLIC
 )
 enable_build_flags(Physics_Service)
 
-# Public Interface
-add_library(Physics_Interface INTERFACE)
-target_link_libraries(Physics_Interface INTERFACE
-    Physics_Service
-)
-add_library(Solver::Physics ALIAS Physics_Interface)
+# ====================================================================
+# 5. Public Interface Alias
+# ====================================================================
+# 外部公開用の名前（Solver::Physics）を定義
+# 実体（Physics_Service）へのエイリアスとして定義するのが一般的です
+add_library(Solver::Physics ALIAS Physics_Service)

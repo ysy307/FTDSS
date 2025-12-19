@@ -113,7 +113,7 @@ contains
         implicit none
         ! 6つのモデルを保持する配列
         type(holder_wrfs) :: wrf_models(6)
-        type(type_params_wrf) :: params(6)
+        type(type_wrf_params) :: params(6)
 
         integer(int32) :: i, j, n_steps
         integer(int32) :: file_unit
@@ -231,7 +231,7 @@ contains
 
         ! 6つのモデルを保持する配列
         type(holder_hcfs) :: hcf_models(6)
-        type(type_params_hcf) :: params(6)
+        type(type_hcf_params) :: params(6)
         type(type_state) :: state
         type(type_iapws97) :: water
 

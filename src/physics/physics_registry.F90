@@ -1,26 +1,35 @@
 module physics_registry
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    ! use :: module_input, only:type_input
-    use :: physics_material_thermal_conductivity, only:holder_thcs, abst_thc
-    ! use :: physics_material_heat_capacity, only:holder_vhcs, abst_vhc
-    use :: physics_material_density, only:holder_dens, abst_den
-    use :: physics_material_specific_heat, only:holder_sphs, abst_sph
-    ! use :: physics_models_hcf, only:holder_hcfs, abst_hcf
-    ! use :: physics_models_gcc, only:holder_gccs, abst_gcc
-    ! use :: physics_models_wrf, only:holder_wrfs, abst_wrf
+    use :: iapws, only:type_iapws97, type_iapws06
+    use :: module_core, only:type_state, type_physics_info
+    use :: module_physics_materials, only:holder_dens, abst_den, holder_sphs, abst_sph, holder_vhcs, abst_vhc, holder_thcs, abst_thc
+    use :: module_physics_models, only:holder_hcfs, abst_hcf, type_hcf_params, holder_gccs, abst_gcc, holder_wrfs, abst_wrf, type_wrf_params, type_evaporation
     implicit none
 
     public :: type_physics_registry
+    public :: type_material_pointers
+
+    type :: type_material_pointers
+        class(abst_thc), pointer :: thc => null()
+        class(abst_vhc), pointer :: vhc => null()
+        class(abst_gcc), pointer :: gcc => null()
+        class(abst_wrf), pointer :: wrf => null()
+        class(abst_den), pointer :: den => null()
+        class(abst_hcf), pointer :: hcf => null()
+    end type type_material_pointers
 
     type :: type_physics_registry
         private
+        type(type_iapws97) :: water
+        type(type_iapws06) :: ice
+        type(type_evaporation) :: evaporation
         type(holder_thcs), allocatable :: thc(:)
         type(holder_dens), allocatable :: den(:)
         type(holder_sphs), allocatable :: sph(:)
-        ! type(holder_vhcs), allocatable :: vhc(:)
-        ! type(holder_gccs), allocatable :: gcc(:)
-        ! type(holder_wrfs), allocatable :: wrf(:)
-        ! type(holder_hcfs), allocatable :: hcf(:)
+        type(holder_vhcs), allocatable :: vhc(:)
+        type(holder_gccs), allocatable :: gcc(:)
+        type(holder_wrfs), allocatable :: wrf(:)
+        type(holder_hcfs), allocatable :: hcf(:)
 
         integer(int32), allocatable :: region_id_map(:)
     contains
@@ -33,37 +42,42 @@ module physics_registry
         procedure, public, pass(self) :: get_gcc => get_gcc_ptr
         procedure, public, pass(self) :: get_wrf => get_wrf_ptr
         procedure, public, pass(self) :: get_hcf => get_hcf_ptr
+        procedure, public, pass(self) :: get_evaporation => get_evaporation_ptr
 
     end type type_physics_registry
 
 contains
 
     ! 初期化（holder内部のinitialize呼ぶ）
-    subroutine initialize_type_physics_registry(self, input, ierr)
+    subroutine initialize_type_physics_registry(self, unique_material_ids, flags_coumpute, density_info, &
+                                                specific_heat_info, heat_capacity_info, thermal_conductivity_info, &
+                                                gcc_model_ids, wrf_model_info, hcf_model_info)
+        implicit none
         class(type_physics_registry), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        integer(int32), intent(inout) :: ierr
+        integer(int32), intent(in) :: unique_material_ids(:)
+        logical, intent(in) :: flags_coumpute(:)
+        type(type_physics_info), intent(in), optional :: density_info(:)
+        type(type_physics_info), intent(in), optional :: specific_heat_info(:)
+        type(type_physics_info), intent(in), optional :: heat_capacity_info(:)
+        type(type_physics_info), intent(in), optional :: thermal_conductivity_info(:)
+        integer(int32), intent(in), optional :: gcc_model_ids(:)
+        type(type_wrf_params), intent(in), optional :: wrf_model_info(:)
+        type(type_hcf_params), intent(in), optional :: hcf_model_info(:)
 
         integer(int32) :: model_idx
         integer(int32) :: num_unique_regions
         integer(int32) :: max_region_id
-        integer(int32), allocatable :: unique_material_ids(:)
         integer(int32) :: current_material_id
 
-        ierr = 0
-        call input%geometry%vtk%get_active_region_info(unique_material_ids)
-        if (ierr /= 0) return
-        if (.not. allocated(unique_material_ids) .or. size(unique_material_ids) == 0) then
-            ierr = -1 ! エラーコード
-            print *, "Error: No active material regions found."
-            stop 1
-        end if
+        call self%water%initialize()
+        call self%ice%initialize()
 
-        ! 実際に存在するユニーク領域の数を正とする
+        call self%evaporation%initialize(self%water)
+
         num_unique_regions = size(unique_material_ids)
         max_region_id = maxval(unique_material_ids)
 
-        if (input%basic%analysis_controls%calculate_thermal) then
+        if (flags_coumpute(1)) then
             allocate (self%thc(num_unique_regions))
             allocate (self%den(num_unique_regions))
             allocate (self%sph(num_unique_regions))
@@ -72,26 +86,35 @@ contains
             allocate (self%wrf(num_unique_regions))
         end if
 
-        if (input%basic%analysis_controls%calculate_hydraulic) then
+        if (flags_coumpute(2)) then
             allocate (self%hcf(num_unique_regions))
         end if
 
-        ! region_idの最大値でマップ配列を確保し、0(無効値)で初期化
         allocate (self%region_id_map(max_region_id), source=0)
 
         do model_idx = 1, num_unique_regions
             current_material_id = unique_material_ids(model_idx)
-            if (input%basic%analysis_controls%calculate_thermal) then
-                call self%thc(model_idx)%initialize(input, current_material_id)
-                call self%den(model_idx)%initialize(input, current_material_id)
-                call self%sph(model_idx)%initialize(input, current_material_id)
-                call self%vhc(model_idx)%initialize(input, current_material_id)
-                call self%gcc(model_idx)%initialize(input, current_material_id)
-                call self%wrf(model_idx)%initialize(input, current_material_id)
+            if (flags_coumpute(1)) then
+                if (.not. present(density_info) .or. .not. present(specific_heat_info) .or. &
+                    .not. present(heat_capacity_info) .or. .not. present(thermal_conductivity_info) .or. &
+                    .not. present(gcc_model_ids) .or. .not. present(wrf_model_info)) then
+                    print *, "Error: Missing required physics info for computing model index ", model_idx
+                    stop 1
+                end if
+                call self%thc(model_idx)%initialize(current_material_id, thermal_conductivity_info(model_idx), self%water, self%ice)
+                call self%den(model_idx)%initialize(current_material_id, density_info(model_idx), self%water, self%ice)
+                call self%sph(model_idx)%initialize(current_material_id, specific_heat_info(model_idx), self%water, self%ice)
+                call self%vhc(model_idx)%initialize(current_material_id, heat_capacity_info(model_idx), self%water, self%ice)
+                call self%gcc(model_idx)%initialize(current_material_id, gcc_model_ids(model_idx), self%water, self%ice)
+                call self%wrf(model_idx)%initialize(current_material_id, wrf_model_info(model_idx))
             end if
 
-            if (input%basic%analysis_controls%calculate_hydraulic) then
-                call self%hcf(model_idx)%initialize(input, current_material_id)
+            if (flags_coumpute(2)) then
+                if (.not. present(hcf_model_info)) then
+                    print *, "Error: Missing required HCF model info for computing model index ", model_idx
+                    stop 1
+                end if
+                call self%hcf(model_idx)%initialize(current_material_id, hcf_model_info(model_idx), self%water)
             end if
 
             self%region_id_map(current_material_id) = model_idx
@@ -307,5 +330,14 @@ contains
 
         hcf_ptr => self%hcf(model_index)%p
     end function get_hcf_ptr
+
+    ! Evaporation getter
+    function get_evaporation_ptr(self) result(evaporation_ptr)
+        implicit none
+        class(type_physics_registry), intent(in), target :: self
+        class(type_evaporation), pointer :: evaporation_ptr
+
+        evaporation_ptr => self%evaporation
+    end function get_evaporation_ptr
 
 end module physics_registry

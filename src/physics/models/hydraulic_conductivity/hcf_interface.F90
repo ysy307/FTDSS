@@ -8,7 +8,7 @@ module physics_models_hcf
     private
 
     public :: abst_hcf
-    public :: type_params_hcf
+    public :: type_hcf_params
     public :: holder_hcfs
     public :: type_hcf_base
     public :: type_hcf_impedance
@@ -18,7 +18,7 @@ module physics_models_hcf
     public :: type_hcf_impedance_viscosity
     public :: type_hcf_base_impedance_viscosity
 
-    type :: type_params_hcf
+    type :: type_hcf_params
         integer(int32) :: unit_id
         integer(int32) :: model_number
         integer(int32) :: hcf_model_number
@@ -42,25 +42,25 @@ module physics_models_hcf
         procedure, pass(self), public :: reset => reset_params_hcf
         procedure, pass(self), public :: copy => copy_params_hcf
         procedure, pass(self), public :: convert => convert_params_hcf
-    end type type_params_hcf
+    end type type_hcf_params
 
     interface
         module subroutine reset_params_hcf(self)
             implicit none
-            class(type_params_hcf), intent(inout) :: self
+            class(type_hcf_params), intent(inout) :: self
 
         end subroutine reset_params_hcf
 
         module subroutine copy_params_hcf(self, source)
             implicit none
-            class(type_params_hcf), intent(inout) :: self
-            type(type_params_hcf), intent(in) :: source
+            class(type_hcf_params), intent(inout) :: self
+            type(type_hcf_params), intent(in) :: source
 
         end subroutine copy_params_hcf
 
         module subroutine convert_params_hcf(self, unit_id, factor)
             implicit none
-            class(type_params_hcf), intent(inout) :: self
+            class(type_hcf_params), intent(inout) :: self
             integer(int32), intent(in) :: unit_id
             real(real64), intent(in), optional :: factor
 
@@ -78,7 +78,7 @@ module physics_models_hcf
             implicit none
             class(holder_hcfs), intent(inout) :: self
             integer(int32), intent(in) :: material_id
-            type(type_params_hcf), intent(in) :: params
+            type(type_hcf_params), intent(in) :: params
             type(type_iapws97), intent(in), target :: water
 
         end subroutine initialize_holder_hcfs
@@ -142,7 +142,7 @@ module physics_models_hcf
 
     type, abstract :: abst_hcf
         private
-        type(type_params_hcf) :: params
+        type(type_hcf_params) :: params
         class(abst_hcf_base), allocatable :: base
         class(abst_hcf_impedance), allocatable :: impedance
         class(abst_hcf_viscosity), allocatable :: viscosity
@@ -150,8 +150,8 @@ module physics_models_hcf
         type(type_iapws97), pointer :: water => null()
     contains
         procedure, pass(self), public :: initialize => initialize_abst_hcf
-        procedure(abst_calc_kflh), pass(self), public, deferred :: calc_kflh
-        procedure, pass(self), public :: calc_klT => calc_klT_hcf
+        procedure(abst_calc_Kflh), pass(self), public, deferred :: calc_Kflh
+        procedure, pass(self), public :: calc_KlT => calc_KlT_hcf
         procedure, pass(self), public :: calc_Kvh => calc_Kvh_hcf
         procedure, pass(self), public :: calc_KvT => calc_KvT_hcf
     end type abst_hcf
@@ -161,18 +161,18 @@ module physics_models_hcf
             implicit none
             class(abst_hcf), intent(inout), target :: self
             integer(int32), intent(in) :: material_id
-            type(type_params_hcf), intent(in) :: params
+            type(type_hcf_params), intent(in) :: params
             type(type_iapws97), intent(in), target :: water
 
         end subroutine initialize_abst_hcf
 
-        module pure elemental subroutine calc_klT_hcf(self, state, klT)
+        module pure elemental subroutine calc_KlT_hcf(self, state, KlT)
             implicit none
             class(abst_hcf), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: klT
+            real(real64), intent(inout) :: KlT
 
-        end subroutine calc_klT_hcf
+        end subroutine calc_KlT_hcf
 
         module pure elemental subroutine calc_Kvh_hcf(self, state, Kvh)
             implicit none
@@ -192,107 +192,107 @@ module physics_models_hcf
     end interface
 
     abstract interface
-        pure elemental subroutine abst_calc_kflh(self, state, kflh)
+        pure elemental subroutine abst_calc_Kflh(self, state, Kflh)
             import :: abst_hcf, type_state, real64
             implicit none
             class(abst_hcf), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine abst_calc_kflh
+        end subroutine abst_calc_Kflh
     end interface
 
     type, extends(abst_hcf) :: type_hcf_base
     contains
-        procedure :: calc_kflh => calc_kflh_base
+        procedure :: calc_Kflh => calc_Kflh_base
     end type type_hcf_base
 
     type, extends(abst_hcf) :: type_hcf_impedance
     contains
-        procedure :: calc_kflh => calc_kflh_impedance
+        procedure :: calc_Kflh => calc_Kflh_impedance
     end type type_hcf_impedance
 
     type, extends(abst_hcf) :: type_hcf_viscosity
     contains
-        procedure :: calc_kflh => calc_kflh_viscosity
+        procedure :: calc_Kflh => calc_Kflh_viscosity
     end type type_hcf_viscosity
 
     type, extends(abst_hcf) :: type_hcf_base_impedance
     contains
-        procedure :: calc_kflh => calc_kflh_base_impedance
+        procedure :: calc_Kflh => calc_Kflh_base_impedance
     end type type_hcf_base_impedance
 
     type, extends(abst_hcf) :: type_hcf_base_viscosity
     contains
-        procedure :: calc_kflh => calc_kflh_base_viscosity
+        procedure :: calc_Kflh => calc_Kflh_base_viscosity
     end type type_hcf_base_viscosity
 
     type, extends(abst_hcf) :: type_hcf_impedance_viscosity
     contains
-        procedure :: calc_kflh => calc_kflh_impedance_viscosity
+        procedure :: calc_Kflh => calc_Kflh_impedance_viscosity
     end type type_hcf_impedance_viscosity
 
     type, extends(abst_hcf) :: type_hcf_base_impedance_viscosity
     contains
-        procedure :: calc_kflh => calc_kflh_base_impedance_viscosity
+        procedure :: calc_Kflh => calc_Kflh_base_impedance_viscosity
     end type type_hcf_base_impedance_viscosity
 
     interface
-        module pure elemental subroutine calc_kflh_base(self, state, kflh)
+        module pure elemental subroutine calc_Kflh_base(self, state, Kflh)
             implicit none
             class(type_hcf_base), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine calc_kflh_base
+        end subroutine calc_Kflh_base
 
-        module pure elemental subroutine calc_kflh_impedance(self, state, kflh)
+        module pure elemental subroutine calc_Kflh_impedance(self, state, Kflh)
             implicit none
             class(type_hcf_impedance), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine calc_kflh_impedance
+        end subroutine calc_Kflh_impedance
 
-        module pure elemental subroutine calc_kflh_viscosity(self, state, kflh)
+        module pure elemental subroutine calc_Kflh_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine calc_kflh_viscosity
+        end subroutine calc_Kflh_viscosity
 
-        module pure elemental subroutine calc_kflh_base_impedance(self, state, kflh)
+        module pure elemental subroutine calc_Kflh_base_impedance(self, state, Kflh)
             implicit none
             class(type_hcf_base_impedance), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine calc_kflh_base_impedance
+        end subroutine calc_Kflh_base_impedance
 
-        module pure elemental subroutine calc_kflh_base_viscosity(self, state, kflh)
+        module pure elemental subroutine calc_Kflh_base_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_base_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine calc_kflh_base_viscosity
+        end subroutine calc_Kflh_base_viscosity
 
-        module pure elemental subroutine calc_kflh_impedance_viscosity(self, state, kflh)
+        module pure elemental subroutine calc_Kflh_impedance_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_impedance_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine calc_kflh_impedance_viscosity
+        end subroutine calc_Kflh_impedance_viscosity
 
-        module pure elemental subroutine calc_kflh_base_impedance_viscosity(self, state, kflh)
+        module pure elemental subroutine calc_Kflh_base_impedance_viscosity(self, state, Kflh)
             implicit none
             class(type_hcf_base_impedance_viscosity), intent(in) :: self
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: kflh
+            real(real64), intent(inout) :: Kflh
 
-        end subroutine calc_kflh_base_impedance_viscosity
+        end subroutine calc_Kflh_base_impedance_viscosity
 
     end interface
 
@@ -305,7 +305,7 @@ module physics_models_hcf
 
     abstract interface
         pure elemental subroutine abst_calc_base_kr(self, h, kr)
-            import :: abst_hcf_base, type_params_hcf, real64
+            import :: abst_hcf_base, type_hcf_params, real64
             implicit none
             class(abst_hcf_base), intent(in) :: self
             real(real64), intent(in) :: h

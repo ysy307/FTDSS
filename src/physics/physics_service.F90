@@ -1,16 +1,9 @@
 module physics_service
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: module_core, only:type_state
-    use :: module_input, only:type_input
-    use :: module_control
-    use :: physics_material_thermal_conductivity, only:abst_thc
-    use :: physics_material_heat_capacity, only:abst_vhc
-    use :: physics_material_density, only:abst_den
-    use :: physics_material_specific_heat, only:abst_sph
-    use :: physics_models_hcf, only:abst_hcf
-    use :: physics_models_gcc, only:abst_gcc
-    use :: physics_models_wrf, only:abst_wrf
-    use :: physics_registry, only:type_physics_registry
+    use :: module_core
+    use :: module_physics_materials, only:abst_thc, abst_vhc, abst_den, abst_sph
+    use :: module_physics_models, only:abst_hcf, abst_gcc, abst_wrf, type_evaporation, type_wrf_params, type_hcf_params
+    use :: physics_registry, only:type_physics_registry, type_material_pointers
 
     implicit none
     private
@@ -21,14 +14,6 @@ module physics_service
     ! Helper Derived Type to Hold Pointers for a Specific Region
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Note: This type holds pointers to various material property classes
-    type :: type_material_pointers
-        class(abst_thc), pointer :: thc => null()
-        class(abst_vhc), pointer :: vhc => null()
-        class(abst_gcc), pointer :: gcc => null()
-        class(abst_wrf), pointer :: wrf => null()
-        class(abst_den), pointer :: den => null()
-        class(abst_hcf), pointer :: hcf => null()
-    end type type_material_pointers
 
     type :: type_phase_property
         real(real64) :: solid
@@ -99,16 +84,23 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Initialization
     !-------------------------------------------------------------------------------------------------------------------------------
-    subroutine initialize_properties_manager(self, input, ierr)
+    subroutine initialize_properties_manager(self, unique_material_ids, flags_coumpute, density_info, &
+                                             specific_heat_info, heat_capacity_info, thermal_conductivity_info, &
+                                             gcc_model_ids, wrf_model_info, hcf_model_info)
         implicit none
         class(type_properties_manager), intent(inout) :: self
-        type(type_input), intent(in) :: input
-        integer(int32), intent(inout) :: ierr
+        integer(int32), intent(in) :: unique_material_ids(:)
+        logical, intent(in) :: flags_coumpute(:)
+        type(type_physics_info), intent(in), optional :: density_info(:)
+        type(type_physics_info), intent(in), optional :: specific_heat_info(:)
+        type(type_physics_info), intent(in), optional :: heat_capacity_info(:)
+        type(type_physics_info), intent(in), optional :: thermal_conductivity_info(:)
+        integer(int32), intent(in), optional :: gcc_model_ids(:)
+        type(type_wrf_params), intent(in), optional :: wrf_model_info(:)
+        type(type_hcf_params), intent(in), optional :: hcf_model_info(:)
 
-        call self%materials%initialize(input, ierr)
-        if (ierr /= 0) then
-            print *, "Error: Failed to initialize materials manager."
-        end if
+        call self%materials%initialize(unique_material_ids, flags_coumpute, density_info, specific_heat_info, &
+                                       heat_capacity_info, thermal_conductivity_info, gcc_model_ids, wrf_model_info, hcf_model_info)
     end subroutine initialize_properties_manager
 
     !-------------------------------------------------------------------------------------------------------------------------------
@@ -122,7 +114,7 @@ contains
         type(type_material_pointers), intent(inout) :: ptrs
 
         select case (target_id)
-        case (calc_thermal)
+        case (PHYSICS_TYPE_THERMAL)
             ptrs%thc => self%materials%get_thc(material_id)
             ptrs%vhc => self%materials%get_vhc(material_id)
             ptrs%gcc => self%materials%get_gcc(material_id)
@@ -135,7 +127,7 @@ contains
                 stop "Error: Failed to associate one or more material pointers."
             end if
 #endif
-        case (calc_hydraulic)
+        case (PHYSICS_TYPE_HYDRAULIC)
             ptrs%den => self%materials%get_den(material_id)
             ptrs%hcf => self%materials%get_hcf(material_id)
 

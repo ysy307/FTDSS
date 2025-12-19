@@ -1,10 +1,13 @@
-module module_materials
+module module_physics_materials
+    use :: physics_materials_base
     use :: physics_materials_density
     use :: physics_materials_specific_heat
     use :: physics_materials_thermal_conductivity
     use :: physics_materials_heat_capacity
     implicit none
     private
+
+    public :: abst_material
 
     public :: holder_dens
     public :: abst_den
@@ -34,4 +37,4 @@ module module_materials
     public :: type_thc_3phase
     public :: type_thc_4phase
 
-end module module_materials
+end module module_physics_materials

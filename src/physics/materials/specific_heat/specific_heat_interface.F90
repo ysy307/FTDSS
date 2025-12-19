@@ -3,7 +3,7 @@ module physics_materials_specific_heat
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state, type_physics_info
     use :: physics_constants, only:TtoK => celsius_to_kelvin
-    use :: materials_base, only:abst_material
+    use :: physics_materials_base, only:abst_material
     implicit none
     private
 

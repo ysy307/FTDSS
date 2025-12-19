@@ -5,7 +5,7 @@
 !> suction and its derivatives based on the Generalized Clausius-Clapeyron equation.
 !> It serves as the foundation for phase change models involving liquid and solid water.
 !>
-module phase_change_liquid_solid_gcc_interface
+module physics_models_phase_change_liquid_solid_gcc
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
@@ -24,9 +24,9 @@ module phase_change_liquid_solid_gcc_interface
     public :: type_gcc_non_segregation
     public :: type_gcc_segregation
 
-    !>
-    !> @brief Holder for GCC objects to handle polymorphism.
-    !>
+!>
+!> @brief Holder for GCC objects to handle polymorphism.
+!>
     type :: holder_gccs
         !> Polymorphic pointer to the specific GCC implementation
         class(abst_gcc), allocatable :: p
@@ -34,9 +34,9 @@ module phase_change_liquid_solid_gcc_interface
         procedure, pass(self) :: initialize => initialize_holder_gccs
     end type holder_gccs
 
-    !>
-    !> @brief Interface for initializing the holder.
-    !>
+!>
+!> @brief Interface for initializing the holder.
+!>
     interface
         module subroutine initialize_holder_gccs(self, material_id, gcc_id, water, ice)
             implicit none
@@ -53,9 +53,9 @@ module phase_change_liquid_solid_gcc_interface
         end subroutine initialize_holder_gccs
     end interface
 
-    !>
-    !> @brief Abstract base class for GCC models.
-    !>
+!>
+!> @brief Abstract base class for GCC models.
+!>
     type, abstract :: abst_gcc
         !> Material ID
         integer(int32) :: material_id = -1
@@ -70,9 +70,9 @@ module phase_change_liquid_solid_gcc_interface
         procedure(abst_deriv2_gcc), pass(self), public, deferred :: deriv2
     end type abst_gcc
 
-    !>
-    !> @brief Abstract interface for calculating suction.
-    !>
+!>
+!> @brief Abstract interface for calculating suction.
+!>
     abstract interface
         !>
         !> @brief Calculate suction [Pa].
@@ -131,9 +131,9 @@ module phase_change_liquid_solid_gcc_interface
         end subroutine initialize_abst_gcc
     end interface
 
-    !>
-    !> @brief GCC model without ice segregation (Non-segregation).
-    !>
+!>
+!> @brief GCC model without ice segregation (Non-segregation).
+!>
     type, extends(abst_gcc) :: type_gcc_non_segregation
     contains
         procedure, pass(self) :: calc => calc_gcc_nonseg
@@ -141,9 +141,9 @@ module phase_change_liquid_solid_gcc_interface
         procedure, pass(self) :: deriv2 => deriv_2nd_gcc_nonseg
     end type type_gcc_non_segregation
 
-    !>
-    !> @brief GCC model with ice segregation.
-    !>
+!>
+!> @brief GCC model with ice segregation.
+!>
     type, extends(abst_gcc) :: type_gcc_segregation
     contains
         procedure, pass(self) :: calc => calc_gcc_seg
@@ -151,9 +151,9 @@ module phase_change_liquid_solid_gcc_interface
         procedure, pass(self) :: deriv2 => deriv_2nd_gcc_seg
     end type type_gcc_segregation
 
-    !>
-    !> @brief Interfaces for concrete implementations of GCC methods.
-    !>
+!>
+!> @brief Interfaces for concrete implementations of GCC methods.
+!>
     interface
         module pure elemental subroutine calc_gcc_nonseg(self, state, suction)
             implicit none
@@ -200,4 +200,4 @@ module phase_change_liquid_solid_gcc_interface
         end subroutine deriv_2nd_gcc_seg
     end interface
 
-end module phase_change_liquid_solid_gcc_interface
+end module physics_models_phase_change_liquid_solid_gcc

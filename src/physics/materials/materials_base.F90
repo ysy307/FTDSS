@@ -1,4 +1,4 @@
-module materials_base
+module physics_materials_base
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state, type_physics_info
@@ -150,4 +150,4 @@ contains
 
     end subroutine calc_vapor_cp_abst_material
 
-end module materials_base
+end module physics_materials_base
