@@ -1,6 +1,7 @@
 module physics_models_phase_change_liquid_solid_fusion
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
+    use :: physics_types, only:abst_physics
     use :: physics_models_wrf, only:abst_wrf, type_wrf_params
     use :: physics_models_phase_change_liquid_solid_gcc, only:abst_gcc
     implicit none
@@ -11,10 +12,8 @@ module physics_models_phase_change_liquid_solid_fusion
     !>
     !> @brief Model for fusion (melting/freezing) physics.
     !>
-    type :: type_fusion
+    type, extends(abst_physics) :: type_fusion
         private
-        type(type_iapws97), pointer :: water => null()
-        type(type_iapws06), pointer :: ice => null()
         class(abst_wrf), pointer :: wrf => null()
         class(abst_gcc), pointer :: gcc => null()
     contains
