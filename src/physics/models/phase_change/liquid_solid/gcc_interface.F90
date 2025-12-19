@@ -17,6 +17,7 @@ module physics_models_phase_change_liquid_solid_gcc
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
         Tf0_K => water_freezing_point_at_standard_atmospheric_pressure_k
 
+    use :: physics_types, only:abst_physics
     implicit none
     private
 
@@ -54,23 +55,17 @@ module physics_models_phase_change_liquid_solid_gcc
         end subroutine initialize_holder_gccs
     end interface
 
-!>
-!> @brief Abstract base class for GCC models.
-!>
-    type, abstract :: abst_gcc
+    !>
+    !> @brief Abstract base class for GCC models.
+    !>
+    type, extends(abst_physics), abstract :: abst_gcc
         !> Material ID
         integer(int32) :: material_id = -1
-        !> Pointer to water property object
-        type(type_iapws97), pointer :: water => null()
-        !> Pointer to ice property object
-        type(type_iapws06), pointer :: ice => null()
     contains
         procedure, pass(self), public :: initialize => initialize_abst_gcc
         procedure(abst_calc_gcc), pass(self), public, deferred :: calc
         procedure(abst_deriv_gcc), pass(self), public, deferred :: deriv
         procedure(abst_deriv2_gcc), pass(self), public, deferred :: deriv2
-        procedure, pass(self), private :: shift_temperature_absolute => shift_temperature_absolute_abst_gcc
-        procedure, pass(self), private :: shift_pressure_absolute => shift_pressure_absolute_abst_gcc
     end type abst_gcc
 
     !>
@@ -132,27 +127,6 @@ module physics_models_phase_change_liquid_solid_gcc
             !> Ice property object
             type(type_iapws06), target, intent(in) :: ice
         end subroutine initialize_abst_gcc
-
-        module pure elemental subroutine shift_temperature_absolute_abst_gcc(self, temperature_degree, temperature_K)
-            implicit none
-            !> GCC object
-            class(abst_gcc), intent(in) :: self
-            !> Temperature in degree Celsius
-            real(real64), intent(in) :: temperature_degree
-            !> Temperature in Kelvin
-            real(real64), intent(inout) :: temperature_K
-
-        end subroutine shift_temperature_absolute_abst_gcc
-
-        module pure elemental subroutine shift_pressure_absolute_abst_gcc(self, pressure_gauge, pressure_absolute)
-            implicit none
-            !> GCC object
-            class(abst_gcc), intent(in) :: self
-            !> Gauge pressure [Pa]
-            real(real64), intent(in) :: pressure_gauge
-            !> Absolute pressure [Pa]
-            real(real64), intent(inout) :: pressure_absolute
-        end subroutine shift_pressure_absolute_abst_gcc
     end interface
 
 !>

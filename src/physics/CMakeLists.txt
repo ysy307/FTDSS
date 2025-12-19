@@ -2,11 +2,12 @@
 # 1. Physics Constants
 # ====================================================================
 # 定数は他のすべてから参照されるため、独立させておきます
-add_library(Physics_Constants STATIC
+add_library(Physics_Base STATIC
     physics_constants.F90
+    physics_types.F90
 )
-target_include_directories(Physics_Constants PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-enable_build_flags(Physics_Constants)
+target_include_directories(Physics_Base PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+enable_build_flags(Physics_Base)
 
 # ====================================================================
 # 2. Physics Materials Group
@@ -41,7 +42,7 @@ add_library(Physics_Materials STATIC ${PHYSICS_MATERIALS_SOURCES})
 
 target_include_directories(Physics_Materials PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Materials PUBLIC
-    Physics_Constants
+    Physics_Base
     Solver::Core
 )
 enable_build_flags(Physics_Materials)
@@ -86,7 +87,7 @@ add_library(Physics_Models STATIC ${PHYSICS_MODELS_SOURCES})
 
 target_include_directories(Physics_Models PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(Physics_Models PUBLIC
-    Physics_Constants
+    Physics_Base
     Solver::Core
 )
 enable_build_flags(Physics_Models)

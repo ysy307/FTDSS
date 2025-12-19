@@ -52,4 +52,6 @@ module physics_constants
     !> Stefan-Boltzman constant [W/m^2/K^4]
     real(real64), parameter, public :: stefan_boltzmann_constant = 5.670374419d-8
 
+    real(real64), parameter, public :: min_vapor_density = 1.0d-8
+
 end module physics_constants
