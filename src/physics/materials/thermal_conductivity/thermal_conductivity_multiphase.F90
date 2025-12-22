@@ -19,9 +19,12 @@ contains
         type(type_thc_dispersity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
+        type(type_coordinate_dp) :: water_flux
+
+        call state%water_flux%get(water_flux)
 
         call self%calc(state, lambda_0)
-        call self%calc_lambda_dispersity(lambda_0, 0.0d0, state%water_flux%x, state%water_flux%y, state%water_flux%z, lambda)
+        call self%calc_lambda_dispersity(lambda_0, 0.0d0, water_flux%x, water_flux%y, water_flux%z, lambda)
 
     end subroutine calc_thc_dispersity_gp_1phase
 
@@ -46,15 +49,18 @@ contains
         type(type_thc_dispersity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
+        type(type_coordinate_dp) :: water_flux
 
         real(real64) :: htc_water, rho_water, cp_water
+
+        call state%water_flux%get(water_flux)
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
         htc_water = rho_water * cp_water
 
         call self%calc(state, lambda_0)
-        call self%calc_lambda_dispersity(lambda_0, htc_water, state%water_flux%x, state%water_flux%y, state%water_flux%z, lambda)
+        call self%calc_lambda_dispersity(lambda_0, htc_water, water_flux%x, water_flux%y, water_flux%z, lambda)
 
     end subroutine calc_thc_dispersity_gp_2phase
 
@@ -79,15 +85,17 @@ contains
         type(type_thc_dispersity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
+        type(type_coordinate_dp) :: water_flux
 
         real(real64) :: htc_water, rho_water, cp_water
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
         htc_water = rho_water * cp_water
+        call state%water_flux%get(water_flux)
 
         call self%calc(state, lambda_0)
-        call self%calc_lambda_dispersity(lambda_0, htc_water, state%water_flux%x, state%water_flux%y, state%water_flux%z, lambda)
+        call self%calc_lambda_dispersity(lambda_0, htc_water, water_flux%x, water_flux%y, water_flux%z, lambda)
 
     end subroutine calc_thc_dispersity_gp_3phase
 
@@ -117,16 +125,18 @@ contains
         type(type_thc_dispersity), intent(inout) :: lambda
 
         real(real64) :: lambda_0
+        type(type_coordinate_dp) :: water_flux
 
         real(real64) :: htc_water, rho_water, cp_water
 
         call self%calc_water_density(state, rho_water)
         call self%calc_water_cp(state, cp_water)
         htc_water = rho_water * cp_water
+        call state%water_flux%get(water_flux)
 
         call self%calc(state, lambda_0)
 
-        call self%calc_lambda_dispersity(lambda_0, htc_water, state%water_flux%x, state%water_flux%y, state%water_flux%z, lambda)
+        call self%calc_lambda_dispersity(lambda_0, htc_water, water_flux%x, water_flux%y, water_flux%z, lambda)
 
     end subroutine calc_thc_dispersity_gp_4phase
 

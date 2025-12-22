@@ -82,11 +82,14 @@ contains
         !> Calculated density [kg/m^3]
         real(real64), intent(inout) :: density
 
-        real(real64) :: temperature_K
-        real(real64) :: pressure_absolute
+        real(real64) :: temperature, temperature_K
+        real(real64) :: pressure, pressure_absolute
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+
+        call self%shift_temperature_absolute(temperature, temperature_K)
+        call self%shift_pressure_absolute(pressure, pressure_absolute)
 
         call self%water%calc_rho(temperature_K, pressure_absolute, density)
 
@@ -103,12 +106,14 @@ contains
         !> Calculated density [kg/m^3]
         real(real64), intent(inout) :: density
 
-        real(real64) :: temperature_K
-        real(real64) :: pressure_absolute
+        real(real64) :: temperature, temperature_K
+        real(real64) :: pressure, pressure_absolute
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
 
+        call self%shift_temperature_absolute(temperature, temperature_K)
+        call self%shift_pressure_absolute(pressure, pressure_absolute)
         call self%ice%calc_rho(temperature_K, pressure_absolute, density)
 
     end subroutine calc_rho_ice_abst_physics
@@ -125,12 +130,16 @@ contains
         !> Calculated density [kg/m^3]
         real(real64), intent(inout) :: density
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
+        real(real64) :: relative_humidity
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call state%relative_humidity%get(relative_humidity)
+
+        call self%shift_temperature_absolute(temperature, temperature_K)
 
         call self%water%calc_saturation_density(temperature_K, density)
-        density = max(density * state%relative_humidity, min_vapor_density)
+        density = max(density * relative_humidity, min_vapor_density)
 
     end subroutine calc_rho_vapor_abst_physics
 
@@ -145,9 +154,10 @@ contains
         !> Calculated saturated vapor density [kg/m^3]
         real(real64), intent(inout) :: density
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%water%calc_saturation_density(temperature_K, density)
     end subroutine calc_rho_vapor_saturation_abst_physics
 
@@ -162,11 +172,13 @@ contains
         !> Calculated specific heat [J/(kg K)]
         real(real64), intent(inout) :: cp
 
-        real(real64) :: temperature_K
-        real(real64) :: pressure_absolute
+        real(real64) :: temperature, temperature_K
+        real(real64) :: pressure, pressure_absolute
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+        call self%shift_temperature_absolute(temperature, temperature_K)
+        call self%shift_pressure_absolute(pressure, pressure_absolute)
 
         call self%water%calc_cp(temperature_K, pressure_absolute, cp)
 
@@ -183,12 +195,14 @@ contains
         !> Calculated specific heat [J/(kg K)]
         real(real64), intent(inout) :: cp
 
-        real(real64) :: temperature_K
-        real(real64) :: pressure_absolute
+        real(real64) :: temperature, temperature_K
+        real(real64) :: pressure, pressure_absolute
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
 
+        call self%shift_temperature_absolute(temperature, temperature_K)
+        call self%shift_pressure_absolute(pressure, pressure_absolute)
         call self%ice%calc_cp(temperature_K, pressure_absolute, cp)
 
     end subroutine calc_cp_ice_abst_physics
@@ -204,9 +218,10 @@ contains
         !> Calculated specific heat [J/(kg K)]
         real(real64), intent(inout) :: cp
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call self%shift_temperature_absolute(temperature, temperature_K)
 
         call self%water%calc_saturation_cp(temperature_K, cp)
 

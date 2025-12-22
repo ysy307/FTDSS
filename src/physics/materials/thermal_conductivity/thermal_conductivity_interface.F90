@@ -1,7 +1,7 @@
 module physics_materials_thermal_conductivity
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
-    use :: module_core, only:type_state, type_physics_info, allocate_array
+    use :: module_core, only:type_state, type_physics_info, allocate_array, type_coordinate_dp
     use :: physics_constants, only:TtoK => celsius_to_kelvin
     use :: physics_materials_base, only:abst_material
     implicit none
