@@ -6,6 +6,7 @@ module module_physics
     use :: physics_types
     use :: module_physics_materials
     use :: module_physics_models
+    use :: physics_service
 
     implicit none
     ! private

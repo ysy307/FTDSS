@@ -64,40 +64,58 @@ contains
     module pure elemental subroutine calc_Kvh_vapor(self, state, Kvh)
         implicit none
         class(type_hcf_vapor), intent(in) :: self
+        !> `Temperature`, `Pressure`, `Air_content`, `Porosity`, `Relative_humidity`
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: Kvh
 
         real(real64) :: Dv, Da, tau
         real(real64) :: rho_water, rho_vapor_sat
+        real(real64) :: temperature, pressure, air_content, porosity, rh
 
-        call self%calc_diffusivity(state%temperature, Da)
-        call self%calc_tortuosity_factor(state%air_content, state%porosity, tau)
-        call self%parent%water%calc_rho(state%temperature + TtoK, state%pressure, rho_water)
-        call self%parent%water%calc_saturation_density(state%temperature + TtoK, rho_vapor_sat)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+        call state%air_content%get(air_content)
+        call state%porosity%get(porosity)
+        call state%relative_humidity%get(rh)
+
+        call self%calc_diffusivity(temperature, Da)
+        call self%calc_tortuosity_factor(air_content, porosity, tau)
+        call self%parent%water%calc_rho(temperature + TtoK, pressure, rho_water)
+        call self%parent%water%calc_saturation_density(temperature + TtoK, rho_vapor_sat)
 
         Dv = Da * tau
-        Kvh = Dv * rho_vapor_sat * Mw * g * state%relative_humidity / (Rg * (TtoK + state%temperature) * rho_water)
+        Kvh = Dv * rho_vapor_sat * Mw * g * rh / (Rg * (TtoK + temperature) * rho_water)
 
     end subroutine calc_Kvh_vapor
 
     module pure elemental subroutine calc_KvT_vapor(self, state, KvT)
         implicit none
         class(type_hcf_vapor), intent(in) :: self
+        !> `Temperature`, `Pressure`, `Air_content`, `Porosity`, `Water_content`, `Relative_humidity`, `Mass_fraction_clay`
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: KvT
 
         real(real64) :: Dv, Da, tau, eta
         real(real64) :: rho_water, drho_vapor_sat_dT
+        real(real64) :: temperature, pressure, air_content, porosity, water_content, mass_fraction_clay, rh
 
-        call self%calc_diffusivity(state%temperature, Da)
-        call self%calc_tortuosity_factor(state%air_content, state%porosity, tau)
-        call self%calc_enhancement_factor(state%water_content, state%porosity, &
-                                          state%mass_fraction_clay, eta)
-        call self%parent%water%calc_rho(state%temperature + TtoK, state%pressure, rho_water)
-        call self%parent%water%calc_saturation_drho_dT(state%temperature + TtoK, drho_vapor_sat_dT)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+        call state%air_content%get(air_content)
+        call state%porosity%get(porosity)
+        call state%water_content%get(water_content)
+        call state%relative_humidity%get(rh)
+        call state%mass_fraction_clay%get(mass_fraction_clay)
+
+        call self%calc_diffusivity(temperature, Da)
+        call self%calc_tortuosity_factor(air_content, porosity, tau)
+        call self%calc_enhancement_factor(water_content, porosity, &
+                                          mass_fraction_clay, eta)
+        call self%parent%water%calc_rho(temperature + TtoK, pressure, rho_water)
+        call self%parent%water%calc_saturation_drho_dT(temperature + TtoK, drho_vapor_sat_dT)
 
         Dv = Da * tau * eta
-        KvT = Dv * state%relative_humidity * drho_vapor_sat_dT / rho_water
+        KvT = Dv * rh * drho_vapor_sat_dT / rho_water
 
     end subroutine calc_KvT_vapor
 

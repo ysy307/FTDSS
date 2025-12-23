@@ -10,6 +10,10 @@ contains
         type(type_hcf_params), intent(in) :: params
         type(type_iapws97), intent(in), target :: water
 
+        if (allocated(self%p)) then
+            deallocate (self%p)
+        end if
+
         select case (params%model_number)
         case (HCF_BASE)
             allocate (type_hcf_base :: self%p)
@@ -208,8 +212,11 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base
+        real(real64) :: pressure
 
-        call self%base%calc_kr(state%pressure, kr_base)
+        call state%pressure%get(pressure)
+
+        call self%base%calc_kr(pressure, kr_base)
         kflh = self%params%k_s * kr_base
 
     end subroutine calc_kflh_base
@@ -221,8 +228,11 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_impedance
+        real(real64) :: ice_content
 
-        call self%impedance%calc_impedance(state%ice_content, kr_impedance)
+        call state%ice_content%get(ice_content)
+
+        call self%impedance%calc_impedance(ice_content, kr_impedance)
         kflh = self%params%k_s * kr_impedance
 
     end subroutine calc_kflh_impedance
@@ -234,8 +244,11 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_viscosity
+        real(real64) :: temperature
 
-        call self%viscosity%calc_viscosity(state%temperature, kr_viscosity)
+        call state%temperature%get(temperature)
+
+        call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%params%k_s * kr_viscosity
 
     end subroutine calc_kflh_viscosity
@@ -247,9 +260,13 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base, kr_impedance
+        real(real64) :: pressure, ice_content
 
-        call self%base%calc_kr(state%pressure, kr_base)
-        call self%impedance%calc_impedance(state%ice_content, kr_impedance)
+        call state%pressure%get(pressure)
+        call state%ice_content%get(ice_content)
+
+        call self%base%calc_kr(pressure, kr_base)
+        call self%impedance%calc_impedance(ice_content, kr_impedance)
         kflh = self%params%k_s * kr_base * kr_impedance
 
     end subroutine calc_kflh_base_impedance
@@ -261,9 +278,13 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base, kr_viscosity
+        real(real64) :: temperature, pressure
 
-        call self%base%calc_kr(state%pressure, kr_base)
-        call self%viscosity%calc_viscosity(state%temperature, kr_viscosity)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+
+        call self%base%calc_kr(pressure, kr_base)
+        call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%params%k_s * kr_base * kr_viscosity
 
     end subroutine calc_kflh_base_viscosity
@@ -275,9 +296,13 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_impedance, kr_viscosity
+        real(real64) :: temperature, ice_content
 
-        call self%impedance%calc_impedance(state%ice_content, kr_impedance)
-        call self%viscosity%calc_viscosity(state%temperature, kr_viscosity)
+        call state%temperature%get(temperature)
+        call state%ice_content%get(ice_content)
+
+        call self%impedance%calc_impedance(ice_content, kr_impedance)
+        call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%params%k_s * kr_impedance * kr_viscosity
 
     end subroutine calc_kflh_impedance_viscosity
@@ -289,10 +314,15 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base, kr_impedance, kr_viscosity
+        real(real64) :: temperature, pressure, ice_content
 
-        call self%base%calc_kr(state%pressure, kr_base)
-        call self%impedance%calc_impedance(state%ice_content, kr_impedance)
-        call self%viscosity%calc_viscosity(state%temperature, kr_viscosity)
+        call state%temperature%get(temperature)
+        call state%ice_content%get(ice_content)
+        call state%pressure%get(pressure)
+
+        call self%base%calc_kr(pressure, kr_base)
+        call self%impedance%calc_impedance(ice_content, kr_impedance)
+        call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%params%k_s * kr_base * kr_impedance * kr_viscosity
 
     end subroutine calc_kflh_base_impedance_viscosity
@@ -304,11 +334,15 @@ contains
         real(real64), intent(inout) :: klT
 
         real(real64) :: Klh_r, dgamma_dT
+        real(real64) :: temperature, pressure
+
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
 
         if (allocated(self%base)) then
-            call self%base%calc_kr(state%pressure, Klh_r)
-            call calc_derivative_surface_tension(state%temperature, dgamma_dT)
-            klT = self%params%k_s * Klh_r * state%pressure * self%params%gain_factor * (dgamma_dT / gamma_0)
+            call self%base%calc_kr(pressure, Klh_r)
+            call calc_derivative_surface_tension(temperature, dgamma_dT)
+            klT = self%params%k_s * Klh_r * pressure * self%params%gain_factor * (dgamma_dT / gamma_0)
         else
             klT = 0.0d0
         end if

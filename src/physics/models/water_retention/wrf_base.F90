@@ -97,6 +97,10 @@ contains
         integer(int32), intent(in) :: material_id
         type(type_wrf_params), intent(in) :: params
 
+        if (allocated(self%p)) then
+            deallocate (self%p)
+        end if
+
         select case (params%model_number)
         case (WRF_BC)
             allocate (type_wrf_bc :: self%p)
