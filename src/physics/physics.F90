@@ -3,13 +3,10 @@ module module_physics
     ! use :: physics_service, only:type_properties_manager, type_phase_property
     ! use :: module_iapws
     use :: physics_constants
-    use :: physics_materials_density
-    use :: physics_materials_specific_heat
-    use :: physics_materials_thermal_conductivity
-    use :: physics_materials_heat_capacity
+    use :: physics_types
+    use :: module_physics_materials
+    use :: module_physics_models
 
-    use :: physics_models_wrf
-    use :: physics_models_hcf
     implicit none
     ! private
 

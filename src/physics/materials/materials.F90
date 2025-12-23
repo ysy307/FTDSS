@@ -11,6 +11,7 @@ module module_physics_materials
     private
 
     public :: type_material_manager
+    public :: type_thc_dispersity
 
     type :: type_material_manager
         private

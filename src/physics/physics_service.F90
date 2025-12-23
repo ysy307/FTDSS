@@ -1,82 +1,44 @@
 module physics_service
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
-    use :: module_physics_materials, only:abst_thc, abst_vhc, abst_den, abst_sph
-    use :: module_physics_models, only:abst_hcf, abst_gcc, abst_wrf, type_evaporation, type_wrf_params, type_hcf_params
-    use :: physics_registry, only:type_physics_registry, type_material_pointers
-
+    use :: module_physics_materials, only:type_material_manager, type_thc_dispersity
+    use :: module_physics_models, only:type_models_manager, type_wrf_params, type_hcf_params
     implicit none
     private
     public :: type_properties_manager
-    public :: type_phase_property
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Helper Derived Type to Hold Pointers for a Specific Region
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Note: This type holds pointers to various material property classes
-
-    type :: type_phase_property
-        real(real64) :: solid
-        real(real64) :: water
-        real(real64) :: ice
-        real(real64) :: gas
-    end type type_phase_property
 
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Main Derived Type with Generic Type-Bound Procedures
     !-------------------------------------------------------------------------------------------------------------------------------
     type :: type_properties_manager
-        type(type_physics_registry) :: materials
+        private
+        type(type_iapws97) :: water
+        type(type_iapws06) :: ice
+        type(type_material_manager), allocatable :: materials(:)
+        type(type_models_manager), allocatable :: models(:)
+        integer(int32), allocatable :: materials_id_map(:)
+        integer(int32) :: num_materials
     contains
         procedure, public :: initialize => initialize_properties_manager
+        procedure, private :: set_map => set_map_materials
 
-        ! --- Public Generic Interfaces (API remains unchanged) ---
-        generic, public :: calc_thc => calculate_thc_scalar, calculate_thc_array
-        generic, public :: calc_vhc => calculate_vhc_scalar, calculate_vhc_array
-        generic, public :: calc_qw => calculate_qw_scalar, calculate_qw_array
-        generic, public :: calc_water_content => calculate_water_content, calculate_water_content_array
-        generic, public :: calc_dQw_dT => calculate_dQw_dT, calculate_dQw_dT_array
-        generic, public :: calc_thermal => calc_thermal_properties_scalar, calc_thermal_properties_array
-        generic, public :: calc_hcf => calculate_hcf_scalar, calculate_hcf_array
-        generic, public :: calc_hydraulic => calc_hydraulic_properties_scalar, calc_hydraulic_properties_array
+        procedure, public :: calc_density
+        procedure, public :: calc_density_water_derivatives
+        procedure, public :: calc_density_ice_derivatives
+        procedure, public :: calc_density_vapor_derivatives
+        procedure, public :: calc_specific_heat
+        procedure, private :: calc_thermal_conductivity_nondispersity
+        procedure, private :: calc_thermal_conductivity_dispersity
+        generic, public :: calc_thermal_conductivity => calc_thermal_conductivity_nondispersity, calc_thermal_conductivity_dispersity
+        procedure, public :: calc_vol_heat_capacity
 
-        ! --- Wrapper Procedures (Public facing) ---
-        procedure, private, pass(self) :: calculate_thc_scalar
-        procedure, private, pass(self) :: calculate_thc_array
-        procedure, private, pass(self) :: calculate_vhc_scalar
-        procedure, private, pass(self) :: calculate_vhc_array
-        procedure, private, pass(self) :: calculate_qw_scalar
-        procedure, private, pass(self) :: calculate_qw_array
-        procedure, private, pass(self) :: calc_thermal_properties_scalar
-        procedure, private, pass(self) :: calc_thermal_properties_array
-        procedure, private, pass(self) :: calculate_hcf_scalar
-        procedure, private, pass(self) :: calculate_hcf_array
-        procedure, private, pass(self) :: calc_hydraulic_properties_scalar
-        procedure, private, pass(self) :: calc_hydraulic_properties_array
+        procedure, public :: update_water_phases
+        procedure, public :: calc_Kflh
+        procedure, public :: calc_KlT
+        procedure, public :: calc_Kvh
+        procedure, public :: calc_KvT
 
-        ! --- Implementation Procedures (Private, do the actual work) ---
-        procedure, private, pass(self) :: calculate_thc_impl_scalar
-        procedure, private, pass(self) :: calculate_thc_impl_array
-        procedure, private, pass(self) :: calculate_vhc_impl_scalar
-        procedure, private, pass(self) :: calculate_vhc_impl_array
-        procedure, private, pass(self) :: calc_thermal_properties_impl_scalar
-        procedure, private, pass(self) :: calc_thermal_properties_impl_array
-        procedure, private, pass(self) :: calculate_hcf_impl_scalar
-        procedure, private, pass(self) :: calculate_hcf_impl_array
-        procedure, private, pass(self) :: calc_hydraulic_properties_impl_scalar
-        procedure, private, pass(self) :: calc_hydraulic_properties_impl_array
-
-        procedure, private, nopass :: calculate_water_content
-        procedure, private, nopass :: calculate_water_content_array
-        procedure, private, nopass :: calculate_dQw_dT
-        procedure, private, nopass :: calculate_dQw_dT_array
-
-        procedure, public, pass(self) :: get_phase_dens
-        procedure, public, pass(self) :: get_phase_vhcs
-        procedure, public, pass(self) :: get_phase_thcs
-        procedure, public, pass(self) :: get_phase_sphs
-
-        procedure, private, pass(self) :: get_pointers_for_region
     end type type_properties_manager
 
 contains
@@ -84,550 +46,215 @@ contains
     !-------------------------------------------------------------------------------------------------------------------------------
     ! Initialization
     !-------------------------------------------------------------------------------------------------------------------------------
-    subroutine initialize_properties_manager(self, unique_material_ids, flags_coumpute, density_info, &
+    subroutine initialize_properties_manager(self, unique_material_ids, density_info, &
                                              specific_heat_info, heat_capacity_info, thermal_conductivity_info, &
-                                             gcc_model_ids, wrf_model_info, hcf_model_info)
+                                             wrf_ids, wrf_model_info, hcf_ids, hcf_model_info, gcc_model_ids)
         implicit none
         class(type_properties_manager), intent(inout) :: self
         integer(int32), intent(in) :: unique_material_ids(:)
-        logical, intent(in) :: flags_coumpute(:)
         type(type_physics_info), intent(in), optional :: density_info(:)
         type(type_physics_info), intent(in), optional :: specific_heat_info(:)
         type(type_physics_info), intent(in), optional :: heat_capacity_info(:)
         type(type_physics_info), intent(in), optional :: thermal_conductivity_info(:)
-        integer(int32), intent(in), optional :: gcc_model_ids(:)
+        integer(int32), intent(in), optional :: wrf_ids(:)
         type(type_wrf_params), intent(in), optional :: wrf_model_info(:)
+        integer(int32), intent(in), optional :: hcf_ids(:)
         type(type_hcf_params), intent(in), optional :: hcf_model_info(:)
+        integer(int32), intent(in), optional :: gcc_model_ids(:)
 
-        call self%materials%initialize(unique_material_ids, flags_coumpute, density_info, specific_heat_info, &
-                                       heat_capacity_info, thermal_conductivity_info, gcc_model_ids, wrf_model_info, hcf_model_info)
+        integer(int32) :: stat
+        integer(int32) :: model_idx, current_material_id
+
+        call self%water%initialize()
+        call self%ice%initialize()
+
+        call self%set_map(unique_material_ids)
+        allocate (self%materials(self%num_materials), stat=stat)
+        if (stat /= 0) then
+            error stop "Error in properties_manager%initialize: Failed to allocate materials array."
+        end if
+        allocate (self%models(self%num_materials), stat=stat)
+        if (stat /= 0) then
+            error stop "Error in properties_manager%initialize: Failed to allocate models array."
+        end if
+
+        do model_idx = 1, self%num_materials
+            current_material_id = self%materials_id_map(model_idx)
+
+            call self%materials(model_idx)%initialize( &
+                material_id=current_material_id, &
+                den_info=density_info(model_idx), &
+                sph_info=specific_heat_info(model_idx), &
+                vhc_info=heat_capacity_info(model_idx), &
+                thc_info=thermal_conductivity_info(model_idx), &
+                water=self%water, ice=self%ice)
+            call self%models(model_idx)%initialize( &
+                material_id=current_material_id, &
+                wrf_id=wrf_ids(model_idx), wrf_params=wrf_model_info(model_idx), &
+                hcf_id=hcf_ids(model_idx), hcf_params=hcf_model_info(model_idx), &
+                gcc_id=gcc_model_ids(model_idx), &
+                water=self%water, ice=self%ice)
+        end do
+
     end subroutine initialize_properties_manager
 
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Helper: Get all necessary pointers for a given region
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Note: 指定された領域IDのポインタを一括で取得するヘルパー
-    subroutine get_pointers_for_region(self, target_id, material_id, ptrs)
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: target_id
-        integer(int32), intent(in) :: material_id
-        type(type_material_pointers), intent(inout) :: ptrs
-
-        select case (target_id)
-        case (PHYSICS_TYPE_THERMAL)
-            ptrs%thc => self%materials%get_thc(material_id)
-            ptrs%vhc => self%materials%get_vhc(material_id)
-            ptrs%gcc => self%materials%get_gcc(material_id)
-            ptrs%wrf => self%materials%get_wrf(material_id)
-            ptrs%den => self%materials%get_den(material_id)
-
-#ifdef USE_DEBUG
-            if (.not. (associated(ptrs%thc) .and. associated(ptrs%vhc) .and. &
-                       associated(ptrs%gcc) .and. associated(ptrs%wrf) .and. associated(ptrs%den))) then
-                stop "Error: Failed to associate one or more material pointers."
-            end if
-#endif
-        case (PHYSICS_TYPE_HYDRAULIC)
-            ptrs%den => self%materials%get_den(material_id)
-            ptrs%hcf => self%materials%get_hcf(material_id)
-
-#ifdef USE_DEBUG
-            if (.not. (associated(ptrs%gcc) .and. associated(ptrs%wrf) .and. &
-                       associated(ptrs%den) .and. associated(ptrs%hcf))) then
-                stop "Error: Failed to associate one or more material pointers."
-            end if
-#endif
-        end select
-    end subroutine get_pointers_for_region
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Helper: Calculate common properties (water content)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    pure elemental subroutine calculate_water_content(ptrs, state)
+    subroutine set_map_materials(self, unique_material_ids)
         implicit none
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: state
+        class(type_properties_manager), intent(inout) :: self
+        integer(int32), intent(in) :: unique_material_ids(:)
 
-        state%density_water = ptrs%den%material2
-        state%density_ice = ptrs%den%material3
-        state%water_content = ptrs%wrf%calc(-ptrs%gcc%calc(state))
-    end subroutine calculate_water_content
+        integer(int32) :: max_region_id
+        integer(int32) :: model_idx
 
-    pure subroutine calculate_water_content_array(ptrs, states)
-        implicit none
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: states(:)
+        self%num_materials = size(unique_material_ids)
+        max_region_id = maxval(unique_material_ids)
 
-        call calculate_water_content(ptrs, states(:))
+        allocate (self%materials_id_map(max_region_id), source=0)
 
-    end subroutine calculate_water_content_array
-
-    pure elemental subroutine calculate_dQw_dT(ptrs, state)
-        implicit none
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: state
-
-        state%density_water = ptrs%den%material2
-        state%density_ice = ptrs%den%material3
-        state%dQw_dT = ptrs%wrf%deriv(-ptrs%gcc%calc(state)) * ptrs%gcc%deriv(state)
-
-    end subroutine calculate_dQw_dT
-
-    pure subroutine calculate_dQw_dT_array(ptrs, states)
-        implicit none
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: states(:)
-
-        call calculate_dQw_dT(ptrs, states(:))
-
-    end subroutine calculate_dQw_dT_array
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Thermal Conductivity (THC)
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! --- Wrapper ---
-    function calculate_thc_scalar(self, material_id, state) result(val)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-        real(real64) :: val
-
-        type(type_material_pointers) :: ptrs
-
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        val = self%calculate_thc_impl_scalar(ptrs, state)
-    end function calculate_thc_scalar
-
-    ! --- Implementation ---
-    function calculate_thc_impl_scalar(self, ptrs, state) result(val)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: state
-        real(real64) :: val
-
-        call self%calculate_water_content(ptrs, state)
-        val = ptrs%thc%calc(state)
-    end function calculate_thc_impl_scalar
-
-    ! --- Wrapper (Array) ---
-    function calculate_thc_array(self, material_id, states) result(vals)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_state), intent(inout) :: states(:)
-        integer(int32), intent(in) :: material_id
-        real(real64) :: vals(size(states))
-
-        type(type_material_pointers) :: ptrs
-
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        vals = self%calculate_thc_impl_array(ptrs, states)
-    end function calculate_thc_array
-
-    ! --- Implementation (Array) ---
-    function calculate_thc_impl_array(self, ptrs, states) result(vals)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: states(:)
-        real(real64) :: vals(size(states))
-
-        integer(int32) :: i
-
-        call self%calc_water_content(ptrs, states)
-        do i = 1, size(states)
-            vals(i) = self%calculate_thc_impl_scalar(ptrs, states(i))
+        do model_idx = 1, self%num_materials
+            self%materials_id_map(unique_material_ids(model_idx)) = model_idx
         end do
-    end function calculate_thc_impl_array
+    end subroutine set_map_materials
 
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! Volumetric Heat Capacity (VHC) Implementation
+    ! Generic Type-Bound Procedures
     !-------------------------------------------------------------------------------------------------------------------------------
-    ! --- Wrapper ---
-    function calculate_vhc_scalar(self, material_id, state) result(val)
+    pure elemental subroutine calc_density(self, material_id, state, density)
         implicit none
         class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: density
+
+        call self%materials(self%materials_id_map(material_id))%calc_density(state, density)
+
+    end subroutine calc_density
+
+    pure elemental subroutine calc_density_water_derivatives(self, material_id, state, dden_dT, dden_dP)
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout), optional :: dden_dT
+        real(real64), intent(inout), optional :: dden_dP
+
+        call self%materials(self%materials_id_map(material_id))%calc_density_water_derivatives(state, dden_dT, dden_dP)
+    end subroutine calc_density_water_derivatives
+
+    pure elemental subroutine calc_density_ice_derivatives(self, material_id, state, dden_dT, dden_dP)
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout), optional :: dden_dT
+        real(real64), intent(inout), optional :: dden_dP
+
+        call self%materials(self%materials_id_map(material_id))%calc_density_ice_derivatives(state, dden_dT, dden_dP)
+    end subroutine calc_density_ice_derivatives
+
+    pure elemental subroutine calc_density_vapor_derivatives(self, material_id, state, dden_dT, dden_dP)
+
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout), optional :: dden_dT
+        real(real64), intent(inout), optional :: dden_dP
+
+        call self%materials(self%materials_id_map(material_id))%calc_density_vapor_derivatives(state, dden_dT, dden_dP)
+    end subroutine calc_density_vapor_derivatives
+
+    pure elemental subroutine calc_specific_heat(self, material_id, state, specific_heat)
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: specific_heat
+
+        call self%materials(self%materials_id_map(material_id))%calc_specific_heat(state, specific_heat)
+
+    end subroutine calc_specific_heat
+
+    pure elemental subroutine calc_thermal_conductivity_nondispersity(self, material_id, state, thermal_conductivity)
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: thermal_conductivity
+
+        call self%materials(self%materials_id_map(material_id))%calc_thermal_conductivity(state, thermal_conductivity)
+
+    end subroutine calc_thermal_conductivity_nondispersity
+
+    pure elemental subroutine calc_thermal_conductivity_dispersity(self, material_id, state, thermal_conductivity)
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        type(type_thc_dispersity), intent(inout) :: thermal_conductivity
+
+        call self%materials(self%materials_id_map(material_id))%calc_thermal_conductivity(state, thermal_conductivity)
+
+    end subroutine calc_thermal_conductivity_dispersity
+
+    pure elemental subroutine calc_vol_heat_capacity(self, material_id, state, vol_heat_capacity)
+        implicit none
+        class(type_properties_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: vol_heat_capacity
+
+        call self%materials(self%materials_id_map(material_id))%calc_vol_heat_capacity(state, vol_heat_capacity)
+
+    end subroutine calc_vol_heat_capacity
+
+    pure elemental subroutine update_water_phases(self, material_id, state)
+        implicit none
+        class(type_properties_manager), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
-        real(real64) :: val
 
-        type(type_material_pointers) :: ptrs
+        call self%models(self%materials_id_map(material_id))%update_water_phases(state)
+    end subroutine update_water_phases
 
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        val = self%calculate_vhc_impl_scalar(ptrs, state)
-    end function calculate_vhc_scalar
-
-    ! --- Implementation ---
-    function calculate_vhc_impl_scalar(self, ptrs, state) result(val)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: state
-        real(real64) :: val
-
-        call self%calculate_water_content(ptrs, state)
-        call self%calculate_dQw_dT(ptrs, state)
-        val = ptrs%vhc%calc(state)
-    end function calculate_vhc_impl_scalar
-
-    ! --- Wrapper (Array) ---
-    function calculate_vhc_array(self, material_id, states) result(vals)
+    pure elemental subroutine calc_Kflh(self, material_id, state, Kflh)
         implicit none
         class(type_properties_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: states(:)
-        real(real64) :: vals(size(states))
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: Kflh
 
-        type(type_material_pointers) :: ptrs
+        call self%models(self%materials_id_map(material_id))%calc_Kflh(state, Kflh)
+    end subroutine calc_Kflh
 
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        vals = self%calculate_vhc_impl_array(ptrs, states)
-    end function calculate_vhc_array
-
-    ! --- Implementation (Array) ---
-    function calculate_vhc_impl_array(self, ptrs, states) result(vals)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: states(:)
-        real(real64) :: vals(size(states))
-
-        integer(int32) :: i
-
-        call self%calc_water_content(ptrs, states)
-        call self%calc_dQw_dT(ptrs, states)
-        do i = 1, size(states)
-            vals(i) = self%calculate_vhc_impl_scalar(ptrs, states(i))
-        end do
-    end function calculate_vhc_impl_array
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Water Content (qw) Implementation
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! --- Wrapper ---
-    function calculate_qw_scalar(self, material_id, state) result(val)
+    pure elemental subroutine calc_KlT(self, material_id, state, KlT)
         implicit none
         class(type_properties_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-        real(real64) :: val
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: KlT
 
-        type(type_material_pointers) :: ptrs
+        call self%models(self%materials_id_map(material_id))%calc_KlT(state, KlT)
+    end subroutine calc_KlT
 
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        call self%calc_water_content(ptrs, state)
-        val = state%water_content
-    end function calculate_qw_scalar
-
-    ! --- Wrapper (Array) ---
-    function calculate_qw_array(self, material_id, states) result(vals)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_state), intent(inout) :: states(:)
-        integer(int32), intent(in) :: material_id
-        real(real64) :: vals(size(states))
-
-        type(type_material_pointers) :: ptrs
-        integer(int32) :: i
-
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        call self%calc_water_content(ptrs, states)
-        do i = 1, size(states)
-            vals(i) = states(i)%water_content
-        end do
-    end function calculate_qw_array
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Thermal Properties Calculation
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! --- Wrapper ---
-    subroutine calc_thermal_properties_scalar(self, material_id, state, thc, vhc)
+    pure elemental subroutine calc_Kvh(self, material_id, state, Kvh)
         implicit none
         class(type_properties_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(inout) :: thc
-        real(real64), intent(inout) :: vhc
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: Kvh
 
-        type(type_material_pointers) :: ptrs
+        call self%models(self%materials_id_map(material_id))%calc_Kvh(state, Kvh)
+    end subroutine calc_Kvh
 
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        call self%calc_thermal_properties_impl_scalar(state, ptrs, thc, vhc)
-    end subroutine calc_thermal_properties_scalar
-
-    ! --- Implementation ---
-    subroutine calc_thermal_properties_impl_scalar(self, state, ptrs, thc, vhc)
-        class(type_properties_manager), intent(in) :: self
-        type(type_state), intent(inout) :: state
-        type(type_material_pointers), intent(in) :: ptrs
-        real(real64), intent(inout) :: thc
-        real(real64), intent(inout) :: vhc
-
-        call self%calculate_water_content(ptrs, state)
-        call self%calculate_dQw_dT(ptrs, state)
-
-        thc = ptrs%thc%calc(state)
-        vhc = ptrs%vhc%calc(state=state)
-
-    end subroutine calc_thermal_properties_impl_scalar
-
-    ! --- Wrapper (Array) ---
-    subroutine calc_thermal_properties_array(self, material_id, states, thcs, vhcs)
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: states(:)
-        real(real64), intent(inout) :: thcs(size(states))
-        real(real64), intent(inout) :: vhcs(size(states))
-
-        type(type_material_pointers) :: ptrs
-
-        call self%get_pointers_for_region(calc_thermal, material_id, ptrs)
-        call self%calc_thermal_properties_impl_array(ptrs, states, thcs, vhcs)
-
-    end subroutine calc_thermal_properties_array
-
-    ! --- Implementation (Array) ---
-    subroutine calc_thermal_properties_impl_array(self, ptrs, states, thcs, vhcs)
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: states(:)
-        real(real64), intent(inout) :: thcs(size(states))
-        real(real64), intent(inout) :: vhcs(size(states))
-
-        integer(int32) :: i
-
-        call self%calc_water_content(ptrs, states)
-        call self%calc_dQw_dT(ptrs, states)
-
-        do i = 1, size(states)
-            thcs(i) = self%calculate_thc_impl_scalar(ptrs, states(i))
-            vhcs(i) = self%calculate_vhc_impl_scalar(ptrs, states(i))
-        end do
-    end subroutine calc_thermal_properties_impl_array
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Hydraulic Conductivity (HCF) Implementation
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! --- Wrapper ---
-    function calculate_hcf_scalar(self, material_id, state) result(val)
+    pure elemental subroutine calc_KvT(self, material_id, state, KvT)
         implicit none
         class(type_properties_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-        real(real64) :: val
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: KvT
 
-        type(type_material_pointers) :: ptrs
-
-        call self%get_pointers_for_region(calc_hydraulic, material_id, ptrs)
-        val = self%calculate_hcf_impl_scalar(ptrs, state)
-    end function calculate_hcf_scalar
-
-    ! --- Implementation ---
-    function calculate_hcf_impl_scalar(self, ptrs, state) result(val)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: state
-        real(real64) :: val
-
-        call self%calc_water_content(ptrs, state)
-        state%ice_content = state%porosity - state%water_content
-
-        val = ptrs%hcf%calc_kflh(state)
-    end function calculate_hcf_impl_scalar
-
-    ! --- Wrapper (Array) ---
-    function calculate_hcf_array(self, material_id, states) result(vals)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: states(:)
-        real(real64) :: vals(size(states))
-
-        type(type_material_pointers) :: ptrs
-
-        call self%get_pointers_for_region(calc_hydraulic, material_id, ptrs)
-
-        vals = self%calculate_hcf_impl_array(ptrs, states)
-    end function calculate_hcf_array
-
-    ! --- Implementation (Array) ---
-    function calculate_hcf_impl_array(self, ptrs, states) result(vals)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: states(:)
-        real(real64) :: vals(size(states))
-
-        integer(int32) :: i
-
-        ! 1. 水分量を配列全体に対して一度に計算
-        call self%calc_water_content(ptrs, states)
-
-        ! 2. ループ内で各点の氷含有量を計算し、HCFを求める
-        do i = 1, size(states)
-            states(i)%ice_content = states(i)%porosity - states(i)%water_content
-            vals(i) = self%calculate_hcf_impl_scalar(ptrs, states(i))
-        end do
-    end function calculate_hcf_impl_array
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Hydraulic Properties Calculation
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! --- Wrapper ---
-    subroutine calc_hydraulic_properties_scalar(self, material_id, state, kflh)
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(inout) :: kflh
-
-        type(type_material_pointers) :: ptrs
-
-        call self%get_pointers_for_region(calc_hydraulic, material_id, ptrs)
-        call self%calc_hydraulic_properties_impl_scalar(state, ptrs, kflh)
-    end subroutine calc_hydraulic_properties_scalar
-
-    ! --- Implementation ---
-    subroutine calc_hydraulic_properties_impl_scalar(self, state, ptrs, kflh)
-        class(type_properties_manager), intent(in) :: self
-        type(type_state), intent(inout) :: state
-        type(type_material_pointers), intent(in) :: ptrs
-        real(real64), intent(inout) :: kflh
-
-        kflh = ptrs%hcf%calc_kflh(state)
-        state%density_water = ptrs%den%material2
-        state%density_ice = ptrs%den%material3
-
-    end subroutine calc_hydraulic_properties_impl_scalar
-
-    ! --- Wrapper (Array) ---
-    subroutine calc_hydraulic_properties_array(self, material_id, states, kflhs)
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: states(:)
-        real(real64), intent(inout) :: kflhs(size(states))
-
-        type(type_material_pointers) :: ptrs
-
-        call self%get_pointers_for_region(calc_hydraulic, material_id, ptrs)
-        call self%calc_hydraulic_properties_impl_array(ptrs, states, kflhs)
-
-    end subroutine calc_hydraulic_properties_array
-
-    ! --- Implementation (Array) ---
-    subroutine calc_hydraulic_properties_impl_array(self, ptrs, states, kflhs)
-        class(type_properties_manager), intent(in) :: self
-        type(type_material_pointers), intent(in) :: ptrs
-        type(type_state), intent(inout) :: states(:)
-        real(real64), intent(inout) :: kflhs(size(states))
-
-        integer(int32) :: i
-
-        do i = 1, size(states)
-            kflhs(i) = ptrs%hcf%calc_kflh(states(i))
-            states(i)%density_water = ptrs%den%material2
-            states(i)%density_ice = ptrs%den%material3
-        end do
-    end subroutine calc_hydraulic_properties_impl_array
-
-    !-------------------------------------------------------------------------------------------------------------------------------
-    ! Get Phase Property
-    !-------------------------------------------------------------------------------------------------------------------------------
-    function get_phase_dens(self, material_id) result(phase_property)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_phase_property) :: phase_property
-
-        class(abst_den), pointer :: den_ptr => null()
-
-        den_ptr => self%materials%get_den(material_id)
-
-#ifdef USE_DEBUG
-        if (.not. associated(den_ptr)) then
-            print *, "Error in get_phase_property: Failed to get density pointer for material_id =", material_id
-            stop "FATAL ERROR: DENSITY POINTER NOT FOUND"
-        end if
-#endif
-
-        phase_property%solid = den_ptr%material1
-        phase_property%water = den_ptr%material2
-        phase_property%ice = den_ptr%material3
-        phase_property%gas = den_ptr%material4
-
-    end function get_phase_dens
-
-    function get_phase_sphs(self, material_id) result(phase_property)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_phase_property) :: phase_property
-
-        class(abst_sph), pointer :: sph_ptr => null()
-
-        sph_ptr => self%materials%get_sph(material_id)
-
-#ifdef USE_DEBUG
-        if (.not. associated(sph_ptr)) then
-            print *, "Error in get_phase_property: Failed to get specific heat pointer for material_id =", material_id
-            stop "FATAL ERROR: SPECIFIC HEAT POINTER NOT FOUND"
-        end if
-#endif
-
-        phase_property%solid = sph_ptr%material1
-        phase_property%water = sph_ptr%material2
-        phase_property%ice = sph_ptr%material3
-        phase_property%gas = sph_ptr%material4
-
-    end function get_phase_sphs
-
-    function get_phase_vhcs(self, material_id) result(phase_property)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_phase_property) :: phase_property
-
-        class(abst_vhc), pointer :: vhc_ptr => null()
-
-        vhc_ptr => self%materials%get_vhc(material_id)
-
-#ifdef USE_DEBUG
-        if (.not. associated(vhc_ptr)) then
-            print *, "Error in get_phase_property: Failed to get volumetric heat capacity pointer for material_id =", material_id
-            stop "FATAL ERROR: VOLUMETRIC HEAT CAPACITY POINTER NOT FOUND"
-        end if
-#endif
-
-        phase_property%solid = vhc_ptr%material1
-        phase_property%water = vhc_ptr%material2
-        phase_property%ice = vhc_ptr%material3
-        phase_property%gas = vhc_ptr%material4
-
-    end function get_phase_vhcs
-
-    function get_phase_thcs(self, material_id) result(phase_property)
-        implicit none
-        class(type_properties_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_phase_property) :: phase_property
-
-        class(abst_thc), pointer :: thc_ptr => null()
-
-        thc_ptr => self%materials%get_thc(material_id)
-
-#ifdef USE_DEBUG
-        if (.not. associated(thc_ptr)) then
-            print *, "Error in get_phase_property: Failed to get thermal heat capacity pointer for material_id =", material_id
-            stop "FATAL ERROR: THERMAL HEAT CAPACITY POINTER NOT FOUND"
-        end if
-#endif
-
-        phase_property%solid = thc_ptr%material1
-        phase_property%water = thc_ptr%material2
-        phase_property%ice = thc_ptr%material3
-        phase_property%gas = thc_ptr%material4
-
-    end function get_phase_thcs
+        call self%models(self%materials_id_map(material_id))%calc_KvT(state, KvT)
+    end subroutine calc_KvT
 
 end module physics_service

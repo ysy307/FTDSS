@@ -83,6 +83,7 @@ set(PHYSICS_MODELS_SOURCES
     models/phase_change/liquid_solid/gcc_base.F90
     models/phase_change/liquid_solid/fusion.F90
     models/phase_change/liquid_vapor/vaporization.F90
+    models/phase_change/phase_systems.F90
     # Entry / Aggregator
     models/models.F90
 )
@@ -101,8 +102,8 @@ enable_build_flags(Physics_Models)
 # ====================================================================
 
 set(PHYSICS_SERVICE_SOURCES
-    physics_registry.F90
-    # physics_service.F90
+    # physics_registry.F90
+    physics_service.F90
     physics.F90
 )
 

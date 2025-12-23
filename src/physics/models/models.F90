@@ -11,6 +11,10 @@ module module_physics_models
     implicit none
     private
 
+    public :: type_models_manager
+    public :: type_wrf_params
+    public :: type_hcf_params
+
     type :: type_models_manager
         private
         type(holder_wrfs) :: wrf
