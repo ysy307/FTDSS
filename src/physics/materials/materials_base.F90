@@ -57,9 +57,15 @@ contains
         real(real64), intent(inout), optional :: phi3
         real(real64), intent(inout), optional :: phi4
 
-        phi1 = 1.0d0 - state%porosity
-        phi2 = state%water_content
-        if (present(phi3)) phi3 = state%ice_content
+        real(real64) :: porosity, water_content, ice_content
+
+        call state%porosity%get(porosity)
+        call state%water_content%get(water_content)
+        call state%ice_content%get(ice_content)
+
+        phi1 = 1.0d0 - porosity
+        phi2 = water_content
+        if (present(phi3)) phi3 = ice_content
         if (present(phi4)) phi4 = 1.0d0 - phi1 - phi2 - phi3
 
     end subroutine get_material_phi

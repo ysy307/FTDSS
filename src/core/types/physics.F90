@@ -10,15 +10,15 @@ module core_types_physics
 ! ------------------------------------------------------------------
     ! 1. Real(real64) Wrapper Type
     ! ------------------------------------------------------------------
-    type :: type_field_r64
+    type :: type_field_dp
         private
         real(real64) :: value = 0.0d0
         logical :: is_set = .false.
     contains
-        procedure, pass(self), public :: set => set_field_r64
-        procedure, pass(self), public :: get => get_field_r64
-        procedure, pass(self), private :: reset => reset_field_r64
-    end type type_field_r64
+        procedure, pass(self), public :: set => set_field_dp
+        procedure, pass(self), public :: get => get_field_dp
+        procedure, pass(self), private :: reset => reset_field_dp
+    end type type_field_dp
 
     ! ------------------------------------------------------------------
     ! 2. Coordinate Wrapper Type
@@ -38,31 +38,31 @@ module core_types_physics
     ! ------------------------------------------------------------------
     type :: type_state
         ! --- Thermodynamic & Physical Properties ---
-        type(type_field_r64) :: temperature ! Temperature [C]
-        type(type_field_r64) :: pressure ! Pressure [m]
-        type(type_field_r64) :: water_content ! Water content [-]
-        type(type_field_r64) :: ice_content ! Ice content [-]
-        type(type_field_r64) :: vapor_content ! Vapor content [-]
-        type(type_field_r64) :: air_content ! Air content [-]
-        type(type_field_r64) :: porosity ! Porosity [-]
+        type(type_field_dp) :: temperature ! Temperature [C]
+        type(type_field_dp) :: pressure ! Pressure [m]
+        type(type_field_dp) :: water_content ! Water content [-]
+        type(type_field_dp) :: ice_content ! Ice content [-]
+        type(type_field_dp) :: vapor_content ! Vapor content [-]
+        type(type_field_dp) :: air_content ! Air content [-]
+        type(type_field_dp) :: porosity ! Porosity [-]
 
         ! --- Thermal Properties ---
-        type(type_field_r64) :: latent_heat_fusion ! [J/kg]
-        type(type_field_r64) :: latent_heat_vaporization ! [J/kg]
+        type(type_field_dp) :: latent_heat_fusion ! [J/kg]
+        type(type_field_dp) :: latent_heat_vaporization ! [J/kg]
 
         ! --- Derivatives ---
-        type(type_field_r64) :: dQw_dT ! d(theta_water)/dT
-        type(type_field_r64) :: dQv_dT ! d(theta_vapor)/dT
-        type(type_field_r64) :: dQa_dT ! d(theta_air)/dT
-        type(type_field_r64) :: dQi_dT ! d(theta_ice)/dT
-        type(type_field_r64) :: dQw_dP ! d(theta_water)/dP
-        type(type_field_r64) :: dQv_dP ! d(theta_vapor)/dP
-        type(type_field_r64) :: dQa_dP ! d(theta_air)/dP
-        type(type_field_r64) :: dQi_dP ! d(theta_ice)/dP
+        type(type_field_dp) :: dQw_dT ! d(theta_water)/dT
+        type(type_field_dp) :: dQv_dT ! d(theta_vapor)/dT
+        type(type_field_dp) :: dQa_dT ! d(theta_air)/dT
+        type(type_field_dp) :: dQi_dT ! d(theta_ice)/dT
+        type(type_field_dp) :: dQw_dP ! d(theta_water)/dP
+        type(type_field_dp) :: dQv_dP ! d(theta_vapor)/dP
+        type(type_field_dp) :: dQa_dP ! d(theta_air)/dP
+        type(type_field_dp) :: dQi_dP ! d(theta_ice)/dP
 
         ! --- Other ---
-        type(type_field_r64) :: relative_humidity ! [-]
-        type(type_field_r64) :: mass_fraction_clay ! [-]
+        type(type_field_dp) :: relative_humidity ! [-]
+        type(type_field_dp) :: mass_fraction_clay ! [-]
 
         ! --- Vectors ---
         type(type_field_coord) :: water_flux ! Water flux vector [m/s]
@@ -80,7 +80,7 @@ module core_types_physics
         real(real64) :: water = 0.0d0
         real(real64) :: ice = 0.0d0
         real(real64) :: vapor = 0.0d0
-        real(real64) :: air = 0.0d0
+        ! real(real64) :: air = 0.0d0
         real(real64), allocatable :: dispersity(:)
         real(real64), allocatable :: params(:)
     end type type_physics_info
@@ -92,19 +92,19 @@ contains
     ! ==================================================================
 
     ! Setter
-    pure elemental subroutine set_field_r64(self, value)
+    pure elemental subroutine set_field_dp(self, value)
         implicit none
-        class(type_field_r64), intent(inout) :: self
+        class(type_field_dp), intent(inout) :: self
         real(real64), intent(in) :: value
 
         self%value = value
         self%is_set = .true.
-    end subroutine set_field_r64
+    end subroutine set_field_dp
 
     ! Getter (Subroutine style)
-    pure elemental subroutine get_field_r64(self, value, is_set)
+    pure elemental subroutine get_field_dp(self, value, is_set)
         implicit none
-        class(type_field_r64), intent(in) :: self
+        class(type_field_dp), intent(in) :: self
         real(real64), intent(inout) :: value
         logical, intent(inout), optional :: is_set
 
@@ -117,16 +117,16 @@ contains
         value = self%value
         if (present(is_set)) is_set = self%is_set
 
-    end subroutine get_field_r64
+    end subroutine get_field_dp
 
     ! Reset
-    pure elemental subroutine reset_field_r64(self)
+    pure elemental subroutine reset_field_dp(self)
         implicit none
-        class(type_field_r64), intent(inout) :: self
+        class(type_field_dp), intent(inout) :: self
 
         self%value = 0.0d0
         self%is_set = .false.
-    end subroutine reset_field_r64
+    end subroutine reset_field_dp
 
     ! Setter
     pure elemental subroutine field_coord_set(self, value)

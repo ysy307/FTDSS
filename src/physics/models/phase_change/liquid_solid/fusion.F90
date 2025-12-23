@@ -46,7 +46,7 @@ contains
     end subroutine initialize_type_fusion
 
     !---------------------------------------------------------------------------
-    ! Ice Calculations (Existing)
+    ! Ice Calculations
     !---------------------------------------------------------------------------
 
     !>
@@ -59,21 +59,24 @@ contains
         real(real64), intent(inout) :: ice_content
 
         real(real64) :: pressure
-        real(real64) :: psi_cryo, psi_cap, psi_eff
+        real(real64) :: psi_cap, psi_cryo, psi_eff
         real(real64) :: theta_target_unfrozen, theta_liquid
         real(real64) :: rho_water, rho_ice, density_ratio
 
         ! 1. 圧力の取得
         call state%pressure%get(pressure)
 
-        ! 2. サクションの計算
+        ! 2. サクション（大きさ）の計算
+        !    ※ここでは判定用に正の値(magnitude)としてpsiを計算します
         psi_cap = max(0.0d0, -pressure)
         call self%gcc%calc(state, psi_cryo)
         psi_eff = max(psi_cap, psi_cryo)
 
         ! 3. 水分量の計算
-        call self%wrf%calc(psi_cap, theta_target_unfrozen)
-        call self%wrf%calc(psi_eff, theta_liquid)
+        !    ※ WRFへの入力は負圧 (Negative Pressure Head) である必要があるため、
+        !       マイナスを付けて渡します。
+        call self%wrf%calc(-psi_cap, theta_target_unfrozen)
+        call self%wrf%calc(-psi_eff, theta_liquid)
 
         ! 4. 氷含有量の決定
         call self%calc_rho_water(state, rho_water)
@@ -104,7 +107,7 @@ contains
         real(real64) :: d_psi_cap_dP
         real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
         real(real64) :: d_psi_eff_dP, d_psi_eff_dT
-        real(real64) :: d_theta_target_dpsi, d_theta_liquid_dpsi
+        real(real64) :: d_theta_target_dPress, d_theta_liquid_dPress ! 変数名を変更 (dPsi -> dPress)
         real(real64) :: rho_w, rho_i, density_ratio
         real(real64) :: theta_target, theta_liquid
 
@@ -138,14 +141,33 @@ contains
             d_psi_eff_dT = d_psi_cryo_dT
         end if
 
-        call self%wrf%calc(psi_cap, theta_target)
-        call self%wrf%calc(max(psi_cap, psi_cryo), theta_liquid)
-        call self%wrf%deriv(psi_cap, d_theta_target_dpsi)
-        call self%wrf%deriv(max(psi_cap, psi_cryo), d_theta_liquid_dpsi)
+        ! WRF計算
+        ! ※微分の計算: 入力は負圧 (-psi)。
+        !   戻り値 d_theta_..._dPress は d(theta)/d(Pressure) (通常は正の値)
+        call self%wrf%calc(-psi_cap, theta_target)
+        call self%wrf%calc(-max(psi_cap, psi_cryo), theta_liquid)
+        call self%wrf%deriv(-psi_cap, d_theta_target_dPress)
+        call self%wrf%deriv(-max(psi_cap, psi_cryo), d_theta_liquid_dPress)
+
+        ! Chain Rule の適用
+        ! 入力変数 P_in = -psi
+        ! d(P_in)/dX = - d(psi)/dX
+        ! d(theta)/dX = d(theta)/d(P_in) * d(P_in)/dX
+        !             = d_theta_..._dPress * (- d_psi_..._dX)
 
         if (theta_target > theta_liquid) then
-            dice_dP = density_ratio * (d_theta_target_dpsi * d_psi_cap_dP - d_theta_liquid_dpsi * d_psi_eff_dP)
-            dice_dT = density_ratio * (-d_theta_liquid_dpsi * d_psi_eff_dT)
+            ! d(Ice)/dP = ratio * [ d(Theta_target)/dP - d(Theta_liquid)/dP ]
+            !           = ratio * [ (dThetaT/dP_in * -dPsiCap/dP) - (dThetaL/dP_in * -dPsiEff/dP) ]
+            !           = ratio * [ - dThetaT * dPsiCap + dThetaL * dPsiEff ]
+
+            dice_dP = density_ratio * ( &
+                      d_theta_target_dPress * (-d_psi_cap_dP) - &
+                      d_theta_liquid_dPress * (-d_psi_eff_dP) &
+                      )
+
+            dice_dT = density_ratio * ( &
+                      -d_theta_liquid_dPress * (-d_psi_eff_dT) &
+                      )
         else
             dice_dP = 0.0d0
             dice_dT = 0.0d0
@@ -154,7 +176,7 @@ contains
     end subroutine calc_ice_content_derivatives
 
     !---------------------------------------------------------------------------
-    ! Liquid Water Calculations (New)
+    ! Liquid Water Calculations
     !---------------------------------------------------------------------------
 
     !>
@@ -169,24 +191,19 @@ contains
         real(real64) :: pressure
         real(real64) :: psi_cap, psi_cryo, psi_eff
 
-        ! 1. 圧力の取得
         call state%pressure%get(pressure)
 
-        ! 2. 毛管サクション
         if (pressure < 0.0d0) then
             psi_cap = -pressure
         else
             psi_cap = 0.0d0
         end if
 
-        ! 3. 凍結サクション (GCC)
         call self%gcc%calc(state, psi_cryo)
-
-        ! 4. 有効サクション (支配的な方)
         psi_eff = max(psi_cap, psi_cryo)
 
-        ! 5. 液状水分量の計算 (WRF)
-        call self%wrf%calc(psi_eff, water_content)
+        ! 修正箇所: 負圧を入力する
+        call self%wrf%calc(-psi_eff, water_content)
 
     end subroutine calc_water_content
 
@@ -200,18 +217,14 @@ contains
         real(real64), intent(inout) :: dwater_dP !> d(theta_l)/dP
         real(real64), intent(inout) :: dwater_dT !> d(theta_l)/dT
 
-        ! ローカル変数
         real(real64) :: pressure
         real(real64) :: psi_cap, psi_cryo
         real(real64) :: d_psi_cap_dP
         real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
         real(real64) :: d_psi_eff_dP, d_psi_eff_dT
-        real(real64) :: d_theta_liquid_dpsi
+        real(real64) :: d_theta_liquid_dPress ! 変数名を変更
 
-        ! 1. 状態量の取得
         call state%pressure%get(pressure)
-
-        ! 2. サクションとその微分の計算
 
         ! [毛管サクション]
         if (pressure < 0.0d0) then
@@ -227,31 +240,27 @@ contains
 
         ! [有効サクションの選択と微分の決定]
         if (psi_cap >= psi_cryo) then
-            ! 乾燥支配 (未凍結、あるいは乾燥が強い)
-            ! d(Psi_eff)/dP = d(Psi_cap)/dP
             d_psi_eff_dP = d_psi_cap_dP
             d_psi_eff_dT = 0.0d0
         else
-            ! 凍結支配
-            ! GCC微分の取得
             call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
             call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
-
-            ! d(Psi_eff)/dX = d(Psi_cryo)/dX
             d_psi_eff_dP = d_psi_cryo_dP
             d_psi_eff_dT = d_psi_cryo_dT
         end if
 
-        ! 3. 水分容量 (dTheta/dPsi) の計算
-        ! 有効サクションにおけるWRFの勾配を取得
-        call self%wrf%deriv(max(psi_cap, psi_cryo), d_theta_liquid_dpsi)
+        ! 3. 水分容量 (dTheta/dPress) の計算
+        ! 修正箇所: 負圧を入力する
+        call self%wrf%deriv(-max(psi_cap, psi_cryo), d_theta_liquid_dPress)
 
         ! 4. 液状水分量の微分の組み立て (Chain Rule)
-        ! d(Theta_l)/dP = (dTheta/dPsi) * (dPsi_eff/dP)
-        dwater_dP = d_theta_liquid_dpsi * d_psi_eff_dP
+        ! 入力は -psi_eff なので、微分のチェーンルールは -d(psi)/dX を掛ける
 
-        ! d(Theta_l)/dT = (dTheta/dPsi) * (dPsi_eff/dT)
-        dwater_dT = d_theta_liquid_dpsi * d_psi_eff_dT
+        ! d(Theta_l)/dP = (dTheta/dP_in) * d(-Psi_eff)/dP
+        dwater_dP = d_theta_liquid_dPress * (-d_psi_eff_dP)
+
+        ! d(Theta_l)/dT = (dTheta/dP_in) * d(-Psi_eff)/dT
+        dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT)
 
     end subroutine calc_water_content_derivatives
 

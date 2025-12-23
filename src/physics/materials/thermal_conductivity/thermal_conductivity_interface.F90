@@ -13,6 +13,7 @@ module physics_materials_thermal_conductivity
     public :: type_thc_2phase
     public :: type_thc_3phase
     public :: type_thc_4phase
+    public :: type_thc_dispersity
 
     type :: holder_thcs
         class(abst_thc), allocatable :: p
