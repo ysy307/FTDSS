@@ -9,6 +9,12 @@ module control_time
 
     public :: type_time
 
+    ! --- Constants ---
+    integer(int32), parameter :: MAX_BDF_ORDER = 6
+    integer(int32), parameter :: ERR_TIME_INIT = 981
+    integer(int32), parameter :: ERR_PROFILER = 982
+
+    ! --- Types ---
     type :: type_time_record
         character(20) :: label = ''
         character(10) :: date = ''
@@ -20,41 +26,72 @@ module control_time
         character(20) :: label = ''
         real(real64) :: total_time = 0.0d0
         real(real64) :: start_time = 0.0d0
+        integer(int32) :: call_count = 0 ! 呼び出し回数も記録すると便利
     end type type_profiler_section
 
     type :: type_time
+        private
+        ! --- Time Stepping State ---
         real(real64) :: start_time = 0.0d0
         real(real64) :: end_time = 0.0d0
-        real(real64) :: time = 0.0d0
+        real(real64) :: current_time = 0.0d0 ! 変数名を time -> current_time に明確化
         real(real64) :: time_old = 0.0d0
+
         real(real64) :: dt = 0.0d0
-        real(real64), allocatable :: dt_old(:)
+        real(real64), allocatable :: dt_old(:) ! History of dt
         real(real64) :: dt_min = 0.0d0
         real(real64) :: dt_max = 0.0d0
-        real(real64) :: time_conversion = 1.0d0
-        real(real64), allocatable :: alpha(:)
+
+        real(real64) :: time_conversion = 1.0d0 ! Unit conversion factor
+
+        ! --- BDF Coefficients ---
+        real(real64) :: alpha(0:MAX_BDF_ORDER) = 0.0d0
         real(real64) :: beta = 0.0d0
         integer(int32) :: bdf_order = 1
-        type(type_time_record) :: start
-        type(type_time_record) :: end
+
+        ! --- Records ---
+        type(type_time_record) :: record_start
+        type(type_time_record) :: record_end
+
+        ! --- Profiler ---
         type(type_profiler_section), allocatable :: sections(:)
+
     contains
+        ! --- Public Interfaces ---
         procedure, public, pass(self) :: initialize => initialize_type_time
         procedure, public, pass(self) :: record => record_timestamp
-        procedure, public, pass(self) :: profile_start => profile_start_timer
-        procedure, public, pass(self) :: profile_stop => profile_stop_timer
-        procedure, private, pass(self) :: compute_bdf_coefficients
+
+        ! Profiler (Overloaded for String and ID)
+        procedure, public, pass(self) :: get_profiler_id
+        procedure, public, pass(self) :: profile_start_by_name
+        procedure, public, pass(self) :: profile_start_by_id
+        generic, public :: profile_start => profile_start_by_name, profile_start_by_id
+
+        procedure, public, pass(self) :: profile_stop_by_name
+        procedure, public, pass(self) :: profile_stop_by_id
+        generic, public :: profile_stop => profile_stop_by_name, profile_stop_by_id
+
+        ! Time Management
         procedure, public, pass(self) :: update_bdf_coefficients => update_bdf_coefficients_wrapper
         procedure, public, pass(self) :: get_record
         procedure, public, pass(self) :: get_time
-        procedure, public, nopass :: convert_time_unit
-        procedure, public, pass(self) :: shift => shift_time
         procedure, public, pass(self) :: get_dt
+        procedure, public, pass(self) :: get_bdf_order
+        procedure, public, pass(self) :: get_bdf_alpha
+        procedure, public, pass(self) :: get_bdf_beta
+        procedure, public, pass(self) :: shift => shift_time
         procedure, public, pass(self) :: display => display_status
+
+        ! --- Private Procedures ---
+        procedure, private, pass(self) :: compute_bdf_coefficients
+        procedure, public, nopass :: convert_time_unit
     end type type_time
 
 contains
 
+    ! ==========================================================================
+    ! Initialization
+    ! ==========================================================================
     subroutine initialize_type_time(self, input, profiler_sections)
         implicit none
         class(type_time), intent(inout) :: self
@@ -65,38 +102,36 @@ contains
         real(real64) :: time_conv_coeff
 
         if (present(input)) then
-            ! --- 最大BDFオーダーを取得 ---
+            ! --- BDF設定 ---
             self%bdf_order = input%basic%solver_settings%bdf_order
+            if (self%bdf_order > MAX_BDF_ORDER) then
+                self%bdf_order = MAX_BDF_ORDER
+                ! 警告を出しても良い箇所
+            end if
 
-            ! --- dt 初期値/max/min ---
+            ! --- 時間単位変換係数の取得 ---
             time_conv_coeff = convert_time_unit(input%conditions%time_control%time_stepping%unit, &
                                                 TIME_UNIT_SECONDS)
+
+            ! --- dt 設定 ---
             self%dt = input%conditions%time_control%time_stepping%initial_step * time_conv_coeff
             self%dt_max = input%conditions%time_control%time_stepping%max_step * time_conv_coeff
             self%dt_min = input%conditions%time_control%time_stepping%min_step * time_conv_coeff
 
-            ! --- dt_old 配列確保（ゼロ初期化） ---
-            if (.not. allocated(self%dt_old)) then
-                allocate (self%dt_old(self%bdf_order), stat=istat)
-                if (istat /= 0) call error_message(981, c_opt="[initialize_type_time] failed allocating dt_old")
-            end if
-            self%dt_old = 0.0_real64
+            ! --- 配列確保 ---
+            if (allocated(self%dt_old)) deallocate (self%dt_old)
+            allocate (self%dt_old(MAX_BDF_ORDER), stat=istat)
+            if (istat /= 0) call error_message(ERR_TIME_INIT, c_opt="Failed allocating dt_old")
 
-            ! --- alpha 配列確保（ゼロ初期化） ---
-            if (.not. allocated(self%alpha)) then
-                allocate (self%alpha(0:self%bdf_order), stat=istat)
-                if (istat /= 0) call error_message(981, c_opt="[initialize_type_time] failed allocating alpha")
-            end if
+            self%dt_old = 0.0_real64
             self%alpha = 0.0_real64
             self%beta = 0.0_real64
 
-            ! --- 初期 BDF 計算 (order=1) ---
-            ! 初期化時には dt_old の履歴が存在しないため，汎用計算ルーチンはエラーとなる．
-            ! そのため，安全な1次精度（後退オイラー法）の係数を直接計算・設定する．
+            ! --- 初期係数計算 (1次精度) ---
             call self%compute_bdf_coefficients(1)
 
-            ! --- シミュレーション開始/終了時間 ---
-            if (.not. input%output_settings%field_output%file_format == "none") then
+            ! --- シミュレーション期間 ---
+            if (input%output_settings%field_output%file_format /= "none") then
                 time_conv_coeff = convert_time_unit(input%conditions%time_control%simulation_period%unit, &
                                                     TIME_UNIT_SECONDS)
                 self%start_time = input%conditions%time_control%simulation_period%start * time_conv_coeff
@@ -105,113 +140,32 @@ contains
                 self%time_conversion = convert_time_unit(input%output_settings%field_output%output_interval_unit, &
                                                          input%conditions%time_control%simulation_period%unit)
             end if
+
+            ! 初期時間をセット
+            self%current_time = self%start_time
         end if
 
-        ! --- Profiler Sections ---
+        ! --- Profiler Sections Initialization ---
         if (present(profiler_sections)) then
+            if (allocated(self%sections)) deallocate (self%sections)
             if (size(profiler_sections) > 0) then
-                if (allocated(self%sections)) deallocate (self%sections)
                 allocate (self%sections(size(profiler_sections)), stat=istat)
-                if (istat /= 0) call error_message(981, c_opt="[initialize_type_time] failed allocating sections")
+                if (istat /= 0) call error_message(ERR_TIME_INIT, c_opt="Failed allocating sections")
+
                 do i = 1, size(profiler_sections)
                     self%sections(i)%label = trim(profiler_sections(i))
                     self%sections(i)%total_time = 0.0_real64
                     self%sections(i)%start_time = 0.0_real64
+                    self%sections(i)%call_count = 0
                 end do
             end if
         end if
 
     end subroutine initialize_type_time
 
-    subroutine record_timestamp(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        integer(int32), intent(in) :: label
-
-        select case (label)
-        case (TIME_RECORD_START)
-            call date_and_time(date=self%start%date, time=self%start%time, zone=self%start%zone)
-            self%start%label = get_time_record_string(label)
-        case (TIME_RECORD_END)
-            call date_and_time(date=self%end%date, time=self%end%time, zone=self%end%zone)
-            self%end%label = get_time_record_string(label)
-        end select
-    end subroutine record_timestamp
-
-    subroutine profile_start_timer(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        character(len=*), intent(in) :: label
-        integer(int32) :: i
-        do i = 1, size(self%sections)
-            if (trim(self%sections(i)%label) == trim(label)) then
-                self%sections(i)%start_time = get_current_time()
-                return
-            end if
-        end do
-        call error_message(982, c_opt="[profile_start_timer] unknown label: "//trim(label))
-    end subroutine profile_start_timer
-
-    subroutine profile_stop_timer(self, label)
-        implicit none
-        class(type_time), intent(inout) :: self
-        character(len=*), intent(in) :: label
-        integer(int32) :: i
-        real(real64) :: end_time
-
-        if (.not. allocated(self%sections)) then
-            call error_message(982, c_opt="[profile_stop_timer] no profiler sections allocated")
-        end if
-
-        end_time = get_current_time()
-        do i = 1, size(self%sections)
-            if (trim(self%sections(i)%label) == trim(label)) then
-                self%sections(i)%total_time = self%sections(i)%total_time + (end_time - self%sections(i)%start_time)
-                self%sections(i)%start_time = 0.0d0
-                return
-            end if
-        end do
-        call error_message(982, c_opt="[profile_stop_timer] unknown label: "//trim(label))
-    end subroutine profile_stop_timer
-
-    function get_current_time() result(current_time)
-        implicit none
-        real(real64) :: current_time
-#ifdef _OPENMP
-        current_time = omp_get_wtime()
-#else
-        integer(int32) :: count, rate
-        call system_clock(count=count, count_rate=rate)
-        current_time = real(count, kind=real64) / real(rate, kind=real64)
-#endif
-    end function get_current_time
-
-    pure function get_record(self, label) result(record)
-        implicit none
-        class(type_time), intent(in) :: self
-        integer(int32), intent(in) :: label
-        character(:), allocatable :: record
-
-        select case (label)
-        case (TIME_RECORD_START)
-            record = trim(self%start%label)//" Time : "// &
-                     self%start%date(1:4)//"-"//self%start%date(5:6)//"-"//self%start%date(7:8)//"T"// &
-                     self%start%time(1:2)//":"//self%start%time(3:4)//":"//self%start%time(5:6)//trim(self%start%zone)
-        case (TIME_RECORD_END)
-            record = trim(self%end%label)//" Time : "// &
-                     self%end%date(1:4)//"-"//self%end%date(5:6)//"-"//self%end%date(7:8)//"T"// &
-                     self%end%time(1:2)//":"//self%end%time(3:4)//":"//self%end%time(5:6)//trim(self%end%zone)
-        end select
-    end function get_record
-
-    function get_time(self) result(t)
-        implicit none
-        class(type_time), intent(in) :: self
-        real(real64) :: t
-
-        t = self%time * self%time_conversion
-    end function get_time
-
+    ! ==========================================================================
+    ! Time Stepping & BDF
+    ! ==========================================================================
     subroutine shift_time(self, reverse)
         implicit none
         class(type_time), intent(inout) :: self
@@ -222,18 +176,21 @@ contains
 
         do_reverse = .false.
         if (present(reverse)) do_reverse = reverse
-        if (.not. allocated(self%dt_old)) return
 
+        if (.not. allocated(self%dt_old)) return
         n = size(self%dt_old)
 
         if (do_reverse) then
-            self%time = self%time_old
+            self%current_time = self%time_old
+            ! 履歴の復元（完全には不可能だが，逆操作として近似）
             if (n > 0) self%dt = self%dt_old(1)
             if (n > 1) self%dt_old(1:n - 1) = self%dt_old(2:n)
             if (n > 0) self%dt_old(n) = 0.0d0
         else
-            self%time_old = self%time
-            self%time = self%time + self%dt
+            self%time_old = self%current_time
+            self%current_time = self%current_time + self%dt
+
+            ! 履歴の更新 (シフト)
             if (n > 1) self%dt_old(2:n) = self%dt_old(1:n - 1)
             if (n > 0) self%dt_old(1) = self%dt
         end if
@@ -245,35 +202,20 @@ contains
         integer(int32), intent(in) :: order
 
         integer(int32) :: i, effective_order, order_to_use
+        real(real64), parameter :: DT_TOL = 1.0d-15
 
-        if (order < 1) then
-            call error_message(981, c_opt="[update_bdf_coefficients] invalid BDF order")
-        end if
-        if (.not. allocated(self%dt_old)) call error_message(981, c_opt="[update_bdf_coefficients] dt_old not allocated")
-        if (size(self%dt_old) < order) call error_message(981, c_opt="[update_bdf_coefficients] dt_old shorter than requested BDF order")
+        if (order < 1) call error_message(ERR_TIME_INIT, c_opt="Invalid BDF order requested")
+        if (.not. allocated(self%dt_old)) call error_message(ERR_TIME_INIT, c_opt="dt_old not allocated")
 
-        ! --- alpha 配列が要求される次数に対して適切か確認し，必要であれば再確保 ---
-        if (.not. allocated(self%alpha) .or. ubound(self%alpha, 1) < self%bdf_order) then
-            if (allocated(self%alpha)) deallocate (self%alpha)
-            allocate (self%alpha(0:self%bdf_order))
-        end if
-
-        ! --- 堅牢性の向上 ---
-        ! dt_old の履歴に基づいて，現在計算可能な最大のBDF次数を決定する．
-        ! BDF次数kには，k個の有効な（ゼロではない）過去のタイムステップが必要．
+        ! --- 利用可能な履歴の長さを確認 ---
         effective_order = 0
-        do i = 1, size(self%dt_old)
-            if (self%dt_old(i) <= 1.0d-15) then
-                ! 履歴がここで途切れている
-                exit
-            end if
+        do i = 1, min(size(self%dt_old), MAX_BDF_ORDER)
+            if (self%dt_old(i) <= DT_TOL) exit
             effective_order = i
         end do
 
-        ! 要求された次数と，履歴から可能な次数のうち，小さい方を使用する．
         order_to_use = min(order, effective_order)
-        ! 履歴がない場合(effective_order=0)でも，最低1次精度は保証する．
-        if (order_to_use < 1) order_to_use = 1
+        if (order_to_use < 1) order_to_use = 1 ! 最低でも1次（Backward Euler）
 
         call self%compute_bdf_coefficients(order_to_use)
     end subroutine update_bdf_coefficients_wrapper
@@ -283,49 +225,33 @@ contains
         class(type_time), intent(inout) :: self
         integer(int32), intent(in) :: order
 
-        integer :: j, m, n
-        real(real64), allocatable :: tau(:)
+        integer(int32) :: j, m, n
+        ! 自動配列を使用 (allocate オーバーヘッドを回避)
+        real(real64) :: tau(0:MAX_BDF_ORDER)
         real(real64) :: num, denom, dLj, Lj
         real(real64), parameter :: eps = 1.0d-15
 
-        if (abs(self%dt) <= 0.0d0) call error_message(981, c_opt="[compute_bdf_coefficients] current dt is nonpositive or zero")
+        if (self%dt <= 0.0d0) call error_message(ERR_TIME_INIT, c_opt="Current dt is nonpositive")
+        if (order > MAX_BDF_ORDER) call error_message(ERR_TIME_INIT, c_opt="Order exceeds MAX_BDF_ORDER")
 
-        ! --- BDF1（後退オイラー法）の場合 ---
-        ! BDF1はdtの履歴を必要としないため，係数は常に一定．
-        ! 履歴がない初期状態でも安全に計算できるよう，このケースを特別に処理する．
+        ! --- BDF1 (Backward Euler) Optimization ---
         if (order == 1) then
             self%alpha(0) = 1.0d0
             self%alpha(1) = -1.0d0
-            if (ubound(self%alpha, 1) >= 2) self%alpha(2:) = 0.0d0 ! 高次の係数をクリア
+            self%alpha(2:MAX_BDF_ORDER) = 0.0d0
             self%beta = 1.0d0
             self%bdf_order = 1
             return
         end if
 
-        ! --- BDF2以上（可変ステップサイズ）の場合 ---
-        if (order < 1) call error_message(981, c_opt="[compute_bdf_coefficients] invalid order")
-        if (.not. allocated(self%dt_old)) call error_message(981, c_opt="[compute_bdf_coefficients] dt_old not allocated")
-        if (size(self%dt_old) < order) call error_message(981, c_opt="[compute_bdf_coefficients] dt_old too short for order")
-
-        ! `tau` は現在の時間 t_n を基準(0)とし，過去の時間点 t_{n-j} を現在のステップ幅 dt で正規化したもの．
+        ! --- Initialize Tau ---
         ! tau_j = (t_{n-j} - t_n) / dt
-        allocate (tau(0:order))
         tau(0) = 0.0d0
         do j = 1, order
             tau(j) = tau(j - 1) - (self%dt_old(j) / self%dt)
         end do
 
-        ! 念のためtauの重複をチェック
-        do j = 0, order
-            do m = j + 1, order
-                if (abs(tau(j) - tau(m)) < eps) then
-                    call error_message(981, c_opt="[compute_bdf_coefficients] duplicate tau values detected. Insufficient dt history.")
-                end if
-            end do
-        end do
-
-        ! ラグランジュ補間多項式の微分からBDF係数（alpha）を計算する．
-        ! これは可変ステップサイズに対応した一般的な数値微分公式．
+        ! --- Compute Coefficients (alpha) ---
         do j = 0, order
             dLj = 0.0d0
             do m = 0, order
@@ -337,12 +263,22 @@ contains
                     num = num * (-tau(n))
                     denom = denom * (tau(j) - tau(n))
                 end do
-                if (abs(denom) < eps) call error_message(981, c_opt="[compute_bdf_coefficients] small denominator")
-                dLj = dLj + num / denom / (tau(j) - tau(m))
+
+                if (abs(denom) < eps) then
+                    ! 分母が極端に小さい場合は安全策としてBDF1にフォールバックなどを検討すべきだが，
+                    ! ここではエラーとして停止させる
+                    call error_message(ERR_TIME_INIT, c_opt="Small denominator in BDF calc")
+                end if
+
+                dLj = dLj + (num / denom) / (tau(j) - tau(m))
             end do
             self%alpha(j) = dLj
         end do
 
+        ! unused alpha should be zero
+        if (order < MAX_BDF_ORDER) self%alpha(order + 1:) = 0.0d0
+
+        ! --- Compute Beta ---
         self%beta = 0.0d0
         do j = 0, order
             Lj = 1.0d0
@@ -353,113 +289,222 @@ contains
             self%beta = self%beta + Lj
         end do
 
-        deallocate (tau)
         self%bdf_order = order
     end subroutine compute_bdf_coefficients
 
-    pure function get_dt(self) result(dt)
+    ! ==========================================================================
+    ! Profiler Logic
+    ! ==========================================================================
+    ! IDを取得する関数（文字列比較をここだけに集約）
+    function get_profiler_id(self, label) result(id)
+        implicit none
         class(type_time), intent(in) :: self
-        real(real64) :: dt
-        dt = self%dt
+        character(len=*), intent(in) :: label
+        integer(int32) :: id, i
+
+        id = -1
+        if (allocated(self%sections)) then
+            do i = 1, size(self%sections)
+                if (trim(self%sections(i)%label) == trim(label)) then
+                    id = i
+                    return
+                end if
+            end do
+        end if
+    end function get_profiler_id
+
+    ! 文字列でスタート（従来の互換性）
+    subroutine profile_start_by_name(self, label)
+        implicit none
+        class(type_time), intent(inout) :: self
+        character(len=*), intent(in) :: label
+        integer(int32) :: id
+
+        id = self%get_profiler_id(label)
+        if (id > 0) then
+            call self%profile_start_by_id(id)
+        else
+            call error_message(ERR_PROFILER, c_opt="Unknown label: "//trim(label))
+        end if
+    end subroutine profile_start_by_name
+
+    ! IDでスタート（高速版）
+    subroutine profile_start_by_id(self, id)
+        implicit none
+        class(type_time), intent(inout) :: self
+        integer(int32), intent(in) :: id
+
+        if (allocated(self%sections)) then
+            if (id >= 1 .and. id <= size(self%sections)) then
+                self%sections(id)%start_time = get_current_wall_time()
+                self%sections(id)%call_count = self%sections(id)%call_count + 1
+            end if
+        end if
+    end subroutine profile_start_by_id
+
+    subroutine profile_stop_by_name(self, label)
+        implicit none
+        class(type_time), intent(inout) :: self
+        character(len=*), intent(in) :: label
+        integer(int32) :: id
+
+        id = self%get_profiler_id(label)
+        if (id > 0) then
+            call self%profile_stop_by_id(id)
+        else
+            call error_message(ERR_PROFILER, c_opt="Unknown label: "//trim(label))
+        end if
+    end subroutine profile_stop_by_name
+
+    subroutine profile_stop_by_id(self, id)
+        implicit none
+        class(type_time), intent(inout) :: self
+        integer(int32), intent(in) :: id
+        real(real64) :: end_time
+
+        if (allocated(self%sections)) then
+            if (id >= 1 .and. id <= size(self%sections)) then
+                end_time = get_current_wall_time()
+                self%sections(id)%total_time = self%sections(id)%total_time + &
+                                               (end_time - self%sections(id)%start_time)
+                self%sections(id)%start_time = 0.0d0
+            end if
+        end if
+    end subroutine profile_stop_by_id
+
+    function get_current_wall_time() result(current_time)
+        implicit none
+        real(real64) :: current_time
+        integer(int32) :: count, rate
+#ifdef _OPENMP
+        current_time = omp_get_wtime()
+#else
+        call system_clock(count=count, count_rate=rate)
+        current_time = real(count, kind=real64) / real(rate, kind=real64)
+#endif
+    end function get_current_wall_time
+
+    ! ==========================================================================
+    ! Utility & Display
+    ! ==========================================================================
+    subroutine record_timestamp(self, label)
+        implicit none
+        class(type_time), intent(inout) :: self
+        integer(int32), intent(in) :: label
+
+        select case (label)
+        case (TIME_RECORD_START)
+            call date_and_time(date=self%record_start%date, time=self%record_start%time, &
+                               zone=self%record_start%zone)
+            self%record_start%label = get_time_record_string(label)
+        case (TIME_RECORD_END)
+            call date_and_time(date=self%record_end%date, time=self%record_end%time, &
+                               zone=self%record_end%zone)
+            self%record_end%label = get_time_record_string(label)
+        end select
+    end subroutine record_timestamp
+
+    pure function get_record(self, label) result(record)
+        implicit none
+        class(type_time), intent(in) :: self
+        integer(int32), intent(in) :: label
+        character(:), allocatable :: record
+
+        select case (label)
+        case (TIME_RECORD_START)
+            record = trim(self%record_start%label)//" Time : "// &
+                     self%record_start%date(1:4)//"-"//self%record_start%date(5:6)//"-"// &
+                     self%record_start%date(7:8)//"T"// &
+                     self%record_start%time(1:2)//":"//self%record_start%time(3:4)//":"// &
+                     self%record_start%time(5:6)//trim(self%record_start%zone)
+        case (TIME_RECORD_END)
+            record = trim(self%record_end%label)//" Time : "// &
+                     self%record_end%date(1:4)//"-"//self%record_end%date(5:6)//"-"// &
+                     self%record_end%date(7:8)//"T"// &
+                     self%record_end%time(1:2)//":"//self%record_end%time(3:4)//":"// &
+                     self%record_end%time(5:6)//trim(self%record_end%zone)
+        case default
+            record = "Unknown Record"
+        end select
+    end function get_record
+
+    ! Getters for private components
+    pure function get_time(self) result(t)
+        class(type_time), intent(in) :: self
+        real(real64) :: t
+        t = self%current_time * self%time_conversion
+    end function get_time
+
+    pure function get_dt(self) result(val)
+        class(type_time), intent(in) :: self
+        real(real64) :: val
+        val = self%dt
     end function get_dt
+
+    pure function get_bdf_order(self) result(val)
+        class(type_time), intent(in) :: self
+        integer(int32) :: val
+        val = self%bdf_order
+    end function get_bdf_order
+
+    pure function get_bdf_alpha(self) result(val)
+        class(type_time), intent(in) :: self
+        real(real64), allocatable :: val(:)
+        val = self%alpha(0:self%bdf_order)
+    end function get_bdf_alpha
+
+    pure function get_bdf_beta(self) result(val)
+        class(type_time), intent(in) :: self
+        real(real64) :: val
+        val = self%beta
+    end function get_bdf_beta
 
     pure function convert_time_unit(source_unit, target_unit) result(coefficient)
         implicit none
-        integer(int32), intent(in) :: source_unit
-        integer(int32), intent(in) :: target_unit
+        integer(int32), intent(in) :: source_unit, target_unit
         real(real64) :: coefficient
-        real(real64) :: source_factor, target_factor
+        real(real64) :: to_seconds_factor(5)
 
-        select case (source_unit)
-        case (TIME_UNIT_SECONDS)
-            source_factor = 1.0d0
-        case (TIME_UNIT_MINUTES)
-            source_factor = 60.0d0
-        case (TIME_UNIT_HOURS)
-            source_factor = 3600.0d0
-        case (TIME_UNIT_DAYS)
-            source_factor = 86400.0d0
-        case (TIME_UNIT_YEARS)
-            source_factor = 31557600.0d0
-        case default
-            source_factor = 1.0d0
-            ! Or error
-        end select
+        ! Table based conversion might be cleaner but select case is fine.
+        ! Simply defined relative to seconds.
+        ! 1:sec, 2:min, 3:hour, 4:day, 5:year
+        to_seconds_factor = [1.0d0, 60.0d0, 3600.0d0, 86400.0d0, 31557600.0d0]
 
-        select case (target_unit)
-        case (TIME_UNIT_SECONDS)
-            target_factor = 1.0d0
-        case (TIME_UNIT_MINUTES)
-            target_factor = 60.0d0
-        case (TIME_UNIT_HOURS)
-            target_factor = 3600.0d0
-        case (TIME_UNIT_DAYS)
-            target_factor = 86400.0d0
-        case (TIME_UNIT_YEARS)
-            target_factor = 31557600.0d0
-        case default
-            target_factor = 1.0d0
-            ! Or error
-        end select
-
-        coefficient = source_factor / target_factor
+        if (source_unit < 1 .or. source_unit > 5 .or. target_unit < 1 .or. target_unit > 5) then
+            coefficient = 1.0d0
+        else
+            coefficient = to_seconds_factor(source_unit) / to_seconds_factor(target_unit)
+        end if
     end function convert_time_unit
 
     subroutine display_status(self)
         implicit none
         class(type_time), intent(in) :: self
-        integer :: i, lb, ub
+        integer :: i
 
-        ! --- Header ---
         write (*, '(a)') "## Time Status"
         write (*, '(a)') "---"
         write (*, *)
 
-        ! --- Simulation Period ---
-        write (*, '(a)') "### Simulation Period (seconds)"
-        write (*, '(a)') "------------------------------------"
+        write (*, '(a)') "### Simulation Period"
         write (*, '(" - Start Time      : ", ES12.5)') self%start_time
         write (*, '(" - End Time        : ", ES12.5)') self%end_time
-        if (trim(self%start%label) /= "") write (*, '(" - Start Timestamp : ", A)') self%get_record(TIME_RECORD_START)
-        if (trim(self%end%label) /= "") write (*, '(" - End Timestamp   : ", A)') self%get_record(TIME_RECORD_END)
         write (*, *)
 
-        ! --- Current Time Step ---
-        write (*, '(a)') "### Current Time Step (seconds)"
-        write (*, '(a)') "------------------------------------"
-        write (*, '(" - Current Time    : ", ES12.5)') self%time
+        write (*, '(a)') "### Current Time Step"
+        write (*, '(" - Current Time    : ", ES12.5)') self%current_time
         write (*, '(" - Current dt      : ", ES12.5)') self%dt
-        write (*, '(" - Min dt          : ", ES12.5)') self%dt_min
-        write (*, '(" - Max dt          : ", ES12.5)') self%dt_max
-
-        if (allocated(self%dt_old)) then
-            write (*, '(a)') "- dt History (newest first):"
-            lb = lbound(self%dt_old, 1)
-            ub = ubound(self%dt_old, 1)
-            write (*, '(100(ES12.5,1X))', advance='no') (self%dt_old(i), i=lb, ub)
-            write (*, *)
-        end if
+        write (*, '(" - BDF Order       : ", I0)') self%bdf_order
         write (*, *)
 
-        ! --- BDF Coefficients ---
-        if (allocated(self%alpha)) then
-            write (*, '(a)') "### BDF Coefficients"
-            write (*, '(" - Current Order   : ", I0)') self%bdf_order
-            do i = lbound(self%alpha, 1), ubound(self%alpha, 1)
-                write (*, '(" - alpha(",I0,") = ", ES12.5)') i, self%alpha(i)
-            end do
-            write (*, '(" - beta = ", ES12.5)') self%beta
-            write (*, *)
-        end if
-
-        ! --- Profiler Results ---
         if (allocated(self%sections)) then
             if (size(self%sections) > 0) then
-                write (*, '(a)') "### Profiler Results (seconds)"
-                write (*, '(a)') "| Section | Time        |"
-                write (*, '(a)') "|:-------:|:-----------:|"
+                write (*, '(a)') "### Profiler Results"
+                write (*, '(a)') "| Section            | Time (s)    | Calls |"
+                write (*, '(a)') "|:-------------------|:-----------:|:-----:|"
                 do i = 1, size(self%sections)
-                    write (*, '("|", A20, "|", ES12.5, "|")') trim(self%sections(i)%label), self%sections(i)%total_time
+                    write (*, '("| ", A18, " | ", ES10.3, " | ", I5, " |")') &
+                        trim(self%sections(i)%label), self%sections(i)%total_time, self%sections(i)%call_count
                 end do
                 write (*, *)
             end if

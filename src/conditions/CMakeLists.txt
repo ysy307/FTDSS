@@ -9,7 +9,7 @@
 # --- Boundary Condition Library ---
 set(CONDITIONS_BOUNDARY_SOURCES
     boundary/boundary_interface.F90
-    # boundary/boundary_base.F90
+    boundary/boundary_base.F90
     boundary/boundary_adiabatic.F90
     boundary/boundary_dirichlet.F90
     boundary/boundary_manager.F90

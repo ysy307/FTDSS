@@ -260,15 +260,15 @@ contains
         integer(int32) :: val
 
         select case (strip(to_lower(key)))
-        case ("dirichlet")
+        case ("Dirichlet")
             val = HYDRAULIC_BC_DIRICHLET
-        case ("neumann")
+        case ("Neumann")
             val = HYDRAULIC_BC_NEUMANN
-        case ("flux")
+        case ("Flux")
             val = HYDRAULIC_BC_FLUX
-        case ("impermeable")
+        case ("Impermeable")
             val = HYDRAULIC_BC_IMPERMEABLE
-        case ("seepage")
+        case ("Seepage")
             val = HYDRAULIC_BC_SEEPAGE
         end select
     end function get_hydraulic_bc_type

@@ -152,7 +152,11 @@ contains
                 write (msg, fmt) "#", err_number, ": Unknown time label"
             end if
         else
-            msg = "Unknown error"
+            if (present(c_opt)) then
+                write (msg, fmt) "#", err_number, ": Unknown error - "//trim(adjustl(c_opt))//"."
+            else
+                write (msg, fmt) "#", err_number, ": Unknown error."
+            end if
         end if
 
 #ifdef _MPI

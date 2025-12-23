@@ -115,12 +115,12 @@ contains
         call get_json_value(json, join(local_buffer), tmp_string, is_required=.true., valid_list=valid_types)
         boundary%type = p_get_value(tmp_string)
         select case (p_get_string(boundary%type))
-        case ("dirichlet", "neumann", "flux", "robin", "heat_transfer", "head_radiation")
+        case ("Dirichlet", "Neumann", "Flux", "Robin", "Convective", "Radiation")
             local_buffer(end_index + 1) = values
             call get_json_value(json, join(local_buffer), boundary%values, &
                                 is_required=.true., array_size=num_time_points)
 
-        case ("adiabatic", "impermeable", "free")
+        case ("Adiabatic", "Impermeable", "Free")
             if (allocated(boundary%values)) deallocate (boundary%values)
         end select
     end subroutine read_conditions_boundary_conditions_local
