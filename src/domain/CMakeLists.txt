@@ -10,6 +10,7 @@
 # This is a foundational component for the domain.
 set(DOMAIN_MESH_SOURCES
     fe/fe_interface.F90
+    fe/fe_integration.F90
     fe/element/element_interface.F90
     fe/element/element_triangle_first.F90
     fe/element/element_triangle_second.F90

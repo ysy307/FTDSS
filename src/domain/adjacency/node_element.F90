@@ -1,150 +1,143 @@
 !>
 !> Manages a reverse map from nodes to the elements they belong to.
-!> This module provides a data structure for efficiently querying the list of
-!> elements that contain a specific node, built from a CSR-formatted element
-!> connectivity array.
+!>
+!> This module transforms the Element->Node connectivity (input) into a
+!> Node->Element map (output) using a CSR (Compressed Sparse Row) format.
+!> This is equivalent to transposing the connectivity matrix.
 !>
 module domain_adjacency_node_element
     use, intrinsic :: iso_fortran_env, only: int32
-
     implicit none
     private
 
     public :: type_map_node_to_element
 
     !>
-    !> A private type to hold a list of element IDs for a single node.
-    !>
-    type, private :: type_element_list
-        !> An array of 1-based element IDs.
-        integer(int32), allocatable :: ids(:)
-    end type type_element_list
-
-    !>
     !> Encapsulates the mapping from each node to a list of its parent elements.
+    !> Uses CSR format for high performance and low memory overhead.
     !>
     type :: type_map_node_to_element
-        private
-        !> The core data structure, an array where each index corresponds to a
-        !> node ID and holds a list of element IDs.
-        type(type_element_list), allocatable :: map_data(:)
+        integer(int32) :: num_nodes = 0
+        integer(int32) :: num_entries = 0 ! Total number of node-element links
+
+        !> Row pointers (Size: num_nodes + 1)
+        integer(int32), allocatable :: ptr(:)
+        !> Column indices (Size: num_entries) - Stores Element IDs
+        integer(int32), allocatable :: ind(:)
     contains
-        procedure, pass(self), public :: initialize => initialize_type_map_node_to_element
+        procedure, pass(self), public :: initialize
         procedure, pass(self), public :: get_list => get_element_list
-        procedure, pass(self), public :: destroy => destroy_type_map_node_to_element
+        procedure, pass(self), public :: destroy
     end type type_map_node_to_element
 
 contains
 
     !>
-    !> Builds the node-to-element map from element connectivity data.
-    !> This routine uses an efficient multi-pass algorithm to first count the
-    !> number of elements per node, then allocate memory, and finally populate
-    !> the map.
+    !> Builds the node-to-element map by transposing the element connectivity.
     !>
-    subroutine initialize_type_map_node_to_element(self, num_nodes, num_elements, conn_ind, conn_val)
-        implicit none
-        !> The map object to be initialized.
+    subroutine initialize(self, num_nodes, num_elements, conn_ind, conn_val)
         class(type_map_node_to_element), intent(inout) :: self
-        !> The total number of nodes in the mesh.
         integer(int32), intent(in) :: num_nodes
-        !> The total number of elements in the mesh.
         integer(int32), intent(in) :: num_elements
-        !> The CSR-style pointer array for the element connectivity (size num_elements + 1).
-        integer(int32), intent(in) :: conn_ind(:)
-        !> The CSR-style index array for the element connectivity, containing node IDs.
-        integer(int32), intent(in) :: conn_val(:)
+        integer(int32), intent(in) :: conn_ind(:) ! Element -> Node pointers
+        integer(int32), intent(in) :: conn_val(:) ! Element -> Node indices
 
-        integer(int32) :: ielem, idx, node_id, start_idx, end_idx
-        integer(int32), allocatable :: node_element_counts(:)
-        integer(int32), allocatable :: current_indices(:)
+        integer(int32) :: i, j, start_idx, end_idx, node_id, cum_sum
+        integer(int32), allocatable :: counts(:)
+        integer(int32), allocatable :: next_pos(:)
 
         call self%destroy()
         if (num_nodes <= 0 .or. num_elements <= 0) return
 
-        allocate (self%map_data(num_nodes))
+        self%num_nodes = num_nodes
 
-        ! ==========================================================
-        ! Pass 1: Count how many elements each node belongs to.
-        ! ==========================================================
-        allocate (node_element_counts(num_nodes))
-        node_element_counts = 0
-        do ielem = 1, num_elements
-            start_idx = conn_ind(ielem)
-            end_idx = conn_ind(ielem + 1) - 1
-            do idx = start_idx, end_idx
-                node_id = conn_val(idx)
-                if (node_id > 0 .and. node_id <= num_nodes) then
-                    node_element_counts(node_id) = node_element_counts(node_id) + 1
+        ! --- Pass 1: Count elements per node (Degree calculation) ---
+        allocate (counts(num_nodes))
+        counts = 0
+
+        do i = 1, num_elements
+            start_idx = conn_ind(i)
+            end_idx = conn_ind(i + 1) - 1
+            do j = start_idx, end_idx
+                node_id = conn_val(j)
+                if (node_id >= 1 .and. node_id <= num_nodes) then
+                    counts(node_id) = counts(node_id) + 1
                 end if
             end do
         end do
 
-        ! ==========================================================
-        ! Pass 2: Allocate the final arrays based on the counts.
-        ! ==========================================================
-        do node_id = 1, num_nodes
-            if (node_element_counts(node_id) > 0) then
-                allocate (self%map_data(node_id)%ids(node_element_counts(node_id)))
-            end if
-        end do
-        deallocate (node_element_counts)
+        ! --- Pass 2: Build CSR Row Pointers (Prefix Sum) ---
+        allocate (self%ptr(num_nodes + 1))
+        self%ptr(1) = 1
+        cum_sum = 1
 
-        ! ==========================================================
-        ! Pass 3: Fill the arrays with the element IDs.
-        ! ==========================================================
-        allocate (current_indices(num_nodes))
-        current_indices = 1
-        do ielem = 1, num_elements
-            start_idx = conn_ind(ielem)
-            end_idx = conn_ind(ielem + 1) - 1
-            do idx = start_idx, end_idx
-                node_id = conn_val(idx)
-                if (node_id > 0 .and. node_id <= num_nodes) then
-                    self%map_data(node_id)%ids(current_indices(node_id)) = ielem
-                    current_indices(node_id) = current_indices(node_id) + 1
+        do i = 1, num_nodes
+            cum_sum = cum_sum + counts(i)
+            self%ptr(i + 1) = cum_sum
+        end do
+
+        self%num_entries = cum_sum - 1
+
+        ! --- Pass 3: Fill Element IDs (Transpose) ---
+        allocate (self%ind(self%num_entries))
+
+        ! Use 'counts' array to keep track of current insert position for each node
+        ! Re-initialize next_pos using ptr
+        allocate (next_pos(num_nodes))
+        next_pos = self%ptr(1:num_nodes)
+
+        do i = 1, num_elements
+            start_idx = conn_ind(i)
+            end_idx = conn_ind(i + 1) - 1
+            do j = start_idx, end_idx
+                node_id = conn_val(j)
+                if (node_id >= 1 .and. node_id <= num_nodes) then
+                    self%ind(next_pos(node_id)) = i ! Store Element ID
+                    next_pos(node_id) = next_pos(node_id) + 1
                 end if
             end do
         end do
-        deallocate (current_indices)
-    end subroutine initialize_type_map_node_to_element
+
+        deallocate (counts)
+        deallocate (next_pos)
+
+    end subroutine initialize
 
     !>
-    !> Returns a pointer to the list of element IDs for a specific node.
+    !> Returns the list of element IDs for a specific node.
     !>
-    function get_element_list(self, node_id) result(id_list)
-        !> The map object.
-        class(type_map_node_to_element), intent(in), target :: self
-        !> The 1-based ID of the node to query.
+    subroutine get_element_list(self, node_id, element_list)
+        class(type_map_node_to_element), intent(in) :: self
         integer(int32), intent(in) :: node_id
-        !> A pointer to the internal array of element IDs. This pointer should not
-        !> be deallocated by the caller. It will be null if the node ID is
-        !> invalid or the node belongs to no elements.
-        integer(int32), pointer :: id_list(:)
+        integer(int32), allocatable, intent(out) :: element_list(:)
+        integer(int32) :: start_idx, end_idx, n
 
-        nullify (id_list)
-        if (node_id < 1 .or. node_id > size(self%map_data)) return
-
-        if (allocated(self%map_data(node_id)%ids)) then
-            id_list => self%map_data(node_id)%ids
+        if (node_id < 1 .or. node_id > self%num_nodes) then
+            allocate (element_list(0))
+            return
         end if
-    end function get_element_list
+
+        start_idx = self%ptr(node_id)
+        end_idx = self%ptr(node_id + 1) - 1
+        n = end_idx - start_idx + 1
+
+        if (n > 0) then
+            allocate (element_list(n))
+            element_list = self%ind(start_idx:end_idx)
+        else
+            allocate (element_list(0))
+        end if
+    end subroutine get_element_list
 
     !>
-    !> Deallocates all memory associated with the map.
+    !> Deallocates memory.
     !>
-    subroutine destroy_type_map_node_to_element(self)
-        implicit none
-        !> The map object to destroy.
+    subroutine destroy(self)
         class(type_map_node_to_element), intent(inout) :: self
-        integer(int32) :: i
-        if (.not. allocated(self%map_data)) return
-        do i = 1, size(self%map_data)
-            if (allocated(self%map_data(i)%ids)) then
-                deallocate (self%map_data(i)%ids)
-            end if
-        end do
-        deallocate (self%map_data)
-    end subroutine destroy_type_map_node_to_element
+        if (allocated(self%ptr)) deallocate (self%ptr)
+        if (allocated(self%ind)) deallocate (self%ind)
+        self%num_nodes = 0
+        self%num_entries = 0
+    end subroutine destroy
 
 end module domain_adjacency_node_element

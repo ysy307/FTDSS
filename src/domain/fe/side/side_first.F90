@@ -1,24 +1,28 @@
 !>
 !> Implements the procedures for the first-order side (line) finite element.
+!> Refactored to use subroutines for all interface methods and strict variable declarations.
 !>
 submodule(domain_fe_side) domain_fe_side_first
     implicit none
+
 contains
 
     !>
     !> Creates and initializes a first-order side (2-node line) element object.
-    !> This function sets up the element properties, including the number of nodes,
-    !> dimension, order, and a 1-point Gauss integration rule suitable for linear elements.
     !>
     module function construct_side_first(input) result(fe)
         implicit none
-        !> The main input data structure (currently unused but kept for API consistency).
+        !> The main input data structure.
         type(type_input), intent(in) :: input
         !> The newly created and allocated first-order side element object.
         class(abst_fe), allocatable :: fe
 
-        character(len=32), parameter :: cell_name = "Line"
-        integer(int32) :: vtk_type, num_nodes, dimension, order, num_gauss
+        character(len=*), parameter :: cell_name = "Line"
+        integer(int32) :: vtk_type
+        integer(int32) :: num_nodes
+        integer(int32) :: dimension
+        integer(int32) :: order
+        integer(int32) :: num_gauss
         real(real64), allocatable :: weight(:)
         real(real64), allocatable :: gauss(:, :)
 
@@ -43,20 +47,19 @@ contains
 
     !>
     !> Calculates the straight-line length of the element.
-    !> This is computed as the Euclidean distance between the element's two nodes.
     !>
-    module function get_length_side_first(self, node_coords, connectivity) result(length)
+    module subroutine get_length_side_first(self, node_coords, connectivity, geometry)
         implicit none
-        !> The first-order side element object.
         class(type_side_first), intent(in) :: self
-        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
-        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
-        !> The computed length of the element.
-        real(real64) :: length
-        integer(int32) :: node1_id, node2_id
-        real(real64) :: dx, dy, dz
+        real(real64), intent(inout) :: geometry
+
+        integer(int32) :: node1_id
+        integer(int32) :: node2_id
+        real(real64) :: dx
+        real(real64) :: dy
+        real(real64) :: dz
 
         node1_id = connectivity(1)
         node2_id = connectivity(2)
@@ -65,159 +68,131 @@ contains
         dy = node_coords(2, node2_id) - node_coords(2, node1_id)
         dz = node_coords(3, node2_id) - node_coords(3, node1_id)
 
-        length = sqrt(dx**2 + dy**2 + dz**2)
-    end function get_length_side_first
+        geometry = sqrt(dx**2 + dy**2 + dz**2)
+    end subroutine get_length_side_first
 
     !>
-    !> Evaluates the shape function \( \psi_i \) for a 2-node linear line element.
-    !> The functions are \( \psi_1(\xi) = \frac{1}{2}(1-\xi) \) and \( \psi_2(\xi) = \frac{1}{2}(1+\xi) \).
+    !> Evaluates the shape function psi.
     !>
-    module pure elemental function psi_side_first(self, i, r) result(psi)
+    pure elemental module subroutine psi_side_first(self, i, r, psi_val)
         implicit none
-        !> The first-order side element object.
         class(type_side_first), intent(in) :: self
-        !> The index of the shape function (1 or 2).
         integer(int32), intent(in) :: i
-        !> The local coordinate vector, where \( \xi = r\%x \).
         type(type_coordinate_dp), intent(in) :: r
-        !> The value of the shape function \( \psi_i(\xi) \).
-        real(real64) :: psi
+        real(real64), intent(inout) :: psi_val
 
         select case (i)
         case (1)
-            psi = 0.5d0 * (1.0d0 - r%x)
+            psi_val = 0.5d0 * (1.0d0 - r%x)
         case (2)
-            psi = 0.5d0 * (1.0d0 + r%x)
+            psi_val = 0.5d0 * (1.0d0 + r%x)
         case default
-            psi = 0.0d0
+            psi_val = 0.0d0
         end select
-    end function psi_side_first
+    end subroutine psi_side_first
 
     !>
-    !> Evaluates the derivative of the shape function with respect to the local
-    !> coordinate, \( \frac{d\psi_i}{d\xi} \).
+    !> Evaluates the derivative of the shape function dpsi.
     !>
-    module pure elemental function dpsi_side_first(self, i, j, r) result(dpsi)
+    pure elemental module subroutine dpsi_side_first(self, i, j, r, dpsi_val)
         implicit none
-        !> The first-order side element object.
         class(type_side_first), intent(in) :: self
-        !> The index of the shape function (1 or 2).
         integer(int32), intent(in) :: i
-        !> The index of the local coordinate to differentiate with respect to (must be 1 for \( \xi \)).
         integer(int32), intent(in) :: j
-        !> The local coordinate vector (unused, as derivatives are constant).
         type(type_coordinate_dp), intent(in) :: r
-        !> The value of the derivative, which is a constant (\( \mp 0.5 \)).
-        real(real64) :: dpsi
+        real(real64), intent(inout) :: dpsi_val
 
-        dpsi = 0.0d0
+        dpsi_val = 0.0d0
         if (j == 1) then
             select case (i)
             case (1)
-                dpsi = -0.5d0
+                dpsi_val = -0.5d0
             case (2)
-                dpsi = 0.5d0
+                dpsi_val = 0.5d0
             end select
         end if
-    end function dpsi_side_first
+    end subroutine dpsi_side_first
 
     !>
-    !> Computes the tangent vector at a specified local coordinate on the element.
-    !> For a linear element, this vector is constant along the element.
+    !> Computes the tangent vector at a specified local coordinate.
     !>
-    module pure function compute_tangent_vector_side_first(self, r, node_coords, connectivity) result(tangent_vec)
+    pure module subroutine compute_tangent_vector_side_first(self, r, node_coords, connectivity, tangent_vec)
         implicit none
-        !> The first-order side element object.
         class(type_side_first), intent(in) :: self
-        !> The local coordinate vector (unused, as the tangent is constant).
         type(type_coordinate_dp), intent(in) :: r
-        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
-        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
-        !> The computed 3D tangent vector.
-        real(real64) :: tangent_vec(3)
-        integer(int32) :: i, node_id
+        real(real64), intent(inout) :: tangent_vec(:)
+
+        integer(int32) :: i
+        integer(int32) :: node_id
+        integer(int32) :: nn
+        real(real64) :: dpsi_val
 
         tangent_vec = 0.0d0
-        do i = 1, self%get_num_nodes()
+        call self%get_num_nodes(nn)
+
+        do i = 1, nn
             node_id = connectivity(i)
-            tangent_vec(1) = tangent_vec(1) + self%dpsi(i, 1, r) * node_coords(1, node_id)
-            tangent_vec(2) = tangent_vec(2) + self%dpsi(i, 1, r) * node_coords(2, node_id)
-            tangent_vec(3) = tangent_vec(3) + self%dpsi(i, 1, r) * node_coords(3, node_id)
+            call self%dpsi(i, 1, r, dpsi_val)
+            tangent_vec(1) = tangent_vec(1) + dpsi_val * node_coords(1, node_id)
+            tangent_vec(2) = tangent_vec(2) + dpsi_val * node_coords(2, node_id)
+            tangent_vec(3) = tangent_vec(3) + dpsi_val * node_coords(3, node_id)
         end do
-    end function compute_tangent_vector_side_first
+    end subroutine compute_tangent_vector_side_first
 
     !>
-    !> Calculates the Jacobian matrix for the 1D element.
-    !> For a 1D element, this is a 1x1 matrix whose single component is the
-    !> magnitude (norm) of the tangent vector, which is constant for a linear element.
+    !> Calculates the Jacobian matrix.
     !>
-    module pure function jacobian_side_first(self, r, node_coords, connectivity) result(jacobian)
+    pure module subroutine jacobian_side_first(self, r, node_coords, connectivity, jac)
         implicit none
-        !> The first-order side element object.
         class(type_side_first), intent(in) :: self
-        !> The local coordinate vector (unused).
         type(type_coordinate_dp), intent(in) :: r
-        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
-        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
-        !> The computed 1x1 Jacobian matrix.
-        real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
+        real(real64), intent(inout) :: jac(:, :)
+
         real(real64) :: tangent_vec(3)
 
-        tangent_vec = self%compute_tangent_vector(r, node_coords, connectivity)
-
-        jacobian(1, 1) = sqrt(sum(tangent_vec**2))
-    end function jacobian_side_first
+        call self%compute_tangent_vector(r, node_coords, connectivity, tangent_vec)
+        jac(1, 1) = sqrt(sum(tangent_vec**2))
+    end subroutine jacobian_side_first
 
     !>
-    !> Calculates the determinant of the Jacobian matrix.
-    !> For a 1D element, this is simply the value of the (1,1) component of the
-    !> Jacobian matrix, which is half the element length.
+    !> Calculates the Jacobian determinant.
     !>
-    module pure function jacobian_det_side_first(self, r, node_coords, connectivity) result(jacobian_det)
+    pure module subroutine jacobian_det_side_first(self, r, node_coords, connectivity, det_j)
         implicit none
-        !> The first-order side element object.
         class(type_side_first), intent(in) :: self
-        !> The local coordinate vector (unused).
         type(type_coordinate_dp), intent(in) :: r
-        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
-        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
-        !> The Jacobian determinant.
-        real(real64) :: jacobian_det
-        real(real64) :: jacobian(self%get_dimension(), self%get_dimension())
+        real(real64), intent(inout) :: det_j
 
-        jacobian = self%jacobian(r, node_coords, connectivity)
-        jacobian_det = jacobian(1, 1)
-    end function jacobian_det_side_first
+        real(real64) :: jac(1, 1)
+
+        call self%jacobian(r, node_coords, connectivity, jac)
+        det_j = jac(1, 1)
+    end subroutine jacobian_det_side_first
 
     !>
-    !> Determines if a point in global coordinates lies on the line segment element.
-    !> This is solved by projecting the vector from the first node to the point onto
-    !> the element's direction vector.
+    !> Checks if a point is on the element.
     !>
     module subroutine is_in_side_first(self, cartesian, normalized, node_coords, connectivity, is_in)
         implicit none
-        !> The first-order side element object.
         class(type_side_first), intent(in) :: self
-        !> The point in global (Cartesian) coordinates to check.
         type(type_coordinate_dp), intent(in) :: cartesian
-        !> The resulting local (normalized) coordinate if the point is on the element.
         type(type_coordinate_dp), intent(inout) :: normalized
-        !> The global coordinates of the mesh nodes.
         real(real64), intent(in) :: node_coords(:, :)
-        !> The connectivity array for the element.
         integer(int32), intent(in) :: connectivity(:)
-        !> A logical flag, set to true if the point is on the element, false otherwise.
         logical, intent(inout) :: is_in
 
-        real(real64) :: v(3), w(3)
-        real(real64) :: t, v_dot_v
-        integer(int32) :: node1_id, node2_id
+        real(real64) :: v(3)
+        real(real64) :: w(3)
+        real(real64) :: t
+        real(real64) :: v_dot_v
+        integer(int32) :: node1_id
+        integer(int32) :: node2_id
         real(real64), parameter :: tol = 1.0e-9
 
         node1_id = connectivity(1)
@@ -236,19 +211,16 @@ contains
         v_dot_v = v(1)**2 + v(2)**2 + v(3)**2
 
         if (v_dot_v < tol**2) then
-            ! The element has zero length; check if the point is at the same location.
             is_in = (abs(w(1)) < tol .and. abs(w(2)) < tol .and. abs(w(3)) < tol)
         else
-            ! Project w onto v to find the parametric coordinate t.
             t = (w(1) * v(1) + w(2) * v(2) + w(3) * v(3)) / v_dot_v
-            ! The point is on the line segment if t is between 0 and 1.
             is_in = (t >= 0.0d0 - tol .and. t <= 1.0d0 + tol)
         end if
 
         if (is_in) then
-            ! Convert parametric coordinate t [0, 1] to local coordinate xi [-1, 1].
             call normalized%set(2.0d0 * t - 1.0d0, 0.0d0, 0.0d0)
         end if
     end subroutine is_in_side_first
 
 end submodule domain_fe_side_first
+

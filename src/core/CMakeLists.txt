@@ -63,6 +63,7 @@ set(CORE_TYPES_SOURCES
     types/pointer.F90
     types/variable.F90
     types/physics.F90
+    types/graph.F90
     types/matrix/matrix_interface.F90
     types/matrix/matrix_dense.F90
     types/matrix/matrix_coo.F90
