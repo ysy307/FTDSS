@@ -51,8 +51,14 @@ module core_types_physics
         type(type_field_r64) :: latent_heat_vaporization ! [J/kg]
 
         ! --- Derivatives ---
-        type(type_field_r64) :: dQw_dT ! d(theta_w)/dT
-        type(type_field_r64) :: dQv_dT ! d(theta_v)/dT
+        type(type_field_r64) :: dQw_dT ! d(theta_water)/dT
+        type(type_field_r64) :: dQv_dT ! d(theta_vapor)/dT
+        type(type_field_r64) :: dQa_dT ! d(theta_air)/dT
+        type(type_field_r64) :: dQi_dT ! d(theta_ice)/dT
+        type(type_field_r64) :: dQw_dP ! d(theta_water)/dP
+        type(type_field_r64) :: dQv_dP ! d(theta_vapor)/dP
+        type(type_field_r64) :: dQa_dP ! d(theta_air)/dP
+        type(type_field_r64) :: dQi_dP ! d(theta_ice)/dP
 
         ! --- Other ---
         type(type_field_r64) :: relative_humidity ! [-]
@@ -166,7 +172,7 @@ contains
     subroutine state_set_all(self, temperature, pressure, water_content, ice_content, &
                              vapor_content, air_content, porosity, &
                              latent_heat_fusion, latent_heat_vaporization, &
-                             dQw_dT, dQv_dT, &
+                             dQw_dT, dQv_dT, dQa_dT, dQi_dT, dQw_dP, dQv_dP, dQa_dP, dQi_dP, &
                              relative_humidity, mass_fraction_clay, &
                              water_flux)
         implicit none
@@ -177,7 +183,8 @@ contains
         real(real64), intent(in), optional :: vapor_content, air_content
         real(real64), intent(in), optional :: porosity
         real(real64), intent(in), optional :: latent_heat_fusion, latent_heat_vaporization
-        real(real64), intent(in), optional :: dQw_dT, dQv_dT
+        real(real64), intent(in), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
+        real(real64), intent(in), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
         real(real64), intent(in), optional :: relative_humidity, mass_fraction_clay
         type(type_coordinate_dp), intent(in), optional :: water_flux
 
@@ -216,6 +223,24 @@ contains
         if (present(dQv_dT)) then
             call self%dQv_dT%set(dQv_dT)
         end if
+        if (present(dQa_dT)) then
+            call self%dQa_dT%set(dQa_dT)
+        end if
+        if (present(dQi_dT)) then
+            call self%dQi_dT%set(dQi_dT)
+        end if
+        if (present(dQw_dP)) then
+            call self%dQw_dP%set(dQw_dP)
+        end if
+        if (present(dQv_dP)) then
+            call self%dQv_dP%set(dQv_dP)
+        end if
+        if (present(dQa_dP)) then
+            call self%dQa_dP%set(dQa_dP)
+        end if
+        if (present(dQi_dP)) then
+            call self%dQi_dP%set(dQi_dP)
+        end if
 
         if (present(relative_humidity)) then
             call self%relative_humidity%set(relative_humidity)
@@ -245,6 +270,12 @@ contains
         call self%latent_heat_vaporization%reset()
         call self%dQw_dT%reset()
         call self%dQv_dT%reset()
+        call self%dQa_dT%reset()
+        call self%dQi_dT%reset()
+        call self%dQw_dP%reset()
+        call self%dQv_dP%reset()
+        call self%dQa_dP%reset()
+        call self%dQi_dP%reset()
         call self%relative_humidity%reset()
         call self%mass_fraction_clay%reset()
         call self%water_flux%reset()

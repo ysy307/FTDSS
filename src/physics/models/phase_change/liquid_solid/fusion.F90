@@ -1,6 +1,7 @@
 module physics_models_phase_change_liquid_solid_fusion
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
+    use :: module_core, only:type_state
     use :: physics_types, only:abst_physics
     use :: physics_models_wrf, only:abst_wrf, type_wrf_params
     use :: physics_models_phase_change_liquid_solid_gcc, only:abst_gcc
@@ -18,16 +19,20 @@ module physics_models_phase_change_liquid_solid_fusion
         class(abst_gcc), pointer :: gcc => null()
     contains
         procedure, pass(self), public :: initialize => initialize_type_fusion
-        ! procedure, pass(self), public :: calc_latent_heat_fusion
+        procedure, pass(self), public :: calc_ice_content
+        procedure, pass(self), public :: calc_ice_content_derivatives
+        procedure, pass(self), public :: calc_water_content
+        procedure, pass(self), public :: calc_water_content_derivatives
+
     end type type_fusion
 
 contains
+
     !>
     !> @brief Initialize fusion model.
     !>
     subroutine initialize_type_fusion(self, wrf, gcc, water, ice)
         implicit none
-        !> Fusion model object
         class(type_fusion), intent(inout) :: self
         class(abst_wrf), intent(in), target :: wrf
         class(abst_gcc), intent(in), target :: gcc
@@ -38,7 +43,216 @@ contains
         self%gcc => gcc
         self%water => water
         self%ice => ice
-
     end subroutine initialize_type_fusion
+
+    !---------------------------------------------------------------------------
+    ! Ice Calculations (Existing)
+    !---------------------------------------------------------------------------
+
+    !>
+    !> @brief Calculate ice content based on thermodynamic state.
+    !>
+    pure elemental subroutine calc_ice_content(self, state, ice_content)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: ice_content
+
+        real(real64) :: pressure
+        real(real64) :: psi_cryo, psi_cap, psi_eff
+        real(real64) :: theta_target_unfrozen, theta_liquid
+        real(real64) :: rho_water, rho_ice, density_ratio
+
+        ! 1. 圧力の取得
+        call state%pressure%get(pressure)
+
+        ! 2. サクションの計算
+        psi_cap = max(0.0d0, -pressure)
+        call self%gcc%calc(state, psi_cryo)
+        psi_eff = max(psi_cap, psi_cryo)
+
+        ! 3. 水分量の計算
+        call self%wrf%calc(psi_cap, theta_target_unfrozen)
+        call self%wrf%calc(psi_eff, theta_liquid)
+
+        ! 4. 氷含有量の決定
+        call self%calc_rho_water(state, rho_water)
+        call self%calc_rho_ice(state, rho_ice)
+
+        if (rho_ice > 1.0d-6) then
+            density_ratio = rho_water / rho_ice
+        else
+            density_ratio = 1.0d0
+        end if
+
+        ice_content = max(0.0d0, (theta_target_unfrozen - theta_liquid) * density_ratio)
+
+    end subroutine calc_ice_content
+
+    !>
+    !> @brief Calculate derivatives of ice content w.r.t pressure and temperature.
+    !>
+    pure elemental subroutine calc_ice_content_derivatives(self, state, dice_dP, dice_dT)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: dice_dP
+        real(real64), intent(inout) :: dice_dT
+
+        real(real64) :: pressure
+        real(real64) :: psi_cap, psi_cryo
+        real(real64) :: d_psi_cap_dP
+        real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
+        real(real64) :: d_psi_eff_dP, d_psi_eff_dT
+        real(real64) :: d_theta_target_dpsi, d_theta_liquid_dpsi
+        real(real64) :: rho_w, rho_i, density_ratio
+        real(real64) :: theta_target, theta_liquid
+
+        call state%pressure%get(pressure)
+        call self%calc_rho_water(state, rho_w)
+        call self%calc_rho_ice(state, rho_i)
+
+        if (rho_i > 1.0d-6) then
+            density_ratio = rho_w / rho_i
+        else
+            density_ratio = 1.0d0
+        end if
+
+        if (pressure < 0.0d0) then
+            psi_cap = -pressure
+            d_psi_cap_dP = -1.0d0
+        else
+            psi_cap = 0.0d0
+            d_psi_cap_dP = 0.0d0
+        end if
+
+        call self%gcc%calc(state, psi_cryo)
+        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
+
+        if (psi_cap >= psi_cryo) then
+            d_psi_eff_dP = d_psi_cap_dP
+            d_psi_eff_dT = 0.0d0
+        else
+            d_psi_eff_dP = d_psi_cryo_dP
+            d_psi_eff_dT = d_psi_cryo_dT
+        end if
+
+        call self%wrf%calc(psi_cap, theta_target)
+        call self%wrf%calc(max(psi_cap, psi_cryo), theta_liquid)
+        call self%wrf%deriv(psi_cap, d_theta_target_dpsi)
+        call self%wrf%deriv(max(psi_cap, psi_cryo), d_theta_liquid_dpsi)
+
+        if (theta_target > theta_liquid) then
+            dice_dP = density_ratio * (d_theta_target_dpsi * d_psi_cap_dP - d_theta_liquid_dpsi * d_psi_eff_dP)
+            dice_dT = density_ratio * (-d_theta_liquid_dpsi * d_psi_eff_dT)
+        else
+            dice_dP = 0.0d0
+            dice_dT = 0.0d0
+        end if
+
+    end subroutine calc_ice_content_derivatives
+
+    !---------------------------------------------------------------------------
+    ! Liquid Water Calculations (New)
+    !---------------------------------------------------------------------------
+
+    !>
+    !> @brief Calculate liquid water content based on thermodynamic state.
+    !>
+    pure elemental subroutine calc_water_content(self, state, water_content)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: water_content
+
+        real(real64) :: pressure
+        real(real64) :: psi_cap, psi_cryo, psi_eff
+
+        ! 1. 圧力の取得
+        call state%pressure%get(pressure)
+
+        ! 2. 毛管サクション
+        if (pressure < 0.0d0) then
+            psi_cap = -pressure
+        else
+            psi_cap = 0.0d0
+        end if
+
+        ! 3. 凍結サクション (GCC)
+        call self%gcc%calc(state, psi_cryo)
+
+        ! 4. 有効サクション (支配的な方)
+        psi_eff = max(psi_cap, psi_cryo)
+
+        ! 5. 液状水分量の計算 (WRF)
+        call self%wrf%calc(psi_eff, water_content)
+
+    end subroutine calc_water_content
+
+    !>
+    !> @brief Calculate derivatives of liquid water content w.r.t pressure and temperature.
+    !>
+    pure elemental subroutine calc_water_content_derivatives(self, state, dwater_dP, dwater_dT)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: dwater_dP !> d(theta_l)/dP
+        real(real64), intent(inout) :: dwater_dT !> d(theta_l)/dT
+
+        ! ローカル変数
+        real(real64) :: pressure
+        real(real64) :: psi_cap, psi_cryo
+        real(real64) :: d_psi_cap_dP
+        real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
+        real(real64) :: d_psi_eff_dP, d_psi_eff_dT
+        real(real64) :: d_theta_liquid_dpsi
+
+        ! 1. 状態量の取得
+        call state%pressure%get(pressure)
+
+        ! 2. サクションとその微分の計算
+
+        ! [毛管サクション]
+        if (pressure < 0.0d0) then
+            psi_cap = -pressure
+            d_psi_cap_dP = -1.0d0
+        else
+            psi_cap = 0.0d0
+            d_psi_cap_dP = 0.0d0
+        end if
+
+        ! [凍結サクション]
+        call self%gcc%calc(state, psi_cryo)
+
+        ! [有効サクションの選択と微分の決定]
+        if (psi_cap >= psi_cryo) then
+            ! 乾燥支配 (未凍結、あるいは乾燥が強い)
+            ! d(Psi_eff)/dP = d(Psi_cap)/dP
+            d_psi_eff_dP = d_psi_cap_dP
+            d_psi_eff_dT = 0.0d0
+        else
+            ! 凍結支配
+            ! GCC微分の取得
+            call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
+            call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+
+            ! d(Psi_eff)/dX = d(Psi_cryo)/dX
+            d_psi_eff_dP = d_psi_cryo_dP
+            d_psi_eff_dT = d_psi_cryo_dT
+        end if
+
+        ! 3. 水分容量 (dTheta/dPsi) の計算
+        ! 有効サクションにおけるWRFの勾配を取得
+        call self%wrf%deriv(max(psi_cap, psi_cryo), d_theta_liquid_dpsi)
+
+        ! 4. 液状水分量の微分の組み立て (Chain Rule)
+        ! d(Theta_l)/dP = (dTheta/dPsi) * (dPsi_eff/dP)
+        dwater_dP = d_theta_liquid_dpsi * d_psi_eff_dP
+
+        ! d(Theta_l)/dT = (dTheta/dPsi) * (dPsi_eff/dT)
+        dwater_dT = d_theta_liquid_dpsi * d_psi_eff_dT
+
+    end subroutine calc_water_content_derivatives
 
 end module physics_models_phase_change_liquid_solid_fusion

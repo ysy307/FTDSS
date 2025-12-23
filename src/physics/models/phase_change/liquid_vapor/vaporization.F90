@@ -26,9 +26,12 @@ module physics_models_phase_change_liquid_vapor_vaporization
         procedure, pass(self), public :: calc_relative_humidity => calc_relative_humidity_evaporation
         procedure, pass(self), public :: deriv_relative_humidity_temperature => deriv_relative_humidity_temperature_evaporation
         procedure, pass(self), public :: deriv_relative_humidity_pressure => deriv_relative_humidity_pressure_evaporation
+
+        !> Calculate vapor content (Liquid equivalent volume fraction)
         procedure, pass(self), public :: calc_vapor_content => calc_vapor_content_vaporization
-        procedure, pass(self), public :: deriv_vapor_content_temperature => deriv_vapor_content_temperature_vaporization
-        procedure, pass(self), public :: deriv_vapor_content_pressure => deriv_vapor_content_pressure_vaporization
+
+        !> Calculate derivatives of vapor content w.r.t P and T
+        procedure, pass(self), public :: calc_vapor_content_derivatives
     end type type_evaporation
 
 contains
@@ -57,61 +60,82 @@ contains
         end if
     end subroutine calc_latent_heat_vaporization
 
+    !> @brief Calculate Relative Humidity (Kelvin equation)
     pure elemental subroutine calc_relative_humidity_evaporation(self, state, relative_humidity)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: relative_humidity
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
+        real(real64) :: pressure
 
-        if (state%pressure >= 0.0d0) then
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+
+        if (pressure >= 0.0d0) then
             relative_humidity = 1.0d0
             return
         end if
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        relative_humidity = exp((state%pressure * Mw) / (rho_std * Rg * temperature_K))
+        call self%shift_temperature_absolute(temperature, temperature_K)
+        ! Kelvin equation: RH = exp( P * Mw / (rho * R * T) )
+        ! Using rho_std for liquid density in the exponent is a standard approximation
+        relative_humidity = exp((pressure * Mw) / (rho_std * Rg * temperature_K))
 
     end subroutine calc_relative_humidity_evaporation
 
+    !> @brief d(RH)/dT
     pure elemental subroutine deriv_relative_humidity_temperature_evaporation(self, state, deriv_rh_temp)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv_rh_temp
-        real(real64) :: rh, temperature_K
+        real(real64) :: rh, temperature, temperature_K
+        real(real64) :: pressure
 
-        if (state%pressure >= 0.0d0) then
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+
+        if (pressure >= 0.0d0) then
             deriv_rh_temp = 0.0d0
             return
         end if
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_relative_humidity(state, rh)
 
-        deriv_rh_temp = rh * (-state%pressure * Mw) / (rho_std * Rg * temperature_K**2)
+        ! d(exp(A/T))/dT = exp(A/T) * (-A/T^2)
+        deriv_rh_temp = rh * (-pressure * Mw) / (rho_std * Rg * temperature_K**2)
     end subroutine deriv_relative_humidity_temperature_evaporation
 
+    !> @brief d(RH)/dP
     pure elemental subroutine deriv_relative_humidity_pressure_evaporation(self, state, deriv_rh_pressure)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv_rh_pressure
-        real(real64) :: rh, temperature_K
+        real(real64) :: rh, temperature, temperature_K
+        real(real64) :: pressure
 
-        if (state%pressure >= 0.0d0) then
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+
+        if (pressure >= 0.0d0) then
             deriv_rh_pressure = 0.0d0
             return
         end if
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_relative_humidity(state, rh)
+
+        ! d(exp(C*P))/dP = C * exp(C*P)
         deriv_rh_pressure = rh * Mw / (rho_std * Rg * temperature_K)
 
     end subroutine deriv_relative_humidity_pressure_evaporation
 
-    !> @brief Calculate vapor content.
+    !> @brief Calculate vapor content (Liquid equivalent).
+    !> theta_v = theta_g * (rho_sat * RH / rho_w)
     pure elemental subroutine calc_vapor_content_vaporization(self, state, vapor_content)
         implicit none
         class(type_evaporation), intent(in) :: self
@@ -120,77 +144,85 @@ contains
 
         real(real64) :: relative_humidity
         real(real64) :: saturation_density, water_density
+        real(real64) :: pressure
+        real(real64) :: air_content
+
+        call state%pressure%get(pressure)
 
         call self%calc_relative_humidity(state, relative_humidity)
-        call self%calc_rho_water(state, water_density)
         call self%calc_rho_vapor_saturation(state, saturation_density)
 
-        vapor_content = saturation_density * relative_humidity * state%air_content / water_density
+        call self%calc_rho_water(state, water_density)
+        call state%air_content%get(air_content)
+
+        vapor_content = saturation_density * relative_humidity * air_content / water_density
     end subroutine calc_vapor_content_vaporization
 
-    !> @brief Derivative of vapor content with respect to temperature.
-    pure elemental subroutine deriv_vapor_content_temperature_vaporization(self, state, deriv_vapor_temp)
+    !>
+    !> @brief 蒸気量(液等価)の圧力・温度微分を計算する
+    !>
+    !> d(theta_v)/dX = d(theta_g)/dX * (Ratio) + theta_g * d(Ratio)/dX
+    !> where Ratio = rho_sat * RH / rho_w
+    !>
+    pure subroutine calc_vapor_content_derivatives(self, state, dvapor_dP, dvapor_dT)
         implicit none
         class(type_evaporation), intent(in) :: self
         type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: deriv_vapor_temp
+        !> Output: Gradient of vapor content
+        real(real64), intent(inout) :: dvapor_dP, dvapor_dT
 
-        real(real64) :: relative_humidity, deriv_rh_temp
-        real(real64) :: saturation_density, water_density
-        real(real64) :: temperature_K
-        real(real64) :: drho_sat_dT, drho_w_dT
-        real(real64) :: pressure_absolute
+        real(real64) :: temperature, pressure, air_content
+        real(real64) :: d_air_content_dP, d_air_content_dT
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        real(real64) :: temperature_K, pressure_abs
+        real(real64) :: rh, drh_dP, drh_dT
+        real(real64) :: rho_sat, drho_sat_dT
+        real(real64) :: rho_w, drho_w_dP, drho_w_dT
+        real(real64) :: ratio, dratio_dP, dratio_dT
 
-        call self%calc_relative_humidity(state, relative_humidity)
-        call self%deriv_relative_humidity_temperature(state, deriv_rh_temp)
+        ! 1. 状態量の準備
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+        call state%air_content%get(air_content)
+        call state%dQa_dP%get(d_air_content_dP)
+        call state%dQa_dT%get(d_air_content_dT)
+        call self%shift_temperature_absolute(temperature, temperature_K)
 
-        call self%water%calc_rho(temperature_K, pressure_absolute, water_density)
-        call self%water%calc_drho_dT(temperature_K, pressure_absolute, drho_w_dT)
+        ! 2. 各項の計算
 
-        call self%water%calc_saturation_density(temperature_K, saturation_density)
-        call self%water%calc_saturation_drho_dT(temperature_K, drho_sat_dT)
+        ! Relative Humidity & Derivatives
+        call self%calc_relative_humidity(state, rh)
+        call self%deriv_relative_humidity_pressure(state, drh_dP)
+        call self%deriv_relative_humidity_temperature(state, drh_dT)
 
-        deriv_vapor_temp = state%air_content * ( &
-                           deriv_rh_temp * saturation_density / water_density + &
-                           relative_humidity * drho_sat_dT / water_density - &
-                           relative_humidity * saturation_density * drho_w_dT / (water_density**2))
-    end subroutine deriv_vapor_content_temperature_vaporization
+        ! Saturation Density (only T dependent)
+        call self%calc_rho_vapor_saturation(state, rho_sat)
+        call self%calc_drho_vapor_saturation_dT(state, drho_sat_dT)
 
-    !> @brief Derivative of vapor content with respect to pressure.
-    pure elemental subroutine deriv_vapor_content_pressure_vaporization(self, state, deriv_vapor_pressure)
-        implicit none
-        class(type_evaporation), intent(in) :: self
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: deriv_vapor_pressure
+        ! Water Density (liquid)
+        call self%calc_rho_water(state, rho_w)
+        call self%calc_drho_water_dT(state, drho_w_dT)
+        call self%calc_drho_water_dP(state, drho_w_dP)
 
-        real(real64) :: relative_humidity, deriv_rh_pressure
-        real(real64) :: saturation_density, water_density
-        real(real64) :: temperature_K
-        real(real64) :: drho_w_dP
-        real(real64) :: pressure_absolute
+        ! 3. 蒸気密度比 (Ratio = rho_sat * RH / rho_w) の計算と微分
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
-        call self%shift_pressure_absolute(state%pressure, pressure_absolute)
+        ratio = (rho_sat * rh) / rho_w
 
-        call self%calc_relative_humidity(state, relative_humidity)
-        call self%deriv_relative_humidity_pressure(state, deriv_rh_pressure)
+        ! d(Ratio)/dP = (rho_sat/rho_w)*dRH/dP - (rho_sat*RH/rho_w^2)*drho_w/dP
+        dratio_dP = (rho_sat / rho_w) * drh_dP - &
+                    (rho_sat * rh / (rho_w**2)) * drho_w_dP
 
-        if (state%pressure < 0.0d0) then
-            call self%water%calc_rho(temperature_K, pressure_absolute, water_density)
-            drho_w_dP = 0.0d0
-        else
-            call self%water%calc_rho(temperature_K, pressure_absolute, water_density)
-            call self%water%calc_drho_dP(temperature_K, pressure_absolute, drho_w_dP)
-        end if
+        ! d(Ratio)/dT = (1/rho_w)*(drho_sat/dT*RH + rho_sat*dRH/dT) - (Ratio/rho_w)*drho_w/dT
+        dratio_dT = (1.0d0 / rho_w) * (drho_sat_dT * rh + rho_sat * drh_dT) - &
+                    (ratio / rho_w) * drho_w_dT
 
-        call self%water%calc_saturation_density(temperature_K, saturation_density)
+        ! 4. 全微分の組み立て (積の微分)
+        ! Vapor = Air * Ratio
+        ! dVapor/dX = dAir/dX * Ratio + Air * dRatio/dX
 
-        deriv_vapor_pressure = state%air_content * ( &
-                               deriv_rh_pressure * saturation_density / water_density - &
-                               relative_humidity * saturation_density * drho_w_dP / (water_density**2))
-    end subroutine deriv_vapor_content_pressure_vaporization
+        dvapor_dP = d_air_content_dP * ratio + air_content * dratio_dP
+        dvapor_dT = d_air_content_dT * ratio + air_content * dratio_dT
+
+    end subroutine calc_vapor_content_derivatives
 
 end module physics_models_phase_change_liquid_vapor_vaporization

@@ -15,15 +15,10 @@ contains
     !>
     module subroutine initialize_holder_gccs(self, material_id, gcc_id, water, ice)
         implicit none
-        !> The holder object
         class(holder_gccs), intent(inout) :: self
-        !> Material identifier
         integer(int32), intent(in) :: material_id
-        !> GCC model identifier (Non-segregation or Segregation)
         integer(int32), intent(in) :: gcc_id
-        !> Water property object
         type(type_iapws97), target, intent(in) :: water
-        !> Ice property object
         type(type_iapws06), target, intent(in) :: ice
 
         select case (gcc_id)
@@ -38,18 +33,54 @@ contains
         end if
     end subroutine initialize_holder_gccs
 
+    ! --------------------------------------------------------------------------
+    ! Holder Wrapper Methods
+    ! --------------------------------------------------------------------------
+
+    module pure elemental subroutine calc_holder(self, state, suction)
+        implicit none
+        class(holder_gccs), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: suction
+        if (allocated(self%p)) then
+            call self%p%calc(state, suction)
+        else
+            suction = 0.0d0
+        end if
+    end subroutine calc_holder
+
+    module pure elemental subroutine deriv_temperature_holder(self, state, deriv)
+        implicit none
+        class(holder_gccs), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+        if (allocated(self%p)) then
+            call self%p%deriv_temperature(state, deriv)
+        else
+            deriv = 0.0d0
+        end if
+    end subroutine deriv_temperature_holder
+
+    module pure elemental subroutine deriv_pressure_holder(self, state, deriv)
+        implicit none
+        class(holder_gccs), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+        if (allocated(self%p)) then
+            call self%p%deriv_pressure(state, deriv)
+        else
+            deriv = 0.0d0
+        end if
+    end subroutine deriv_pressure_holder
+
     !>
     !> @brief Initialize the abstract GCC base.
     !>
     module subroutine initialize_abst_gcc(self, material_id, water, ice)
         implicit none
-        !> Abstract GCC object
         class(abst_gcc), intent(inout) :: self
-        !> Material identifier
         integer(int32), intent(in) :: material_id
-        !> Water property object
         type(type_iapws97), target, intent(in) :: water
-        !> Ice property object
         type(type_iapws06), target, intent(in) :: ice
 
         self%material_id = material_id
@@ -57,166 +88,166 @@ contains
         self%ice => ice
     end subroutine initialize_abst_gcc
 
-    !>
-    !> @brief Calculate suction for GCC without segregation [Pa].
-    !>
-    !> Uses the Clapeyron equation tailored for non-segregated ice-water systems.
-    !> Suction is 0 when temperature is above freezing point.
-    !>
+    ! ==========================================================================
+    ! Non-Segregation Implementation
+    ! ==========================================================================
+
     module pure elemental subroutine calc_gcc_nonseg(self, state, suction)
         implicit none
-        !> GCC object
         class(type_gcc_non_segregation), intent(in) :: self
-        !> Thermodynamic state
         type(type_state), intent(in) :: state
-        !> Calculated suction [Pa]
         real(real64), intent(inout) :: suction
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
         real(real64) :: rho_water
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
-        if (state%temperature <= Tf0) then
-            ! Apply generalized Clausius-Clapeyron equation for non-segregation
-            ! Result in Pa (J/m^3)
+        if (temperature <= Tf0) then
             suction = -lf * rho_water * log(temperature_K / Tf0_K)
         else
             suction = 0.0d0
         end if
     end subroutine calc_gcc_nonseg
 
-    !>
-    !> @brief Calculate first derivative of suction with respect to temperature [Pa/K].
-    !>
-    module pure elemental subroutine deriv_gcc_nonseg(self, state, suction_derivative)
+    module pure elemental subroutine deriv_temp_gcc_nonseg(self, state, suction_derivative)
         implicit none
-        !> GCC object
         class(type_gcc_non_segregation), intent(in) :: self
-        !> Thermodynamic state
         type(type_state), intent(in) :: state
-        !> Derivative of suction w.r.t temperature [Pa/K]
         real(real64), intent(inout) :: suction_derivative
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
         real(real64) :: rho_water
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
-        if (state%temperature <= Tf0) then
-            ! Derivative of suction w.r.t temperature [Pa/K]
+        if (temperature <= Tf0) then
             suction_derivative = -lf * rho_water / temperature_K
         else
             suction_derivative = 0.0d0
         end if
-    end subroutine deriv_gcc_nonseg
+    end subroutine deriv_temp_gcc_nonseg
 
-    !>
-    !> @brief Calculate second derivative of suction with respect to temperature [Pa/K^2].
-    !>
-    module pure elemental subroutine deriv_2nd_gcc_nonseg(self, state, suction_derivative)
+    module pure elemental subroutine deriv_pres_gcc_nonseg(self, state, suction_derivative)
         implicit none
-        !> GCC object
         class(type_gcc_non_segregation), intent(in) :: self
-        !> Thermodynamic state
         type(type_state), intent(in) :: state
-        !> Second derivative of suction w.r.t temperature [Pa/K^2]
+        real(real64), intent(inout) :: suction_derivative
+        ! Non-segregation model: d(Suction)/dP = 0
+        suction_derivative = 0.0d0
+    end subroutine deriv_pres_gcc_nonseg
+
+    module pure elemental subroutine deriv2_temp_gcc_nonseg(self, state, suction_derivative)
+        implicit none
+        class(type_gcc_non_segregation), intent(in) :: self
+        type(type_state), intent(in) :: state
         real(real64), intent(inout) :: suction_derivative
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
         real(real64) :: rho_water
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
-        if (state%temperature <= Tf0) then
-            ! Second derivative of suction w.r.t temperature [Pa/K^2]
+        if (temperature <= Tf0) then
             suction_derivative = lf * rho_water / (temperature_K * temperature_K)
         else
             suction_derivative = 0.0d0
         end if
-    end subroutine deriv_2nd_gcc_nonseg
+    end subroutine deriv2_temp_gcc_nonseg
 
-    !>
-    !> @brief Calculate suction for GCC with segregation [Pa].
-    !>
-    !> Considers the density difference between ice and water, and the pressure effect.
-    !>
+    ! ==========================================================================
+    ! Segregation Implementation
+    ! ==========================================================================
+
     module pure elemental subroutine calc_gcc_seg(self, state, suction)
         implicit none
-        !> GCC object
         class(type_gcc_segregation), intent(in) :: self
-        !> Thermodynamic state
         type(type_state), intent(in) :: state
-        !> Calculated suction [Pa]
         real(real64), intent(inout) :: suction
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
+        real(real64) :: pressure
         real(real64) :: rho_water, rho_ice
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
         call self%calc_rho_ice(state, rho_ice)
 
-        if (state%temperature <= Tf0) then
-            ! Generalized Clausius-Clapeyron equation for segregation
-            ! Result in Pa
-            suction = (rho_ice / rho_water - 1.0d0) * state%pressure - lf * rho_ice * log(temperature_K / Tf0_K)
+        if (temperature <= Tf0) then
+            suction = (rho_ice / rho_water - 1.0d0) * pressure - lf * rho_ice * log(temperature_K / Tf0_K)
         else
             suction = 0.0d0
         end if
     end subroutine calc_gcc_seg
 
-    !>
-    !> @brief Calculate first derivative of suction for GCC with segregation [Pa/K].
-    !>
-    module pure elemental subroutine deriv_gcc_seg(self, state, suction_derivative)
+    module pure elemental subroutine deriv_temp_gcc_seg(self, state, suction_derivative)
         implicit none
-        !> GCC object
         class(type_gcc_segregation), intent(in) :: self
-        !> Thermodynamic state
         type(type_state), intent(in) :: state
-        !> Derivative of suction w.r.t temperature [Pa/K]
         real(real64), intent(inout) :: suction_derivative
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature, temperature_K
         real(real64) :: rho_ice
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_ice(state, rho_ice)
 
-        if (state%temperature <= Tf0) then
+        if (temperature <= Tf0) then
             suction_derivative = (-lf * rho_ice / temperature_K)
         else
             suction_derivative = 0.0d0
         end if
-    end subroutine deriv_gcc_seg
+    end subroutine deriv_temp_gcc_seg
 
-    !>
-    !> @brief Calculate second derivative of suction for GCC with segregation [Pa/K^2].
-    !>
-    module pure elemental subroutine deriv_2nd_gcc_seg(self, state, suction_derivative)
+    module pure elemental subroutine deriv_pres_gcc_seg(self, state, suction_derivative)
         implicit none
-        !> GCC object
         class(type_gcc_segregation), intent(in) :: self
-        !> Thermodynamic state
         type(type_state), intent(in) :: state
-        !> Second derivative of suction w.r.t temperature [Pa/K^2]
         real(real64), intent(inout) :: suction_derivative
 
-        real(real64) :: temperature_K
+        real(real64) :: temperature
+        real(real64) :: rho_water, rho_ice
+
+        call state%temperature%get(temperature)
+
+        ! 凍結状態でのみ圧力微分が値を持ちます（非凍結時はサクション0固定のため微分0）
+        if (temperature <= Tf0) then
+            call self%calc_rho_water(state, rho_water)
+            call self%calc_rho_ice(state, rho_ice)
+            ! d(Suction)/dP = (rho_ice / rho_water - 1.0)
+            suction_derivative = (rho_ice / rho_water - 1.0d0)
+        else
+            suction_derivative = 0.0d0
+        end if
+    end subroutine deriv_pres_gcc_seg
+
+    module pure elemental subroutine deriv2_temp_gcc_seg(self, state, suction_derivative)
+        implicit none
+        class(type_gcc_segregation), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: suction_derivative
+
+        real(real64) :: temperature, temperature_K
         real(real64) :: rho_ice
 
-        call self%shift_temperature_absolute(state%temperature, temperature_K)
+        call state%temperature%get(temperature)
+        call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_ice(state, rho_ice)
 
-        if (state%temperature <= Tf0) then
+        if (temperature <= Tf0) then
             suction_derivative = (lf * rho_ice / (temperature_K * temperature_K))
         else
             suction_derivative = 0.0d0
         end if
-    end subroutine deriv_2nd_gcc_seg
+    end subroutine deriv2_temp_gcc_seg
 
 end submodule gcc_base
